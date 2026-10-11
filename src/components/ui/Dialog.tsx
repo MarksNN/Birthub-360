@@ -16,6 +16,15 @@ export interface DialogProps extends React.ComponentPropsWithoutRef<typeof Dialo
   children?: React.ReactNode;
 }
 
+/* Superfície por token (A03-P0-01): reage ao tema claro/escuro em vez de hex escuro fixo.
+   Mobile (A03-P1-04): margem lateral de 1rem, altura limitada à viewport dinâmica e rolagem
+   interna, para o modal nunca estourar a tela em 390px. */
+const DIALOG_SURFACE =
+  'fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border border-line bg-surface-elevated p-6 text-ink duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95';
+
+const DIALOG_CLOSE_CLASS =
+  'absolute right-4 top-4 rounded-sm text-ink-2 opacity-80 transition-opacity hover:opacity-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none';
+
 const DialogPortal = DialogPrimitive.Portal;
 
 const DialogClose = DialogPrimitive.Close;
@@ -27,7 +36,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'fixed inset-0 z-50 bg-overlay backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className,
     )}
     {...props}
@@ -45,18 +54,15 @@ const DialogContent = React.forwardRef<
       ref={ref}
       aria-modal="true"
       className={cn(
-        'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-[#1C1D24] p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-2xl text-slate-200',
+        DIALOG_SURFACE,
+        'max-w-lg shadow-card data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
         className,
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close
-        aria-label="Fechar modal"
-        className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-[#13151A] transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#8B7DFF] focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-white/5 data-[state=open]:text-slate-400 text-slate-400"
-      >
-        <X className="h-4 w-4" />
-        <span className="sr-only">Fechar modal</span>
+      <DialogPrimitive.Close aria-label="Fechar modal" className={DIALOG_CLOSE_CLASS}>
+        <X className="h-4 w-4" aria-hidden="true" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
@@ -83,7 +89,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      'text-lg font-display font-semibold leading-none tracking-tight text-white',
+      'text-lg font-display font-semibold leading-tight tracking-tight text-ink',
       className,
     )}
     {...props}
@@ -97,7 +103,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-slate-400', className)}
+    className={cn('text-sm text-ink-2', className)}
     {...props}
   />
 ));
@@ -111,6 +117,8 @@ function Dialog({
   onClose,
   onOpenChange,
   title,
+  subtitle,
+  variant: _variant,
   maxWidth,
   preventClose,
   footer,
@@ -118,7 +126,11 @@ function Dialog({
   ...props
 }: DialogProps) {
   const isConvenienceMode =
-    isOpen !== undefined || onClose !== undefined || title !== undefined || footer !== undefined;
+    isOpen !== undefined ||
+    onClose !== undefined ||
+    title !== undefined ||
+    subtitle !== undefined ||
+    footer !== undefined;
   if (!isConvenienceMode) {
     return (
       <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} {...props}>
@@ -129,6 +141,9 @@ function Dialog({
 
   const effectiveOpen = open ?? isOpen ?? false;
   const handleOpenChange = (newOpen: boolean) => {
+    // A03-P1-05: preventClose bloqueia qualquer fechamento iniciado pelo usuário (Esc/overlay),
+    // não só esconde o X.
+    if (!newOpen && preventClose) return;
     if (onOpenChange) onOpenChange(newOpen);
     if (!newOpen && onClose) onClose();
   };
@@ -139,25 +154,29 @@ function Dialog({
         <DialogOverlay />
         <DialogPrimitive.Content
           aria-modal="true"
-          className={cn(
-            'fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-white/10 bg-[#1C1D24] p-6 shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:rounded-2xl text-slate-200',
-            maxWidth || 'max-w-lg',
-          )}
+          // Sem subtitle, desliga o aria-describedby automático do Radix (evita referência vazia).
+          {...(subtitle ? {} : { 'aria-describedby': undefined })}
+          onEscapeKeyDown={preventClose ? (event) => event.preventDefault() : undefined}
+          onPointerDownOutside={preventClose ? (event) => event.preventDefault() : undefined}
+          onInteractOutside={preventClose ? (event) => event.preventDefault() : undefined}
+          className={cn(DIALOG_SURFACE, 'shadow-xl', maxWidth || 'max-w-lg')}
         >
-          {title && (
-            <DialogHeader>
-              <DialogTitle>{title}</DialogTitle>
+          {title || subtitle ? (
+            <DialogHeader className={cn(!preventClose && 'pr-8')}>
+              {/* Radix exige nome acessível: sem title visível, o título fica só para leitores de tela. */}
+              <DialogTitle className={title ? undefined : 'sr-only'}>
+                {title || 'Diálogo'}
+              </DialogTitle>
+              {subtitle && <DialogDescription>{subtitle}</DialogDescription>}
             </DialogHeader>
+          ) : (
+            <DialogTitle className="sr-only">Diálogo</DialogTitle>
           )}
           {children}
           {footer && <DialogFooter>{footer}</DialogFooter>}
           {!preventClose && (
-            <DialogPrimitive.Close
-              aria-label="Fechar modal"
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-bg transition-opacity hover:opacity-100"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Fechar modal</span>
+            <DialogPrimitive.Close aria-label="Fechar modal" className={DIALOG_CLOSE_CLASS}>
+              <X className="h-4 w-4" aria-hidden="true" />
             </DialogPrimitive.Close>
           )}
         </DialogPrimitive.Content>
