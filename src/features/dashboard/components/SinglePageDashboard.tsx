@@ -79,7 +79,7 @@ export function SinglePageDashboard() {
             <button
               type="button"
               onClick={() => refetch()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-brand/90 text-slate-950 text-sm font-bold transition-all shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-brand/90 text-on-brand text-sm font-bold transition-all shadow-md cursor-pointer"
             >
               <RotateCw className="w-4 h-4" />
               Tentar novamente
@@ -158,7 +158,7 @@ export function SinglePageDashboard() {
               onClick={() => navigate('/app/crm')}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-brand hover:bg-brand/90 text-slate-950 text-sm font-bold transition-all shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-brand hover:bg-brand/90 text-on-brand text-sm font-bold transition-all shadow-md cursor-pointer"
             >
               <Activity className="w-4 h-4" />
               <span>Abrir Cockpit CRM</span>
@@ -332,7 +332,7 @@ export function SinglePageDashboard() {
                 <button
                   type="button"
                   onClick={() => navigate('/app/prospect')}
-                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand text-slate-950 text-xs font-bold shadow-sm cursor-pointer"
+                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand text-on-brand text-xs font-bold shadow-sm cursor-pointer"
                 >
                   <Search className="w-3.5 h-3.5" />
                   Prospectar Novos Leads

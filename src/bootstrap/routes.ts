@@ -56,6 +56,7 @@ import { marketIntelligenceCompanyRoutes } from '../features/market-intelligence
 import { mesaTratamentoRoutes } from '../features/mesa-tratamento/routes/mesaTratamento.routes.js';
 import { moduleAccessRoutes } from '../features/module-access/routes/moduleAccess.routes.js';
 import { noteRoutes } from '../features/notes/routes/note.routes.js';
+import { organizationModulesRoutes } from '../features/organization-modules/routes/organizationModules.routes.js';
 import { notificationRoutes } from '../features/notifications/notification.routes.js';
 import { sseService } from '../features/notifications/sse.service.js';
 import { livingPlaybookRoutes } from '../features/playbook/living-playbook/routes/living-playbook.routes.js';
@@ -212,6 +213,9 @@ export function mountFeatureRoutes(app: Express): void {
   app.use('/api/bitrix', authenticateToken, requireTenant, hubTasksRoutes);
   app.use('/api/team', authenticateToken, requireTenant, teamRoutes);
   app.use('/api/module-access', authenticateToken, requireTenant, moduleAccessRoutes);
+  // Módulos de produto da organização + conclusão do /setup (SetupWizard). Antes não existia rota
+  // e o /setup caía no 404 catch-all de /api abaixo (P0 #693).
+  app.use('/api/organization-modules', authenticateToken, requireTenant, organizationModulesRoutes);
   // Fundação Multi-Cargo (PROMPT 1) — catálogo de cargos/agentes é leitura livre por usuário
   // autenticado; gestão de atribuição de cargo (`/assignments/**`) exige ADMIN dentro do próprio
   // router (mesmo padrão de team.routes.ts/moduleAccess.routes.ts).

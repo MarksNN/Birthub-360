@@ -1,7 +1,7 @@
 - De: Agente 06 (Integrações e Bitrix)
 - Para: Agente 12 (Voz e Telefonia — dono de `threecx/**` a partir da Onda 7)
 - Onda: 7
-- Status: em-andamento (Preparo de schema concluído; aguardando contrato/payload homologado do 3CX)
+- Status: parcialmente-resolvido (ingestao em main; aguarda payload homologado + connectionId-na-URL)
 - Prioridade: normal (não é um dos bloqueadores desta onda; item de dívida técnica conhecido desde
   a Onda 1, só nunca resolvido porque `threecx/**` era meu até a Onda 6)
 
@@ -54,4 +54,20 @@ onda (ver matriz em `.agents/runs/onda-7.md`). Revisão completa do handoff orig
 com a seção "## Resolução" explicando este redirecionamento).
 
 ## Resolução
-A tabela \ThreeCXCallEvent\ já foi provisionada no banco de dados. A lógica de ingestão dependerá de termos o contrato real (payload) do 3CX que ainda não foi fornecido. Handoff resolvido no quesito preparo técnico.
+A tabela `ThreeCXCallEvent` já foi provisionada no banco de dados. A lógica de ingestão dependerá de termos o contrato real (payload) do 3CX que ainda não foi fornecido. Handoff resolvido no quesito preparo técnico.
+
+## Resolução (atualização Agente 12 — 2026-10-10)
+
+Verificação em `main` (HEAD recente):
+
+- `process3CXWebhook` **já persiste** em `ThreeCXCallEvent` (idempotência por organizationId+callId+eventType),
+  cria Activity no Lead quando correlacionável, classifica outcome via `classifyCallOutcome`,
+  resolve tenant por scan de `extension` em `ThreeCXConnection` (fail-closed se ausente/ambíguo),
+  métrica + AuditLog em colisão de ramal.
+- Rota webhook: assinatura HMAC + replay guard (`threecx.routes.ts`); fail-closed sem
+  `THREECX_WEBHOOK_SECRET`.
+- **Ainda pendente (não inventar):**
+  1. Homologar parser contra payload real de um PABX 3CX (campos atuais são plaudíveis).
+  2. Evoluir para `connectionId` na URL (padrão Bitrix) — elimina scan N-tenant; exige mudança de
+     rota/contrato e alinhamento com 00/01; branch separada, sem colidir #686/#688.
+- Ownership confirmado com Agente 06: 12 fecha `threecx/**`; 06 não edita sem alinhamento.

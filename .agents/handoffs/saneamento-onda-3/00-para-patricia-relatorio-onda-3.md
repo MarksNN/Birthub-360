@@ -2,7 +2,7 @@
 - Para: Patricia (revisão de PR/merge/push)
 - Onda: saneamento-onda-3 (fonte: docs/audits/repository-debt-audit/, arquivo de coordenação
   `BirthHub360-Ondas-Saneamento/Onda-3-Integridade-Dados.txt`)
-- Status: em-andamento (Reauditoria técnica e documentação concluídas; aguardando revisão do PR/merge)
+- Status: resolvido — Agente 24 APROVOU documental (2026-10-10); itens da onda cobertos por #471 / #578 / #589
 - Branch/worktree: `fix/onda-3-data-integrity`, `.claude/worktrees/onda-3-integridade-dados`,
   baseado em `origin/main` (HEAD `89fced61`, já inclui DATA-006/#463)
 
@@ -42,7 +42,7 @@ próximo passo concreto: "attempt `migrate deploy` against a throwaway fresh dat
 **Conclusão**: o drift documentado no Piloto 002 (histórico de ~80 migrations, que exigiu
 `db push --force-reset` para contornar) **não se reproduz hoje** com as 111 migrations atuais
 aplicadas do zero. Isso responde diretamente ao "business impact" que a DATA-002 original
-levantava (\"um ambiente novo... não pode ser confiavelmente subido com `migrate deploy`\") —
+levantava ("um ambiente novo... não pode ser confiavelmente subido com `migrate deploy`") —
 hoje pode. **Não fecho isso como "nunca mais vai acontecer"**: a causa raiz original (uma migration
 squash/baseline malfeito em algum ponto da história de ~80 migrations) não foi investigada
 retroativamente, e nenhuma migration nova adicionou uma trava de CI que pegue esse tipo de drift
@@ -114,8 +114,24 @@ estavam sem comentário stale, não precisaram de mudança.
 
 - Não converti `organizationId` para `NOT NULL` em Company/Contact/Lead/Activity — decisão tomada
   e documentada, execução pendente de aprovação explícita + verificação de dado real em produção
-  (ver seção 2 acima).
-- Não adicionei um gate de CI para `prisma migrate diff` (mencionado como quick win pela própria
-  auditoria) — está fora do escopo desta onda (schema, não workflow), registrado aqui para o
-  Coordenador (Agente 00) considerar como item novo se quiser.
-- Nenhum merge, push ou PR aberto — aguardando esta revisão e confirmação do usuário.
+  (ver seção 2 acima). **Follow-up depois entregue em #578** (reaplicação NOT NULL + cascade).
+- Não adicionei um gate de CI **bloqueante** para `prisma migrate diff` — fora do escopo desta onda
+  (schema, não workflow). O passo existe em `.github/workflows/ci.yml` com `continue-on-error: true`
+  (`npm run verify:migration-drift`). Handoff de follow-up: `01-para-08-ci-migrate-diff-gate.md`.
+- Nenhum merge, push ou PR aberto nesta execução original — revisão/PRs vieram depois (#471 etc.).
+
+## Resolução (Agente 01 — 2026-10-10)
+
+Coordenador 00 informou: **Agente 24 APROVOU documental** a onda de saneamento 3. Este handoff
+estava stale em `em-andamento` e passa a **resolvido**.
+
+Cobertura por PR/issue (citação exigida pelo 00):
+
+| Item original | Entrega | PR |
+|---|---|---|
+| DATA-002 / DATA-003 / DOCBRAND-013 (docs no schema) | docs(data): reconfirma drift + documenta organizationId nullable | [#471](https://github.com/MaarkssN/Birthub-360/pull/471) (merged) |
+| DATA-003 follow-up NOT NULL + cascade | fix(data-007): organizationId/tenantId NOT NULL + efeitos colaterais | [#578](https://github.com/MaarkssN/Birthub-360/pull/578) (merged) |
+| DOCBRAND / brand legado AtlasGR·TotalTrac | chore(brand): migra referências legadas + backfill | [#589](https://github.com/MaarkssN/Birthub-360/pull/589) (merged) |
+
+Pendência remanescente **fora** do escopo documental desta onda (não bloqueia o fechamento):
+gate CI migrate-diff ainda não-bloqueante — ver handoff `01-para-08-ci-migrate-diff-gate.md`.
