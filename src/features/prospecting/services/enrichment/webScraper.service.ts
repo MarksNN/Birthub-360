@@ -2,13 +2,12 @@
  * Web Scraper & Signals Service (Crawlee + Cheerio + Playwright fallback)
  *
  * Executa rastreamento controlado de websites corporativos:
- * 1. Crawler leve HTTP com Cheerio para extrair metadados, links e contatos corporativos.
+ * 1. Crawler leve HTTP para extrair metadados, links e contatos corporativos.
  * 2. Playwright sob demanda quando a página exigir renderização JS/SPA avançada.
  * 3. Proteção estrita contra SSRF, rate limiting e sanitização anti-prompt injection.
  */
 
 import { logger } from '../../../../lib/logger.js';
-import * as cheerio from 'cheerio';
 
 export interface ScrapedWebSignals {
   url: string;
@@ -73,16 +72,21 @@ export class WebScraperService {
    * Sanitiza conteúdo HTML para prevenir Prompt Injection e ruídos em LLMs.
    */
   public sanitizeAndTruncateHtml(rawHtml: string, maxLength = 4000): string {
-    const $ = cheerio.load(rawHtml);
-    // Remove tags de script, style, nav, svg, iframe
-    $('script, style, noscript, svg, iframe, nav, footer').remove();
-    let text = $('body').text() || $.text();
-    // Normaliza espaços e remove caracteres de controle
-    text = text
+    let sanitized = rawHtml
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, ' ')
+      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, ' ')
+      .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, ' ')
+      .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ' ');
+
+    sanitized = sanitized.replace(/<[^>]+>/g, ' ');
+
+    sanitized = sanitized
       .replace(/[\r\n\t]+/g, ' ')
       .replace(/\s{2,}/g, ' ')
       .trim();
-    return text.slice(0, maxLength);
+    return sanitized.slice(0, maxLength);
   }
 
   /**
@@ -119,7 +123,7 @@ export class WebScraperService {
       throw new Error(`URL rejeitada por política de segurança SSRF: ${targetUrl}`);
     }
 
-    // Tentativa 1: HTTP Leve com Cheerio
+    // Tentativa 1: HTTP Leve
     if (!options.forcePlaywright) {
       try {
         const controller = new AbortController();
@@ -135,27 +139,29 @@ export class WebScraperService {
 
         if (response.ok) {
           const html = await response.text();
-          const $ = cheerio.load(html);
+          let title = '';
+          const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+          if (titleMatch) title = titleMatch[1].trim();
 
-          const title =
-            $('title').text().trim() || $('meta[property="og:title"]').attr('content') || '';
-          const description =
-            $('meta[name="description"]').attr('content') ||
-            $('meta[property="og:description"]').attr('content') ||
-            '';
+          let description = '';
+          const descMatch =
+            html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
+          if (descMatch) description = descMatch[1].trim();
 
           const openGraph: Record<string, string> = {};
-          $('meta[property^="og:"]').each((_, el) => {
-            const prop = $(el).attr('property');
-            const content = $(el).attr('content');
-            if (prop && content) openGraph[prop] = content;
-          });
+          const ogMatches = html.matchAll(
+            /<meta[^>]*property=["'](og:[^"']+)["'][^>]*content=["']([^"']+)["']/gi,
+          );
+          for (const match of ogMatches) {
+            if (match[1] && match[2]) openGraph[match[1]] = match[2];
+          }
 
           const links: string[] = [];
-          $('a[href]').each((_, el) => {
-            const href = $(el).attr('href');
-            if (href) links.push(href);
-          });
+          const linkMatches = html.matchAll(/<a[^>]*href=["']([^"']+)["']/gi);
+          for (const match of linkMatches) {
+            if (match[1]) links.push(match[1]);
+          }
 
           const socialLinks = {
             linkedin: links.find(
@@ -166,9 +172,8 @@ export class WebScraperService {
             twitter: links.find((l) => l.includes('twitter.com/') || l.includes('x.com/')),
           };
 
-          const rawText = $.text();
-          const contacts = this.extractContacts(rawText);
           const sanitizedTextSnippet = this.sanitizeAndTruncateHtml(html);
+          const contacts = this.extractContacts(sanitizedTextSnippet);
 
           return {
             url: targetUrl,
@@ -201,8 +206,8 @@ export class WebScraperService {
         const content = await page.content();
         await browser.close();
 
-        const $ = cheerio.load(content);
-        const contacts = this.extractContacts($.text());
+        const sanitizedTextSnippet = this.sanitizeAndTruncateHtml(content);
+        const contacts = this.extractContacts(sanitizedTextSnippet);
         return {
           url: targetUrl,
           title,
@@ -210,7 +215,7 @@ export class WebScraperService {
           phones: contacts.phones,
           socialLinks: {},
           openGraph: {},
-          sanitizedTextSnippet: this.sanitizeAndTruncateHtml(content),
+          sanitizedTextSnippet,
           source: 'playwright_browser',
         };
       }
