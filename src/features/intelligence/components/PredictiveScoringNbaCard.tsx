@@ -83,8 +83,8 @@ export function PredictiveScoringNbaCard({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadInsights = useCallback(async () => {
-    if (!leadId) return;
+  const loadInsights = useCallback(async (): Promise<boolean> => {
+    if (!leadId) return false;
     setLoading(true);
     setError(null);
     try {
@@ -107,9 +107,11 @@ export function PredictiveScoringNbaCard({
 
       setScoreData(scoreRes.data);
       setNbaData(nbaRes.data);
+      return true;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Falha ao carregar inteligência preditiva';
       setError(msg);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -121,8 +123,12 @@ export function PredictiveScoringNbaCard({
 
   const handleRefresh = async () => {
     SoundFX.play('click');
-    await loadInsights();
-    toast.success('Pontuação e Next Best Action recalculados com sucesso!');
+    const ok = await loadInsights();
+    if (ok) {
+      toast.success('Pontuação e Next Best Action recalculados com sucesso!');
+    } else {
+      toast.error('Não foi possível recalcular a pontuação preditiva.');
+    }
   };
 
   const ChannelIcon = nbaData ? (CHANNEL_ICONS[nbaData.recommendedChannel] ?? Zap) : Zap;

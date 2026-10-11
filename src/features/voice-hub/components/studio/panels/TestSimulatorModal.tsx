@@ -1,8 +1,20 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Mic, MicOff, PhoneOff, User, Bot, Loader2, AlertTriangle } from 'lucide-react';
-import { logger } from '../../../../../lib/logger.js';
+import { clientLogger as logger } from '../../../../../lib/clientLogger.js';
 import { useStudioStore } from '../../../store/useStudioStore.js';
 import { validationEngine } from '../../../../../lib/studio/ValidationEngine.js';
+
+interface Recognition {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onstart: (() => void) | null;
+  onresult: ((event: { results: { transcript: string }[][] }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
 
 interface TestSimulatorModalProps {
   onClose: () => void;
@@ -27,31 +39,19 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [, setTranscript] = useState('');
 
-  const recognitionRef = useRef<any | null>(null);
+  const recognitionRef = useRef<Recognition | null>(null);
+
+  const mountedRef = useRef(false);
+  const audioAttemptRef = useRef(0);
+  const chatControllerRef = useRef<AbortController | null>(null);
 
   // Audio waveform refs
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    // Initial welcome message
-    setMessages([
-      {
-        role: 'agent',
-        text: 'Olá! Este é um chat de demonstração (mock) para testar a UI de teste de voz. Clique no microfone e diga algo.',
-      },
-    ]);
-
-    return () => {
-      stopAudioWave();
-      if (recognitionRef.current) recognitionRef.current.stop();
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
-    };
-  }, [stopAudioWave]);
 
   const drawWaveform = () => {
     const canvas = canvasRef.current;
@@ -96,11 +96,19 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
   };
 
   const startAudioWave = async () => {
+    const attempt = ++audioAttemptRef.current;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!mountedRef.current || attempt !== audioAttemptRef.current) {
+        for (const track of stream.getTracks()) track.stop();
+        return;
+      }
       streamRef.current = stream;
 
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) throw new Error('AudioContext unavailable');
       const audioContext = new AudioContextClass();
       audioContextRef.current = audioContext;
 
@@ -114,24 +122,59 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       dataArrayRef.current = dataArray;
 
-      requestAnimationFrame(drawWaveform);
-    } catch (err: any) {
-      logger.error('Error fetching stream', { err });
+      drawWaveform();
+    } catch (err: unknown) {
+      stopAudioWave();
+      if (mountedRef.current) setIsListening(false);
+      logger.error({ err }, 'Error fetching stream');
     }
   };
 
-  const stopAudioWave = () => {
+  const stopAudioWave = useCallback(() => {
+    audioAttemptRef.current += 1;
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    if (streamRef.current) streamRef.current.getTracks().forEach((track) => track.stop());
+    if (streamRef.current) {
+      for (const track of streamRef.current.getTracks()) track.stop();
+    }
     if (audioContextRef.current && audioContextRef.current.state !== 'closed')
-      audioContextRef.current.close();
+      void audioContextRef.current.close().catch(() => {});
+    animationFrameRef.current = null;
+    streamRef.current = null;
+    audioContextRef.current = null;
+    analyserRef.current = null;
+    dataArrayRef.current = null;
 
     const canvas = canvasRef.current;
     if (canvas) {
       const canvasCtx = canvas.getContext('2d');
       if (canvasCtx) canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    // Initial welcome message
+    setMessages([
+      {
+        role: 'agent',
+        text: 'Olá! Este é um chat de demonstração (mock) para testar a UI de teste de voz. Clique no microfone e diga algo.',
+      },
+    ]);
+
+    return () => {
+      mountedRef.current = false;
+      chatControllerRef.current?.abort();
+      stopAudioWave();
+      if (recognitionRef.current) {
+        recognitionRef.current.onstart = null;
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.stop();
+      }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    };
+  }, [stopAudioWave]);
 
   const handleSendText = async (text: string) => {
     if (!text.trim() || isLoading) return;
@@ -141,7 +184,10 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
     setIsLoading(true);
 
     try {
+      const controller = new AbortController();
+      chatControllerRef.current = controller;
       const response = await fetch('/api/chat', {
+        signal: controller.signal,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentMessages: [...messages, userMsg] }),
@@ -150,6 +196,7 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
       if (!response.ok) throw new Error('Falha na comunicação');
 
       const data = await response.json();
+      if (!mountedRef.current) return;
       setMessages((prev) => [...prev, { role: 'agent', text: data.text }]);
 
       // Native TTS
@@ -159,11 +206,12 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
         utterance.lang = 'pt-BR';
         window.speechSynthesis.speak(utterance);
       }
-    } catch (err: any) {
-      logger.error('Error sending message in test simulator', { err });
+    } catch (err: unknown) {
+      if (!mountedRef.current) return;
+      logger.error({ err }, 'Error sending message in test simulator');
       setMessages((prev) => [...prev, { role: 'agent', text: 'Erro de comunicação.' }]);
     } finally {
-      setIsLoading(false);
+      if (mountedRef.current) setIsLoading(false);
     }
   };
 
@@ -179,8 +227,12 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
       return;
     }
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const speechWindow = window as unknown as {
+      SpeechRecognition?: new () => Recognition;
+      webkitSpeechRecognition?: new () => Recognition;
+    };
+    const SpeechRecognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -192,7 +244,7 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
       startAudioWave();
     };
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setTranscript(text);
       handleSendText(text);
@@ -235,6 +287,7 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
           <button
             type="button"
             onClick={onClose}
+            aria-label="Fechar simulador"
             className="p-2 text-slate-400 hover:bg-slate-800 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
@@ -310,6 +363,7 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
             <button
               type="button"
               onClick={toggleListening}
+              aria-label={isListening ? 'Parar microfone' : 'Iniciar microfone'}
               className={`w-16 h-16 flex items-center justify-center rounded-full shadow-lg transition-all ${
                 isListening
                   ? 'bg-red-500 text-white shadow-red-500/20 animate-pulse'
@@ -322,6 +376,7 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
             <button
               type="button"
               onClick={onClose}
+              aria-label="Encerrar demonstração"
               className="w-12 h-12 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all hover:text-white"
             >
               <PhoneOff className="w-5 h-5" />

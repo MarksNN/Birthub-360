@@ -18,7 +18,15 @@ coverage
 *.key
 backups
 *.dump
+# `*.sql` no .dockerignore é ancorado na raiz do contexto (semântica Go filepath.Match do
+# moby/patternmatcher): só exclui dumps soltos na raiz (ex.: migrate.sql). As migrations do
+# Prisma DEVEM entrar na imagem — o CMD roda `npx prisma migrate deploy` no boot e o estágio
+# final copia /app/prisma. A exceção abaixo é explícita (defesa em profundidade) para que um
+# endurecimento futuro para `**/*.sql` não as remova silenciosamente.
+# Ver .agents/runs/00-dockerignore-prisma-migrations-20261010.md
 *.sql
+!prisma/migrations/
+!prisma/migrations/**
 
 # Agentes, memória operacional, IDEs
 .agents

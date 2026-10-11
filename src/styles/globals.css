@@ -1,103 +1,106 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-/* Birth Hub 360 — tipografia atual (Design Language v2.0):
-   - Sora (fonte VARIÁVEL, eixos wght 100–800) → títulos e subtítulos: H1–H6,
-     `.bh-label`, `font-display`.
-   - Inter (fonte VARIÁVEL, wght 100–900) → corpo e interface (`--font-sans`), conforme a
-     Constituição visual (`.agents/BIRTH_HUB_DESIGN_CONSTITUTION.md`: Sora em títulos, Inter na UI).
-   - IBM Plex Mono → dados tabulares e código (`--font-mono`).
-   Todas self-hosted em `public/fonts/` (licença OFL junto dos arquivos), sem CDN de terceiros — o
-   app roda offline no Android via Capacitor. Só as faixas de peso realmente usadas são carregadas
-   (Plex Mono: 400/500/600/700 + 400 itálico).
-   Obs. (A03-P0-02, aberto): `elegance.css` ainda sobrescreve a família do body/títulos via Google
-   Fonts; decisão de escopo desse arquivo está com o Coordenador 00. */
+/* Birth Hub 360 — Tipografia Oficial:
+   - Plus Jakarta Sans: Fonte Principal para corpo e títulos (pesos 400, 500, 600, 700, 800)
+   - JetBrains Mono: Fonte Monospaçada para código, métricas, badges técnicos e contadores (pesos 500, 700)
+   - Sora: Display alternativo para botões especiais e heros
+   Fontes self-hosted em `public/fonts/` com fallbacks para garantir suporte offline no Android/Capacitor. */
 
+/* Plus Jakarta Sans (latin-ext) */
 @font-face {
-  font-family: "IBM Plex Mono";
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 800;
   font-display: swap;
-  src: url("/fonts/ibm-plex-mono-400.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "IBM Plex Mono";
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-mono-400-italic.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "IBM Plex Mono";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-mono-500.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "IBM Plex Mono";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-mono-600.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "IBM Plex Mono";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("/fonts/ibm-plex-mono-700.ttf") format("truetype");
-}
-
-/* Birth Hub 360 — famílias tipográficas, self-hosted a partir dos .woff2
-   originais em `public/fonts/`:
-
-   - Sora → display. Títulos, chamadas institucionais, hero. Fonte VARIÁVEL
-     (latin/latin-ext) cobre toda a faixa de peso (100–800).
-   - IBM Plex Mono → UI e dados. Menus, textos, tabelas, dashboards, relatórios,
-     números tabulares (KPIs, valores em R$, métricas).
-
-   Ambas self-hosted para funcionar offline no Android via Capacitor, sem CDN
-   de terceiros. O "B" do emblema é vetorizado dentro dos SVGs de
-   `identidade-visual/birthhub360/logos/` — não é uma família tipográfica
-   carregada em runtime. */
-
-/* Inter — UI/corpo (A03-P1-02). Os .woff2 já existiam em public/fonts/ sem @font-face. */
-/* latin-ext */
-@font-face {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/fonts/inter-latin-ext.woff2") format("woff2");
+  src: url('/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
     U+A720-A7FF;
 }
 
-/* latin */
+/* Plus Jakarta Sans (latin) */
 @font-face {
-  font-family: "Inter";
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 400 800;
   font-display: swap;
-  src: url("/fonts/inter-latin.woff2") format("woff2");
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* JetBrains Mono (fallback para self-hosted e system mono) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    local('JetBrains Mono Medium'),
+    local('JetBrainsMono-Medium'),
+    url('/fonts/ibm-plex-mono-500.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    local('JetBrains Mono Bold'),
+    local('JetBrainsMono-Bold'),
+    url('/fonts/ibm-plex-mono-700.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-400-italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-500.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-700.ttf') format('truetype');
+}
+
 /* latin-ext */
 @font-face {
-  font-family: "Sora";
+  font-family: 'Sora';
   font-style: normal;
   font-weight: 100 800;
   font-display: swap;
-  src: url("/fonts/sora-latin-ext.woff2") format("woff2");
+  src: url('/fonts/sora-latin-ext.woff2') format('woff2');
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
@@ -106,29 +109,44 @@
 
 /* latin */
 @font-face {
-  font-family: "Sora";
+  font-family: 'Sora';
   font-style: normal;
   font-weight: 100 800;
   font-display: swap;
-  src: url("/fonts/sora-latin.woff2") format("woff2");
+  src: url('/fonts/sora-latin.woff2') format('woff2');
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 :root {
-  /* Paleta "Strategic Command Center" (09/2026, redesenho pedido explicitamente
-     pelo usuário — substitui a âncora Obsidian/Snow White). Regra nova:
-     NENHUM neutro é preto ou branco puro — todo fundo/texto neutro carrega um
-     matiz das cinco cores da marca (dourado, roxo, azul, vermelho, rosa). Tema
-     claro parte de um branco rosado (Blossom White); o escuro parte de um azul
-     marinho profundo (Deep Navy) — ver bloco `.dark` abaixo.
+  /* ==========================================================================
+     PALETA OFICIAL DE CORES NEON — BIRTH HUB 360°
+     Azul Neon:    #00D4FF (Tecnologia, confiança, inovação)
+     Rosa Neon:    #FF2D9B (Energia, criatividade, atitude)
+     Dourado Neon: #FFC107 (Sofisticação, prosperidade, previsibilidade e métricas)
+     Preto Neon:   #0D0D0D (Fundo principal Dark Mode)
+     Branco Neon:  #F8F9FF (Textos corridos de corpo, subtítulos secundários)
+     Fundo Cards:  #14141A (Superfícies e cartões de conteúdo)
+     Bordas Glow:  rgba(0, 212, 255, 0.22) (Bordas com efeito neon sutil)
+     ========================================================================== */
+  --neon-blue: #00d4ff;
+  --neon-pink: #ff2d9b;
+  --neon-gold: #ffc107;
+  --neon-black: #0d0d0d;
+  --neon-white: #f8f9ff;
+  --neon-card-bg: #14141a;
+  --neon-card-border: rgba(0, 212, 255, 0.22);
 
-     Contraste verificado pela fórmula de luminância relativa do WCAG
-     (calculado, não estimado), tema claro:
-       --ink   (#174A9C) 7.85:1 contra --bg/--surface
-       --ink-2 (#6D28D9) 6.62:1 contra --bg/--surface
-     Ambos com folga sobre o mínimo AA (4.5:1). */
+  /* Tons Light complementares */
+  --light-pink: #e6007a;
+  --light-blue: #0284c7;
+  --light-gold: #d97706;
+
+  /* Gradientes Oficiais */
+  --grad-titles: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
+  --grad-cta: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%);
+
   --bg: #f8fafc;
   --surface: #ffffff;
   --surface-2: #f1f5f9;
@@ -154,29 +172,25 @@
   --midnight: #0b132b;
   --sunset: #ef4444;
   --red-violet: #8b5cf6;
-  /* --red-violet cru como TEXTO (não badge/halo) mede ~5.1:1 contra superfície clara — passa AA
-     cru, sem precisar de versão própria aqui. Existe só para o escuro poder sobrescrever abaixo
-     (mesmo padrão de --critical/--ok-active): achado real do axe-core, CTA "font-bold text-red-
-     violet" em SinglePageDashboard.tsx caía pra 3.28:1 contra --surface escura (#111D3F). */
   --red-violet-active: var(--red-violet);
-  --gold: #d4af37;
+  --gold: #ffc107;
   --white: #ffffff;
 
-  /* BirthHub 360 - Destaque (7 colors) - atualizado para cores do HTML */
-  --brand: #0ea5e9;
-  --brand-2: #38bdf8;
-  --on-brand: #0b132b;
+  /* BirthHub 360 - Cores de Marca Neon */
+  --brand: #00d4ff;
+  --brand-2: #ff2d9b;
+  --on-brand: #0d0d0d;
   --iris: #8b5cf6;
-  --orbit-blue: #3b82f6;
+  --orbit-blue: #00d4ff;
   --red: #ef4444;
-  --pink: #8b5cf6;
-  --warn: #f59e0b;
+  --pink: #ff2d9b;
+  --warn: #ffc107;
   --ok: #22c55e;
 
-  /* Gradientes e glows para landing/login */
-  --grad-brand: linear-gradient(135deg, #00e5ff 0%, #3b82f6 55%, #8b5cf6 100%);
-  --glow-brand: 0 0 22px rgba(0, 229, 255, 0.35);
-  --glow-iris: 0 0 22px rgba(139, 92, 246, 0.3);
+  /* Gradientes e glows */
+  --grad-brand: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
+  --glow-brand: 0 0 22px rgba(0, 212, 255, 0.35);
+  --glow-iris: 0 0 22px rgba(255, 45, 155, 0.3);
   /* Indireção pro --color-info do @theme poder ser sobrescrito por tema (mesmo padrão de
      --warn/--ok acima e --critical mais abaixo) — sem isso, `.dark { --color-info: ... }` perderia
      pra `--color-info: #3b82f6` gerado pelo bloco `@theme` (que vem depois no arquivo e empata em
@@ -267,9 +281,12 @@
   --shadow-nav-value: 12px 0 34px -28px rgba(26, 21, 19, 0.45);
   --shadow-nav-active-value: 0 10px 26px -14px color-mix(in srgb, var(--brand) 52%, black);
   --radius-nav-item-value: 12px;
-  --font-brand-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-brand-display: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-brand-serif: "Playfair Display", "Georgia", serif;
+  --font-brand-sans:
+    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-brand-display:
+    'Plus Jakarta Sans', 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-brand-serif: 'Playfair Display', 'Georgia', serif;
+  --font-brand-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Motion system tokens — durations e easings canônicos (Design Language v2.0, seção 8).
      Referenciados por .bh-interactive, Framer Motion variants e qualquer transition CSS
@@ -464,43 +481,43 @@
 }
 
 .dark {
-  /* Minimalist Dark Theme (Updated) */
-  --bg: #15151a;
-  --surface: #1c1d24;
-  --surface-2: #13151a;
-  --surface-subtle: #1c1d24;
-  --surface-elevated: #22232b;
-  --surface-interactive: #22232b;
-  --overlay: rgba(15, 20, 25, 0.85);
-  --ink: #f8fafc;
-  --ink-2: #94a3b8;
-  --line: rgba(255, 255, 255, 0.05);
+  /* Paleta Oficial Neon — Dark Mode (0D0D0D fundo, 14141A cards, F8F9FF texto) */
+  --bg: #0d0d0d;
+  --surface: #14141a;
+  --surface-2: #14141a;
+  --surface-subtle: #1c1c24;
+  --surface-elevated: #1f1f28;
+  --surface-interactive: #252530;
+  --overlay: rgba(13, 13, 13, 0.85);
+  --ink: #f8f9ff;
+  --ink-2: #a1a1b5;
+  --line: rgba(0, 212, 255, 0.18);
   /* Ver :root (A03-P1-09/P1-01): no escuro a marca crua já passa como anel/texto (>= 3:1 / 4.5:1),
      e a borda de controle clareia em direção a --ink. Calculado: ~4:1 contra --surface escura. */
   --border-input: color-mix(in srgb, var(--ink) 45%, var(--surface));
   --line-strong: color-mix(in srgb, var(--ink) 60%, var(--surface));
   --brand-text: var(--brand);
   --focus-ring: var(--brand);
-  --soft: rgba(139, 125, 255, 0.1);
+  --soft: rgba(0, 212, 255, 0.12);
   /* Paleta Coolors - Dark mode versions */
-  --coolors-yellow: #ffd166;
+  --coolors-yellow: #ffc107;
   --coolors-orange: #ff6b35;
-  --coolors-pink: #ff3399;
+  --coolors-pink: #ff2d9b;
   --coolors-purple: #8b7dff;
-  --coolors-blue: #4da6ff;
-  /* Atualização de tokens */
-  --brand: #8b7dff;
-  --brand-2: #a78bfa;
+  --coolors-blue: #00d4ff;
+  /* Atualização de tokens oficiais */
+  --brand: #00d4ff;
+  --brand-2: #ff2d9b;
   --iris: #8b7dff;
-  --orbit-blue: #38bdf8;
+  --orbit-blue: #00d4ff;
   --red: #ef4444;
-  --pink: #f472b6;
-  --warn: #f59e0b;
-  --gold: #fcd34d;
-  /* Acentos de ícone da Sidebar, lado escuro: matizes mais vibrantes e legíveis - Coolors */
-  --nav-c-gold: #ffd166;
-  --nav-c-iris: #9d4edd;
-  --nav-c-blue: #4da6ff;
+  --pink: #ff2d9b;
+  --warn: #ffc107;
+  --gold: #ffc107;
+  /* Acentos de ícone da Sidebar, lado escuro: matizes neon vibrantes */
+  --nav-c-gold: #ffc107;
+  --nav-c-iris: #ff2d9b;
+  --nav-c-blue: #00d4ff;
   --nav-c-red: #ff6b6b;
   --nav-c-green: #4ade80;
   --nav-c-violet: #c4b5fd;
@@ -610,21 +627,31 @@
   --font-sans: var(--font-brand-sans);
   --font-display: var(--font-brand-display);
   --font-serif: var(--font-brand-serif);
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-mono:
+    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
 
-  /* Paleta oficial Birth Hub 360 (brand book, p. 07). Substitui os pares de
-     tokens por marca que existiam aqui (--color-atlas-* / --color-birthhub360*),
-     de quando a plataforma trocava de identidade em runtime entre duas marcas.
-     Agora há uma marca só, então cor de marca e cor de produto são a mesma
-     coisa: use --color-brand/--color-brand-2 para ação e os quatro tokens
-     abaixo quando precisar nomear a cor da paleta em si. */
-  --color-obsidian: #0b132b;
-  --color-midnight: #0b132b;
+  /* Cores Neon Oficiais Birth Hub 360 */
+  --color-neon-blue: #00d4ff;
+  --color-neon-pink: #ff2d9b;
+  --color-neon-gold: #ffc107;
+  --color-neon-black: #0d0d0d;
+  --color-neon-white: #f8f9ff;
+  --color-neon-card: #14141a;
+  --color-neon-border: rgba(0, 212, 255, 0.22);
+
+  /* Tons Light complementares */
+  --color-light-pink: #e6007a;
+  --color-light-blue: #0284c7;
+  --color-light-gold: #d97706;
+
+  /* Paleta oficial Birth Hub 360 */
+  --color-obsidian: #0d0d0d;
+  --color-midnight: #0d0d0d;
   --color-sunset: #ef4444;
-  --color-red-violet: #8b5cf6;
-  --color-gold: #00e5ff;
-  --color-white: #ffffff;
-  --color-snow: #ffffff;
+  --color-red-violet: #ff2d9b;
+  --color-gold: #ffc107;
+  --color-white: #f8f9ff;
+  --color-snow: #f8f9ff;
   --color-parchment: #e9e4d9;
   /* "Inteligência em movimento" — halos, indicadores, órbita. Não é fundo de
      botão: ver o comentário de --iris em :root. */
@@ -964,26 +991,74 @@
     color: var(--ink);
   }
 
-  /* Revertido em 2026-09-04 (finalização de release; mesmo achado/correção já proposto e validado
-     pelo próprio dono do repositório em PR #326, nunca mergeada — extraído aqui porque o bug
-     seguia ativo em `main`). O commit 4264bcb ("títulos com cor da marca ativa") tinha aplicado
-     `color: var(--brand)` + `uppercase` + peso 700 fixo a TODO h1-h6 da aplicação inteira — não só
-     à tela de login (única superfície onde o pedido original fazia sentido), mas a cada título de
-     cada tela autenticada (dashboard, CRM, pipeline, configurações etc.). Duas regressões reais:
-     (1) `--brand` sobre `--bg` claro fica abaixo do mínimo AA de 4.5:1 para texto normal — na
-     marca da época (#FF5618) media ~3:1, e com o Antique Gold da Birth Hub 360 seria ainda pior
-     (2.10:1), o que torna a regra mais necessária, não menos — mesma classe de bug já documentada
-     como DQA-19 (texto sobre cor sólida de marca); (2) uppercase+cor de marca em todo título quebra a hierarquia visual de um
-     dashboard denso de uso repetido (CLAUDE.md, seção 4, regra #8: "UX nunca é sacrificado por
-     estética"). `color: var(--ink)` continua reagindo a tema claro/escuro (é um token, não um
-     valor fixo); só não força mais a cor de marca sobre título nenhum. */
+  /* REGRA MANDATÓRIA DO DESIGN:
+     Todos os títulos (h1 ao h6) devem usar as cores neon (#00D4FF, #FF2D9B ou #FFC107)
+     ou gradientes, nunca branco ou preto. Cor padrão de títulos: Azul Neon (#00D4FF). */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    color: var(--ink);
+    color: var(--neon-blue);
+    letter-spacing: -0.02em;
+  }
+
+  .neon-title-blue,
+  h1.neon-title-blue,
+  h2.neon-title-blue,
+  h3.neon-title-blue,
+  h4.neon-title-blue,
+  h5.neon-title-blue,
+  h6.neon-title-blue {
+    color: #00d4ff;
+    text-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
+  }
+
+  .neon-title-pink,
+  h1.neon-title-pink,
+  h2.neon-title-pink,
+  h3.neon-title-pink,
+  h4.neon-title-pink,
+  h5.neon-title-pink,
+  h6.neon-title-pink {
+    color: #ff2d9b;
+    text-shadow: 0 0 18px rgba(255, 45, 155, 0.45);
+  }
+
+  .neon-title-gold,
+  h1.neon-title-gold,
+  h2.neon-title-gold,
+  h3.neon-title-gold,
+  h4.neon-title-gold,
+  h5.neon-title-gold,
+  h6.neon-title-gold {
+    color: #ffc107;
+    text-shadow: 0 0 18px rgba(255, 193, 7, 0.45);
+  }
+
+  .neon-gradient-title {
+    background: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.35));
+  }
+
+  .neon-btn-cta,
+  .btn-cta-neon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    font-weight: 700;
+    color: #0d0d0d;
+    background: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%);
+    box-shadow:
+      0 0 25px rgba(255, 45, 155, 0.45),
+      0 0 35px rgba(0, 212, 255, 0.35);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Display 44-72 e Título 28-36 usam Sora (h1-h3); Subtítulo 16-20 e Corpo
@@ -1044,7 +1119,7 @@
 
   button,
   a,
-  [role="button"] {
+  [role='button'] {
     transition-duration: 180ms;
     transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
