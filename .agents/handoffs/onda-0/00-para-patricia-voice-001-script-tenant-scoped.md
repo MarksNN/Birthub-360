@@ -1,9 +1,10 @@
 # Handoff — VOICE-001 (ressalva da Onda 0, corrigida)
 
-**De:** sessão birthub-360-47 (auditoria "quantas ondas" + verificação de ressalvas)
-**Para:** Patricia (revisão + PR/merge/push, com confirmação do usuário)
-**Branch:** `fix/onda0-voice-001-tenant-script` (worktree isolado, base = `origin/main` em 1665f5d0,
-já inclui todo o programa post-09)
+- De: 12 (Voz e Telefonia)
+- Para: 00 (Coordenador)
+- Onda: 0
+- Status: resolvido (PR #495 integrado em main @ d7e099f8)
+- Prioridade: alto
 
 ## Contexto
 

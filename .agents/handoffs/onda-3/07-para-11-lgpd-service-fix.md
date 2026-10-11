@@ -1,10 +1,10 @@
 # HandOff: Fix LGPD Service TypeScript Errors
 
-- **De**: 07 (IA e Automações)
-- **Para**: 11 (Marca e Ativos Institucionais)
-- **Onda**: 3
-- **Status**: resolvido
-- **Prioridade**: bloqueador
+- De: 07 (IA e Automações)
+- Para: 11 (Marca e Ativos Institucionais)
+- Onda: 3
+- Status: resolvido
+- Prioridade: bloqueador
 
 ## Problema
 Compilação TypeScript falha no arquivo `src/features/lgpd/lgpd.service.ts` com erros de propriedades inexistentes (`status`, `leads`, `whatsAppMessages`).

@@ -1,7 +1,8 @@
 - De: Onda 10.1 — P0 Security Closure (sessão Claude Code on the web, tag `v1.0.0-rc.1`)
 - Para: Patricia (revisão de PR/merge/push)
 - Onda: 10.1 (`PROMPT 10.1 — P0 SECURITY CLOSURE`)
-- Status: **RESOLVED** (pendência de exclusão da tag remota)
+- Status: resolvido (tag remota v1.0.0-rc.1 excluída; PR #712 integrado em main @ ca424e7c)
+- Prioridade: alto
 - Branch original: `claude/p0-security-tag-exposure-4txa6g`
 - PR docs: https://github.com/maarkss1/Birthub-360/pull/502
 - Branch desta atualização: `agente/15-sec-2026-001-tag-resolved`
