@@ -1,6 +1,3 @@
-import type React from 'react';
-import { useEffect, useState, useId } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   AlertCircle,
@@ -41,6 +38,9 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useId, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import { useTheme } from '../../../contexts/ThemeContext.js';
 import { authClient } from '../../../lib/auth-client.js';
@@ -1331,13 +1331,19 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           10. MODAL DE LOGIN / CADASTRO (VANCOUVER PLUS INTEGRADO)
       ════════════════════════════════════════════════════════════════════ */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+        >
           <div className="vancouver-card w-full max-w-md p-8 bg-white shadow-2xl relative">
             {/* Botão Fechar */}
             <button
               type="button"
               onClick={() => setShowAuthModal(false)}
-              className="absolute top-5 right-5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              aria-label="Fechar janela de autenticação"
+              className="absolute top-5 right-5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1347,7 +1353,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <div className="flex justify-center mb-1">
                 <BH360LogoMark size={40} />
               </div>
-              <h2 className="font-display text-2xl font-bold text-[#0b132b]">
+              <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#0b132b]">
                 {authMode === 'signin' && 'Acessar o Hub'}
                 {authMode === 'signup' && 'Criar Nova Conta'}
                 {authMode === 'forgot' && 'Recuperar Senha'}
@@ -1361,13 +1367,19 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
             {/* Mensagens de Sucesso ou Erro */}
             {errorMessage && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <div
+                role="alert"
+                className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2"
+              >
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
             )}
             {successMessage && (
-              <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+              <div
+                role="status"
+                className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2"
+              >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{successMessage}</span>
               </div>
@@ -1377,33 +1389,41 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               {authMode === 'signup' && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label
+                    htmlFor="auth-modal-name"
+                    className="block text-xs font-bold text-slate-700 mb-1"
+                  >
                     Nome Completo
                   </label>
                   <input
+                    id="auth-modal-name"
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Seu nome"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#0ea5e9] bg-[#f8fafc]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label
+                  htmlFor="auth-modal-email"
+                  className="block text-xs font-bold text-slate-700 mb-1"
+                >
                   E-mail Corporativo
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
+                    id="auth-modal-email"
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nome@empresa.com.br"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#0ea5e9] bg-[#f8fafc]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                   />
                 </div>
               </div>
@@ -1411,12 +1431,17 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               {authMode !== 'forgot' && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-700">Senha</label>
+                    <label
+                      htmlFor="auth-modal-password"
+                      className="block text-xs font-bold text-slate-700"
+                    >
+                      Senha
+                    </label>
                     {authMode === 'signin' && (
                       <button
                         type="button"
                         onClick={() => setAuthMode('forgot')}
-                        className="text-[11px] text-[#0ea5e9] hover:underline"
+                        className="text-[11px] text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
                       >
                         Esqueceu?
                       </button>
@@ -1425,17 +1450,19 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                   <div className="relative">
                     <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     <input
+                      id="auth-modal-password"
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#0ea5e9] bg-[#f8fafc]"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                     />
                     <button
                       type="button"
+                      aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded p-0.5"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -1450,7 +1477,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     id="remember"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-slate-300 text-[#0ea5e9] focus:ring-[#0ea5e9]"
+                    className="rounded border-slate-300 text-brand focus:ring-ring focus-visible:ring-2 focus-visible:ring-ring"
                   />
                   <label htmlFor="remember" className="text-xs text-slate-600">
                     Lembrar deste dispositivo
@@ -1461,7 +1488,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="vancouver-btn-gradient w-full py-3 mt-2 text-sm justify-center"
+                className="vancouver-btn-gradient w-full py-3 mt-2 text-sm justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <span>Processando...</span>
@@ -1487,7 +1514,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                       setSuccessMessage('');
                       setAuthMode('signup');
                     }}
-                    className="text-[#0ea5e9] font-bold hover:underline"
+                    className="text-brand font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
                   >
                     Criar conta
                   </button>
@@ -1502,7 +1529,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                       setSuccessMessage('');
                       setAuthMode('signin');
                     }}
-                    className="text-[#0ea5e9] font-bold hover:underline"
+                    className="text-brand font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
                   >
                     Voltar ao login
                   </button>
