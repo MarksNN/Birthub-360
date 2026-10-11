@@ -10,7 +10,12 @@ import { prisma } from '../../../lib/prisma.js';
 // "summary" ausente passava sem barrar, silenciosamente. `.partial()` porque o próprio código já
 // tinha fallback por campo faltando — o schema só formaliza esse fallback em vez de confiar em
 // `typeof` ad-hoc.
-const qualificationResponseSchema = z.object({ score: z.number(), summary: z.string() }).partial();
+const qualificationResponseSchema = z
+  .object({
+    score: z.coerce.number(),
+    summary: z.string(),
+  })
+  .partial();
 
 // Define the state for the graph
 const LeadQualificationState = Annotation.Root({

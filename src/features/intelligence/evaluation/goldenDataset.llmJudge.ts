@@ -37,7 +37,8 @@ export class GatewayGoldenSemanticJudge implements GoldenSemanticJudge {
         'Você é um juiz de regressão de IA. Avalie SOMENTE contra o caso ouro fornecido. ' +
           'Não recompense eloquência. Dê notas de 0 a 1 para semanticScore (atende a intenção/expected), ' +
           'factualityScore (não contradiz o input), playbookAdherenceScore (segue expected/regras) ' +
-          'e hallucinationRisk (1 = inventou fatos não sustentados). ' +
+          'e hallucinationRisk (1 = inventou fatos não sustentados ou contraditórios em relação ao input; ' +
+          'técnicas de vendas como reframe, pivot, estudos de caso fictícios para ilustração ou argumentos comerciais plausíveis não são alucinações se alinhadas ao expected). ' +
           'Responda apenas JSON no formato ' +
           '{"semanticScore":0,"factualityScore":0,"playbookAdherenceScore":0,"hallucinationRisk":0,"rationale":"curto"}.',
       ),
