@@ -31,37 +31,10 @@ const cardVariants = cva('relative overflow-hidden rounded-2xl text-ink', {
         'bg-gradient-to-br from-surface to-surface-2 border border-brand/20 shadow-sm hover:border-brand/50 transition-all duration-300 hover:-translate-y-0.5',
       floating:
         'bg-surface-elevated/95 border border-line shadow-lg backdrop-blur-xl transition-all duration-300',
-      // Variantes decorativas preservadas para compatibilidade (@deprecated)
-      // Prefira as variantes estruturais acima (surface, panel, metric, data, feature, floating)
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
-      iris: 'bg-surface border border-accent-violet/40 shadow-glow-accent-violet transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:scale-[1.005] hover:border-accent-violet hover:shadow-[0_0_30px_rgba(139,92,246,0.6)]',
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
-      cyan: 'bg-surface border border-accent-cyan/40 shadow-glow-accent-cyan transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:scale-[1.005] hover:border-accent-cyan hover:shadow-glow-accent-cyan',
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
-      pulse:
-        'bg-surface border border-pulse/40 shadow-glow-pulse transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:scale-[1.005] hover:border-pulse hover:shadow-[0_0_30px_rgba(239,68,68,0.6)]',
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
-      glass:
-        'bg-surface/60 backdrop-blur-xl border border-brand/30 shadow-glow-brand transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-surface/80 hover:border-brand hover:shadow-glow-brand-strong hover:-translate-y-0.5 hover:scale-[1.005]',
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
-      metallic:
-        'bg-gradient-to-br from-surface via-brand/5 to-surface-2 border border-brand/40 shadow-glow-brand transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-brand hover:shadow-glow-brand-strong hover:-translate-y-0.5 hover:scale-[1.005]',
       bento:
         'bg-surface border border-line shadow-sm hover:border-brand/30 hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
       cosmic:
         'bg-gradient-to-br from-surface-elevated/90 to-brand/10 backdrop-blur-2xl border border-brand/50 shadow-card hover:border-brand hover:shadow-glow-brand-strong hover:-translate-y-1 transition-all duration-300',
-      /** @deprecated Kept for backward compatibility but should not be used in new code. */
-      specular:
-        'bg-surface/75 backdrop-blur-2xl border border-brand/40 shadow-card hover:border-brand hover:shadow-glow-brand-strong hover:-translate-y-1 transition-all duration-300',
-      vancouver:
-        'vancouver-card bg-surface border border-line hover:border-line-strong shadow-sm transition-all duration-300 hover:-translate-y-1',
-      vancouverGradient:
-        'bg-gradient-to-br from-brand to-brand-2 text-on-brand border-line shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300',
-      vancouverGold:
-        'bg-warning-solid text-white border-line shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300',
-      vancouverPink:
-        'bg-[color-mix(in_srgb,var(--pink)_65%,black)] text-white border-line shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300',
     },
     padding: {
       default: 'p-6',
