@@ -22,12 +22,10 @@ export const groqProvider: ProviderAdapter = {
 
     // Lista de fallback de modelos compatíveis no Groq para tolerância a rate-limits específicos de modelo (TPD)
     const modelCandidates = [primaryGroqModel];
-    if (primaryGroqModel === 'llama-3.1-8b-instant') {
-      modelCandidates.push('llama-3.3-70b-versatile', 'openai/gpt-oss-20b');
-    } else if (primaryGroqModel === 'llama-3.3-70b-versatile') {
-      modelCandidates.push('llama-3.1-8b-instant', 'openai/gpt-oss-120b');
-    } else {
-      modelCandidates.push('llama-3.1-8b-instant', 'llama-3.3-70b-versatile');
+    if (primaryGroqModel === 'openai/gpt-oss-20b') {
+      modelCandidates.push('openai/gpt-oss-120b', 'llama-3.1-8b-instant');
+    } else if (primaryGroqModel === 'openai/gpt-oss-120b') {
+      modelCandidates.push('openai/gpt-oss-20b', 'llama-3.3-70b-versatile');
     }
 
     let lastError: unknown;
@@ -52,6 +50,7 @@ export const groqProvider: ProviderAdapter = {
       } catch (err: any) {
         lastError = err;
         const msg = String(err?.message || err);
+        // Se for erro de quota de modelo específico (429 com tokens per day / rate limit), tenta o próximo modelo candidato
         if (
           msg.includes('429') &&
           (msg.includes('tokens per day') ||

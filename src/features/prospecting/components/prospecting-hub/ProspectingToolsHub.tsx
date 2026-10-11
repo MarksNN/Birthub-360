@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Building2, Mail, MapPin, Newspaper } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Card, CardDescription, CardTitle } from '../../../../components/ui/Card.js';
 import { GithubIcon as Github } from '../../../../components/ui/icons/GithubIcon.js';
 import { LinkedinIcon as Linkedin } from '../../../../components/ui/icons/LinkedinIcon.js';
 import { YoutubeIcon as Youtube } from '../../../../components/ui/icons/YoutubeIcon.js';
-import { useBrandAccent } from '../../../../hooks/useBrandAccent.js';
 import { api } from '../../../../lib/api.js';
 import { fadeInUp, SPRING_SOFT, staggerContainer, staggerItem } from '../../../../lib/motion.js';
 import { ApolloTool } from './tools/ApolloTool.js';
@@ -23,64 +21,88 @@ const TOOL_TABS: {
   id: ToolId;
   label: string;
   icon: any;
+  category: string;
   description: string;
   statusKey: keyof Omit<ToolsStatus, 'providerMode'>;
+  iconBg: string;
+  iconColor: string;
 }[] = [
   {
     id: 'google-places',
     label: 'Google Places',
     icon: MapPin,
+    category: 'Local & Mapas',
     description:
       'Busca empresas por categoria e região, só via Google Places (New) Text Search — sem outras fontes misturadas.',
     statusKey: 'googlePlaces',
+    iconBg: 'bg-sky-50 dark:bg-sky-500/10 border-sky-200/80 dark:border-sky-500/20',
+    iconColor: 'text-sky-600 dark:text-sky-400',
   },
   {
     id: 'apollo',
     label: 'Apollo.io',
     icon: Building2,
+    category: 'Firmografia & B2B',
     description:
       'Busca firmográfica de empresas por ICP (segmento, porte, região), só via Apollo Organization Search.',
     statusKey: 'apollo',
+    iconBg: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200/80 dark:border-indigo-500/20',
+    iconColor: 'text-indigo-600 dark:text-indigo-400',
   },
   {
     id: 'hunter',
     label: 'Hunter.io',
     icon: Mail,
+    category: 'E-mails & Domínio',
     description:
       'Encontra e verifica e-mails reais de pessoas a partir do domínio de uma empresa, só via Hunter.io.',
     statusKey: 'hunter',
+    iconBg: 'bg-orange-50 dark:bg-orange-500/10 border-orange-200/80 dark:border-orange-500/20',
+    iconColor: 'text-orange-600 dark:text-orange-400',
   },
   {
     id: 'linkedin',
     label: 'LinkedIn',
     icon: Linkedin,
+    category: 'Decisores & Social',
     description:
       'Busca empresas e decisores com perfil real de LinkedIn (via Apollo), mais um gerador de link manual.',
     statusKey: 'apollo',
+    iconBg: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200/80 dark:border-blue-500/20',
+    iconColor: 'text-blue-600 dark:text-blue-400',
   },
   {
     id: 'github',
     label: 'GitHub',
     icon: Github,
+    category: 'Tecnologia & Dev',
     description:
       'Busca organizações públicas no GitHub — sinal de maturidade técnica de uma empresa-alvo. Gratuita, sem chave.',
     statusKey: 'github',
+    iconBg: 'bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/60',
+    iconColor: 'text-slate-800 dark:text-slate-200',
   },
   {
     id: 'news',
     label: 'Notícias',
     icon: Newspaper,
+    category: 'Imprensa & Mídia',
     description:
       'Menções recentes de imprensa sobre uma empresa via GDELT — gratuita, sem chave, últimos 6 meses.',
     statusKey: 'news',
+    iconBg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/80 dark:border-emerald-500/20',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
   },
   {
     id: 'youtube',
     label: 'YouTube',
     icon: Youtube,
+    category: 'Vídeo & Conteúdo',
     description:
       'Confere os metadados públicos de um vídeo já encontrado (título, canal, thumbnail) — não é busca por palavra-chave.',
     statusKey: 'youtube',
+    iconBg: 'bg-rose-50 dark:bg-rose-500/10 border-rose-200/80 dark:border-rose-500/20',
+    iconColor: 'text-rose-600 dark:text-rose-400',
   },
 ];
 
@@ -93,7 +115,6 @@ const TOOL_TABS: {
 export function ProspectingToolsHub() {
   const [activeTool, setActiveTool] = useState<ToolId | null>(null);
   const [status, setStatus] = useState<ToolsStatus | null>(null);
-  const accent = useBrandAccent();
 
   useEffect(() => {
     api
@@ -106,11 +127,15 @@ export function ProspectingToolsHub() {
     return (
       <div className="space-y-6">
         <header>
-          <h2 className="font-display text-xl font-bold text-ink tracking-tight">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-brand-text dark:text-neon-blue">
+            Fontes & Conectores
+          </div>
+          <h2 className="font-display text-2xl font-bold text-ink tracking-tight mt-0.5">
             Ferramentas de Prospecção
           </h2>
-          <p className="text-sm text-ink-2 mt-1">
-            Escolha uma fonte para prospectar isoladamente, sem misturar com as outras.
+          <p className="text-sm text-ink-2 mt-1 max-w-2xl">
+            Execute consultas e enriquecimento em canais e bases de dados externas isoladamente, sem
+            misturar com as outras fontes.
           </p>
         </header>
 
@@ -119,7 +144,7 @@ export function ProspectingToolsHub() {
           variants={staggerContainer()}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
         >
           {TOOL_TABS.map((tool) => {
             const Icon = tool.icon;
@@ -130,38 +155,58 @@ export function ProspectingToolsHub() {
                 type="button"
                 variants={staggerItem}
                 whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 transition={SPRING_SOFT}
                 onClick={() => setActiveTool(tool.id)}
-                className="text-left cursor-pointer group"
+                className="text-left cursor-pointer group h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-2xl"
               >
-                <Card
-                  variant="default"
-                  padding="sm"
-                  className={`h-full transition-colors duration-300 ${accent.hoverBorder} group-hover:bg-surface-2 group-focus-visible:bg-surface-2 group-hover:shadow-lg group-focus-visible:shadow-lg`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div
-                      className={`w-9 h-9 rounded-xl ${accent.bgSoft} flex items-center justify-center ${accent.text} shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 group-focus-visible:scale-110`}
-                    >
-                      <Icon size={16} />
+                <div className="h-full relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-surface border border-line hover:border-line-strong hover:shadow-lg transition-all duration-300">
+                  {/* Top highlight accent */}
+                  <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand dark:via-neon-blue to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                  <div>
+                    {/* Header: Icon + Category + Badge */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div
+                        className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 shadow-sm ${tool.iconBg} ${tool.iconColor}`}
+                      >
+                        <Icon size={18} strokeWidth={2} />
+                      </div>
+
+                      {status && configured === false ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-warn/15 text-warning-active dark:text-warning border border-warn/30">
+                          Não configurado
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-ok/15 text-ok-active dark:text-ok border border-ok/30 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-ok animate-pulse" />
+                          Pronto
+                        </span>
+                      )}
                     </div>
-                    {status && configured === false && (
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-warn/15 text-warning-active dark:text-warning border border-warn/30">
-                        Não configurado
-                      </span>
-                    )}
+
+                    {/* Category pill */}
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-2/80 mb-1">
+                      {tool.category}
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-display text-base font-bold text-ink group-hover:text-brand-text dark:group-hover:text-neon-blue transition-colors tracking-tight">
+                      {tool.label}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="mt-1.5 text-xs leading-relaxed text-ink-2 line-clamp-3 font-normal">
+                      {tool.description}
+                    </p>
                   </div>
-                  <CardTitle className={`${accent.text} text-sm`}>{tool.label}</CardTitle>
-                  <CardDescription className="mt-1 text-xs leading-snug line-clamp-3">
-                    {tool.description}
-                  </CardDescription>
-                  <span
-                    className={`mt-3 inline-flex items-center gap-1 text-xs font-bold ${accent.text} opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-colors duration-300 group-hover:translate-x-0.5`}
-                  >
-                    Abrir <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </Card>
+
+                  {/* Footer Action */}
+                  <div className="mt-4 pt-3.5 border-t border-line flex items-center justify-between text-xs font-semibold text-ink-2 group-hover:text-brand-text dark:group-hover:text-neon-blue transition-colors">
+                    <span>Acessar ferramenta</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </div>
+                </div>
               </motion.button>
             );
           })}
