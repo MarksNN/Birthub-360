@@ -60,6 +60,7 @@ export function ChannelDonut({
             return (
               <div
                 key={label}
+                role="presentation"
                 onMouseEnter={() => {
                   if (soundHover) SoundFX.play('hover');
                 }}
