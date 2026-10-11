@@ -162,6 +162,104 @@ security:
   - sessionCookie: []
 
 paths:
+  /organization-modules:
+    get:
+      tags: [Módulos da Organização]
+      summary: Consulta o estado dos módulos de produto habilitados e onboarding da organização
+      responses:
+        '200':
+          description: Estado atual dos módulos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: object }
+        '401': { description: Não autenticado }
+    put:
+      tags: [Módulos da Organização]
+      summary: Atualiza a lista completa de módulos ativos da organização (somente ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                modules:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Módulos atualizados com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: object }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /organization-modules/onboarding/complete:
+    post:
+      tags: [Módulos da Organização]
+      summary: Marca o onboarding da organização como concluído (somente ADMIN)
+      responses:
+        '200':
+          description: Onboarding marcado como concluído
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: object }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /organization-modules/{moduleKey}:
+    parameters:
+      - in: path
+        name: moduleKey
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Módulos da Organização]
+      summary: Habilita um módulo de produto específico para a organização (somente ADMIN)
+      responses:
+        '200':
+          description: Módulo habilitado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: object }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    delete:
+      tags: [Módulos da Organização]
+      summary: Desabilita um módulo de produto específico para a organização (somente ADMIN)
+      responses:
+        '200':
+          description: Módulo desabilitado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data: { type: object }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   /sales-orchestration/overview:
     get:
       tags: [Sales Orchestration]
