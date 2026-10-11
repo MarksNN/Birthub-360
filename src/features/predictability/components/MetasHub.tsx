@@ -1,17 +1,23 @@
-import { Target, Trophy, ArrowUpRight, Users, Medal } from 'lucide-react';
+import { ArrowUpRight, Target, Trophy } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
-import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
+import { PredictabilityEmptyState, PredictabilityStatusBanner } from './PredictabilityNoData.js';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../components/ui/Table.js';
+  formatBRL,
+  formatPct,
+  unavailableReason,
+  usePredictabilityOverview,
+} from './usePredictabilityOverview.js';
+
+// P0 #693 (Agente 02): leitura real via predictabilityApi (Agente 04, PR #697).
+// Meta só por organização (NEW_MRR): sellers[].goalAmount é sempre null → coluna "Meta" indisponível.
 
 export function MetasHub() {
+  const { data, loading, error, noRealData, partial, reload } = usePredictabilityOverview();
+  const g = data?.goals ?? null;
+  const cur = data?.meta.currency ?? 'BRL';
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--bg)] text-[var(--ink)]">
       <CommandCenterHeader title="Metas e Projeções" icon={Target} />
@@ -20,117 +26,107 @@ export function MetasHub() {
         <div className="mb-4">
           <p className="text-sm text-[var(--ink-2)]">
             Acompanhamento de cotas e performance do time
+            {data ? ` · período ${data.meta.period}` : ''}
           </p>
         </div>
-        {/* KPIs Globais */}
+
+        <PredictabilityStatusBanner
+          what="as metas"
+          loading={loading}
+          error={error}
+          noRealData={noRealData}
+          partial={partial}
+          failedSources={data?.meta.failedSources}
+          onRetry={reload}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <KpiCard
             title="Meta Global do Mês"
-            value="R$ 500.000"
-            trend={{ value: 'Q3 2026', isPositive: true }}
+            value={formatBRL(g?.goalAmount, cur)}
             icon={Target}
-            subtitle="Objetivo da empresa"
+            subtitle={
+              g?.goalAmount != null
+                ? `Faltam ${formatBRL(g.remainingAmount, cur)}`
+                : (unavailableReason(data, 'goals.goalAmount') ?? 'Indisponível')
+            }
             variant="default"
           />
           <KpiCard
             title="Total Atingido"
-            value="R$ 385.000"
-            trend={{ value: '77%', isPositive: true }}
+            value={formatBRL(g?.closedAmount, cur)}
             icon={Trophy}
-            subtitle="Faltam R$ 115.000"
+            subtitle={
+              g?.pctOfGoal != null
+                ? `${formatPct(g.pctOfGoal)} da meta`
+                : (unavailableReason(data, 'goals.closedAmount') ??
+                  unavailableReason(data, 'goals.goalAmount') ??
+                  'Indisponível')
+            }
             variant="default"
           />
           <KpiCard
-            title="Pace (Ritmo Atual)"
-            value="105%"
-            trend={{ value: '+5%', isPositive: true }}
+            title="Projeção do Mês"
+            value={formatBRL(g?.projectedAmount, cur)}
             icon={ArrowUpRight}
-            subtitle="Projeção final: R$ 525.000"
+            subtitle={
+              g?.projectedPctOfGoal != null
+                ? `${formatPct(g.projectedPctOfGoal)} da meta`
+                : (unavailableReason(data, 'forecast.forecastAmount') ?? 'Sem meta para comparar')
+            }
             variant="default"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Medal className="w-5 h-5 text-[var(--nav-c-gold)]" />
-                Leaderboard (Top Performers)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 p-0 border-t border-[var(--line)]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Vendedor</TableHead>
-                    <TableHead>Meta</TableHead>
-                    <TableHead>Realizado</TableHead>
-                    <TableHead className="text-right">%</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">João Reis</TableCell>
-                    <TableCell>R$ 100k</TableCell>
-                    <TableCell>R$ 115k</TableCell>
-                    <TableCell className="text-right text-[var(--nav-c-green)] font-semibold">
-                      115%
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Maria Silva</TableCell>
-                    <TableCell>R$ 100k</TableCell>
-                    <TableCell>R$ 95k</TableCell>
-                    <TableCell className="text-right text-[var(--nav-c-gold)] font-semibold">
-                      95%
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Carlos Andrade</TableCell>
-                    <TableCell>R$ 100k</TableCell>
-                    <TableCell>R$ 45k</TableCell>
-                    <TableCell className="text-right text-[var(--nav-c-red)] font-semibold">
-                      45%
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-[var(--nav-c-iris)]" />
-                Metas por Equipe
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 p-6 border-t border-[var(--line)] space-y-6">
-              {/* Fake Progress Bars */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">Equipe Enterprise</span>
-                  <span className="text-[var(--nav-c-green)]">82%</span>
-                </div>
-                <div className="h-2 w-full bg-[var(--line)] rounded-full overflow-hidden">
-                  <div className="h-full bg-[var(--nav-c-green)] w-[82%]" />
-                </div>
-                <p className="text-xs text-[var(--ink-3)]">R$ 246.000 de R$ 300.000</p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">Equipe SMB</span>
-                  <span className="text-[var(--nav-c-gold)]">69%</span>
-                </div>
-                <div className="h-2 w-full bg-[var(--line)] rounded-full overflow-hidden">
-                  <div className="h-full bg-[var(--nav-c-gold)] w-[69%]" />
-                </div>
-                <p className="text-xs text-[var(--ink-3)]">R$ 138.000 de R$ 200.000</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Desempenho por Vendedor</CardTitle>
+          </CardHeader>
+          <CardContent className="border-t border-[var(--line)] pt-6">
+            {g && g.sellers.length > 0 ? (
+              <>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-[var(--ink-3)]">
+                      <th className="py-1 font-medium">Vendedor</th>
+                      <th className="py-1 font-medium text-right">Meta</th>
+                      <th className="py-1 font-medium text-right">Ganhos</th>
+                      <th className="py-1 font-medium text-right">Perdidos</th>
+                      <th className="py-1 font-medium text-right">Win rate</th>
+                      <th className="py-1 font-medium text-right">Em aberto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {g.sellers.map((s) => (
+                      <tr key={s.owner} className="border-t border-[var(--line)]">
+                        <td className="py-1.5">{s.owner}</td>
+                        <td className="py-1.5 text-right text-[var(--ink-3)]">Indisponível</td>
+                        <td className="py-1.5 text-right tabular-nums">{s.wonCount}</td>
+                        <td className="py-1.5 text-right tabular-nums">{s.lostCount}</td>
+                        <td className="py-1.5 text-right tabular-nums">{formatPct(s.winRate)}</td>
+                        <td className="py-1.5 text-right tabular-nums">
+                          {formatBRL(s.openAmount, cur)} ({s.openCount})
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="text-xs text-[var(--ink-3)] mt-3">
+                  Meta por vendedor: {unavailableReason(data, 'goals.sellers.goalAmount')} — metas
+                  são cadastradas só por organização.
+                </p>
+              </>
+            ) : (
+              <PredictabilityEmptyState
+                title="Sem dados por vendedor"
+                hint={
+                  unavailableReason(data, 'goals.sellers') ??
+                  'Nenhum vendedor com negócios no período.'
+                }
+              />
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
