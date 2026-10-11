@@ -23,3 +23,6 @@ Tabela de tokens com razao de contraste WCAG AA (texto e foco) para claro e escu
 
 ## Contexto adicional
 Nenhum codigo foi alterado na Onda A. Ver matriz de ferramentas e plano de ondas no documento acima.
+
+## Atualização 2026-10-11
+O usuário enviou a referência "Paleta de Cores Neon": rosa `#FF2D9B`, azul `#00D4FF`, dourado `#FFC107`, preto `#0D0D0D`, branco `#F8F9FF`. Registrada como direção proposta na seção 8 de MODERNIZACAO-UI-ONDA-A.md. Falta: confirmação do 11, aprovação humana formal e contraste por token (variantes `*-ink` para o tema claro).

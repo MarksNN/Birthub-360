@@ -98,3 +98,25 @@ Regra: nada de migração em massa antes do Piloto validado e aprovado pelo 24.
 - `tsc`, `lint`, `build`: **NÃO EXECUTADO** (nenhum código alterado; baseline não aplicável).
 - Licenças MIT de shadcn-admin e shadcndashboard: **VERIFICADO** em `LICENSE` do GitHub. Demais: **NÃO EXECUTADO** (reconfirmar).
 - Sem screenshots antes/depois nesta onda: **NÃO EXECUTADO** (sem mudança visual).
+
+## 8. Decisão de paleta (referência enviada pelo usuário em 2026-10-11)
+
+Paleta "Neon" adotada como **direção oficial proposta**, pendente de confirmação do Agente 11 e de aprovação humana formal (logo e ativos institucionais não mudam).
+
+| Papel | Nome | Hex | Uso |
+|---|---|---|---|
+| Destaque / energia | Rosa neon | #FF2D9B | Destaques seletivos |
+| Marca / interação | Azul neon | #00D4FF | Tecnologia, links, foco |
+| Premium | Dourado neon | #FFC107 | Elementos premium (substitui #D4AF37 da documentação) |
+| Superfície escura | Preto | #0D0D0D | Fundo do tema escuro |
+| Texto / superfície clara | Branco | #F8F9FF | Texto no escuro, base do claro |
+
+Contraste estimado pela fórmula WCAG (**não medido em navegador**):
+- No escuro (#0D0D0D), as três cores neon passam em AA para texto: o dourado fica em torno de 12:1, o azul em ~11:1 e o rosa em ~5:1.
+- No claro, azul e dourado como texto **falham** (~1,6–1,8:1), e o rosa fica em ~3,6:1. No tema claro é preciso criar variantes escuras de texto/ícone por token (*-ink), usando o neon só em fundos, bordas e brilhos.
+- Texto sobre fundo neon deve usar --on-brand escuro, nunca branco.
+
+Consequências:
+1. legance.css (que força --brand para ouro) precisa ser confinado ou removido na Onda B para a cascata não sobrescrever esta paleta.
+2. docs/DESIGN_SYSTEM.md e docs/design/* devem ser atualizados pelo 11/03 depois da aprovação.
+3. Os valores de contraste acima precisam ser verificados por token no navegador (axe) antes da migração.
