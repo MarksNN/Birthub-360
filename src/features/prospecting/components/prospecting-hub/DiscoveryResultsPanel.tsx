@@ -77,7 +77,9 @@ export function DiscoveryResultsPanel({
   rejectingKey: string | null;
   onRejectCandidate: (candidate: ProspectCandidate, idx: number) => void;
 }) {
-  const [exportTarget, setExportTarget] = useState<'companies' | 'decisionMakers' | 'complete'>('complete');
+  const [exportTarget, setExportTarget] = useState<'companies' | 'decisionMakers' | 'complete'>(
+    'complete',
+  );
   const [maskLgpd, setMaskLgpd] = useState(false);
   const [csvDelimiter, setCsvDelimiter] = useState(';');
   const [exportColumns, setExportColumns] = useState<number[]>(
@@ -131,7 +133,10 @@ export function DiscoveryResultsPanel({
               type="button"
               onClick={() => {
                 SoundFX.play('click');
-                onExport('xlsx', exportColumns, exportTarget, { maskPersonalPhones: maskLgpd, csvDelimiter });
+                onExport('xlsx', exportColumns, exportTarget, {
+                  maskPersonalPhones: maskLgpd,
+                  csvDelimiter,
+                });
               }}
               className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
@@ -139,7 +144,12 @@ export function DiscoveryResultsPanel({
             </button>
             <button
               type="button"
-              onClick={() => onExport('csv', exportColumns, exportTarget, { maskPersonalPhones: maskLgpd, csvDelimiter })}
+              onClick={() =>
+                onExport('csv', exportColumns, exportTarget, {
+                  maskPersonalPhones: maskLgpd,
+                  csvDelimiter,
+                })
+              }
               className="px-4 py-2 rounded-xl border border-line text-xs text-ink hover:bg-surface-interactive transition-all cursor-pointer"
             >
               Exportar CSV
@@ -200,7 +210,9 @@ export function DiscoveryResultsPanel({
                   onChange={(e) => setMaskLgpd(e.target.checked)}
                   className="rounded border-line text-brand"
                 />
-                <span className="font-medium text-ink">Proteção LGPD (Mascarar telefones pessoais)</span>
+                <span className="font-medium text-ink">
+                  Proteção LGPD (Mascarar telefones pessoais)
+                </span>
               </label>
             </div>
           </div>

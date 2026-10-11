@@ -423,7 +423,14 @@ export function ProspectingHub() {
         ]),
       );
 
-      const historyHeaders = ['Empresa', 'CNPJ', 'Fonte', 'Data da Pesquisa', 'Score ICP', 'Qualidade'];
+      const historyHeaders = [
+        'Empresa',
+        'CNPJ',
+        'Fonte',
+        'Data da Pesquisa',
+        'Score ICP',
+        'Qualidade',
+      ];
       const historyRows: unknown[][] = allowed.map((c) => [
         c.tradeName,
         c.cnpjGuess ?? '',
@@ -459,7 +466,9 @@ export function ProspectingHub() {
           headers = selectedColumns.map((i) => headers[i]);
           rows = rows.map((row) => selectedColumns.map((i) => row[i]));
 
-          const sheet = workbook.addWorksheet(target === 'decisionMakers' ? 'Decisores' : 'Empresas');
+          const sheet = workbook.addWorksheet(
+            target === 'decisionMakers' ? 'Decisores' : 'Empresas',
+          );
           sheet.addRow(headers);
           rows.forEach((row) => sheet.addRow(row));
         }
@@ -483,7 +492,9 @@ export function ProspectingHub() {
             .replace(/^[=+@-]/, "'$&")
             .replace(/"/g, '""')}"`;
         blob = new Blob(
-          [`\uFEFF${[headers, ...rows].map((row) => row.map(escapeCsv).join(delimiter)).join('\r\n')}`],
+          [
+            `\uFEFF${[headers, ...rows].map((row) => row.map(escapeCsv).join(delimiter)).join('\r\n')}`,
+          ],
           { type: 'text/csv;charset=utf-8' },
         );
       }

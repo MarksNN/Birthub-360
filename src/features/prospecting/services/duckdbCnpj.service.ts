@@ -1,9 +1,9 @@
 /**
  * DuckDB CNPJ Analytics & Ingestion Service
- * 
+ *
  * Permite consultas analíticas locais e de alta performance na base de Dados Abertos
  * da Receita Federal (tabelas EMPRE, ESTABELE, CNAE, SOCIOS) com busca textual/trigram.
- * 
+ *
  * Fallback transparente: caso o DuckDB não esteja compilado ou o arquivo .duckdb
  * local não esteja presente, delega suavemente para as fontes públicas (BrasilAPI / MinhaReceita)
  * garantindo resiliência e sem quebrar a UI.
@@ -55,7 +55,9 @@ export class DuckDBCnpjService {
   private isDatabaseReady = false;
 
   constructor() {
-    this.dbPath = process.env.DUCKDB_CNPJ_PATH || path.resolve(process.cwd(), 'data', 'cnpj_dados_abertos.duckdb');
+    this.dbPath =
+      process.env.DUCKDB_CNPJ_PATH ||
+      path.resolve(process.cwd(), 'data', 'cnpj_dados_abertos.duckdb');
     this.initDuckDB();
   }
 
@@ -69,15 +71,21 @@ export class DuckDBCnpjService {
   private async initDuckDB(): Promise<void> {
     try {
       if (!fs.existsSync(this.dbPath)) {
-        logger.info(`[DuckDBCnpjService] Arquivo DuckDB não encontrado em ${this.dbPath}. Operando em modo Fallback.`);
+        logger.info(
+          `[DuckDBCnpjService] Arquivo DuckDB não encontrado em ${this.dbPath}. Operando em modo Fallback.`,
+        );
         return;
       }
 
       // Import dinâmico defensivo para não quebrar ambientes sem o binário nativo ou empacotamento Vite
       const moduleName = 'duckdb';
-      const duckdbModule = await (Function('m', 'return import(m)')(moduleName) as Promise<any>).catch(() => null);
+      const duckdbModule = await (
+        Function('m', 'return import(m)')(moduleName) as Promise<any>
+      ).catch(() => null);
       if (!duckdbModule) {
-        logger.info('[DuckDBCnpjService] Pacote duckdb não instalado nativamente. Usando fallback HTTP.');
+        logger.info(
+          '[DuckDBCnpjService] Pacote duckdb não instalado nativamente. Usando fallback HTTP.',
+        );
         return;
       }
 
@@ -88,7 +96,10 @@ export class DuckDBCnpjService {
       this.isDatabaseReady = true;
       logger.info(`[DuckDBCnpjService] DuckDB conectado com sucesso em ${this.dbPath}`);
     } catch (error) {
-      logger.warn({ err: error }, '[DuckDBCnpjService] Falha ao inicializar conexão com DuckDB. Fallback ativo');
+      logger.warn(
+        { err: error },
+        '[DuckDBCnpjService] Falha ao inicializar conexão com DuckDB. Fallback ativo',
+      );
       this.isDatabaseReady = false;
     }
   }
@@ -149,7 +160,10 @@ export class DuckDBCnpjService {
           total: results.length,
         };
       } catch (err) {
-        logger.warn({ err }, '[DuckDBCnpjService] Falha na busca textual DuckDB. Acionando fallback');
+        logger.warn(
+          { err },
+          '[DuckDBCnpjService] Falha na busca textual DuckDB. Acionando fallback',
+        );
       }
     }
 
@@ -200,7 +214,10 @@ export class DuckDBCnpjService {
     });
   }
 
-  private async queryDuckDBTextSearch(params: DuckDBCnpjSearchParams, limit: number): Promise<DuckDBCnpjCompany[]> {
+  private async queryDuckDBTextSearch(
+    params: DuckDBCnpjSearchParams,
+    limit: number,
+  ): Promise<DuckDBCnpjCompany[]> {
     return new Promise((resolve, reject) => {
       let sql = `
         SELECT 

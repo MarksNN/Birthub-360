@@ -1,6 +1,6 @@
 /**
  * Web Scraper & Signals Service (Crawlee + Cheerio + Playwright fallback)
- * 
+ *
  * Executa rastreamento controlado de websites corporativos:
  * 1. Crawler leve HTTP com Cheerio para extrair metadados, links e contatos corporativos.
  * 2. Playwright sob demanda quando a página exigir renderização JS/SPA avançada.
@@ -78,7 +78,10 @@ export class WebScraperService {
     $('script, style, noscript, svg, iframe, nav, footer').remove();
     let text = $('body').text() || $.text();
     // Normaliza espaços e remove caracteres de controle
-    text = text.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+    text = text
+      .replace(/[\r\n\t]+/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
     return text.slice(0, maxLength);
   }
 
@@ -89,11 +92,18 @@ export class WebScraperService {
     const emailMatches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
     // Filtra e-mails de extensões de arquivos ou templates
     const cleanEmails = [...new Set(emailMatches)].filter(
-      (e) => !e.endsWith('.png') && !e.endsWith('.jpg') && !e.endsWith('.webp') && !e.includes('example.com')
+      (e) =>
+        !e.endsWith('.png') &&
+        !e.endsWith('.jpg') &&
+        !e.endsWith('.webp') &&
+        !e.includes('example.com'),
     );
 
-    const phoneMatches = text.match(/(?:\+?55\s?)?(?:\(?\d{2}\)?\s?)?(?:9?\d{4}[-\s]?\d{4})/g) || [];
-    const cleanPhones = [...new Set(phoneMatches.map((p) => p.trim()))].filter((p) => p.replace(/\D/g, '').length >= 10);
+    const phoneMatches =
+      text.match(/(?:\+?55\s?)?(?:\(?\d{2}\)?\s?)?(?:9?\d{4}[-\s]?\d{4})/g) || [];
+    const cleanPhones = [...new Set(phoneMatches.map((p) => p.trim()))].filter(
+      (p) => p.replace(/\D/g, '').length >= 10,
+    );
 
     return { emails: cleanEmails.slice(0, 5), phones: cleanPhones.slice(0, 5) };
   }
@@ -101,7 +111,10 @@ export class WebScraperService {
   /**
    * Rastreia e extrai sinais web do site corporativo.
    */
-  public async scrapeWebsite(targetUrl: string, options: { forcePlaywright?: boolean } = {}): Promise<ScrapedWebSignals> {
+  public async scrapeWebsite(
+    targetUrl: string,
+    options: { forcePlaywright?: boolean } = {},
+  ): Promise<ScrapedWebSignals> {
     if (!this.isSafeUrl(targetUrl)) {
       throw new Error(`URL rejeitada por política de segurança SSRF: ${targetUrl}`);
     }
@@ -124,8 +137,12 @@ export class WebScraperService {
           const html = await response.text();
           const $ = cheerio.load(html);
 
-          const title = $('title').text().trim() || $('meta[property="og:title"]').attr('content') || '';
-          const description = $('meta[name="description"]').attr('content') || $('meta[property="og:description"]').attr('content') || '';
+          const title =
+            $('title').text().trim() || $('meta[property="og:title"]').attr('content') || '';
+          const description =
+            $('meta[name="description"]').attr('content') ||
+            $('meta[property="og:description"]').attr('content') ||
+            '';
 
           const openGraph: Record<string, string> = {};
           $('meta[property^="og:"]').each((_, el) => {
@@ -141,7 +158,9 @@ export class WebScraperService {
           });
 
           const socialLinks = {
-            linkedin: links.find((l) => l.includes('linkedin.com/company') || l.includes('linkedin.com/in')),
+            linkedin: links.find(
+              (l) => l.includes('linkedin.com/company') || l.includes('linkedin.com/in'),
+            ),
             instagram: links.find((l) => l.includes('instagram.com/')),
             facebook: links.find((l) => l.includes('facebook.com/')),
             twitter: links.find((l) => l.includes('twitter.com/') || l.includes('x.com/')),
@@ -171,7 +190,9 @@ export class WebScraperService {
     // Se falhar ou exigir Playwright, recorre defensivamente ao Playwright se instalado
     try {
       const moduleName = 'playwright';
-      const pw = await (Function('m', 'return import(m)')(moduleName) as Promise<any>).catch(() => null);
+      const pw = await (Function('m', 'return import(m)')(moduleName) as Promise<any>).catch(
+        () => null,
+      );
       if (pw?.chromium) {
         const browser = await pw.chromium.launch({ headless: true });
         const page = await browser.newPage();
@@ -194,7 +215,10 @@ export class WebScraperService {
         };
       }
     } catch (browserErr) {
-      logger.warn({ err: browserErr }, `[WebScraperService] Playwright fallback falhou ou indisponível para ${targetUrl}`);
+      logger.warn(
+        { err: browserErr },
+        `[WebScraperService] Playwright fallback falhou ou indisponível para ${targetUrl}`,
+      );
     }
 
     return {

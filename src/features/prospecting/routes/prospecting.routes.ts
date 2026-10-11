@@ -592,11 +592,15 @@ router.post('/enrich', async (req: Request, res: Response, next: NextFunction): 
 
     const { webScraperService } = await import('../services/enrichment/webScraper.service.js');
     if (!webScraperService.isSafeUrl(url)) {
-      res.status(400).json({ success: false, error: 'URL bloqueada pela política de segurança SSRF' });
+      res
+        .status(400)
+        .json({ success: false, error: 'URL bloqueada pela política de segurança SSRF' });
       return;
     }
 
-    const scrapedData = await webScraperService.scrapeWebsite(url, { forcePlaywright: Boolean(forceBrowser) });
+    const scrapedData = await webScraperService.scrapeWebsite(url, {
+      forcePlaywright: Boolean(forceBrowser),
+    });
     res.json({
       success: true,
       data: scrapedData,
