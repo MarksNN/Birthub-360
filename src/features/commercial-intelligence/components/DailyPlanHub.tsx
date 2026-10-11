@@ -792,17 +792,13 @@ export function DailyPlanHub() {
                   key={task.id}
                   onClick={() => toggleTask(task.id)}
                   className={`w-full text-left p-4 rounded-2xl border transition-colors cursor-pointer bg-surface ${
-                    task.completed
-                      ? 'border-ok/40 bg-ok/5'
-                      : 'border-line hover:border-brand/30'
+                    task.completed ? 'border-ok/40 bg-ok/5' : 'border-line hover:border-brand/30'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div
                       className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center ${
-                        task.completed
-                          ? 'bg-ok border-ok text-on-brand'
-                          : 'border-line'
+                        task.completed ? 'bg-ok border-ok text-on-brand' : 'border-line'
                       }`}
                     >
                       {task.completed && <Check className="w-3.5 h-3.5" />}
