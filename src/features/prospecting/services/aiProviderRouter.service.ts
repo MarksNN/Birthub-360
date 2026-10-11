@@ -175,13 +175,18 @@ Responda APENAS com um JSON válido no formato:
       return {
         criteria: {
           segmento: parsed.segmento || '',
-          subsegmento: parsed.subsegmento || undefined,
           cidade: parsed.cidade || undefined,
           estado: parsed.estado || undefined,
           porte: parsed.porte || undefined,
-          cnaePrincipal: parsed.cnaePrincipal || undefined,
           decisorCargos: Array.isArray(parsed.decisorCargos) ? parsed.decisorCargos : undefined,
           palavrasChave: parsed.palavrasChave || undefined,
+          segmentoDetalhes:
+            parsed.subsegmento || parsed.cnaePrincipal
+              ? {
+                  nicho: parsed.subsegmento,
+                  cnaePrincipal: parsed.cnaePrincipal,
+                }
+              : undefined,
         },
         explanation: parsed.explanation || 'Critérios interpretados por IA.',
         suggestedKeywords: parsed.palavrasChave

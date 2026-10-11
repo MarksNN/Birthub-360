@@ -7,11 +7,17 @@
  */
 
 import { logger } from '../../../lib/logger.js';
-import {
-  PhoneNormalizationUtil,
-  TextSimilarityUtil,
-} from '../utils/openSourceTextAndPhone.util.js';
 import type { DecisionMaker, ProspectCandidate } from '../domain/prospectTypes.js';
+
+function formatNationalPhone(rawPhone: string): string | null {
+  const digits = (rawPhone || '').replace(/\D/g, '');
+  if (digits.length < 10) return null;
+  const ddd = digits.slice(0, 2);
+  const rest = digits.slice(2);
+  return rest.length === 9
+    ? `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5)}`
+    : `(${ddd}) ${rest.slice(0, 4)}-${rest.slice(4)}`;
+}
 
 export interface PublicCnpjData {
   cnpj: string;
@@ -105,9 +111,7 @@ export class BrazilPublicCnpjService {
    */
   public static toProspectCandidate(data: PublicCnpjData): ProspectCandidate {
     const tradeName = data.nomeFantasia || data.razaoSocial;
-    const phone = data.telefones[0]
-      ? PhoneNormalizationUtil.formatNational(data.telefones[0])
-      : null;
+    const phone = data.telefones[0] ? formatNationalPhone(data.telefones[0]) : null;
     const decisionMakers: DecisionMaker[] = data.sociosQsa.map((s) => ({
       name: s.nome,
       title: s.qualificacao,
@@ -130,42 +134,37 @@ export class BrazilPublicCnpjService {
         ? { name: decisionMakers[0].name, role: decisionMakers[0].title || 'Sócio' }
         : null,
       rationale: `Dados cadastrais oficiais confirmados via Receita Federal (CNAE ${data.cnaePrincipal})`,
-      source: 'receita_federal',
+      source: 'brasilapi',
       segmentObserved: true,
       phone,
       emails: data.emails,
       decisionMakers,
-      cnaePrincipal: data.cnaePrincipal,
-      cnaeDescricao: data.cnaeDescricao,
-      cnaesSecundarios: data.cnaesSecundarios,
-      situacaoCadastral: data.situacaoCadastral,
-      dataAbertura: data.dataAbertura,
-      naturezaJuridica: data.naturezaJuridica,
-      capitalSocial: data.capitalSocial,
-      porte: data.porte,
-      enderecoCompleto: {
-        logradouro: data.endereco.logradouro,
-        numero: data.endereco.numero,
-        complemento: data.endereco.complemento,
-        bairro: data.endereco.bairro,
-        cidade: data.endereco.municipio,
-        uf: data.endereco.uf,
-        cep: data.endereco.cep,
+      companyData: {
+        cnaePrincipal: data.cnaePrincipal,
+        cnaeDescricao: data.cnaeDescricao,
+        cnaesSecundarios: data.cnaesSecundarios,
+        situacaoCadastral: data.situacaoCadastral,
+        dataAbertura: data.dataAbertura,
+        naturezaJuridica: data.naturezaJuridica,
+        capitalSocial: data.capitalSocial,
+        porte: data.porte,
+        enderecoCompleto: {
+          logradouro: data.endereco.logradouro,
+          numero: data.endereco.numero,
+          complemento: data.endereco.complemento,
+          bairro: data.endereco.bairro,
+          cidade: data.endereco.municipio,
+          uf: data.endereco.uf,
+          cep: data.endereco.cep,
+        },
       },
-      sourcesProvenance: [
-        {
-          field: 'cnpj',
+      provenance: {
+        cnpj: {
           source: 'receita_federal',
-          observedAt: new Date().toISOString(),
-          verified: true,
+          queriedAt: new Date().toISOString(),
+          status: 'reported',
         },
-        {
-          field: 'razaoSocial',
-          source: 'receita_federal',
-          observedAt: new Date().toISOString(),
-          verified: true,
-        },
-      ],
+      },
     };
   }
 
