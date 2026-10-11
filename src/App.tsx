@@ -293,7 +293,6 @@ const LeadApprovalDeck = lazy(() =>
   })),
 );
 
-
 const PropostasList = lazy(() =>
   import('./features/crm360/components/PropostasList.js').then((m) => ({
     default: m.PropostasList,
