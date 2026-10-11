@@ -21,7 +21,7 @@ import {
 import { SoundFX } from '../../lib/soundEffects.js';
 import type { Company, Contact, PaginatedResponse } from '../../types/index.js';
 import type { TabType } from '../layout/tabMeta.js';
-import { TAB_META } from '../layout/tabMeta.js';
+import { isNavHiddenTab, TAB_META } from '../layout/tabMeta.js';
 import { BorderBeam } from './BorderBeam.js';
 
 type ResultItem = {
@@ -310,7 +310,7 @@ export function CommandPalette() {
     result.push(...quickActions.filter((a) => !q || normalize(a.label).includes(q)));
 
     const moduleItems: ResultItem[] = MODULE_ORDER.filter(
-      (tab) => !q || normalize(TAB_META[tab].label).includes(q),
+      (tab) => !isNavHiddenTab(tab) && (!q || normalize(TAB_META[tab].label).includes(q)),
     ).map((tab) => ({
       id: `mod-${tab}`,
       group: 'Navegar',

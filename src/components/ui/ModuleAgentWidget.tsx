@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Sparkles, X, Send } from 'lucide-react';
 import type { TabType } from '../layout/tabMeta.js';
+import { isNavHiddenTab } from '../layout/tabMeta.js';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { hasRequiredRole, MESA_TRATAMENTO_ROLES } from '../../lib/auth/authorization.js';
@@ -174,7 +175,7 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
         'outbound',
         'dialer',
         ...(canAccessMesaTratamento ? (['mesa-tratamento'] as TabType[]) : []),
-      ],
+      ].filter((tab) => !isNavHiddenTab(tab as TabType)),
     },
     {
       title: 'ADMINISTRAÇÃO',
@@ -185,7 +186,11 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
     },
   ];
 
-  const activeGroup = navGroupsByJourney.find((g) => (g.items as TabType[]).includes(activeTab));
+  const navGroups = navGroupsByJourney.map((g) => ({
+    ...g,
+    items: (g.items as TabType[]).filter((tab) => !isNavHiddenTab(tab)),
+  }));
+  const activeGroup = navGroups.find((g) => (g.items as TabType[]).includes(activeTab));
 
   if (!activeGroup) return null;
   const agent = AGENTS_BY_PILLAR[activeGroup.title];
