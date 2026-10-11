@@ -56,9 +56,15 @@ export function useSidebarState({
 
   // Auto-expande o grupo se a aba ativa pertencer aos seus sub-itens
   useEffect(() => {
-    const revenueTabs: TabType[] = ['crm', 'crm360', 'propostas', 'forecast'];
-    if (revenueTabs.includes(activeTab)) {
-      setExpandedGroups((prev) => (prev.revenue_tree ? prev : { ...prev, revenue_tree: true }));
+    const groupTabs: Record<string, TabType[]> = {
+      revenue_tree: ['crm', 'crm360', 'propostas', 'forecast'],
+      'market-intelligence': ['market-intelligence'],
+      prospecting: ['prospect'],
+    };
+    for (const [groupId, tabs] of Object.entries(groupTabs)) {
+      if (tabs.includes(activeTab)) {
+        setExpandedGroups((prev) => (prev[groupId] ? prev : { ...prev, [groupId]: true }));
+      }
     }
   }, [activeTab]);
 
@@ -68,13 +74,14 @@ export function useSidebarState({
     setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   }, []);
 
-  const [launch, setLaunch] = useState<(NavLaunch & { tab: TabType }) | null>(null);
+  const [launch, setLaunch] = useState<(NavLaunch & { tab: TabType; path?: string }) | null>(null);
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
 
   const openTab = useCallback(
-    (tab: TabType) => {
-      navigate(`/app/${tab}`);
+    // `path` = sub-rota real sob /app (ex.: `market-intelligence/hub`); sem ele, `/app/<tab>`.
+    (tab: TabType, path?: string) => {
+      navigate(`/app/${path ?? tab}`);
       onCloseMobile?.();
     },
     [navigate, onCloseMobile],
@@ -82,12 +89,12 @@ export function useSidebarState({
 
   const finishLaunch = useCallback(() => {
     if (!launch) return;
-    openTab(launch.tab);
+    openTab(launch.tab, launch.path);
     setLaunch(null);
   }, [launch, openTab]);
 
   const selectTab = useCallback(
-    (tab: TabType, event: React.MouseEvent) => {
+    (tab: TabType, event: React.MouseEvent, path?: string) => {
       if (launch) return;
       if (tab !== activeTab) SoundFX.play('navigate');
 
@@ -101,7 +108,7 @@ export function useSidebarState({
         event.altKey;
 
       if (skip) {
-        openTab(tab);
+        openTab(tab, path);
         return;
       }
 
@@ -110,6 +117,7 @@ export function useSidebarState({
       const rect = anchor.getBoundingClientRect();
       setLaunch({
         tab,
+        path,
         label: meta.label,
         Icon: meta.icon,
         accent: NAV_ACCENT_VAR[meta.accent] || 'var(--nav-c-blue)',

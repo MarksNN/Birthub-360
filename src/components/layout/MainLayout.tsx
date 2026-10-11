@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar.js';
 import { AppTopbar } from './AppTopbar.js';
 import { OfflineBanner } from './OfflineBanner.js';
@@ -13,11 +14,16 @@ interface MainLayoutProps {
   activeTab?: string;
 }
 
-export function MainLayout({ children, activeTab }: MainLayoutProps) {
+export function MainLayout({ children, activeTab: activeTabProp }: MainLayoutProps) {
   const { mobileNavOpen, toggleMobileNav, closeMobileNav } = useNavigationState();
+  // App.tsx monta <MainLayout> sem `activeTab` — sem isto a Sidebar nunca marcava o item ativo
+  // (nem expandia o grupo) e o Topbar caía sempre no meta de `dashboard`. Deriva de /app/<tab>/…
+  // (mesma regra do FuturisticLayout); a prop explícita continua tendo precedência.
+  const { pathname } = useLocation();
+  const activeTab = activeTabProp ?? (pathname.split('/')[2] || 'dashboard');
 
   return (
-    <div className="relative flex flex-col h-screen h-[100dvh] w-full overflow-hidden bg-gradient-to-br from-background to-surface-2 text-foreground antialiased selection:bg-brand selection:text-on-brand">
+    <div className="relative flex flex-col h-screen h-[100dvh] w-full overflow-hidden bg-bg font-sans text-ink antialiased selection:bg-brand selection:text-on-brand">
       <OfflineBanner />
 
       <div className="relative flex flex-1 min-h-0 w-full overflow-hidden">
