@@ -218,19 +218,13 @@ export function KpiCard({
     );
   }
 
+  // Ramo sem onSelect: puramente apresentacional (sem role/teclado).
+  // Remover onSelect?.() aqui — após o early-return, TS estreita onSelect a undefined (TS2349).
   return (
     <div
       onPointerMove={handlePointerMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      role={onSelect ? 'button' : undefined}
-      tabIndex={onSelect ? 0 : undefined}
-      onKeyDown={onSelect ? (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect?.();
-        }
-      } : undefined}
       className={sharedClassName}
     >
       {content}
