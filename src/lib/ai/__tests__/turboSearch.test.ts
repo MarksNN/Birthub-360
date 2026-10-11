@@ -106,10 +106,10 @@ describe('Turbo interpretation with mocked providers', () => {
     await run({
       mode: 'groq',
       allowPaidProviders: true,
-      query: 'Empresas telefone 11987654321 e contato@empresa.com',
+      query: 'Empresas telefone 11987654321 e contato@transportadora.com.br',
     });
     const messages = mocks.chat.mock.calls[0][0].messages;
-    expect(JSON.stringify(messages)).not.toContain('contato@empresa.com');
+    expect(JSON.stringify(messages)).not.toContain('contato@transportadora.com.br');
     expect(JSON.stringify(messages)).not.toContain('11987654321');
   });
   it('blocks paid generation when ledger unavailable', async () => {
