@@ -282,9 +282,6 @@ const LandingInnovative = lazy(() =>
   import('./features/voice-hub/pages/LandingInnovative.js').then((m) => ({ default: m.default })),
 );
 const Ldr = lazy(() => import('./pages/Ldr.js').then((m) => ({ default: m.Ldr })));
-const FirstAccessWizard = lazy(() =>
-  import('./features/onboarding/pages/FirstAccessWizard.js').then((m) => ({ default: m.default })),
-);
 const Account360 = lazy(() =>
   import('./features/market-intelligence/components/Account360.js').then((m) => ({
     default: m.Account360,
@@ -588,14 +585,6 @@ export default function App() {
                       />
                       <Route path="/" element={<Landing360 />} />
                       <Route path="/welcome" element={<WelcomeScreen />} />
-                      <Route
-                        path="/onboarding"
-                        element={
-                          <ProtectedRoute>
-                            <FirstAccessWizard />
-                          </ProtectedRoute>
-                        }
-                      />
                       <Route path="/landing-new" element={<LandingInnovative />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfUse />} />
