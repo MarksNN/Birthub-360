@@ -40,18 +40,14 @@ export const KanbanColumn = React.memo(function KanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`relative flex flex-col rounded-xl min-w-[320px] max-w-[320px] max-h-full shrink-0 border transition-all duration-300 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-brand/20 before:to-transparent before:z-20 ${
+      className={`relative flex flex-col rounded-xl min-w-[320px] max-w-[320px] max-h-full shrink-0 border bg-surface transition-all duration-300 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-brand/20 before:to-transparent before:z-20 ${
         isOver
           ? 'border-brand/50 shadow-[0_0_30px_rgba(0,229,255,0.15)] scale-[1.01]'
           : 'border-line/40 hover:border-line/70'
       }`}
-      style={{ background: 'var(--surface)' }}
     >
       {/* Cabeçalho da coluna */}
-      <div
-        className="px-4 pt-4 pb-3 sticky top-0 z-10 flex flex-col gap-1 backdrop-blur-md"
-        style={{ background: 'var(--surface)', borderBottom: '1px solid var(--line)' }}
-      >
+      <div className="px-4 pt-4 pb-3 sticky top-0 z-10 flex flex-col gap-1 backdrop-blur-md bg-surface border-b border-line">
         <div className="flex justify-between items-center gap-2">
           <h3 className="font-mono text-[11px] font-semibold tracking-widest uppercase text-ink-2 flex items-center gap-1.5 min-w-0">
             <span className="shrink-0" aria-hidden="true">
