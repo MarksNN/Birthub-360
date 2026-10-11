@@ -12,7 +12,7 @@ import { dispatchSyncStatus } from './SyncIndicator.js';
  * que as ações serão armazenadas localmente e sincronizadas automaticamente quando
  * a conexão for restabelecida.
  *
- * Fica montado em fluxo normal no topo de `MainLayout` / `FuturisticLayout`,
+ * Fica montado em fluxo normal no topo de `MainLayout`,
  * acima da Sidebar/Topbar, empurrando o conteúdo para baixo. Mantém `role="status"`
  * e `aria-live="polite"` para anúncio acessível em leitores de tela.
  */
