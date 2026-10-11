@@ -149,6 +149,9 @@ tags:
   - name: Orquestração Comercial
     description: >-
       Módulo de Orquestração Comercial — playbooks, roteiros, jornadas comerciais e processos de vendas
+  - name: Módulos da Organização
+    description: >-
+      Gerenciamento de módulos de produto ativos e conclusão do onboarding da organização (/setup)
   - name: Webhooks
     description: >-
       Endpoints de entrada de provedores externos, montados ANTES do `express.json()` global —
@@ -10128,6 +10131,130 @@ paths:
               { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
           }
 
+  /organization-modules:
+    get:
+      tags: [Módulos da Organização]
+      summary: Retorna a configuração e módulos ativos da organização
+      description: Leitura liberada para qualquer usuário autenticado da organização (o gate de módulos avalia todos os papéis).
+      responses:
+        '200':
+          description: Estado atual dos módulos da organização
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/OrganizationModulesView' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Módulos da Organização]
+      summary: Substitui a lista de módulos habilitados da organização
+      description: Restrito a ADMIN. Módulos marcados como alwaysActive continuam habilitados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [modules]
+              properties:
+                modules:
+                  type: array
+                  items: { type: string }
+                  description: Lista de chaves dos módulos habilitados (ex. ['crm', 'prospecting', 'intelligence'])
+      responses:
+        '200':
+          description: Configuração de módulos atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/OrganizationModulesView' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /organization-modules/onboarding/complete:
+    post:
+      tags: [Módulos da Organização]
+      summary: Marca a conclusão do onboarding de módulos (/setup) da organização
+      description: Restrito a ADMIN.
+      responses:
+        '200':
+          description: Onboarding concluído com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/OrganizationModulesView' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /organization-modules/{moduleKey}:
+    post:
+      tags: [Módulos da Organização]
+      summary: Habilita um módulo específico da organização
+      description: Restrito a ADMIN.
+      parameters:
+        - name: moduleKey
+          in: path
+          required: true
+          schema: { type: string }
+          description: Chave do módulo (ex. 'prospecting', 'voice', 'intelligence')
+      responses:
+        '200':
+          description: Módulo habilitado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/OrganizationModulesView' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Módulos da Organização]
+      summary: Desabilita um módulo específico da organização
+      description: Restrito a ADMIN. Módulos alwaysActive (ex. 'hub') não podem ser desabilitados.
+      parameters:
+        - name: moduleKey
+          in: path
+          required: true
+          schema: { type: string }
+          description: Chave do módulo a ser desabilitado
+      responses:
+        '200':
+          description: Módulo desabilitado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/OrganizationModulesView' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
 components:
   securitySchemes:
     sessionCookie:
@@ -10883,4 +11010,36 @@ components:
         notifyEmails: { type: array, items: { type: string, format: email } }
         webhookUrl: { type: string, format: uri }
         action: { type: string, enum: [notify_only, enforce_fallback, throttle] }
+
+    # ── Módulos da Organização (/setup) ──
+    OrganizationModuleView:
+      type: object
+      required: [key, label, alwaysActive, active]
+      properties:
+        key: { type: string, example: 'prospecting' }
+        label: { type: string, example: 'Prospecção' }
+        alwaysActive: { type: boolean, example: false }
+        active: { type: boolean, example: true }
+
+    OrganizationModulesView:
+      type: object
+      required: [configured, onboardingCompleted, activeModules, modules]
+      properties:
+        configured:
+          type: boolean
+          description: False se a organização nunca salvou módulos (legado, todos ativos por padrão)
+        onboardingCompleted:
+          type: boolean
+          description: True se o fluxo de /setup foi concluído pela organização
+        onboardingCompletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        activeModules:
+          type: array
+          items: { type: string }
+          example: ['hub', 'prospecting', 'intelligence']
+        modules:
+          type: array
+          items: { $ref: '#/components/schemas/OrganizationModuleView' }
 
