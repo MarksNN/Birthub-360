@@ -4,7 +4,8 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { DS_TOKENS, DS_CLASSES } from '@/lib/designSystem';
 import { BentoGrid, BentoCard, BentoMetric, BentoHero, BentoInsight } from '@/components/ui/bento';
-import { FloatingDock } from '@/components/layout/FloatingDock';
+import { MobileNavDrawer } from '@/components/layout/MobileNavDrawer';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { PageTransition } from '@/components/layout/PageTransition';
 import {
   Skeleton,
@@ -87,17 +88,17 @@ describe('Onda 1 — Design System Foundation & Core Components', () => {
     });
   });
 
-  describe('Prompt 04: FloatingDock Mobile', () => {
-    it('should render mobile quick navigation items and menu action', () => {
+  describe('Prompt 04: Mobile Navigation Drawer', () => {
+    it('should render mobile drawer with accessible aside and backdrop', () => {
       render(
         <MemoryRouter>
-          <FloatingDock activeTab="dashboard" onOpenFullMenu={() => {}} />
+          <AuthProvider>
+            <MobileNavDrawer isOpen={true} onClose={() => {}} activeTab="dashboard" />
+          </AuthProvider>
         </MemoryRouter>,
       );
-      expect(screen.getByRole('navigation', { name: /navegação rápida/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /painel/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /captar/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /menu/i })).toBeInTheDocument();
+      expect(screen.getByRole('complementary', { name: /navegação móvel/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /fechar menu de navegação/i })).toBeInTheDocument();
     });
   });
 
