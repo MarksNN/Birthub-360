@@ -7,6 +7,12 @@ Quem implementa cada onda seguinte do pacote `birthhub360_copiloto_ai_pack` (ver
 `C:\Users\Marks\Desktop\BIRTHHUB360_COPILOTO_IA_AGENTES_PROMPTS_EXTENSAO_CHROME` para o pacote de
 especificação original — agentes, prompts e roadmap por onda).
 
+## Nav vs módulo (P0 #693 / 00)
+
+A tab/rota de frontend `copiloto_ia` (`/app/copiloto_ia`) **não** monta `CopilotoIaHub`.
+É **alias** de `/app/intelligence/elite-agent` → `EliteCommercialAgentWorkspace` (decisão Coordenador 00: sem hub separado falso na nav).
+Este módulo continua dono de `/api/copiloto-ia`, painéis embutidos (`LeadCopilotoPanel`) e `CopilotoIaHub.tsx` para superfície futura — roteamento de nav exige Agente 02 + nova decisão 00.
+
 ## O que é
 
 Módulo do Copiloto Comercial IA (pacote `birthhub360_copiloto_ai_pack`), já cobrindo as Ondas 1-6 do
