@@ -131,7 +131,7 @@ export function UnifiedNode({
       {/* Footer Metrics (Optional) */}
       {data.metrics && (
         <div className="flex items-center justify-between px-4 py-2 border-t border-white/5 bg-black/20 rounded-b-xl text-[10px] font-mono text-gray-400">
-          <span>{data.metrics.invocations.toLocaleString()} runs</span>
+          <span>{(data.metrics.invocations ?? 0).toLocaleString()} runs</span>
           <span>{data.metrics.latencyMs}ms</span>
         </div>
       )}
