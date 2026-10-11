@@ -29,7 +29,7 @@ Execução de `npm run lint` revelou 8 avisos de acessibilidade (lint/a11y):
 ```tsx
 <div
   key={label}
-  className="group grid grid-cols-[10px_1fr:auto] items-center gap-3 p-1.5 rounded-lg transition-colors hover:bg-surface-elevated/60"
+  className="group grid grid-cols-[10px_1fr_auto] items-center gap-3 p-1.5 rounded-lg transition-colors hover:bg-surface-elevated/60"
 >
 ```
 - ❌ VIOLAÇÃO: `div` com hover state sem role
