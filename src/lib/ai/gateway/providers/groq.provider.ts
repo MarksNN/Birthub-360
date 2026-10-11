@@ -18,22 +18,50 @@ export const groqProvider: ProviderAdapter = {
   async chatCompletion(params: ProviderChatParams): Promise<ChatCompletionResponse> {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) throw new Error('Groq não está configurado (GROQ_API_KEY ausente).');
-    const groqModel = resolveGroqModelName(params.resolvedModel);
-    return callProvider(
-      'groq',
-      () =>
-        requestChatCompletion(
-          GROQ_CHAT_URL,
-          apiKey,
-          groqModel,
-          params.messages,
-          params.temperature,
-          params.agentContext,
-          params.timeoutMs,
-          false, // Groq ignora user/metadata — não vazamos agentContext para fora sem necessidade.
-          { maxTokens: params.maxTokens, jsonMode: params.jsonMode },
-        ),
-      params.retries,
-    );
+    const primaryGroqModel = resolveGroqModelName(params.resolvedModel);
+
+    // Lista de fallback de modelos compatíveis no Groq para tolerância a rate-limits específicos de modelo (TPD)
+    const modelCandidates = [primaryGroqModel];
+    if (primaryGroqModel === 'openai/gpt-oss-20b') {
+      modelCandidates.push('openai/gpt-oss-120b', 'llama-3.1-8b-instant');
+    } else if (primaryGroqModel === 'openai/gpt-oss-120b') {
+      modelCandidates.push('openai/gpt-oss-20b', 'llama-3.3-70b-versatile');
+    }
+
+    let lastError: unknown;
+    for (const groqModel of modelCandidates) {
+      try {
+        return await callProvider(
+          'groq',
+          () =>
+            requestChatCompletion(
+              GROQ_CHAT_URL,
+              apiKey,
+              groqModel,
+              params.messages,
+              params.temperature,
+              params.agentContext,
+              params.timeoutMs,
+              false, // Groq ignora user/metadata — não vazamos agentContext para fora sem necessidade.
+              { maxTokens: params.maxTokens, jsonMode: params.jsonMode },
+            ),
+          params.retries,
+        );
+      } catch (err: any) {
+        lastError = err;
+        const msg = String(err?.message || err);
+        // Se for erro de quota de modelo específico (429 com tokens per day / rate limit), tenta o próximo modelo candidato
+        if (
+          msg.includes('429') &&
+          (msg.includes('tokens per day') ||
+            msg.includes('TPD') ||
+            msg.includes('Rate limit reached for model'))
+        ) {
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw lastError;
   },
 };
