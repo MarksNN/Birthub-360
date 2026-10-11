@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Target,
-  Zap,
-  Building2,
-  TrendingUp,
-  ArrowUpRight,
-  AlertTriangle,
-} from 'lucide-react';
+import { Target, Zap, Building2, TrendingUp, ArrowUpRight, AlertTriangle } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
   Card,
@@ -124,9 +117,7 @@ export function InteligenciaMercadoHub() {
   const sectors = useMemo(() => sectorBreakdown(companies), [companies]);
   const total = meta?.total ?? 0;
   const sampleLabel =
-    companies.length > 0
-      ? `${formatInt(companies.length)} na amostra carregada`
-      : 'Sem amostra';
+    companies.length > 0 ? `${formatInt(companies.length)} na amostra carregada` : 'Sem amostra';
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--bg)] text-[var(--ink)]">
@@ -288,7 +279,9 @@ export function InteligenciaMercadoHub() {
                               .filter(Boolean)
                               .join(' · ') || 'Sem CNAE/localização'}
                           </p>
-                          <span className="text-[10px] text-[var(--ink-3)] font-mono">{c.cnpj}</span>
+                          <span className="text-[10px] text-[var(--ink-3)] font-mono">
+                            {c.cnpj}
+                          </span>
                         </div>
                         <Link
                           to={`/app/market-intelligence?cnpj=${encodeURIComponent(c.cnpj)}`}

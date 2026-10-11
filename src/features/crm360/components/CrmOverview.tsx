@@ -296,8 +296,8 @@ export function CrmOverview({ onNavigate }: CrmOverviewProps) {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-ink">
-                      {((activity as any).lead as any)?.company?.tradeName ||
-                        ((activity as any).lead as any)?.contact?.name ||
+                      {activity.lead?.company?.tradeName ||
+                        activity.lead?.contact?.name ||
                         activity.type}
                     </p>
                     <p className="truncate text-xs text-ink-2">
