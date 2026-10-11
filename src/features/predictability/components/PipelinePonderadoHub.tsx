@@ -1,18 +1,23 @@
-import { Layers, Calculator, BarChart4, AlertCircle } from 'lucide-react';
+import { AlertCircle, BarChart4, Calculator, Layers } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
-import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
+import { PredictabilityEmptyState, PredictabilityStatusBanner } from './PredictabilityNoData.js';
 import {
-  NO_DATA_SUBTITLE,
-  NO_DATA_VALUE,
-  PredictabilityEmptyState,
-  PredictabilityNoDataNotice,
-} from './PredictabilityNoData.js';
+  formatBRL,
+  formatPct,
+  unavailableReason,
+  usePredictabilityOverview,
+} from './usePredictabilityOverview.js';
 
-// P0 #693 (Agente 02): valores em R$ fixos removidos — sem API, a tela mostra "Sem dados".
-// Plugar leitura real quando a PR B do Agente 04 (crm overview + goals/forecast) for mergeada.
+// P0 #693 (Agente 02): leitura real via predictabilityApi (Agente 04, PR #697). Sem R$ inventado.
 
 export function PipelinePonderadoHub() {
+  const { data, loading, error, noRealData, partial, reload } = usePredictabilityOverview();
+  const p = data?.pipeline ?? null;
+  const cur = data?.meta.currency ?? 'BRL';
+  const weightedReason = unavailableReason(data, 'pipeline.weightedAmount');
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--bg)] text-[var(--ink)]">
       <CommandCenterHeader title="Pipeline Ponderado" icon={Layers} />
@@ -21,48 +26,96 @@ export function PipelinePonderadoHub() {
         <div className="mb-4">
           <p className="text-sm text-[var(--ink-2)]">
             O valor do seu funil ajustado pela probabilidade de fechamento
+            {data ? ` · período ${data.meta.period}` : ''}
           </p>
         </div>
 
-        <PredictabilityNoDataNotice what="O Pipeline Ponderado" />
+        <PredictabilityStatusBanner
+          what="o pipeline ponderado"
+          loading={loading}
+          error={error}
+          noRealData={noRealData}
+          partial={partial}
+          failedSources={data?.meta.failedSources}
+          onRetry={reload}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <KpiCard
             title="Valor Bruto do Funil"
-            value={NO_DATA_VALUE}
+            value={formatBRL(p?.grossAmount, cur)}
             icon={BarChart4}
-            subtitle={NO_DATA_SUBTITLE}
+            subtitle={
+              p?.grossAmount != null
+                ? `${p.grossCount ?? 0} negócios abertos`
+                : (unavailableReason(data, 'pipeline.grossAmount') ?? 'Indisponível')
+            }
             variant="default"
           />
           <KpiCard
             title="Valor Ponderado"
-            value={NO_DATA_VALUE}
+            value={formatBRL(p?.weightedAmount, cur)}
             icon={Calculator}
-            subtitle={NO_DATA_SUBTITLE}
+            subtitle={
+              p?.weightedAmount != null
+                ? 'Σ valor × probabilidade'
+                : (weightedReason ?? 'Indisponível')
+            }
             variant="default"
           />
           <KpiCard
             title="Risco Calculado"
-            value={NO_DATA_VALUE}
+            value={formatBRL(p?.atRiskAmount, cur)}
             icon={AlertCircle}
-            subtitle={NO_DATA_SUBTITLE}
+            subtitle={
+              p?.atRiskAmount != null ? 'Bruto − ponderado' : (weightedReason ?? 'Indisponível')
+            }
             variant="default"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Cálculo por Etapa do Pipeline</CardTitle>
-            </CardHeader>
-            <CardContent className="border-t border-[var(--line)] pt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Cálculo por Etapa do Pipeline</CardTitle>
+          </CardHeader>
+          <CardContent className="border-t border-[var(--line)] pt-6">
+            {p && p.stages.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs text-[var(--ink-3)]">
+                    <th className="py-1 font-medium">Etapa</th>
+                    <th className="py-1 font-medium text-right">Negócios</th>
+                    <th className="py-1 font-medium text-right">Bruto</th>
+                    <th className="py-1 font-medium text-right">Prob. média</th>
+                    <th className="py-1 font-medium text-right">Ponderado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {p.stages.map((s) => (
+                    <tr key={s.stageName} className="border-t border-[var(--line)]">
+                      <td className="py-1.5">{s.stageName}</td>
+                      <td className="py-1.5 text-right tabular-nums">{s.count}</td>
+                      <td className="py-1.5 text-right tabular-nums">
+                        {formatBRL(s.grossAmount, cur)}
+                      </td>
+                      <td className="py-1.5 text-right tabular-nums">
+                        {formatPct(s.avgProbability)}
+                      </td>
+                      <td className="py-1.5 text-right tabular-nums">
+                        {formatBRL(s.weightedAmount, cur)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
               <PredictabilityEmptyState
-                title="Sem dados do pipeline"
-                hint="O cálculo por etapa aparece quando houver leitura real do CRM."
+                title="Sem cálculo por etapa"
+                hint={weightedReason ?? 'Sem negócios abertos no período.'}
               />
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

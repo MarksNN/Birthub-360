@@ -3,8 +3,8 @@ import { lazy, Suspense, useCallback, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary.js';
 import { MainLayout } from './components/layout/MainLayout.js';
-import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 import { OnboardingGate } from './components/layout/OnboardingGate.js';
+import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 import { RequireModuleAccess } from './components/layout/RequireModuleAccess.js';
 import { RequireRole } from './components/layout/RequireRole.js';
 import { ClickSpark } from './components/ui/ClickSpark.js';
@@ -15,7 +15,11 @@ import { BrandProvider } from './contexts/BrandContext.js';
 import { DailyClosingProvider } from './contexts/DailyClosingContext.js';
 import { ExperienceModeProvider } from './contexts/ExperienceModeContext.js';
 import { ThemeProvider } from './contexts/ThemeContext.js';
-import { COMMERCIAL_INTELLIGENCE_ROLES, MESA_TRATAMENTO_ROLES } from './lib/auth/authorization.js';
+import {
+  COMMERCIAL_INTELLIGENCE_ROLES,
+  COPILOTO_IA_ROLES,
+  MESA_TRATAMENTO_ROLES,
+} from './lib/auth/authorization.js';
 
 const SetupWizard = lazy(() =>
   import('./features/onboarding/components/SetupWizard.js').then((m) => ({
@@ -395,7 +399,16 @@ function AppLayout() {
             />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
-            <Route path="copiloto_ia" element={<CopilotoIaHub />} />
+            {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,
+              não só no item de navegação — evita 403 cru ao digitar a URL. */}
+            <Route
+              path="copiloto_ia"
+              element={
+                <RequireRole allowedRoles={[...COPILOTO_IA_ROLES]}>
+                  <CopilotoIaHub />
+                </RequireRole>
+              }
+            />
             <Route path="companies" element={<CompanyList />} />
             <Route path="contacts" element={<ContactList />} />
             <Route path="activities" element={<ActivityList />} />
