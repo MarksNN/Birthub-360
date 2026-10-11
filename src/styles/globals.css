@@ -1004,10 +1004,7 @@
     letter-spacing: -0.02em;
   }
 
-  /* Aplicação estrita da Regra Mandatória: nunca branco ou preto em títulos */
-  :is(h1, h2, h3, h4, h5, h6):is(.text-white, .text-black, .text-slate-900, .text-gray-900, [class*="dark:text-white"]) {
-    color: var(--neon-blue) !important;
-  }
+  /* Títulos por padrão usam a identidade visual, preservando classes de cores utilitárias explícitas */
 
   .neon-title-blue,
   h1.neon-title-blue,
