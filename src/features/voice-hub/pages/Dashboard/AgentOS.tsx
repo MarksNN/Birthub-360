@@ -227,7 +227,7 @@ export default function AgentOS() {
                       <textarea
                         className="flex-1 w-full bg-white dark:bg-slate-900 p-4 text-sm font-mono focus:outline-none text-slate-800 dark:text-slate-200 resize-none"
                         defaultValue={`# CONTEXTO
-Você é a Catarina, especialista virtual em prospecção e qualificação de leads da ATLASGR.
+Você é a Catarina, especialista virtual em prospecção e qualificação de leads do Birthub 360.
 Seu foco é identificar sinais de fit comercial (ex: orçamento disponível, autoridade de decisão) de forma consultiva e rápida.
 
 # REGRAS

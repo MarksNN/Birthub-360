@@ -1,7 +1,7 @@
 - De: 06 (Integrações e Bitrix)
 - Para: 01 (Plataforma, Segurança e Dados)
 - Onda: 16
-- Status: aberto
+- Status: resolvido (schema entregue por 01 e consumido por 06)
 - Prioridade: bloqueador (núcleo CRM externo + HubSpot E2E)
 - Revisor: 24
 
@@ -121,3 +121,13 @@ model ExternalCrmStageMapping {
 - Sucede `.agents/handoffs/onda-14/06-para-01-schema-novos-crms.md` (resolvido).
 - Bitrix NÃO é migrado para `ExternalEntityLink` nesta onda (continua com `bitrixLeadId`/`bitrixDealId`).
 - Consumidor: plano núcleo (B) e HubSpot E2E (C) do 06. Implementação do 06 só após status `resolvido`.
+
+## Resolução (Agente 06 — 2026-10-11)
+- Migration `20261013120000_external_crm_entity_links_stage_mapping` entregue pelo Agente 01 em `main`.
+- `ExternalCrmService.pushLeadToAllConnections` refatorado para:
+  1. Filtrar conexões com `status = 'active'` E `outboundEnabled = true`.
+  2. Consultar vínculo prévio em `prisma.externalEntityLink` em vez de `ExternalCrmSyncLog`.
+  3. Fazer `upsert` em `ExternalEntityLink` após sync externo com `lastDirection = 'outbound'`.
+  4. Manter `ExternalCrmSyncLog` como trilha de auditoria e atualizar `lastSyncAt`.
+- Teste unitário adicionado e passando: `tests/unit/features/integrations/shared/ExternalCrmService.outbound.test.ts`.
+
