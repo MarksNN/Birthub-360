@@ -113,9 +113,7 @@ describe('Drawer', () => {
     await user.click(screen.getByRole('button', { name: 'Fechar gaveta' }));
     expect(onClose).toHaveBeenCalledTimes(1);
 
-    const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/60');
-    expect(backdrop).toBeInTheDocument();
-    if (!(backdrop instanceof HTMLElement)) throw new Error('Backdrop do Drawer não encontrado');
+    const backdrop = screen.getByTestId('drawer-overlay');
     await user.click(backdrop);
     expect(onClose).toHaveBeenCalledTimes(2);
   });

@@ -24,7 +24,7 @@ export function AdaptiveDashboard() {
   const showWorkspaceSection = !isLoading && !error && workspace?.status === 'READY';
 
   return (
-    <>
+    <div className="operate-dense min-h-full bg-bg text-ink">
       <SinglePageDashboard />
       {showWorkspaceSection && workspace && (
         <motion.div
@@ -40,6 +40,6 @@ export function AdaptiveDashboard() {
           <WorkspaceReadySection workspace={workspace} />
         </motion.div>
       )}
-    </>
+    </div>
   );
 }

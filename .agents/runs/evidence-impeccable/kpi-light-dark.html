@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Impeccable Operate — KpiCard light/dark</title>
+<style>
+:root {
+  --bg:#FBF8F3; --surface:#fff; --surface-elevated:#fff; --ink:#141218; --ink-2:#5b5670;
+  --line:rgba(20,18,24,.12); --brand:#C9A24C; --brand-text:#8a6a1f; --focus-ring:#8a6a1f;
+  --ok:#22c55e; --ok-active:#15803d; --critical:#b91c1c; --critical-active:#991b1b;
+  --gold:#C9A24C; --iris:#8b5cf6; --pulse:#ec4899;
+  font-family: Inter, system-ui, sans-serif;
+}
+.dark {
+  --bg:#0E0C12; --surface:#1C1D24; --surface-elevated:#22232b; --ink:#F8F4EA; --ink-2:#A1A1B5;
+  --line:rgba(248,244,234,.12); --brand:#00D4FF; --brand-text:#00D4FF; --focus-ring:#00D4FF;
+  --ok:#4ade80; --ok-active:#86efac; --critical:#f87171; --critical-active:#fca5a5;
+}
+body { margin:0; background:var(--bg); color:var(--ink); }
+.wrap { max-width:1100px; margin:0 auto; padding:24px; }
+.toolbar { display:flex; gap:12px; align-items:center; margin-bottom:20px; }
+button { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:8px 14px; cursor:pointer; }
+.grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); }
+.card { border:1px solid var(--line); background:var(--surface); border-radius:16px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+.card h3 { margin:12px 0 4px; font-size:26px; font-weight:700; }
+.card p { margin:0; font-size:13px; color:var(--ink-2); }
+.chip { width:38px; height:38px; border-radius:12px; border:1px solid var(--brand); background:color-mix(in srgb, var(--brand) 12%, transparent); color:var(--brand-text); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+.label { font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2); margin-bottom:8px; }
+@media (max-width:420px){ .wrap{padding:12px;} .grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="toolbar">
+    <strong>Operate KPI — evidência Impeccable</strong>
+    <button id="tog" type="button">Alternar tema</button>
+    <span id="mode">light</span>
+  </div>
+  <div class="label">P0 cockpit densify</div>
+  <div class="grid">
+    <div class="card"><div class="chip">OK</div><h3>128</h3><p>Leads quentes</p></div>
+    <div class="card"><div class="chip">$</div><h3>R$ 84k</h3><p>Pipeline ponderado</p></div>
+    <div class="card"><div class="chip">→</div><h3>17</h3><p>Próximas ações</p></div>
+    <div class="card"><div class="chip">!</div><h3>4</h3><p>Bloqueios</p></div>
+  </div>
+</div>
+<script>
+const b=document.getElementById('tog'), m=document.getElementById('mode');
+b.onclick=()=>{document.documentElement.classList.toggle('dark'); m.textContent=document.documentElement.classList.contains('dark')?'dark':'light';};
+</script>
+</body>
+</html>
