@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SCREENSHOTS_DIR = path.join(__dirname, '..', 'visual-audit-capture');
+const SCREENSHOTS_DIR = path.join(__dirname, '..', 'visual-audit-authenticated');
 const OUTPUT_DIR = path.join(__dirname, '..', 'visual-manual-output');
 
 if (!fs.existsSync(OUTPUT_DIR)) {

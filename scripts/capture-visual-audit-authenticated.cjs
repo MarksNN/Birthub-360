@@ -67,9 +67,9 @@ async function captureScreenshots() {
   const results = [];
 
   try {
-    // Usar credenciais do usuário temporário criado
-    const email = 'audit-temp-1791213079215@birthhub360.internal';
-    const password = 'AuditTemp123!';
+    // Usar credenciais do usuário já existente
+    const email = 'marcelinmark@gmail.com';
+    const password = process.env.ADMIN_INITIAL_PASSWORD || '00000000';
 
     console.log('Attempting to login with temp user...');
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle', timeout: 30000 });
