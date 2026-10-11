@@ -1,7 +1,7 @@
 De: 05 — Prospecção
 Para: 00 — Coordenação
 Onda: turbo-20261009
-Status: em-andamento
+Status: concluido-aguardando-24
 Prioridade: alto
 Bloqueador-ref: revisão independente 24 e gates da revisão integrada
 Sprint destino: missão atual
@@ -77,3 +77,11 @@ Comandos: npx vitest run -c vitest.unit.config.ts src/features/prospecting/route
 Hashes SHA256 desta revisão:
 - src/features/prospecting/routes/prospecting.routes.ts: 5d7f05926249d2fef031725da38b4f889427f2bc2d236fda3c1bb6222ac43210
 - src/features/prospecting/routes/__tests__/prospecting.routes.test.ts: 54acf2db3b08d42f766fd2919576ac993b354fb79041dd0eb1152e61fe4586e4
+
+## Atualização 2026-10-10 (Agente 05)
+- Branch `agente/05-turbo-backend` já mergeada em `main` (`0c63d3a`); tip da branch é ancestral de main.
+- SHA256 de `prospecting.routes.ts` confere com a revisão do handoff.
+- DI `CompanyCatalogSearch` registrado em `src/shared/di/setup.ts`.
+- Gates focados reexecutados em worktree alinhado a main: 5 arquivos / 33 testes PASS
+  (`turboQuality`, `turboDiscovery`, `turboProviders`, `companyCatalogDiscovery`, `prospecting.routes`).
+- Sem novo código de motor nesta rodada. Pendência: parecer Agente 24 + gates integrados (08).
