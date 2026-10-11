@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import { Prisma, type PrismaClient } from '@prisma/client';
 import {
   Campaign,
   type CampaignProps,
@@ -24,43 +24,49 @@ function rowToProps(row: CampaignRow): CampaignProps {
   };
 }
 
-// TODO: Refactor native SQL queries to use Prisma ORM directly.
 export class PgCampaignRepository implements CampaignRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(campaign: Campaign): Promise<void> {
     const props = campaign.toProps();
-    await this.prisma.$executeRawUnsafe(
-      `INSERT INTO campaigns (id, name, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT (id) DO UPDATE SET
-         name = EXCLUDED.name,
-         status = EXCLUDED.status,
-         updated_at = EXCLUDED.updated_at`,
-      [props.id, props.name, props.status, props.createdAt, props.updatedAt],
-    );
+    await this.prisma.$executeRaw(Prisma.sql`
+      INSERT INTO campaigns (id, name, status, created_at, updated_at)
+      VALUES (
+        ${props.id}::uuid,
+        ${props.name},
+        ${props.status},
+        ${props.createdAt},
+        ${props.updatedAt}
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        name = EXCLUDED.name,
+        status = EXCLUDED.status,
+        updated_at = EXCLUDED.updated_at`);
   }
 
   async findById(id: string): Promise<Campaign | null> {
-    const rows = await this.prisma.$queryRawUnsafe<CampaignRow[]>(
-      'SELECT * FROM campaigns WHERE id = $1',
-      [id],
-    );
+    const rows = await this.prisma.$queryRaw<CampaignRow[]>(Prisma.sql`
+      SELECT id, name, status, created_at, updated_at
+      FROM campaigns
+      WHERE id = ${id}::uuid`);
     const row = rows[0];
     return row === undefined ? null : Campaign.restore(rowToProps(row));
   }
 
   async findActive(): Promise<Campaign[]> {
-    const rows = await this.prisma.$queryRawUnsafe<CampaignRow[]>(
-      "SELECT * FROM campaigns WHERE status = 'active' ORDER BY created_at DESC",
-    );
+    const rows = await this.prisma.$queryRaw<CampaignRow[]>(Prisma.sql`
+      SELECT id, name, status, created_at, updated_at
+      FROM campaigns
+      WHERE status = 'active'
+      ORDER BY created_at DESC`);
     return rows.map((row) => Campaign.restore(rowToProps(row)));
   }
 
   async findAll(): Promise<Campaign[]> {
-    const rows = await this.prisma.$queryRawUnsafe<CampaignRow[]>(
-      'SELECT * FROM campaigns ORDER BY created_at DESC',
-    );
+    const rows = await this.prisma.$queryRaw<CampaignRow[]>(Prisma.sql`
+      SELECT id, name, status, created_at, updated_at
+      FROM campaigns
+      ORDER BY created_at DESC`);
     return rows.map((row) => Campaign.restore(rowToProps(row)));
   }
 }

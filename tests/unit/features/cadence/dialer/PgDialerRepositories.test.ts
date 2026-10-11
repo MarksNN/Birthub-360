@@ -6,8 +6,13 @@ import {
   TERMINAL_CALL_ATTEMPT_STATUSES,
   type CallAttemptProps,
 } from '../../../../../src/features/cadence/dialer/domain/entities/CallAttempt.js';
+import { Campaign } from '../../../../../src/features/cadence/dialer/domain/entities/Campaign.js';
+import { Lead } from '../../../../../src/features/cadence/dialer/domain/entities/Lead.js';
+import { PhoneNumber } from '../../../../../src/features/cadence/dialer/domain/value-objects/PhoneNumber.js';
 import { PgCallAttemptRepository } from '../../../../../src/features/cadence/dialer/infrastructure/db/repositories/PgCallAttemptRepository.js';
+import { PgCampaignRepository } from '../../../../../src/features/cadence/dialer/infrastructure/db/repositories/PgCampaignRepository.js';
 import { PgDncRepository } from '../../../../../src/features/cadence/dialer/infrastructure/db/repositories/PgDncRepository.js';
+import { PgLeadRepository } from '../../../../../src/features/cadence/dialer/infrastructure/db/repositories/PgLeadRepository.js';
 
 const queryRaw = vi.fn();
 const executeRaw = vi.fn();
@@ -145,5 +150,185 @@ describe('PgDncRepository', () => {
     expect(sql.sql).toContain('INSERT INTO dnc_list');
     expect(sql.sql).toContain('ON CONFLICT (phone) DO UPDATE');
     expect(sql.values).toEqual(['+5511999999999', 'opt-out']);
+  });
+});
+
+describe('PgCampaignRepository', () => {
+  const repo = new PgCampaignRepository(prisma);
+  const campaignProps = {
+    id: '44444444-4444-4444-8444-444444444444',
+    name: 'Campanha Teste',
+    status: 'active' as const,
+    createdAt: new Date('2026-10-10T10:00:00Z'),
+    updatedAt: new Date('2026-10-10T10:00:00Z'),
+  };
+
+  it('save faz upsert parametrizado em campaigns', async () => {
+    executeRaw.mockResolvedValue(1);
+    await repo.save(Campaign.restore(campaignProps));
+    const sql = sqlArg(executeRaw);
+    expect(sql.sql).toContain('INSERT INTO campaigns');
+    expect(sql.sql).toContain('ON CONFLICT (id) DO UPDATE');
+    expect(sql.values).toEqual([
+      campaignProps.id,
+      campaignProps.name,
+      campaignProps.status,
+      campaignProps.createdAt,
+      campaignProps.updatedAt,
+    ]);
+  });
+
+  it('findById retorna campanha ou null', async () => {
+    queryRaw.mockResolvedValueOnce([
+      {
+        id: campaignProps.id,
+        name: campaignProps.name,
+        status: campaignProps.status,
+        created_at: campaignProps.createdAt,
+        updated_at: campaignProps.updatedAt,
+      },
+    ]).mockResolvedValueOnce([]);
+
+    const found = await repo.findById(campaignProps.id);
+    expect(found?.toProps()).toEqual(campaignProps);
+    expect(sqlArg(queryRaw).values).toEqual([campaignProps.id]);
+
+    const notFound = await repo.findById(campaignProps.id);
+    expect(notFound).toBeNull();
+  });
+
+  it('findActive busca apenas status active', async () => {
+    queryRaw.mockResolvedValue([
+      {
+        id: campaignProps.id,
+        name: campaignProps.name,
+        status: 'active',
+        created_at: campaignProps.createdAt,
+        updated_at: campaignProps.updatedAt,
+      },
+    ]);
+    const list = await repo.findActive();
+    expect(list).toHaveLength(1);
+    expect(list[0]?.toProps().status).toBe('active');
+    const sql = sqlArg(queryRaw);
+    expect(sql.sql).toContain("status = 'active'");
+  });
+
+  it('findAll retorna todas as campanhas ordenadas', async () => {
+    queryRaw.mockResolvedValue([]);
+    await repo.findAll();
+    const sql = sqlArg(queryRaw);
+    expect(sql.sql).toContain('FROM campaigns');
+    expect(sql.sql).toContain('ORDER BY created_at DESC');
+  });
+});
+
+describe('PgLeadRepository', () => {
+  const repo = new PgLeadRepository(prisma);
+  const leadProps = {
+    id: '55555555-5555-4555-8555-555555555555',
+    campaignId: '44444444-4444-4444-8444-444444444444',
+    name: 'Lead Teste',
+    phone: PhoneNumber.create('+5511988887777'),
+    status: 'pending' as const,
+    attempts: 0,
+    nextAttemptAt: new Date('2026-10-10T12:00:00Z'),
+    createdAt: new Date('2026-10-10T10:00:00Z'),
+    updatedAt: new Date('2026-10-10T10:00:00Z'),
+  };
+
+  it('save faz upsert parametrizado em lote de 1 lead', async () => {
+    executeRaw.mockResolvedValue(1);
+    await repo.save(Lead.restore(leadProps));
+    const sql = sqlArg(executeRaw);
+    expect(sql.sql).toContain('INSERT INTO leads');
+    expect(sql.sql).toContain('ON CONFLICT (id) DO UPDATE');
+    expect(sql.values).toEqual([
+      leadProps.id,
+      leadProps.campaignId,
+      leadProps.name,
+      leadProps.phone.toE164(),
+      leadProps.status,
+      leadProps.attempts,
+      leadProps.nextAttemptAt,
+      leadProps.createdAt,
+      leadProps.updatedAt,
+    ]);
+  });
+
+  it('findById retorna lead restaurado ou null', async () => {
+    queryRaw.mockResolvedValueOnce([
+      {
+        id: leadProps.id,
+        campaign_id: leadProps.campaignId,
+        name: leadProps.name,
+        phone: leadProps.phone.toE164(),
+        status: leadProps.status,
+        attempts: leadProps.attempts,
+        next_attempt_at: leadProps.nextAttemptAt,
+        created_at: leadProps.createdAt,
+        updated_at: leadProps.updatedAt,
+      },
+    ]).mockResolvedValueOnce([]);
+
+    const found = await repo.findById(leadProps.id);
+    expect(found?.toProps().id).toEqual(leadProps.id);
+    expect(sqlArg(queryRaw).values).toEqual([leadProps.id]);
+
+    const notFound = await repo.findById(leadProps.id);
+    expect(notFound).toBeNull();
+  });
+
+  it('claimNextEligible executa CTE com FOR UPDATE SKIP LOCKED parametrizado', async () => {
+    const now = new Date('2026-10-10T12:00:00Z');
+    queryRaw.mockResolvedValue([
+      {
+        id: leadProps.id,
+        campaign_id: leadProps.campaignId,
+        name: leadProps.name,
+        phone: leadProps.phone.toE164(),
+        status: 'in_progress',
+        attempts: leadProps.attempts,
+        next_attempt_at: leadProps.nextAttemptAt,
+        created_at: leadProps.createdAt,
+        updated_at: now,
+      },
+    ]);
+
+    const claimed = await repo.claimNextEligible(leadProps.campaignId, now, 5);
+    expect(claimed).toHaveLength(1);
+    expect(claimed[0]?.toProps().status).toBe('in_progress');
+    const sql = sqlArg(queryRaw);
+    expect(sql.sql).toContain('FOR UPDATE SKIP LOCKED');
+    expect(sql.values).toEqual([leadProps.campaignId, now, 5, now]);
+  });
+
+  it('existsByCampaignAndPhone retorna booleano parametrizado', async () => {
+    queryRaw.mockResolvedValueOnce([{ exists: 1 }]).mockResolvedValueOnce([]);
+    expect(await repo.existsByCampaignAndPhone(leadProps.campaignId, '+5511988887777')).toBe(true);
+    const sql = sqlArg(queryRaw);
+    expect(sql.values).toEqual([leadProps.campaignId, '+5511988887777']);
+    expect(await repo.existsByCampaignAndPhone(leadProps.campaignId, '+5511900000000')).toBe(false);
+  });
+
+  it('getCampaignStats computa agregação parametrizada', async () => {
+    queryRaw.mockResolvedValue([
+      {
+        total_leads: '10',
+        pending: '5',
+        in_progress: '2',
+        contacted: '3',
+        exhausted: '0',
+        do_not_call: '0',
+        invalid_number: '0',
+      },
+    ]);
+
+    const stats = await repo.getCampaignStats(leadProps.campaignId);
+    expect(stats.totalLeads).toBe(10);
+    expect(stats.contacted).toBe(3);
+    expect(stats.contactRatePercent).toBe(30);
+    const sql = sqlArg(queryRaw);
+    expect(sql.values).toEqual([leadProps.campaignId]);
   });
 });
