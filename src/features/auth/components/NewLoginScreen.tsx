@@ -1194,7 +1194,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-[#0b132b]">Ajuda</h3>
+                <h3 className="font-display text-xl font-bold text-[#00D4FF]">Ajuda</h3>
                 <p className="text-xs text-slate-500 mt-2">
                   Documentação técnica, manuais de uso e suporte aos pilares.
                 </p>
@@ -1215,7 +1215,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-[#0b132b]">Contato</h3>
+                <h3 className="font-display text-xl font-bold text-[#00D4FF]">Contato</h3>
                 <p className="text-xs text-slate-500 mt-2">comercial@birthhub360.com</p>
                 <p className="text-xs text-slate-500 mt-1">
                   Fale diretamente com nossa diretoria comercial.
@@ -1231,7 +1231,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {/* Card 3: Newsletter / Novidades */}
             <div className="vancouver-quick-card">
               <div>
-                <h3 className="font-display text-xl font-bold text-[#0b132b]">Novidades</h3>
+                <h3 className="font-display text-xl font-bold text-[#00D4FF]">Novidades</h3>
                 <p className="text-xs text-slate-500 mt-2">
                   Receba insights semanais sobre IA aplicada a vendas B2B.
                 </p>
@@ -1254,7 +1254,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-[#0b132b]">Segurança</h3>
+                <h3 className="font-display text-xl font-bold text-[#00D4FF]">Segurança</h3>
                 <p className="text-xs text-slate-500 mt-2">
                   Auditorias de segurança, RLS multi-tenant e conformidade LGPD.
                 </p>
@@ -1276,7 +1276,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center pb-12 border-b border-slate-100">
             <div className="space-y-3">
-              <h3 className="font-display text-2xl font-bold text-[#0b132b]">
+              <h3 className="font-display text-2xl font-bold text-[#00D4FF]">
                 Pronto para estruturar sua operação comercial com rigor e inteligência?
               </h3>
               <p className="text-sm text-slate-500">

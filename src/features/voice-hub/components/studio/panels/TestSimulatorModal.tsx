@@ -231,8 +231,12 @@ export function TestSimulatorModal({ onClose }: TestSimulatorModalProps) {
       SpeechRecognition?: new () => Recognition;
       webkitSpeechRecognition?: new () => Recognition;
     };
+<<<<<<< HEAD
     const SpeechRecognition =
       speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+=======
+    const SpeechRecognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+>>>>>>> origin/agente/24-recovery-review-20261010
     if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
