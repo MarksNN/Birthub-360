@@ -107,13 +107,13 @@ describe('ActivityService', () => {
 
   // Achado da auditoria de forecast/BI (Onda 7): ferramenta de IA em
   // src/features/intelligence/tools/opsTools.ts cria uma Activity para um vendedor humano
-  // executar, mas atribuía 'Enxame de IA Atlas' como owner quando nenhum era informado — nome
-  // fabricado mascarando ausência de responsável real. Este teste garante que a persistência
+  // executar, mas atribuía 'Enxame de IA Birth Hub 360' como owner quando nenhum era informado —
+  // nome fabricado mascarando ausência de responsável real. Este teste garante que a persistência
   // rejeita esse valor na origem, para esse chamador e qualquer outro futuro.
   it('should reject a fabricated placeholder owner instead of persisting it', async () => {
     const input = {
       type: 'Ligação' as const,
-      owner: 'Enxame de IA Atlas',
+      owner: 'Enxame de IA Birth Hub 360',
       date: '2024-01-01T10:00:00Z',
       leadId: 'lead-1',
       status: 'Pendente' as const,

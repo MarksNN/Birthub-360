@@ -15,7 +15,7 @@ export interface BitrixUserOption {
 }
 
 /**
- * Ponte Usuário-Atlas ↔ Usuário-Bitrix — deliberadamente SEM coluna nova no schema (Integrações
+ * Ponte Usuário-Birthub ↔ Usuário-Bitrix — deliberadamente SEM coluna nova no schema (Integrações
  * não cria migração própria, ver AGENTS.md raiz: "prisma/schema.prisma: somente Agente 01"). O
  * casamento é feito em tempo de requisição, por e-mail: assume que a pessoa usa o mesmo e-mail
  * corporativo nos dois sistemas — mesma premissa que já vale hoje para o convite de equipe

@@ -19,14 +19,14 @@ function buildFakeRepository(): ActivityRepository {
 }
 
 describe('ActivityUseCases.createActivity — owner fabricado', () => {
-  it('rejeita "Enxame de IA Atlas" antes de chegar no repositório', async () => {
+  it('rejeita "Enxame de IA Birth Hub 360" antes de chegar no repositório', async () => {
     const repo = buildFakeRepository();
     const useCases = new ActivityUseCases(repo);
 
     await expect(
       useCases.createActivity('org-1', {
         type: 'Ligação',
-        owner: 'Enxame de IA Atlas',
+        owner: 'Enxame de IA Birth Hub 360',
         date: '2026-08-15T10:00:00Z',
         status: 'Pendente',
         leadId: 'lead-1',

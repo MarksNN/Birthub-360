@@ -120,7 +120,7 @@ export interface SearchRunRequest {
   employeeCount?: string;
   annualRevenue?: string;
   decisionMakerRole?: string;
-  company?: 'atlas' | 'totaltrac';
+  company?: string;
   limit?: number;
 }
 
