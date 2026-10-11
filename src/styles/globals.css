@@ -1,59 +1,37 @@
 @import "tailwindcss";
 
-/* Birth Hub 360 — Tipografia Oficial:
-   - Plus Jakarta Sans: Fonte Principal para corpo e títulos (pesos 400, 500, 600, 700, 800)
-   - JetBrains Mono: Fonte Monospaçada para código, métricas, badges técnicos e contadores (pesos 500, 700)
-   - Sora: Display alternativo para botões especiais e heros
+/* Birth Hub 360 — Tipografia Oficial Exclusiva:
+   - Sora: Títulos, Heros, Ações e Display
+   - Inter: Interface, Menus, Formulários, Tabelas e Corpo de Texto (com toque arredondado)
+   - IBM Plex Mono: Dados, Código, KPIs, Métricas e Badges Técnicos
    Fontes self-hosted em `public/fonts/` com fallbacks para garantir suporte offline no Android/Capacitor. */
 
-/* Plus Jakarta Sans (latin-ext) */
+/* Inter (latin-ext) */
 @font-face {
-  font-family: "Plus Jakarta Sans";
+  font-family: "Inter";
   font-style: normal;
   font-weight: 400 800;
   font-display: swap;
-  src: url("/fonts/plus-jakarta-sans-latin-ext.woff2") format("woff2");
+  src: url("/fonts/inter-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
     U+A720-A7FF;
 }
 
-/* Plus Jakarta Sans (latin) */
+/* Inter (latin) */
 @font-face {
-  font-family: "Plus Jakarta Sans";
+  font-family: "Inter";
   font-style: normal;
   font-weight: 400 800;
   font-display: swap;
-  src: url("/fonts/plus-jakarta-sans-latin.woff2") format("woff2");
+  src: url("/fonts/inter-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* JetBrains Mono (fallback para self-hosted e system mono) */
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src:
-    local("JetBrains Mono Medium"),
-    local("JetBrainsMono-Medium"),
-    url("/fonts/ibm-plex-mono-500.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src:
-    local("JetBrains Mono Bold"),
-    local("JetBrainsMono-Bold"),
-    url("/fonts/ibm-plex-mono-700.ttf") format("truetype");
-}
-
+/* IBM Plex Mono */
 @font-face {
   font-family: "IBM Plex Mono";
   font-style: normal;
@@ -94,7 +72,7 @@
   src: url("/fonts/ibm-plex-mono-700.ttf") format("truetype");
 }
 
-/* latin-ext */
+/* Sora (latin-ext) */
 @font-face {
   font-family: "Sora";
   font-style: normal;
@@ -107,7 +85,7 @@
     U+A720-A7FF;
 }
 
-/* latin */
+/* Sora (latin) */
 @font-face {
   font-family: "Sora";
   font-style: normal;
@@ -282,11 +260,13 @@
   --shadow-nav-active-value: 0 10px 26px -14px color-mix(in srgb, var(--brand) 52%, black);
   --radius-nav-item-value: 12px;
   --font-brand-sans:
-    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-brand-display:
-    "Plus Jakarta Sans", "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-brand-serif: "Playfair Display", "Georgia", serif;
-  --font-brand-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+    "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-brand-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-features-rounded: "cv05", "cv11", "ss01";
+  --tracking-rounded: -0.012em;
+  --tracking-display: -0.02em;
 
   /* Motion system tokens — durations e easings canônicos (Design Language v2.0, seção 8).
      Referenciados por .bh-interactive, Framer Motion variants e qualquer transition CSS
