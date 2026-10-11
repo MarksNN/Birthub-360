@@ -18,7 +18,7 @@ import {
 import { useOrchestrationOverview } from './useOrchestrationOverview.js';
 
 export function JornadasComerciaisHub() {
-  const { data, isTemplate, loading, error, reload } = useOrchestrationOverview();
+  const { data, isTemplate, noRealData, loading, error, reload } = useOrchestrationOverview();
   const jornadas = data?.jornadas ?? [];
 
   return (
@@ -49,7 +49,12 @@ export function JornadasComerciaisHub() {
           </p>
         </div>
 
-        <OrchestrationStatusBanner isTemplate={isTemplate} error={error} onRetry={reload} />
+        <OrchestrationStatusBanner
+          isTemplate={isTemplate}
+          noRealData={noRealData}
+          error={error}
+          onRetry={reload}
+        />
 
         {/* KPIs (P0 #693: sem números fixos — só API ou “Indisponível”) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

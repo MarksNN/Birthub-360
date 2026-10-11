@@ -30,7 +30,7 @@ import {
 import { formatMetric, useOrchestrationOverview } from './useOrchestrationOverview.js';
 
 export function PlaybooksHub() {
-  const { data, isTemplate, loading, error, reload } = useOrchestrationOverview();
+  const { data, isTemplate, noRealData, loading, error, reload } = useOrchestrationOverview();
   const playbooks = data?.playbooks ?? [];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
@@ -75,7 +75,12 @@ export function PlaybooksHub() {
           </div>
         </div>
 
-        <OrchestrationStatusBanner isTemplate={isTemplate} error={error} onRetry={reload} />
+        <OrchestrationStatusBanner
+          isTemplate={isTemplate}
+          noRealData={noRealData}
+          error={error}
+          onRetry={reload}
+        />
 
         {/* KPIs (P0 #693: sem números fixos — só API ou “Indisponível”) */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
