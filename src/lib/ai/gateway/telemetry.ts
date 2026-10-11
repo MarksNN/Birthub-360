@@ -13,6 +13,7 @@ import type { ChatCompletionMessage, ChatCompletionResponse } from './types.js';
  * Envia um trace de observabilidade para o Langfuse (se LANGFUSE_PUBLIC_KEY/SECRET_KEY estiverem
  * configurados — ver src/lib/langfuse.ts). Nunca lança: telemetria não pode derrubar uma resposta
  * de IA que já foi entregue com sucesso ao chamador.
+ * Aplica amostragem controlada (sample rate, padrão 10% quando configurado em LANGFUSE_SAMPLE_RATE).
  */
 export function traceAiGeneration(params: {
   provider: string;
@@ -24,6 +25,11 @@ export function traceAiGeneration(params: {
   usage?: ChatCompletionResponse['usage'];
   startedAt: number;
 }): void {
+  const sampleRate = Number.parseFloat(process.env.LANGFUSE_SAMPLE_RATE ?? '1.0');
+  if (sampleRate < 1.0 && Math.random() > sampleRate) {
+    return;
+  }
+
   const langfuse = getLangfuseClient();
   if (!langfuse) return;
   try {

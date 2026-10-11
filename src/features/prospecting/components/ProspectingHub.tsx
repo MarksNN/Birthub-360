@@ -336,7 +336,8 @@ export function ProspectingHub() {
   const exportResults = async (
     format: 'xlsx' | 'csv',
     columns: number[],
-    target: 'companies' | 'decisionMakers',
+    target: 'companies' | 'decisionMakers' | 'complete',
+    options: { maskPersonalPhones?: boolean; csvDelimiter?: string } = {},
   ) => {
     const allowed = filteredCandidates
       .filter(
@@ -345,7 +346,7 @@ export function ProspectingHub() {
           (selectedCandidates.size === 0 || selectedCandidates.has(i)),
       )
       .map(({ c }) => c);
-    if (!columns.length) {
+    if (!columns.length && target !== 'complete') {
       setDiscoverError('Selecione ao menos uma coluna para exportar.');
       return;
     }
@@ -356,7 +357,17 @@ export function ProspectingHub() {
       return;
     }
     try {
-      let headers = [
+      const maskPhone = (phone?: string | null) => {
+        if (!phone) return '';
+        if (!options.maskPersonalPhones) return phone;
+        const clean = phone.replace(/\D/g, '');
+        if (clean.length >= 10) {
+          return `${phone.slice(0, 5)}****-${phone.slice(-2)}`;
+        }
+        return phone;
+      };
+
+      const companyHeaders = [
         'Nome',
         'Razão social',
         'CNPJ',
@@ -372,7 +383,7 @@ export function ProspectingHub() {
         'Score ICP',
         'Completude',
       ];
-      let rows: unknown[][] = allowed.map((c) => [
+      const companyRows: unknown[][] = allowed.map((c) => [
         c.tradeName,
         c.legalNameGuess ?? '',
         c.cnpjGuess ?? '',
@@ -381,7 +392,7 @@ export function ProspectingHub() {
         c.location,
         c.website ?? '',
         (c.emails ?? []).join(', '),
-        c.phone ?? '',
+        maskPhone(c.phone),
         c.linkedinUrl ?? '',
         (c.decisionMakers ?? c.apolloContacts ?? [])
           .map((d) => `${d.name} (${d.title ?? ''}) ${d.email ?? ''}`)
@@ -390,56 +401,89 @@ export function ProspectingHub() {
         c.metrics?.icpScore ?? '',
         c.metrics?.completeness ?? '',
       ]);
-      if (target === 'decisionMakers') {
-        headers = [
-          'Nome',
-          'Cargo',
-          'Empresa',
-          'LinkedIn',
-          'E-mail profissional',
-          'Telefone profissional',
-          'Fonte do e-mail',
-        ];
-        rows = allowed.flatMap((c) =>
-          (c.decisionMakers ?? c.apolloContacts ?? []).map((d) => [
-            d.name,
-            d.title ?? '',
-            c.tradeName,
-            d.linkedinUrl ?? '',
-            d.email ?? '',
-            d.phone ?? '',
-            d.emailSource ?? 'Não informada',
-          ]),
-        );
-        if (!rows.length) {
-          setDiscoverError('Nenhum decisor disponível nos resultados selecionados.');
-          return;
-        }
-      }
-      const selectedColumns = columns
-        .filter((i) => i >= 0 && i < headers.length)
-        .sort((a, b) => a - b);
-      headers = selectedColumns.map((i) => headers[i]);
-      rows = rows.map((row) => selectedColumns.map((i) => row[i]));
+
+      const decisionMakerHeaders = [
+        'Nome',
+        'Cargo',
+        'Empresa',
+        'LinkedIn',
+        'E-mail profissional',
+        'Telefone profissional',
+        'Fonte do e-mail',
+      ];
+      const decisionMakerRows: unknown[][] = allowed.flatMap((c) =>
+        (c.decisionMakers ?? c.apolloContacts ?? []).map((d) => [
+          d.name,
+          d.title ?? '',
+          c.tradeName,
+          d.linkedinUrl ?? '',
+          d.email ?? '',
+          maskPhone(d.phone),
+          d.emailSource ?? 'Não informada',
+        ]),
+      );
+
+      const historyHeaders = ['Empresa', 'CNPJ', 'Fonte', 'Data da Pesquisa', 'Score ICP', 'Qualidade'];
+      const historyRows: unknown[][] = allowed.map((c) => [
+        c.tradeName,
+        c.cnpjGuess ?? '',
+        c.source ?? 'Radar Discovery',
+        new Date().toISOString().slice(0, 10),
+        c.metrics?.icpScore ?? '',
+        c.metrics?.completeness ?? '',
+      ]);
+
       let blob: Blob;
       if (format === 'xlsx') {
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
-        const sheet = workbook.addWorksheet('Prospects');
-        sheet.addRow(headers);
-        rows.forEach((row) => {
-          sheet.addRow(row);
-        });
+
+        if (target === 'complete') {
+          const sheetEmpresas = workbook.addWorksheet('Empresas');
+          sheetEmpresas.addRow(companyHeaders);
+          companyRows.forEach((row) => sheetEmpresas.addRow(row));
+
+          const sheetDecisores = workbook.addWorksheet('Decisores');
+          sheetDecisores.addRow(decisionMakerHeaders);
+          decisionMakerRows.forEach((row) => sheetDecisores.addRow(row));
+
+          const sheetHistorico = workbook.addWorksheet('Histórico de Enriquecimento');
+          sheetHistorico.addRow(historyHeaders);
+          historyRows.forEach((row) => sheetHistorico.addRow(row));
+        } else {
+          let headers = target === 'decisionMakers' ? decisionMakerHeaders : companyHeaders;
+          let rows = target === 'decisionMakers' ? decisionMakerRows : companyRows;
+          const selectedColumns = columns
+            .filter((i) => i >= 0 && i < headers.length)
+            .sort((a, b) => a - b);
+          headers = selectedColumns.map((i) => headers[i]);
+          rows = rows.map((row) => selectedColumns.map((i) => row[i]));
+
+          const sheet = workbook.addWorksheet(target === 'decisionMakers' ? 'Decisores' : 'Empresas');
+          sheet.addRow(headers);
+          rows.forEach((row) => sheet.addRow(row));
+        }
+
         blob = new Blob([await workbook.xlsx.writeBuffer()], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
       } else {
+        let headers = target === 'decisionMakers' ? decisionMakerHeaders : companyHeaders;
+        let rows = target === 'decisionMakers' ? decisionMakerRows : companyRows;
+        if (target !== 'complete') {
+          const selectedColumns = columns
+            .filter((i) => i >= 0 && i < headers.length)
+            .sort((a, b) => a - b);
+          headers = selectedColumns.map((i) => headers[i]);
+          rows = rows.map((row) => selectedColumns.map((i) => row[i]));
+        }
+        const delimiter = options.csvDelimiter || ';';
         const escapeCsv = (value: unknown) =>
           `"${String(value)
             .replace(/^[=+@-]/, "'$&")
             .replace(/"/g, '""')}"`;
         blob = new Blob(
-          [`\uFEFF${[headers, ...rows].map((row) => row.map(escapeCsv).join(';')).join('\r\n')}`],
+          [`\uFEFF${[headers, ...rows].map((row) => row.map(escapeCsv).join(delimiter)).join('\r\n')}`],
           { type: 'text/csv;charset=utf-8' },
         );
       }
