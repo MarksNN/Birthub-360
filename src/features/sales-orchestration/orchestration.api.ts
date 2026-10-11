@@ -133,9 +133,10 @@ export const orchestrationApi = {
   getOverview: async (): Promise<SalesOrchestrationOverview> => {
     try {
       // apiFetch já remove `{ success, data }` → tipar o valor útil, não o envelope HTTP
-      const res = await api.get<SalesOrchestrationOverview | { data: SalesOrchestrationOverview; meta?: SalesOrchestrationMeta }>(
-        '/api/sales-orchestration/overview',
-      );
+      const res = await api.get<
+        | SalesOrchestrationOverview
+        | { data: SalesOrchestrationOverview; meta?: SalesOrchestrationMeta }
+      >('/api/sales-orchestration/overview');
       return normalizeOrchestrationOverview(res);
     } catch (err) {
       if (err instanceof SalesOrchestrationApiError) throw err;
