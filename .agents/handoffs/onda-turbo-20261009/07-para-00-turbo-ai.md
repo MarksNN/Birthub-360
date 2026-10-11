@@ -1,7 +1,7 @@
 De: 07 — IA e Automações
 Para: 00 — Coordenador, 05 — Prospecção, 24 — Revisão Independente
 Onda: turbo-20261009
-Status: em-andamento
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: revisão independente e validação de ambiente
 Sprint destino: onda atual
@@ -65,3 +65,14 @@ src/lib/ai/usage-log.ts 7FEDEEBAF4AF39C5FE6E94B8BA19C00D66B92549501BCBB5B6284710
 ## Aprendizado reutilizável
 
 Orçamento legado é fail-open por indisponibilidade DB, e estimatedTokens da quota não é utilizado internamente; o Turbo exige leitura estrita e compara consumedTokens+estimativa ao limite. logAiUsage anteriormente ignorava costInUsd, atribuindo preço aproximado a execução local: agora honra custo explícito e conserva comportamento anterior quando ausente. Mocks de custo/provedores nunca demonstram autorização/conectividade real.
+
+## Resolução (2026-10-10, validação 07)
+
+- Entrega já integrada em `main`: merge `d95c97d` ("Merge branch 'agente/07-turbo-ai'"), tip da branch `87b8d6e0cdbfe435aa2b571eba8267be54518b19`, ancestral de `origin/main` (`36cea20` no momento desta validação).
+- Hashes SHA-256 dos 8 arquivos da seção "Revisão exata SHA256" conferidos: idênticos em `origin/main` e no tip `87b8d6e`.
+- Revalidação em worktree limpo de `origin/main` (`36cea20`, após `npm ci`):
+  - `npx vitest run -c vitest.unit.config.ts src/lib/ai/__tests__/usage-log.test.ts src/lib/ai/__tests__/turboSearch.test.ts src/lib/ai/__tests__/gateway.test.ts src/lib/ai/gateway/__tests__/providers.golden.test.ts src/lib/ai/gateway/__tests__/retry.test.ts` → exit 0, 5 arquivos / 61 testes passaram, 4.32s.
+  - `npx tsc --noEmit` → exit 2, 1 diagnóstico fora do domínio IA: `src/components/ui/KpiCard.tsx(231,11): TS2349` (não relacionado a esta entrega; registrado para o dono de UI/00).
+- Parecer 24 existente: `.agents/reviews/turbo-ai-2026-10-09-24.md` — APROVADO para integração técnica; release/deploy BLOQUEADO naquele parecer.
+- Se o Coordenador 00 pediu review fresco pós-merge, o 24 deve reconfirmar contra `origin/main` (hashes acima e o comando de testes desta seção).
+- Pendências do handoff original (endpoint/audit/conectividade real pelo 00/05, concorrência distribuída do orçamento) continuam válidas e fora deste fechamento.

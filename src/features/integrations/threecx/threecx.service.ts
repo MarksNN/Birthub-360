@@ -379,7 +379,13 @@ export async function make3CXCall(
   }
 
   logger.info(
-    { organizationId, connectionId: conn.id, extension: conn.extension, destinationNumber: `****${destinationNumber.replace(/\D/g, '').slice(-4)}`, callId },
+    {
+      organizationId,
+      connectionId: conn.id,
+      extension: conn.extension,
+      destinationNumber: `****${destinationNumber.replace(/\D/g, '').slice(-4)}`,
+      callId,
+    },
     '[3cx] Chamada disparada via 3CX PABX',
   );
 
@@ -746,9 +752,9 @@ export async function process3CXWebhook(
 
     let lead = explicitLeadId
       ? await prisma.lead.findFirst({
-        where: { id: explicitLeadId, organizationId },
-        include: { contact: true },
-      })
+          where: { id: explicitLeadId, organizationId },
+          include: { contact: true },
+        })
       : null;
 
     if (!lead) {

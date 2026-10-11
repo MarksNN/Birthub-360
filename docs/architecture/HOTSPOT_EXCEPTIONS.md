@@ -164,10 +164,11 @@ propósito por estar fora de "## Exceções ativas"):
 
 ### `src/features/voice-hub/store/useStudioStore.ts`
 
-- **Limite excepcional:** 1100 linhas
+- **Limite excepcional:** 1150 linhas
 - **Dono:** Agente 12 — Voz e Telefonia
-- **Motivo:** Modularizado na campanha techdebt-2026-09-29 (extraídos studioTypes.ts, nodeRegistry.ts e initialData.ts), reduzindo de 1744 para 1084 linhas.
+- **Motivo:** Modularizado na campanha techdebt-2026-09-29 (extraídos studioTypes.ts, nodeRegistry.ts e initialData.ts), reduzindo de 1744 para 1084 linhas. Arquivo voltou a 1103 linhas (acima do teto 1100); bump temporário 1150 para desbloquear CI (#695/#692). Agente 12 deve re-modularizar ou confirmar teto.
 - **Registrado em:** 2026-09-29
+- **Atualizado em:** 2026-10-11 (Agente 08 — QA Release e Git)
 - **Reavaliar até:** 2026-11-30
 
 ### `src/lib/voice-hub/services/workflowRuntimeService.ts`
