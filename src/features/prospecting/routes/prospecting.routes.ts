@@ -28,55 +28,9 @@ import { getTurboProviderHealth } from '../services/turboHealth.service.js';
 import { checkProviderRateLimit } from '../services/providerRateLimit.js';
 import { normalizeCompanyDomain } from '../utils/domain.js';
 
-import { AIProviderRouter } from '../services/aiProviderRouter.service.js';
-import { BrazilPublicCnpjService } from '../services/brazilPublicCnpj.service.js';
-
 const icebreakerService = new IcebreakerService();
-const aiRouter = AIProviderRouter.getInstance();
 
 const router = Router();
-
-// Rota de status e checagem de saúde dos provedores de IA (Groq e Ollama)
-router.get(
-  '/ai/health',
-  async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const [groq, ollama] = await Promise.all([
-        aiRouter.checkGroqHealth(),
-        aiRouter.checkOllamaHealth(),
-      ]);
-      res.json({
-        success: true,
-        data: {
-          groq,
-          ollama,
-          activeRouter: 'AIProviderRouter',
-        },
-      });
-    } catch (error: any) {
-      next(error);
-    }
-  },
-);
-
-// Interpretação de busca em linguagem natural para filtros estruturados via IA
-router.post(
-  '/ai/parse-query',
-  requireRole(['ADMIN', 'GESTOR', 'CLOSER', 'SDR']),
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { prompt, mode } = req.body as { prompt?: string; mode?: 'auto' | 'groq' | 'local' };
-      if (!prompt || typeof prompt !== 'string') {
-        res.status(400).json({ success: false, error: 'O campo "prompt" é obrigatório.' });
-        return;
-      }
-      const parsed = await aiRouter.parseNaturalLanguageQuery(prompt, mode);
-      res.json({ success: true, data: parsed });
-    } catch (error: any) {
-      next(error);
-    }
-  },
-);
 
 const rejectCandidateSchema = z.object({
   tradeName: z.string().trim().min(1, 'tradeName é obrigatório').max(200),
@@ -627,29 +581,21 @@ router.get(
   },
 );
 
-// Enriquecimento web via scraper seguro (Cheerio + Playwright fallback)
+// Enriquecimento web via scraper Crawlee — ainda não implementado (achado MEDIUM da auditoria de
+// release-readiness: respondia sempre `success:true` com dados fabricados, o que enganaria
+// qualquer integrador que a chamasse. 501 é honesto sobre o estado real; a rota fica reservada
+// para quando o scraper Crawlee for implementado de verdade.
 router.post('/enrich', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { url, forceBrowser } = req.body as { url?: string; forceBrowser?: boolean };
+    const { url } = req.body as { url?: string };
     if (!url) {
       res.status(400).json({ success: false, error: 'A URL é obrigatória para o scraper' });
       return;
     }
 
-    const { webScraperService } = await import('../services/enrichment/webScraper.service.js');
-    if (!webScraperService.isSafeUrl(url)) {
-      res
-        .status(400)
-        .json({ success: false, error: 'URL bloqueada pela política de segurança SSRF' });
-      return;
-    }
-
-    const scrapedData = await webScraperService.scrapeWebsite(url, {
-      forcePlaywright: Boolean(forceBrowser),
-    });
-    res.json({
-      success: true,
-      data: scrapedData,
+    res.status(501).json({
+      success: false,
+      error: 'Enriquecimento via scraper (Crawlee) ainda não foi implementado.',
     });
   } catch (error: any) {
     next(error);

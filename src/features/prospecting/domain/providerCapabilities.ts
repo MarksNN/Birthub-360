@@ -23,14 +23,7 @@ import { getRateLimitPerMinute } from '../services/providerRateLimit.js';
  * ler a capacidade dele.
  */
 
-export type DiscoveryProviderId =
-  | 'apollo'
-  | 'googlePlaces'
-  | 'nominatim'
-  | 'receita_federal'
-  | 'duckdb_cnpj'
-  | 'searxng'
-  | 'crawlee';
+export type DiscoveryProviderId = 'apollo' | 'googlePlaces' | 'nominatim';
 export type ProviderId = DiscoveryProviderId | 'hunter';
 
 export type ProviderDataKind =
