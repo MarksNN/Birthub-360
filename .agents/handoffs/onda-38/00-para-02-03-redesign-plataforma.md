@@ -1,30 +1,39 @@
 - De: Agente 00 (Coordenador / Antigravity)
 - Para: Agente 02 (Produto e UX) e Agente 03 (Design e Acessibilidade)
 - Onda: 38
-- Status: postponed
+- Status: em_curso
 - Prioridade: alto
+- Atualizado: 2026-10-10 (America/Sao_Paulo)
 
 ## Problema
-O usuário final solicitou um redesign completo de toda a plataforma para garantir "a melhor experiência e o melhor visual possível", com foco especial em botões, cards, tipografia, alinhamento, hierarquia visual e microinterações auditivas/visuais.
+O usuário final solicitou redesign da plataforma com a melhor experiência e visual possível (botões, cards, tipografia, alinhamento, hierarquia, microinterações). Direção atual do Marcelo: skill Impeccable + referência Vancouver+ (https://vancouverplus-template.modulify.website/), temas **light e dark** (não só dark). Foco imediato citado: Operate/dashboard.
 
 ## Arquivo(s) envolvido(s)
-- `identidade-visual/MANUAL_UI_UX_PLATAFORMA.md` (novo manual base)
-- `src/App.tsx`
-- Todos os arquivos globais de CSS/Tailwind (`src/index.css`, `tailwind.config.js`)
-- Componentes compartilhados (`src/components/ui/**`)
+- `identidade-visual/MANUAL_UI_UX_PLATAFORMA.md` (manual base)
+- Referência Vancouver+ / tokens Impeccable (Agente 03)
+- `src/App.tsx`, Sidebar/navegação (coordenar 02↔03)
+- CSS/Tailwind e `src/components/ui/**` (dono Agente 03 durante o redesign)
+- Componentes compartilhados de layout (handoff 03→02 se shell mudar)
 
-## Alteração necessária
-1. Agente 03 deve ler o `identidade-visual/MANUAL_UI_UX_PLATAFORMA.md` e criar os tokens de design globais no Tailwind (cores institucionais, fontes Mont/Montserrat, radius de 8px para botões e 12px para cards, box-shadows padrão).
-2. Agente 02 deve aplicar esses tokens e componentes base em todo o sistema de navegação, formulários e layouts (Sidebar, Header, modais), padronizando alinhamentos à esquerda e garantindo o respiro adequado de whitespace.
-3. Agente 02 também deve implementar hooks/providers globais para a resposta de som (`Audio UI`) descrita no manual, ligando aos botões de sucesso, erro e alertas.
+## Papéis agora
+1. **Agente 03** — lidera visual: tokens, ui/styles, a11y, Impeccable light+dark; fecha PR a11y em paralelo quando aplicável.
+2. **Agente 02** — P0 #693 em curso (settings honestos, orquestração UX, /setup fluxo, copiloto vs Elite); **não** edita `src/components/ui/**` nem `src/styles/**` enquanto o redesign roda. Se App/Sidebar precisar mudar por causa do redesign, 03 abre handoff para 02.
+3. **Cartógrafo** — mapa estrutural; fora do redesign visual.
+
+## Alteração necessária (redesign)
+1. Agente 03: tokens globais (Tailwind/Impeccable), light+dark, componentes ui.
+2. Agente 02: quando liberado, aplicar tokens no shell (Sidebar/Header/modais), whitespace, Audio UI hooks do manual — via handoff do 03.
+3. Isolar em branch `agente/03-*` / `agente/02-*`; nunca main; não colidir com #689/#692/#693 P0 funcionais.
 
 ## Teste esperado
-- A plataforma deve rodar localmente com os novos estilos sem quebrar o layout existente.
-- Cores de marca, fontes e interações de botão devem refletir as regras estritas do manual.
-- O gate E2E/Playwright não deve quebrar por conta de mudanças de DOM/classes.
+- Plataforma sobe com light+dark sem quebrar layout/funcional.
+- Gate E2E/Playwright não quebra por DOM/classes.
+- Agente 24 audita antes de merge.
+
+## Status operacional (2026-10-10)
+- Redesign: **em curso** (03 lidera; freeze anterior da onda 38 superado pelo pedido explícito do Marcelo via Juni/00).
+- Agente 02: focado nos P0 #693; handoff redesign aguardando coordenação de arquivos do 03.
+- Agente 03: atualizar este arquivo com branch/PR de redesign quando abrir.
 
 ## Contexto adicional
-Esta é uma iniciativa massiva que requer isolamento em branch separada e sincronia forte entre Agente 02 e 03. Não quebre a funcionalidade, o foco é puramente styling e UX.
-
-## Resolução
-Onda 38 está bloqueada pelo Freeze de Escopo da Sprint atual. O RC1 Go-Live foca apenas em features funcionais prontas e paridade. Marcado como resolvido/adiado para o futuro.
+Sincronia forte 02↔03. Não quebrar funcionalidade. P0 #693 (falso salvo, orquestração, setup, copiloto) seguem em paralelo em branches `agente/02-p0-*`.
