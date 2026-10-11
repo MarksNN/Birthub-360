@@ -1,4 +1,4 @@
-import type { TabType } from '../components/layout/tabMeta.js';
+import { NAV_HIDDEN_TABS, NAV_TAB_ALIASES, type TabType } from '../components/layout/tabMeta.js';
 
 // Contrato de navegação entre ferramentas que disparam navegação fora do fluxo normal de clique
 // (hoje: comando de voz — ver VoiceCommandWidget.tsx). Existe porque esse widget é montado em
@@ -15,7 +15,11 @@ export const navigationBus = {
 
   requestNavigation(tab: string): boolean {
     if (!isKnownTab(tab) || !activeNavigator) return false;
-    activeNavigator(tab);
+    // P0 #693 item 6: alias (dialer → cadence) navega pro destino real; módulos no gate
+    // MODULE_NOT_READY (voice-hub/outbound) não são destino — reportar false é o ack honesto.
+    const target = NAV_TAB_ALIASES[tab] ?? tab;
+    if (NAV_HIDDEN_TABS.has(target)) return false;
+    activeNavigator(target);
     return true;
   },
 };
