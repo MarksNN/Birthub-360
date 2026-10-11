@@ -74,9 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       soundHover = false,
       sound,
       shine = false,
-      magnetic = variant === 'default' ||
-        variant === 'primary' ||
-        variant === 'cosmic',
+      magnetic = variant === 'default' || variant === 'primary' || variant === 'cosmic',
       disabled,
       children,
       ...props
