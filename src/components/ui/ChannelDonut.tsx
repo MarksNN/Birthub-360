@@ -64,7 +64,7 @@ export function ChannelDonut({
                 onMouseEnter={() => {
                   if (soundHover) SoundFX.play('hover');
                 }}
-                className="group grid grid-cols-[10px_1fr:auto] items-center gap-3 p-1.5 rounded-lg transition-colors hover:bg-surface-elevated/60"
+                className="group grid grid-cols-[10px_1fr_auto] items-center gap-3 p-1.5 rounded-lg transition-colors hover:bg-surface-elevated/60"
               >
                 <span
                   aria-hidden="true"
