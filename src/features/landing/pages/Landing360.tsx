@@ -194,6 +194,7 @@ export function Landing360({
   const { currentUser, isPending: isAuthPending } = useAuth();
   const { theme, setThemeMode } = useTheme();
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   // Forçar Dark Mode na landing para a Paleta Neon
   useEffect(() => {
@@ -960,6 +961,50 @@ export function Landing360({
                 <p className="text-xs text-[#F8F9FF]/70">
                   Contrato fechado e aprendizados de win/loss retroalimentam o sistema.
                 </p>
+              </div>
+            </div>
+
+            {/* Demonstração Real do Motor de Prospecção — Radar Discovery */}
+            <div className="mt-12 rounded-2xl border border-[#00D4FF]/30 bg-[#14141A] p-4 sm:p-6 shadow-[0_0_25px_rgba(0,212,255,0.15)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-[#232332]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#00D4FF] animate-pulse" />
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF]">
+                    Radar Discovery em Operação Real · Fontes Abertas
+                  </span>
+                </div>
+                <span className="font-mono text-[11px] text-[#F8F9FF]/60">
+                  Captura de tela real do produto · Desktop &amp; Mobile
+                </span>
+              </div>
+
+              <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0D0D0D]">
+                {reduceMotion ? (
+                  <img
+                    src="/landing/prospeccao/poster-prospect-radar.png"
+                    alt="Radar de Prospecção Comercial do Birth Hub 360°"
+                    className="w-full h-auto object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster="/landing/prospeccao/poster-prospect-radar.png"
+                    className="w-full h-auto object-cover"
+                  >
+                    <source src="/landing/prospeccao/prospect-radar-demo.webm" type="video/webm" />
+                    <source src="/landing/prospeccao/prospect-radar-demo.mp4" type="video/mp4" />
+                    Seu navegador não suporta a tag de vídeo.
+                  </video>
+                )}
+              </div>
+
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#F8F9FF]/70 font-mono">
+                <span>✦ ICP Filtrado por Segmento, Região e Personas B2B</span>
+                <span className="text-[#00D4FF]">Integração nativa com Bitrix24 &amp; CRM</span>
               </div>
             </div>
           </div>
