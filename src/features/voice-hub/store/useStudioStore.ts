@@ -14,7 +14,6 @@ import { initialNodes, initialEdges } from './initialData.js';
 import { createWorkflowPersistenceActions } from './workflowPersistence.js';
 export { workflowGraphSnapshot } from './workflowPersistence.js';
 import type { NodeLifecycleState, StudioState } from './studioTypes.js';
-<<<<<<< HEAD
 
 // Re-exports for backwards compatibility
 export { nodeRegistry };
@@ -25,13 +24,6 @@ export type {
   StudioState,
 } from './studioTypes.js';
 
-=======
-
-// Re-exports for backwards compatibility
-export { nodeRegistry };
-export type { NodeLifecycleState, NodeRegistryItem, SimulationLog, StudioState } from './studioTypes.js';
-
->>>>>>> origin/agente/24-recovery-review-20261010
 let workflowEpoch = 0;
 
 let simulationInterval: ReturnType<typeof setInterval> | null = null;
