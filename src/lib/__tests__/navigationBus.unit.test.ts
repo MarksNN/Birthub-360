@@ -60,4 +60,24 @@ describe('navigationBus — contrato de navegação (destination id canônico + 
     expect(navigationBus.requestNavigation('prompts')).toBe(false);
     expect(called).toBe(false);
   });
+
+  // P0 #693 item 6 (handoff 17→02): gate MODULE_NOT_READY intencional no backend.
+  it('resolve o alias dialer → cadence (não promete Discador 3CX)', () => {
+    const calls: string[] = [];
+    navigationBus.registerNavigator((tab) => calls.push(tab));
+
+    expect(navigationBus.requestNavigation('dialer')).toBe(true);
+    expect(calls).toEqual(['cadence']);
+  });
+
+  it.each(['voice-hub', 'outbound'])(
+    'não navega para %s (módulo no gate) e reporta false',
+    (tab) => {
+      const calls: string[] = [];
+      navigationBus.registerNavigator((t) => calls.push(t));
+
+      expect(navigationBus.requestNavigation(tab)).toBe(false);
+      expect(calls).toEqual([]);
+    },
+  );
 });
