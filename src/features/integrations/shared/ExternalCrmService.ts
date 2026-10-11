@@ -4,7 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { getCrmProvider, listCrmProviders, type CrmConnectionConfig } from './CrmProvider.js';
+import { type CrmConnectionConfig, getCrmProvider, listCrmProviders } from './CrmProvider.js';
 
 // Ensure all providers are registered before use
 import '../hubspot/HubspotProvider.js';
@@ -122,6 +122,11 @@ export const ExternalCrmService = {
   /**
    * Push a lead to all active connections of the org that support outbound sync.
    * Used by the crm-outbound-sync queue worker.
+   *
+   * Regras Onda 16 (Coordenador 00 / Agente 06):
+   * 1. Conexões filtradas por status='active' E outboundEnabled=true.
+   * 2. ID externo lido e gravado em ExternalEntityLink (fonte de verdade).
+   * 3. ExternalCrmSyncLog gerado para auditoria.
    */
   async pushLeadToAllConnections(
     organizationId: string,
@@ -129,7 +134,11 @@ export const ExternalCrmService = {
     normalizedLead: { name: string; amount?: number; stageLabel?: string },
   ) {
     const connections = await prisma.externalCrmConnection.findMany({
-      where: { organizationId },
+      where: {
+        organizationId,
+        status: 'active',
+        outboundEnabled: true,
+      },
     });
 
     const results = await Promise.allSettled(
@@ -137,23 +146,61 @@ export const ExternalCrmService = {
         const provider = getCrmProvider(conn.provider);
         const config: CrmConnectionConfig = JSON.parse(conn.config);
 
-        // Check for existing external ID in logs
-        const existingLog = await prisma.externalCrmSyncLog.findFirst({
+        // Fonte de verdade estável: ExternalEntityLink
+        const existingLink = await prisma.externalEntityLink.findUnique({
           where: {
-            connectionId: conn.id,
-            leadId,
-            direction: 'outbound',
-            status: 'success',
+            connectionId_entityType_internalId: {
+              connectionId: conn.id,
+              entityType: 'lead',
+              internalId: leadId,
+            },
           },
-          orderBy: { createdAt: 'desc' },
         });
+
+        const externalIdToUse = existingLink?.externalId;
 
         const result = await provider.pushLead(
           config,
-          { externalId: existingLog?.externalEntityId ?? '', ...normalizedLead },
-          existingLog?.externalEntityId ?? undefined,
+          { externalId: externalIdToUse ?? '', ...normalizedLead },
+          externalIdToUse ?? undefined,
         );
 
+        const now = new Date();
+
+        // Grava/atualiza vínculo em ExternalEntityLink
+        await prisma.externalEntityLink.upsert({
+          where: {
+            connectionId_externalType_externalId: {
+              connectionId: conn.id,
+              externalType: 'deal',
+              externalId: result.externalId,
+            },
+          },
+          update: {
+            lastSyncedAt: now,
+            lastDirection: 'outbound',
+            internalId: leadId,
+            entityType: 'lead',
+          },
+          create: {
+            organizationId,
+            connectionId: conn.id,
+            entityType: 'lead',
+            internalId: leadId,
+            externalType: 'deal',
+            externalId: result.externalId,
+            lastSyncedAt: now,
+            lastDirection: 'outbound',
+          },
+        });
+
+        // Atualiza lastSyncAt da conexão
+        await prisma.externalCrmConnection.update({
+          where: { id: conn.id },
+          data: { lastSyncAt: now },
+        });
+
+        // Auditoria em ExternalCrmSyncLog
         await prisma.externalCrmSyncLog.create({
           data: {
             organizationId,
@@ -161,6 +208,7 @@ export const ExternalCrmService = {
             leadId,
             direction: 'outbound',
             status: 'success',
+            entityType: 'lead',
             externalEntityId: result.externalId,
           },
         });
