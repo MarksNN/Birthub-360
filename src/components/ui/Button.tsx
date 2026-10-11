@@ -33,8 +33,6 @@ const buttonVariants = cva(
         link: 'text-brand-ink dark:text-brand underline-offset-4 hover:underline',
         cosmic:
           'bg-brand text-on-brand hover:bg-brand-active hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] shadow-sm',
-        vancouver:
-          'bg-brand text-on-brand hover:bg-brand-active hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] shadow-sm',
       },
       size: {
         default: 'h-9 px-4 py-2',
@@ -78,8 +76,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       shine = false,
       magnetic = variant === 'default' ||
         variant === 'primary' ||
-        variant === 'cosmic' ||
-        variant === 'vancouver',
+        variant === 'cosmic',
       disabled,
       children,
       ...props
