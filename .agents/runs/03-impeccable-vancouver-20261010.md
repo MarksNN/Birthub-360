@@ -1,6 +1,6 @@
 # Run — Agente 03 Impeccable Operate light+dark (2026-10-10)
 
-**Branch:** `agente/03-impeccable-vancouver` (base a11y #692 @ 91268d8)  
+**Branch:** `agente/03-impeccable-vancouver` (base a11y #692 @ 0e933e0 (parecer 24 vigente))  
 **Repo:** MaarkssN/Birthub-360  
 **Modo:** Operate · referência Vancouver+ · light + dark
 
@@ -24,6 +24,29 @@
 - PRODUCT.md (usuários: operadores + gestores)
 - DESIGN.md do app Operate; playbook movido para `docs/strategy/DESIGN-playbook.md`
 - elegance.css: remove Google Fonts; body/display usam Inter/Sora self-hosted; sem `!important` Fraunces
+
+
+## Superfícies prioritárias (Cartógrafo, 2026-10-10)
+
+Ordem de evidência light+dark — mapa canônico PR #693:
+
+**P0 (Command Center / entrada)**
+1. `/app` + `/app/dashboard` — AdaptiveDashboard (cockpit)
+2. `/app/workspace` — WorkspaceHome
+3. `/app/daily-plan` — DailyPlanHub (foco SDR)
+
+**P1 (pilares comerciais)**
+4. `/app/crm` — CrmBoard
+5. `/app/crm360` — CrmOverview
+6. `/app/prospect` — ProspectingHub
+7. `/app/intelligence` e `/app/copiloto_ia` — IntelligenceHub / EliteCommercialAgentWorkspace
+
+**P2 — evitar como vitrine**
+- voice-hub, outbound, dialer (503 MODULE_NOT_READY)
+- forecast/metas/pipeline_ponderado (números hardcoded)
+- settings_* (PillarSettingsPlaceholder)
+
+Shell App/Sidebar = Agente 02 (handoff se precisar). Escopo 03: ui/** + styles/**.
 
 ## Fora de escopo
 
