@@ -26,6 +26,7 @@ vi.mock('../../../../../src/lib/toast.js', () => ({
 }));
 
 import { PredictiveScoringNbaCard } from '../../../../../src/features/intelligence/components/PredictiveScoringNbaCard.js';
+import { toast } from '../../../../../src/lib/toast.js';
 
 describe('PredictiveScoringNbaCard — Componente de UI para Scoring Vetorial e NBA', () => {
   beforeEach(() => {
@@ -160,5 +161,46 @@ describe('PredictiveScoringNbaCard — Componente de UI para Scoring Vetorial e 
     await userEvent.click(refreshButton);
 
     expect(postMock).toHaveBeenCalledTimes(4); // 2 da montagem + 2 do refresh
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith(
+        'Pontuação e Next Best Action recalculados com sucesso!',
+      );
+    });
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it('não anuncia sucesso quando o recálculo pelo header falha', async () => {
+    postMock.mockImplementation((url: string) => {
+      if (url.includes('/lead-score')) {
+        return Promise.resolve({ success: true, data: mockScoreData });
+      }
+      return Promise.resolve({ success: true, data: mockNbaData });
+    });
+
+    render(
+      <PredictiveScoringNbaCard
+        leadId="lead-123"
+        leadName="Carlos Silva"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('82')).toBeInTheDocument();
+    });
+
+    postMock.mockRejectedValue(new Error('Serviço preditivo indisponível'));
+
+    const refreshButton = screen.getByRole('button', {
+      name: /recalcular pontuação preditiva/i,
+    });
+    await userEvent.click(refreshButton);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Não foi possível recalcular a pontuação preditiva.',
+      );
+    });
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(screen.getByText('Serviço preditivo indisponível')).toBeInTheDocument();
   });
 });
