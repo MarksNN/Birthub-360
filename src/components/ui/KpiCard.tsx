@@ -1,4 +1,4 @@
-import { useState, type ComponentType, type MouseEvent, type PointerEvent } from 'react';
+import { type ComponentType, type MouseEvent, type PointerEvent, useState } from 'react';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
 
@@ -129,7 +129,8 @@ export function KpiCard({
     'group relative w-full overflow-hidden rounded-2xl border border-line bg-surface p-5 text-left text-ink shadow-sm transition-all duration-300',
     onSelect &&
       'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-line-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
-    active && 'border-brand/60 bg-surface-elevated shadow-[0_0_0_2px_color-mix(in_srgb,var(--brand)_25%,transparent)]',
+    active &&
+      'border-brand/60 bg-surface-elevated shadow-[0_0_0_2px_color-mix(in_srgb,var(--brand)_25%,transparent)]',
     className,
   );
 
@@ -185,7 +186,9 @@ export function KpiCard({
               </span>
             )}
             {displaySubtitle && (
-              <span className={cn('text-[11px] text-ink-2', !trend && t.trend)}>{displaySubtitle}</span>
+              <span className={cn('text-[11px] text-ink-2', !trend && t.trend)}>
+                {displaySubtitle}
+              </span>
             )}
           </div>
         )}
@@ -209,14 +212,7 @@ export function KpiCard({
     );
   }
 
-  return (
-    <div
-      onPointerMove={handlePointerMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={sharedClassName}
-    >
-      {content}
-    </div>
-  );
+  // Estático: sem handlers de ponteiro (Biome noStaticElementInteractions).
+  // Spotlight/hover SFX só no <button> com onSelect.
+  return <div className={sharedClassName}>{content}</div>;
 }
