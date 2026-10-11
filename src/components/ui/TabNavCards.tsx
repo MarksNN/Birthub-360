@@ -39,10 +39,10 @@ export function TabNavCards({
               onSelect(item.id);
             }}
             className={cn(
-              'group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-white/5 bg-[#1C1D24] p-4 px-5 text-left shadow-sm transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B7DFF]/40 cursor-pointer',
+              'group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-line bg-surface p-4 px-5 text-left shadow-sm transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg cursor-pointer',
               active
-                ? 'border-[#8B7DFF]/60 bg-[#1F202B] shadow-md'
-                : 'hover:border-white/10 hover:shadow-md',
+                ? 'border-brand/60 bg-surface-elevated shadow-md'
+                : 'hover:border-line-strong hover:bg-surface-interactive hover:shadow-md',
             )}
           >
             <span
@@ -50,8 +50,8 @@ export function TabNavCards({
               className={cn(
                 'absolute inset-x-0 top-0 h-[2px] transition-all duration-300',
                 active
-                  ? 'bg-gradient-to-r from-[#8B7DFF] to-[#6D5CE6]'
-                  : 'bg-transparent group-hover:bg-white/10',
+                  ? 'bg-gradient-to-r from-brand to-brand-2'
+                  : 'bg-transparent group-hover:bg-brand/20',
               )}
             />
             <span
@@ -59,8 +59,8 @@ export function TabNavCards({
               className={cn(
                 'flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] border transition-all duration-300 group-hover:scale-110 group-hover:rotate-3',
                 active
-                  ? 'scale-105 bg-[#8B7DFF] text-[#13151A] border-transparent shadow-sm'
-                  : 'bg-[#8B7DFF]/10 text-[#8B7DFF] border-transparent group-hover:bg-[#8B7DFF]/20',
+                  ? 'scale-105 bg-brand text-on-brand border-transparent shadow-sm'
+                  : 'bg-brand/10 text-brand border-transparent group-hover:bg-brand/20',
               )}
             >
               <item.icon className="h-[22px] w-[22px]" />
@@ -68,14 +68,14 @@ export function TabNavCards({
             <span className="min-w-0">
               <span
                 className={cn(
-                  'block text-[15.5px] font-bold tracking-tight transition-colors group-hover:text-white',
-                  active ? 'text-white' : 'text-slate-200',
+                  'block text-[15.5px] font-bold tracking-tight transition-colors group-hover:text-ink',
+                  active ? 'text-ink font-extrabold' : 'text-ink-2',
                 )}
               >
                 {item.title}
               </span>
               {item.subtitle && (
-                <span className="mt-0.5 block text-[11px] leading-snug text-slate-400">
+                <span className="mt-0.5 block text-[11px] leading-snug text-ink-2 opacity-80">
                   {item.subtitle}
                 </span>
               )}
