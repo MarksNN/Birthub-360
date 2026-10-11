@@ -19,6 +19,12 @@ describe('Guardrails PII - Email Allowlist and Tokenized Redaction', () => {
       expect(result.matches).toHaveLength(0);
     });
 
+    it('permite e-mails genéricos de placeholder em templates (ex.: seu@email.com)', () => {
+      const result = detectPII('Contato: seu@email.com ou contato@empresa.com');
+      expect(result.blocked).toBe(false);
+      expect(result.matches).toHaveLength(0);
+    });
+
     it('é case-insensitive para os domínios permitidos', () => {
       const result1 = detectPII('ADMIN@BIRTHHUB360.COM');
       const result2 = detectPII('TEST@EXAMPLE.COM');

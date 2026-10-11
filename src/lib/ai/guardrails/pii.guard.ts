@@ -13,12 +13,24 @@ const CREDIT_CARD_PATTERN = /\d{4}[-.\s]?\d{4}[-.\s]?\d{4}[-.\s]?\d{4}/g;
 /**
  * Domínios de email autorizados/isentos de bloqueio de PII
  * - @birthhub360.com e @birthhub360.com.br: domínio interno corporativo da plataforma
- * - @example.com: domínio RFC 2606 reservado para testes, documentação e Golden Dataset
+ * - @example.com, @example.org, @example.net: domínios RFC 2606 reservados para testes, documentação e Golden Dataset
+ * - @email.com: domínio de preenchimento/placeholder genérico frequentemente gerado por modelos em templates (ex.: seu@email.com)
  */
-const ALLOWED_EMAIL_DOMAINS = ['@birthhub360.com', '@birthhub360.com.br', '@example.com'] as const;
+const ALLOWED_EMAIL_DOMAINS = [
+  '@birthhub360.com',
+  '@birthhub360.com.br',
+  '@example.com',
+  '@example.org',
+  '@example.net',
+  '@email.com',
+] as const;
+
+const PLACEHOLDER_EMAIL_REGEX =
+  /^(?:seu|seu\.email|seuemail|contato|exemplo|teste|usuario|user)@(email\.com|empresa\.com|empresa\.com\.br|suaempresa\.com|dominio\.com)$/i;
 
 function isAllowedEmail(email: string): boolean {
   const lower = email.toLowerCase();
+  if (PLACEHOLDER_EMAIL_REGEX.test(lower)) return true;
   return ALLOWED_EMAIL_DOMAINS.some((domain) => lower.endsWith(domain));
 }
 
