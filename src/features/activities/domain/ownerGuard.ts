@@ -17,7 +17,11 @@ import { AppError } from '../../../shared/middlewares/errorHandler.js';
  */
 const FORBIDDEN_PLACEHOLDER_OWNERS = new Set([
   'enxame de ia atlas',
+  'enxame de ia atlasgr',
   'enxame de ia birthhub360',
+  'enxame de ia birth hub 360',
+  'enxame de ia birthhub 360',
+  'enxame de ia do hub',
   'vendedor 1',
   'vendedor padrão',
   'vendedor genérico',
