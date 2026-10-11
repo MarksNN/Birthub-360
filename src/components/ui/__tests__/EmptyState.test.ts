@@ -20,7 +20,9 @@ describe('EmptyState Component (Design System Primitives)', () => {
     );
 
     expect(screen.getByText('Nenhum lead encontrado')).toBeInTheDocument();
-    expect(screen.getByText('Tente ajustar os filtros da busca para ver resultados.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Tente ajustar os filtros da busca para ver resultados.'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
 

@@ -28,9 +28,7 @@ function resolveAutoBreadcrumbs(pathname: string): BreadcrumbItem[] {
   // Remove o prefixo 'app' se presente
   const appSegments = segments[0] === 'app' ? segments.slice(1) : segments;
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Início', href: '/app' },
-  ];
+  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Início', href: '/app' }];
 
   let accumulatedPath = '/app';
 
@@ -76,16 +74,10 @@ export function AppBreadcrumbs({ className, items }: AppBreadcrumbsProps) {
           return (
             <li key={`${item.label}-${index}`} className="flex items-center gap-1.5">
               {!isFirst && (
-                <ChevronRight
-                  className="h-3.5 w-3.5 text-ink-2/40 shrink-0"
-                  aria-hidden="true"
-                />
+                <ChevronRight className="h-3.5 w-3.5 text-ink-2/40 shrink-0" aria-hidden="true" />
               )}
               {item.current ? (
-                <span
-                  aria-current="page"
-                  className="font-semibold text-ink truncate max-w-[200px]"
-                >
+                <span aria-current="page" className="font-semibold text-ink truncate max-w-[200px]">
                   {item.label}
                 </span>
               ) : item.href ? (
