@@ -25,6 +25,7 @@ const useJudge = process.env.GOLDEN_EVAL_USE_LLM_JUDGE !== 'false';
 const overallMinimum = Number(process.env.GOLDEN_OVERALL_MINIMUM ?? '0.70');
 const categoryMinimum = Number(process.env.GOLDEN_CATEGORY_MINIMUM ?? '0.35');
 const caseMinimum = Number(process.env.GOLDEN_CASE_MINIMUM ?? '0.25');
+const maxHallucinationRisk = Number(process.env.GOLDEN_MAX_HALLUCINATION_RISK ?? '0.35');
 
 const report = await evaluateGoldenDataset(observed, {
   judge: useJudge ? new GatewayGoldenSemanticJudge() : undefined,
@@ -32,6 +33,7 @@ const report = await evaluateGoldenDataset(observed, {
     overallMinimum,
     categoryMinimum,
     caseMinimum,
+    maxHallucinationRisk,
   },
 });
 

@@ -10,7 +10,12 @@ import { prisma } from '../../../lib/prisma.js';
 // "summary" ausente passava sem barrar, silenciosamente. `.partial()` porque o próprio código já
 // tinha fallback por campo faltando — o schema só formaliza esse fallback em vez de confiar em
 // `typeof` ad-hoc.
-const qualificationResponseSchema = z.object({ score: z.number(), summary: z.string() }).partial();
+const qualificationResponseSchema = z
+  .object({
+    score: z.coerce.number(),
+    summary: z.string(),
+  })
+  .partial();
 
 // Define the state for the graph
 const LeadQualificationState = Annotation.Root({
@@ -82,10 +87,9 @@ export const leadQualificationGraph = new StateGraph(LeadQualificationState)
       latencyMs: Date.now() - startTime,
     });
 
+    const content = (response.content as string) || '';
     try {
-      const result = qualificationResponseSchema.parse(
-        cleanAndParseJson<unknown>(response.content as string),
-      );
+      const result = qualificationResponseSchema.parse(cleanAndParseJson<unknown>(content));
       const score =
         typeof result.score === 'number' ? Math.max(0, Math.min(100, result.score)) : 50;
       return {
@@ -94,6 +98,19 @@ export const leadQualificationGraph = new StateGraph(LeadQualificationState)
         status: score >= 70 ? 'QUALIFIED' : 'UNQUALIFIED',
       };
     } catch {
+      // Fallback resiliente: tenta extrair "score" via regex se o JSON vier com formatação ligeiramente atípica
+      const scoreMatch =
+        content.match(/"score"\s*:\s*(\d+)/i) || content.match(/\bscore\s*:\s*(\d+)/i);
+      const summaryMatch =
+        content.match(/"summary"\s*:\s*"([^"]+)"/i) || content.match(/\bsummary\s*:\s*"([^"]+)"/i);
+      if (scoreMatch) {
+        const score = Math.max(0, Math.min(100, parseInt(scoreMatch[1], 10)));
+        return {
+          qualificationScore: score,
+          summary: summaryMatch ? summaryMatch[1] : 'Resumo extraído via fallback estrutural.',
+          status: score >= 70 ? 'QUALIFIED' : 'UNQUALIFIED',
+        };
+      }
       return {
         qualificationScore: 50,
         summary: 'Falha ao interpretar a resposta da IA — verifique manualmente.',
