@@ -1,0 +1,59 @@
+telephony import fail: Cannot find package 'twilio' imported from /workspace/b360-08-503/src/lib/voice-hub/routes/telephony.routes.ts
+[2026-10-10 22:58:39.195 -0300] ERROR: ❌ Erro de Validação nas Variáveis de Ambiente
+    env: "test"
+    service: "birthhub360-api"
+    errors: {
+      "_errors": [],
+      "DATABASE_URL": {
+        "_errors": [
+          "Invalid input: expected string, received undefined"
+        ]
+      }
+    }
+[2026-10-10 22:58:39.577 -0300] WARN: [search] MEILI_MASTER_KEY não configurada — usando chave fixa de desenvolvimento local. NUNCA use isso em produção (a trava acima impede a subida sem a variável real).
+    env: "test"
+    service: "birthhub360-api"
+twilioClient import fail: Cannot find package 'twilio' imported from /workspace/b360-08-503/src/lib/voice-hub/services/twilioClient.ts
+mounted:  3cx-webhook voice-result birth-voice-webhook
+GET /api/voice-hub/workflow [no-auth] -> 401 {"error":"stub-unauthenticated"}
+GET /api/voice-hub/workflow [auth] -> 503 {"success":false,"code":"MODULE_NOT_READY","module":"voice-hub","error":"Módulo indisponível: integração segura por organização ainda não concluída."}
+POST /api/voice-hub/workflow [auth] -> 503 {"success":false,"code":"MODULE_NOT_READY","module":"voice-hub","error":"Módulo indisponível: integração segura por organização ainda não concluída."}
+POST /api/voice-hub/workflow/publish [auth] -> 503 {"success":false,"code":"MODULE_NOT_READY","module":"voice-hub","error":"Módulo indisponível: integração segura por organização ainda não concluída."}
+POST /api/voice-hub/calls/outbound [auth] -> 503 {"success":false,"code":"MODULE_NOT_READY","module":"voice-hub","error":"Módulo indisponível: integração segura por organização ainda não concluída."}
+GET /api/outbound/campaigns [auth] -> 503 {"success":false,"code":"MODULE_NOT_READY","module":"outbound","error":"Módulo indisponível: integração segura por organização ainda não concluída."}
+POST /api/dialer-3cx/call [auth] -> 503 {"success":false,"code":"MODULE_NOT_READY","module":"dialer-3cx","error":"Módulo indisponível: integração segura por organização ainda não concluída."}
+POST /api/telephony/twilio/voice [no-auth] -> 404 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/telephony/twilio/voice</pre>
+</body>
+</html>
+
+POST /api/telephony/twilio/outbound [no-auth] -> 404 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/telephony/twilio/outbound</pre>
+</body>
+</html>
+
+POST /api/integrations/3cx/webhook [no-auth] -> 503 {"success":false,"error":"Webhook não configurado."}
+[2026-10-10 22:58:40.525 -0300] ERROR: Webhook do 3CX recebido, mas THREECX_WEBHOOK_SECRET não está configurado.
+    env: "test"
+    service: "birthhub360-api"
+[2026-10-10 22:58:40.536 -0300] ERROR: Webhook voice-result recebido, mas BIRTHHUB360_WEBHOOK_SECRET não está configurado.
+    env: "test"
+    service: "birthhub360-api"
+POST /api/webhooks/voice-result [no-auth] -> 503 {"success":false,"error":"Webhook não configurado."}
+POST /api/integrations/birth-voice/webhook [no-auth] -> 503 {"success":false,"error":"Webhook não configurado."}
+[2026-10-10 22:58:40.538 -0300] ERROR: Webhook do SDR de voz recebido, mas nenhum segredo (de conexão ou global) está configurado.
+    env: "test"
+    service: "birthhub360-api"
+    organizationId: null
