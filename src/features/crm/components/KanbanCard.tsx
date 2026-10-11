@@ -173,7 +173,7 @@ export const KanbanCard = React.memo(function KanbanCard({
           e.preventDefault();
         }
       }}
-      className={`backdrop-blur-[8px] rounded-xl border transition-all duration-200 group relative overflow-hidden ${
+      className={`backdrop-blur-[8px] rounded-xl border transition-all duration-200 group relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
         isSelected
           ? 'border-brand ring-1 ring-brand/60 shadow-glow-brand'
           : isHighPriority
@@ -205,7 +205,7 @@ export const KanbanCard = React.memo(function KanbanCard({
           type="button"
           onClick={handleCheckboxClick}
           aria-label={isSelected ? `Desmarcar ${companyName}` : `Selecionar ${companyName}`}
-          className="absolute top-3 left-3 z-20 p-1 rounded-lg text-brand hover:scale-110 active:scale-95 transition-all"
+          className="absolute top-3 left-3 z-20 p-1 rounded-lg text-brand hover:scale-110 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           style={{
             background: 'rgba(255,255,255,0.06)',
             border: '1px solid rgba(255,255,255,0.1)',
@@ -363,7 +363,7 @@ export const KanbanCard = React.memo(function KanbanCard({
               // (Antique Gold cru já mede ~8.74:1 contra a superfície escura), escurecida no
               // claro (--color-brand-ink, ver globals.css) porque a cor crua ali cai abaixo
               // de 4.5:1. Mesmo par usado em todo o app — ver design-system/SKILL.md.
-              className="flex items-center gap-1 text-[11px] font-bold text-brand-ink dark:text-brand hover:opacity-75 disabled:opacity-50 transition-all active:scale-95 px-1.5 py-0.5 rounded-md hover:bg-brand/10"
+              className="flex items-center gap-1 text-[11px] font-bold text-brand-ink dark:text-brand hover:opacity-75 disabled:opacity-50 transition-all active:scale-95 px-1.5 py-0.5 rounded-md hover:bg-brand/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {converting ? (
                 <Loader2 className="w-3 h-3 animate-spin" />
@@ -379,7 +379,7 @@ export const KanbanCard = React.memo(function KanbanCard({
               onClick={handleEnrich}
               disabled={enriching}
               title="Reenriquecer com dados da Receita Federal"
-              className="flex items-center gap-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 disabled:opacity-50 transition-all active:scale-95 px-1.5 py-0.5 rounded-md hover:bg-amber-400/10"
+              className="flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:text-amber-400 disabled:opacity-50 transition-all active:scale-95 px-1.5 py-0.5 rounded-md hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {enriching ? (
                 <Loader2 className="w-3 h-3 animate-spin" />
