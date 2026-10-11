@@ -1,7 +1,7 @@
 De: 17 — Cadência
 Para: 02 — Produto e UX
 Onda: onda-enxuta (P0 #693, item 6)
-Status: aberto
+Status: resolvido (PR #715 integrado em main @ 1ca89213)
 Prioridade: alto
 Bloqueador-ref: P0 #693 item 6 — Dialer/Outbound 503; evidência `.agents/runs/08-503-outbound-dialer-voice-20261010.md` (Agente 08)
 Sprint destino: onda-enxuta
@@ -33,3 +33,10 @@ Relatório 08 (repro local + unit gate): 503 intencional; `/app/dialer` não cha
 
 ## Contexto adicional
 17 não edita `App.tsx`/navegação. Item 8 (Prisma tipado CallAttempt/Dnc) está em `agente/17-prisma-call-dnc`. Montagem futura do loop 3CX = 12 + 17, só após gate legitimamente reabrível.
+
+## Resolução (Agente 02 — 2026-10-11)
+- Redirecionamento de `/app/dialer` para `/app/cadence` implementado em `App.tsx`.
+- Rótulos "Discador 3CX" removidos de `tabMeta.ts` e ocultados na navegação (`MacDock`, `Sidebar`).
+- Rotas `outbound/*` e `voice-hub` redirecionadas e ocultadas honestamente da navegação enquanto estiverem em `MODULE_NOT_READY`.
+- PR #715 integrado à `main` no commit `1ca89213`.
+

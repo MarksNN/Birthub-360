@@ -161,7 +161,7 @@ router.post('/webhooks/bland/:token', validateBlandCallbackToken, async (req, re
 
   // There must never be a built-in credential or localhost destination in this production path.
   // Both values are external configuration and the callback fails closed when either is absent.
-  const atlasBaseUrl = process.env.ATLASGR_BASE_URL?.trim();
+  const atlasBaseUrl = (process.env.BIRTHHUB360_BASE_URL || process.env.ATLASGR_BASE_URL)?.trim();
   const webhookSecret = process.env.BIRTHHUB360_WEBHOOK_SECRET?.trim();
   if (!atlasBaseUrl || !webhookSecret) {
     logger.error(
