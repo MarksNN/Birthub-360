@@ -278,7 +278,7 @@ export function DailyPlanHub() {
         );
       case 'WHATSAPP':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-ok/10 text-ok-active border border-ok/20">
             <MessageCircle className="w-3 h-3" /> WhatsApp
           </span>
         );
@@ -322,8 +322,8 @@ export function DailyPlanHub() {
               title={item.completed ? 'Concluído' : 'Marcar como concluído'}
               className={`mt-0.5 shrink-0 w-6 h-6 rounded-lg border flex items-center justify-center transition-colors cursor-pointer ${
                 item.completed
-                  ? 'bg-emerald-500 border-emerald-500 text-slate-950'
-                  : 'border-line hover:border-emerald-500 hover:bg-emerald-50 text-transparent'
+                  ? 'bg-ok border-ok text-on-brand'
+                  : 'border-line hover:border-ok hover:bg-ok/10 text-transparent'
               }`}
             >
               <Check className="w-4 h-4" />
@@ -394,7 +394,7 @@ export function DailyPlanHub() {
                 href={`https://wa.me/55${item.phone.replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 text-xs font-bold transition-colors inline-flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-xl bg-ok/10 text-ok-active hover:bg-ok/20 text-xs font-bold transition-colors inline-flex items-center gap-1.5"
               >
                 <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
               </a>
@@ -515,7 +515,7 @@ export function DailyPlanHub() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-bg p-4 md:p-8 space-y-6 min-h-screen text-ink">
+    <div className="operate-dense flex-1 overflow-y-auto bg-bg p-4 md:p-8 space-y-6 min-h-screen text-ink">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Banner de Identificação & Ações Globais */}
         <div className="p-6 rounded-3xl bg-gradient-to-r from-brand/10 via-brand-2/10 to-gold/10 border border-brand/20 shadow-card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -793,7 +793,7 @@ export function DailyPlanHub() {
                   onClick={() => toggleTask(task.id)}
                   className={`w-full text-left p-4 rounded-2xl border transition-colors cursor-pointer bg-surface ${
                     task.completed
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
+                      ? 'border-ok/40 bg-ok/5'
                       : 'border-line hover:border-brand/30'
                   }`}
                 >
@@ -801,7 +801,7 @@ export function DailyPlanHub() {
                     <div
                       className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center ${
                         task.completed
-                          ? 'bg-emerald-500 border-emerald-500 text-slate-950'
+                          ? 'bg-ok border-ok text-on-brand'
                           : 'border-line'
                       }`}
                     >
