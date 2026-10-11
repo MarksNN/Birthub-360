@@ -1,14 +1,13 @@
 /**
- * Web Scraper & Signals Service (Crawlee + Cheerio + Playwright fallback)
+ * Web Scraper & Signals Service (Zero external deps HTTP + regex parser, Playwright optional fallback)
  *
  * Executa rastreamento controlado de websites corporativos:
- * 1. Crawler leve HTTP com Cheerio para extrair metadados, links e contatos corporativos.
- * 2. Playwright sob demanda quando a página exigir renderização JS/SPA avançada.
+ * 1. Crawler leve HTTP nativo sem dependências externas adicionais (HTML regex sanitizado).
+ * 2. Playwright sob demanda dinâmica quando a página exigir renderização JS/SPA avançada.
  * 3. Proteção estrita contra SSRF, rate limiting e sanitização anti-prompt injection.
  */
 
 import { logger } from '../../../../lib/logger.js';
-import * as cheerio from 'cheerio';
 
 export interface ScrapedWebSignals {
   url: string;
@@ -73,11 +72,17 @@ export class WebScraperService {
    * Sanitiza conteúdo HTML para prevenir Prompt Injection e ruídos em LLMs.
    */
   public sanitizeAndTruncateHtml(rawHtml: string, maxLength = 4000): string {
-    const $ = cheerio.load(rawHtml);
     // Remove tags de script, style, nav, svg, iframe
-    $('script, style, noscript, svg, iframe, nav, footer').remove();
-    let text = $('body').text() || $.text();
-    // Normaliza espaços e remove caracteres de controle
+    let text = rawHtml
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+      .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, ' ')
+      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, ' ')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, ' ')
+      .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, ' ')
+      .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ');
+
     text = text
       .replace(/[\r\n\t]+/g, ' ')
       .replace(/\s{2,}/g, ' ')
@@ -119,7 +124,7 @@ export class WebScraperService {
       throw new Error(`URL rejeitada por política de segurança SSRF: ${targetUrl}`);
     }
 
-    // Tentativa 1: HTTP Leve com Cheerio
+    // Tentativa 1: HTTP Leve nativo com parsing regex seguro
     if (!options.forcePlaywright) {
       try {
         const controller = new AbortController();
@@ -135,27 +140,38 @@ export class WebScraperService {
 
         if (response.ok) {
           const html = await response.text();
-          const $ = cheerio.load(html);
 
-          const title =
-            $('title').text().trim() || $('meta[property="og:title"]').attr('content') || '';
-          const description =
-            $('meta[name="description"]').attr('content') ||
-            $('meta[property="og:description"]').attr('content') ||
-            '';
+          const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+          const ogTitleMatch = html.match(
+            /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
+          );
+          const title = (titleMatch ? titleMatch[1] : ogTitleMatch ? ogTitleMatch[1] : '').trim();
+
+          const descMatch = html.match(
+            /<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i,
+          );
+          const ogDescMatch = html.match(
+            /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i,
+          );
+          const description = (descMatch ? descMatch[1] : ogDescMatch ? ogDescMatch[1] : '').trim();
 
           const openGraph: Record<string, string> = {};
-          $('meta[property^="og:"]').each((_, el) => {
-            const prop = $(el).attr('property');
-            const content = $(el).attr('content');
-            if (prop && content) openGraph[prop] = content;
-          });
+          const ogMatches = html.matchAll(
+            /<meta[^>]+property=["'](og:[^"']+)["'][^>]+content=["']([^"']+)["']/gi,
+          );
+          for (const match of ogMatches) {
+            if (match[1] && match[2]) {
+              openGraph[match[1]] = match[2];
+            }
+          }
 
           const links: string[] = [];
-          $('a[href]').each((_, el) => {
-            const href = $(el).attr('href');
-            if (href) links.push(href);
-          });
+          const linkMatches = html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi);
+          for (const match of linkMatches) {
+            if (match[1]) {
+              links.push(match[1]);
+            }
+          }
 
           const socialLinks = {
             linkedin: links.find(
@@ -166,8 +182,7 @@ export class WebScraperService {
             twitter: links.find((l) => l.includes('twitter.com/') || l.includes('x.com/')),
           };
 
-          const rawText = $.text();
-          const contacts = this.extractContacts(rawText);
+          const contacts = this.extractContacts(html);
           const sanitizedTextSnippet = this.sanitizeAndTruncateHtml(html);
 
           return {
@@ -201,8 +216,7 @@ export class WebScraperService {
         const content = await page.content();
         await browser.close();
 
-        const $ = cheerio.load(content);
-        const contacts = this.extractContacts($.text());
+        const contacts = this.extractContacts(content);
         return {
           url: targetUrl,
           title,
