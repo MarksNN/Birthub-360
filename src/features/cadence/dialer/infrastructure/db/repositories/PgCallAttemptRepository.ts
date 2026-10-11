@@ -1,27 +1,47 @@
-import type { PrismaClient } from '@prisma/client';
-import {
-  CallAttempt,
-  TERMINAL_CALL_ATTEMPT_STATUSES,
-  type CallAttemptProps,
-  type CallAttemptStatus,
-} from '../../../domain/entities/CallAttempt.js';
+import { Prisma, type PrismaClient } from '@prisma/client';
 import {
   AgentDnConflictError,
   type CallAttemptRepository,
 } from '../../../application/ports/CallAttemptRepository.js';
+import {
+  CallAttempt,
+  type CallAttemptProps,
+  type CallAttemptStatus,
+  TERMINAL_CALL_ATTEMPT_STATUSES,
+} from '../../../domain/entities/CallAttempt.js';
 
 /** Nome do índice único parcial criado na migration 002 (ver esse arquivo para o motivo). */
 const ACTIVE_AGENT_DN_CONSTRAINT = 'uq_call_attempts_active_agent_dn';
+const UNIQUE_VIOLATION_SQLSTATE = '23505';
 
+type UnknownRecord = Record<string, unknown>;
+
+function asRecord(value: unknown): UnknownRecord | null {
+  return typeof value === 'object' && value !== null ? (value as UnknownRecord) : null;
+}
+
+/**
+ * Detecta a violação do índice `uq_call_attempts_active_agent_dn` (SQLSTATE 23505).
+ *
+ * Aceita dois formatos de erro:
+ * - erro cru do driver `pg` (`{ code: '23505', constraint: '<nome>' }`);
+ * - erro do Prisma com `@prisma/adapter-pg` (P2002/P2010), em que o erro do
+ *   driver vem em `meta.driverAdapterError.cause` como
+ *   `{ originalCode: '23505', constraint: { index: '<nome>' } }`.
+ */
 function isActiveAgentDnViolation(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: unknown }).code === '23505' &&
-    'constraint' in error &&
-    (error as { constraint?: unknown }).constraint === ACTIVE_AGENT_DN_CONSTRAINT
-  );
+  const err = asRecord(error);
+  if (err === null) return false;
+
+  if (err.code === UNIQUE_VIOLATION_SQLSTATE && err.constraint === ACTIVE_AGENT_DN_CONSTRAINT) {
+    return true;
+  }
+
+  const cause = asRecord(asRecord(asRecord(err.meta)?.driverAdapterError)?.cause);
+  if (cause === null) return false;
+  const isUniqueViolation =
+    cause.originalCode === UNIQUE_VIOLATION_SQLSTATE || cause.kind === 'UniqueConstraintViolation';
+  return isUniqueViolation && asRecord(cause.constraint)?.index === ACTIVE_AGENT_DN_CONSTRAINT;
 }
 
 interface CallAttemptRow {
@@ -49,41 +69,43 @@ function rowToProps(row: CallAttemptRow): CallAttemptProps {
 }
 
 /**
- * Gera a lista de placeholders SQL ($N, $N+1, ...) para os status terminais,
- * a partir da constante do domínio — uma única fonte de verdade em vez de
- * duplicar a lista de status em SQL. `startAt` é a posição do primeiro
- * placeholder (depende de quantos outros parâmetros vêm antes na query).
+ * Lista parametrizada dos status terminais, a partir da constante do domínio —
+ * fonte única de verdade em vez de duplicar a lista de status em SQL.
  */
-function terminalStatusPlaceholders(startAt: number): string {
-  return TERMINAL_CALL_ATTEMPT_STATUSES.map((_, index) => `$${startAt + index}`).join(', ');
+function terminalStatusList(): Prisma.Sql {
+  return Prisma.join(TERMINAL_CALL_ATTEMPT_STATUSES);
 }
 
-// TODO: Refactor native SQL queries to use Prisma ORM directly.
+/**
+ * As tabelas do discador (`call_attempts`, migrations em `../migrations`) usam
+ * colunas snake_case que o model Prisma `CallAttempt` não cobre
+ * (provider_call_id, started_at, ended_at). Por isso as queries usam
+ * `$queryRaw`/`$executeRaw` com tagged templates (parametrizados), não o
+ * Client CRUD. Alinhamento do schema: handoff 17 → 01 (onda-enxuta).
+ */
 export class PgCallAttemptRepository implements CallAttemptRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async save(attempt: CallAttempt): Promise<void> {
     const props = attempt.toProps();
     try {
-      await this.prisma.$executeRawUnsafe(
-        `INSERT INTO call_attempts (id, lead_id, campaign_id, agent_dn, status, provider_call_id, started_at, ended_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT (id) DO UPDATE SET
-           status = EXCLUDED.status,
-           provider_call_id = EXCLUDED.provider_call_id,
-           ended_at = EXCLUDED.ended_at`,
-        [
-          props.id,
-          props.leadId,
-          props.campaignId,
-          props.agentDn,
-          props.status,
-          props.providerCallId,
-          props.startedAt,
-          props.endedAt,
-        ],
-      );
-    } catch (error: any) {
+      await this.prisma.$executeRaw(Prisma.sql`
+        INSERT INTO call_attempts (id, lead_id, campaign_id, agent_dn, status, provider_call_id, started_at, ended_at)
+        VALUES (
+          ${props.id}::uuid,
+          ${props.leadId}::uuid,
+          ${props.campaignId}::uuid,
+          ${props.agentDn},
+          ${props.status},
+          ${props.providerCallId},
+          ${props.startedAt},
+          ${props.endedAt}
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          status = EXCLUDED.status,
+          provider_call_id = EXCLUDED.provider_call_id,
+          ended_at = EXCLUDED.ended_at`);
+    } catch (error: unknown) {
       if (isActiveAgentDnViolation(error)) {
         throw new AgentDnConflictError(props.agentDn);
       }
@@ -92,29 +114,29 @@ export class PgCallAttemptRepository implements CallAttemptRepository {
   }
 
   async findById(id: string): Promise<CallAttempt | null> {
-    const rows = await this.prisma.$queryRawUnsafe<CallAttemptRow[]>(
-      'SELECT * FROM call_attempts WHERE id = $1',
-      [id],
-    );
+    const rows = await this.prisma.$queryRaw<CallAttemptRow[]>(Prisma.sql`
+      SELECT id, lead_id, campaign_id,
+             agent_dn, status, provider_call_id, started_at, ended_at
+      FROM call_attempts
+      WHERE id = ${id}::uuid`);
     const row = rows[0];
     return row === undefined ? null : CallAttempt.restore(rowToProps(row));
   }
 
   async findInProgress(campaignId: string): Promise<CallAttempt[]> {
-    const rows = await this.prisma.$queryRawUnsafe<CallAttemptRow[]>(
-      `SELECT * FROM call_attempts
-       WHERE campaign_id = $1 AND status NOT IN (${terminalStatusPlaceholders(2)})`,
-      [campaignId, ...TERMINAL_CALL_ATTEMPT_STATUSES],
-    );
+    const rows = await this.prisma.$queryRaw<CallAttemptRow[]>(Prisma.sql`
+      SELECT id, lead_id, campaign_id,
+             agent_dn, status, provider_call_id, started_at, ended_at
+      FROM call_attempts
+      WHERE campaign_id = ${campaignId}::uuid
+        AND status NOT IN (${terminalStatusList()})`);
     return rows.map((row) => CallAttempt.restore(rowToProps(row)));
   }
 
   async findBusyAgentDns(): Promise<Set<string>> {
-    const rows = await this.prisma.$queryRawUnsafe<{ agent_dn: string }[]>(
-      `SELECT DISTINCT agent_dn FROM call_attempts
-       WHERE status NOT IN (${terminalStatusPlaceholders(1)})`,
-      [...TERMINAL_CALL_ATTEMPT_STATUSES],
-    );
+    const rows = await this.prisma.$queryRaw<{ agent_dn: string }[]>(Prisma.sql`
+      SELECT DISTINCT agent_dn FROM call_attempts
+      WHERE status NOT IN (${terminalStatusList()})`);
     return new Set(rows.map((row) => row.agent_dn));
   }
 }

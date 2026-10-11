@@ -30,48 +30,38 @@ experiência da **Birth Hub 360º**.
 
 ## 2. Paleta Oficial de Cores
 
-| Nome da Cor        | Hex       | Papel no sistema                                                     |
-| ------------------ | --------- | -------------------------------------------------------------------- |
-| **Antique Gold**   | `#D4AF37` | **Primária.** Valor, foco e assinatura: ação principal, KPI, realce. |
-| **Deep Iris**      | `#5B21B6` | Inteligência em movimento: halos, indicadores, órbita.               |
-| **Orbit Blue**     | `#0065D2` | Terceira cor da órbita 360º.                                         |
-| **Obsidian Black** | `#0B132B` | Profundidade. Superfície escura e **texto sobre marca**.             |
-| **Snow White**     | `#F8FAFC` | Respiro. Texto sobre superfície escura.                              |
-| **Midnight**       | `#08090F` | Fundo de página do tema escuro.                                      |
-| **Parchment**      | `#E9E4D9` | Superfície clara institucional.                                      |
+| Nome da Cor | Hex / Código | Significado / Uso Principal |
+| :--- | :--- | :--- |
+| **Azul Neon** | `#00D4FF` | Tecnologia, confiança, inovação. Usado na cor padrão de títulos, bordas ativas e cards de destaque comercial. |
+| **Rosa Neon** | `#FF2D9B` | Energia, criatividade, atitude. Usado em destaques, tags, inteligência de mercado e gradientes de botões. |
+| **Dourado Neon** | `#FFC107` | Sofisticação, prosperidade, previsibilidade e métricas. |
+| **Preto Neon (Fundo)** | `#0D0D0D` | Fundo principal da página (Dark Mode), gerando alto contraste com as cores neon. |
+| **Branco Neon (Texto)** | `#F8F9FF` | Textos corridos de corpo, subtítulos secundários e leitura padrão. |
+| **Fundo de Cards** | `#14141A` | Superfícies e cartões de conteúdo. |
+| **Bordas Glow** | `rgba(0, 212, 255, 0.22)` | Bordas com efeito neon sutil. |
 
-**A regra de contraste que mais importa:** ouro é uma cor **clara**. Texto branco
-sobre `#D4AF37` mede 2.10:1 e nunca é aceitável. O par correto é Obsidian sobre
-ouro — 8.74:1 — que é o mesmo par do CTA do brand book. No produto isso é o token
-`text-on-brand`; para a cor de marca usada como **texto** sobre fundo claro, use
-`text-brand-ink`.
+### Variações e Gradientes Principais
 
-### Sistema Cromático 360º
+- **Gradiente de Títulos:** `linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%)`
+- **Gradiente de Ação / Botões (CTA):** `linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%)`
+- **Tons Light complementares:** Rosa claro (`#E6007A`), Azul claro (`#0284C7`) e Dourado/Âmbar (`#D97706`).
 
-O gradiente é movimento, não decoração.
-
-1. **USE** — halos, bordas, indicadores e hero sections.
-2. **LIMIT** — um gradiente dominante por composição.
-3. **ANCHOR** — base sempre Obsidian ou Snow White.
-4. **GOLD** — reservar para valor, foco e assinatura.
+> **Regra Mandatória do Design:** Há uma regra estrita no projeto onde todos os títulos (`h1` ao `h6`) devem usar as cores neon (`#00D4FF`, `#FF2D9B` ou `#FFC107`) ou gradientes, **nunca branco ou preto**.
 
 ---
 
 ## 3. Tipografia
 
-- **Display (H1–H3):** _Bodoni Moda_ — headlines, títulos, chamadas institucionais.
-- **Interface (H4–H6, corpo, tabelas):** _Inter_ — menus, textos, dashboards, relatórios.
-- **Números tabulares:** _IBM Plex Mono_.
+- **Fonte Principal / Corpo e Títulos:** **Plus Jakarta Sans**
+  - **Pesos:** `400` (Regular), `500` (Medium), `600` (Semi-bold), `700` (Bold), `800` (Extra-bold).
+  - **Fallback:** `-apple-system, BlinkMacSystemFont, sans-serif`.
+  - *(Alternativa display para botões especiais e heros: **Sora**)*.
+- **Fonte Monospaçada / Código e Métricas:** **JetBrains Mono**
+  - **Pesos:** `500` e `700`.
+  - **Fallback:** `monospace`.
+  - **Uso:** Badges técnicos, contadores, tags numéricas e pilares do sistema.
 
-Escala do brand book: Display 44–72 · Título 28–36 · Subtítulo 16–20 · Corpo 10–14
-· Label 8–10.
-
-Bodoni é um Didone de contraste alto: suas hastes finas somem abaixo de ~20px, por
-isso títulos pequenos usam Inter. Em interface a prioridade é legibilidade; em
-comunicação, presença.
-
-As duas famílias são **self-hosted** em `public/fonts/` (arquivos variáveis, latin
-e latin-ext) — nenhuma requisição a CDN de fonte.
+As famílias contam com suporte **self-hosted** em `public/fonts/` e fontes variáveis para funcionamento offline no Android via Capacitor.
 
 ---
 

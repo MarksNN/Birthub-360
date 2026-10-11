@@ -17,7 +17,7 @@ export function WorkspaceHome() {
   const { workspace, isLoading, error, reload } = useWorkspace();
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col items-center overflow-y-auto bg-transparent font-sans w-full">
+    <div className="operate-dense relative flex min-h-full flex-1 flex-col items-center overflow-y-auto bg-bg text-ink font-sans w-full">
       <div className="bh-page relative z-[1] flex flex-1 flex-col items-center justify-center w-full px-4 py-8">
         {isLoading && (
           <div aria-live="polite" aria-busy="true" className="flex items-center gap-2 text-ink-2">
