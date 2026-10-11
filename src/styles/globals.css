@@ -37,7 +37,10 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: local("JetBrains Mono Medium"), local("JetBrainsMono-Medium"), url("/fonts/ibm-plex-mono-500.ttf") format("truetype");
+  src:
+    local("JetBrains Mono Medium"),
+    local("JetBrainsMono-Medium"),
+    url("/fonts/ibm-plex-mono-500.ttf") format("truetype");
 }
 
 @font-face {
@@ -45,7 +48,10 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: local("JetBrains Mono Bold"), local("JetBrainsMono-Bold"), url("/fonts/ibm-plex-mono-700.ttf") format("truetype");
+  src:
+    local("JetBrains Mono Bold"),
+    local("JetBrainsMono-Bold"),
+    url("/fonts/ibm-plex-mono-700.ttf") format("truetype");
 }
 
 @font-face {
@@ -124,22 +130,22 @@
      Fundo Cards:  #14141A (Superfícies e cartões de conteúdo)
      Bordas Glow:  rgba(0, 212, 255, 0.22) (Bordas com efeito neon sutil)
      ========================================================================== */
-  --neon-blue: #00D4FF;
-  --neon-pink: #FF2D9B;
-  --neon-gold: #FFC107;
-  --neon-black: #0D0D0D;
-  --neon-white: #F8F9FF;
-  --neon-card-bg: #14141A;
+  --neon-blue: #00d4ff;
+  --neon-pink: #ff2d9b;
+  --neon-gold: #ffc107;
+  --neon-black: #0d0d0d;
+  --neon-white: #f8f9ff;
+  --neon-card-bg: #14141a;
   --neon-card-border: rgba(0, 212, 255, 0.22);
 
   /* Tons Light complementares */
-  --light-pink: #E6007A;
-  --light-blue: #0284C7;
-  --light-gold: #D97706;
+  --light-pink: #e6007a;
+  --light-blue: #0284c7;
+  --light-gold: #d97706;
 
   /* Gradientes Oficiais */
-  --grad-titles: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
-  --grad-cta: linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%);
+  --grad-titles: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
+  --grad-cta: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%);
 
   --bg: #f8fafc;
   --surface: #ffffff;
@@ -167,22 +173,22 @@
   --sunset: #ef4444;
   --red-violet: #8b5cf6;
   --red-violet-active: var(--red-violet);
-  --gold: #FFC107;
+  --gold: #ffc107;
   --white: #ffffff;
 
   /* BirthHub 360 - Cores de Marca Neon */
-  --brand: #00D4FF;
-  --brand-2: #FF2D9B;
-  --on-brand: #0D0D0D;
+  --brand: #00d4ff;
+  --brand-2: #ff2d9b;
+  --on-brand: #0d0d0d;
   --iris: #8b5cf6;
-  --orbit-blue: #00D4FF;
+  --orbit-blue: #00d4ff;
   --red: #ef4444;
-  --pink: #FF2D9B;
-  --warn: #FFC107;
+  --pink: #ff2d9b;
+  --warn: #ffc107;
   --ok: #22c55e;
 
   /* Gradientes e glows */
-  --grad-brand: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+  --grad-brand: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
   --glow-brand: 0 0 22px rgba(0, 212, 255, 0.35);
   --glow-iris: 0 0 22px rgba(255, 45, 155, 0.3);
   /* Indireção pro --color-info do @theme poder ser sobrescrito por tema (mesmo padrão de
@@ -275,8 +281,10 @@
   --shadow-nav-value: 12px 0 34px -28px rgba(26, 21, 19, 0.45);
   --shadow-nav-active-value: 0 10px 26px -14px color-mix(in srgb, var(--brand) 52%, black);
   --radius-nav-item-value: 12px;
-  --font-brand-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-brand-display: "Plus Jakarta Sans", "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-brand-sans:
+    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-brand-display:
+    "Plus Jakarta Sans", "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-brand-serif: "Playfair Display", "Georgia", serif;
   --font-brand-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
 
@@ -474,36 +482,36 @@
 
 .dark {
   /* Paleta Oficial Neon — Dark Mode (0D0D0D fundo, 14141A cards, F8F9FF texto) */
-  --bg: #0D0D0D;
-  --surface: #14141A;
-  --surface-2: #14141A;
-  --surface-subtle: #1C1C24;
-  --surface-elevated: #1F1F28;
+  --bg: #0d0d0d;
+  --surface: #14141a;
+  --surface-2: #14141a;
+  --surface-subtle: #1c1c24;
+  --surface-elevated: #1f1f28;
   --surface-interactive: #252530;
   --overlay: rgba(13, 13, 13, 0.85);
-  --ink: #F8F9FF;
-  --ink-2: #A1A1B5;
+  --ink: #f8f9ff;
+  --ink-2: #a1a1b5;
   --line: rgba(0, 212, 255, 0.18);
   --soft: rgba(0, 212, 255, 0.12);
   /* Paleta Coolors - Dark mode versions */
-  --coolors-yellow: #FFC107;
+  --coolors-yellow: #ffc107;
   --coolors-orange: #ff6b35;
-  --coolors-pink: #FF2D9B;
+  --coolors-pink: #ff2d9b;
   --coolors-purple: #8b7dff;
-  --coolors-blue: #00D4FF;
+  --coolors-blue: #00d4ff;
   /* Atualização de tokens oficiais */
-  --brand: #00D4FF;
-  --brand-2: #FF2D9B;
+  --brand: #00d4ff;
+  --brand-2: #ff2d9b;
   --iris: #8b7dff;
-  --orbit-blue: #00D4FF;
+  --orbit-blue: #00d4ff;
   --red: #ef4444;
-  --pink: #FF2D9B;
-  --warn: #FFC107;
-  --gold: #FFC107;
+  --pink: #ff2d9b;
+  --warn: #ffc107;
+  --gold: #ffc107;
   /* Acentos de ícone da Sidebar, lado escuro: matizes neon vibrantes */
-  --nav-c-gold: #FFC107;
-  --nav-c-iris: #FF2D9B;
-  --nav-c-blue: #00D4FF;
+  --nav-c-gold: #ffc107;
+  --nav-c-iris: #ff2d9b;
+  --nav-c-blue: #00d4ff;
   --nav-c-red: #ff6b6b;
   --nav-c-green: #4ade80;
   --nav-c-violet: #c4b5fd;
@@ -619,30 +627,31 @@
   --font-sans: var(--font-brand-sans);
   --font-display: var(--font-brand-display);
   --font-serif: var(--font-brand-serif);
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-mono:
+    "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
 
   /* Cores Neon Oficiais Birth Hub 360 */
-  --color-neon-blue: #00D4FF;
-  --color-neon-pink: #FF2D9B;
-  --color-neon-gold: #FFC107;
-  --color-neon-black: #0D0D0D;
-  --color-neon-white: #F8F9FF;
-  --color-neon-card: #14141A;
+  --color-neon-blue: #00d4ff;
+  --color-neon-pink: #ff2d9b;
+  --color-neon-gold: #ffc107;
+  --color-neon-black: #0d0d0d;
+  --color-neon-white: #f8f9ff;
+  --color-neon-card: #14141a;
   --color-neon-border: rgba(0, 212, 255, 0.22);
 
   /* Tons Light complementares */
-  --color-light-pink: #E6007A;
-  --color-light-blue: #0284C7;
-  --color-light-gold: #D97706;
+  --color-light-pink: #e6007a;
+  --color-light-blue: #0284c7;
+  --color-light-gold: #d97706;
 
   /* Paleta oficial Birth Hub 360 */
-  --color-obsidian: #0D0D0D;
-  --color-midnight: #0D0D0D;
+  --color-obsidian: #0d0d0d;
+  --color-midnight: #0d0d0d;
   --color-sunset: #ef4444;
-  --color-red-violet: #FF2D9B;
-  --color-gold: #FFC107;
-  --color-white: #F8F9FF;
-  --color-snow: #F8F9FF;
+  --color-red-violet: #ff2d9b;
+  --color-gold: #ffc107;
+  --color-white: #f8f9ff;
+  --color-snow: #f8f9ff;
   --color-parchment: #e9e4d9;
   /* "Inteligência em movimento" — halos, indicadores, órbita. Não é fundo de
      botão: ver o comentário de --iris em :root. */
@@ -1002,7 +1011,7 @@
   h4.neon-title-blue,
   h5.neon-title-blue,
   h6.neon-title-blue {
-    color: #00D4FF;
+    color: #00d4ff;
     text-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
   }
 
@@ -1013,7 +1022,7 @@
   h4.neon-title-pink,
   h5.neon-title-pink,
   h6.neon-title-pink {
-    color: #FF2D9B;
+    color: #ff2d9b;
     text-shadow: 0 0 18px rgba(255, 45, 155, 0.45);
   }
 
@@ -1024,12 +1033,12 @@
   h4.neon-title-gold,
   h5.neon-title-gold,
   h6.neon-title-gold {
-    color: #FFC107;
+    color: #ffc107;
     text-shadow: 0 0 18px rgba(255, 193, 7, 0.45);
   }
 
   .neon-gradient-title {
-    background: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+    background: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
@@ -1044,9 +1053,11 @@
     justify-content: center;
     gap: 0.65rem;
     font-weight: 700;
-    color: #0D0D0D;
-    background: linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%);
-    box-shadow: 0 0 25px rgba(255, 45, 155, 0.45), 0 0 35px rgba(0, 212, 255, 0.35);
+    color: #0d0d0d;
+    background: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%);
+    box-shadow:
+      0 0 25px rgba(255, 45, 155, 0.45),
+      0 0 35px rgba(0, 212, 255, 0.35);
     transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 

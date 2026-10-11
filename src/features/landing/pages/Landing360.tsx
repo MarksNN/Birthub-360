@@ -559,11 +559,17 @@ export function Landing360({
 
             {/* Headlines Principais — Cores Neon Oficiais (Nunca Branco ou Preto) */}
             <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.15] max-w-4xl">
-              <span className="text-[#00D4FF] drop-shadow-[0_0_24px_rgba(0,212,255,0.45)]">Dados que Conectam.</span>
+              <span className="text-[#00D4FF] drop-shadow-[0_0_24px_rgba(0,212,255,0.45)]">
+                Dados que Conectam.
+              </span>
               <br />
-              <span className="text-[#FF2D9B] drop-shadow-[0_0_24px_rgba(255,45,155,0.45)]">Inteligência que Decide.</span>
+              <span className="text-[#FF2D9B] drop-shadow-[0_0_24px_rgba(255,45,155,0.45)]">
+                Inteligência que Decide.
+              </span>
               <br />
-              <span className="text-[#FFC107] drop-shadow-[0_0_24px_rgba(255,193,7,0.45)]">Resultados que Acontecem.</span>
+              <span className="text-[#FFC107] drop-shadow-[0_0_24px_rgba(255,193,7,0.45)]">
+                Resultados que Acontecem.
+              </span>
             </h1>
 
             {/* Subheadline Oficial */}
@@ -851,7 +857,9 @@ export function Landing360({
                       >
                         {p.name}
                       </h3>
-                      <p className="font-sans text-xs text-[#F8F9FF]/70 leading-snug mb-3">{p.desc}</p>
+                      <p className="font-sans text-xs text-[#F8F9FF]/70 leading-snug mb-3">
+                        {p.desc}
+                      </p>
                       <div className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#1C1C26] text-[#F8F9FF]/90 border border-white/10">
                         Foco: {p.focus}
                       </div>
@@ -982,8 +990,8 @@ export function Landing360({
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong className="text-[#00D4FF]">Diagnóstico de Entraves:</strong> Alerta deals estagnados com sugestões
-                    claras de destravamento.
+                    <strong className="text-[#00D4FF]">Diagnóstico de Entraves:</strong> Alerta
+                    deals estagnados com sugestões claras de destravamento.
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
@@ -991,8 +999,8 @@ export function Landing360({
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong className="text-[#FF2D9B]">Próxima Melhor Ação:</strong> Recomendações acionáveis para o vendedor
-                    avançar o contato.
+                    <strong className="text-[#FF2D9B]">Próxima Melhor Ação:</strong> Recomendações
+                    acionáveis para o vendedor avançar o contato.
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
@@ -1000,8 +1008,8 @@ export function Landing360({
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>
-                    <strong className="text-[#FFC107]">Isolamento &amp; Segurança:</strong> Seus dados comerciais jamais são
-                    utilizados para treinar modelos públicos.
+                    <strong className="text-[#FFC107]">Isolamento &amp; Segurança:</strong> Seus
+                    dados comerciais jamais são utilizados para treinar modelos públicos.
                   </span>
                 </div>
               </div>
@@ -1016,7 +1024,9 @@ export function Landing360({
                       COPILOTO COMERCIAL ATIVO
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-[#F8F9FF]/50">Contexto: Deal #4892</span>
+                  <span className="font-mono text-[10px] text-[#F8F9FF]/50">
+                    Contexto: Deal #4892
+                  </span>
                 </div>
                 <div className="space-y-3 font-mono text-xs">
                   <div className="p-3 rounded-xl bg-[#1A1A24] border border-[#FF2D9B]/25 text-[#F8F9FF]/80">
@@ -1107,7 +1117,9 @@ export function Landing360({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="section-card p-5 border-t-4 border-t-[#00D4FF]">
-                <div className="font-mono text-xs text-[#00D4FF]/70 uppercase">Taxa de Conversão</div>
+                <div className="font-mono text-xs text-[#00D4FF]/70 uppercase">
+                  Taxa de Conversão
+                </div>
                 <div className="font-display text-2xl font-extrabold text-[#00D4FF] my-1">
                   Funil 360°
                 </div>
@@ -1139,7 +1151,9 @@ export function Landing360({
               </div>
 
               <div className="section-card p-5 border-t-4 border-t-[#00D4FF]">
-                <div className="font-mono text-xs text-[#00D4FF]/70 uppercase">Motivos de Perda</div>
+                <div className="font-mono text-xs text-[#00D4FF]/70 uppercase">
+                  Motivos de Perda
+                </div>
                 <div className="font-display text-2xl font-extrabold text-[#00D4FF] my-1">
                   Win / Loss
                 </div>
@@ -1247,7 +1261,9 @@ export function Landing360({
 
               <div className="p-5 rounded-2xl bg-[#14141A] border border-[#232332] text-center">
                 <div className="font-mono text-sm font-bold text-[#FFC107]">Telefonia em Nuvem</div>
-                <div className="font-sans text-xs text-[#F8F9FF]/60 mt-1">Gravação &amp; Métricas</div>
+                <div className="font-sans text-xs text-[#F8F9FF]/60 mt-1">
+                  Gravação &amp; Métricas
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-[#14141A] border border-[#232332] text-center">
@@ -1539,7 +1555,9 @@ export function Landing360({
                   >
                     {authMethod === 'sso' ? 'E-mail ou Domínio SSO' : 'E-mail Corporativo'}
                   </label>
-                  <span className="font-mono text-[10px] text-[#00D4FF]/70">Domínio empresarial</span>
+                  <span className="font-mono text-[10px] text-[#00D4FF]/70">
+                    Domínio empresarial
+                  </span>
                 </div>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#F8F9FF]/40 group-focus-within:text-[#00D4FF] transition-colors duration-200" />
