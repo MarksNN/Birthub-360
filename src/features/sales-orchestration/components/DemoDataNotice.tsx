@@ -8,10 +8,13 @@ import { AlertTriangle, Info, RefreshCw } from 'lucide-react';
  */
 export function OrchestrationStatusBanner({
   isTemplate,
+  noRealData = false,
   error,
   onRetry,
 }: {
   isTemplate: boolean;
+  /** `meta.source === 'none'` (contrato 04): organização sem dados reais ainda. */
+  noRealData?: boolean;
   error?: string | null;
   onRetry?: () => void;
 }) {
@@ -59,6 +62,26 @@ export function OrchestrationStatusBanner({
             Os itens abaixo são modelos ilustrativos e{' '}
             <strong>não refletem a operação da sua organização</strong>. Métricas sem cálculo real
             aparecem como “Indisponível”.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  if (noRealData) {
+    return (
+      <div
+        role="note"
+        aria-label="Sem dados reais"
+        className="flex gap-3 p-4 rounded-xl border border-[var(--line)] bg-[var(--surface-2)]"
+      >
+        <Info className="w-5 h-5 shrink-0 mt-0.5 text-[var(--ink-3)]" aria-hidden="true" />
+        <div className="text-sm">
+          <p className="font-semibold text-[var(--ink)] flex items-center gap-2">
+            Sem dados reais ainda <DemoBadge show label="Sem dados" />
+          </p>
+          <p className="text-xs text-[var(--ink-2)] mt-1">
+            Sua organização ainda não tem playbooks ou cadências registrados. Nada é preenchido com
+            exemplos; métricas sem cálculo real aparecem como “Indisponível”.
           </p>
         </div>
       </div>

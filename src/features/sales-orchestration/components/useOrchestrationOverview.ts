@@ -4,10 +4,12 @@ import { orchestrationApi, type SalesOrchestrationOverview } from '../orchestrat
 /**
  * Normaliza a resposta para a UI nunca exibir número inventado (P0 #693, Agente 02).
  *
- * Servidor anterior ao contrato do Agente 04 responde sem `meta` e com métricas seed
- * (complianceRate/aderência/conversão/eficácia fixas no código). Nesse caso tratamos tudo como
- * TEMPLATE e anulamos as métricas → a tela mostra “Indisponível” + badge Exemplo.
- * Com o contrato do 04 (`meta.source` 'real' | 'template' | 'none'), respeitamos o que vier.
+ * Contrato do Agente 04 (agente/04-p0-693-orquestracao-honesta): `meta.source` 'real' | 'none',
+ * métricas sem cálculo vêm `null` e listadas em `meta.unavailableMetrics`; jornadas/processos/
+ * roteiros vêm `[]` (`meta.emptySections`). Respeitamos o que vier.
+ *
+ * Servidor anterior ao contrato (sem `meta`) responde com seed/métricas fixas no código: nesse caso
+ * tratamos tudo como TEMPLATE e anulamos as métricas → “Indisponível” + badge Exemplo.
  */
 function normalize(raw: SalesOrchestrationOverview): {
   data: SalesOrchestrationOverview;
@@ -15,7 +17,16 @@ function normalize(raw: SalesOrchestrationOverview): {
 } {
   const source = (raw.meta as { source?: string } | undefined)?.source;
   if (source) {
-    return { data: raw, isTemplate: source === 'template' };
+    return {
+      data: {
+        ...raw,
+        playbooks: raw.playbooks ?? [],
+        jornadas: raw.jornadas ?? [],
+        processos: raw.processos ?? [],
+        roteiros: raw.roteiros ?? [],
+      },
+      isTemplate: source === 'template',
+    };
   }
   const nulled = {
     ...raw,
@@ -28,10 +39,10 @@ function normalize(raw: SalesOrchestrationOverview): {
     playbooks: (raw.playbooks ?? []).map((p) => ({ ...p, complianceRate: null })),
     jornadas: (raw.jornadas ?? []).map((j) => ({
       ...j,
-      conversionRate: null as unknown as number,
+      conversionRate: null,
     })),
     processos: raw.processos ?? [],
-    roteiros: (raw.roteiros ?? []).map((r) => ({ ...r, taxaSucesso: null as unknown as number })),
+    roteiros: (raw.roteiros ?? []).map((r) => ({ ...r, taxaSucesso: null })),
     meta: {
       source: 'none',
       unavailableMetrics: [
@@ -42,7 +53,7 @@ function normalize(raw: SalesOrchestrationOverview): {
         'taxaSucesso',
       ],
     },
-  } as SalesOrchestrationOverview;
+  } satisfies SalesOrchestrationOverview;
   return { data: nulled, isTemplate: true };
 }
 
@@ -50,6 +61,7 @@ function normalize(raw: SalesOrchestrationOverview): {
 export function useOrchestrationOverview() {
   const [data, setData] = useState<SalesOrchestrationOverview | null>(null);
   const [isTemplate, setIsTemplate] = useState(false);
+  const [source, setSource] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [nonce, setNonce] = useState(0);
@@ -66,10 +78,12 @@ export function useOrchestrationOverview() {
         const n = normalize(res);
         setData(n.data);
         setIsTemplate(n.isTemplate);
+        setSource(n.isTemplate ? 'template' : (n.data.meta?.source ?? null));
       })
       .catch((err: unknown) => {
         if (!mounted) return;
         setData(null);
+        setSource(null);
         setError(
           err instanceof Error
             ? err.message
@@ -85,7 +99,9 @@ export function useOrchestrationOverview() {
   }, [nonce]);
 
   const reload = useCallback(() => setNonce((n) => n + 1), []);
-  return { data, isTemplate, loading, error, reload };
+  /** `meta.source === 'none'`: organização ainda sem dados reais (não é erro nem demo). */
+  const noRealData = !loading && !error && source === 'none';
+  return { data, isTemplate, noRealData, loading, error, reload };
 }
 
 /** Formata métrica possivelmente nula. Nunca inventa valor. */
