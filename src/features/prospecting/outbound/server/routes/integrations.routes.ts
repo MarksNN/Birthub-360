@@ -156,7 +156,7 @@ integrationsRouter.post(
               idempotent: true,
               leadId: priorBitrixLeadId,
               message: `Lead "${lead.name}" já havia sido exportado para o Bitrix24 (Lead #${priorBitrixLeadId}, em ${priorCreatedAt}). Envie novamente com "force" para reprocessar de propósito.`,
-              target: effectiveWebhook.includes('totaltrac') ? 'Total Trac' : 'Birth Hub 360',
+              target: 'Birthub 360',
               warnings: eligibility.warnings,
             });
           }
@@ -205,7 +205,7 @@ integrationsRouter.post(
           success: true,
           leadId: bitrixLeadId,
           message: `Lead "${lead.name}" exportado com sucesso para o Bitrix24! (Lead #${bitrixLeadId})`,
-          target: effectiveWebhook.includes('totaltrac') ? 'Total Trac' : 'Birth Hub 360',
+          target: 'Birthub 360',
           warnings: eligibility.warnings,
         });
       }

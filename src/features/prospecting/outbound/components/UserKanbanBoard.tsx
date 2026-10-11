@@ -200,7 +200,7 @@ export function UserKanbanBoard({ user, isDark }: UserKanbanBoardProps) {
             </h4>
             <p className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} mb-2`}>
               "Liste 3 objeções comuns sobre preço em rastreamento e como contorná-las usando os
-              diferenciais da TotalTrac."
+              diferenciais da Birthub 360."
             </p>
             <button
               type="button"

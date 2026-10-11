@@ -1,10 +1,8 @@
 import type { User, IntegrationsConfig } from '../types.js';
 
-// Decide qual webhook do Bitrix24 usar. Por padrão ('auto') segue a marca do
-// usuário logado, para acabar com o risco de mandar um lead da Atlas para o
-// Bitrix da Total Trac (ou vice-versa) por causa de um seletor manual esquecido
-// na posição errada. 'totaltrac'/'birthhub360'/'custom' continuam disponíveis como
-// substituição explícita para quem realmente precisa.
+// Decide qual webhook do Bitrix24 usar. Por padrão ('auto') segue a organização do
+// usuário logado para o Bitrix da Birthub 360. 'totaltrac'/'birthhub360'/'custom' continuam disponíveis como
+// substituição explícita para compatibilidade.
 export function resolveBitrixWebhook(
   user: User | null | undefined,
   config: IntegrationsConfig | undefined,
