@@ -25,6 +25,7 @@
 
 import type { Prisma } from '@prisma/client';
 import type { PlaybookKey } from '../../../config/playbooks.js';
+import type { DecisionMaker } from '../domain/prospectTypes.js';
 import { fromPrismaCompanyStatus } from '../../../lib/enumMap.js';
 import { logger } from '../../../lib/logger.js';
 import type { prisma } from '../../../lib/prisma.js';
@@ -86,14 +87,7 @@ export interface EnrichCompanyOptions {
   activePlaybook?: PlaybookKey;
   /** Decisores já buscados na tela de descoberta (Apollo/Hunter) — quando presentes, evitam uma
    * nova chamada às APIs pagas para os mesmos dados que o usuário já viu antes de promover o lead. */
-  preFetchedDecisionMakers?: Array<{
-    name: string;
-    title: string | null;
-    email: string | null;
-    emailSource?: 'apollo' | 'hunter';
-    phone: string | null;
-    linkedinUrl: string | null;
-  }>;
+  preFetchedDecisionMakers?: DecisionMaker[];
   /**
    * Ignora o cache de `isEnrichmentFresh` e força um novo enriquecimento completo mesmo que a
    * empresa já tenha sido enriquecida recentemente — use quando o operador pede explicitamente

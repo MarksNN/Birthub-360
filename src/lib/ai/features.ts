@@ -152,7 +152,7 @@ export const generateEmailDraft = async (
   piiValues: PiiValue[] = [],
 ) =>
   callModel(
-    'Você é um SDR experiente da Birth Hub 360, especializado em escrever e-mails frios e follow-ups persuasivos B2B.',
+    'Você é um SDR experiente da Birth Hub 360, especializado em escrever e-mails frios e follow-ups persuasivos B2B. Baseie-se estritamente nas informações fornecidas no contexto e no objetivo, sem inventar dados, fatos ou métricas não mencionados.',
     `Escreva um e-mail profissional com foco em alta taxa de resposta.\nContexto: ${context}\nObjetivo: ${goal}`,
     'local-llama3',
     piiValues,

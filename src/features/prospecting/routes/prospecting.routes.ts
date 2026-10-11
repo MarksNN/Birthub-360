@@ -28,9 +28,55 @@ import { getTurboProviderHealth } from '../services/turboHealth.service.js';
 import { checkProviderRateLimit } from '../services/providerRateLimit.js';
 import { normalizeCompanyDomain } from '../utils/domain.js';
 
+import { AIProviderRouter } from '../services/aiProviderRouter.service.js';
+import { BrazilPublicCnpjService } from '../services/brazilPublicCnpj.service.js';
+
 const icebreakerService = new IcebreakerService();
+const aiRouter = AIProviderRouter.getInstance();
 
 const router = Router();
+
+// Rota de status e checagem de saúde dos provedores de IA (Groq e Ollama)
+router.get(
+  '/ai/health',
+  async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const [groq, ollama] = await Promise.all([
+        aiRouter.checkGroqHealth(),
+        aiRouter.checkOllamaHealth(),
+      ]);
+      res.json({
+        success: true,
+        data: {
+          groq,
+          ollama,
+          activeRouter: 'AIProviderRouter',
+        },
+      });
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
+
+// Interpretação de busca em linguagem natural para filtros estruturados via IA
+router.post(
+  '/ai/parse-query',
+  requireRole(['ADMIN', 'GESTOR', 'CLOSER', 'SDR']),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { prompt, mode } = req.body as { prompt?: string; mode?: 'auto' | 'groq' | 'local' };
+      if (!prompt || typeof prompt !== 'string') {
+        res.status(400).json({ success: false, error: 'O campo "prompt" é obrigatório.' });
+        return;
+      }
+      const parsed = await aiRouter.parseNaturalLanguageQuery(prompt, mode);
+      res.json({ success: true, data: parsed });
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
 
 const rejectCandidateSchema = z.object({
   tradeName: z.string().trim().min(1, 'tradeName é obrigatório').max(200),
