@@ -10,17 +10,22 @@
    ========================================================================== */
 
 :root {
-  --neon-pink: #FF2D9B;
-  --neon-blue: #00D4FF;
-  --neon-gold: #FFC107;
-  --neon-black: #0D0D0D;
-  --neon-white: #F8F9FF;
-  --neon-card-bg: #14141A;
+  --neon-pink: #ff2d9b;
+  --neon-blue: #00d4ff;
+  --neon-gold: #ffc107;
+  --neon-black: #0d0d0d;
+  --neon-white: #f8f9ff;
+  --neon-card-bg: #14141a;
   --neon-card-border: rgba(0, 212, 255, 0.22);
 }
 
 /* REGRA GLOBAL ABSOLUTA: Nenhum título pode ser branco ou preto */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--neon-blue);
   letter-spacing: -0.02em;
 }
@@ -31,7 +36,7 @@ h1.neon-title-blue,
 h2.neon-title-blue,
 h3.neon-title-blue,
 h4.neon-title-blue {
-  color: #00D4FF !important;
+  color: #00d4ff !important;
   text-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
 }
 
@@ -40,7 +45,7 @@ h1.neon-title-pink,
 h2.neon-title-pink,
 h3.neon-title-pink,
 h4.neon-title-pink {
-  color: #FF2D9B !important;
+  color: #ff2d9b !important;
   text-shadow: 0 0 18px rgba(255, 45, 155, 0.45);
 }
 
@@ -49,13 +54,13 @@ h1.neon-title-gold,
 h2.neon-title-gold,
 h3.neon-title-gold,
 h4.neon-title-gold {
-  color: #FFC107 !important;
+  color: #ffc107 !important;
   text-shadow: 0 0 18px rgba(255, 193, 7, 0.45);
 }
 
 /* Gradientes Vibrantes de Título (Sem Branco e Sem Preto) */
 .neon-gradient-title {
-  background: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+  background: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
@@ -63,17 +68,17 @@ h4.neon-title-gold {
 }
 
 .grad-text-blue {
-  color: #00D4FF !important;
+  color: #00d4ff !important;
   text-shadow: 0 0 14px rgba(0, 212, 255, 0.5);
 }
 
 .grad-text-purple {
-  color: #FF2D9B !important;
+  color: #ff2d9b !important;
   text-shadow: 0 0 14px rgba(255, 45, 155, 0.5);
 }
 
 .grad-text-cyan {
-  color: #FFC107 !important;
+  color: #ffc107 !important;
   text-shadow: 0 0 14px rgba(255, 193, 7, 0.5);
 }
 
@@ -90,9 +95,11 @@ h4.neon-title-gold {
   font-family: var(--font-brand-display, "Sora", sans-serif);
   font-weight: 800;
   font-size: 0.95rem;
-  color: #0D0D0D !important;
-  background: linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%) !important;
-  box-shadow: 0 0 25px rgba(255, 45, 155, 0.45), 0 0 35px rgba(0, 212, 255, 0.35);
+  color: #0d0d0d !important;
+  background: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%) !important;
+  box-shadow:
+    0 0 25px rgba(255, 45, 155, 0.45),
+    0 0 35px rgba(0, 212, 255, 0.35);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   border: none;
@@ -102,7 +109,9 @@ h4.neon-title-gold {
 .vancouver-btn-gradient:hover,
 .btn-cta-light:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 0 35px rgba(255, 45, 155, 0.65), 0 0 50px rgba(0, 212, 255, 0.55);
+  box-shadow:
+    0 0 35px rgba(255, 45, 155, 0.65),
+    0 0 50px rgba(0, 212, 255, 0.55);
   filter: brightness(1.1);
 }
 
@@ -122,9 +131,9 @@ h4.neon-title-gold {
   font-family: var(--font-brand-display, "Sora", sans-serif);
   font-weight: 700;
   font-size: 0.925rem;
-  color: #00D4FF !important;
+  color: #00d4ff !important;
   background: rgba(0, 212, 255, 0.08) !important;
-  border: 1.5px solid #00D4FF !important;
+  border: 1.5px solid #00d4ff !important;
   box-shadow: 0 0 18px rgba(0, 212, 255, 0.2);
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
@@ -172,7 +181,7 @@ h4.neon-title-gold {
 
 /* Cards de Seção e Pilares */
 .section-card {
-  background: #14141A !important;
+  background: #14141a !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.25rem;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -181,12 +190,14 @@ h4.neon-title-gold {
 
 .section-card:hover {
   border-color: rgba(0, 212, 255, 0.45) !important;
-  box-shadow: 0 0 25px rgba(0, 212, 255, 0.2), 0 12px 35px rgba(0, 0, 0, 0.6) !important;
+  box-shadow:
+    0 0 25px rgba(0, 212, 255, 0.2),
+    0 12px 35px rgba(0, 0, 0, 0.6) !important;
   transform: translateY(-3px);
 }
 
 .pillar-card {
-  background: #14141A !important;
+  background: #14141a !important;
   border-radius: 1rem;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -197,7 +208,7 @@ h4.neon-title-gold {
 }
 
 .flow-step-card {
-  background: #14141A !important;
+  background: #14141a !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1rem;
   transition: all 0.3s ease;
@@ -211,28 +222,30 @@ h4.neon-title-gold {
 
 /* Card Glow no Modal / Login */
 .card-glow-light {
-  background: #14141A !important;
+  background: #14141a !important;
   border: 1px solid rgba(0, 212, 255, 0.3) !important;
-  box-shadow: 0 0 40px rgba(0, 212, 255, 0.18), 0 15px 45px rgba(0, 0, 0, 0.6) !important;
+  box-shadow:
+    0 0 40px rgba(0, 212, 255, 0.18),
+    0 15px 45px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Badges e Kickers Neon */
 .neon-badge-blue {
   background: rgba(0, 212, 255, 0.12) !important;
   border: 1px solid rgba(0, 212, 255, 0.4) !important;
-  color: #00D4FF !important;
+  color: #00d4ff !important;
 }
 
 .neon-badge-pink {
   background: rgba(255, 45, 155, 0.12) !important;
   border: 1px solid rgba(255, 45, 155, 0.4) !important;
-  color: #FF2D9B !important;
+  color: #ff2d9b !important;
 }
 
 .neon-badge-gold {
   background: rgba(255, 193, 7, 0.12) !important;
   border: 1px solid rgba(255, 193, 7, 0.4) !important;
-  color: #FFC107 !important;
+  color: #ffc107 !important;
 }
 
 /* Logo glow */

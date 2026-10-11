@@ -1,16 +1,24 @@
 - De: 15
 - Para: 10
 - Onda: os
-- Status: resolvido
+- Status: superado
 - Prioridade: normal
-## Problema
-Middlewares de seguranca precisam ser montados no server.ts, mas o Agente 15 não tem permissão de edição desse arquivo.
-## Arquivo(s) envolvido(s)
-- src/middleware/opa.ts
-- server.ts
-## Alteração necessária
-Por favor, importe o `opaMiddleware` de `src/middleware/opa.ts` e adicione-o à aplicação no arquivo `server.ts`.
-## Teste esperado
-Testar as rotas da aplicação para garantir que o middleware OPA está validando o role e organizationId corretamente na porta 8181.
-## Contexto adicional
-Criado pela solicitação de integração de segurança com OPA.
+
+## Problema (histórico)
+
+Middlewares de segurança precisavam ser montados no `server.ts`, mas o Agente 15 não tinha
+permissão de edição desse arquivo. Este handoff pedia importar `opaMiddleware` de
+`src/middleware/opa.ts` e montá-lo em `server.ts`.
+
+## Resolução Formal (Missão 15 — 2026-10-10)
+
+**Não montar.** OPA foi descontinuado (decisão Agente 00 + Marcelo). Remoção de código morto
+já refletida em `origin/main`:
+
+- `src/middleware/opa.ts` — ausente (diretório `src/middleware/` inexistente)
+- `infrastructure/opa/policies/**` — ausente
+- serviço `opa` em `docker-compose.services.yml` — ausente
+- RBAC canônico mantido: `src/shared/middlewares/requireRole.ts` +
+  `src/lib/auth/authorization.ts` (Better Auth + hierarquia de papéis)
+
+Handoff arquivado como **superado**. Não há ação para o Agente 10.
