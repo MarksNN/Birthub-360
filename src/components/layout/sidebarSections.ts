@@ -5,6 +5,12 @@ import { TAB_META, type TabType } from './tabMeta.js';
 export interface NavSubItem {
   tab: TabType;
   label: string;
+  /**
+   * Sub-rota real sob /app (ex.: `market-intelligence/hub`). Quando presente, a navegação vai
+   * para `/app/<path>` e o item só fica ativo nessa URL exata — `tab` continua sendo o TabType
+   * "dono" (meta/ícone/animação). Sem `path`, navega para `/app/<tab>` como antes.
+   */
+  path?: string;
 }
 
 export interface NavGroupItem {
@@ -72,10 +78,20 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
       title: 'INTELLIGENCE',
       groups: [
         {
+          // Handoff 05: LDR (`/app/market-intelligence`) + Hub de MI (`/app/market-intelligence/hub`)
+          // — ambas rotas reais em App.tsx; antes o hub não tinha nenhum caminho de navegação.
           id: 'market-intelligence',
           label: 'Inteligência de Mercado',
           icon: TAB_META['market-intelligence'].icon,
           primaryTab: 'market-intelligence',
+          subItems: [
+            { tab: 'market-intelligence', label: 'Pesquisa LDR' },
+            {
+              tab: 'market-intelligence',
+              path: 'market-intelligence/hub',
+              label: 'Hub de Inteligência',
+            },
+          ],
         },
         ...(canAccessCommercialIntelligence
           ? [
@@ -109,10 +125,15 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
       title: 'EXECUTION',
       groups: [
         {
+          // Handoff 05: Prospecção Inteligente (`/app/prospect/inteligente`) era rota órfã.
           id: 'prospecting',
           label: 'Prospecção',
           icon: TAB_META.prospect.icon,
           primaryTab: 'prospect',
+          subItems: [
+            { tab: 'prospect', label: 'Prospecção' },
+            { tab: 'prospect', path: 'prospect/inteligente', label: 'Prospecção Inteligente' },
+          ],
         },
         {
           id: 'cadences',

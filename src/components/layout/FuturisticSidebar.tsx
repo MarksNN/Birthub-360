@@ -2,10 +2,10 @@ import { motion } from 'framer-motion';
 import { LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { hasRequiredRole, MESA_TRATAMENTO_ROLES } from '../../lib/auth/authorization.js';
-import { shimmerBeam, staggerContainer, staggerItem, useTilt } from '../../lib/motion.js';
+import { staggerContainer, staggerItem, useTilt } from '../../lib/motion.js';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { BirthHubLogo } from '../brand/BirthHubLogo.js';
 import { TAB_META, type TabType } from './tabMeta.js';
@@ -20,10 +20,28 @@ interface FuturisticSidebarProps {
   onToggleCollapse?: () => void;
 }
 
+interface NavSubRoute {
+  /** TabType dono (ícone/meta). */
+  tab: TabType;
+  /** Sub-rota real sob /app. */
+  path: string;
+  label: string;
+}
+
 interface NavGroupDefinition {
   title: string;
   items: TabType[];
+  /** Destinos reais sem TabType próprio (handoff 05: hub de MI, prospecção inteligente). */
+  subRoutes?: NavSubRoute[];
 }
+
+const PROSPECCAO_SUB_ROUTES: NavSubRoute[] = [
+  { tab: 'market-intelligence', path: 'market-intelligence/hub', label: 'Hub de Inteligência' },
+  { tab: 'prospect', path: 'prospect/inteligente', label: 'Prospecção Inteligente' },
+];
+
+const FOCUS_RING =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-1 focus-visible:ring-offset-surface-elevated';
 
 /** Logo com inclinação 3D sutil — segue o cursor, desativado com prefers-reduced-motion */
 function LogoWithTilt({ children }: { children: React.ReactNode }) {
@@ -74,6 +92,10 @@ export function FuturisticSidebar({
   const { currentUser, isAdmin, canAccessCommercialIntelligence, canAccessCopilotoIa, logout } =
     useAuth();
   const navigate = useNavigate();
+  const appPath = useLocation().pathname.replace(/^\/app\/?/, '');
+  const activeSubRoute = PROSPECCAO_SUB_ROUTES.find(
+    (r) => appPath === r.path || appPath.startsWith(`${r.path}/`),
+  );
   const canManageOperations =
     !!currentUser && hasRequiredRole(currentUser.role, ['ADMIN', 'GESTOR']);
   const canAccessMesaTratamento =
@@ -102,6 +124,7 @@ export function FuturisticSidebar({
         {
           title: 'PROSPECÇÃO INTELIGENTE',
           items: ['prospect', 'cadence'],
+          subRoutes: PROSPECCAO_SUB_ROUTES,
         },
         {
           title: 'CRM COMERCIAL',
@@ -139,7 +162,8 @@ export function FuturisticSidebar({
         },
         {
           title: 'PROSPECÇÃO INTELIGENTE',
-          items: ['prospect', 'cadence'],
+          items: ['prospect', 'market-intelligence', 'cadence'],
+          subRoutes: PROSPECCAO_SUB_ROUTES,
         },
         {
           title: 'COPILOTO COMERCIAL IA',
@@ -147,7 +171,6 @@ export function FuturisticSidebar({
             ...(canAccessCommercialIntelligence ? (['commercial_intelligence'] as TabType[]) : []),
             ...(canAccessCopilotoIa ? (['copiloto_ia'] as TabType[]) : []),
             'intelligence',
-            'market-intelligence',
             'knowledge',
             'analytics',
             'winloss',
@@ -212,7 +235,7 @@ export function FuturisticSidebar({
     const meta = TAB_META[tab];
     if (!meta) return null;
     const Icon = meta.icon;
-    const isActive = activeTab === tab;
+    const isActive = activeTab === tab && !activeSubRoute;
 
     return (
       <motion.button
@@ -223,91 +246,90 @@ export function FuturisticSidebar({
         title={meta.label}
         aria-label={meta.label}
         aria-current={isActive ? 'page' : undefined}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-        className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated cursor-pointer ${
+        className={`group relative flex h-8 w-full items-center gap-2.5 rounded-md border px-2 text-left text-[13px] font-medium transition-colors cursor-pointer ${FOCUS_RING} ${
           isActive
-            ? 'bg-gradient-to-r from-brand/20 via-brand/10 to-transparent text-brand shadow-lg shadow-brand/20 ring-1 ring-brand/30 border-l-2 border-brand'
-            : 'text-ink-2 hover:bg-surface-interactive/60 hover:text-ink hover:shadow-sm hover:border-l-2 hover:border-brand/30'
+            ? 'border-brand bg-surface font-semibold text-ink ring-1 ring-focus-ring/40'
+            : 'border-transparent text-ink-2 hover:border-line hover:bg-surface hover:text-ink'
         } ${isCollapsed ? 'lg:px-0 lg:justify-center' : ''}`}
       >
-        {/* Shimmer beam no hover — apenas no item ativo */}
-        {isActive && (
-          <motion.span
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            variants={shimmerBeam}
-            initial="initial"
-            whileHover="hover"
-            aria-hidden="true"
-            style={{
-              background:
-                'linear-gradient(105deg, transparent 40%, rgba(212,175,55,0.18) 50%, transparent 60%)',
-            }}
-          />
-        )}
-
         <Icon
           size={16}
           aria-hidden="true"
-          className={`shrink-0 transition-all duration-300 ${isActive ? 'scale-110 text-brand' : 'group-hover:scale-110 group-hover:text-brand/60'}`}
+          className={`shrink-0 ${isActive ? 'text-primary' : 'text-ink-2 group-hover:text-ink'}`}
         />
-        <span
-          className={`truncate relative z-10 ${isCollapsed ? 'lg:hidden' : ''} ${isActive ? 'font-semibold tracking-tight' : ''}`}
-        >
-          {meta.label}
-        </span>
-        {isActive && (
-          <span className="absolute right-2 w-1.5 h-1.5 rounded-full bg-brand shadow-[0_0_8px_var(--color-brand)]" />
-        )}
+        <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{meta.label}</span>
+      </motion.button>
+    );
+  };
+
+  const renderSubRoute = (route: NavSubRoute) => {
+    const Icon = TAB_META[route.tab]?.icon;
+    const isActive = activeSubRoute === route;
+    return (
+      <motion.button
+        key={route.path}
+        type="button"
+        variants={staggerItem}
+        onClick={() => {
+          if (!isActive) SoundFX.play('navigate');
+          navigate(`/app/${route.path}`);
+          onCloseMobile?.();
+        }}
+        title={route.label}
+        aria-label={route.label}
+        aria-current={isActive ? 'page' : undefined}
+        className={`group relative flex h-8 w-full items-center gap-2.5 rounded-md border px-2 text-left text-[13px] font-medium transition-colors cursor-pointer ${FOCUS_RING} ${
+          isActive
+            ? 'border-brand bg-surface font-semibold text-ink ring-1 ring-focus-ring/40'
+            : 'border-transparent text-ink-2 hover:border-line hover:bg-surface hover:text-ink'
+        } ${isCollapsed ? 'lg:px-0 lg:justify-center' : ''}`}
+      >
+        {Icon ? (
+          <Icon
+            size={16}
+            aria-hidden="true"
+            className={`shrink-0 ${isActive ? 'text-primary' : 'text-ink-2 group-hover:text-ink'}`}
+          />
+        ) : null}
+        <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{route.label}</span>
       </motion.button>
     );
   };
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex h-full flex-col bg-surface-elevated/60 backdrop-blur-2xl border-r border-line/50 shadow-[4px_0_24px_rgba(0,0,0,0.04)] transition-[width,transform] duration-300 lg:static lg:translate-x-0 ${
-        isCollapsed ? 'lg:w-[5rem]' : 'lg:w-[16rem]'
+      className={`fixed inset-y-0 left-0 z-40 flex h-full flex-col bg-surface-elevated font-sans text-ink border-r border-line transition-[width,transform] duration-200 lg:static lg:translate-x-0 ${
+        isCollapsed ? 'lg:w-16' : 'lg:w-60'
       } ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
       aria-label="Navegação principal - Futuristic Command Center"
     >
-      {/* Linha de luz superior */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
-
       <div className="flex flex-col shrink-0">
         <div
-          className={`flex items-center justify-between border-b border-line/50 px-5 py-4 ${isCollapsed ? 'lg:justify-center lg:px-2' : ''}`}
+          className={`flex items-center justify-between border-b border-line px-4 h-14 ${isCollapsed ? 'lg:justify-center lg:px-2' : ''}`}
         >
           {isCollapsed ? (
             <LogoWithTilt>
-              <BirthHubLogo
-                variant="symbol"
-                className="h-8 w-8 text-brand shadow-[0_0_12px_rgba(212,175,55,0.3)]"
-              />
+              <BirthHubLogo variant="symbol" className="h-7 w-7 text-brand" />
             </LogoWithTilt>
           ) : (
             <>
               <div className="flex items-center gap-2.5">
                 <LogoWithTilt>
-                  <BirthHubLogo
-                    variant="symbol"
-                    className="h-8 w-8 text-brand shadow-[0_0_12px_rgba(212,175,55,0.3)]"
-                  />
+                  <BirthHubLogo variant="symbol" className="h-7 w-7 text-brand" />
                 </LogoWithTilt>
                 <div className="leading-tight">
-                  <h1 className="flex items-center gap-1 text-sm font-bold tracking-tight text-ink">
+                  <h1 className="flex items-center gap-1 font-display text-sm font-semibold tracking-tight text-ink">
                     Birth Hub 360°
                   </h1>
-                  <span className="text-[10px] font-medium tracking-wide text-ink-2">
-                    Futuristic Command Center
-                  </span>
+                  <span className="text-[10px] font-medium tracking-wide text-ink-2">Operate</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={toggleCollapse}
-                className="hidden rounded-md p-1.5 text-ink-2 transition-all duration-200 hover:bg-surface-interactive hover:text-ink hover:scale-110 lg:block"
+                className={`hidden rounded-md border border-input p-1.5 text-ink-2 transition-colors hover:bg-surface hover:text-ink lg:block ${FOCUS_RING}`}
                 title="Recolher menu"
+                aria-label="Recolher menu lateral"
               >
                 <PanelLeftClose size={16} />
               </button>
@@ -320,8 +342,9 @@ export function FuturisticSidebar({
             <button
               type="button"
               onClick={toggleCollapse}
-              className="rounded-md p-1.5 text-ink-2 transition-all duration-200 hover:bg-surface-interactive hover:text-ink hover:scale-110"
+              className={`rounded-md border border-input p-1.5 text-ink-2 transition-colors hover:bg-surface hover:text-ink ${FOCUS_RING}`}
               title="Expandir menu lateral"
+              aria-label="Expandir menu lateral"
             >
               <PanelLeftOpen size={16} />
             </button>
@@ -331,37 +354,35 @@ export function FuturisticSidebar({
 
       <nav
         aria-label="Navegação principal"
-        className="custom-scrollbar flex-1 space-y-4 overflow-y-auto px-2.5 py-3"
+        className="custom-scrollbar flex-1 space-y-4 overflow-y-auto px-2 py-3"
       >
         {navGroups.map((group) => (
           <motion.section
             key={group.title}
-            className="space-y-1"
+            className="space-y-0.5"
             aria-label={group.title}
             variants={staggerContainer(0.05, 0.04)}
             initial="hidden"
             animate="show"
           >
-            <div className={`mb-2 flex items-center px-3 ${isCollapsed ? 'lg:hidden' : ''}`}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-ink-2/80">
+            <div className={`mb-1 flex items-center px-2 ${isCollapsed ? 'lg:hidden' : ''}`}>
+              <p className="font-display text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-2">
                 {group.title}
               </p>
             </div>
             {isCollapsed && (
-              <div
-                className="hidden lg:block my-2 mx-auto w-4 h-px bg-line/50"
-                aria-hidden="true"
-              />
+              <div className="hidden lg:block my-2 mx-auto w-4 h-px bg-line" aria-hidden="true" />
             )}
             {group.items.map(renderNavItem)}
+            {group.subRoutes?.map(renderSubRoute)}
           </motion.section>
         ))}
       </nav>
 
-      <div className="p-4 pt-2">
+      <div className="border-t border-line p-2">
         {currentUser && (
           <div
-            className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-surface-subtle/60 to-surface-elevated/40 backdrop-blur-md px-3 py-3 transition-all duration-300 ${
+            className={`relative overflow-hidden rounded-md border border-line bg-surface px-2 py-2 ${
               isCollapsed ? 'lg:px-1.5 lg:py-2 lg:flex lg:justify-center' : ''
             }`}
             title={
@@ -371,7 +392,7 @@ export function FuturisticSidebar({
             }
           >
             <div className="flex min-w-0 items-center gap-3 relative z-10">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand/80 to-brand-2/90 text-sm font-bold text-on-brand shadow-lg shadow-brand/20 ring-2 ring-surface transition-transform duration-300 hover:scale-110">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-on-brand">
                 {currentUser.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className={`min-w-0 flex-1 ${isCollapsed ? 'lg:hidden' : ''}`}>
@@ -389,22 +410,16 @@ export function FuturisticSidebar({
         <button
           type="button"
           onClick={logout}
-          className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-left text-sm font-bold text-critical transition-all duration-200 hover:scale-[1.02] hover:border-critical/15 hover:bg-critical/10 hover:shadow-sm hover:shadow-critical/10 active:scale-95 ${
+          className={`group mt-1 flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md border border-transparent px-2 text-left text-[13px] font-semibold text-critical transition-colors hover:border-critical/15 hover:bg-critical/10 ${FOCUS_RING} ${
             isCollapsed ? 'lg:justify-center lg:px-0' : ''
           }`}
           title="Encerrar sessão e sair da conta"
           aria-label="Encerrar sessão e sair da conta"
         >
-          <LogOut
-            size={20}
-            className="shrink-0 opacity-80 transition-transform group-hover:-translate-x-1"
-          />
+          <LogOut size={16} aria-hidden="true" className="shrink-0" />
           <span className={isCollapsed ? 'lg:hidden' : ''}>Sair da Conta</span>
         </button>
       </div>
-
-      {/* Linha de luz inferior */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-iris/30 to-transparent" />
     </aside>
   );
 }

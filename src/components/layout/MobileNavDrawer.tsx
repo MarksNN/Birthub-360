@@ -24,7 +24,7 @@ export function MobileNavDrawer({ isOpen, onClose, activeTab }: MobileNavDrawerP
       {/* Gaveta da Sidebar Mobile */}
       <aside
         aria-label="Navegação móvel"
-        className="relative z-50 flex h-full w-64 max-w-[85vw] flex-col bg-[#0B132B] border-r border-white/10 shadow-2xl animate-slide-in-left"
+        className="relative z-50 flex h-full w-64 max-w-[85vw] flex-col bg-surface-elevated border-r border-line shadow-2xl animate-slide-in-left"
       >
         <Sidebar activeTab={activeTab as TabType} onCloseMobile={onClose} mobileOpen={isOpen} />
       </aside>
