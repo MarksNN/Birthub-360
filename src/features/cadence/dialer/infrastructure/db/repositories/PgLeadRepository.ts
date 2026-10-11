@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@prisma/client';
+import { Prisma, type PrismaClient } from '@prisma/client';
 import { Lead, type LeadProps, type LeadStatus } from '../../../domain/entities/Lead.js';
 import { PhoneNumber } from '../../../domain/value-objects/PhoneNumber.js';
 import type { LeadRepository } from '../../../application/ports/LeadRepository.js';
@@ -37,7 +37,6 @@ function rowToProps(row: LeadRow): LeadProps {
  */
 const BULK_UPSERT_CHUNK_SIZE = 500;
 
-// TODO: Refactor native SQL queries to use Prisma ORM directly.
 export class PgLeadRepository implements LeadRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -63,9 +62,10 @@ export class PgLeadRepository implements LeadRepository {
   }
 
   async findById(id: string): Promise<Lead | null> {
-    const rows = await this.prisma.$queryRawUnsafe<LeadRow[]>('SELECT * FROM leads WHERE id = $1', [
-      id,
-    ]);
+    const rows = await this.prisma.$queryRaw<LeadRow[]>(Prisma.sql`
+      SELECT id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at
+      FROM leads
+      WHERE id = ${id}::uuid`);
     const row = rows[0];
     return row === undefined ? null : Lead.restore(rowToProps(row));
   }
@@ -84,32 +84,29 @@ export class PgLeadRepository implements LeadRepository {
     if (limit <= 0) {
       return [];
     }
-    const rows = await this.prisma.$queryRawUnsafe<LeadRow[]>(
-      `WITH candidates AS (
-         SELECT id FROM leads
-         WHERE campaign_id = $1
-           AND status = 'pending'
-           AND (next_attempt_at IS NULL OR next_attempt_at <= $2)
-         ORDER BY created_at ASC
-         LIMIT $3
-         FOR UPDATE SKIP LOCKED
-       )
-       UPDATE leads
-       SET status = 'in_progress', updated_at = $2
-       FROM candidates
-       WHERE leads.id = candidates.id
-       RETURNING leads.*`,
-      [campaignId, now, limit],
-    );
+    const rows = await this.prisma.$queryRaw<LeadRow[]>(Prisma.sql`
+      WITH candidates AS (
+        SELECT id FROM leads
+        WHERE campaign_id = ${campaignId}::uuid
+          AND status = 'pending'
+          AND (next_attempt_at IS NULL OR next_attempt_at <= ${now})
+        ORDER BY created_at ASC
+        LIMIT ${limit}
+        FOR UPDATE SKIP LOCKED
+      )
+      UPDATE leads
+      SET status = 'in_progress', updated_at = ${now}
+      FROM candidates
+      WHERE leads.id = candidates.id
+      RETURNING leads.*`);
     return rows.map((row) => Lead.restore(rowToProps(row)));
   }
 
   async existsByCampaignAndPhone(campaignId: string, phoneE164: string): Promise<boolean> {
-    const rows = await this.prisma.$queryRawUnsafe<{ exists: number }[]>(
-      'SELECT 1 AS exists FROM leads WHERE campaign_id = $1 AND phone = $2 LIMIT 1',
-      campaignId,
-      phoneE164,
-    );
+    const rows = await this.prisma.$queryRaw<{ exists: number }[]>(Prisma.sql`
+      SELECT 1 AS exists FROM leads
+      WHERE campaign_id = ${campaignId}::uuid AND phone = ${phoneE164}
+      LIMIT 1`);
     return rows.length > 0;
   }
 
@@ -124,7 +121,7 @@ export class PgLeadRepository implements LeadRepository {
     invalidNumber: number;
     contactRatePercent: number;
   }> {
-    const rows = await this.prisma.$queryRawUnsafe<
+    const rows = await this.prisma.$queryRaw<
       {
         total_leads: string;
         pending: string;
@@ -134,19 +131,17 @@ export class PgLeadRepository implements LeadRepository {
         do_not_call: string;
         invalid_number: string;
       }[]
-    >(
-      `SELECT
-         COUNT(*)::text AS total_leads,
-         COUNT(*) FILTER (WHERE status = 'pending')::text AS pending,
-         COUNT(*) FILTER (WHERE status = 'in_progress')::text AS in_progress,
-         COUNT(*) FILTER (WHERE status = 'contacted')::text AS contacted,
-         COUNT(*) FILTER (WHERE status = 'exhausted')::text AS exhausted,
-         COUNT(*) FILTER (WHERE status = 'do_not_call')::text AS do_not_call,
-         COUNT(*) FILTER (WHERE status = 'invalid_number')::text AS invalid_number
-       FROM leads
-       WHERE campaign_id = $1`,
-      [campaignId],
-    );
+    >(Prisma.sql`
+      SELECT
+        COUNT(*)::text AS total_leads,
+        COUNT(*) FILTER (WHERE status = 'pending')::text AS pending,
+        COUNT(*) FILTER (WHERE status = 'in_progress')::text AS in_progress,
+        COUNT(*) FILTER (WHERE status = 'contacted')::text AS contacted,
+        COUNT(*) FILTER (WHERE status = 'exhausted')::text AS exhausted,
+        COUNT(*) FILTER (WHERE status = 'do_not_call')::text AS do_not_call,
+        COUNT(*) FILTER (WHERE status = 'invalid_number')::text AS invalid_number
+      FROM leads
+      WHERE campaign_id = ${campaignId}::uuid`);
 
     const row = rows[0];
     const totalLeads = row ? Number.parseInt(row.total_leads, 10) : 0;
@@ -175,40 +170,29 @@ export class PgLeadRepository implements LeadRepository {
 
   private async upsertMany(leads: readonly Lead[]): Promise<void> {
     if (leads.length === 0) return;
-    const columnsPerRow = 9;
-    const placeholderRows: string[] = [];
-    const values: unknown[] = [];
 
-    leads.forEach((lead, index) => {
+    const rowFragments: Prisma.Sql[] = leads.map((lead) => {
       const props = lead.toProps();
-      const base = index * columnsPerRow;
-      const placeholders = Array.from(
-        { length: columnsPerRow },
-        (_, column) => `$${base + column + 1}`,
-      ).join(', ');
-      placeholderRows.push(`(${placeholders})`);
-      values.push(
-        props.id,
-        props.campaignId,
-        props.name,
-        props.phone.toE164(),
-        props.status,
-        props.attempts,
-        props.nextAttemptAt,
-        props.createdAt,
-        props.updatedAt,
-      );
+      return Prisma.sql`(
+        ${props.id}::uuid,
+        ${props.campaignId}::uuid,
+        ${props.name},
+        ${props.phone.toE164()},
+        ${props.status},
+        ${props.attempts},
+        ${props.nextAttemptAt},
+        ${props.createdAt},
+        ${props.updatedAt}
+      )`;
     });
 
-    await this.prisma.$executeRawUnsafe(
-      `INSERT INTO leads (id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at)
-       VALUES ${placeholderRows.join(', ')}
-       ON CONFLICT (id) DO UPDATE SET
-         status = EXCLUDED.status,
-         attempts = EXCLUDED.attempts,
-         next_attempt_at = EXCLUDED.next_attempt_at,
-         updated_at = EXCLUDED.updated_at`,
-      ...values,
-    );
+    await this.prisma.$executeRaw(Prisma.sql`
+      INSERT INTO leads (id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at)
+      VALUES ${Prisma.join(rowFragments)}
+      ON CONFLICT (id) DO UPDATE SET
+        status = EXCLUDED.status,
+        attempts = EXCLUDED.attempts,
+        next_attempt_at = EXCLUDED.next_attempt_at,
+        updated_at = EXCLUDED.updated_at`);
   }
 }
