@@ -1,16 +1,16 @@
 import { motion } from 'framer-motion';
 import { Bookmark, Camera, Database, Landmark, Wrench } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { PageTitleCard } from '../../../components/ui/PageTitleCard.js';
 import { GamificationWidget } from '../../../components/ui/GamificationWidget.js';
+import { PageTitleCard } from '../../../components/ui/PageTitleCard.js';
 import { BRAND } from '../../../config/brand.js';
 import { api } from '../../../lib/api.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import {
   ATLAS_PERSONA_OPTIONS,
-  SEGMENTO_OPTIONS,
   BIRTHHUB360_PERSONA_OPTIONS,
   BIRTHHUB360_SEGMENTO_OPTIONS,
+  SEGMENTO_OPTIONS,
 } from '../../../shared/constants/icp-options.js';
 import type { CnpjLookupResult, FitScoreResult } from '../services/enrichment.service.js';
 import type {
@@ -674,7 +674,7 @@ export function ProspectingHub() {
               }}
               role="tab"
               aria-selected={tab === 'cnpj'}
-              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'cnpj'
                   ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
@@ -690,7 +690,7 @@ export function ProspectingHub() {
               }}
               role="tab"
               aria-selected={tab === 'discovery'}
-              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'discovery'
                   ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
@@ -706,7 +706,7 @@ export function ProspectingHub() {
               }}
               role="tab"
               aria-selected={tab === 'ocr'}
-              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'ocr'
                   ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
@@ -722,7 +722,7 @@ export function ProspectingHub() {
               }}
               role="tab"
               aria-selected={tab === 'tools'}
-              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'tools'
                   ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
@@ -738,7 +738,7 @@ export function ProspectingHub() {
               SoundFX.play('focus');
               setIsSavedSearchesOpen(true);
             }}
-            className="flex items-center gap-2 rounded-control border border-line bg-surface-elevated/90 px-4 py-2.5 text-xs font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:bg-surface-interactive hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            className="flex items-center gap-2 rounded-control border border-line bg-surface-elevated/90 px-4 py-2.5 text-xs font-semibold text-ink shadow-sm transition-all hover:border-brand/40 hover:bg-surface-interactive hover:scale-[1.02] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Bookmark size={16} className="text-brand animate-pulse" /> Listas Salvas & Agendamentos
           </button>
