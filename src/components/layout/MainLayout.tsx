@@ -17,8 +17,8 @@ interface MainLayoutProps {
 export function MainLayout({ children, activeTab: activeTabProp }: MainLayoutProps) {
   const { mobileNavOpen, toggleMobileNav, closeMobileNav } = useNavigationState();
   // App.tsx monta <MainLayout> sem `activeTab` — sem isto a Sidebar nunca marcava o item ativo
-  // (nem expandia o grupo) e o Topbar caía sempre no meta de `dashboard`. Deriva de /app/<tab>/…
-  // (mesma regra do FuturisticLayout); a prop explícita continua tendo precedência.
+  // (nem expandia o grupo) e o Topbar caía sempre no meta de `dashboard`. Deriva de /app/<tab>/…;
+  // a prop explícita continua tendo precedência.
   const { pathname } = useLocation();
   const activeTab = activeTabProp ?? (pathname.split('/')[2] || 'dashboard');
 
