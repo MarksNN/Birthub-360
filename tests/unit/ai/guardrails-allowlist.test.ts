@@ -3,10 +3,14 @@ import { detectPII, redactPII } from '../../../src/lib/ai/guardrails/pii.guard.j
 
 describe('Guardrails PII - Email Allowlist and Tokenized Redaction', () => {
   describe('detectPII allowlist behavior', () => {
-    it('permite e-mails corporativos @birthhub360.com sem bloquear', () => {
-      const result = detectPII('Contato comercial: suporte@birthhub360.com');
-      expect(result.blocked).toBe(false);
-      expect(result.matches).toHaveLength(0);
+    it('permite e-mails corporativos @birthhub360.com e @birthhub360.com.br sem bloquear', () => {
+      const result1 = detectPII('Contato comercial: suporte@birthhub360.com');
+      expect(result1.blocked).toBe(false);
+      expect(result1.matches).toHaveLength(0);
+
+      const result2 = detectPII('Contato comercial: seu.email@birthhub360.com.br');
+      expect(result2.blocked).toBe(false);
+      expect(result2.matches).toHaveLength(0);
     });
 
     it('permite e-mails de teste e documentação @example.com para suportar o Golden Dataset', () => {
