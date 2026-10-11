@@ -3,7 +3,7 @@
 - De: 01 (Plataforma, Segurança e Dados)
 - Para: 06 (Integrações e Bitrix) · Revisor: 24 · Coordenação: 00
 - Handoff origem: `06-para-01-vinculos-externos-crm-e-mapeamento-etapas.md` (branch `agente/06-onda16-external-crm-handoff`)
-- Status: schema entregue na branch `agente/01-external-crm-links` (aguardando revisão/merge)
+- Status: resolvido (migration integrada em main @ daa8e842 e consumida em main @ 472ccf5b)
 
 ## Entregue
 Migration `prisma/migrations/20261013120000_external_crm_entity_links_stage_mapping` (aditiva, sem quebra):
