@@ -1,0 +1,86 @@
+# WORKTREES BACKUP - 2026-10-10
+# Gerado automaticamente para migração de máquina
+
+## Worktrees Ativas (15 total)
+
+### Principal
+C:/Github/Birthub-360 [main] - 8d643da03
+
+### Worktrees Recovery Voice (4)
+C:/Github/birthub-recovery-integration [integracao/onda-resgate-20261010] - ad3e7102a
+C:/Github/birthub-recovery-qa [agente/08-recovery-qa-20261010] - 87c50400a
+C:/Github/birthub-recovery-review [agente/24-recovery-review-20261010] - e5f11f218
+C:/Github/birthub-voice-recovery [agente/12-voice-recovery-20261010] - 376a9a806
+
+### Worktrees Turbo (7)
+C:/Github/birthub-turbo-01 [agente/01-turbo-catalog-contract] - 7afaeb845
+C:/Github/birthub-turbo-05 [agente/05-turbo-backend] - d317dce56
+C:/Github/birthub-turbo-07 [agente/07-turbo-ai] - 87b8d6e0c
+C:/Github/birthub-turbo-08 [agente/08-turbo-tests] - 63cd799b9
+C:/Github/birthub-turbo-24 [agente/24-turbo-review] - e32bad52d
+C:/Github/birthub-turbo-review [integracao/onda-turbo-20261009] - 1dea58319
+C:/Github/birthub-turbo-ui [agente/05-turbo-ui] - fd40d4658
+
+### Worktrees Codex (3)
+C:/Users/marce/.codex/worktrees/audit-antigravity-sync/Birthub-360 [audit/antigravity-sync-reviews-2026-10-09] - a2ead2d8e
+C:/Users/marce/.codex/worktrees/aws-migration-rehearsal/Birthub-360 [codex/aws-release-security-fix] - b34734e79
+C:/Users/marce/.codex/worktrees/aws-release-architecture/Birthub-360 [codex/aws-release-architecture-fix] - 49b522424
+
+## Comandos para Recriar na Nova Máquina
+
+### 1. Clonar o repositório principal
+git clone https://github.com/MaarkssN/Birthub-360.git C:/Github/Birthub-360
+cd C:/Github/Birthub-360
+
+### 2. Recriar worktrees Recovery Voice
+git worktree add ../birthub-recovery-integration integracao/onda-resgate-20261010
+git worktree add ../birthub-recovery-qa agente/08-recovery-qa-20261010
+git worktree add ../birthub-recovery-review agente/24-recovery-review-20261010
+git worktree add ../birthub-voice-recovery agente/12-voice-recovery-20261010
+
+### 3. Recriar worktrees Turbo
+git worktree add ../birthub-turbo-01 agente/01-turbo-catalog-contract
+git worktree add ../birthub-turbo-05 agente/05-turbo-backend
+git worktree add ../birthub-turbo-07 agente/07-turbo-ai
+git worktree add ../birthub-turbo-08 agente/08-turbo-tests
+git worktree add ../birthub-turbo-24 agente/24-turbo-review
+git worktree add ../birthub-turbo-review integracao/onda-turbo-20261009
+git worktree add ../birthub-turbo-ui agente/05-turbo-ui
+
+### 4. Recriar worktrees Codex (opcional - já mergeadas)
+git worktree add ../audit-antigravity-sync audit/antigravity-sync-reviews-2026-10-09
+git worktree add ../aws-migration-rehearsal codex/aws-release-security-fix
+git worktree add ../aws-release-architecture codex/aws-release-architecture-fix
+
+## Status dos Commits
+
+### Main
+- 3 commits à frente de origin/main
+- Branch protegida: precisa de PR para push
+
+### Branches Pushadas
+✅ integracao/onda-resgate-20261010
+✅ agente/08-recovery-qa-20261010
+✅ agente/24-recovery-review-20261010
+✅ agente/12-voice-recovery-20261010
+
+### Branches já no remote (Turbo)
+✅ agente/01-turbo-catalog-contract
+✅ agente/05-turbo-backend
+✅ agente/07-turbo-ai
+✅ agente/08-turbo-tests
+✅ agente/24-turbo-review
+✅ integracao/onda-turbo-20261009
+✅ agente/05-turbo-ui
+
+### Branches já no remote (Codex)
+✅ audit/antigravity-sync-reviews-2026-10-09
+✅ codex/aws-release-security-fix
+✅ codex/aws-release-architecture-fix
+
+## Observações
+
+- Repositório foi movido para: https://github.com/MaarkssN/Birthub-360.git
+- Branch main está protegida e requer PR
+- 14 vulnerabilidades de dependências detectadas (4 high, 7 moderate, 3 low)
+- Todas as alterações foram commitadas e pushadas antes da migração

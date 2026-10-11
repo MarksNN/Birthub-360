@@ -3,8 +3,8 @@ import { lazy, Suspense, useCallback, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary.js';
 import { MainLayout } from './components/layout/MainLayout.js';
-import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 import { OnboardingGate } from './components/layout/OnboardingGate.js';
+import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 import { RequireModuleAccess } from './components/layout/RequireModuleAccess.js';
 import { RequireRole } from './components/layout/RequireRole.js';
 import { ClickSpark } from './components/ui/ClickSpark.js';
@@ -15,7 +15,11 @@ import { BrandProvider } from './contexts/BrandContext.js';
 import { DailyClosingProvider } from './contexts/DailyClosingContext.js';
 import { ExperienceModeProvider } from './contexts/ExperienceModeContext.js';
 import { ThemeProvider } from './contexts/ThemeContext.js';
-import { COMMERCIAL_INTELLIGENCE_ROLES, MESA_TRATAMENTO_ROLES } from './lib/auth/authorization.js';
+import {
+  COMMERCIAL_INTELLIGENCE_ROLES,
+  COPILOTO_IA_ROLES,
+  MESA_TRATAMENTO_ROLES,
+} from './lib/auth/authorization.js';
 
 const SetupWizard = lazy(() =>
   import('./features/onboarding/components/SetupWizard.js').then((m) => ({
@@ -78,6 +82,15 @@ const IntelligenceHub = lazy(() =>
 const EliteCommercialAgentWorkspace = lazy(() =>
   import('./features/intelligence/components/EliteCommercialAgentWorkspace.js').then((m) => ({
     default: m.EliteCommercialAgentWorkspace,
+  })),
+);
+// P0 #693 (Agente 02): a tab `copiloto_ia` ("Copiloto IA") abria o Elite Agent (NBA) — rótulo
+// e tela divergentes. A tela canônica do Copiloto Comercial IA é `CopilotoIaHub` (Conversas +
+// Configurações; LeadCopilotoPanel já navega para /app/copiloto_ia?tab=conversas&leadId=...).
+// O Elite Agent continua na rota própria `intelligence/elite-agent`.
+const CopilotoIaHub = lazy(() =>
+  import('./features/copiloto-ia/components/CopilotoIaHub.js').then((m) => ({
+    default: m.CopilotoIaHub,
   })),
 );
 const CompanyList = lazy(() =>
@@ -386,7 +399,16 @@ function AppLayout() {
             />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
-            <Route path="copiloto_ia" element={<EliteCommercialAgentWorkspace />} />
+            {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,
+              não só no item de navegação — evita 403 cru ao digitar a URL. */}
+            <Route
+              path="copiloto_ia"
+              element={
+                <RequireRole allowedRoles={[...COPILOTO_IA_ROLES]}>
+                  <CopilotoIaHub />
+                </RequireRole>
+              }
+            />
             <Route path="companies" element={<CompanyList />} />
             <Route path="contacts" element={<ContactList />} />
             <Route path="activities" element={<ActivityList />} />

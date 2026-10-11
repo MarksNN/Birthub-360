@@ -149,6 +149,7 @@ export function MacDock({ activeTab }: MacDockProps) {
             return (
               <div
                 key={group.title}
+                role="group"
                 className="relative flex flex-col items-center"
                 onMouseEnter={() => setHoveredGroup(group.title)}
                 onMouseLeave={() => setHoveredGroup(null)}
@@ -170,6 +171,7 @@ export function MacDock({ activeTab }: MacDockProps) {
 
                 {/* Dock Icon */}
                 <motion.button
+                  type="button"
                   onClick={() => {
                     if (group.items.length > 0) {
                       navigate(`/app/${group.items[0]}`);

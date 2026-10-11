@@ -1,0 +1,152 @@
+# CHECKLIST DE MIGRAÇÃO - ARQUIVOS LOCAIS
+# Data: 2026-10-10
+# Gerado automaticamente - contém arquivos NÃO versionados no Git
+
+## 🔴 ARQUIVOS CRÍTICOS (CREDENCIAIS/SEGREDOS)
+
+### 1. Variáveis de Ambiente
+**Origem:** C:\Github\Birthub-360\
+**Destino:** Mesmo caminho na nova máquina
+
+- ✅ `.env` (211 linhas) - CONTÉM CREDENCIAIS DE BANCO, API KEYS, SEGREDOS
+- ✅ `.env.test` (2701 bytes) - Ambiente de teste
+
+**Ação:** Copiar manualmente via método seguro (não email, não chat)
+**Importância:** CRÍTICA - Sem isso, a aplicação não funciona
+
+### 2. Configuração MCP (Modulify Token)
+**Origem:** C:\Github\Birthub-360\.vscode\mcp.json
+**Destino:** C:\Github\Birthub-360\.vscode\mcp.json
+
+**Conteúdo:** Token de autorização Modulify (Bearer token)
+**Ação:** Copiar arquivo
+**Importância:** ALTA - Integração MCP vai quebrar sem isso
+
+---
+
+## 🟡 ARQUIVOS DE CONFIGURAÇÃO LOCAL
+
+### 3. Configuração Devin
+**Origem:** C:\Github\Birthub-360\.devin\config.local.json
+**Destino:** C:\Github\Birthub-360\.devin\config.local.json
+
+**Conteúdo:** Permissões locais do Devin (Exec allowlist)
+**Ação:** Copiar arquivo
+**Importância:** MÉDIA - Pode ser recriado manualmente se perdido
+
+### 4. Configuração VSCode
+**Origem:** C:\Github\Birthub-360\.vscode\settings.json
+**Destino:** C:\Github\Birthub-360\.vscode\settings.json
+
+**Conteúdo:** formatOnSave, autoSave, packageManager
+**Ação:** Copiar arquivo
+**Importância:** BAIXA - Pode ser recriado manualmente
+
+---
+
+## 🟢 DADOS DO CODEX (OPCIONAL)
+
+### 5. Estado Global do Codex
+**Origem:** C:\Users\marce\.codex\
+**Destino:** C:\Users\marce\.codex\
+
+**Conteúdo:**
+- .codex-global-state.json (485 KB) - Estado, histórico, worktrees
+- .sandbox/ - Ambiente sandbox
+- .sandbox-bin/ - Binários sandbox
+- ambient-suggestions/ - Sugestões de ambiente
+- attachments/ - Anexos de sessões
+
+**Ação:** Copiar diretório inteiro
+**Importância:** BAIXA/MÉDIA - Preserva histórico e contexto do Codex
+**Nota:** Se não copiar, o Codex vai começar "limpo" na nova máquina
+
+---
+
+## ✅ ARQUIVOS JÁ COPIADOS (GITHUB)
+
+### Documentação de Worktrees
+- ✅ WORKTREES-BACKUP-2026-10-10.txt - Já criado, levar para nova máquina
+
+### Branches e Commits
+- ✅ Todas as branches pushadas
+- ✅ Todos os commits salvos
+- ✅ Worktrees documentadas
+
+---
+
+## 📋 ORDEM DE MIGRAÇÃO SUGERIDA
+
+### Na máquina ATUAL (antes de desligar):
+
+1. **Copiar arquivos críticos para pen drive/nuvem segura:**
+   - `.env`
+   - `.env.test`
+   - `.vscode/mcp.json`
+
+2. **(Opcional) Backup do Codex:**
+   - Compactar `C:\Users\marce\.codex\` em ZIP
+   - Copiar para local seguro
+
+3. **Documentar versões:**
+   - Node.js: `node --version`
+   - npm: `npm --version`
+   - Git: `git --version`
+
+### Na máquina NOVA:
+
+1. **Clonar repositório:**
+   ```bash
+   git clone https://github.com/MaarkssN/Birthub-360.git C:/Github/Birthub-360
+   ```
+
+2. **Restaurar arquivos críticos:**
+   - Copiar `.env` para `C:\Github\Birthub-360\.env`
+   - Copiar `.env.test` para `C:\Github\Birthub-360\.env.test`
+   - Copiar `.vscode/mcp.json` para `C:\Github\Birthub-360\.vscode\mcp.json`
+
+3. **Restaurar configurações locais:**
+   - Criar `.devin/` e copiar `config.local.json`
+   - Criar `.vscode/` e copiar `settings.json`
+
+4. **(Opcional) Restaurar Codex:**
+   - Criar `C:\Users\marce\.codex\`
+   - Descompactar backup do Codex
+
+5. **Recriar worktrees:**
+   - Seguir instruções em `WORKTREES-BACKUP-2026-10-10.txt`
+
+6. **Instalar dependências:**
+   ```bash
+   cd C:/Github/Birthub-360
+   npm install
+   ```
+
+7. **Verificar ambiente:**
+   ```bash
+   npm run typecheck
+   npm run lint
+   npm run build
+   ```
+
+---
+
+## ⚠️ AVISOS DE SEGURANÇA
+
+1. **NUNCA commitar `.env` no Git** - Já está no .gitignore corretamente
+2. **Token Modulify** é credencial - tratar como segredo
+3. **DATABASE_URL** no .env contém senha do banco - proteger
+4. **API keys** no .env - não compartilhar por canais inseguros
+
+---
+
+## 📝 CHECKLIST RÁPIDO PARA IMPRESSÃO
+
+- [ ] Copiar .env (CRÍTICO)
+- [ ] Copiar .env.test (CRÍTICO)
+- [ ] Copiar .vscode/mcp.json (ALTA)
+- [ ] Copiar .devin/config.local.json (MÉDIA)
+- [ ] Copiar .vscode/settings.json (BAIXA)
+- [ ] (Opcional) Backup .codex/ (BAIXA/MÉDIA)
+- [ ] Levar WORKTREES-BACKUP-2026-10-10.txt
+- [ ] Documentar versões Node/npm/Git

@@ -13,11 +13,10 @@ import {
   CheckCircle2,
   History,
 } from 'lucide-react';
-import type { FlowHealthScore, ValidationIssue } from '../../../lib/studio/types.js';
+import type { ValidationIssue } from '../../../lib/studio/types.js';
 import { ShieldAlert } from 'lucide-react';
 
 interface TopBarProps {
-  health?: FlowHealthScore;
   issues: ValidationIssue[];
   onZoomIn?: () => void;
   onZoomOut?: () => void;
@@ -30,7 +29,6 @@ interface TopBarProps {
 }
 
 export function TopBar({
-  health,
   issues,
   onZoomIn,
   onZoomOut,
@@ -62,8 +60,12 @@ export function TopBar({
             <Play className="w-4 h-4 fill-current" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-gray-100 leading-tight">Customer Service Bot</h1>
-            <p className="text-[10px] text-gray-500 font-mono">v1.0.4 • Auto-saved just now</p>
+            <h1 className="text-sm font-bold text-gray-100 leading-tight">
+              Editor de fluxo de voz
+            </h1>
+            <p className="text-[10px] text-gray-500 font-mono">
+              Validação e publicação em homologação
+            </p>
           </div>
         </div>
 
@@ -130,16 +132,6 @@ export function TopBar({
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 text-green-400 rounded-md text-xs font-medium border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]">
               <ShieldAlert className="w-3.5 h-3.5" />
               Ready
-            </div>
-          )}
-
-          {health && (
-            <div className="flex items-center gap-2" title="Flow Health Score">
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${health.score > 90 ? 'bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.1)]' : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'}`}
-              >
-                {health.score}
-              </div>
             </div>
           )}
         </div>

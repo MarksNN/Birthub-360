@@ -3,9 +3,10 @@ import { X, History, RotateCcw, Loader2, ShieldAlert, Clock, CheckCircle2 } from
 import { useStudioStore } from '../../../store/useStudioStore.js';
 import { ValidationIssuesList } from './ValidationIssuesList.js';
 
-function formatPublishedAt(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
+function formatPublishedAt(iso: string | Date | null | undefined): string {
+  if (!iso) return 'Data indisponível';
+  const date = iso instanceof Date ? iso : new Date(iso);
+  if (Number.isNaN(date.getTime())) return 'Data indisponível';
   return date.toLocaleString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
@@ -159,7 +160,10 @@ export function VersionHistoryPanel() {
                     </span>
                   </div>
                   <p className="text-[11px] text-gray-400 mt-0.5 truncate">
-                    Publicado por {v.publishedBy || 'usuário desconhecido'}
+                    Publicado por{' '}
+                    {typeof v.publishedBy === 'string' && v.publishedBy
+                      ? v.publishedBy
+                      : 'usuário desconhecido'}
                   </p>
                 </div>
 
