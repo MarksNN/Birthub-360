@@ -3,7 +3,7 @@
 De: Cartógrafo + Agente 02 (inventário)
 Para: Marks Orquestrador (distribuição) → donos por linha
 Onda: mapa-modulos
-Status: aberto
+Status: resolvido
 Prioridade: bloqueador (honestidade de produto / nav)
 Sprint destino: pós-merge #693
 
@@ -50,3 +50,10 @@ Freeze: feature nova só via handoff. Não editar App/Sidebar neste pack sem coo
 3. **Item 3 (Orquestração de vendas — seed e métricas fabricadas): RESOLVIDO (PRs #696 e #698 / commits 79e8ecdf, 84ff40ce, e06ebcf0)**
    - `SalesOrchestrationService.ts`: métricas sintéticas (`complianceRate: 88 + idx%10`, `aderenciaPlaybook: 88.4`) e playbooks seed removidos; quando vazio retorna lista vazia e `meta.source = 'none'`.
    - `PlaybooksHub.tsx`, `JornadasComerciaisHub.tsx`, `ProcessosVendasHub.tsx`, `RoteirosHub.tsx`: hubs agora consom `orchestrationApi` real via `useOrchestrationOverview` com badge `Sem dados` quando `meta.source === 'none'`, métricas `null` exibidas como "Indisponível", e empty states reais.
+
+4. **Item 4 (Prospecção Inteligente / MI hubs sem listas fictícias): RESOLVIDO (commit 35358e58)**
+   - Hubs de MI e Prospecção limpos de listas e candidatos sintéticos, adotando estados honestos de carregamento, erro e vazio com dados da API real.
+
+5. **Item 5 (Outbound/Dialer/Voice Hub 503 e redirecionamentos): RESOLVIDO (PRs #709, #715, #717 / commits bd53c08f, 1ca89213, d118ae63)**
+   - Redirecionamento `/app/dialer` → `/app/cadence` implementado e rotas 503 ocultadas/gated honestamente.
+   - `Results.tsx` do Voice Hub agora trata estados explícitos de `MODULE_NOT_READY` e 503 sem fabricar chamadas ou métricas fictícias.

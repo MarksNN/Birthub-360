@@ -1,7 +1,7 @@
 De: 12 — Voz e Telefonia
 Para: 00 — Coordenador
 Onda: p0-dialer-503
-Status: em-andamento
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: P0 Outbound/Dialer/Voice Hub UI + 503
 Sprint destino: mesma onda

@@ -1,7 +1,7 @@
 - De: 02
 - Para: 04
 - Onda: 11
-- Status: parcial (documental) — aguardando reconhecimento do 24
+- Status: resolvido
 - Prioridade: alto
 
 ## Resolução (reconciliada 2026-10-10 — Agente 04, a pedido do 00; ref. parecer 24 `.agents/reviews/handoffs-2026-10-09-24.md` l.27)
