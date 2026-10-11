@@ -208,7 +208,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('whatsapp');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'whatsapp' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'whatsapp' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">💬</span> WhatsApp
           </button>
@@ -218,7 +218,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('google');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'google' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'google' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">📧</span> Google Workspace
           </button>
@@ -228,7 +228,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('bitrix');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'bitrix' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'bitrix' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🔗</span> Bitrix24
           </button>
@@ -238,7 +238,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('hubspot');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'hubspot' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'hubspot' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🟠</span> HubSpot
           </button>
@@ -248,7 +248,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('pipedrive');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'pipedrive' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'pipedrive' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🟢</span> Pipedrive
           </button>
@@ -258,7 +258,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('rdstation');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'rdstation' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'rdstation' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🔵</span> RD Station
           </button>
@@ -268,7 +268,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('monday');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'monday' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'monday' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🔴</span> Monday.com
           </button>
@@ -278,7 +278,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('3cx');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === '3cx' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === '3cx' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <IconWrench className="w-4 h-4 text-sky-500" /> PABX 3CX
           </button>
@@ -288,7 +288,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('voice-hub');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'voice-hub' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'voice-hub' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🎙️</span> SDR de Voz IA
           </button>
@@ -298,7 +298,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('slack');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'slack' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'slack' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">💬</span> Slack
           </button>
@@ -308,7 +308,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('stripe');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'stripe' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'stripe' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">💳</span> Stripe
           </button>
@@ -318,7 +318,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('omie');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'omie' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'omie' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <span className="text-lg">🧾</span> Omie
           </button>
@@ -328,7 +328,7 @@ export function Integrations() {
               SoundFX.play('navigate');
               setActiveTab('webhooks');
             }}
-            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'webhooks' ? 'bg-brand/10 text-brand-ink dark:text-brand' : 'text-ink-2 hover:bg-surface-2'}`}
+            className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'webhooks' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
             <Activity className="w-4 h-4 text-brand" /> Webhooks & Monitor
           </button>
