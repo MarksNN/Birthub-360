@@ -492,12 +492,6 @@
   --ink: #f8f9ff;
   --ink-2: #a1a1b5;
   --line: rgba(0, 212, 255, 0.18);
-  /* Ver :root (A03-P1-09/P1-01): no escuro a marca crua já passa como anel/texto (>= 3:1 / 4.5:1),
-     e a borda de controle clareia em direção a --ink. Calculado: ~4:1 contra --surface escura. */
-  --border-input: color-mix(in srgb, var(--ink) 45%, var(--surface));
-  --line-strong: color-mix(in srgb, var(--ink) 60%, var(--surface));
-  --brand-text: var(--brand);
-  --focus-ring: var(--brand);
   --soft: rgba(0, 212, 255, 0.12);
   /* Paleta Coolors - Dark mode versions */
   --coolors-yellow: #ffc107;
@@ -578,6 +572,12 @@
      translúcido, só pra texto sólido contra --surface/--surface-2. Removido o override; ver
      `.claude/PILOTS.md`. */
   --critical-active: color-mix(in srgb, var(--critical) 20%, white);
+  /* Ver :root (A03-P1-09/P1-01): no escuro a marca crua já passa como anel/texto (>= 3:1 / 4.5:1),
+     e a borda de controle clareia em direção a --ink. Calculado: ~4:1 contra --surface escura. */
+  --border-input: color-mix(in srgb, var(--ink) 45%, var(--surface));
+  --line-strong: color-mix(in srgb, var(--ink) 60%, var(--surface));
+  --brand-text: var(--brand);
+  --focus-ring: var(--brand);
   /* A03-P1-06: com a paleta efetiva (elegance.css troca --ok pelo sage #5f8a7a também no escuro),
      --color-ok cru no badge soft escuro media 4.04:1 (< 4.5:1). 25% de branco recupera margem
      (~6:1 com o sage; ~8.6:1 com o verde original), mesma direção de --critical-active no escuro. */
