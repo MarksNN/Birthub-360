@@ -8,6 +8,7 @@ import {
   Plus,
   AlertTriangle,
   PlugZap,
+  Building2,
 } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
@@ -53,8 +54,21 @@ type TenantContact = {
   } | null;
 };
 
+type TenantCompany = {
+  id: string;
+  tradeName?: string | null;
+  legalName?: string | null;
+  cnpj?: string | null;
+  segment?: string | null;
+};
+
 type ContactsPage = {
   data: TenantContact[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+};
+
+type CompaniesPage = {
+  data: TenantCompany[];
   meta: { total: number; page: number; limit: number; totalPages: number };
 };
 
@@ -73,6 +87,8 @@ export function ProspeccaoInteligenteHub() {
   const [providers, setProviders] = useState<ProviderState[] | null>(null);
   const [contacts, setContacts] = useState<TenantContact[]>([]);
   const [totalContacts, setTotalContacts] = useState(0);
+  const [companies, setCompanies] = useState<TenantCompany[]>([]);
+  const [totalCompanies, setTotalCompanies] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -80,19 +96,19 @@ export function ProspeccaoInteligenteHub() {
     setError(null);
     (async () => {
       try {
-        const [providerList, contactsPage] = await Promise.all([
+        const [providerList, contactsPage, companiesPage] = await Promise.all([
           api.get<ProviderState[]>('/api/prospecting/providers'),
           api.get<ContactsPage>('/api/contacts?page=1&limit=25'),
+          api.get<CompaniesPage>('/api/companies?page=1&limit=25'),
         ]);
         if (cancelled) return;
         setProviders(Array.isArray(providerList) ? providerList : []);
-        const rows = Array.isArray(contactsPage?.data)
-          ? contactsPage.data
-          : Array.isArray(contactsPage as unknown as TenantContact[])
-            ? (contactsPage as unknown as TenantContact[])
-            : [];
+        const rows = Array.isArray(contactsPage?.data) ? contactsPage.data : [];
         setContacts(rows);
         setTotalContacts(contactsPage?.meta?.total ?? rows.length);
+        const companyRows = Array.isArray(companiesPage?.data) ? companiesPage.data : [];
+        setCompanies(companyRows);
+        setTotalCompanies(companiesPage?.meta?.total ?? companyRows.length);
       } catch (reason: unknown) {
         if (!cancelled) {
           setError(
@@ -103,6 +119,8 @@ export function ProspeccaoInteligenteHub() {
           setProviders(null);
           setContacts([]);
           setTotalContacts(0);
+          setCompanies([]);
+          setTotalCompanies(0);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -157,8 +175,29 @@ export function ProspeccaoInteligenteHub() {
         <div className="mb-4">
           <h2 className="text-xl font-bold">Motor de Descoberta de Decisores</h2>
           <p className="text-sm text-[var(--ink-2)]">
-            Contatos do tenant e estado real dos provedores — sem listas ou KPIs inventados.
+            Contatos e empresas do tenant + estado real dos provedores — sem listas ou KPIs
+            inventados.
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <Link
+              to="/app/market-intelligence/hub"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              Radar MI
+            </Link>
+            <Link
+              to="/app/market-intelligence"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              LDR
+            </Link>
+            <Link
+              to="/app/prospect"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              Hub de Prospecção
+            </Link>
+          </div>
         </div>
 
         {loading && (
@@ -196,11 +235,11 @@ export function ProspeccaoInteligenteHub() {
                 title="Contatos no tenant"
                 value={formatInt(totalContacts)}
                 trend={{
-                  value: `${formatInt(contacts.length)} nesta página`,
-                  isPositive: totalContacts > 0,
+                  value: `${formatInt(totalCompanies)} empresas no CRM`,
+                  isPositive: totalContacts > 0 || totalCompanies > 0,
                 }}
                 icon={Users}
-                subtitle="Fonte: /api/contacts (organização atual)"
+                subtitle="Fontes: /api/contacts + /api/companies"
                 variant="default"
               />
               <KpiCard
@@ -251,6 +290,62 @@ export function ProspeccaoInteligenteHub() {
                 </CardContent>
               </Card>
             )}
+
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4" /> Empresas do tenant (CRM)
+                </CardTitle>
+                <CardDescription>
+                  Contas reais da organização. Account 360 usa o id do CRM — só listamos o que
+                  existe no tenant.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 border-t border-[var(--line)] pt-4">
+                {companies.length === 0 ? (
+                  <EmptyState
+                    title="Nenhuma empresa no CRM deste tenant"
+                    description="Aprove contas pelo LDR ou descubra no Hub de Prospecção. Esta tela não inventa empresas."
+                    actionLabel="Abrir LDR"
+                    onAction={() => window.location.assign('/app/market-intelligence')}
+                    icon={<Building2 className="w-8 h-8 text-[#8B7DFF]" />}
+                  />
+                ) : (
+                  companies.map((co) => (
+                    <div
+                      key={co.id}
+                      className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0">
+                        <div className="font-semibold text-sm truncate">
+                          {co.tradeName || co.legalName || 'Empresa sem nome'}
+                        </div>
+                        <p className="text-xs text-[var(--ink-2)] mt-0.5 truncate">
+                          {[co.segment, co.cnpj].filter(Boolean).join(' · ') || 'Sem segmento/CNPJ'}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        {co.cnpj ? (
+                          <Link
+                            to={`/app/market-intelligence?cnpj=${encodeURIComponent(co.cnpj)}`}
+                            className="inline-flex items-center h-8 px-3 text-xs font-semibold rounded-xl border border-white/10"
+                          >
+                            LDR
+                          </Link>
+                        ) : null}
+                        <Link
+                          to={`/app/market-intelligence/accounts/${co.id}`}
+                          className="inline-flex items-center h-8 px-3 text-xs font-semibold rounded-xl bg-[#8B7DFF] text-[#13151A]"
+                        >
+                          Account 360
+                        </Link>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>

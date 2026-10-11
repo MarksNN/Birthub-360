@@ -150,6 +150,26 @@ export function InteligenciaMercadoHub() {
           <p className="text-sm text-[var(--ink-2)]">
             Contas e scores vêm do snapshot publicado do catálogo — sem números inventados.
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <Link
+              to="/app/market-intelligence"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              LDR (CNPJ)
+            </Link>
+            <Link
+              to="/app/prospect/inteligente"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              Prospecção Inteligente
+            </Link>
+            <Link
+              to="/app/prospect"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              Hub de Prospecção
+            </Link>
+          </div>
         </div>
 
         {loading && (
@@ -271,10 +291,10 @@ export function InteligenciaMercadoHub() {
                           <span className="text-[10px] text-[var(--ink-3)] font-mono">{c.cnpj}</span>
                         </div>
                         <Link
-                          to="/app/market-intelligence"
-                          className="inline-flex items-center h-8 px-3 text-xs font-semibold rounded-xl border border-white/10"
+                          to={`/app/market-intelligence?cnpj=${encodeURIComponent(c.cnpj)}`}
+                          className="inline-flex items-center h-8 px-3 text-xs font-semibold rounded-xl border border-white/10 shrink-0"
                         >
-                          Ver LDR <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
+                          Abrir no LDR <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
                         </Link>
                       </div>
                     ))

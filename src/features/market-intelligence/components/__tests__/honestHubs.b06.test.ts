@@ -90,6 +90,9 @@ describe('B-06 ProspeccaoInteligenteHub — sem dados fictícios', () => {
       if (url.startsWith('/api/contacts')) {
         return { data: [], meta: { total: 0, page: 1, limit: 25, totalPages: 0 } };
       }
+      if (url.startsWith('/api/companies')) {
+        return { data: [], meta: { total: 0, page: 1, limit: 25, totalPages: 0 } };
+      }
       throw new Error(`URL inesperada: ${url}`);
     });
     renderWithRouter(createElement(ProspeccaoInteligenteHub));
@@ -124,14 +127,29 @@ describe('B-06 ProspeccaoInteligenteHub — sem dados fictícios', () => {
           meta: { total: 1, page: 1, limit: 25, totalPages: 1 },
         };
       }
+      if (url.startsWith('/api/companies')) {
+        return {
+          data: [
+            {
+              id: 'co-tenant-1',
+              tradeName: 'Tenant Corp',
+              legalName: 'Tenant Corp LTDA',
+              cnpj: '11222333000181',
+              segment: 'SaaS',
+            },
+          ],
+          meta: { total: 1, page: 1, limit: 25, totalPages: 1 },
+        };
+      }
       throw new Error(`URL inesperada: ${url}`);
     });
     renderWithRouter(createElement(ProspeccaoInteligenteHub));
     expect(await screen.findByText('Ana Real')).toBeInTheDocument();
-    expect(screen.getByText('Tenant Corp')).toBeInTheDocument();
+    expect(screen.getAllByText('Tenant Corp').length).toBeGreaterThan(0);
     await waitFor(() => {
       expect(screen.getByText('Contatos no tenant')).toBeInTheDocument();
     });
     expect(screen.queryByText('Camila Guimarães')).not.toBeInTheDocument();
+    expect(screen.getByText('Account 360')).toBeInTheDocument();
   });
 });
