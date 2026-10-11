@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { hasRequiredRole, MESA_TRATAMENTO_ROLES } from '../../lib/auth/authorization.js';
 import { PILLAR_ICONS } from '../brand/PillarIcons.js';
-import { TAB_META, type TabType } from './tabMeta.js';
+import { isNavHiddenTab, TAB_META, type TabType } from './tabMeta.js';
 import { BirthHubLogo } from '../brand/BirthHubLogo.js';
 
 interface NavGroupDefinition {
@@ -39,7 +39,7 @@ export function MacDock({ activeTab }: MacDockProps) {
     'ADMINISTRAÇÃO',
   ];
 
-  const navGroupsByJourney: NavGroupDefinition[] = [
+  const rawNavGroupsByJourney: NavGroupDefinition[] = [
     {
       title: 'PILAR 01 — HUB COMERCIAL',
       items: ['workspace', 'crm', 'crm360', 'propostas', 'companies', 'contacts'],
@@ -86,10 +86,8 @@ export function MacDock({ activeTab }: MacDockProps) {
     },
     {
       title: 'PILAR 08 — ENGAJAMENTO COMERCIAL',
+      // voice-hub/outbound/dialer: fora da nav (NAV_HIDDEN_TABS — gate MODULE_NOT_READY, P0 #693 item 6).
       items: [
-        'voice-hub',
-        'outbound',
-        'dialer',
         ...(canAccessMesaTratamento ? (['mesa-tratamento'] as TabType[]) : []),
       ],
     },
@@ -101,6 +99,12 @@ export function MacDock({ activeTab }: MacDockProps) {
       }) as TabType[],
     },
   ];
+
+  // Filtro defensivo + remove pilar vazio (ex.: PILAR 08 sem Mesa para VISUALIZADOR) — um ícone de
+  // dock que não navega para lugar nenhum seria nav falsa.
+  const navGroupsByJourney: NavGroupDefinition[] = rawNavGroupsByJourney
+    .map((group) => ({ ...group, items: group.items.filter((tab) => !isNavHiddenTab(tab)) }))
+    .filter((group) => group.items.length > 0);
 
   const GROUP_ORDER_BY_ROLE: Partial<Record<string, string[]>> = {
     CLOSER: allPillars,

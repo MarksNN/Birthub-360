@@ -293,15 +293,6 @@ const LeadApprovalDeck = lazy(() =>
   })),
 );
 
-const VoiceStudioPage = lazy(() =>
-  import('./features/voice-hub/pages/VoiceStudio.js').then((m) => ({ default: m.default })),
-);
-const OutboundApp = lazy(() =>
-  import('./features/prospecting/outbound/App.js').then((m) => ({ default: m.default })),
-);
-const DialerFrontend = lazy(() =>
-  import('./features/cadence/components/CadenceHub.js').then((m) => ({ default: m.CadenceHub })),
-);
 
 const PropostasList = lazy(() =>
   import('./features/crm360/components/PropostasList.js').then((m) => ({
@@ -413,9 +404,15 @@ function AppLayout() {
             <Route path="contacts" element={<ContactList />} />
             <Route path="activities" element={<ActivityList />} />
 
-            <Route path="voice-hub" element={<VoiceStudioPage />} />
-            <Route path="outbound/*" element={<OutboundApp />} />
-            <Route path="dialer" element={<DialerFrontend />} />
+            {/* P0 #693 item 6 (handoff 17→02): `/api/voice-hub/*`, `/api/outbound/*` e
+              `/api/dialer-3cx/*` respondem 503 MODULE_NOT_READY por `legacyModuleGate` (intencional,
+              isolamento por org — NÃO reabrir aqui). `/app/dialer` era só CadenceHub com rótulo
+              "Discador 3CX": vai direto pra Cadências. Voice Hub/Outbound não têm UI honesta pro
+              503 (caíam em erro genérico/404), então deep-link volta pro dashboard até o 12
+              reabrir o gate; os módulos saem da navegação via NAV_HIDDEN_TABS (tabMeta.ts). */}
+            <Route path="dialer" element={<Navigate to="/app/cadence" replace />} />
+            <Route path="voice-hub/*" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="outbound/*" element={<Navigate to="/app/dashboard" replace />} />
 
             <Route path="cadence" element={<CadenceHub />} />
             <Route path="playbooks" element={<PlaybooksHub />} />

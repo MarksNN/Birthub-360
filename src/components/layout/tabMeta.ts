@@ -215,9 +215,12 @@ export const TAB_META: Record<TabType, { label: string; icon: any; accent: NavAc
   settings_automation: { label: 'Ajustes de Automação', icon: SettingsIcon, accent: 'slate' },
 
   // PILAR 08 — ENGAJAMENTO COMERCIAL
-  'voice-hub': { label: 'Voice Hub', icon: Mic, accent: 'iris' },
-  outbound: { label: 'Outbound AI', icon: PhoneCall, accent: 'red' },
-  dialer: { label: 'Discador 3CX', icon: PhoneCall, accent: 'teal' },
+  // P0 #693 item 6 (handoff 17→02): voice-hub/outbound/dialer estão atrás de `legacyModuleGate`
+  // (503 MODULE_NOT_READY intencional). Rótulos honestos até o 12 liberar o módulo real — nada de
+  // prometer "Discador 3CX" quando a rota cai em Cadências. Ver NAV_HIDDEN_TABS/NAV_TAB_ALIASES.
+  'voice-hub': { label: 'Voice Hub (indisponível)', icon: Mic, accent: 'iris' },
+  outbound: { label: 'Outbound AI (indisponível)', icon: PhoneCall, accent: 'red' },
+  dialer: { label: 'Cadências (discador indisponível)', icon: PhoneCall, accent: 'teal' },
   'mesa-tratamento': { label: 'Mesa de Tratamento', icon: Headset, accent: 'red' },
   settings_engagement: { label: 'Ajustes de Engajamento', icon: SettingsIcon, accent: 'slate' },
 
@@ -228,3 +231,23 @@ export const TAB_META: Record<TabType, { label: string; icon: any; accent: NavAc
   'module-access': { label: 'Acesso a Módulos', icon: ShieldCheck, accent: 'green' },
   settings: { label: 'Ajustes Globais', icon: SettingsIcon, accent: 'slate' },
 };
+
+/**
+ * P0 #693 item 6 (handoff 17→02) — módulos com backend em `legacyModuleGate`
+ * (`/api/voice-hub/*`, `/api/outbound/*`, `/api/dialer-3cx/*` → 503 MODULE_NOT_READY intencional).
+ * Não aparecem na navegação (dock, sidebar, voz) até o 12 reabrir o gate com isolamento por org.
+ * `dialer` também sai da nav: o destino real dele é Cadências (ver NAV_TAB_ALIASES).
+ * Superfícies em `src/components/ui/**` (CommandPalette, ModuleAgentWidget) devem filtrar por aqui.
+ */
+export const NAV_HIDDEN_TABS: ReadonlySet<TabType> = new Set<TabType>([
+  'voice-hub',
+  'outbound',
+  'dialer',
+]);
+
+/** Destino canônico de tabs que são apenas alias de outro módulo. `/app/dialer` → `/app/cadence`. */
+export const NAV_TAB_ALIASES: Readonly<Partial<Record<TabType, TabType>>> = { dialer: 'cadence' };
+
+export function isNavHiddenTab(tab: TabType): boolean {
+  return NAV_HIDDEN_TABS.has(tab);
+}
