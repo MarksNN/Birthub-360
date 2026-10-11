@@ -1,4 +1,17 @@
-name: Deploy to AWS Production
+# Arquivado por decisão do Agente 10 (Opção A: Manter EC2 via SSH)
+# Motivo: Este workflow está configurado para ECS/ECR/S3/CloudFront, mas:
+# - Nunca foi ativado (ausência de secret AWS_ROLE_TO_ASSUME)
+# - Diverge da arquitetura canônica documentada (100% Local-First / Single-Node)
+# - Diverge do ambiente real de produção (EC2 via SSH, operacional)
+# - K8s, ArgoCD, Helm charts, ECS estão marcados como ARCHIVED/LEGACY
+# - Migração para ECS/ECR seria regressão arquitetural desnecessária
+# Ref: .agents/handoffs/onda-liquidacao-debitos/00-para-08-10-estrategia-deploy-unificada.md
+# Ref: .agents/handoffs/onda-liquidacao-debitos/10-para-08-arquivar-deploy-aws.md
+#
+# Deploy real deve usar scripts EC2: deploy-ec2.sh, deploy-ec2.ps1, deploy-aws.ps1
+# Ver documentação em docs/operations/PRODUCTION_ARCHITECTURE.md ou docs/operations/DEPLOY_EC2.md
+
+name: Deploy to AWS Production (DISABLED - Arquivado)
 
 on:
   push:

@@ -1,5 +1,4 @@
 import { useState, type ComponentType, type MouseEvent, type PointerEvent } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
 
@@ -129,7 +128,7 @@ export function KpiCard({
   const sharedClassName = cn(
     'group relative w-full overflow-hidden rounded-2xl border border-white/5 bg-[#1C1D24] p-5 text-left shadow-sm transition-all duration-300',
     onSelect &&
-      'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-white/10 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B7DFF]',
+    'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-white/10 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B7DFF]',
     active && 'border-[#8B7DFF]/60 shadow-[0_0_0_2px_rgba(139,125,255,0.2)] bg-[#1F202B]',
     className,
   );
@@ -225,6 +224,13 @@ export function KpiCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onKeyDown={onSelect ? (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect?.();
+        }
+      } : undefined}
       className={sharedClassName}
     >
       {content}

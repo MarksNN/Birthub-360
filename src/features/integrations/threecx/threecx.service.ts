@@ -134,7 +134,7 @@ export async function connect3CX(
 
   await save3CXConnectionForOrg(organizationId, newConn);
   logger.info(
-    { organizationId, connectionId, pbxUrl, extension: input.extension },
+    { organizationId, connectionId, extension: input.extension },
     '[3cx] PABX 3CX conectado com sucesso',
   );
 
@@ -182,7 +182,7 @@ export async function test3CXConnection(
     });
 
     logger.info(
-      { organizationId, connectionId, pbxUrl: conn.pbxUrl, ok: res.ok },
+      { organizationId, connectionId, ok: res.ok },
       '[3cx] Teste de comunicação realizado',
     );
     // CORREÇÃO: antes este retorno era sempre success:true (inclusive quando o ping falhava ou
@@ -202,7 +202,7 @@ export async function test3CXConnection(
     if (err instanceof AppError) throw err;
     const timedOut = controller.signal.aborted;
     logger.warn(
-      { err, organizationId, connectionId, pbxUrl: conn.pbxUrl, timedOut },
+      { err, organizationId, connectionId, timedOut },
       '[3cx] Falha ao testar comunicação com o PABX',
     );
     return {
@@ -359,12 +359,14 @@ export async function make3CXCall(
   }
 
   if (!dialSucceeded) {
+    // Mascarar telefone nos logs (últimos 4 dígitos apenas)
+    const maskedPhone = destinationNumber.replace(/\D/g, '').slice(-4);
     logger.warn(
       {
         organizationId,
         connectionId: conn.id,
         extension: conn.extension,
-        destinationNumber,
+        destinationNumber: `****${maskedPhone}`,
         callId,
         failureReason,
       },
@@ -377,7 +379,7 @@ export async function make3CXCall(
   }
 
   logger.info(
-    { organizationId, connectionId: conn.id, extension: conn.extension, destinationNumber, callId },
+    { organizationId, connectionId: conn.id, extension: conn.extension, destinationNumber: `****${destinationNumber.replace(/\D/g, '').slice(-4)}`, callId },
     '[3cx] Chamada disparada via 3CX PABX',
   );
 
@@ -744,9 +746,9 @@ export async function process3CXWebhook(
 
     let lead = explicitLeadId
       ? await prisma.lead.findFirst({
-          where: { id: explicitLeadId, organizationId },
-          include: { contact: true },
-        })
+        where: { id: explicitLeadId, organizationId },
+        include: { contact: true },
+      })
       : null;
 
     if (!lead) {

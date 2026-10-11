@@ -49,7 +49,7 @@ export function BottomDrawer() {
   } = useStudioStore();
 
   const valResult = validationEngine.validate(nodes, edges);
-  const { issues, healthScore } = valResult;
+  const { issues } = valResult;
 
   const handleAddVariable = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,9 +153,7 @@ export function BottomDrawer() {
 
         {/* Diagnostic Quick Tag */}
         <div className="flex items-center gap-2">
-          <div className="text-[10px] font-bold text-gray-500 font-mono">
-            ENGINE: ACTIVE_VOICE_v1
-          </div>
+          <div className="text-[10px] font-bold text-gray-500 font-mono">ENGINE: INDISPONÍVEL</div>
           <div className="h-3 w-px bg-white/10" />
           {issues.filter((i) => i.type === 'error').length === 0 ? (
             <div className="text-[10px] font-semibold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20 shadow-[0_0_5px_rgba(34,197,94,0.2)]">
@@ -394,148 +392,15 @@ export function BottomDrawer() {
           )}
 
           {activeTab === 'events' && (
-            <motion.div
-              key="events"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 bg-[#090a0f] p-4 font-mono text-xs overflow-y-auto space-y-1.5 text-slate-300 select-text"
-            >
-              <div className="text-slate-500 border-b border-white/5 pb-2 mb-2">
-                EVENT-DRIVEN STREAM LOGS (Birth Voice Engine Bus)
-              </div>
-              <div className="flex items-start gap-2 hover:bg-white/5 py-1 px-1.5 rounded text-iris transition-colors">
-                <span>[08:12:01]</span>
-                <span>EVENT_EMITTED</span>
-                <span>
-                  telephony.session.init{' '}
-                  {JSON.stringify({ ani: '+5511999998888', dnis: '0800-999-888' })}
-                </span>
-              </div>
-              <div className="flex items-start gap-2 hover:bg-white/5 py-1 px-1.5 rounded text-green-300 transition-colors">
-                <span>[08:12:02]</span>
-                <span>EVENT_EMITTED</span>
-                <span>
-                  voice.provider.loaded {JSON.stringify({ voiceId: 'Rachel', latencyMs: 240 })}
-                </span>
-              </div>
-              <div className="flex items-start gap-2 hover:bg-white/5 py-1 px-1.5 rounded text-brand-ink dark:text-brand transition-colors">
-                <span>[08:12:03]</span>
-                <span>EVENT_EMITTED</span>
-                <span>
-                  prompt.generation.chunk_stream{' '}
-                  {JSON.stringify({ tokens: 140, provider: 'Gemini' })}
-                </span>
-              </div>
-              <div className="flex items-start gap-2 hover:bg-white/5 py-1 px-1.5 rounded text-amber-300 transition-colors">
-                <span>[08:12:04]</span>
-                <span>EVENT_EMITTED</span>
-                <span>
-                  decision.match_score.intent {JSON.stringify({ value: 'Suporte', score: 0.94 })}
-                </span>
-              </div>
-            </motion.div>
+            <div role="status" className="p-4 text-sm text-gray-400">
+              Telemetria de chamadas indisponível. Nenhum evento real foi recebido para exibir.
+            </div>
           )}
-
           {activeTab === 'analytics' && (
-            <motion.div
-              key="analytics"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-4 gap-3 bg-transparent"
-            >
-              {/* Dynamic Health Scores */}
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Complexity / Legibilidade
-                </div>
-                <div className="text-2xl font-bold text-gray-200 font-mono mt-1">
-                  {healthScore.complexity}%
-                </div>
-                <div className="w-full bg-white/10 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div
-                    className="bg-iris h-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"
-                    style={{ width: `${healthScore.complexity}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Estimated Cost / 10k calls
-                </div>
-                <div className="text-2xl font-bold text-gray-200 font-mono mt-1">
-                  ${(healthScore.estimatedCost * 10000).toFixed(2)}
-                </div>
-                <div className="text-[10px] text-gray-500 mt-1 font-mono">
-                  Avg: ${healthScore.estimatedCost} USD per call
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Avg Latency (STT + LLM + TTS)
-                </div>
-                <div className="text-2xl font-bold text-gray-200 font-mono mt-1">
-                  {healthScore.latency}ms
-                </div>
-                <div className="text-[10px] text-green-400 font-semibold mt-1">
-                  Excellent (under 1200ms)
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Risk Assessment Score
-                </div>
-                <div className="text-2xl font-bold text-red-400 font-mono mt-1">
-                  {healthScore.risk}%
-                </div>
-                <div className="w-full bg-white/10 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div
-                    className="bg-red-500 h-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"
-                    style={{ width: `${healthScore.risk}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Node Reusability Index
-                </div>
-                <div className="text-xl font-bold text-gray-300 font-mono mt-1">
-                  {healthScore.reusability}/100
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Path Coverage Score
-                </div>
-                <div className="text-xl font-bold text-gray-300 font-mono mt-1">
-                  {healthScore.coverage}/100
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Scalability Rating
-                </div>
-                <div className="text-xl font-bold text-gray-300 font-mono mt-1">
-                  {healthScore.scalability}/100
-                </div>
-              </div>
-
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                  Overall Quality Index
-                </div>
-                <div className="text-xl font-bold text-iris font-mono mt-1">
-                  {healthScore.quality}/100
-                </div>
-              </div>
-            </motion.div>
+            <div role="status" className="p-4 text-sm text-gray-400">
+              Métricas do fluxo indisponíveis. Não há custo, latência ou qualidade medidos para
+              exibir.
+            </div>
           )}
 
           {activeTab === 'catarina' && (

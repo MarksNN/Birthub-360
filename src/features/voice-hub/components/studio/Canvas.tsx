@@ -17,8 +17,10 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+import { authClient } from '../../../../lib/auth-client.js';
+import { useWorkflowPersistence } from '../../store/useWorkflowPersistence.js';
 import { validationEngine } from '../../../../lib/studio/ValidationEngine.js';
-import { useStudioStore } from '../../store/useStudioStore.js';
+import { useStudioStore, workflowGraphSnapshot } from '../../store/useStudioStore.js';
 import type { StudioNode, StudioEdge } from '../../lib/studio/types.js';
 import {
   StartNode,
@@ -39,6 +41,7 @@ import { TopBar } from './panels/TopBar.js';
 import { LayersPanel } from './panels/LayersPanel.js';
 import { InspectorPanel } from './panels/InspectorPanel.js';
 import { BottomDrawer } from './panels/BottomDrawer.js';
+import { VersionHistoryPanel } from './panels/VersionHistoryPanel.js';
 const TestSimulatorModal = lazy(() =>
   import('./panels/TestSimulatorModal.js').then((m) => ({ default: m.TestSimulatorModal })),
 );
@@ -62,7 +65,8 @@ const edgeTypes = {
   studioEdge: CustomStudioEdge,
 };
 
-function CanvasInner() {
+function CanvasInner({ contextKey }: { contextKey: string | null }) {
+  const { loadState, saveState, retryLoad, retrySave } = useWorkflowPersistence(contextKey);
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
 
   const {
@@ -74,27 +78,11 @@ function CanvasInner() {
     setEdges,
     connectNodes,
     nodeLifecycles,
-    loadWorkflowFromServer,
-    saveWorkflowToServer,
     publishWorkflowToServer,
     publishState,
     publishIssues,
     openVersionHistory,
   } = useStudioStore();
-
-  useEffect(() => {
-    // loadWorkflowFromServer();
-  }, []);
-
-  useEffect(() => {
-    // Only save if there are actual nodes
-    if (nodes.length > 0) {
-      const timer = setTimeout(() => {
-        saveWorkflowToServer();
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [nodes, saveWorkflowToServer]);
 
   useEffect(() => {
     // Auto-dismiss the publish result banner; the outcome is still visible afterwards via the
@@ -117,11 +105,10 @@ function CanvasInner() {
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) || null;
 
   const result = validationEngine.validate(nodes, edges);
-  const health = result.healthScore;
   const issues = result.issues;
 
   const renderedNodes = nodes.map((n) => {
-    const nodeIssues = issues.filter((i) => i.nodeId === n.id);
+    const nodeIssues = issues.filter((i) => !i.nodeId || i.nodeId === n.id);
     const lifecycle = nodeLifecycles[n.id] || 'Ready';
     return {
       ...n,
@@ -149,10 +136,51 @@ function CanvasInner() {
 
   const onConnect = useCallback((params: Connection) => connectNodes(params), [connectNodes]);
 
+  // Do not mount editor controls during hydration: mouse, tab focus, and ReactFlow keyboard
+  // deletion cannot modify the demonstration or a previous session's graph.
+  if (loadState !== 'ready' || !contextKey) {
+    return (
+      <div className="flex flex-1 items-center justify-center bg-[#0B0D14] p-6 text-slate-300">
+        {loadState === 'error' ? (
+          <div role="alert" className="space-y-4 text-center">
+            <p>Não foi possível carregar o fluxo. O backend pode estar indisponível.</p>
+            <p>Edição e salvamento automático bloqueados para proteger os dados existentes.</p>
+            <button type="button" onClick={retryLoad}>
+              Tentar novamente
+            </button>
+          </div>
+        ) : (
+          <p role="status">
+            {contextKey
+              ? 'Carregando o fluxo salvo da organização...'
+              : 'Aguardando sessão e organização autenticadas...'}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  const graphIsSaved = workflowGraphSnapshot(nodes, edges) === useStudioStore.getState().savedGraph;
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-[#0B0D14]">
+      <div
+        role={saveState === 'error' ? 'alert' : 'status'}
+        className="px-4 py-2 text-xs text-slate-300"
+      >
+        {saveState === 'error'
+          ? 'Falha ao salvar. Alterações não confirmadas.'
+          : saveState === 'saving'
+            ? 'Salvando versão enviada...'
+            : graphIsSaved
+              ? 'Fluxo carregado ou gravação confirmada pelo servidor.'
+              : 'Alterações locais aguardando salvamento.'}
+        {saveState === 'error' && (
+          <button type="button" onClick={retrySave} className="ml-4">
+            Tentar salvar novamente
+          </button>
+        )}
+      </div>
       <TopBar
-        health={health}
         issues={issues}
         onZoomIn={() => zoomIn({ duration: 300 })}
         onZoomOut={() => zoomOut({ duration: 300 })}
@@ -223,14 +251,21 @@ function CanvasInner() {
       </div>
 
       <BottomDrawer />
+      <VersionHistoryPanel />
     </div>
   );
 }
 
 export function VisualCanvas() {
+  const { data: session, isPending } = authClient.useSession();
+  const organizationId = session?.user.organizationId;
+  const contextKey =
+    !isPending && session?.session.id && organizationId
+      ? `${session.session.id}:${session.user.id}:${organizationId}`
+      : null;
   return (
     <ReactFlowProvider>
-      <CanvasInner />
+      <CanvasInner key={contextKey ?? 'signed-out'} contextKey={contextKey} />
     </ReactFlowProvider>
   );
 }

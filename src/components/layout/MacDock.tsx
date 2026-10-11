@@ -113,8 +113,8 @@ export function MacDock({ activeTab }: MacDockProps) {
   const roleOrder = GROUP_ORDER_BY_ROLE[currentUser?.role ?? ''];
   const navGroups = roleOrder
     ? [...navGroupsByJourney].sort(
-        (a, b) => roleOrder.indexOf(a.title) - roleOrder.indexOf(b.title),
-      )
+      (a, b) => roleOrder.indexOf(a.title) - roleOrder.indexOf(b.title),
+    )
     : navGroupsByJourney;
 
   // Find which group is currently active
@@ -149,6 +149,7 @@ export function MacDock({ activeTab }: MacDockProps) {
             return (
               <div
                 key={group.title}
+                role="group"
                 className="relative flex flex-col items-center"
                 onMouseEnter={() => setHoveredGroup(group.title)}
                 onMouseLeave={() => setHoveredGroup(null)}
@@ -170,6 +171,7 @@ export function MacDock({ activeTab }: MacDockProps) {
 
                 {/* Dock Icon */}
                 <motion.button
+                  type="button"
                   onClick={() => {
                     if (group.items.length > 0) {
                       navigate(`/app/${group.items[0]}`);
@@ -178,11 +180,10 @@ export function MacDock({ activeTab }: MacDockProps) {
                   whileHover={{ scale: 1.35, y: 4 }}
                   whileTap={{ scale: 0.9 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  className={`relative grid place-items-center w-[46px] h-[46px] rounded-[18px] border transition-colors ${
-                    isGroupActive
-                      ? 'bg-white/10 border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.05)] text-white'
-                      : 'bg-white/5 border-transparent text-white/60 hover:text-white hover:bg-white/15 hover:border-white/20'
-                  }`}
+                  className={`relative grid place-items-center w-[46px] h-[46px] rounded-[18px] border transition-colors ${isGroupActive
+                    ? 'bg-white/10 border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.05)] text-white'
+                    : 'bg-white/5 border-transparent text-white/60 hover:text-white hover:bg-white/15 hover:border-white/20'
+                    }`}
                 >
                   {Icon ? <Icon isActive={isGroupActive} className="w-[22px] h-[22px]" /> : null}
 
@@ -212,11 +213,10 @@ export function MacDock({ activeTab }: MacDockProps) {
             <button
               key={tabId}
               onClick={() => navigate(`/app/${tabId}`)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-all whitespace-nowrap ${
-                isTabActive
-                  ? 'bg-white text-midnight shadow-sm font-semibold'
-                  : 'text-white/60 hover:text-white hover:bg-white/10'
-              }`}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-all whitespace-nowrap ${isTabActive
+                ? 'bg-white text-midnight shadow-sm font-semibold'
+                : 'text-white/60 hover:text-white hover:bg-white/10'
+                }`}
             >
               <SubIcon size={14} strokeWidth={isTabActive ? 2 : 1.75} />
               {meta.label}
