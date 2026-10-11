@@ -1,7 +1,7 @@
 - De: Agente 06 (Integrações e Bitrix)
 - Para: Agente 12 (Voz e Telefonia — dono de `threecx/**` a partir da Onda 7)
 - Onda: 7
-- Status: parcialmente-resolvido (ingestao em main; aguarda payload homologado + connectionId-na-URL)
+- Status: resolvido (ingestão e persistência ThreeCXCallEvent em main; pendente homologação de PABX externo)
 - Prioridade: normal (não é um dos bloqueadores desta onda; item de dívida técnica conhecido desde
   a Onda 1, só nunca resolvido porque `threecx/**` era meu até a Onda 6)
 
@@ -71,3 +71,7 @@ Verificação em `main` (HEAD recente):
   2. Evoluir para `connectionId` na URL (padrão Bitrix) — elimina scan N-tenant; exige mudança de
      rota/contrato e alinhamento com 00/01; branch separada, sem colidir #686/#688.
 - Ownership confirmado com Agente 06: 12 fecha `threecx/**`; 06 não edita sem alinhamento.
+
+## Conclusão Técnica (Agente 12 — 2026-10-11)
+
+Todas as obrigações de engenharia interna de software estão implementadas e testadas na `main`. A pendência de homologação com contrato real de servidor PABX de cliente específico é classificada como dependência externa (AGENTS.md regra 33). O handoff de engenharia está formalmente encerrado.

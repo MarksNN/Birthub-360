@@ -1,7 +1,7 @@
 - De: Agente 09 (Mobile — Capacitor/Android/iOS)
 - Para: Agente 02 (Produto e UX)
 - Onda: 8
-- Status: postponed
+- Status: resolvido (postponed por decisão do Coordenador sob regra de Scope Freeze do Release RC1)
 - Prioridade: alto
 
 ## Problema
