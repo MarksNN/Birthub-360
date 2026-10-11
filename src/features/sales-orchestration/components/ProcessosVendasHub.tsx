@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Network, Zap, CheckCircle, Clock, ShieldAlert, Plus, Filter, Search } from 'lucide-react';
+import { useState } from 'react';
+import { Network, Zap, CheckCircle, ShieldAlert, Plus, Search } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
   Card,
@@ -20,25 +20,18 @@ import {
   TableHeader,
   TableRow,
 } from '../../../components/ui/Table.js';
-import { orchestrationApi, type ProcessoVendaItem } from '../orchestration.api.js';
+import {
+  DemoBadge,
+  NO_API_SUBTITLE,
+  OrchestrationEmptyState,
+  OrchestrationStatusBanner,
+} from './DemoDataNotice.js';
+import { formatMetric, useOrchestrationOverview } from './useOrchestrationOverview.js';
 
 export function ProcessosVendasHub() {
-  const [processos, setProcessos] = useState<ProcessoVendaItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isTemplate, loading, error, reload } = useOrchestrationOverview();
+  const processos = data?.processos ?? [];
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    let mounted = true;
-    orchestrationApi.getOverview().then((res) => {
-      if (mounted) {
-        setProcessos(res.processos);
-        setLoading(false);
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const filtered = processos.filter(
     (p) =>
@@ -54,7 +47,12 @@ export function ProcessosVendasHub() {
         icon={Network}
         actions={
           <div className="flex gap-2">
-            <Button variant="default" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              disabled
+              title="Em breve — criação ainda não disponível"
+            >
               <Plus className="w-4 h-4 mr-2" /> Novo Processo (SOP)
             </Button>
           </div>
@@ -70,30 +68,29 @@ export function ProcessosVendasHub() {
           </p>
         </div>
 
-        {/* KPIs */}
+        <OrchestrationStatusBanner isTemplate={isTemplate} error={error} onRetry={reload} />
+
+        {/* KPIs (P0 #693: sem números fixos — só API ou “Indisponível”) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <KpiCard
             title="Speed-to-Lead (Média)"
-            value="3.8 min"
-            trend={{ value: 'Meta: < 5 min', isPositive: true }}
+            value={formatMetric(data?.kpis.speedToLeadMin, ' min')}
             icon={Zap}
-            subtitle="Tempo até primeira tentativa SDR"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="Conformidade de SLA"
-            value="97.1%"
-            trend={{ value: '+2.4%', isPositive: true }}
+            value="Indisponível"
             icon={CheckCircle}
-            subtitle="Regras cumpridas sem desvios"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="Descartes sem Justificativa"
-            value="0"
-            trend={{ value: 'Travas ativas', isPositive: true }}
+            value="Indisponível"
             icon={ShieldAlert}
-            subtitle="100% dos motivos catalogados"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
         </div>
@@ -124,6 +121,25 @@ export function ProcessosVendasHub() {
             {loading ? (
               <div className="p-8 text-center text-sm text-[var(--ink-3)]">
                 Carregando procedimentos...
+              </div>
+            ) : error ? (
+              <div className="p-8 text-center text-sm text-[var(--ink-3)]">
+                Processos indisponíveis — falha ao carregar dados da API.
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="p-6">
+                <OrchestrationEmptyState
+                  title={
+                    processos.length === 0
+                      ? 'Nenhum processo cadastrado'
+                      : 'Nenhum processo encontrado'
+                  }
+                  hint={
+                    processos.length === 0
+                      ? 'Ainda não há SOPs cadastrados para a organização.'
+                      : 'Ajuste o filtro.'
+                  }
+                />
               </div>
             ) : (
               <Table>
@@ -161,7 +177,8 @@ export function ProcessosVendasHub() {
                       <TableCell className="text-xs text-[var(--ink-2)]">
                         {item.responsavel}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right space-x-1">
+                        <DemoBadge show={isTemplate} />
                         <Badge
                           variant="default"
                           className="bg-[var(--nav-c-green)]/10 text-[var(--nav-c-green)]"

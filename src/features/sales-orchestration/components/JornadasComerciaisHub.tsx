@@ -1,13 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import {
-  GitBranch,
-  Clock,
-  ArrowRight,
-  CheckCircle2,
-  Shield,
-  AlertTriangle,
-  Users,
-} from 'lucide-react';
+import { GitBranch, Clock, CheckCircle2, Shield, Users } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
   Card,
@@ -19,24 +10,16 @@ import {
 import { KpiCard } from '../../../components/ui/KpiCard.js';
 import { Button } from '../../../components/ui/Button.js';
 import { Badge } from '../../../components/ui/Badge.js';
-import { orchestrationApi, type JornadaEtapa } from '../orchestration.api.js';
+import {
+  NO_API_SUBTITLE,
+  OrchestrationEmptyState,
+  OrchestrationStatusBanner,
+} from './DemoDataNotice.js';
+import { useOrchestrationOverview } from './useOrchestrationOverview.js';
 
 export function JornadasComerciaisHub() {
-  const [jornadas, setJornadas] = useState<JornadaEtapa[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    orchestrationApi.getOverview().then((res) => {
-      if (mounted) {
-        setJornadas(res.jornadas);
-        setLoading(false);
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const { data, isTemplate, loading, error, reload } = useOrchestrationOverview();
+  const jornadas = data?.jornadas ?? [];
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--bg)] text-[var(--ink)]">
@@ -45,7 +28,12 @@ export function JornadasComerciaisHub() {
         icon={GitBranch}
         actions={
           <div className="flex gap-2">
-            <Button variant="default" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              disabled
+              title="Em breve — criação ainda não disponível"
+            >
               <GitBranch className="w-4 h-4 mr-2" /> Nova Jornada
             </Button>
           </div>
@@ -61,30 +49,29 @@ export function JornadasComerciaisHub() {
           </p>
         </div>
 
-        {/* KPIs */}
+        <OrchestrationStatusBanner isTemplate={isTemplate} error={error} onRetry={reload} />
+
+        {/* KPIs (P0 #693: sem números fixos — só API ou “Indisponível”) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <KpiCard
             title="Ciclo Médio de Venda"
-            value="15.5 dias"
-            trend={{ value: '-3.2 dias vs mês anterior', isPositive: true }}
+            value="Indisponível"
             icon={Clock}
-            subtitle="Do primeiro toque ao fechamento"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="Conversão Ponta a Ponta"
-            value="11.4%"
-            trend={{ value: '+1.8%', isPositive: true }}
+            value="Indisponível"
             icon={CheckCircle2}
-            subtitle="De Lead Descoberto a Negócio Ganho"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="SLA de Passagem de Bastão"
-            value="94.2%"
-            trend={{ value: 'Dentro do limite de 4h', isPositive: true }}
+            value="Indisponível"
             icon={Shield}
-            subtitle="SDR → Closer sem atrasos"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
         </div>
@@ -98,7 +85,7 @@ export function JornadasComerciaisHub() {
                 variant="default"
                 className="bg-[var(--nav-c-blue)]/10 text-[var(--nav-c-blue)] font-normal"
               >
-                Modelo Ativo: Enterprise & Mid-Market
+                {isTemplate ? 'Modelo de exemplo' : 'Jornada da organização'}
               </Badge>
             </CardTitle>
             <CardDescription>
@@ -108,6 +95,16 @@ export function JornadasComerciaisHub() {
           <CardContent className="border-t border-[var(--line)] pt-6">
             {loading ? (
               <div className="h-64 bg-[var(--surface-2)] rounded-xl animate-pulse" />
+            ) : error ? (
+              <OrchestrationEmptyState
+                title="Jornada indisponível"
+                hint="Falha ao carregar dados da API."
+              />
+            ) : jornadas.length === 0 ? (
+              <OrchestrationEmptyState
+                title="Nenhuma jornada configurada"
+                hint="Ainda não há etapas de jornada cadastradas para a organização."
+              />
             ) : (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -122,7 +119,9 @@ export function JornadasComerciaisHub() {
                             PASSO {idx + 1}
                           </span>
                           <span className="text-xs font-semibold text-[var(--nav-c-green)]">
-                            {etapa.conversionRate}% conv.
+                            {etapa.conversionRate === null
+                              ? 'Conv. indisponível'
+                              : `${etapa.conversionRate}% conv.`}
                           </span>
                         </div>
                         <h4 className="font-semibold text-sm mb-1">{etapa.name}</h4>
