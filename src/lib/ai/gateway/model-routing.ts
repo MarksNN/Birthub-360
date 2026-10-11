@@ -18,11 +18,11 @@ const MODEL_ALIASES: Record<string, string> = {
 };
 
 const GROQ_MODEL_ALIASES: Record<string, string> = {
-  'local-llama3': 'openai/gpt-oss-120b',
-  'local-llama3-fast': 'openai/gpt-oss-20b',
-  'gpt-4o': 'openai/gpt-oss-120b',
-  'gpt-4o-mini': 'openai/gpt-oss-20b',
-  'claude-sonnet': 'openai/gpt-oss-120b',
+  'local-llama3': 'llama-3.3-70b-versatile',
+  'local-llama3-fast': 'llama-3.1-8b-instant',
+  'gpt-4o': 'llama-3.3-70b-versatile',
+  'gpt-4o-mini': 'llama-3.1-8b-instant',
+  'claude-sonnet': 'llama-3.3-70b-versatile',
 };
 
 /** Resolve o nome lógico pedido pelo chamador para o nome canônico usado internamente

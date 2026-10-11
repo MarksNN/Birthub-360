@@ -22,10 +22,12 @@ export const groqProvider: ProviderAdapter = {
 
     // Lista de fallback de modelos compatíveis no Groq para tolerância a rate-limits específicos de modelo (TPD)
     const modelCandidates = [primaryGroqModel];
-    if (primaryGroqModel === 'openai/gpt-oss-20b') {
-      modelCandidates.push('openai/gpt-oss-120b', 'llama-3.1-8b-instant');
-    } else if (primaryGroqModel === 'openai/gpt-oss-120b') {
-      modelCandidates.push('openai/gpt-oss-20b', 'llama-3.3-70b-versatile');
+    if (primaryGroqModel === 'llama-3.1-8b-instant') {
+      modelCandidates.push('llama-3.3-70b-versatile', 'openai/gpt-oss-20b');
+    } else if (primaryGroqModel === 'llama-3.3-70b-versatile') {
+      modelCandidates.push('llama-3.1-8b-instant', 'openai/gpt-oss-120b');
+    } else {
+      modelCandidates.push('llama-3.1-8b-instant', 'llama-3.3-70b-versatile');
     }
 
     let lastError: unknown;
