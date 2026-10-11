@@ -1,37 +1,23 @@
 - De: 11
 - Para: 15
 - Onda: c0
-- Status: resolvido
+- Status: superado
 - Prioridade: normal
 
-## Problema
-`infrastructure/opa/policies/tenancy.rego` (package `birthhub360.tenancy`, regras `brand_allowed`/
-`cross_brand_violation`) é carregado pelo engine OPA em runtime (a pasta inteira
-`infrastructure/opa/policies` é montada no container via `docker-compose.services.yml`), mas
-**nenhum endpoint do código-fonte consulta `birthhub360/tenancy`** — confirmado via grep em todo
-`src/`. Só `birthhub360/rbac` (`rbac.rego`) é efetivamente chamado, por `src/middleware/opa.ts` e
-`src/lib/auth/authorization.ts`.
+## Problema (histórico)
 
-O comentário do próprio arquivo `tenancy.rego` o descreve como "a prova técnica" de isolamento de
-tenant por marca — risco de má-interpretação: alguém pode concluir, numa auditoria de segurança,
-que há uma camada de isolamento por `brand` ativa quando na prática ela nunca é invocada por
-nenhuma rota HTTP.
+`infrastructure/opa/policies/tenancy.rego` (e o stack OPA) não era consultado por nenhuma rota;
+risko de falsa sensação de isolamento de tenant.
 
-## Arquivo(s) envolvido(s)
-`infrastructure/opa/policies/tenancy.rego`, `infrastructure/opa/policies/rbac.rego` (este último
-**é** consultado — não remover, só o namespace `birthhub360.rbac` carrega a marca antiga como nome
-técnico).
+## Resolução Formal (Missão 15 — 2026-10-10)
 
-## Alteração necessária
-Decisão do Agente 15 (ou 01A, tenancy): (a) remover `tenancy.rego` por não ser consumido, ou
-(b) conectar de fato o middleware a esse endpoint se o isolamento que ele descreve ainda for uma
-necessidade real não coberta por outro mecanismo. Não decidir isso é manter uma falsa sensação de
-segurança documentada no próprio repositório.
+Opção (a) do handoff original: **remover**. Confirmado em `origin/main`:
 
-## Teste esperado
-Se removido: nenhuma rota muda de comportamento (confirma que realmente não era consultado). Se
-conectado: teste de acesso cruzado entre tenants/marcas deve falhar como a policy descreve.
+- `infrastructure/opa/` inteiro ausente
+- `src/middleware/opa.ts` ausente
+- serviço `opa` ausente de `docker-compose.services.yml`
+- Isolamento e autorização canônicos: Better Auth + `requireRole` +
+  `src/lib/auth/authorization.ts` + RLS PostgreSQL (sem sidecar OPA)
 
-## Contexto adicional
-Detalhado em `docs/architecture/LEGACY_BRAND_CONTENT_MAP.md` §2.4. Relevante também para a Onda C3
-(Agente 01A — Confiabilidade de Dados, RLS e Retenção).
+Handoff arquivado como **superado**. Nenhuma rota muda de comportamento (código já não era
+consumidor).
