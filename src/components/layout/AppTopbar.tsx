@@ -9,6 +9,7 @@ import { useLiveClock } from '../../hooks/useLiveClock.js';
 import { OPEN_COMMAND_PALETTE_EVENT } from '../../lib/paletteIntent.js';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { BirthHubLogo } from '../brand/BirthHubLogo.js';
+import { AppBreadcrumbs } from './AppBreadcrumbs.js';
 import { TAB_META, type TabType } from './tabMeta.js';
 import { SyncIndicator } from './SyncIndicator.js';
 
@@ -120,12 +121,10 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           <Icon className="h-4 w-4 shrink-0 text-[color:var(--el-gold-deep)]" strokeWidth={1.5} />
         </div>
         <div className="flex flex-col leading-none">
-          <span className="text-[10px] uppercase tracking-[0.25em] text-[color:var(--el-ink-3)] font-display">
-            Birth Hub 360°
-          </span>
+          <AppBreadcrumbs className="mb-1 hidden sm:flex" />
           <h1
-            className="truncate font-display text-base text-[color:var(--el-ink)] italic mt-0.5"
-            style={{ fontWeight: 400 }}
+            className="truncate font-display text-base text-[color:var(--el-ink)] mt-0.5"
+            style={{ fontWeight: 600 }}
           >
             {meta.label}
           </h1>
