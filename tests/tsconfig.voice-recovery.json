@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "unit/features/voice-hub-studio-persistence.test.ts",
+    "unit/features/voice-hub-test-simulator.test.tsx",
+    "unit/features/voice-hub-canvas-recovery.test.tsx",
+    "unit/features/voice-hub-availability-gate.test.ts",
+    "../src/features/voice-hub/pages/VoiceStudio.tsx",
+    "../src/lib/studio/ValidationEngine.ts",
+    "../src/vite-env.d.ts"
+  ],
+  "exclude": ["../node_modules", "../dist"]
+}

@@ -38,45 +38,35 @@
 
 ## 2. Color System
 
-### Primary Palette
+### Primary Neon Palette
 ```
-Navy       #0B132B  — Foundation: authority, depth, command
-Gold       #FFBE0B  — Signal: action, value, focus, signature (Coolors Amber Gold)
-Off-White  #F8FAFC  — Clarity: space, readability, contrast
-```
-
-### Coolors Palette (2026 - Vancouver Plus Integration)
-```
-Amber Gold  #FFBE0B  — Primary accent, warnings, highlights
-Blaze Orange #FB5607  — Energy, urgency, call-to-action
-Neon Pink   #FF006E  — AI/Intelligence, critical states, attention
-Blue Violet #8338EC  — Secondary accent, depth, sophistication
-Azure Blue  #3A86FF  — Primary brand color, navigation, active states
+Azul Neon       #00D4FF  — Tecnologia, confiança, inovação. Cor padrão de títulos, bordas e destaque comercial
+Rosa Neon       #FF2D9B  — Energia, criatividade, atitude. Destaques, tags, inteligência e gradientes de botões
+Dourado Neon    #FFC107  — Sofisticação, prosperidade, previsibilidade e métricas
+Preto Neon      #0D0D0D  — Fundo principal da página (Dark Mode), gerando alto contraste
+Branco Neon     #F8F9FF  — Textos corridos de corpo, subtítulos secundários e leitura padrão
+Fundo de Cards  #14141A  — Superfícies e cartões de conteúdo
+Bordas Glow     rgba(0, 212, 255, 0.22) — Bordas com efeito neon sutil
 ```
 
-### Semantic Palette
+### Gradients & Light Tones
 ```
-Intelligence  var(--coolors-purple)  #8338EC  — Data connections, insights
-Execution     var(--ok)              #22C55E  — Success, completion, green states
-Decision      var(--critical)                 — Risk, alerts, attention required
-Signal        var(--coolors-yellow)  #FFBE0B  — Warning, pending, caution
+Gradiente de Títulos:    linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%)
+Gradiente de Ação (CTA): linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%)
+Tons Light:              Rosa claro (#E6007A), Azul claro (#0284C7), Dourado/Âmbar (#D97706)
 ```
 
-### Usage Rules
-- Navy appears on: sidebar, header, navy-themed sections
-- Gold appears on: primary CTAs, active states, key metrics, 1-3 accents per screen max
-- Semantic colors appear on: status indicators, badges, alerts — never decoratively
-- Surface system: bg → surface → surface-elevated (3 levels of depth)
+### Mandatory Title Rule
+> **Regra Mandatória do Design:** Todos os títulos (`h1` ao `h6`) devem usar as cores neon (`#00D4FF`, `#FF2D9B` ou `#FFC107`) ou gradientes oficiais, **nunca branco ou preto**.
 
 ## 3. Typography System
 
 ### Font Roles
 | Role | Font | Usage |
 |------|------|-------|
-| Display | Sora | Hero headlines, page titles, section names |
-| UI/Body | IBM Plex Mono | Body text, labels, navigation, tables, forms |
-| Data | IBM Plex Mono | Numbers, KPIs, metrics — tabular figures |
-| Brand Serif | Playfair Display | Special editorial moments only |
+| Primary & Titles | Plus Jakarta Sans | Corpo e títulos: H1–H6, parágrafos, formulários, botões (400, 500, 600, 700, 800) |
+| Display (Alternativa) | Sora | Display, heros institucionais e botões especiais |
+| Data & Code | JetBrains Mono | Badges técnicos, KPIs, contadores, tags numéricas e pilares (500, 700) |
 
 ### Scale
 | Token | Size | Line Height | Font | Usage |

@@ -48,7 +48,7 @@ FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3024
 
 # Dependências de SO para a aplicação, Prisma e Chromium/Playwright headless (Crawlee/scraping)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -104,10 +104,10 @@ RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs nodejs \
     && chown -R nodejs:nodejs /app
 USER nodejs
 
-EXPOSE 3000
+EXPOSE 3024
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000/health/live').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+    CMD node -e "fetch('http://127.0.0.1:${PORT:-3024}/health/live').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
 # `prisma migrate deploy` roda a cada boot do container, antes do processo Node começar a
 # aceitar tráfego — mesma garantia que render.yaml já tem no startCommand real

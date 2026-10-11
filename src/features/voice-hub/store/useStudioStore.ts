@@ -8,19 +8,18 @@ import type {
 } from '../lib/studio/types.js';
 import { validationEngine } from '../../../lib/studio/ValidationEngine.js';
 import { addEdge } from '@xyflow/react';
-import { logger } from '../../../lib/logger.js';
+import { clientLogger as logger } from '../../../lib/clientLogger.js';
 import { nodeRegistry } from './nodeRegistry.js';
 import { initialNodes, initialEdges } from './initialData.js';
-import type {
-  NodeLifecycleState,
-  NodeRegistryItem,
-  SimulationLog,
-  StudioState,
-} from './studioTypes.js';
+import { createWorkflowPersistenceActions } from './workflowPersistence.js';
+export { workflowGraphSnapshot } from './workflowPersistence.js';
+import type { NodeLifecycleState, StudioState } from './studioTypes.js';
 
 // Re-exports for backwards compatibility
 export { nodeRegistry };
-export type { NodeLifecycleState, NodeRegistryItem, SimulationLog, StudioState };
+export type { NodeLifecycleState, NodeRegistryItem, SimulationLog, StudioState } from './studioTypes.js';
+
+let workflowEpoch = 0;
 
 let simulationInterval: ReturnType<typeof setInterval> | null = null;
 export const useStudioStore = create<StudioState>((set, get) => ({
@@ -183,6 +182,48 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   publishIssues: [],
 
   workflowId: null,
+  workflowContext: null,
+  loadState: 'loading',
+  saveState: 'idle',
+  savedGraph: null,
+  setWorkflowContext: (context) => {
+    workflowEpoch += 1;
+    get().stopSimulation();
+    set({
+      workflowContext: context,
+      nodes: [],
+      edges: [],
+      workflowId: null,
+      past: [],
+      future: [],
+      clipboard: null,
+      selectedNodeId: null,
+      nodeLifecycles: {},
+      templates: [],
+      favorites: [],
+      searchQuery: '',
+      activeCategory: 'all',
+      simulationVariables: {},
+      simulationLogs: [],
+      activeSimulationNodeId: null,
+      isDebugging: false,
+      simulationStepIndex: -1,
+      isSimulationPaused: false,
+      loadState: 'loading',
+      saveState: 'idle',
+      savedGraph: null,
+      publishState: 'idle',
+      publishIssues: [],
+      isVersionHistoryOpen: false,
+      workflowVersions: [],
+      versionHistoryState: 'idle',
+      versionHistoryError: null,
+      rollbackState: 'idle',
+      rollbackIssues: [],
+      rollbackError: null,
+      rollbackTargetVersion: null,
+    });
+  },
 
   isVersionHistoryOpen: false,
   workflowVersions: [],
@@ -222,11 +263,6 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         label: `${regItem.label} ${get().nodes.filter((n) => n.type === type).length + 1}`,
         category: regItem.category,
         config: { ...regItem.defaultConfig },
-        metrics: {
-          invocations: 0,
-          errorRate: 0,
-          latencyMs: 15,
-        },
       },
     };
 
@@ -417,6 +453,14 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       return;
     }
 
+    if (!validationEngine.validate(startNodes, get().edges).isValid) {
+      get().addSimulationLog({
+        type: 'error',
+        message: 'Simulação bloqueada: o fluxo não possui validação disponível e aprovada.',
+      });
+      return;
+    }
+
     set({
       isDebugging: true,
       simulationStepIndex: 0,
@@ -457,7 +501,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       // forbids — surface the real error and halt instead.
       const { issues: liveIssues } = validationEngine.validate(nodes, edges);
       const blockingIssues = liveIssues.filter(
-        (i) => i.nodeId === currentNode.id && i.type === 'error',
+        (i) => (!i.nodeId || i.nodeId === currentNode.id) && i.type === 'error',
       );
       if (blockingIssues.length > 0) {
         get().setNodeLifecycle(currentNode.id, 'Failed');
@@ -656,7 +700,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     // that ValidationEngine flags as an error, and don't silently mark it "Completed".
     const { issues: liveIssues } = validationEngine.validate(nodes, edges);
     const blockingIssues = liveIssues.filter(
-      (i) => i.nodeId === currentNode.id && i.type === 'error',
+      (i) => (!i.nodeId || i.nodeId === currentNode.id) && i.type === 'error',
     );
     if (blockingIssues.length > 0) {
       get().setNodeLifecycle(currentNode.id, 'Failed');
@@ -731,6 +775,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
   // AI Flow Refactoring and Generation
   applyAiRefactor: async (mode) => {
+    const epoch = workflowEpoch;
     get().addSimulationLog({
       type: 'event',
       message: `Enviando fluxo ativo para a Catarina AI para refatoração real (modo: ${mode})...`,
@@ -748,6 +793,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       }
 
       const data = await response.json();
+      if (epoch !== workflowEpoch) return;
       if (data?.nodes) {
         set({ nodes: data.nodes });
         get().addSimulationLog({
@@ -756,6 +802,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         });
       }
     } catch (err: unknown) {
+      if (epoch !== workflowEpoch) return;
       logger.error({ err }, 'Error applying AI refactor to workflow');
       const errMessage = err instanceof Error ? err.message : String(err);
       get().addSimulationLog({
@@ -806,6 +853,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
 
   generateWorkflowFromPrompt: async (prompt) => {
+    const epoch = workflowEpoch;
     get().addSimulationLog({
       type: 'event',
       message: `Catarina AI está processando o prompt natural com Gemini real: "${prompt}"...`,
@@ -823,6 +871,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       }
 
       const data = await response.json();
+      if (epoch !== workflowEpoch) return;
       if (data?.nodes && data.edges) {
         const lifecycles: Record<string, NodeLifecycleState> = {};
         data.nodes.forEach((n: { id: string }) => {
@@ -843,6 +892,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         });
       }
     } catch (err: unknown) {
+      if (epoch !== workflowEpoch) return;
       logger.error({ err }, 'Error generating workflow from prompt');
       const errMessage = err instanceof Error ? err.message : String(err);
       get().addSimulationLog({
@@ -851,56 +901,9 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       });
     }
   },
-  loadWorkflowFromServer: async () => {
-    try {
-      const res = await fetch('/api/workflow');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.workflow) {
-          const lifecycles: Record<string, NodeLifecycleState> = {};
-          data.workflow.nodes.forEach((n: { id: string }) => {
-            lifecycles[n.id] = 'Ready';
-          });
-          set({
-            nodes: data.workflow.nodes,
-            edges: data.workflow.edges,
-            nodeLifecycles: lifecycles,
-            workflowId: data.workflow.id ?? null,
-          });
-          get().addSimulationLog({
-            type: 'success',
-            message: 'Fluxo carregado com sucesso do banco de dados do servidor!',
-          });
-        }
-      }
-    } catch (err: any) {
-      logger.error({ err }, 'Error loading workflow from server');
-    }
-  },
-  saveWorkflowToServer: async () => {
-    try {
-      const { nodes, edges } = get();
-      const res = await fetch('/api/workflow', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nodes, edges, name: 'Voice Agent Flow' }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (data.workflow?.id) {
-        set({ workflowId: data.workflow.id });
-      }
-      get().addSimulationLog({
-        type: 'info',
-        message: 'Progresso do Canvas salvo de forma segura e persistente no banco de dados.',
-      });
-    } catch (err: any) {
-      logger.error({ err }, 'Error saving workflow to server');
-    }
-  },
-
+  ...createWorkflowPersistenceActions(get, set, () => workflowEpoch),
   publishWorkflowToServer: async () => {
+    const epoch = workflowEpoch;
     const { nodes, edges } = get();
 
     // Fast local pre-check so an obviously-broken flow doesn't even round-trip: purely a UX
@@ -918,8 +921,9 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
     set({ publishState: 'publishing' });
     try {
-      const res = await fetch('/api/workflow/publish', { method: 'POST' });
+      const res = await fetch('/api/voice-hub/workflow/publish', { method: 'POST' });
       const data = await res.json().catch(() => ({}));
+      if (epoch !== workflowEpoch) return;
 
       if (res.ok) {
         set({
@@ -948,6 +952,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         message: `Falha ao publicar: ${data.error || res.statusText || 'erro desconhecido no servidor'}`,
       });
     } catch (err: any) {
+      if (epoch !== workflowEpoch) return;
       logger.error({ err }, 'Error publishing workflow to server');
       set({ publishState: 'error', publishIssues: [] });
       get().addSimulationLog({
@@ -976,6 +981,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
 
   fetchWorkflowVersions: async () => {
+    const epoch = workflowEpoch;
     const { workflowId } = get();
     if (!workflowId) {
       // Nothing has round-tripped through the server yet (or nothing has ever been published) —
@@ -986,8 +992,9 @@ export const useStudioStore = create<StudioState>((set, get) => ({
 
     set({ versionHistoryState: 'loading', versionHistoryError: null });
     try {
-      const res = await fetch(`/api/workflow/${workflowId}/versions`);
+      const res = await fetch(`/api/voice-hub/workflow/${workflowId}/versions`);
       const data = await res.json().catch(() => ({}));
+      if (epoch !== workflowEpoch) return;
 
       if (!res.ok) {
         set({
@@ -1002,6 +1009,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       const versions: WorkflowVersionSummary[] = Array.isArray(data.versions) ? data.versions : [];
       set({ versionHistoryState: 'idle', workflowVersions: versions, versionHistoryError: null });
     } catch (err: any) {
+      if (epoch !== workflowEpoch) return;
       logger.error({ err }, 'Error fetching workflow version history');
       set({
         versionHistoryState: 'error',
@@ -1012,6 +1020,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
 
   rollbackWorkflowToVersion: async (version: number) => {
+    const epoch = workflowEpoch;
     const { workflowId } = get();
     if (!workflowId) return;
 
@@ -1023,10 +1032,14 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     });
 
     try {
-      const res = await fetch(`/api/workflow/${workflowId}/versions/${version}/rollback`, {
-        method: 'POST',
-      });
+      const res = await fetch(
+        `/api/voice-hub/workflow/${workflowId}/versions/${version}/rollback`,
+        {
+          method: 'POST',
+        },
+      );
       const data = await res.json().catch(() => ({}));
+      if (epoch !== workflowEpoch) return;
 
       if (res.ok && data.workflow) {
         const lifecycles: Record<string, NodeLifecycleState> = {};
@@ -1067,6 +1080,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
         message: `Falha ao restaurar versão ${version}: ${data.error || res.statusText || 'erro desconhecido no servidor'}`,
       });
     } catch (err: any) {
+      if (epoch !== workflowEpoch) return;
       logger.error({ err }, 'Error rolling back workflow version');
       set({
         rollbackState: 'error',

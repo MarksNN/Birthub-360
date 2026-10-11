@@ -3,20 +3,11 @@ import type {
   StudioEdge,
   ValidationIssue,
   WorkflowVersionSummary,
+  NodeLifecycleState,
 } from '../lib/studio/types.js';
 import type { Connection } from '@xyflow/react';
 
-export type NodeLifecycleState =
-  | 'Created'
-  | 'Initialized'
-  | 'Configured'
-  | 'Validated'
-  | 'Ready'
-  | 'Executing'
-  | 'Completed'
-  | 'Failed'
-  | 'Retry'
-  | 'Archived';
+export type { NodeLifecycleState } from '../lib/studio/types.js';
 
 export interface NodeRegistryItem {
   type: string;
@@ -100,6 +91,7 @@ export interface StudioState {
   addSimulationLog: (log: Omit<SimulationLog, 'timestamp'>) => void;
   clearSimulationLogs: () => void;
   updateSimulationVariable: (key: string, value: unknown) => void;
+  deleteSimulationVariable: (key: string) => void;
   startSimulation: () => void;
   stopSimulation: () => void;
   pauseSimulation: () => void;
@@ -108,13 +100,20 @@ export interface StudioState {
   stepSimulationBackward: () => void;
 
   // AI Generation & Refactoring
-  applyAiRefactor: (mode: 'moreHuman' | 'reduceCost' | 'simplify') => Promise<void>;
+  applyAiRefactor: (
+    mode: 'moreHuman' | 'reduceCost' | 'simplify' | 'reduceLatency',
+  ) => Promise<void>;
   generateWorkflowFromPrompt: (prompt: string) => Promise<void>;
 
   // Server state & publishing
   workflowId: string | null;
-  loadWorkflowFromServer: () => Promise<void>;
-  saveWorkflowToServer: () => Promise<void>;
+  workflowContext: string | null;
+  loadState: 'loading' | 'ready' | 'error';
+  saveState: 'idle' | 'saving' | 'saved' | 'error';
+  savedGraph: string | null;
+  setWorkflowContext: (context: string | null) => void;
+  loadWorkflowFromServer: (signal?: AbortSignal) => Promise<boolean>;
+  saveWorkflowToServer: (signal?: AbortSignal) => Promise<boolean>;
 
   publishState: 'idle' | 'publishing' | 'success' | 'error';
   publishIssues: ValidationIssue[];

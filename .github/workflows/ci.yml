@@ -108,6 +108,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       redis:
         image: redis:7-alpine
@@ -118,6 +121,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       meilisearch:
         image: getmeili/meilisearch:v1.12
@@ -131,6 +137,9 @@ jobs:
           --health-timeout 5s
           --health-start-period 30s
           --health-retries 12
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     env:
       NODE_ENV: test
@@ -360,6 +369,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       redis:
         image: redis:7-alpine
@@ -370,6 +382,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       meilisearch:
         image: getmeili/meilisearch:v1.12
@@ -382,6 +397,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     env:
       NODE_ENV: test

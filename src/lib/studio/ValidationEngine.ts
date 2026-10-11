@@ -11,10 +11,16 @@ export interface ValidationResult {
 }
 
 export const validationEngine = {
-  validate: (_nodes: any[], _edges: any[]): ValidationResult => {
+  validate: (_nodes: unknown[], _edges: unknown[]): ValidationResult => {
     return {
-      isValid: true,
-      issues: [],
+      isValid: false,
+      issues: [
+        {
+          id: 'validation-unavailable',
+          type: 'error',
+          message: 'Validação de fluxos indisponível. Publicação e execução bloqueadas.',
+        },
+      ],
     };
   },
 };
