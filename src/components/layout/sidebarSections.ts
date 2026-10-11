@@ -97,7 +97,7 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           ? [
               {
                 id: 'copilot',
-                label: 'Copilot',
+                label: 'Copiloto IA',
                 icon: TAB_META.copiloto_ia.icon,
                 primaryTab: 'copiloto_ia' as TabType,
               },
