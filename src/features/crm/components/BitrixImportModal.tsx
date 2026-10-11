@@ -162,7 +162,12 @@ export function BitrixImportModal({ isOpen, onClose, onImportSuccess }: BitrixIm
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative bg-surface border border-line rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-brand/50 before:to-transparent before:z-20">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bitrix-import-modal-title"
+        className="relative bg-surface border border-line rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-brand/50 before:to-transparent before:z-20"
+      >
         {/* Header do Modal */}
         <div className="p-6 border-b border-line flex items-center justify-between bg-surface-2/60">
           <div className="flex items-center gap-3">
@@ -170,7 +175,9 @@ export function BitrixImportModal({ isOpen, onClose, onImportSuccess }: BitrixIm
               <Download className="w-6 h-6 rotate-180" />
             </div>
             <div>
-              <h3 className="font-extrabold text-lg text-ink">Receber do Bitrix24</h3>
+              <h3 id="bitrix-import-modal-title" className="font-extrabold text-lg text-ink">
+                Receber do Bitrix24
+              </h3>
               <p className="text-xs text-ink-2">
                 Selecione os leads ou negócios do portal Bitrix para importar sob demanda para o CRM
               </p>
@@ -179,7 +186,8 @@ export function BitrixImportModal({ isOpen, onClose, onImportSuccess }: BitrixIm
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors"
+            aria-label="Fechar modal de importação Bitrix24"
+            className="p-2 rounded-xl text-ink-2 hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="w-5 h-5" />
           </button>
@@ -455,7 +463,7 @@ export function BitrixImportModal({ isOpen, onClose, onImportSuccess }: BitrixIm
             type="button"
             onClick={handleQuickSyncRecent}
             disabled={importing}
-            className="text-xs font-bold text-ink-2 hover:text-brand transition-colors flex items-center gap-1.5"
+            className="text-xs font-bold text-ink-2 hover:text-brand transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
           >
             {importing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -469,7 +477,7 @@ export function BitrixImportModal({ isOpen, onClose, onImportSuccess }: BitrixIm
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-line bg-surface hover:bg-surface-2 text-xs font-bold text-ink transition-colors w-full sm:w-auto"
+              className="px-4 py-2.5 rounded-xl border border-line bg-surface hover:bg-surface-2 text-xs font-bold text-ink transition-colors w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Cancelar
             </button>
@@ -477,7 +485,7 @@ export function BitrixImportModal({ isOpen, onClose, onImportSuccess }: BitrixIm
               type="button"
               onClick={handleImportSelected}
               disabled={importing || selectedIds.size === 0}
-              className="relative overflow-hidden px-5 py-2.5 bg-brand text-on-brand hover:brightness-110 active:scale-95 rounded-xl text-xs font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm hover:shadow-glow-brand w-full sm:w-auto cursor-pointer"
+              className="relative overflow-hidden px-5 py-2.5 bg-brand text-on-brand hover:brightness-110 active:scale-95 rounded-xl text-xs font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm hover:shadow-glow-brand w-full sm:w-auto cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-1000 pointer-events-none"
