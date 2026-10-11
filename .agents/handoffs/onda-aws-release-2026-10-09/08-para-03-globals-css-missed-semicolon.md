@@ -33,7 +33,7 @@ Corrigir o CSS inválido (semicolon ausente / sintaxe pós-processada quebrada) 
 ## Resolução
 **Status:** resolvido por Agente 03 (2026-10-10).
 
-**Causa raiz:** não era `globals.css`. O Tailwind gerava CSS inválido a partir de `grid-cols-[10px_1fr:auto]` → `grid-template-columns: 10px 1fr:auto;` (postcss Missed semicolon). Fontes:
+**Causa raiz:** não era `globals.css`. O Tailwind gerava CSS inválido a partir de classe malformada grid-cols com dois pontos no lugar de underline (postcss Missed semicolon). Fontes:
 1. `ChannelDonut.tsx` no #689
 2. exemplo no handoff `.md` (scan de Markdown do Tailwind v4)
 

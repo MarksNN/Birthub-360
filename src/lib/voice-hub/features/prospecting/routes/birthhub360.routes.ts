@@ -233,7 +233,7 @@ router.post('/webhooks/bland/:token', validateBlandCallbackToken, async (req, re
   });
 
   try {
-    const response = await fetch(`${atlasBaseUrl.replace(/\/$/, '')}/api/webhooks/voice-result`, {
+    const response = await fetch(`${birthhubBaseUrl.replace(/\/$/, '')}/api/webhooks/voice-result`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

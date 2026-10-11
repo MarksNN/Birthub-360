@@ -66,7 +66,7 @@ describe('extractText — fixtures reais (sem mock de parser)', () => {
 
   it('extrai texto real de tests/fixtures/knowledge/sample.docx via mammoth de verdade', async () => {
     const result = await extractText('sample.docx', fixtureBase64('sample.docx'));
-    // Fixture contém marca antiga "Atlas TotalTrac" - atualizado para Birth Hub 360
+    // Fixture atualizada para Birthub 360
     expect(result).toContain('Fixture de teste - Base de Conhecimento Birth Hub 360.');
     expect(result).toContain('CPI DEC-10 opcao A');
   });

@@ -1,4 +1,4 @@
-# Guia de Governança de Banco de Dados e Concorrência — BirthHub 360 / AtlasGR
+# Guia de Governança de Banco de Dados e Concorrência — Birthub 360
 
 ## 1. Contexto e Objetivos
 

@@ -369,7 +369,7 @@ function createHeader(title) {
         </div>
         <div class="meta-item">
           <span class="meta-label">Repository</span>
-          <span class="meta-value">AtlasGR</span>
+          <span class="meta-value">Birthub 360</span>
         </div>
       </div>
     </div>
@@ -384,7 +384,7 @@ function generateIndex() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Repository Intelligence Hub | AtlasGR</title>
+      <title>Repository Intelligence Hub | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -393,12 +393,12 @@ function generateIndex() {
         <div class="main-content">
           <div class="header">
             <h1>Repository Intelligence Hub</h1>
-            <p class="text-muted">Autonomous Technical Documentation Portal for AtlasGR</p>
+            <p class="text-muted">Autonomous Technical Documentation Portal for Birthub 360</p>
 
             <div class="meta-info mt-8">
               <div class="meta-item">
                 <span class="meta-label">Project Name</span>
-                <span class="meta-value">AtlasGR - Commercial Intelligence OS</span>
+                <span class="meta-value">Birthub 360 - Commercial Intelligence OS</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">Branch</span>
@@ -501,7 +501,7 @@ function generatePRD() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>01 - PRD | Product Requirements Document | AtlasGR</title>
+      <title>01 - PRD | Product Requirements Document | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -511,7 +511,7 @@ function generatePRD() {
           ${createHeader('PRODUCT REQUIREMENTS DOCUMENT (PRD)')}
 
           <h2>1. Product Overview</h2>
-          <p><strong>Name:</strong> AtlasGR</p>
+          <p><strong>Name:</strong> Birthub 360</p>
           <p><strong>Description:</strong> Commercial Intelligence OS & B2B Prospector. A comprehensive platform integrating CRM, AI-driven prospecting (SDR voice & email), lead enrichment, and autonomous workflow orchestration.</p>
 
           <h2>2. Target Audience & Personas</h2>
@@ -617,7 +617,7 @@ function generateChangelog() {
 ## [Auto-Generated] - ${gitInfo.date}
 ### Commit: ${gitInfo.commit} (${gitInfo.branch})
 
-* Initial generation of Repository Intelligence documentation for AtlasGR.
+* Initial generation of Repository Intelligence documentation for Birthub 360.
 * Created \`00-INDEX.html\` with project analytics and navigation.
 * Created \`01-PRD.html\` detailing product features, CRM, Copilot, Voice SDR, and Encrichment Engine.
 * Generated baseline for TRD, App Flow, UI/UX, Backend Schema, and Implementation Plan.
@@ -640,7 +640,7 @@ function generateTRD() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>02 - TRD | Technical Requirements Document | AtlasGR</title>
+      <title>02 - TRD | Technical Requirements Document | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -650,7 +650,7 @@ function generateTRD() {
           ${createHeader('TECHNICAL REQUIREMENTS DOCUMENT (TRD)')}
 
           <h2>1. Architecture Overview</h2>
-          <p>The AtlasGR architecture strictly follows Clean Architecture separation principles (Presentation, Application, Domain, Infrastructure, Shared, Core, Config, Tests).</p>
+          <p>The Birthub 360 architecture strictly follows Clean Architecture separation principles (Presentation, Application, Domain, Infrastructure, Shared, Core, Config, Tests).</p>
 
           <pre>
 USER (Browser / Client)
@@ -797,7 +797,7 @@ function generateBackendSchema() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>05 - BACKEND SCHEMA | Database & APIs | AtlasGR</title>
+      <title>05 - BACKEND SCHEMA | Database & APIs | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -884,7 +884,7 @@ function generateAppFlow() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>03 - APP FLOW | Application Flow & User Journey | AtlasGR</title>
+      <title>03 - APP FLOW | Application Flow & User Journey | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -974,7 +974,7 @@ function generateUIUX() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>04 - UI/UX DESIGN | Design System & Interface Analysis | AtlasGR</title>
+      <title>04 - UI/UX DESIGN | Design System & Interface Analysis | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -984,7 +984,7 @@ function generateUIUX() {
           ${createHeader('UI/UX DESIGN SYSTEM & INTERFACE ANALYSIS')}
 
           <h2>1. Design System Overview</h2>
-          <p>The AtlasGR interface is built using <strong>React</strong>, <strong>Tailwind CSS</strong>, and <strong>shadcn/ui</strong>. It emphasizes a clean, enterprise-grade data-dense design optimized for B2B operations.</p>
+          <p>The Birthub 360 interface is built using <strong>React</strong>, <strong>Tailwind CSS</strong>, and <strong>shadcn/ui</strong>. It emphasizes a clean, enterprise-grade data-dense design optimized for B2B operations.</p>
 
           <h2>2. Core Technologies</h2>
           <table>
@@ -1053,7 +1053,7 @@ function generateImplementationPlan() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>06 - IMPLEMENTATION PLAN | Actionable Roadmap | AtlasGR</title>
+      <title>06 - IMPLEMENTATION PLAN | Actionable Roadmap | Birthub 360</title>
       ${style}
     </head>
     <body>
@@ -1063,7 +1063,7 @@ function generateImplementationPlan() {
           ${createHeader('IMPLEMENTATION PLAN')}
 
           <h2>Execution Strategy</h2>
-          <p>This plan addresses the technical debt, feature gaps, and architectural evolution required for AtlasGR. All new development must follow the sequence: 1. Audit 2. Verify 3. Refactor 4. Integrate Open Source 5. Code 6. Test 7. Document.</p>
+          <p>This plan addresses the technical debt, feature gaps, and architectural evolution required for Birthub 360. All new development must follow the sequence: 1. Audit 2. Verify 3. Refactor 4. Integrate Open Source 5. Code 6. Test 7. Document.</p>
 
           <h2>Phase 1: TECHNICAL DEBT & CLEANUP</h2>
           <table>

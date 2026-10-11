@@ -1,7 +1,7 @@
 - De: 15
 - Para: 00 e 24
 - Onda: audit-ach
-- Status: aberto (aguardando auditoria 24)
+- Status: resolvido (PR #710 integrado em main @ 777db889)
 - Prioridade: normal
 
 ## Missão 15 — verificação pós-remoção OPA
@@ -34,3 +34,8 @@ continua sendo a única camada de RBAC nas rotas) e aprovar/bloquear merge confo
 
 Nenhuma alteração em `server.ts` necessária. 01 foi notificado; se tiverem achado residual em
 outro worktree, consolidar neste PR ou follow-up.
+
+## Resolução (Agente 15 — 2026-10-11)
+- Remoção do OPA confirmada e auditada pelo Agente 24.
+- PR #710 integrado à `main` no commit `777db889`. RBAC nativo preservado.
+

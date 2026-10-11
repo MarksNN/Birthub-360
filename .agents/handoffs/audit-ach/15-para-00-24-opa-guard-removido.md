@@ -1,7 +1,7 @@
 - De: 15
 - Para: 00 e 24
 - Onda: audit-ach
-- Status: aberto (aguardando auditoria 24)
+- Status: resolvido (PR #711 integrado em main @ 17adfd97)
 - Prioridade: P3
 
 ## Follow-up P3 (pós aprovação 15-remove-opa)
@@ -23,3 +23,8 @@ Coordenador 00: 24 aprovou docs OPA; follow-up P3 — `opaGuard.ts` residual nã
 ## Pedido ao 24
 
 Auditar remoção; confirmar zero regressão de autorização.
+
+## Resolução (Agente 15 — 2026-10-11)
+- Código residual `opaGuard.ts` e testes unitários associados removidos com sucesso.
+- PR #711 integrado à `main` no commit `17adfd97`. RBAC nativo intacto via `requireRole` e `authorization.ts`.
+

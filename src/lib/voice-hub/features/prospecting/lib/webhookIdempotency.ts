@@ -43,7 +43,8 @@ export function __setIdempotencyClientForTests(client: Redis | null): void {
   redisClient = client;
 }
 
-export const ATLASGR_OUTBOUND_IDEMPOTENCY_PREFIX = 'idempotency:birthhub360-outbound-call:';
+export const BIRTHHUB360_OUTBOUND_IDEMPOTENCY_PREFIX = 'idempotency:birthhub360-outbound-call:';
+export const ATLASGR_OUTBOUND_IDEMPOTENCY_PREFIX = BIRTHHUB360_OUTBOUND_IDEMPOTENCY_PREFIX;
 export const BLAND_CALLBACK_IDEMPOTENCY_PREFIX = 'idempotency:bland-call-result:';
 
 /** Default dedup window: long enough to absorb realistic webhook-retry storms (most providers give
@@ -51,7 +52,9 @@ export const BLAND_CALLBACK_IDEMPOTENCY_PREFIX = 'idempotency:bland-call-result:
  * later isn't silently dropped forever. Configurable because "realistic" depends on Birth Hub 360's own
  * retry policy, which this repo doesn't control. */
 export const DEFAULT_IDEMPOTENCY_TTL_SECONDS = Number(
-  process.env.ATLASGR_WEBHOOK_IDEMPOTENCY_TTL_SECONDS ?? 24 * 60 * 60,
+  process.env.BIRTHHUB360_WEBHOOK_IDEMPOTENCY_TTL_SECONDS ??
+    process.env.ATLASGR_WEBHOOK_IDEMPOTENCY_TTL_SECONDS ??
+    24 * 60 * 60,
 );
 
 const CALLBACK_PROCESSING_TTL_SECONDS = 60;
@@ -69,13 +72,9 @@ export function buildBirthhub360OutboundIdempotencyKey(payload: {
   phoneNumber: string;
   name: string;
   company: string;
-  leadId?: string;
-  phoneNumber: string;
-  name: string;
-  company: string;
 }): string {
   if (payload.leadId) {
-    return `${ATLASGR_OUTBOUND_IDEMPOTENCY_PREFIX}lead:${payload.leadId}`;
+    return `${BIRTHHUB360_OUTBOUND_IDEMPOTENCY_PREFIX}lead:${payload.leadId}`;
   }
   const normalized = [
     payload.phoneNumber.replace(/\D/g, ''),
@@ -83,7 +82,7 @@ export function buildBirthhub360OutboundIdempotencyKey(payload: {
     payload.company.trim().toLowerCase(),
   ].join('|');
   const hash = createHash('sha256').update(normalized).digest('hex');
-  return `${ATLASGR_OUTBOUND_IDEMPOTENCY_PREFIX}hash:${hash}`;
+  return `${BIRTHHUB360_OUTBOUND_IDEMPOTENCY_PREFIX}hash:${hash}`;
 }
 
 /** Bland callbacks carry a provider-generated immutable call id, which is the ideal dedup key. */

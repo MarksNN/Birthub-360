@@ -48,6 +48,7 @@ function buildApp() {
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.BIRTHHUB360_WEBHOOK_SECRET = SECRET;
+  process.env.BIRTHHUB360_BASE_URL = 'https://birthhub360.example.com';
   process.env.ATLASGR_BASE_URL = 'https://birthhub360.example.com';
   process.env.BLAND_WEBHOOK_TOKEN = 'callback-token';
   mockBeginCallback.mockResolvedValue('acquired');
@@ -168,6 +169,7 @@ describe('POST /api/webhooks/bland/:token', () => {
   });
 
   it('fails closed when the Birth Hub 360 forwarding destination is missing', async () => {
+    delete process.env.BIRTHHUB360_BASE_URL;
     delete process.env.ATLASGR_BASE_URL;
     const app = buildApp();
     const res = await request(app)
