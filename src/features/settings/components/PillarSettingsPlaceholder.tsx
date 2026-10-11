@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Settings,
   Shield,
@@ -8,18 +8,12 @@ import {
   Sliders,
   Database,
   BrainCircuit,
-  CheckCircle2,
-  Clock,
   Phone,
-  MessageSquare,
   Building2,
   Target,
   LineChart,
   Workflow,
-  Cpu,
-  RefreshCw,
   AlertCircle,
-  Check,
 } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
@@ -41,7 +35,6 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
   const [activeTab, setActiveTab] = useState<
     'ferramentas' | 'permissoes' | 'automacoes' | 'integracoes'
   >('ferramentas');
-  const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   // Estados locais interativos para as ferramentas
   const [hubStagnationDays, setHubStagnationDays] = useState(14);
@@ -76,10 +69,12 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
   const [engRecordCalls, setEngRecordCalls] = useState(true);
   const [engWorkingHoursOnly, setEngWorkingHoursOnly] = useState(true);
 
-  const handleSave = () => {
-    setSaveStatus('Configurações salvas com sucesso!');
-    setTimeout(() => setSaveStatus(null), 3000);
-  };
+  // P0 #693 (Agente 02): não existe API de persistência para configurações por pilar.
+  // Antes, "Salvar" exibia "Configurações salvas com sucesso!" sem gravar nada (sucesso falso).
+  // Agora o botão fica desabilitado e a tela avisa que é só pré-visualização.
+  // Não inventar API `pillar.*` aqui — quando houver contrato real (Agente 01), plugar o save.
+  const SAVE_UNAVAILABLE_MSG =
+    'Salvar indisponível: estas configurações ainda não são gravadas no servidor.';
 
   const tabs = [
     { id: 'ferramentas' as const, label: 'Ferramentas & Regras', icon: Sliders },
@@ -710,13 +705,18 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
         icon={Settings}
         actions={
           <div className="flex items-center gap-2">
-            {saveStatus && (
-              <span className="text-xs font-semibold text-[var(--nav-c-green)] flex items-center gap-1 animate-fade-in">
-                <Check className="w-3.5 h-3.5" /> {saveStatus}
-              </span>
-            )}
-            <Button variant="default" size="sm" onClick={handleSave}>
-              <Save className="w-4 h-4 mr-2" /> Salvar Alterações
+            <span className="text-xs font-semibold text-[var(--ink-3)] hidden md:inline">
+              Em breve
+            </span>
+            <Button
+              variant="default"
+              size="sm"
+              disabled
+              aria-disabled="true"
+              title={SAVE_UNAVAILABLE_MSG}
+              aria-label={SAVE_UNAVAILABLE_MSG}
+            >
+              <Save className="w-4 h-4 mr-2" /> Salvar indisponível
             </Button>
           </div>
         }
@@ -754,9 +754,9 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
             <span className="text-xs font-semibold text-[var(--ink)] block mb-1">
               Status do Pilar
             </span>
-            <div className="flex items-center gap-1.5 text-xs text-[var(--nav-c-green)] font-medium">
-              <span className="w-2 h-2 rounded-full bg-[var(--nav-c-green)] animate-pulse" />
-              100% Operacional
+            <div className="flex items-center gap-1.5 text-xs text-[var(--ink-2)] font-medium">
+              <span className="w-2 h-2 rounded-full bg-[var(--ink-3)]" />
+              Configuração não persistida
             </div>
           </div>
         </div>
@@ -769,11 +769,8 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
                 <Badge variant="outline" className="text-xs font-semibold">
                   {pillarName}
                 </Badge>
-                <Badge
-                  variant="default"
-                  className="bg-[var(--nav-c-green)]/10 text-[var(--nav-c-green)] text-xs"
-                >
-                  Ativo no Ambiente
+                <Badge variant="outline" className="text-xs">
+                  Pré-visualização
                 </Badge>
               </div>
               <h2 className="text-2xl font-bold">{tabs.find((t) => t.id === activeTab)?.label}</h2>
@@ -781,6 +778,24 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
                 Gerencie regras operacionais, governança e conectores exclusivos do{' '}
                 <strong>{pillarName}</strong>.
               </p>
+            </div>
+
+            <div
+              role="note"
+              className="flex gap-3 p-4 rounded-xl border border-[var(--nav-c-gold)]/30 bg-[var(--nav-c-gold)]/5"
+            >
+              <AlertCircle
+                className="w-5 h-5 shrink-0 mt-0.5 text-[var(--nav-c-gold)]"
+                aria-hidden="true"
+              />
+              <div className="text-sm">
+                <p className="font-semibold text-[var(--ink)]">Pré-visualização — nada é salvo</p>
+                <p className="text-xs text-[var(--ink-2)] mt-1">
+                  Os valores abaixo são padrões ilustrativos. Alterações feitas aqui{' '}
+                  <strong>não são gravadas</strong> e se perdem ao sair da tela. Salvar estará
+                  disponível quando a API de configurações do pilar existir.
+                </p>
+              </div>
             </div>
 
             {/* Render Tab Contents */}
@@ -916,18 +931,15 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
                   {[
                     {
                       name: 'Banco de Dados Principal (PostgreSQL / Prisma)',
-                      status: 'Conectado',
-                      latency: '4ms',
+                      status: 'Não monitorado aqui',
                     },
                     {
                       name: 'Fila de Mensageria (Redis / BullMQ)',
-                      status: 'Operacional',
-                      latency: '2ms',
+                      status: 'Não monitorado aqui',
                     },
                     {
                       name: 'Gateway de Telemetria e Logs (OpenTelemetry)',
-                      status: 'Ativo',
-                      latency: '12ms',
+                      status: 'Não monitorado aqui',
                     },
                   ].map((conn) => (
                     <div
@@ -935,18 +947,15 @@ export function PillarSettingsPlaceholder({ pillarName }: PillarSettingsProps) {
                       className="flex items-center justify-between p-3.5 bg-[var(--surface-2)] rounded-xl border border-[var(--line)]"
                     >
                       <div className="flex items-center gap-3">
-                        <CheckCircle2 className="w-4 h-4 text-[var(--nav-c-green)]" />
+                        <Database className="w-4 h-4 text-[var(--ink-3)]" aria-hidden="true" />
                         <div>
                           <p className="font-semibold text-sm">{conn.name}</p>
                           <p className="text-xs text-[var(--ink-3)]">
-                            Latência de resposta: {conn.latency}
+                            Saúde e latência reais ficam no painel de observabilidade.
                           </p>
                         </div>
                       </div>
-                      <Badge
-                        variant="default"
-                        className="bg-[var(--nav-c-green)]/10 text-[var(--nav-c-green)]"
-                      >
+                      <Badge variant="outline" className="text-xs">
                         {conn.status}
                       </Badge>
                     </div>

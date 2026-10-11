@@ -212,7 +212,8 @@ export function KpiCard({
     );
   }
 
-  // Estático: sem handlers de ponteiro (Biome noStaticElementInteractions).
-  // Spotlight/hover SFX só no <button> com onSelect.
+  // Ramo sem onSelect: puramente apresentacional (sem role/teclado/ponteiro).
+  // Sem onSelect?.() aqui — após o early-return, TS estreita onSelect a undefined (TS2349, #702).
+  // Sem handlers de ponteiro (Biome noStaticElementInteractions); spotlight/hover SFX só no <button>.
   return <div className={sharedClassName}>{content}</div>;
 }
