@@ -11,8 +11,8 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { type FormEvent, useCallback, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 type Capability = {
   status: 'AVAILABLE' | 'PARTIAL' | 'NOT_AVAILABLE';
@@ -150,15 +150,15 @@ function CapabilityCard({
 }
 
 export function LdrAccountIntelligence() {
+  const [searchParams] = useSearchParams();
   const [draftCnpj, setDraftCnpj] = useState('');
   const [account, setAccount] = useState<LdrAccount | null>(null);
   const [dataset, setDataset] = useState<LdrResponse['dataset'] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
-    const cnpj = draftCnpj.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  const loadByCnpj = useCallback(async (raw: string) => {
+    const cnpj = raw.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     if (!cnpj) return;
 
     setLoading(true);
@@ -183,6 +183,18 @@ export function LdrAccountIntelligence() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const fromQuery = searchParams.get('cnpj');
+    if (!fromQuery) return;
+    setDraftCnpj(fromQuery);
+    void loadByCnpj(fromQuery);
+  }, [searchParams, loadByCnpj]);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    await loadByCnpj(draftCnpj);
   };
 
   return (
@@ -222,12 +234,20 @@ export function LdrAccountIntelligence() {
               </div>
               <p className="mt-1">Ausência de dado permanece como NÃO DISPONÍVEL.</p>
             </div>
-            <Link
-              to="/app/market-intelligence/deck"
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-active px-4 py-2 text-xs font-black text-on-brand hover:brightness-110"
-            >
-              <Zap className="h-4 w-4" /> Abrir fila de aprovação
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                to="/app/market-intelligence/hub"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-active px-4 py-2 text-xs font-black text-on-brand hover:brightness-110"
+              >
+                <Zap className="h-4 w-4" /> Radar / Hub
+              </Link>
+              <Link
+                to="/app/prospect/inteligente"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-black text-white hover:bg-white/10"
+              >
+                Prospecção Inteligente
+              </Link>
+            </div>
           </div>
         </div>
       </header>
