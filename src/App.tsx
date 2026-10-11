@@ -80,6 +80,15 @@ const EliteCommercialAgentWorkspace = lazy(() =>
     default: m.EliteCommercialAgentWorkspace,
   })),
 );
+// P0 #693 (Agente 02): a tab `copiloto_ia` ("Copiloto IA") abria o Elite Agent (NBA) — rótulo
+// e tela divergentes. A tela canônica do Copiloto Comercial IA é `CopilotoIaHub` (Conversas +
+// Configurações; LeadCopilotoPanel já navega para /app/copiloto_ia?tab=conversas&leadId=...).
+// O Elite Agent continua na rota própria `intelligence/elite-agent`.
+const CopilotoIaHub = lazy(() =>
+  import('./features/copiloto-ia/components/CopilotoIaHub.js').then((m) => ({
+    default: m.CopilotoIaHub,
+  })),
+);
 const CompanyList = lazy(() =>
   import('./features/companies/components/CompanyList.js').then((m) => ({
     default: m.CompanyList,
@@ -386,7 +395,7 @@ function AppLayout() {
             />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
-            <Route path="copiloto_ia" element={<EliteCommercialAgentWorkspace />} />
+            <Route path="copiloto_ia" element={<CopilotoIaHub />} />
             <Route path="companies" element={<CompanyList />} />
             <Route path="contacts" element={<ContactList />} />
             <Route path="activities" element={<ActivityList />} />
