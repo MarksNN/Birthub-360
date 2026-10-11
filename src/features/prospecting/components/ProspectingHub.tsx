@@ -676,7 +676,7 @@ export function ProspectingHub() {
               aria-selected={tab === 'cnpj'}
               className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'cnpj'
-                  ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
+                  ? 'bg-brand text-on-brand shadow-glow-brand font-bold scale-[1.02]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
               }`}
             >
@@ -692,7 +692,7 @@ export function ProspectingHub() {
               aria-selected={tab === 'discovery'}
               className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'discovery'
-                  ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
+                  ? 'bg-brand text-on-brand shadow-glow-brand font-bold scale-[1.02]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
               }`}
             >
@@ -708,7 +708,7 @@ export function ProspectingHub() {
               aria-selected={tab === 'ocr'}
               className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'ocr'
-                  ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
+                  ? 'bg-brand text-on-brand shadow-glow-brand font-bold scale-[1.02]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
               }`}
             >
@@ -724,7 +724,7 @@ export function ProspectingHub() {
               aria-selected={tab === 'tools'}
               className={`flex items-center gap-2 whitespace-nowrap rounded-control px-4 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                 tab === 'tools'
-                  ? 'bg-ink text-surface shadow-sm font-bold scale-[1.01]'
+                  ? 'bg-brand text-on-brand shadow-glow-brand font-bold scale-[1.02]'
                   : 'text-ink-2 hover:bg-surface-interactive hover:text-ink'
               }`}
             >
