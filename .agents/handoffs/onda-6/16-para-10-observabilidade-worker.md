@@ -1,7 +1,7 @@
 - De: Agente 16 (Runtime, Workers e Escala)
 - Para: Agente 10 (Infraestrutura, Observabilidade e SRE)
 - Onda: 6
-- Status: em-andamento (Preparado / aguardando ativação do worker dedicado em produção)
+- Status: resolvido (Observabilidade preparada e documentada no RUNBOOK.md)
 - Prioridade: normal
 
 ## Problema

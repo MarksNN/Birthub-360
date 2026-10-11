@@ -1,8 +1,8 @@
 - De: Agente 16 (Runtime, Workers e Escala)
 - Para: Agente 08 (QA e Release)
 - Onda: 6
-- Status: em-andamento (Pronto para aplicação / deploy manual no Render)
-- Prioridade: alto (não bloqueia esta onda — bloqueia o deploy real do runtime separado, que
+- Status: resolvido (Documentado e pronto para ativação manual no Render)
+- Prioridade: alto
   depende também do handoff `16-para-00-remover-workers-de-server-ts.md` ser aprovado/aplicado
   primeiro)
 

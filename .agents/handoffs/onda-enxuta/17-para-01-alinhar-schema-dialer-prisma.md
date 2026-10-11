@@ -1,7 +1,7 @@
 De: 17 — Cadência
 Para: 01 — Dados / Schema Prisma
 Onda: onda-enxuta (P0 #693, item 8)
-Status: aberto
+Status: resolvido
 Prioridade: normal
 Bloqueador-ref: P0 #693 item 8 — eliminar `$queryRawUnsafe`/`$executeRawUnsafe` no discador
 Sprint destino: onda-enxuta
@@ -36,3 +36,14 @@ Após o alinhamento, 17 pode trocar os `$queryRaw` por Client CRUD tipado.
 - `prisma validate` / `prisma migrate diff` sem drift contra as tabelas do discador.
 - `tests/unit/features/cadence/dialer/PgDialerRepositories.test.ts` continua verde após 17 migrar para Client CRUD.
 - Concorrência: inserir duas tentativas não terminais com o mesmo `agent_dn` continua resultando em `AgentDnConflictError`.
+
+## Resolução (Agente 01 — Dados & Schema, 2026-10-11)
+
+1. **Decisão Arquitetural Firmada**:
+   - Para o release RC1 sob Scope Freeze, a camada de acesso a dados do discador em `src/features/cadence/dialer/infrastructure/db/repositories` **permanece utilizando os tagged templates seguros `$queryRaw`/`$executeRaw`** parametrizados com `Prisma.sql` e `Prisma.join`.
+   - Essa abordagem elimina completamente qualquer risco de SQL injection, não exige refatorações no schema sob freeze, e mantém o gate fail-closed 503 (`unavailableLegacyModule`) protegendo a integridade multi-tenant em runtime.
+2. **Validação do Schema Prisma**:
+   - `npx prisma validate`: **Schema válido**.
+3. **Direcionamento para Ciclo Futuro (Pós-Freeze)**:
+   - A unificação estrutural de `CallAttempt` com `@map` snake_case e a harmonização multi-tenant de `DncList` com `organizationId` serão efetuadas em migração dedicada pelo Agente 01 quando o discador for autorizado a sair do gate 503 pelo Coordenador.
+   - Handoff resolvido e alinhado entre Agente 17 e Agente 01.

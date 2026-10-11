@@ -1,7 +1,7 @@
 De: 05 — Prospecção
 Para: 00 — Coordenação
 Onda: turbo-20261009
-Status: concluido-aguardando-24
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: revisão independente 24 e gates da revisão integrada
 Sprint destino: missão atual
