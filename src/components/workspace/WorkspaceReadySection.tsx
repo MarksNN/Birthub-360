@@ -17,7 +17,7 @@ const KPI_STATUS_META: Record<string, { label: string; tone: string }> = {
   AVAILABLE: { label: 'Disponível', tone: 'text-success' },
   STALE: { label: 'Desatualizado', tone: 'text-warning' },
   ERROR: { label: 'Erro', tone: 'text-danger' },
-  DISABLED: { label: 'Desativado', tone: 'text-muted' },
+  DISABLED: { label: 'Desativado', tone: 'text-ink-2' },
 };
 
 function moduleMeta(moduleKey: string) {

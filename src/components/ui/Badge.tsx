@@ -3,22 +3,22 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils.js';
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#8B7DFF] focus:ring-offset-2 focus:ring-offset-[#13151A]',
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-[#8B7DFF]/10 text-[#8B7DFF]',
-        secondary: 'border-white/10 bg-[#1C1D24] text-slate-300',
-        destructive: 'border-transparent bg-[#EF4444]/10 text-[#EF4444]',
-        danger: 'border-transparent bg-[#EF4444]/10 text-[#EF4444]',
-        outline: 'text-slate-300 border-white/10',
-        success: 'border-transparent bg-[#22c55e]/10 text-[#22c55e]',
-        warning: 'border-transparent bg-[#EAB308]/10 text-[#EAB308]',
-        info: 'border-transparent bg-[#38bdf8]/10 text-[#38bdf8]',
-        holographic: 'border-[#8B7DFF]/20 bg-[#8B7DFF]/10 text-[#8B7DFF]',
-        neon: 'border-[#8B7DFF]/20 bg-[#8B7DFF]/10 text-[#8B7DFF] font-mono',
+        default: 'border-transparent bg-brand/10 text-brand-ink dark:text-brand',
+        secondary: 'border-line bg-surface text-ink',
+        destructive: 'border-transparent bg-critical/10 text-critical-active',
+        danger: 'border-transparent bg-critical/10 text-critical-active',
+        outline: 'text-ink border-input',
+        success: 'border-transparent bg-ok/10 text-ok-active',
+        warning: 'border-transparent bg-warn/10 text-warn-active',
+        info: 'border-transparent bg-info/10 text-info-active',
+        holographic: 'border-brand/20 bg-brand/10 text-brand-ink dark:text-brand',
+        neon: 'border-brand/20 bg-brand/10 text-brand-ink dark:text-brand font-mono',
         gradient:
-          'border-transparent bg-gradient-to-r from-[#8B7DFF] to-[#6D5CE6] text-white shadow-sm',
+          'border-transparent bg-gradient-to-r from-brand to-brand-2 text-on-brand shadow-sm',
       },
     },
     defaultVariants: {

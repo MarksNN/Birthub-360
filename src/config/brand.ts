@@ -37,32 +37,42 @@ export const BRAND = {
   /** Valores (brand book, p. 10). Em inglês no original. */
   values: ['Innovation', 'Data Intelligence', 'Efficiency', 'Scalability'] as const,
   colors: {
-    /** Primary / Brand */
-    brand: '#00E5FF',
-    /** Primary Hover */
+    /** Azul Neon: Tecnologia, confiança, inovação. Cor padrão de títulos, bordas ativas e destaque */
+    neonBlue: '#00D4FF',
+    brand: '#00D4FF',
     brandAccent: '#33EBFF',
-    /** Midnight Blue (Base dark) */
-    obsidian: '#0B132B',
-    /** Midnight Blue */
-    midnight: '#0B132B',
-    /** Error / Danger */
+    /** Rosa Neon: Energia, criatividade, atitude. Destaques, tags, inteligência de mercado e gradientes */
+    neonPink: '#FF2D9B',
+    pink: '#FF2D9B',
+    redViolet: '#FF2D9B',
+    /** Dourado Neon: Sofisticação, prosperidade, previsibilidade e métricas */
+    neonGold: '#FFC107',
+    gold: '#FFC107',
+    /** Preto Neon (Fundo): Fundo principal Dark Mode */
+    neonBlack: '#0D0D0D',
+    obsidian: '#0D0D0D',
+    midnight: '#0D0D0D',
+    /** Branco Neon (Texto): Textos de corpo, subtítulos e leitura */
+    neonWhite: '#F8F9FF',
+    white: '#F8F9FF',
+    snow: '#F8F9FF',
+    blossom: '#F8F9FF',
+    /** Fundo de Cards: Superfícies e cartões de conteúdo */
+    neonCardBg: '#14141A',
+    surface: '#14141A',
+    card: '#14141A',
+    /** Bordas Glow */
+    neonCardBorder: 'rgba(0, 212, 255, 0.22)',
+    glowBorder: 'rgba(0, 212, 255, 0.22)',
+    /** Tons Light complementares */
+    lightPink: '#E6007A',
+    lightBlue: '#0284C7',
+    lightGold: '#D97706',
+    /** Semânticos complementares */
     sunsetOrange: '#EF4444',
-    /** AI / Purple */
-    redViolet: '#8B5CF6',
-    /** White */
-    white: '#FFFFFF',
-    /** AI / Purple */
-    iris: '#8B5CF6',
-    /** Intelligence Blue */
-    orbitBlue: '#3B82F6',
-    /** Error / Danger */
     red: '#EF4444',
-    /** AI / Purple */
-    pink: '#8B5CF6',
-    /** White */
-    snow: '#FFFFFF',
-    /** White */
-    blossom: '#FFFFFF',
+    iris: '#FF2D9B',
+    orbitBlue: '#00D4FF',
   },
   /**
    * Perfis sociais da plataforma.
