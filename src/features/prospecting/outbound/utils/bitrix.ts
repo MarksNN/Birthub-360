@@ -13,7 +13,11 @@ export function resolveBitrixWebhook(
     return config?.customBitrixWebhook || '';
   }
   if (target === 'birthhub360') {
-    return config?.bitrixAtlasGrWebhook || 'https://birthhub360.bitrix24.com.br/rest/';
+    return (
+      config?.bitrixBirthhub360Webhook ||
+      config?.bitrixAtlasGrWebhook ||
+      'https://birthhub360.bitrix24.com.br/rest/'
+    );
   }
   if (target === 'totaltrac') {
     return config?.bitrixBirthhub360Webhook || '';
@@ -21,7 +25,11 @@ export function resolveBitrixWebhook(
 
   // 'auto'
   if (user?.company === 'atlas') {
-    return config?.bitrixAtlasGrWebhook || 'https://birthhub360.bitrix24.com.br/rest/';
+    return (
+      config?.bitrixBirthhub360Webhook ||
+      config?.bitrixAtlasGrWebhook ||
+      'https://birthhub360.bitrix24.com.br/rest/'
+    );
   }
   return config?.bitrixBirthhub360Webhook || '';
 }

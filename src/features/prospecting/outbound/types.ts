@@ -474,7 +474,7 @@ export interface IntegrationsConfig {
   hunterApiKey: string;
   blandAiApiKey: string;
   bitrixBirthhub360Webhook: string;
-  bitrixAtlasGrWebhook: string;
+  bitrixAtlasGrWebhook?: string;
   // 'auto' (padrão recomendado) escolhe o webhook pela marca do usuário logado;
   // as demais opções seguem disponíveis como substituição manual explícita.
   activeBitrixTarget: 'auto' | 'totaltrac' | 'birthhub360' | 'custom';
