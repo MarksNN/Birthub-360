@@ -98,7 +98,8 @@ export function CyberInput({
     <div className="relative">
       <input
         className={cn(
-          'w-full rounded-xl text-ink placeholder:text-ink-2/50 transition-all duration-300 outline-none',
+          // A03-P1-10: outline removido só junto de um anel de foco visível por token (>= 3:1).
+          'w-full rounded-xl text-ink placeholder:text-ink-2 transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
           variantStyles[variant].base,
           isFocused ? variantStyles[variant].focused : variantStyles[variant].unfocused,
           isFocused && variant === 'neon' && glowColors[glowColor],
