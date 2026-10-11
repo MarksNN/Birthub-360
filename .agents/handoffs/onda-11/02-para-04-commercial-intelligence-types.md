@@ -1,14 +1,15 @@
 - De: 02
 - Para: 04
 - Onda: 11
-- Status: resolvido
+- Status: parcial (documental) — aguardando reconhecimento do 24
 - Prioridade: alto
 
-## Resolução
-Resolvido em conjunto pelas frentes de Inteligência Comercial (Agente 04) e Plataforma:
-1. As interfaces e schemas de `ExecutiveOverview` (adicionados `coverageProtection`, `previousPeriod`, `forecastConfidence`), `PerformanceMetrics` (`funnelHistoricalTrackingSince`) e `PipelineCreation` (`businessDaysElapsed`, `businessDaysTotal`) foram alinhados em `src/features/commercial-intelligence/domain/CommercialIntelligence.ts` e consumidos corretamente em `src/features/commercial-intelligence/application/executiveExport.ts`.
-2. Mocks e asserções em `src/features/commercial-intelligence/__tests__/executiveExport.unit.test.ts` foram devidamente atualizados e os testes unitários foram validados.
-3. Imports não utilizados (`ESTADO_OPTIONS`, `QUANTIDADE_OPTIONS`) foram limpos em `ProspectingHub.tsx` e `DiscoveryFilterPanel.tsx`. Typecheck `npx tsc --noEmit` validado 100% verde.
+## Resolução (reconciliada 2026-10-10 — Agente 04, a pedido do 00; ref. parecer 24 `.agents/reviews/handoffs-2026-10-09-24.md` l.27)
+Correção real: commit `ac2a942d` (2026-08-17). O domínio NÃO foi alterado — `ExecutiveOverview.coverageProtection/previousPeriod/forecastConfidence`, `PerformanceMetrics.funnelHistoricalTrackingSince` e `PipelineCreation.elapsedBusinessDays/totalBusinessDays` já existiam em `src/features/commercial-intelligence/domain/CommercialIntelligence.ts` (desde `876d13c7`/`a557d6ee`). O erro vinha dos consumidores:
+1. `application/executiveExport.ts`: `businessDaysElapsed/businessDaysTotal` → `elapsedBusinessDays/totalBusinessDays` (nomes canônicos; os nomes antigos não existem no código).
+2. `__tests__/executiveExport.unit.test.ts`: fixtures completadas com os campos acima.
+Evidência @ `origin/main` 36cea202 (2026-10-10): `npx vitest run -c vitest.unit.config.ts executiveExport.unit.test.ts CommercialIntelligenceUseCases.unit.test.ts` → 82/82; `npm run typecheck` → 0 erros em `src/features/commercial-intelligence/**` (1 erro fora do escopo: `src/components/ui/KpiCard.tsx` TS2349, outra frente).
+Errata: a versão de 2026-10-09 (`0a22c580`) dizia que o domínio ganhou `businessDaysElapsed/businessDaysTotal` e que imports foram limpos em `DiscoveryFilterPanel.tsx` — incorreto (`ESTADO_OPTIONS` é usado lá). Limpeza de imports não faz parte deste handoff.
 
 ## Problema
 Erros de TypeScript na feature de `commercial-intelligence`:

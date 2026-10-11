@@ -3,8 +3,8 @@ import { lazy, Suspense, useCallback, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary.js';
 import { MainLayout } from './components/layout/MainLayout.js';
-import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 import { OnboardingGate } from './components/layout/OnboardingGate.js';
+import { ProtectedRoute } from './components/layout/ProtectedRoute.js';
 import { RequireModuleAccess } from './components/layout/RequireModuleAccess.js';
 import { RequireRole } from './components/layout/RequireRole.js';
 import { ClickSpark } from './components/ui/ClickSpark.js';
@@ -15,7 +15,11 @@ import { BrandProvider } from './contexts/BrandContext.js';
 import { DailyClosingProvider } from './contexts/DailyClosingContext.js';
 import { ExperienceModeProvider } from './contexts/ExperienceModeContext.js';
 import { ThemeProvider } from './contexts/ThemeContext.js';
-import { COMMERCIAL_INTELLIGENCE_ROLES, MESA_TRATAMENTO_ROLES } from './lib/auth/authorization.js';
+import {
+  COMMERCIAL_INTELLIGENCE_ROLES,
+  COPILOTO_IA_ROLES,
+  MESA_TRATAMENTO_ROLES,
+} from './lib/auth/authorization.js';
 
 const SetupWizard = lazy(() =>
   import('./features/onboarding/components/SetupWizard.js').then((m) => ({
@@ -78,6 +82,15 @@ const IntelligenceHub = lazy(() =>
 const EliteCommercialAgentWorkspace = lazy(() =>
   import('./features/intelligence/components/EliteCommercialAgentWorkspace.js').then((m) => ({
     default: m.EliteCommercialAgentWorkspace,
+  })),
+);
+// P0 #693 (Agente 02): a tab `copiloto_ia` ("Copiloto IA") abria o Elite Agent (NBA) — rótulo
+// e tela divergentes. A tela canônica do Copiloto Comercial IA é `CopilotoIaHub` (Conversas +
+// Configurações; LeadCopilotoPanel já navega para /app/copiloto_ia?tab=conversas&leadId=...).
+// O Elite Agent continua na rota própria `intelligence/elite-agent`.
+const CopilotoIaHub = lazy(() =>
+  import('./features/copiloto-ia/components/CopilotoIaHub.js').then((m) => ({
+    default: m.CopilotoIaHub,
   })),
 );
 const CompanyList = lazy(() =>
@@ -280,15 +293,6 @@ const LeadApprovalDeck = lazy(() =>
   })),
 );
 
-const VoiceStudioPage = lazy(() =>
-  import('./features/voice-hub/pages/VoiceStudio.js').then((m) => ({ default: m.default })),
-);
-const OutboundApp = lazy(() =>
-  import('./features/prospecting/outbound/App.js').then((m) => ({ default: m.default })),
-);
-const DialerFrontend = lazy(() =>
-  import('./features/cadence/components/CadenceHub.js').then((m) => ({ default: m.CadenceHub })),
-);
 
 const PropostasList = lazy(() =>
   import('./features/crm360/components/PropostasList.js').then((m) => ({
@@ -386,14 +390,29 @@ function AppLayout() {
             />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
-            <Route path="copiloto_ia" element={<EliteCommercialAgentWorkspace />} />
+            {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,
+              não só no item de navegação — evita 403 cru ao digitar a URL. */}
+            <Route
+              path="copiloto_ia"
+              element={
+                <RequireRole allowedRoles={[...COPILOTO_IA_ROLES]}>
+                  <CopilotoIaHub />
+                </RequireRole>
+              }
+            />
             <Route path="companies" element={<CompanyList />} />
             <Route path="contacts" element={<ContactList />} />
             <Route path="activities" element={<ActivityList />} />
 
-            <Route path="voice-hub" element={<VoiceStudioPage />} />
-            <Route path="outbound/*" element={<OutboundApp />} />
-            <Route path="dialer" element={<DialerFrontend />} />
+            {/* P0 #693 item 6 (handoff 17→02): `/api/voice-hub/*`, `/api/outbound/*` e
+              `/api/dialer-3cx/*` respondem 503 MODULE_NOT_READY por `legacyModuleGate` (intencional,
+              isolamento por org — NÃO reabrir aqui). `/app/dialer` era só CadenceHub com rótulo
+              "Discador 3CX": vai direto pra Cadências. Voice Hub/Outbound não têm UI honesta pro
+              503 (caíam em erro genérico/404), então deep-link volta pro dashboard até o 12
+              reabrir o gate; os módulos saem da navegação via NAV_HIDDEN_TABS (tabMeta.ts). */}
+            <Route path="dialer" element={<Navigate to="/app/cadence" replace />} />
+            <Route path="voice-hub/*" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="outbound/*" element={<Navigate to="/app/dashboard" replace />} />
 
             <Route path="cadence" element={<CadenceHub />} />
             <Route path="playbooks" element={<PlaybooksHub />} />

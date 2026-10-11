@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   BookOpen,
   CheckCircle2,
@@ -8,7 +8,6 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Search,
-  Filter,
 } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
@@ -22,26 +21,19 @@ import { KpiCard } from '../../../components/ui/KpiCard.js';
 import { Button } from '../../../components/ui/Button.js';
 import { Badge } from '../../../components/ui/Badge.js';
 import { Input } from '../../../components/ui/Input.js';
-import { orchestrationApi, type PlaybookItem } from '../orchestration.api.js';
+import {
+  DemoBadge,
+  NO_API_SUBTITLE,
+  OrchestrationEmptyState,
+  OrchestrationStatusBanner,
+} from './DemoDataNotice.js';
+import { formatMetric, useOrchestrationOverview } from './useOrchestrationOverview.js';
 
 export function PlaybooksHub() {
-  const [playbooks, setPlaybooks] = useState<PlaybookItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isTemplate, noRealData, loading, error, reload } = useOrchestrationOverview();
+  const playbooks = data?.playbooks ?? [];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
-
-  useEffect(() => {
-    let mounted = true;
-    orchestrationApi.getOverview().then((res) => {
-      if (mounted) {
-        setPlaybooks(res.playbooks);
-        setLoading(false);
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const categories = ['Todas', 'Outbound', 'Inbound', 'Enterprise', 'Expansão'];
 
@@ -60,7 +52,12 @@ export function PlaybooksHub() {
         icon={BookOpen}
         actions={
           <div className="flex gap-2">
-            <Button variant="default" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              disabled
+              title="Em breve — criação ainda não disponível"
+            >
               <Plus className="w-4 h-4 mr-2" /> Novo Playbook
             </Button>
           </div>
@@ -78,38 +75,41 @@ export function PlaybooksHub() {
           </div>
         </div>
 
-        {/* KPIs Globais */}
+        <OrchestrationStatusBanner
+          isTemplate={isTemplate}
+          noRealData={noRealData}
+          error={error}
+          onRetry={reload}
+        />
+
+        {/* KPIs (P0 #693: sem números fixos — só API ou “Indisponível”) */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <KpiCard
-            title="Playbooks Ativos"
-            value="6"
-            trend={{ value: '+2 este trimestre', isPositive: true }}
+            title="Playbooks Listados"
+            value={loading || error ? '—' : String(playbooks.length)}
             icon={BookOpen}
-            subtitle="100% alinhados ao ICP"
+            subtitle={isTemplate ? 'Modelos de exemplo' : 'Cadastrados na organização'}
             variant="default"
           />
           <KpiCard
             title="Aderência Operacional"
-            value="88.4%"
-            trend={{ value: '+4.2%', isPositive: true }}
+            value={formatMetric(data?.kpis.aderenciaPlaybook, '%')}
             icon={ShieldCheck}
-            subtitle="Execução dos passos obrigatórios"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="Tempo Médio de Rampa"
-            value="14 dias"
-            trend={{ value: '-5 dias', isPositive: true }}
+            value="Indisponível"
             icon={Clock}
-            subtitle="Novos vendedores operando"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="Pessoas Impactadas"
-            value="28 rep."
-            trend={{ value: 'SDRs e Closers', isPositive: true }}
+            value="Indisponível"
             icon={Users}
-            subtitle="Engajamento diário ativo"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
         </div>
@@ -151,6 +151,17 @@ export function PlaybooksHub() {
             <div className="h-48 bg-[var(--surface-2)] rounded-xl" />
             <div className="h-48 bg-[var(--surface-2)] rounded-xl" />
           </div>
+        ) : error ? null : filteredPlaybooks.length === 0 ? (
+          <OrchestrationEmptyState
+            title={
+              playbooks.length === 0 ? 'Nenhum playbook cadastrado' : 'Nenhum playbook encontrado'
+            }
+            hint={
+              playbooks.length === 0
+                ? 'Quando playbooks forem cadastrados na organização, eles aparecerão aqui.'
+                : 'Ajuste a busca ou o filtro de categoria.'
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredPlaybooks.map((pb) => (
@@ -171,6 +182,7 @@ export function PlaybooksHub() {
                         <Badge variant="outline" className="text-xs">
                           Público: {pb.targetRole}
                         </Badge>
+                        <DemoBadge show={isTemplate} />
                       </div>
                       <CardTitle className="text-lg">{pb.title}</CardTitle>
                     </div>
@@ -197,7 +209,9 @@ export function PlaybooksHub() {
                     </span>
                     <span>
                       Aderência:{' '}
-                      <strong className="text-[var(--nav-c-blue)]">{pb.complianceRate}%</strong>
+                      <strong className="text-[var(--nav-c-blue)]">
+                        {formatMetric(pb.complianceRate, '%')}
+                      </strong>
                     </span>
                     <span>Atualizado: {pb.lastUpdated}</span>
                   </div>

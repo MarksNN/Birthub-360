@@ -172,7 +172,8 @@ describe('Row Level Security (RLS) - Cobertura e Isolamento Semântico no Banco 
     const globalCatalogCount = models.filter((m) => m.category === 'GLOBAL_CATALOG').length;
     const systemInternalCount = models.filter((m) => m.category === 'SYSTEM_INTERNAL').length;
 
-    expect(tenantScopedCount).toBe(127);
+    // onda-16: +ExternalEntityLink, +ExternalCrmStageMapping (127 -> 129)
+    expect(tenantScopedCount).toBe(129);
     expect(globalCatalogCount).toBe(14);
     expect(systemInternalCount).toBe(1);
   });
@@ -210,6 +211,21 @@ describe('Row Level Security (RLS) - Cobertura e Isolamento Semântico no Banco 
       missingPolicy,
       `Tabelas sem nenhuma policy RLS ativa nas migrations:\n${missingPolicy.join(', ')}`,
     ).toEqual([]);
+  });
+
+  it('onda-16: ExternalEntityLink e ExternalCrmStageMapping têm RLS ENABLE+FORCE e tenant_isolation simétrica', () => {
+    for (const tableName of ['ExternalEntityLink', 'ExternalCrmStageMapping']) {
+      const model = models.find((m) => m.tableName === tableName);
+      expect(model?.category, `${tableName} deve ser TENANT_SCOPED`).toBe('TENANT_SCOPED');
+      const state = tableState[tableName];
+      expect(state.enabled, `${tableName} sem ENABLE RLS`).toBe(true);
+      expect(state.forced, `${tableName} sem FORCE RLS`).toBe(true);
+      const policy = state.policies['tenant_isolation'];
+      expect(policy, `${tableName} sem policy tenant_isolation`).toBeDefined();
+      const tenantExpr = /"organizationId"\s*=\s*current_setting\('app\.current_tenant_id',\s*true\)/;
+      expect(policy.body).toMatch(new RegExp(`USING\\s*\\(\\s*${tenantExpr.source}`));
+      expect(policy.body).toMatch(new RegExp(`WITH\\s+CHECK\\s*\\(\\s*${tenantExpr.source}`));
+    }
   });
 
   it('garante que NENHUMA tabela TENANT_SCOPED possui WITH CHECK (true)', () => {

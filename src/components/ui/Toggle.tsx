@@ -42,8 +42,8 @@ export function Toggle({
 
   const classicStyles = {
     container: 'h-6 w-11',
-    checked: 'bg-[#8B7DFF] shadow-sm hover:brightness-110',
-    unchecked: 'bg-[#1C1D24] border-white/10 hover:bg-[#22232B]',
+    checked: 'bg-brand shadow-sm hover:brightness-110',
+    unchecked: 'bg-surface-subtle border-input hover:bg-surface-interactive',
     thumb: 'h-5 w-5 bg-white shadow-sm',
   };
 
@@ -51,10 +51,8 @@ export function Toggle({
     <div className={cn('flex items-center justify-between gap-3', className)}>
       {(label || description) && (
         <label htmlFor={toggleId} className="flex flex-col select-none cursor-pointer">
-          {label && <span className="text-sm font-semibold text-slate-200">{label}</span>}
-          {description && (
-            <span className="text-xs text-slate-400 leading-relaxed">{description}</span>
-          )}
+          {label && <span className="text-sm font-semibold text-ink">{label}</span>}
+          {description && <span className="text-xs text-ink-2 leading-relaxed">{description}</span>}
         </label>
       )}
 
@@ -68,7 +66,7 @@ export function Toggle({
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
         className={cn(
-          'relative inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
+          'relative inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
           classicStyles.container,
           checked ? classicStyles.checked : classicStyles.unchecked,
           disabled && 'cursor-not-allowed opacity-50 hover:brightness-100',

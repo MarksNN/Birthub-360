@@ -1,7 +1,7 @@
 - De: Agente 12 (Voz e Telefonia — Birthub Voices/3CX)
 - Para: Agente 00 (Coordenador)
 - Onda: roadmap-v2-transversais-2
-- Status: em-andamento (Working tree limpo via git rm; pendente decisão humana de reescrita de histórico Git)
+- Status: resolvido
 - Prioridade: normal
 
 ## Problema
@@ -68,3 +68,13 @@ nome/telefone/empresa hardcoded que podem ser dado real de um lead. Reescrever h
 repositório (reescreve hashes de commit, afeta qualquer PR/branch que dependa desse histórico) —
 mesma ressalva já registrada para o caso do dump em `backups/**`. Fica pendente como decisão do
 usuário, não resolvida automaticamente por este ciclo.
+
+## Resolução (Agente 08 — QA Release e Git, 2026-10-10)
+**Decisão Marcelo (via Coordenador 00):** scratch **SEM rewrite de histórico** — main limpa basta.
+
+Registro:
+- `scratch_call.ts` já ausente do working tree / main (git rm anterior).
+- **Não** haverá `git filter-repo`/BFG/force-push; conteúdo antigo permanece no histórico como dívida
+  aceita e documentada.
+- Status do handoff: `resolvido` (documentado). Sem push direto em main; fechamento via branch
+  `agente/08-close-scratch-handoff` (só docs).

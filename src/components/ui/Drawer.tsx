@@ -14,8 +14,9 @@ const DrawerOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
+    data-testid="drawer-overlay"
     className={cn(
-      'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'fixed inset-0 z-50 bg-overlay backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className,
     )}
     {...props}
@@ -33,9 +34,9 @@ const DrawerContent = React.forwardRef<
   DrawerContentProps
 >(({ side = 'right', className, children, ...props }, ref) => {
   const sideVariants = {
-    top: 'inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+    top: 'inset-x-0 top-0 max-h-[85dvh] border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
     bottom:
-      'inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+      'inset-x-0 bottom-0 max-h-[85dvh] border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
     left: 'inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm',
     right:
       'inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-md',
@@ -48,7 +49,7 @@ const DrawerContent = React.forwardRef<
         ref={ref}
         aria-modal="true"
         className={cn(
-          'fixed z-50 gap-4 border-white/10 bg-[#1C1D24] p-6 shadow-xl transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
+          'fixed z-50 gap-4 overflow-y-auto overscroll-contain border-line bg-surface-elevated p-6 text-ink shadow-xl transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
           sideVariants[side],
           className,
         )}
@@ -57,10 +58,9 @@ const DrawerContent = React.forwardRef<
         {children}
         <DialogPrimitive.Close
           aria-label="Fechar gaveta"
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-[#13151A] transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#8B7DFF] focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-white/5"
+          className="absolute right-4 top-4 rounded-sm text-ink-2 opacity-80 transition-opacity hover:opacity-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none"
         >
-          <X className="h-4 w-4 text-slate-400" />
-          <span className="sr-only">Fechar gaveta</span>
+          <X className="h-4 w-4" aria-hidden="true" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DrawerPortal>
@@ -87,7 +87,7 @@ const DrawerTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-display font-semibold text-white', className)}
+    className={cn('text-lg font-display font-semibold text-ink', className)}
     {...props}
   />
 ));
@@ -99,7 +99,7 @@ const DrawerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-slate-400', className)}
+    className={cn('text-sm text-ink-2', className)}
     {...props}
   />
 ));
@@ -143,13 +143,16 @@ function Drawer({
 
   return (
     <DialogPrimitive.Root open={effectiveOpen} onOpenChange={handleOpenChange} {...props}>
-      <DrawerContent side={side}>
-        {title && (
-          <DrawerHeader>
-            <DrawerTitle>{title}</DrawerTitle>
-            {subtitle && <DrawerDescription>{subtitle}</DrawerDescription>}
-          </DrawerHeader>
-        )}
+      <DrawerContent
+        side={side}
+        // Sem subtitle, desliga o aria-describedby automático do Radix (evita referência vazia).
+        {...(subtitle ? {} : { 'aria-describedby': undefined })}
+      >
+        {/* A03-P1-05: Radix exige nome acessível; sem title visível, o título fica sr-only. */}
+        <DrawerHeader className={cn(!title && !subtitle && 'sr-only', 'pr-8')}>
+          <DrawerTitle className={title ? undefined : 'sr-only'}>{title || 'Painel'}</DrawerTitle>
+          {subtitle && <DrawerDescription>{subtitle}</DrawerDescription>}
+        </DrawerHeader>
         {children}
       </DrawerContent>
     </DialogPrimitive.Root>
