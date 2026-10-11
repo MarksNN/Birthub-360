@@ -21,6 +21,10 @@ migration `20260923170000_add_external_crm_and_workspace_layouts`) não permite 
 HubSpot ponta a ponta é **exceção explícita solicitada pelo Marcelo (dono do produto)** nesta onda.
 Escopo limitado ao núcleo genérico + HubSpot; nenhum outro provider/extra entra neste handoff.
 
+## Decisões fechadas (Coordenador 00)
+1. ALTER em `ExternalCrmSyncLog`: incluir `entityType String?`, `payloadHash String?` + `@@index([connectionId, externalEntityId])` (obrigatório nesta migration).
+2. Comportamento do importador (após schema): sem match → criar Lead (+Company/Contact se vierem) na mesma transação (não fila de revisão).
+
 ## Arquivo(s) envolvido(s)
 - `prisma/schema.prisma` (models ExternalCrm*, ~linhas 4923-5010)
 - `prisma/migrations/<nova>/migration.sql`
@@ -95,7 +99,7 @@ model ExternalCrmStageMapping {
 }
 ```
 
-### 4. `ExternalCrmSyncLog` (ALTER opcional, baixo custo)
+### 4. `ExternalCrmSyncLog` (ALTER obrigatório)
 - `entityType String?`, `payloadHash String?` + `@@index([connectionId, externalEntityId])`.
 
 ### RLS
