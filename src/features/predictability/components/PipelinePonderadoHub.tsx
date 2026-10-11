@@ -1,17 +1,23 @@
-import { Layers, Calculator, BarChart4, AlertCircle } from 'lucide-react';
+import { AlertCircle, BarChart4, Calculator, Layers } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
-import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
+import { PredictabilityEmptyState, PredictabilityStatusBanner } from './PredictabilityNoData.js';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../components/ui/Table.js';
+  formatBRL,
+  formatPct,
+  unavailableReason,
+  usePredictabilityOverview,
+} from './usePredictabilityOverview.js';
+
+// P0 #693 (Agente 02): leitura real via predictabilityApi (Agente 04, PR #697). Sem R$ inventado.
 
 export function PipelinePonderadoHub() {
+  const { data, loading, error, noRealData, partial, reload } = usePredictabilityOverview();
+  const p = data?.pipeline ?? null;
+  const cur = data?.meta.currency ?? 'BRL';
+  const weightedReason = unavailableReason(data, 'pipeline.weightedAmount');
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--bg)] text-[var(--ink)]">
       <CommandCenterHeader title="Pipeline Ponderado" icon={Layers} />
@@ -19,33 +25,51 @@ export function PipelinePonderadoHub() {
       <div className="flex-1 p-6 space-y-6 overflow-y-auto">
         <div className="mb-4">
           <p className="text-sm text-[var(--ink-2)]">
-            O valor real do seu funil ajustado pelo risco de fechamento
+            O valor do seu funil ajustado pela probabilidade de fechamento
+            {data ? ` · período ${data.meta.period}` : ''}
           </p>
         </div>
-        {/* KPIs Globais */}
+
+        <PredictabilityStatusBanner
+          what="o pipeline ponderado"
+          loading={loading}
+          error={error}
+          noRealData={noRealData}
+          partial={partial}
+          failedSources={data?.meta.failedSources}
+          onRetry={reload}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <KpiCard
             title="Valor Bruto do Funil"
-            value="R$ 1.250.000"
-            trend={{ value: '140 negócios', isPositive: true }}
+            value={formatBRL(p?.grossAmount, cur)}
             icon={BarChart4}
-            subtitle="Soma total sem descontos"
+            subtitle={
+              p?.grossAmount != null
+                ? `${p.grossCount ?? 0} negócios abertos`
+                : (unavailableReason(data, 'pipeline.grossAmount') ?? 'Indisponível')
+            }
             variant="default"
           />
           <KpiCard
-            title="Valor Ponderado (Real)"
-            value="R$ 485.000"
-            trend={{ value: '38.8% do Bruto', isPositive: true }}
+            title="Valor Ponderado"
+            value={formatBRL(p?.weightedAmount, cur)}
             icon={Calculator}
-            subtitle="Ajustado pela probabilidade"
+            subtitle={
+              p?.weightedAmount != null
+                ? 'Σ valor × probabilidade'
+                : (weightedReason ?? 'Indisponível')
+            }
             variant="default"
           />
           <KpiCard
             title="Risco Calculado"
-            value="Alto"
-            trend={{ value: 'R$ 765k em risco', isPositive: false }}
+            value={formatBRL(p?.atRiskAmount, cur)}
             icon={AlertCircle}
-            subtitle="Falta tração no topo do funil"
+            subtitle={
+              p?.atRiskAmount != null ? 'Bruto − ponderado' : (weightedReason ?? 'Indisponível')
+            }
             variant="default"
           />
         </div>
@@ -54,66 +78,42 @@ export function PipelinePonderadoHub() {
           <CardHeader>
             <CardTitle>Cálculo por Etapa do Pipeline</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 border-t border-[var(--line)]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Fase</TableHead>
-                  <TableHead className="text-right">Volume (Qtd)</TableHead>
-                  <TableHead className="text-right">Valor Bruto</TableHead>
-                  <TableHead className="text-center">Probabilidade (Win Rate)</TableHead>
-                  <TableHead className="text-right">Valor Ponderado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">1. Prospecção Ativa</TableCell>
-                  <TableCell className="text-right">45</TableCell>
-                  <TableCell className="text-right">R$ 450.000</TableCell>
-                  <TableCell className="text-center text-[var(--ink-3)]">10%</TableCell>
-                  <TableCell className="text-right font-semibold">R$ 45.000</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">2. Qualificação (SDR)</TableCell>
-                  <TableCell className="text-right">32</TableCell>
-                  <TableCell className="text-right">R$ 320.000</TableCell>
-                  <TableCell className="text-center text-[var(--ink-3)]">25%</TableCell>
-                  <TableCell className="text-right font-semibold">R$ 80.000</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">3. Apresentação / Demo</TableCell>
-                  <TableCell className="text-right">28</TableCell>
-                  <TableCell className="text-right">R$ 280.000</TableCell>
-                  <TableCell className="text-center text-[var(--ink-3)]">50%</TableCell>
-                  <TableCell className="text-right font-semibold">R$ 140.000</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">4. Envio de Proposta</TableCell>
-                  <TableCell className="text-right">20</TableCell>
-                  <TableCell className="text-right">R$ 120.000</TableCell>
-                  <TableCell className="text-center text-[var(--ink-3)]">75%</TableCell>
-                  <TableCell className="text-right font-semibold">R$ 90.000</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">5. Negociação Final</TableCell>
-                  <TableCell className="text-right">15</TableCell>
-                  <TableCell className="text-right">R$ 80.000</TableCell>
-                  <TableCell className="text-center text-[var(--ink-3)]">90%</TableCell>
-                  <TableCell className="text-right font-semibold text-[var(--nav-c-green)]">
-                    R$ 72.000
-                  </TableCell>
-                </TableRow>
-                <TableRow className="bg-[var(--surface-2)]">
-                  <TableCell className="font-bold">Total Geral</TableCell>
-                  <TableCell className="text-right font-bold">140</TableCell>
-                  <TableCell className="text-right font-bold">R$ 1.250.000</TableCell>
-                  <TableCell className="text-center font-bold">--</TableCell>
-                  <TableCell className="text-right font-bold text-[var(--nav-c-teal)]">
-                    R$ 427.000
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+          <CardContent className="border-t border-[var(--line)] pt-6">
+            {p && p.stages.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs text-[var(--ink-3)]">
+                    <th className="py-1 font-medium">Etapa</th>
+                    <th className="py-1 font-medium text-right">Negócios</th>
+                    <th className="py-1 font-medium text-right">Bruto</th>
+                    <th className="py-1 font-medium text-right">Prob. média</th>
+                    <th className="py-1 font-medium text-right">Ponderado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {p.stages.map((s) => (
+                    <tr key={s.stageName} className="border-t border-[var(--line)]">
+                      <td className="py-1.5">{s.stageName}</td>
+                      <td className="py-1.5 text-right tabular-nums">{s.count}</td>
+                      <td className="py-1.5 text-right tabular-nums">
+                        {formatBRL(s.grossAmount, cur)}
+                      </td>
+                      <td className="py-1.5 text-right tabular-nums">
+                        {formatPct(s.avgProbability)}
+                      </td>
+                      <td className="py-1.5 text-right tabular-nums">
+                        {formatBRL(s.weightedAmount, cur)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <PredictabilityEmptyState
+                title="Sem cálculo por etapa"
+                hint={weightedReason ?? 'Sem negócios abertos no período.'}
+              />
+            )}
           </CardContent>
         </Card>
       </div>
