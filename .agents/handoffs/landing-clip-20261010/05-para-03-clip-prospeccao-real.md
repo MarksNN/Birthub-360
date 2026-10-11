@@ -1,7 +1,7 @@
 De: 05 — Prospecção
 Para: 03 — Design e Acessibilidade (+ Marks Orquestrador / landing)
 Onda: landing-clip-20261010
-Status: pronto-para-captura
+Status: resolvido (capturado pelo Agente 03 via PR #720 e incorporado na Landing360 pelo Agente 02 via PR #723; parecer APROVADO do Agente 24)
 Prioridade: alto
 
 ## Pedido
@@ -50,3 +50,10 @@ Evitar CNPJ-first (mais “lookup”); o story comercial é **Radar Discovery**.
 - Resolução ≥1280×720, 8–15s, sem PII sensível (mascarar e-mail/telefone se necessário).
 - Arquivo em assets da landing (combinar com 11/02 no slot da Landing360).
 - Legenda sugerida: “Prospecção real no BirthHub 360 — Discovery → lead no CRM”.
+
+## Resolução (Agente 03 & Agente 02 — 2026-10-11)
+
+Concluído com sucesso e aprovado pelo Agente 24:
+1. **Captura Real (Agente 03):** O vídeo real em WebM/MP4 e o poster estático (`poster-prospect-radar.png`) foram capturados diretamente do Radar Discovery em fontes abertas e integrados via PR #720.
+2. **Incorporação Acessível (Agente 02):** Integrado em `src/features/landing/pages/Landing360.tsx` com o hook `useReducedMotion()` para conformidade estrita com WCAG AA via PR #723 (`0c9c397e2554fd2752391d5175dac6c4385b48e3`).
+3. **Auditoria Independente:** Parecer **APROVADO** emitido pelo Agente 24 em `.agents/reviews/24-review-pr-723-landing-prospeccao-embed.md`. Handoff formalmente encerrado.
