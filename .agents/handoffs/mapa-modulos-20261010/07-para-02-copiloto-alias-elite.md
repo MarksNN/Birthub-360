@@ -1,7 +1,7 @@
 De: 07 — IA e Automações
 Para: 02 — Produto e UX
 Onda: mapa-modulos-20261010
-Status: aberto
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: P0 #693 item 7 (Coordenador 00)
 Sprint destino: onda atual
@@ -47,3 +47,10 @@ Referência 07 (já documentado nesta entrega):
 ## Contexto adicional
 
 Branch 07: `agente/07-copiloto-alias-elite`. Handoff de nav é bloqueador de UX; código de inteligência/docs já alinhados nesta PR.
+
+## Resolução (2026-10-10)
+
+Agente 02 montou `CopilotoIaHub` em `/app/copiloto_ia` na branch `agente/02-p0-falso-salvo-setup-copiloto` (Elite só em `intelligence/elite-agent`).
+Marks Orquestrador priorizou **módulo completo na nav** — supersede a hipótese de alias Elite.
+07 confirmou OK ao 02 e atualizou BT-020/AGENTS.
+Residuais para 02: label Sidebar "Copilot"→"Copiloto IA"; `RequireRole` na rota.
