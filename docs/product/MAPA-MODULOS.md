@@ -1,6 +1,6 @@
 # Mapa de Módulos — Birth Hub 360°
 
-> Índice estrutural gerado pelo Cartógrafo de Produto (2026-10-10, BRT). Só inventário: **nenhum status operacional foi inferido sem evidência**. As colunas *Propósito / Status / Melhorias* ficam como `(02 preenche)` para o Agente 02 (Produto & UX).
+> Índice estrutural (Cartógrafo) + Propósito/Status/Melhorias (Agente 02), 2026-10-10/11 BRT. Status = verificação **estática** no código (sem runtime). P0 consolidados abaixo e em `.agents/handoffs/mapa-modulos/P0-distribuicao.md`.
 >
 > - Remoto canônico: **MaarkssN/Birthub-360** (`main`), snapshot `33edc320f0e6` (merge de 2026-10-10 00:13 BRT). `Marks-Mah/Birthub-360` responde **301 → MaarkssN/Birthub-360** (repo renomeado/transferido; mesmos refs).
 > - Fontes: `src/App.tsx`, `src/components/layout/tabMeta.ts`, `src/components/layout/sidebarSections.ts`, `src/lib/navigationBus.ts`, `src/bootstrap/routes.ts`, `src/bootstrap/legacyModuleGate.ts`, `.agents/PLAN-V4/03-PRODUCT/03-PRODUCT-SURFACE-MAP.md`, `.agents/PLAN-V4/03-PRODUCT/04-THREE-PILLARS-NAVIGATION-CONVERGENCE.md`, `.agents/VISUAL_ARCHITECTURE_INVENTORY.md`, `documentacao-aplicacao/inventario/mapa-de-navegacao.md`, listagem `src/features/*`.
@@ -213,3 +213,20 @@ Interno: `/design-lab/command-language` · `/design-lab/components-v2`
 | `copilot` (HUD), `crm`, `job-roles`, `lgpd`, `notes`, `attachments`, `feature-flags`, `bug-reports`, `gamification`, `notifications` | ok | montados em `src/bootstrap/routes.ts` |
 | `mobile` | não verificado | Capacitor/offline sync (`offlineSync.service.ts`, 1 teste) — fora do escopo desta leitura |
 
+
+
+## P0 — backlog distribuível (inventário fechado; execução = handoff)
+
+Status no mapa já marcado (`mock`/`quebrado`). Fechar o *gap de produto* exige dono + handoff (freeze: sem feature nova neste PR).
+
+| # | Itens | Status mapa | Dono sugerido | Ação mínima sugerida |
+|---|---|---|---|---|
+| 1 | `settings_*` (8) | mock | 02 | Remover falso “salvo” ou persistir |
+| 2 | `forecast` / `metas` / `pipeline_ponderado` | mock | 02 (+04 dados) | Ligar a `/api/crm` ou esconder da Sidebar |
+| 3 | `playbooks` / `jornadas` / `processos` / `roteiros` | mock | 02 | Seed/métricas sintéticas → vazio real |
+| 4 | `market-intelligence/hub`, `prospect/inteligente` | mock | 05 | Listas hardcoded → API ou remover |
+| 5 | `/setup` + `organization-modules` | quebrado | 01/16 | Mount API ou desligar wizard |
+| 6 | `outbound`, `dialer`, `voice-hub` | quebrado | 05 + 12 | Tirar da nav até 503 resolvido; dialer≠CadenceHub |
+| 7 | `copiloto_ia` alias vs feature `copiloto-ia` | parcial | 07 (+02) | Apontar rota à UI certa ou renomear |
+
+Detalhe e evidências: tabela principal deste arquivo + runs `cartografo-mapa-modulos-20261010.md` e `02-mapa-modulos-20261010.md`.
