@@ -102,8 +102,10 @@ const KNOWN_RLS_ONLY_MODELS = [
   // (tenant-scoped) e a RLS do Postgres (migration 20260923170000) cobre o resto. Mesma decisão
   // já tomada para BitrixConnection/BitrixSyncRule/BitrixSyncLog.
   'ExternalCrmConnection',
+  'ExternalCrmStageMapping',
   'ExternalCrmSyncLog',
   'ExternalCrmSyncRule',
+  'ExternalEntityLink',
   'ForecastSnapshot',
   'GoogleWorkspaceConnection',
   'IntelligenceEvidence',
