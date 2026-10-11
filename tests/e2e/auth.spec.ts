@@ -37,10 +37,18 @@ test.describe('Autenticação', () => {
     // Sessão nova, sem os cookies do signup, pra forçar um login real do zero.
     await context.clearCookies();
     await page.goto('/login');
-    await page.getByLabel('Credencial Institucional').fill(email);
+    await page.getByPlaceholder('nome@empresa.com.br', { exact: true }).fill(email);
     await page.getByPlaceholder('••••••••').fill(E2E_PASSWORD);
-    await page.getByRole('button', { name: /^ENTRAR NO BIRTH HUB/ }).click();
+    const signinResponsePromise = page.waitForResponse(
+      (response) => new URL(response.url()).pathname === '/api/auth/sign-in/email'
+        && response.request().method() === 'POST',
+    );
+    await page.getByRole('button', { name: /^Entrar na Plataforma$/ }).click();
+    expect((await signinResponsePromise).ok()).toBe(true);
     await expect(page).toHaveURL(/\/app/, { timeout: 15_000 });
+    const sessionResponse = await page.request.get('/api/auth/get-session');
+    expect(sessionResponse.ok()).toBe(true);
+    expect((await sessionResponse.json())?.user?.email).toBe(email);
   });
 
   test('login com senha incorreta é rejeitado pelo servidor e não navega pro app', async ({
@@ -52,15 +60,25 @@ test.describe('Autenticação', () => {
 
     await context.clearCookies();
     await page.goto('/login');
-    await page.getByLabel('Credencial Institucional').fill(email);
+    await page.getByPlaceholder('nome@empresa.com.br', { exact: true }).fill(email);
     await page.getByPlaceholder('••••••••').fill('SenhaErradaDeProposito!');
-    await page.getByRole('button', { name: /^ENTRAR NO BIRTH HUB/ }).click();
+    const signinResponsePromise = page.waitForResponse(
+      (response) => new URL(response.url()).pathname === '/api/auth/sign-in/email'
+        && response.request().method() === 'POST',
+    );
+    await page.getByRole('button', { name: /^Entrar na Plataforma$/ }).click();
+    const signinResponse = await signinResponsePromise;
+    expect(signinResponse.status()).toBe(401);
+    const signinError = await signinResponse.json();
+    expect(typeof signinError.message).toBe('string');
+    await expect(page.getByText(signinError.message, { exact: true })).toBeVisible();
 
-    // LoginScreen só renderiza um único <p> dentro do <form>: a mensagem de erro devolvida pelo
-    // servidor (result.error.message do better-auth) quando a autenticação falha.
-    await expect(page.locator('form p')).toBeVisible({ timeout: 10_000 });
+    // A API deve rejeitar a senha; uma mensagem visível sozinha não prova rejeição.
+    const sessionResponse = await page.request.get('/api/auth/get-session');
+    expect(sessionResponse.ok()).toBe(true);
+    expect(await sessionResponse.json()).toBeNull();
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('button', { name: /^ENTRAR NO BIRTH HUB/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Entrar na Plataforma$/ })).toBeVisible();
   });
 
   test('acessar /app sem sessão válida redireciona para /login (ProtectedRoute)', async ({

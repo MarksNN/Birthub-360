@@ -1,32 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { uniqueTestEmail, E2E_PASSWORD } from './helpers';
+import { signUp, uniqueTestEmail } from './helpers';
 
 test.describe('Onboarding de Módulos da Organização', () => {
   test('O administrador é obrigado a configurar a org no primeiro acesso e o acesso fica restrito', async ({ page }) => {
     const email = uniqueTestEmail('onboarding-modules');
     const name = `E2E Org Onboarding ${email}`;
 
-    // 1. SignUp manual para não acionar o auto-wizard do helpers.ts
-    await page.goto('/login?signup=1');
-    await page.getByPlaceholder('Seu Nome Completo').fill(name);
-    await page.getByLabel('Credencial Institucional').fill(email);
-    await page.getByPlaceholder('        ').fill(E2E_PASSWORD); // Senha
-    await page.getByRole('button', { name: /^Criar conta$/ }).click();
-
-    // Dependendo do ALLOW_DEV_AUTH_BYPASS, ele pode pedir verificação ou já entrar.
-    // O mais comum em dev/CI é já entrar, então vamos focar no caminho de bypass ligado
-    // (que é o que acontece no CI).
-    const outcome = await Promise.race([
-      page.waitForURL('**/setup').then(() => 'setup'),
-      page.getByText(/Enviamos um link de confirmação/).waitFor({ state: 'visible' }).then(() => 'verification')
-    ]);
-
-    // O teste real requer o bypass ativo ou que completemos a verificação,
-    // mas num ambiente de dev/CI, ALLOW_DEV_AUTH_BYPASS é true.
-    if (outcome === 'verification') {
-      test.skip(true, 'Teste requer ambiente com bypass de verificação de e-mail ativado.');
-      return;
-    }
+    // Cadastro e login reais; mantém o wizard para testar sua configuração neste spec.
+    await signUp(page, { email, name, completeOnboarding: false });
 
     // 2. Garante que estamos na tela do wizard
     await expect(page).toHaveURL(/\/setup/);

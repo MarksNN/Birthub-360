@@ -18,143 +18,79 @@ interface SignUpOptions {
   email: string;
   password?: string;
   name?: string;
+  completeOnboarding?: boolean;
 }
 
-// Cria um usuário real via o formulário de cadastro do LoginScreen (mesmo caminho que um usuário
-// real percorre — sem atalho de API/seed), espera a navegação pro destino pós-login real (o Command
-// Center em `/app`; `/hub` só redireciona pra lá) e então deixa a sessão de teste
-// pronta em `/app` (CRM), porque é o que a imensa maioria dos specs que consomem este helper
-// assume logo em seguida (clique direto num botão da Sidebar, sem `goto` explícito antes).
-//
-// Desde que o cadastro passou a exigir confirmação de posse do e-mail
-// (requireEmailVerification em src/lib/auth.ts — corrige um achado real do piloto de
-// threat-modeling do Mantis: antes, qualquer "algo@birthhub360.com.br" digitado, mesmo não sendo dono
-// real, virava sessão + ADMIN na hora), o sign-up passa a ter DOIS desfechos possíveis, e este
-// helper não pode assumir qual: com `ALLOW_DEV_AUTH_BYPASS=true` (é o caso deste job de CI — ver
-// ci.yml — e também de qualquer ambiente local que o exporte), `requireEmailVerification` fica
-// `false` e o comportamento é o de sempre (sessão aberta na hora, direto pro Hub); sem o
-// bypass, o better-auth NÃO loga mais automaticamente — a resposta vem com `token: null` e um
-// e-mail de verificação é "enviado" (sem SMTP configurado em teste, o link só é logado no
-// servidor — ver sendVerificationEmail em src/lib/auth.ts). Assumir sempre o segundo caso foi um
-// bug real: neste job (bypass ligado) o app já navega pro Hub na hora, o aviso de confirmação
-// nunca aparece, e esperar por ele até estourar 30s por chamada de `signUp()` — multiplicado por
-// dezenas de specs — foi o que fez o `application gate` do CI estourar o timeout do job inteiro
-// (30min) duas vezes seguidas. Por isso o helper detecta qual dos dois desfechos realmente
-// aconteceu em vez de presumir.
+// Cria a conta pelo cadastro visível de NewLoginScreen e depois força um login pela UI.
+// Não depende do antigo ?signup=1 nem presume que cadastro abre uma sessão.
 export async function signUp(
   page: Page,
-  { email, password = E2E_PASSWORD, name }: SignUpOptions,
+  { email, password = E2E_PASSWORD, name, completeOnboarding = true }: SignUpOptions,
 ) {
-  // Organization.name é @unique (prisma/schema.prisma) e o hook de signup (src/lib/auth.ts) deriva
-  // o nome da org a partir de `name` + marca — um default fixo tipo "E2E Test User" faz toda
-  // segunda chamada de signUp() colidir na constraint única. Isso apareceu mascarado como uma
-  // suposta violação de RLS, porque o catch de executeWithRls (src/lib/prisma.ts) reexecutava a
-  // query sem contexto nenhum depois do erro real (P2002) — bug real corrigido separadamente.
+  // Organization.name é única e deriva do nome do primeiro usuário.
   const resolvedName = name ?? `E2E Test User ${email}`;
-  // OnboardingTour.tsx mostra um tour em overlay 1.5s depois do primeiro carregamento de /app pra
-  // qualquer navegador sem essa chave no localStorage — em testes isso sempre é "sem", então o
-  // overlay aparecia no meio do teste e bloqueava clique nos botões da sidebar (crm.spec.ts).
-  // addInitScript roda antes de qualquer script da página em toda navegação futura.
   await page.addInitScript(() => {
     window.localStorage.setItem('@prospector:has_seen_tour', 'true');
   });
-  // ?signup=1: o link visível "Registrar Novo Acesso" foi removido da tela (contas são
-  // provisionadas pelo admin), mas o formulário de cadastro real continua existindo — ver
-  // comentário em LoginScreen.tsx. Evita reintroduzir um atalho de API/seed que fugiria do
-  // caminho real que um usuário (ou o próprio LoginScreen em modo de teste) percorre.
-  await page.goto('/login?signup=1');
-  await page.getByPlaceholder('Seu Nome Completo').fill(resolvedName);
-  await page.getByLabel('Credencial Institucional').fill(email);
-  await page.getByPlaceholder('••••••••').fill(password);
+  await page.goto('/login');
   await page.getByRole('button', { name: /^Criar conta$/ }).click();
+  await page.getByPlaceholder('Seu nome', { exact: true }).fill(resolvedName);
+  await page.getByPlaceholder('nome@empresa.com.br', { exact: true }).fill(email);
+  await page.getByPlaceholder('••••••••', { exact: true }).fill(password);
+  const signupResponsePromise = page.waitForResponse(
+    (response) => new URL(response.url()).pathname === '/api/auth/sign-up/email'
+      && response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: /^Solicitar Acesso$/ }).click();
+  const signupResponse = await signupResponsePromise;
+  expect(signupResponse.ok(), 'Cadastro real deve ser confirmado pelo servidor').toBe(true);
+  const signupData = await signupResponse.json();
+  expect(signupData.user?.email).toBe(email);
+  expect(signupData.token === null || (typeof signupData.token === 'string' && signupData.token.length > 0),
+    'Cadastro deve informar token válido ou null explícito').toBe(true);
 
-  // 15s bastava numa suíte E2E curta, mas com dezenas de specs rodando em série (workers: 1) contra
-  // o mesmo servidor/Postgres de teste, o signup (POST /api/auth/sign-up/email + refetch de sessão,
-  // ver LoginScreen.tsx) ocasionalmente passa de 15s sob a carga do runner do CI — sem indício de
-  // travamento real. 30s dá folga sem mascarar um hang de verdade.
-  //
-  // Corrida entre os dois desfechos possíveis (ver comentário da função) em vez de assumir um dos
-  // dois: `Promise.race` resolve assim que o PRIMEIRO virar verdadeiro — na prática isso acontece
-  // em segundos (não nos 30s cheios), porque o desfecho que realmente vai ocorrer neste ambiente
-  // sempre se resolve rápido; só o desfecho que NÃO vai acontecer fica pendurado até seu próprio
-  // timeout (daí o `.catch(() => null)`, pra nunca virar unhandled rejection).
-  const verificationPanel = page.getByText(/Enviamos um link de confirmação/);
-  const outcome = await Promise.race([
-    page
-      .waitForURL('**/app*', { timeout: 45_000 })
-      .then(() => 'authenticated' as const)
-      .catch(() => null),
-    page
-      .waitForURL('**/setup', { timeout: 45_000 })
-      .then(() => 'setup' as const)
-      .catch(() => null),
-    verificationPanel
-      .waitFor({ state: 'visible', timeout: 45_000 })
-      .then(() => 'pending-verification' as const)
-      .catch(() => null),
-  ]);
+  if (signupData.token === null) {
+    // Sem bypass de teste, confirma posse do e-mail no banco como o helper anterior;
+    // não cria usuário/sessão por seed nem altera a política de autenticação do produto.
+    await expect(page.getByText('Conta criada com sucesso! Verifique seu e-mail.', { exact: true }))
+      .toBeVisible();
+    requestContext.enterWith({ bypassRls: true });
+    await prisma.user.update({ where: { email }, data: { emailVerified: true } });
+  }
 
-  if (outcome === 'setup') {
-    // Nova regra de Onda C (Modularização): primeiro acesso de uma org sem onboardingCompletedAt
-    // redireciona o ADMIN pro wizard em /setup. Preenchemos o wizard automaticamente pra não
-    // quebrar os dezenas de specs existentes que esperam terminar em /app.
+  // Remove eventual sessão criada pelo cadastro para provar um login novo com a senha.
+  await page.context().clearCookies();
+  await page.goto('/login');
+  await page.getByPlaceholder('nome@empresa.com.br', { exact: true }).fill(email);
+  await page.getByPlaceholder('••••••••', { exact: true }).fill(password);
+  const signinResponsePromise = page.waitForResponse(
+    (response) => new URL(response.url()).pathname === '/api/auth/sign-in/email'
+      && response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: /^Entrar na Plataforma$/ }).click();
+  const signinResponse = await signinResponsePromise;
+  expect(signinResponse.ok(), 'Login com senha real deve ser confirmado pelo servidor').toBe(true);
+  const signinData = await signinResponse.json();
+  expect(signinData.user?.email).toBe(email);
+  expect(signinData.token).toBeTruthy();
+
+  await page.waitForURL(/\/(app|setup)(?:[/?#]|$)/, { timeout: 45_000 });
+  if (completeOnboarding && new URL(page.url()).pathname === '/setup') {
     await page.getByRole('button', { name: /Continuar/ }).click();
     await page.getByRole('button', { name: /Ir para o Dashboard/ }).click();
-    await page.waitForURL('**/app*', { timeout: 15_000 });
-    return;
   }
-  if (outcome === 'authenticated') {
-    // O login faz `window.location.href = '/hub'` e `/hub` só redireciona para `/app` (a tela do Hub
-    // foi removida — o Command Center em /app é o destino único), então a URL final já é `/app`.
-    return;
-  }
-  if (outcome !== 'pending-verification') {
-    throw new Error(
-      'signUp(): nem a navegação para /app nem /setup nem o aviso de confirmação de e-mail apareceram a tempo.',
-    );
-  }
+  await expect(page).toHaveURL(completeOnboarding ? /\/app(?:[/?#]|$)/ : /\/setup(?:[/?#]|$)/, { timeout: 15_000 });
 
-  // Confirma a posse do e-mail direto no banco — o passo que, numa conta real, aconteceria ao
-  // clicar no link recebido (ver comentário do helper acima).
-  requestContext.enterWith({ bypassRls: true });
-  await prisma.user.update({ where: { email }, data: { emailVerified: true } });
-
-  // Login real via API (não pela UI de novo) — só o CADASTRO em si precisa passar pela tela (é o
-  // caminho que exercita o hook real de criação/RLS); autenticar de novo depois de confirmado não
-  // precisa recarregar/hidratar a tela de login inteira só para preencher os mesmos 2 campos.
-  // `page.request` compartilha o cookie jar do browser context com `page`, então o cookie de
-  // sessão que a API devolve aqui já vale para a navegação seguinte.
-  //
-  // `page.request` não copia automaticamente um header Origin igual ao da página — melhor não
-  // depender de estar (ou não) isento da checagem por ainda não ter cookie de sessão (ver
-  // validateOrigin em node_modules/better-auth/dist/api/middlewares/origin-check.mjs) e mandar
-  // explícito. `page.url()` aqui ainda é a tela de login/signup, então a origem é a confiável.
-  const signInRes = await page.request.post('/api/auth/sign-in/email', {
-    headers: { Origin: new URL(page.url()).origin },
-    data: { email, password },
-  });
-  if (!signInRes.ok()) {
-    throw new Error(
-      `Login pós-verificação falhou (status ${signInRes.status()}): ${await signInRes.text()}`,
-    );
-  }
-  await page.goto('/app');
-  
-  // Trata o redirecionamento potencial para o /setup se for o primeiro acesso da org
-  const postLoginOutcome = await Promise.race([
-    page.waitForURL('**/app*', { timeout: 15_000 }).then(() => 'app' as const).catch(() => null),
-    page.waitForURL('**/setup', { timeout: 15_000 }).then(() => 'setup' as const).catch(() => null)
-  ]);
-
-  if (postLoginOutcome === 'setup') {
-    await page.getByRole('button', { name: /Continuar/ }).click();
-    await page.getByRole('button', { name: /Ir para o Dashboard/ }).click();
-    await page.waitForURL('**/app*', { timeout: 15_000 });
-  } else if (postLoginOutcome !== 'app') {
-    throw new Error('signUp(): após confirmação de e-mail, falhou ao acessar /app ou /setup.');
-  }
+  // URL sozinha não comprova sessão: consulta o backend com os cookies do navegador.
+  const sessionResponse = await page.request.get('/api/auth/get-session');
+  expect(sessionResponse.ok(), 'Sessão autenticada deve existir no backend').toBe(true);
+  const sessionData = await sessionResponse.json();
+  expect(sessionData?.user?.email).toBe(email);
+  expect(sessionData?.user?.id).toBeTruthy();
+  expect(sessionData?.session?.userId).toBeTruthy();
+  expect(sessionData?.session?.userId).toBe(sessionData?.user?.id);
+  expect(sessionData?.session?.id).toBeTruthy();
 }
-
 /**
  * Rebaixa/eleva o papel de um usuário já cadastrado, direto no banco de teste — usado só por
  * specs de RBAC que precisam de um papel diferente de ADMIN (o público `signUp()` sempre cria um
