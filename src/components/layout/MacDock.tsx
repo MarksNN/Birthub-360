@@ -109,9 +109,7 @@ export function MacDock({ activeTab }: MacDockProps) {
     {
       title: 'PILAR 08 — ENGAJAMENTO COMERCIAL',
       // voice-hub/outbound/dialer: fora da nav (NAV_HIDDEN_TABS — gate MODULE_NOT_READY, P0 #693 item 6).
-      items: [
-        ...(canAccessMesaTratamento ? (['mesa-tratamento'] as TabType[]) : []),
-      ],
+      items: [...(canAccessMesaTratamento ? (['mesa-tratamento'] as TabType[]) : [])],
     },
     {
       title: 'ADMINISTRAÇÃO',

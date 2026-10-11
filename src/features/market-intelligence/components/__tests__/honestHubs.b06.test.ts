@@ -38,9 +38,7 @@ describe('B-06 InteligenciaMercadoHub — sem dados fictícios', () => {
 
   it('mostra estado bloqueado quando não há snapshot e nunca lista empresas inventadas', async () => {
     renderWithRouter(createElement(InteligenciaMercadoHub));
-    expect(
-      await screen.findByText('Catálogo de inteligência não disponível'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Catálogo de inteligência não disponível')).toBeInTheDocument();
     expect(screen.queryByText('TechLog Soluções')).not.toBeInTheDocument();
     expect(screen.queryByText('1.420 empresas')).not.toBeInTheDocument();
     expect(screen.queryByText('91.4%')).not.toBeInTheDocument();
@@ -96,9 +94,7 @@ describe('B-06 ProspeccaoInteligenteHub — sem dados fictícios', () => {
       throw new Error(`URL inesperada: ${url}`);
     });
     renderWithRouter(createElement(ProspeccaoInteligenteHub));
-    expect(
-      await screen.findByText('Provedores de prospecção não conectados'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Provedores de prospecção não conectados')).toBeInTheDocument();
     expect(screen.queryByText('Rodrigo Medeiros')).not.toBeInTheDocument();
     expect(screen.queryByText('CloudScale Brasil')).not.toBeInTheDocument();
     expect(screen.queryByText('4.850 contatos')).not.toBeInTheDocument();

@@ -132,7 +132,8 @@ export function ProspeccaoInteligenteHub() {
   }, []);
 
   const paidProviders = useMemo(
-    () => (providers || []).filter((p) => p.billable || p.id === 'apollo' || p.id === 'googlePlaces'),
+    () =>
+      (providers || []).filter((p) => p.billable || p.id === 'apollo' || p.id === 'googlePlaces'),
     [providers],
   );
   const anyPaidReady = paidProviders.some(providerConnected);
@@ -290,7 +291,6 @@ export function ProspeccaoInteligenteHub() {
                 </CardContent>
               </Card>
             )}
-
 
             <Card>
               <CardHeader>
