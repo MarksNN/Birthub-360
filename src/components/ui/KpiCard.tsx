@@ -1,53 +1,53 @@
-import { useState, type ComponentType, type MouseEvent, type PointerEvent } from 'react';
+import { type ComponentType, type MouseEvent, type PointerEvent, useState } from 'react';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
 
-/* Generalizado a partir de `KpiStat` (JoaoReisDiagnosticHub.tsx) — atualizado para novo visual Minimal Dark */
+/* Operate Impeccable — tones via tokens semânticos (light + dark). */
 const KPI_TONES = {
   brand: {
-    chip: 'border-[#38bdf8] text-[#38bdf8] bg-[#38bdf8]/10',
-    trend: 'text-[#38bdf8]',
-    glow: 'rgba(56,189,248,0.15)',
+    chip: 'border-brand/40 text-brand-text bg-brand/10',
+    trend: 'text-brand-text',
+    glow: 'color-mix(in srgb, var(--brand) 22%, transparent)',
   },
   ink: {
-    chip: 'border-slate-500 text-slate-400 bg-slate-800',
-    trend: 'text-slate-400',
-    glow: 'rgba(255,255,255,0.06)',
+    chip: 'border-line text-ink-2 bg-surface-2',
+    trend: 'text-ink-2',
+    glow: 'color-mix(in srgb, var(--ink) 8%, transparent)',
   },
   ok: {
-    chip: 'border-[#22c55e] text-[#22c55e] bg-[#22c55e]/10',
-    trend: 'text-[#22c55e]',
-    glow: 'rgba(34,197,94,0.15)',
+    chip: 'border-ok/40 text-ok-active bg-ok/10',
+    trend: 'text-ok-active',
+    glow: 'color-mix(in srgb, var(--ok) 22%, transparent)',
   },
   gold: {
-    chip: 'border-[#EAB308] text-[#EAB308] bg-[#EAB308]/10',
-    trend: 'text-[#EAB308]',
-    glow: 'rgba(234,179,8,0.15)',
+    chip: 'border-[color:var(--gold)]/40 text-[color:var(--gold)] bg-[color:var(--gold)]/10',
+    trend: 'text-[color:var(--gold)]',
+    glow: 'color-mix(in srgb, var(--gold) 22%, transparent)',
   },
   critical: {
-    chip: 'border-[#EF4444] text-[#EF4444] bg-[#EF4444]/10',
-    trend: 'text-[#EF4444]',
-    glow: 'rgba(239,68,68,0.15)',
+    chip: 'border-critical/40 text-critical-active bg-critical/10',
+    trend: 'text-critical-active',
+    glow: 'color-mix(in srgb, var(--critical) 22%, transparent)',
   },
   iris: {
-    chip: 'border-[#8B5CF6] text-[#8B5CF6] bg-[#8B5CF6]/10',
-    trend: 'text-[#8B5CF6]',
-    glow: 'rgba(139,92,246,0.15)',
+    chip: 'border-[color:var(--iris)]/40 text-[color:var(--iris)] bg-[color:var(--iris)]/10',
+    trend: 'text-[color:var(--iris)]',
+    glow: 'color-mix(in srgb, var(--iris) 22%, transparent)',
   },
   cyan: {
-    chip: 'border-[#06b6d4] text-[#06b6d4] bg-[#06b6d4]/10',
-    trend: 'text-[#06b6d4]',
-    glow: 'rgba(6,182,212,0.15)',
+    chip: 'border-brand/40 text-brand-text bg-brand/10',
+    trend: 'text-brand-text',
+    glow: 'color-mix(in srgb, var(--brand) 22%, transparent)',
   },
   pulse: {
-    chip: 'border-[#EC4899] text-[#EC4899] bg-[#EC4899]/10',
-    trend: 'text-[#EC4899]',
-    glow: 'rgba(236,72,153,0.15)',
+    chip: 'border-[color:var(--pulse)]/40 text-[color:var(--pulse)] bg-[color:var(--pulse)]/10',
+    trend: 'text-[color:var(--pulse)]',
+    glow: 'color-mix(in srgb, var(--pulse) 22%, transparent)',
   },
   orange: {
-    chip: 'border-[#F97316] text-[#F97316] bg-[#F97316]/10',
-    trend: 'text-[#F97316]',
-    glow: 'rgba(249,115,22,0.15)',
+    chip: 'border-warning/40 text-warning bg-warning/10',
+    trend: 'text-warning',
+    glow: 'color-mix(in srgb, var(--warning, #f97316) 22%, transparent)',
   },
 } as const;
 
@@ -126,10 +126,11 @@ export function KpiCard({
   };
 
   const sharedClassName = cn(
-    'group relative w-full overflow-hidden rounded-2xl border border-white/5 bg-[#1C1D24] p-5 text-left shadow-sm transition-all duration-300',
+    'group relative w-full overflow-hidden rounded-2xl border border-line bg-surface p-5 text-left text-ink shadow-sm transition-all duration-300',
     onSelect &&
-    'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-white/10 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B7DFF]',
-    active && 'border-[#8B7DFF]/60 shadow-[0_0_0_2px_rgba(139,125,255,0.2)] bg-[#1F202B]',
+      'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-line-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+    active &&
+      'border-brand/60 bg-surface-elevated shadow-[0_0_0_2px_color-mix(in_srgb,var(--brand)_25%,transparent)]',
     className,
   );
 
@@ -145,20 +146,15 @@ export function KpiCard({
         />
       )}
 
-      <div className="relative z-10 flex flex-col justify-between h-full space-y-4">
-        {/* Top: Icon */}
+      <div className="relative z-10 flex h-full flex-col justify-between space-y-4">
         <div className="flex items-start justify-between">
           <span
             className={cn(
-              'flex h-[38px] w-[38px] items-center justify-center rounded-xl border border-dashed transition-all duration-300 group-hover:scale-110 group-hover:rotate-3',
+              'flex h-[38px] w-[38px] items-center justify-center rounded-xl border transition-all duration-300 group-hover:scale-110 group-hover:rotate-3',
               t.chip,
             )}
-            style={{
-              borderStyle:
-                'solid' /* Override dashed with solid to match image, or keep border thin */,
-            }}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-5 w-5" aria-hidden="true" />
           </span>
 
           {active && (
@@ -167,23 +163,21 @@ export function KpiCard({
               aria-hidden="true"
               title="Card ativo"
             >
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#8B7DFF] opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#8B7DFF]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
             </span>
           )}
         </div>
 
-        {/* Middle: Value & Label */}
         <div>
-          <h3 className="font-sans text-[26px] font-bold text-white tracking-tight leading-none mb-1.5">
+          <h3 className="mb-1.5 font-display text-[26px] font-bold leading-none tracking-tight text-ink">
             {value}
           </h3>
-          <p className="text-[13px] font-medium text-slate-400">{displayLabel}</p>
+          <p className="text-[13px] font-medium text-ink-2">{displayLabel}</p>
         </div>
 
-        {/* Bottom: Trend / Subtitle */}
         {(trend || displaySubtitle) && (
-          <div className="flex items-center gap-1.5 mt-2">
+          <div className="mt-2 flex items-center gap-1.5">
             {trend && (
               <span className={cn('text-[11px] font-semibold', t.trend)}>
                 {trend.isPositive !== false ? '+' : '-'}
@@ -192,7 +186,7 @@ export function KpiCard({
               </span>
             )}
             {displaySubtitle && (
-              <span className={cn('text-[11px] text-slate-500', !trend && t.trend)}>
+              <span className={cn('text-[11px] text-ink-2', !trend && t.trend)}>
                 {displaySubtitle}
               </span>
             )}
@@ -218,16 +212,8 @@ export function KpiCard({
     );
   }
 
-  // Ramo sem onSelect: puramente apresentacional (sem role/teclado).
-  // Remover onSelect?.() aqui — após o early-return, TS estreita onSelect a undefined (TS2349).
-  return (
-    <div
-      onPointerMove={handlePointerMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={sharedClassName}
-    >
-      {content}
-    </div>
-  );
+  // Ramo sem onSelect: puramente apresentacional (sem role/teclado/ponteiro).
+  // Sem onSelect?.() aqui — após o early-return, TS estreita onSelect a undefined (TS2349, #702).
+  // Sem handlers de ponteiro (Biome noStaticElementInteractions); spotlight/hover SFX só no <button>.
+  return <div className={sharedClassName}>{content}</div>;
 }

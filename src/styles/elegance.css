@@ -115,6 +115,10 @@
   --ink: var(--el-ink);
   --ink-2: var(--el-ink-2);
   --line: var(--el-line);
+  /* A03-P0-02 (cirúrgico, a11y): o :root acima define --on-brand: var(--el-ink), que no escuro
+     resolve para o creme #f8f4ea — 2.18:1 sobre o ouro --brand. Texto sobre superfície de marca
+     precisa ficar escuro nos dois temas (ouro é claro): ink do tema claro, ~8:1. */
+  --on-brand: #141218;
 }
 
 /* ─── Typography ─────────────────────────────────────────────────── */
@@ -638,8 +642,10 @@ h3,
 }
 
 /* ─── Focus Rings (elegant, gold) ────────────────────────────────── */
+/* A03-P1-01 (cirúrgico, a11y): ouro cru sobre pearl mede 2.26:1 (< 3:1). Usa o token de foco
+   de globals.css (ouro escurecido no claro, ouro cru no escuro); fallback mantém o ouro. */
 *:focus-visible {
-  outline: 2px solid var(--el-gold);
+  outline: 2px solid var(--focus-ring, var(--el-gold));
   outline-offset: 2px;
   border-radius: inherit;
 }

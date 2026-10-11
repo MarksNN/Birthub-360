@@ -157,6 +157,17 @@
   --ink: #0b132b;
   --ink-2: #475569;
   --line: rgba(11, 19, 43, 0.12);
+  /* A03-P1-09 — --line é DECORATIVO (divisores, ~1.2–1.3:1). Limite de controle de formulário
+     (input/select/textarea/toggle/outline) precisa de >= 3:1 (WCAG 1.4.11): --border-input.
+     --line-strong é o degrau de hover. Derivados de --ink/--surface para seguirem qualquer
+     paleta ativa (inclusive a de elegance.css), sem hex novo. Calculado: ~3.5:1 (claro). */
+  --border-input: color-mix(in srgb, var(--ink) 50%, var(--surface));
+  --line-strong: color-mix(in srgb, var(--ink) 65%, var(--surface));
+  /* A03-P1-01 — anel de foco >= 3:1. --brand cru como anel no claro mede 2.26–2.65:1 (ouro do
+     elegance / sky). Mesma fórmula de --color-brand-ink (53% preto), ~6–7:1 contra --bg/--surface.
+     --brand-text é o mesmo tom, para uso como TEXTO (alias `primary`). */
+  --brand-text: color-mix(in srgb, var(--brand) 53%, black);
+  --focus-ring: var(--brand-text);
   /* Paleta Oficial */
   --midnight: #0b132b;
   --sunset: #ef4444;
@@ -290,11 +301,6 @@
   --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Vancouver Plus Button Gradient - Paleta Coolors */
-.vancouver-btn-gradient {
-  background: linear-gradient(135deg, var(--coolors-blue) 0%, var(--coolors-purple) 100%);
 }
 
 /* Vancouver Plus Card Styles */
@@ -566,9 +572,16 @@
      translúcido, só pra texto sólido contra --surface/--surface-2. Removido o override; ver
      `.claude/PILOTS.md`. */
   --critical-active: color-mix(in srgb, var(--critical) 20%, white);
-  /* --color-ok cru já passa 4.5:1 contra a superfície escura — ver comentário de --ok-active
-     no :root acima. */
-  --ok-active: var(--color-ok);
+  /* Ver :root (A03-P1-09/P1-01): no escuro a marca crua já passa como anel/texto (>= 3:1 / 4.5:1),
+     e a borda de controle clareia em direção a --ink. Calculado: ~4:1 contra --surface escura. */
+  --border-input: color-mix(in srgb, var(--ink) 45%, var(--surface));
+  --line-strong: color-mix(in srgb, var(--ink) 60%, var(--surface));
+  --brand-text: var(--brand);
+  --focus-ring: var(--brand);
+  /* A03-P1-06: com a paleta efetiva (elegance.css troca --ok pelo sage #5f8a7a também no escuro),
+     --color-ok cru no badge soft escuro media 4.04:1 (< 4.5:1). 25% de branco recupera margem
+     (~6:1 com o sage; ~8.6:1 com o verde original), mesma direção de --critical-active no escuro. */
+  --ok-active: color-mix(in srgb, var(--color-ok) 75%, white);
   /* --warn cru já passa 11.70:1 contra a superfície escura — ver comentário de --warn-active no
      :root acima. */
   --warn-active: var(--warn);
@@ -658,7 +671,20 @@
   /* text-red-violet-active — variante seguro-como-texto de --color-red-violet (que fica intocado
      para halos/badges), ver --red-violet-active em :root/.dark. */
   --color-red-violet-active: var(--red-violet-active);
-  --color-ring: var(--brand);
+  --color-ring: var(--focus-ring);
+  --color-focus-ring: var(--focus-ring);
+  /* Borda de controle >= 3:1 (A03-P1-09): `border-input`; hover: `border-line-strong`. */
+  --color-input: var(--border-input);
+  --color-line-strong: var(--line-strong);
+  /* A03-P2-07 — aliases de nomenclatura shadcn ainda usados no código (MainLayout,
+     LandingLoginSplitScreen, AISuiteHub…) e que hoje geram classes sem efeito. Só aliases para os
+     tokens semânticos existentes; não criar componente novo em cima deles.
+     `primary` aponta para --brand-text (seguro como texto nos dois temas), não para --brand cru. */
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-border: var(--line);
+  --color-primary: var(--brand-text);
+  --color-muted: var(--surface-2);
 
   --color-success: #22c55e;
   --color-warning: #f59e0b;
@@ -1102,7 +1128,7 @@
      próprio anel de foco. Regras mais específicas (ex.: focus-visible:ring-* dos componentes)
      continuam vencendo por especificidade. */
   :focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
@@ -1209,9 +1235,9 @@
   }
 
   .bh-focus:focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 20%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus-ring) 20%, transparent);
   }
 
   .bh-interactive {
@@ -1349,7 +1375,7 @@
   }
 
   .bh-state-focus:focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
@@ -1501,7 +1527,7 @@
 
 /* Focus utility */
 .bh-focus {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -1595,7 +1621,10 @@
   font-family: var(--font-brand-display);
   font-weight: 600;
   font-size: 0.875rem;
-  color: var(--white);
+  /* A03-P1-08: texto branco sobre o gradiente claro media 2.40–3.04:1. --on-brand é o par
+     validado de texto sobre superfície de marca (ver --color-on-brand no @theme). Definição única
+     (a duplicata com --coolors-* perto do topo foi removida — A03-P3-04). */
+  color: var(--on-brand);
   background: linear-gradient(135deg, var(--brand) 0%, var(--iris) 100%);
   box-shadow: 0 4px 14px color-mix(in srgb, var(--brand) 35%, transparent);
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
