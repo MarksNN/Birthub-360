@@ -944,6 +944,8 @@ model Organization {
   externalCrmConnections        ExternalCrmConnection[]
   externalCrmSyncRules          ExternalCrmSyncRule[]
   externalCrmSyncLogs           ExternalCrmSyncLog[]
+  externalEntityLinks           ExternalEntityLink[]
+  externalCrmStageMappings      ExternalCrmStageMapping[]
   attachments                   Attachment[]
   optOutRecords                 OptOutRecord[]
   crmPipelines                  CrmPipeline[]
@@ -4940,15 +4942,42 @@ model ExternalCrmConnection {
   /// Whether we process inbound webhooks/events from this CRM
   inboundEventsEnabled Boolean @default(false)
 
-  syncRules ExternalCrmSyncRule[]
-  syncLogs  ExternalCrmSyncLog[]
+  /// Estado operacional consultável sem decifrar `config` (onda-16).
+  /// "active" | "expired" | "error" | "disconnected"
+  status String @default("active")
+
+  /// Espelho NÃO sensível de `config.expiresAt`. Tokens NUNCA saem de `config` (cifrado via piiFields).
+  tokenExpiresAt DateTime?
+  lastRefreshAt  DateTime?
+  lastErrorAt    DateTime?
+  /// Mensagem de erro já sanitizada pelo chamador (sem token/segredo).
+  lastError      String?   @db.Text
+
+  /// Identificador da conta/portal no CRM externo (ex.: HubSpot `hub_id`).
+  externalAccountId String?
+
+  /// De/para de campos por conexão:
+  /// { "lead": { "<campoInterno>": "<propExterna>" }, "company": {...}, "contact": {...} }
+  fieldMapping Json @default("{}")
+
+  /// Outbound (push para o CRM externo) só para conexões com opt-in explícito.
+  outboundEnabled Boolean   @default(false)
+  lastSyncAt      DateTime?
+
+  syncRules     ExternalCrmSyncRule[]
+  syncLogs      ExternalCrmSyncLog[]
+  entityLinks   ExternalEntityLink[]
+  stageMappings ExternalCrmStageMapping[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  /// Postgres aceita múltiplos NULL: conexões antigas sem externalAccountId não colidem.
+  @@unique([organizationId, provider, externalAccountId])
   @@index([organizationId])
   @@index([organizationId, createdAt])
   @@index([provider])
+  @@index([status, tokenExpiresAt])
 }
 
 model ExternalCrmSyncRule {
@@ -4997,6 +5026,10 @@ model ExternalCrmSyncLog {
   lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
 
   externalEntityId String?
+  /// "lead" | "company" | "contact" (onda-16, decisão 00)
+  entityType       String?
+  /// Hash do payload trocado (anti-eco/idempotência; decisão 00)
+  payloadHash      String?
   payloadSnapshot  String? @db.Text
   errorDetails     String? @db.Text
 
@@ -5005,8 +5038,66 @@ model ExternalCrmSyncLog {
   @@index([organizationId])
   @@index([organizationId, createdAt])
   @@index([connectionId])
+  @@index([connectionId, externalEntityId])
   @@index([leadId])
   @@index([createdAt])
+}
+
+/// Vínculo estável entidade interna <-> ID no CRM externo (fonte de verdade do sync; o SyncLog é só auditoria).
+/// Importador (decisão 00, onda-16): inbound sem match aqui -> criar Lead (+Company/Contact quando vierem)
+/// e os respectivos ExternalEntityLink NA MESMA TRANSAÇÃO (sem fila de revisão).
+/// Bitrix NÃO usa esta tabela nesta onda (segue bitrixLeadId/bitrixDealId).
+model ExternalEntityLink {
+  id             String                @id @default(cuid())
+  organizationId String
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connectionId   String
+  connection     ExternalCrmConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  /// "lead" | "company" | "contact"
+  entityType        String
+  /// Lead.id | Company.id | Contact.id (sem FK polimórfica)
+  internalId        String
+  /// Objeto no CRM externo, ex.: "deal" | "company" | "contact"
+  externalType      String
+  externalId        String
+  /// last-write-wins / anti-loop
+  externalUpdatedAt DateTime?
+  lastSyncedAt      DateTime?
+  /// "inbound" | "outbound"
+  lastDirection     String?
+  /// anti-eco: não reprocessar o que nós mesmos enviamos
+  lastPayloadHash   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([connectionId, externalType, externalId])
+  @@unique([connectionId, entityType, internalId])
+  @@index([organizationId])
+  @@index([organizationId, entityType, internalId])
+}
+
+/// Mapeamento etapa externa (ex.: HubSpot pipeline/dealstage) <-> LeadStatus interno, por conexão.
+model ExternalCrmStageMapping {
+  id                 String                @id @default(cuid())
+  organizationId     String
+  organization       Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connectionId       String
+  connection         ExternalCrmConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  externalPipelineId String
+  externalStageId    String
+  externalStageLabel String?
+  internalStatus     LeadStatus
+  /// Etapa usada ao empurrar (outbound) esse LeadStatus
+  outboundDefault    Boolean               @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([connectionId, externalPipelineId, externalStageId])
+  @@index([organizationId])
+  @@index([connectionId, internalStatus])
 }
 
 // ---------------------------------------------------------------------------------------------
