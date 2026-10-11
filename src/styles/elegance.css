@@ -10,12 +10,13 @@
    - Ink       #141218  (deep ink)
    - Pearl     #FBF8F3  (warm cream)
 
-   Typography:
-   - Fraunces (variable serif) — display, headlines
-   - Instrument Sans — body, UI
+   Typography (Constituição / Impeccable Operate):
+   - Sora — display, headlines (--font-brand-display)
+   - Inter — body, UI (--font-brand-sans)
+   - Self-hosted; sem Google Fonts
    ───────────────────────────────────────────────────────────────────── */
 
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap");
+/* Google Fonts removido (Impeccable Operate / Constituição): Sora+Inter self-hosted. */
 
 /* ─── Design Tokens Override ───────────────────────────────────────── */
 :root,
@@ -126,7 +127,7 @@ html,
 body {
   background: var(--el-pearl);
   color: var(--el-ink);
-  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-brand-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
   font-feature-settings:
     "ss01" on,
     "cv11" on;
@@ -150,23 +151,22 @@ body {
     radial-gradient(700px 400px at 110% 105%, rgba(95, 138, 122, 0.1), transparent 55%);
 }
 
-/* Display font applied globally where font-display class is used */
+/* Display: Sora (Constituição) — sem !important para não travar utilitários */
 .font-display,
-[class*="font-display"],
 h1,
 h2,
 h3,
 .text-display,
 .el-display {
-  font-family: "Fraunces", "Instrument Serif", ui-serif, Georgia, serif !important;
+  font-family: var(--font-brand-display), "Sora", ui-sans-serif, system-ui, sans-serif;
   font-optical-sizing: auto;
   letter-spacing: -0.02em;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .el-display-italic,
 .font-display-italic {
-  font-family: "Instrument Serif", "Fraunces", ui-serif, Georgia, serif !important;
+  font-family: var(--font-brand-display), "Sora", ui-sans-serif, system-ui, sans-serif;
   font-style: italic;
   letter-spacing: -0.01em;
 }
@@ -465,7 +465,7 @@ h3,
   gap: 0.6rem;
   padding: 0.7rem 1.4rem;
   border-radius: var(--el-r-pill);
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-brand-sans), "Inter", sans-serif;
   font-weight: 500;
   font-size: 0.875rem;
   letter-spacing: 0.01em;
@@ -605,7 +605,7 @@ h3,
   border: 1px solid var(--el-line-strong);
   border-radius: var(--el-r-md);
   color: var(--el-ink);
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-brand-sans), "Inter", sans-serif;
   font-size: 0.925rem;
   transition: all 0.3s var(--el-ease);
   outline: none;
@@ -624,7 +624,7 @@ h3,
   align-items: center;
   gap: 1rem;
   color: var(--el-ink-3);
-  font-family: "Fraunces", serif;
+  font-family: var(--font-brand-display), "Sora", sans-serif;
   font-style: italic;
   font-size: 0.875rem;
 }
