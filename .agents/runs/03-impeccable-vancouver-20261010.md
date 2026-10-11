@@ -15,7 +15,7 @@
 | G5 | Contraste AA em brand/on-brand | feito no #692 | manter |
 | G6 | Foco visível ≥ 3:1 | feito no #692 | manter |
 | G7 | Densidade Operate (scan + próxima ação) | **em curso** | precisa surfaces com 02 |
-| G8 | Evidências screenshots light/dark desktop/mobile | aberto | 08 / browser |
+| G8 | Evidências screenshots light/dark desktop/mobile | **feito (mock KPI)** | `.agents/runs/evidence-impeccable/` |
 | G9 | Axe nos dois temas | aberto | 08 |
 | G10 | Remover scan de classes inválidas em `.md` | feito no #689 | lição: não colar className quebrado em handoffs |
 
@@ -58,3 +58,12 @@ App.tsx, Sidebar, voice-hub, #689 MacDock/KpiCard/ThemeToggle, package.json, ide
 - `elegance.css`: helpers `.operate-dense` / `.operate-kpi-grid` / `.operate-panel`
 - Shell App/Sidebar: Agente 02 em `agente/02-shell-impeccable-operate`
 - Base a11y local merge `#692` @ bc341a2 (remoto impeccable ainda precisa sync via push de arquivos)
+
+## Evidências (2026-10-10)
+
+Mock Operate KPI (HTML) — light/dark × desktop/mobile:
+- `desktop-light.png` / `desktop-dark.png`
+- `mobile-light.png` / `mobile-dark.png`
+- fonte: `kpi-light-dark.html`
+
+App live screenshots dependem de shell 02 + session; este mock valida tokens Operate pearl vs ink.
