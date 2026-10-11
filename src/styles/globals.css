@@ -304,12 +304,12 @@
 }
 
 /* Vancouver Plus Card Styles */
-.dark .vancouver-card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
-}
-
 .vancouver-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%);
+}
+
+.dark .vancouver-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
 }
 
 /* Vancouver Plus Badge Styles */
