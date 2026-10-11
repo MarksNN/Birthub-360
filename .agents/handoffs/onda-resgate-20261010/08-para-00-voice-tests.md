@@ -1,7 +1,7 @@
 De: Agente 08 — QA e Release
 Para: Agente 00 — Coordenador
 Onda: resgate-20261010
-Status: aberto
+Status: resolvido (PR #688 integrado na main @ 38bac465; parecer APROVADO pelo 24)
 Prioridade: alto
 Bloqueador-ref: persistência real e isolamento backend não restabelecidos
 Sprint destino: revisão independente 24 e integração local autorizada

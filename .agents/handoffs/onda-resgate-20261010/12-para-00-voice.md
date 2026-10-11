@@ -3,7 +3,7 @@
 De: 12 — Voz e Telefonia
 Para: 00 — Coordenação; 07 — Validação/runtime; 08 — QA; 24 — Auditoria independente
 Onda: resgate-20261010
-Status: em-andamento (implementado; aguardando auditoria independente)
+Status: resolvido (PR #688 integrado na main @ 38bac465; parecer APROVADO pelo 24)
 Prioridade: alto
 Bloqueador-ref: backend-voice-hub-indisponivel; validation-unavailable
 Sprint destino: mesma onda para review; ativação backend fora deste resgate

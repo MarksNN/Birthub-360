@@ -161,14 +161,16 @@ router.post('/webhooks/bland/:token', validateBlandCallbackToken, async (req, re
 
   // There must never be a built-in credential or localhost destination in this production path.
   // Both values are external configuration and the callback fails closed when either is absent.
-  const atlasBaseUrl = (process.env.BIRTHHUB360_BASE_URL || process.env.ATLASGR_BASE_URL)?.trim();
+  const birthhubBaseUrl = (
+    process.env.BIRTHHUB360_BASE_URL || process.env.ATLASGR_BASE_URL
+  )?.trim();
   const webhookSecret = process.env.BIRTHHUB360_WEBHOOK_SECRET?.trim();
-  if (!atlasBaseUrl || !webhookSecret) {
+  if (!birthhubBaseUrl || !webhookSecret) {
     logger.error(
       'Bland AI callback cannot be forwarded: Birth Hub 360 destination or signing secret is missing',
       {
         callId,
-        hasBaseUrl: Boolean(atlasBaseUrl),
+        hasBaseUrl: Boolean(birthhubBaseUrl),
         hasSecret: Boolean(webhookSecret),
       },
     );
@@ -233,17 +235,20 @@ router.post('/webhooks/bland/:token', validateBlandCallbackToken, async (req, re
   });
 
   try {
-    const response = await fetch(`${birthhubBaseUrl.replace(/\/$/, '')}/api/webhooks/voice-result`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-birthhub360-webhook-secret': webhookSecret,
-        // Lets the receiving CRM make its own update idempotent even if this service crashes after
-        // Birth Hub 360 accepts the request but before Redis is marked `done`.
-        'x-idempotency-key': `bland-call-result:${callId}`,
+    const response = await fetch(
+      `${birthhubBaseUrl.replace(/\/$/, '')}/api/webhooks/voice-result`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-birthhub360-webhook-secret': webhookSecret,
+          // Lets the receiving CRM make its own update idempotent even if this service crashes after
+          // Birth Hub 360 accepts the request but before Redis is marked `done`.
+          'x-idempotency-key': `bland-call-result:${callId}`,
+        },
+        body: JSON.stringify(forwardPayload),
       },
-      body: JSON.stringify(forwardPayload),
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Birth Hub 360 voice-result returned HTTP ${response.status}`);
