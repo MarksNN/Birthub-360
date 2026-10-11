@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   MessageSquareText,
   Copy,
@@ -9,39 +9,25 @@ import {
   Users,
   Plus,
   Sparkles,
-  Filter,
 } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from '../../../components/ui/Card.js';
+import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
 import { Button } from '../../../components/ui/Button.js';
 import { Badge } from '../../../components/ui/Badge.js';
-import { orchestrationApi, type RoteiroItem } from '../orchestration.api.js';
+import {
+  DemoBadge,
+  NO_API_SUBTITLE,
+  OrchestrationEmptyState,
+  OrchestrationStatusBanner,
+} from './DemoDataNotice.js';
+import { useOrchestrationOverview } from './useOrchestrationOverview.js';
 
 export function RoteirosHub() {
-  const [roteiros, setRoteiros] = useState<RoteiroItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isTemplate, noRealData, loading, error, reload } = useOrchestrationOverview();
+  const roteiros = data?.roteiros ?? [];
   const [selectedCanal, setSelectedCanal] = useState<string>('Todos');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    orchestrationApi.getOverview().then((res) => {
-      if (mounted) {
-        setRoteiros(res.roteiros);
-        setLoading(false);
-      }
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const canais = ['Todos', 'Telefone', 'WhatsApp', 'Reunião'];
 
@@ -75,7 +61,12 @@ export function RoteirosHub() {
         icon={MessageSquareText}
         actions={
           <div className="flex gap-2">
-            <Button variant="default" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              disabled
+              title="Em breve — criação ainda não disponível"
+            >
               <Plus className="w-4 h-4 mr-2" /> Novo Roteiro
             </Button>
           </div>
@@ -93,30 +84,34 @@ export function RoteirosHub() {
           </div>
         </div>
 
-        {/* KPIs */}
+        <OrchestrationStatusBanner
+          isTemplate={isTemplate}
+          noRealData={noRealData}
+          error={error}
+          onRetry={reload}
+        />
+
+        {/* KPIs (P0 #693: sem números fixos — só API ou “Indisponível”) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <KpiCard
-            title="Scripts Catalogados"
-            value="18 roteiros"
-            trend={{ value: 'Multicanal', isPositive: true }}
+            title="Roteiros Listados"
+            value={loading || error ? '—' : String(roteiros.length)}
             icon={MessageSquareText}
-            subtitle="Cold call, whatsapp e reuniões"
+            subtitle={isTemplate ? 'Modelos de exemplo' : 'Cadastrados na organização'}
             variant="default"
           />
           <KpiCard
             title="Taxa de Conexão Média"
-            value="79.3%"
-            trend={{ value: '+8.5% com ganchos validados', isPositive: true }}
+            value="Indisponível"
             icon={Sparkles}
-            subtitle="Eficácia comprovada no campo"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
           <KpiCard
             title="Variáveis Dinâmicas"
-            value="100% integradas"
-            trend={{ value: 'Auto-preenchimento CRM', isPositive: true }}
+            value="Indisponível"
             icon={Check}
-            subtitle="Zero cópia manual"
+            subtitle={NO_API_SUBTITLE}
             variant="default"
           />
         </div>
@@ -145,6 +140,17 @@ export function RoteirosHub() {
             <div className="h-56 bg-[var(--surface-2)] rounded-xl" />
             <div className="h-56 bg-[var(--surface-2)] rounded-xl" />
           </div>
+        ) : error ? null : filtered.length === 0 ? (
+          <OrchestrationEmptyState
+            title={
+              roteiros.length === 0 ? 'Nenhum roteiro cadastrado' : 'Nenhum roteiro neste canal'
+            }
+            hint={
+              roteiros.length === 0
+                ? 'Ainda não há roteiros cadastrados para a organização.'
+                : 'Escolha outro canal.'
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filtered.map((rot) => (
@@ -160,6 +166,7 @@ export function RoteirosHub() {
                         <Badge variant="outline" className="text-xs">
                           {rot.fase}
                         </Badge>
+                        <DemoBadge show={isTemplate} />
                       </div>
                       <CardTitle className="text-base">{rot.titulo}</CardTitle>
                     </div>
@@ -167,7 +174,9 @@ export function RoteirosHub() {
                       variant="default"
                       className="bg-[var(--nav-c-green)]/10 text-[var(--nav-c-green)] text-xs"
                     >
-                      {rot.taxaSucesso}% eficácia
+                      {rot.taxaSucesso === null
+                        ? 'Eficácia indisponível'
+                        : `${rot.taxaSucesso}% eficácia`}
                     </Badge>
                   </div>
                 </CardHeader>

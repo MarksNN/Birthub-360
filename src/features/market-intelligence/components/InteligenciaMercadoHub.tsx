@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Target,
-  Search,
-  BarChart2,
   Zap,
   Building2,
   TrendingUp,
-  Filter,
-  Globe,
   ArrowUpRight,
+  AlertTriangle,
 } from 'lucide-react';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import {
@@ -19,32 +17,116 @@ import {
   CardDescription,
 } from '../../../components/ui/Card.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
-import { Button } from '../../../components/ui/Button.js';
 import { Badge } from '../../../components/ui/Badge.js';
+import { EmptyState } from '../../../components/ui/EmptyState.js';
+import { BlockedState, SourceRequiredIcon } from '../../../components/ui/BlockedState.js';
+import { Skeleton } from '../../../components/ui/Skeleton.js';
+
+type CatalogCompany = {
+  id: string;
+  cnpj: string;
+  razaoSocial: string | null;
+  nomeFantasia: string | null;
+  cnaePrincipalDescricao: string | null;
+  uf: string | null;
+  municipioNome: string | null;
+  icpScore: number | null;
+  icpTier: string | null;
+};
+
+type CatalogMeta = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};
+
+type CatalogDataset = {
+  competencia: string | null;
+  recordsActive?: number;
+  status?: string;
+} | null;
+
+type CatalogResponse = {
+  success: boolean;
+  data: CatalogCompany[];
+  meta: CatalogMeta;
+  dataset: CatalogDataset;
+  error?: string;
+};
+
+function formatInt(n: number): string {
+  return new Intl.NumberFormat('pt-BR').format(n);
+}
+
+function sectorBreakdown(rows: CatalogCompany[]) {
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    const label = (row.cnaePrincipalDescricao || '').trim() || 'Sem CNAE informado';
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  const total = rows.length || 1;
+  return [...counts.entries()]
+    .map(([setor, count]) => ({
+      setor,
+      count,
+      percent: Math.round((count / total) * 100),
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
+}
 
 export function InteligenciaMercadoHub() {
-  const [selectedSegmento, setSelectedSegmento] = useState('SaaS B2B');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [companies, setCompanies] = useState<CatalogCompany[]>([]);
+  const [meta, setMeta] = useState<CatalogMeta | null>(null);
+  const [dataset, setDataset] = useState<CatalogDataset>(null);
 
-  const sinais = [
-    {
-      empresa: 'TechLog Soluções',
-      sinal: 'Abriu 5 vagas comerciais (SDR/Closer)',
-      timing: 'Hoje às 09:15',
-      score: 94,
-    },
-    {
-      empresa: 'AgroFinance Tech',
-      sinal: 'Recebeu aporte Series A de R$ 15M',
-      timing: 'Ontem',
-      score: 89,
-    },
-    {
-      empresa: 'Varejo Connect',
-      sinal: 'Trocou de CRM no stack público',
-      timing: 'Há 2 dias',
-      score: 82,
-    },
-  ];
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    (async () => {
+      try {
+        const response = await fetch(
+          '/api/companies/market-intelligence?page=1&pageSize=25&sort=icp',
+          { credentials: 'include' },
+        );
+        const payload = (await response.json()) as CatalogResponse;
+        if (!response.ok || payload.success === false) {
+          throw new Error(payload.error || 'Falha ao carregar o catálogo de inteligência.');
+        }
+        if (cancelled) return;
+        setCompanies(Array.isArray(payload.data) ? payload.data : []);
+        setMeta(payload.meta ?? null);
+        setDataset(payload.dataset ?? null);
+      } catch (reason: unknown) {
+        if (!cancelled) {
+          setError(
+            reason instanceof Error
+              ? reason.message
+              : 'Não foi possível carregar a inteligência de mercado.',
+          );
+          setCompanies([]);
+          setMeta(null);
+          setDataset(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sectors = useMemo(() => sectorBreakdown(companies), [companies]);
+  const total = meta?.total ?? 0;
+  const sampleLabel =
+    companies.length > 0
+      ? `${formatInt(companies.length)} na amostra carregada`
+      : 'Sem amostra';
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[var(--bg)] text-[var(--ink)]">
@@ -53,9 +135,12 @@ export function InteligenciaMercadoHub() {
         icon={Target}
         actions={
           <div className="flex gap-2">
-            <Button variant="default" size="sm">
-              <Zap className="w-4 h-4 mr-2" /> Novo Radar de Sinais
-            </Button>
+            <Link
+              to="/app/market-intelligence"
+              className="inline-flex items-center h-8 px-3 text-xs font-semibold rounded-xl bg-[#8B7DFF] text-[#13151A]"
+            >
+              <Zap className="w-4 h-4 mr-2" /> Abrir LDR
+            </Link>
           </div>
         }
       />
@@ -63,106 +148,194 @@ export function InteligenciaMercadoHub() {
         <div className="mb-4">
           <h2 className="text-xl font-bold">Radar de Mercado & ICP</h2>
           <p className="text-sm text-[var(--ink-2)]">
-            Transforme dados de mercado e sinais de intenção em oportunidades qualificadas.
+            Contas e scores vêm do snapshot publicado do catálogo — sem números inventados.
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <Link
+              to="/app/market-intelligence"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              LDR (CNPJ)
+            </Link>
+            <Link
+              to="/app/prospect/inteligente"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              Prospecção Inteligente
+            </Link>
+            <Link
+              to="/app/prospect"
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--ink-2)] hover:text-[var(--ink)]"
+            >
+              Hub de Prospecção
+            </Link>
+          </div>
         </div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <KpiCard
-            title="Contas no Radar ICP"
-            value="1.420 empresas"
-            trend={{ value: '+120 novas este mês', isPositive: true }}
-            icon={Building2}
-            subtitle="Faturamento e CNAE aderentes"
-            variant="default"
-          />
-          <KpiCard
-            title="Sinais Quentes Captados"
-            value="38 alertas"
-            trend={{ value: 'Intenção alta', isPositive: true }}
-            icon={Zap}
-            subtitle="Gatilhos de expansão e contratação"
-            variant="default"
-          />
-          <KpiCard
-            title="Taxa de Precisão ICP"
-            value="91.4%"
-            trend={{ value: '+3.2%', isPositive: true }}
-            icon={TrendingUp}
-            subtitle="Validação com base na Receita"
-            variant="default"
-          />
-        </div>
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-28 rounded-2xl" />
+            ))}
+          </div>
+        )}
 
-        {/* Sinais em Tempo Real */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sinais de Mercado Recentes</CardTitle>
-              <CardDescription>
-                Oportunidades com momento ideal de abordagem detectado pela IA.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 border-t border-[var(--line)] pt-4">
-              {sinais.map((s) => (
-                <div
-                  key={s.empresa}
-                  className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] flex items-center justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm">{s.empresa}</span>
-                      <Badge
-                        variant="default"
-                        className="bg-[var(--nav-c-teal)]/10 text-[var(--nav-c-teal)] text-xs"
-                      >
-                        Score {s.score}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-[var(--ink-2)] mt-0.5">{s.sinal}</p>
-                    <span className="text-[10px] text-[var(--ink-3)] font-mono">{s.timing}</span>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Ver Conta <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
-                  </Button>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        {!loading && error && (
+          <div
+            role="alert"
+            className="flex items-center gap-2 text-sm text-critical py-4 px-3 rounded-xl border border-critical/30 bg-critical/5"
+          >
+            <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
+          </div>
+        )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Distribuição de ICP por Setor</CardTitle>
-              <CardDescription>
-                Segmentos mais representativos no seu mercado endereçável (TAM).
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 border-t border-[var(--line)] pt-6">
-              {[
-                { setor: 'Tecnologia & Software', percent: 45, count: 639 },
-                { setor: 'Serviços Financeiros & Fintechs', percent: 28, count: 397 },
-                { setor: 'Logística & Cadeia de Suprimentos', percent: 18, count: 255 },
-                { setor: 'Indústria & Manufatura 4.0', percent: 9, count: 129 },
-              ].map((item) => (
-                <div key={item.setor} className="space-y-1.5">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span>{item.setor}</span>
-                    <span className="text-[var(--ink-3)]">
-                      {item.count} empresas ({item.percent}%)
-                    </span>
-                  </div>
-                  <div className="h-2 w-full bg-[var(--surface-2)] rounded-full overflow-hidden border border-[var(--line)]">
-                    <div
-                      className="h-full bg-[var(--nav-c-teal)] rounded-full"
-                      style={{ width: `${item.percent}%` }}
+        {!loading && !error && !dataset && (
+          <BlockedState
+            tone="warning"
+            icon={SourceRequiredIcon}
+            title="Catálogo de inteligência não disponível"
+            description="Nenhum snapshot CNPJ publicado (READY/CNPJ_ACTIVE) está acessível neste ambiente. Conecte/ative o dataset para popular o radar — a interface não preenche métricas fictícias."
+            actionLabel="Abrir LDR"
+            onAction={() => {
+              window.location.assign('/app/market-intelligence');
+            }}
+          />
+        )}
+
+        {!loading && !error && dataset && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <KpiCard
+                title="Contas no radar (catálogo)"
+                value={formatInt(total)}
+                trend={{
+                  value: dataset.competencia
+                    ? `Competência ${dataset.competencia}`
+                    : 'Snapshot ativo',
+                  isPositive: total > 0,
+                }}
+                icon={Building2}
+                subtitle={sampleLabel}
+                variant="default"
+              />
+              <KpiCard
+                title="Amostra com ICP"
+                value={formatInt(companies.filter((c) => c.icpScore != null).length)}
+                trend={{
+                  value: 'Só linhas retornadas nesta página',
+                  isPositive: true,
+                }}
+                icon={Zap}
+                subtitle="Sem alertas inventados de intenção"
+                variant="default"
+              />
+              <KpiCard
+                title="Registros ativos no dataset"
+                value={
+                  dataset.recordsActive != null ? formatInt(Number(dataset.recordsActive)) : '—'
+                }
+                trend={{
+                  value: 'Fonte do snapshot publicado',
+                  isPositive: true,
+                }}
+                icon={TrendingUp}
+                subtitle="Não é taxa de precisão fabricada"
+                variant="default"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contas do catálogo (amostra)</CardTitle>
+                  <CardDescription>
+                    Lista real do endpoint de market-intelligence. Sinais por conta ficam no Account
+                    360 / LDR — esta tela não inventa timeline de gatilhos.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3 border-t border-[var(--line)] pt-4">
+                  {companies.length === 0 ? (
+                    <EmptyState
+                      title="Nenhuma empresa no catálogo"
+                      description="O snapshot está ativo, mas a consulta não retornou empresas. Ajuste filtros no LDR ou aguarde a próxima publicação."
+                      actionLabel="Abrir LDR"
+                      onAction={() => window.location.assign('/app/market-intelligence')}
+                      icon={<Building2 className="w-8 h-8 text-[#8B7DFF]" />}
                     />
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
+                  ) : (
+                    companies.slice(0, 8).map((c) => (
+                      <div
+                        key={c.id}
+                        className="p-3.5 rounded-xl bg-[var(--surface-2)] border border-[var(--line)] flex items-center justify-between gap-3"
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-sm truncate">
+                              {c.nomeFantasia || c.razaoSocial || 'Empresa sem razão social'}
+                            </span>
+                            {c.icpScore != null && (
+                              <Badge
+                                variant="default"
+                                className="bg-[var(--nav-c-teal)]/10 text-[var(--nav-c-teal)] text-xs"
+                              >
+                                ICP {c.icpScore}
+                                {c.icpTier ? ` · ${c.icpTier}` : ''}
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-[var(--ink-2)] mt-0.5 truncate">
+                            {[c.cnaePrincipalDescricao, c.municipioNome, c.uf]
+                              .filter(Boolean)
+                              .join(' · ') || 'Sem CNAE/localização'}
+                          </p>
+                          <span className="text-[10px] text-[var(--ink-3)] font-mono">{c.cnpj}</span>
+                        </div>
+                        <Link
+                          to={`/app/market-intelligence?cnpj=${encodeURIComponent(c.cnpj)}`}
+                          className="inline-flex items-center h-8 px-3 text-xs font-semibold rounded-xl border border-white/10 shrink-0"
+                        >
+                          Abrir no LDR <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
+                        </Link>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Distribuição por CNAE (amostra)</CardTitle>
+                  <CardDescription>
+                    Calculada apenas sobre as {formatInt(companies.length)} linhas carregadas — não
+                    representa TAM inventado.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 border-t border-[var(--line)] pt-6">
+                  {sectors.length === 0 ? (
+                    <p className="text-xs text-[var(--ink-2)]">Sem linhas para agregar setores.</p>
+                  ) : (
+                    sectors.map((item) => (
+                      <div key={item.setor} className="space-y-1.5">
+                        <div className="flex justify-between text-xs font-medium gap-2">
+                          <span className="truncate">{item.setor}</span>
+                          <span className="text-[var(--ink-3)] shrink-0">
+                            {item.count} ({item.percent}%)
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-[var(--surface-2)] rounded-full overflow-hidden border border-[var(--line)]">
+                          <div
+                            className="h-full bg-[var(--nav-c-teal)] rounded-full"
+                            style={{ width: `${Math.max(item.percent, 2)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

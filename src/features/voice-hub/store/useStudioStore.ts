@@ -17,7 +17,12 @@ import type { NodeLifecycleState, StudioState } from './studioTypes.js';
 
 // Re-exports for backwards compatibility
 export { nodeRegistry };
-export type { NodeLifecycleState, NodeRegistryItem, SimulationLog, StudioState } from './studioTypes.js';
+export type {
+  NodeLifecycleState,
+  NodeRegistryItem,
+  SimulationLog,
+  StudioState,
+} from './studioTypes.js';
 
 let workflowEpoch = 0;
 
