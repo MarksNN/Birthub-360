@@ -103,8 +103,8 @@
      Azul Neon:    #00D4FF (Tecnologia, confiança, inovação)
      Rosa Neon:    #FF2D9B (Energia, criatividade, atitude)
      Dourado Neon: #FFC107 (Sofisticação, prosperidade, previsibilidade e métricas)
-     Preto Neon:   #0D0D0D (Fundo principal Dark Mode)
-     Branco Neon:  #F8F9FF (Textos corridos de corpo, subtítulos secundários)
+     Preto Neon:   #0D0D0D (Fundo principal Dark Mode — NUNCA para textos)
+     Azul Leitura: #70D6FF (Textos corridos de corpo, subtítulos secundários — SEM BRANCO)
      Fundo Cards:  #14141A (Superfícies e cartões de conteúdo)
      Bordas Glow:  rgba(0, 212, 255, 0.22) (Bordas com efeito neon sutil)
      ========================================================================== */
@@ -112,7 +112,8 @@
   --neon-pink: #ff2d9b;
   --neon-gold: #ffc107;
   --neon-black: #0d0d0d;
-  --neon-white: #f8f9ff;
+  --neon-white: #70d6ff;
+  --neon-text: #70d6ff;
   --neon-card-bg: #14141a;
   --neon-card-border: rgba(0, 212, 255, 0.22);
 
@@ -157,7 +158,7 @@
   /* BirthHub 360 - Cores de Marca Neon */
   --brand: #00d4ff;
   --brand-2: #ff2d9b;
-  --on-brand: #0d0d0d;
+  --on-brand: #041c32;
   --iris: #8b5cf6;
   --orbit-blue: #00d4ff;
   --red: #ef4444;
@@ -452,7 +453,7 @@
 }
 
 .dark {
-  /* Paleta Oficial Neon — Dark Mode (0D0D0D fundo, 14141A cards, F8F9FF texto) */
+  /* Paleta Oficial Neon — Dark Mode (0D0D0D fundo, 14141A cards, 70D6FF texto neon suave — SEM BRANCO OU PRETO) */
   --bg: #0d0d0d;
   --surface: #14141a;
   --surface-2: #14141a;
@@ -460,8 +461,8 @@
   --surface-elevated: #1f1f28;
   --surface-interactive: #252530;
   --overlay: rgba(13, 13, 13, 0.85);
-  --ink: #f8f9ff;
-  --ink-2: #a1a1b5;
+  --ink: #70d6ff;
+  --ink-2: #38bdf8;
   --line: rgba(0, 212, 255, 0.18);
   --soft: rgba(0, 212, 255, 0.12);
   /* Paleta Coolors - Dark mode versions */
@@ -604,7 +605,8 @@
   --color-neon-pink: #ff2d9b;
   --color-neon-gold: #ffc107;
   --color-neon-black: #0d0d0d;
-  --color-neon-white: #f8f9ff;
+  --color-neon-white: #70d6ff;
+  --color-neon-text: #70d6ff;
   --color-neon-card: #14141a;
   --color-neon-border: rgba(0, 212, 255, 0.22);
 
@@ -619,8 +621,8 @@
   --color-sunset: #ef4444;
   --color-red-violet: #ff2d9b;
   --color-gold: #ffc107;
-  --color-white: #f8f9ff;
-  --color-snow: #f8f9ff;
+  --color-white: #70d6ff;
+  --color-snow: #70d6ff;
   --color-parchment: #e9e4d9;
   /* "Inteligência em movimento" — halos, indicadores, órbita. Não é fundo de
      botão: ver o comentário de --iris em :root. */
@@ -963,9 +965,10 @@
     color: var(--ink);
   }
 
-  /* REGRA MANDATÓRIA DO DESIGN:
-     Todos os títulos (h1 ao h6) devem usar as cores neon (#00D4FF, #FF2D9B ou #FFC107)
-     ou gradientes, nunca branco ou preto. Cor padrão de títulos: Azul Neon (#00D4FF). */
+  /* REGRA MANDATÓRIA ABSOLUTA DO DESIGN — BIRTH HUB 360°:
+     NENHUMA FONTE DE NENHUM TEXTO OU TÍTULO PODE SER BRANCA OU PRETA.
+     Todos os títulos (h1 ao h6) usam cores neon (#00D4FF, #FF2D9B ou #FFC107) ou gradientes neon.
+     Todos os textos de corpo e parágrafos usam tons neon (#70D6FF, #00D4FF, #38BDF8, #FFC107). */
   h1,
   h2,
   h3,
@@ -1028,8 +1031,9 @@
     justify-content: center;
     gap: 0.65rem;
     font-weight: 700;
-    color: #0d0d0d;
-    background: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%);
+    color: #00d4ff;
+    background: #14141a;
+    border: 2px solid #00d4ff;
     box-shadow:
       0 0 25px rgba(255, 45, 155, 0.45),
       0 0 35px rgba(0, 212, 255, 0.35);

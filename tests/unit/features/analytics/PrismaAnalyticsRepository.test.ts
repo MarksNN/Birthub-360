@@ -49,7 +49,7 @@ describe('PrismaAnalyticsRepository.sumOpenPipelineValue', () => {
         'Negocios_Ganhos',
         'Negocios_Perdidos',
         'Lead_Desqualificado',
-        'Piloto_Atlas_Profile_Cancelado',
+        'Piloto_Birthub360_Profile_Cancelado',
         'Piloto_Logistico_Cancelado',
       ]),
     );
@@ -94,7 +94,7 @@ describe('PrismaAnalyticsRepository.countOpenLeads — exclui desqualificado e p
         'Negocios_Ganhos',
         'Negocios_Perdidos',
         'Lead_Desqualificado',
-        'Piloto_Atlas_Profile_Cancelado',
+        'Piloto_Birthub360_Profile_Cancelado',
         'Piloto_Logistico_Cancelado',
       ]),
     );
@@ -124,7 +124,7 @@ describe('PrismaAnalyticsRepository.groupLostLeadsByReason', () => {
       expect.arrayContaining([
         'Negocios_Perdidos',
         'Lead_Desqualificado',
-        'Piloto_Atlas_Profile_Cancelado',
+        'Piloto_Birthub360_Profile_Cancelado',
         'Piloto_Logistico_Cancelado',
       ]),
     );

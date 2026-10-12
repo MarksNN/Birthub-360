@@ -67,7 +67,7 @@ já corrigido para usar a implementação real).
 ## Fechamento (`closedAt`) — fonte única
 
 `src/lib/enumMap.ts` → `LEAD_CLOSING_STATUSES` / `isLeadClosingStatus()`: `'Negócios Ganhos'`,
-`'Negócios Perdidos'`, `'Piloto Atlas Profile - Cancelado'`, `'Piloto Logístico - Cancelado'`.
+`'Negócios Perdidos'`, `'Piloto Birthub 360 Profile - Cancelado'`, `'Piloto Logístico - Cancelado'`.
 União dos 3 conjuntos que existiam antes desta sprint — nenhum comportamento existente foi
 revertido, só os dois caminhos mais estreitos passaram a tratar os 2 estágios "Cancelado" como
 fechamento, igual ao terceiro já fazia.

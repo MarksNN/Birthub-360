@@ -1170,7 +1170,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <span className="font-bold text-xs text-purple-600">QDR</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="OpenAI API">
-              <span className="font-bold text-xs text-slate-900">AI</span>
+              <span className="font-bold text-xs text-sky-600">AI</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="MinIO Storage">
               <span className="font-bold text-xs text-red-600">MIO</span>
@@ -1410,7 +1410,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Seu nome"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-sky-950 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                   />
                 </div>
               )}
@@ -1431,7 +1431,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nome@empresa.com.br"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-sky-950 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                   />
                 </div>
               </div>
@@ -1464,7 +1464,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-sky-950 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                     />
                     <button
                       type="button"

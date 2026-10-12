@@ -3,10 +3,12 @@
    Rosa Neon:    #FF2D9B (Energia, Criatividade, Atitude)
    Azul Neon:    #00D4FF (Tecnologia, Confiança, Inovação)
    Dourado Neon: #FFC107 (Sofisticação, Prosperidade, Destaque)
-   Preto Neon:   #0D0D0D (Elegância, Mistério, Modernidade - Fundo)
-   Branco Neon:  #F8F9FF (Pureza, Clareza, Equilíbrio - Textos de corpo)
+   Azul Leitura: #70D6FF (Texto suave, alta legibilidade - SEM BRANCO)
+   Preto Neon:   #0D0D0D (Fundo escuro apenas - NUNCA em textos)
+   Fundo Cards:  #14141A (Superfícies e cartões)
    
-   REGRA MANDATÓRIA: TODOS OS TÍTULOS DEVEM USAR UMA COR QUE NÃO SEJA BRANCO OU PRETO
+   REGRA MANDATÓRIA ABSOLUTA: NENHUMA FONTE DE NENHUM TEXTO OU TÍTULO PODE SER BRANCA OU PRETA.
+   Todos os títulos e textos devem usar estritamente as cores da paleta neon.
    ========================================================================== */
 
 :root {
@@ -14,12 +16,13 @@
   --neon-blue: #00d4ff;
   --neon-gold: #ffc107;
   --neon-black: #0d0d0d;
-  --neon-white: #f8f9ff;
+  --neon-white: #70d6ff;
+  --neon-text: #70d6ff;
   --neon-card-bg: #14141a;
   --neon-card-border: rgba(0, 212, 255, 0.22);
 }
 
-/* REGRA GLOBAL ABSOLUTA: Nenhum título pode ser branco ou preto */
+/* REGRA GLOBAL ABSOLUTA: Nenhum título nem texto pode ser branco ou preto */
 h1,
 h2,
 h3,
@@ -28,6 +31,10 @@ h5,
 h6 {
   color: var(--neon-blue);
   letter-spacing: -0.02em;
+}
+
+.landing-neon-root {
+  color: #70d6ff !important;
 }
 
 /* Cores Neon específicas para Títulos */
@@ -82,7 +89,7 @@ h4.neon-title-gold {
   text-shadow: 0 0 14px rgba(255, 193, 7, 0.5);
 }
 
-/* Botões Neon */
+/* Botões Neon - Sem texto preto ou branco */
 .vancouver-btn-gradient,
 .btn-cta-light {
   position: relative;
@@ -95,20 +102,22 @@ h4.neon-title-gold {
   font-family: var(--font-brand-display, "Sora", sans-serif);
   font-weight: 800;
   font-size: 0.95rem;
-  color: #0d0d0d !important;
-  background: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%) !important;
+  color: #00d4ff !important;
+  background: #14141a !important;
+  border: 2px solid #00d4ff !important;
   box-shadow:
-    0 0 25px rgba(255, 45, 155, 0.45),
-    0 0 35px rgba(0, 212, 255, 0.35);
+    0 0 25px rgba(0, 212, 255, 0.45),
+    0 0 35px rgba(255, 45, 155, 0.35);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
-  border: none;
   text-decoration: none;
 }
 
 .vancouver-btn-gradient:hover,
 .btn-cta-light:hover {
   transform: translateY(-2px) scale(1.02);
+  color: #ff2d9b !important;
+  border-color: #ff2d9b !important;
   box-shadow:
     0 0 35px rgba(255, 45, 155, 0.65),
     0 0 50px rgba(0, 212, 255, 0.55);

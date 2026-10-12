@@ -20,7 +20,7 @@ const DESQUALIFICADO = 'Lead_Desqualificado';
 export const CLOSED_LOST_STATUSES = [
   LOST,
   DESQUALIFICADO,
-  'Piloto_Atlas_Profile_Cancelado',
+  'Piloto_Birthub360_Profile_Cancelado',
   'Piloto_Logistico_Cancelado',
 ] as const;
 

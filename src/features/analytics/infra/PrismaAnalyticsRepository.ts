@@ -256,7 +256,7 @@ export class PrismaAnalyticsRepository implements AnalyticsRepository {
           in: [
             'Negocios_Perdidos',
             'Lead_Desqualificado',
-            'Piloto_Atlas_Profile_Cancelado',
+            'Piloto_Birthub360_Profile_Cancelado',
             'Piloto_Logistico_Cancelado',
           ] as unknown as never[],
         },

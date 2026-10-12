@@ -29,7 +29,7 @@ describe('enumMap — isLeadClosingStatus / LEAD_CLOSING_STATUSES', () => {
   it('reconhece os 4 status que fecham o lead', () => {
     expect(isLeadClosingStatus('Negócios Ganhos')).toBe(true);
     expect(isLeadClosingStatus('Negócios Perdidos')).toBe(true);
-    expect(isLeadClosingStatus('Piloto Atlas Profile - Cancelado')).toBe(true);
+    expect(isLeadClosingStatus('Piloto Birthub 360 Profile - Cancelado')).toBe(true);
     expect(isLeadClosingStatus('Piloto Logístico - Cancelado')).toBe(true);
   });
 
@@ -50,7 +50,7 @@ describe('enumMap — isLeadClosingStatus / LEAD_CLOSING_STATUSES', () => {
       [
         'Negócios Ganhos',
         'Negócios Perdidos',
-        'Piloto Atlas Profile - Cancelado',
+        'Piloto Birthub 360 Profile - Cancelado',
         'Piloto Logístico - Cancelado',
       ].sort(),
     );

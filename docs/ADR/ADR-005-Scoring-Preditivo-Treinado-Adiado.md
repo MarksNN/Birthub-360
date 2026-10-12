@@ -16,7 +16,7 @@ Nenhum dos três está presente:
 
 1. **Não existe rótulo de churn no schema.** `LeadStatus` (`prisma/schema.prisma`) só tem
    `Negocios_Ganhos` ("won") como estado funil-final positivo, além de dois cancelamentos
-   específicos de piloto (`Piloto_Atlas_Profile_Cancelado`, `Piloto_Logistico_Cancelado`).
+   específicos de piloto (`Piloto_Birthub360_Profile_Cancelado`, `Piloto_Logistico_Cancelado`).
    `CompanyStatus` (`Ativo | Inativo | Em_analise`) é higiene de dado, não churn.
    `DealClosureEvent` registra COMO um negócio foi fechado como ganho, não um evento de
    cancelamento. O único campo relacionado a churn é
