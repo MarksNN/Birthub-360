@@ -1,7 +1,14 @@
 import type { ReactNode } from 'react';
 import { cn } from '../../lib/utils.js';
 
-export type PageTitleAccent = 'brand' | 'iris' | 'success' | 'warning';
+export type PageTitleAccent =
+  | 'brand'
+  | 'iris'
+  | 'success'
+  | 'warning'
+  | 'pink'
+  | 'gold'
+  | 'neutral';
 
 // Tokens do tema (globals.css) — pares claro/escuro já calibrados para contraste AA.
 const ACCENTS: Record<
@@ -14,6 +21,20 @@ const ACCENTS: Record<
     title: 'text-brand-ink dark:text-brand',
     eyebrow: 'text-brand-ink dark:text-brand',
     card: 'border-brand/25 bg-brand/[0.04]',
+  },
+  pink: {
+    bar: 'bg-[#FF2D9B]',
+    chip: 'bg-[#FF2D9B]/10 border-[#FF2D9B]/25 text-[#E6007A] dark:text-[#FF2D9B]',
+    title: 'text-[#E6007A] dark:text-[#FF2D9B]',
+    eyebrow: 'text-[#E6007A] dark:text-[#FF2D9B]',
+    card: 'border-[#FF2D9B]/25 bg-[#FF2D9B]/[0.04]',
+  },
+  gold: {
+    bar: 'bg-[#FFC107]',
+    chip: 'bg-[#FFC107]/10 border-[#FFC107]/30 text-[#D97706] dark:text-[#FFC107]',
+    title: 'text-[#D97706] dark:text-[#FFC107]',
+    eyebrow: 'text-[#D97706] dark:text-[#FFC107]',
+    card: 'border-[#FFC107]/25 bg-[#FFC107]/[0.04]',
   },
   iris: {
     bar: 'bg-iris',
@@ -35,6 +56,13 @@ const ACCENTS: Record<
     title: 'text-warning-active dark:text-warning',
     eyebrow: 'text-warning-active dark:text-warning',
     card: 'border-warning/25 bg-warning/[0.04]',
+  },
+  neutral: {
+    bar: 'bg-line-strong',
+    chip: 'bg-surface-2 border-line text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: 'border-line bg-surface',
   },
 };
 

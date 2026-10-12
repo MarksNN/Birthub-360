@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '../../lib/utils.js';
+import type { PageTitleAccent } from './PageTitleCard.js';
 import { PageTitleCard } from './PageTitleCard.js';
 import type { VisualStateType } from './VisualState.js';
 import { VisualState } from './VisualState.js';
@@ -17,7 +18,41 @@ interface CommandCenterHeaderProps {
   state?: VisualStateType;
   /** Slot for action buttons rendered on the right side. */
   actions?: React.ReactNode;
+  accent?: PageTitleAccent;
   className?: string;
+}
+
+function resolveAccent(
+  title: string,
+  pillar?: string,
+  explicitAccent?: PageTitleAccent,
+): PageTitleAccent {
+  if (explicitAccent) return explicitAccent;
+  const t = `${title} ${pillar ?? ''}`.toLowerCase();
+  if (
+    t.includes('forecast') ||
+    t.includes('meta') ||
+    t.includes('ponderado') ||
+    t.includes('financeiro') ||
+    t.includes('faturamento') ||
+    t.includes('prospecção')
+  ) {
+    return 'gold';
+  }
+  if (
+    t.includes('ia') ||
+    t.includes('inteligência') ||
+    t.includes('playbook') ||
+    t.includes('roteiro') ||
+    t.includes('jornada') ||
+    t.includes('copilot')
+  ) {
+    return 'pink';
+  }
+  if (t.includes('sucesso') || t.includes('auditoria') || t.includes('conformidade')) {
+    return 'success';
+  }
+  return 'brand';
 }
 
 /**
@@ -31,6 +66,7 @@ export function CommandCenterHeader({
   pillar,
   state,
   actions,
+  accent,
   className,
 }: CommandCenterHeaderProps) {
   const renderIcon = () => {
@@ -39,6 +75,8 @@ export function CommandCenterHeader({
     const IconComp = icon as React.ComponentType<{ className?: string }>;
     return <IconComp className="h-5 w-5" />;
   };
+
+  const resolvedAccent = resolveAccent(title, pillar, accent);
 
   return (
     <PageTitleCard
@@ -49,7 +87,7 @@ export function CommandCenterHeader({
       icon={renderIcon()}
       badge={state ? <VisualState state={state} size="sm" /> : undefined}
       actions={actions}
-      accent="brand"
+      accent={resolvedAccent}
     />
   );
 }

@@ -655,7 +655,7 @@ export function ProspectingHub() {
             title="Prospecção Comercial & Enriquecimento"
             subtitle="Motor de enriquecimento autônomo com IA para capturar leads corporativos de altíssimo nível."
             icon={<Landmark className="h-5 w-5" />}
-            accent="brand"
+            accent="gold"
           />
           <GamificationWidget />
         </motion.div>
