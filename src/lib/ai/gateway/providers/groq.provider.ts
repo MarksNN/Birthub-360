@@ -25,7 +25,9 @@ export const groqProvider: ProviderAdapter = {
     if (primaryGroqModel === 'openai/gpt-oss-20b') {
       modelCandidates.push('openai/gpt-oss-120b', 'llama-3.1-8b-instant');
     } else if (primaryGroqModel === 'openai/gpt-oss-120b') {
-      modelCandidates.push('openai/gpt-oss-20b', 'llama-3.3-70b-versatile');
+      modelCandidates.push('openai/gpt-oss-20b', 'llama-3.1-8b-instant');
+    } else {
+      modelCandidates.push('openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant');
     }
 
     let lastError: unknown;
@@ -50,12 +52,15 @@ export const groqProvider: ProviderAdapter = {
       } catch (err: any) {
         lastError = err;
         const msg = String(err?.message || err);
-        // Se for erro de quota de modelo específico (429 com tokens per day / rate limit), tenta o próximo modelo candidato
+        // Se for erro de quota de modelo específico (429) ou modelo não acessível nesta chave (404 / does not exist), tenta o próximo modelo candidato
         if (
-          msg.includes('429') &&
-          (msg.includes('tokens per day') ||
-            msg.includes('TPD') ||
-            msg.includes('Rate limit reached for model'))
+          msg.includes('429') ||
+          msg.includes('404') ||
+          msg.includes('does not exist') ||
+          msg.includes('not have access') ||
+          msg.includes('tokens per day') ||
+          msg.includes('TPD') ||
+          msg.includes('Rate limit reached for model')
         ) {
           continue;
         }
