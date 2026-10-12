@@ -1,4 +1,4 @@
-﻿import type React from 'react';
+import type React from 'react';
 import { Building2, Sparkles } from 'lucide-react';
 import type { LeadStatus } from './types.js';
 
@@ -27,15 +27,15 @@ export function LeadCardHeader({
         : 'text-slate-400 bg-slate-500/10 border-slate-500/20';
 
   return (
-    <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/5">
+    <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-200 dark:border-[#F8F9FF]/5">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <Building2 className="w-4 h-4 text-brand shrink-0" />
-          <h3 className="font-bold text-base text-slate-900 dark:text-white tracking-tight leading-snug">
+          <h3 className="font-bold text-base text-slate-800 dark:text-[#F8F9FF] tracking-tight leading-snug">
             {companyName}
           </h3>
         </div>
-        {sector && <p className="text-xs text-slate-500 dark:text-white/50 pl-6">{sector}</p>}
+        {sector && <p className="text-xs text-slate-500 dark:text-[#F8F9FF]/50 pl-6">{sector}</p>}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
@@ -51,7 +51,7 @@ export function LeadCardHeader({
           value={status}
           disabled={isSaving}
           onChange={(e) => onStatusChange(e.target.value as LeadStatus)}
-          className="text-xs font-semibold rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 px-2 py-1 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-50 cursor-pointer"
+          className="text-xs font-semibold rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-[#F8F9FF]/10 px-2 py-1 text-slate-800 dark:text-[#F8F9FF] focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-50 cursor-pointer"
           aria-label={`Status do lead ${companyName}`}
         >
           <option value="NOVO">Novo</option>
