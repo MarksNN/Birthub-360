@@ -236,7 +236,9 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
                 </p>
               </div>
               <div className="space-y-1">
-                <div className="font-bold text-[#F8F9FF] text-sm">Família Secundária: Montserrat</div>
+                <div className="font-bold text-[#F8F9FF] text-sm">
+                  Família Secundária: Montserrat
+                </div>
                 <p className="text-slate-400 text-[11px] leading-relaxed">
                   Aplicada nesta aplicação web para garantir legibilidade de alta performance no
                   ecossistema digital.
