@@ -80,7 +80,11 @@ export const LeadNewsDossierSection: React.FC<LeadNewsDossierSectionProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-xs text-white">{item.title}</span>
+                  <span
+                    className={`font-bold text-xs ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
+                  >
+                    {item.title}
+                  </span>
                   <span className="text-[10px] text-slate-400 shrink-0">
                     {item.source} • {item.date}
                   </span>

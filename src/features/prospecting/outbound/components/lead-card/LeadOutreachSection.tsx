@@ -107,7 +107,7 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-[var(--brand-primary)]" />
               <h4
-                className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}
+                className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
               >
                 Roteiros Comerciais & Copys com IA (Sob Demanda)
               </h4>
@@ -151,7 +151,7 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
               type="button"
               onClick={handleGenerateCopies}
               disabled={isGeneratingCopies || isEnrichingNews}
-              className="px-5 py-2.5 bg-gradient-to-r from-[var(--brand-primary)] to-[#FF7010] hover:from-[var(--brand-secondary-hover)] hover:to-[var(--brand-secondary)] text-white font-bold text-xs rounded-xl transition shadow-md shadow-[var(--brand-primary)]/25 flex items-center gap-2"
+              className="px-5 py-2.5 bg-gradient-to-r from-[var(--brand-primary)] to-[#FF7010] hover:from-[var(--brand-secondary-hover)] hover:to-[var(--brand-secondary)] text-[#F8F9FF] font-bold text-xs rounded-xl transition shadow-md shadow-[var(--brand-primary)]/25 flex items-center gap-2"
             >
               {isGeneratingCopies ? (
                 <>
@@ -202,10 +202,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('cold_call')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'cold_call'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <PhoneCall className="w-3.5 h-3.5" />
@@ -216,10 +216,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('cold_email')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'cold_email'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
@@ -230,10 +230,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('whatsapp')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'whatsapp'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -244,10 +244,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('linkedin')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'linkedin'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <Linkedin className="w-3.5 h-3.5" />
@@ -258,10 +258,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('objection_matrix')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'objection_matrix'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -272,10 +272,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('qualification_matrix')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'qualification_matrix'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <ListChecks className="w-3.5 h-3.5" />
@@ -286,10 +286,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('ice_breaker')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'ice_breaker'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <Flame className="w-3.5 h-3.5 text-orange-400" />
@@ -300,10 +300,10 @@ export const LeadOutreachSection: React.FC<LeadOutreachSectionProps> = ({
             onClick={() => setActiveChannel('prompt')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
               activeChannel === 'prompt'
-                ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                 : isDark
                   ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             <Terminal className="w-3.5 h-3.5 text-[#93DBF2]" />

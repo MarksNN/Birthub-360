@@ -88,8 +88,8 @@ export const LeadDecisionMakerSection: React.FC<LeadDecisionMakerSectionProps> =
                 placeholder="Nome do Decisor"
                 className={`text-xs font-bold rounded px-2 py-1 border outline-none ${
                   isDark
-                    ? 'bg-slate-900 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
+                    ? 'bg-slate-900 border-slate-700 text-[#F8F9FF]'
+                    : 'bg-white border-slate-300 text-slate-800'
                 }`}
               />
               <input
@@ -105,7 +105,9 @@ export const LeadDecisionMakerSection: React.FC<LeadDecisionMakerSectionProps> =
               />
             </div>
           ) : (
-            <p className={`text-sm font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <p
+              className={`text-sm font-bold truncate ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
+            >
               {dmName}{' '}
               <span
                 className={`text-xs font-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}
@@ -128,8 +130,8 @@ export const LeadDecisionMakerSection: React.FC<LeadDecisionMakerSectionProps> =
             placeholder="Email do decisor"
             className={`text-xs font-mono rounded px-2 py-1 border outline-none ${
               isDark
-                ? 'bg-slate-900 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
+                ? 'bg-slate-900 border-slate-700 text-[#F8F9FF]'
+                : 'bg-white border-slate-300 text-slate-800'
             }`}
           />
         ) : (
@@ -178,8 +180,8 @@ export const LeadDecisionMakerSection: React.FC<LeadDecisionMakerSectionProps> =
             placeholder="Telefone do decisor"
             className={`text-xs font-mono rounded px-2 py-1 border outline-none ${
               isDark
-                ? 'bg-slate-900 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
+                ? 'bg-slate-900 border-slate-700 text-[#F8F9FF]'
+                : 'bg-white border-slate-300 text-slate-800'
             }`}
           />
         ) : (
@@ -239,8 +241,8 @@ export const LeadDecisionMakerSection: React.FC<LeadDecisionMakerSectionProps> =
             placeholder="URL do LinkedIn (ex: https://www.linkedin.com/in/...)"
             className={`text-xs font-mono rounded px-2 py-1 border outline-none ${
               isDark
-                ? 'bg-slate-900 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
+                ? 'bg-slate-900 border-slate-700 text-[#F8F9FF]'
+                : 'bg-white border-slate-300 text-slate-800'
             }`}
           />
         ) : (

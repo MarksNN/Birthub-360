@@ -94,7 +94,7 @@ export const LeadActionsBar: React.FC<LeadActionsBarProps> = ({
           disabled={isSaving}
           className={`px-3.5 py-1.5 font-bold rounded-lg border flex items-center gap-1.5 transition shadow-sm ${
             saveSuccess
-              ? 'bg-emerald-500 text-white border-emerald-600'
+              ? 'bg-emerald-500 text-[#F8F9FF] border-emerald-600'
               : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border-emerald-500/40'
           }`}
           title="Salvar alterações do lead no SQLite"
@@ -134,7 +134,7 @@ export const LeadActionsBar: React.FC<LeadActionsBarProps> = ({
           type="button"
           onClick={handleEnrichNews}
           disabled={isEnrichingNews}
-          className="px-3.5 py-1.5 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-primary)] hover:from-[var(--brand-primary-hover)] hover:to-[var(--brand-primary-hover)] text-white font-bold rounded-lg transition shadow-md shadow-[var(--brand-primary)]/20 flex items-center gap-1.5"
+          className="px-3.5 py-1.5 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-primary)] hover:from-[var(--brand-primary-hover)] hover:to-[var(--brand-primary-hover)] text-[#F8F9FF] font-bold rounded-lg transition shadow-md shadow-[var(--brand-primary)]/20 flex items-center gap-1.5"
           title="Segunda etapa: buscar notícias públicas na internet e gerar roteiros avançados"
         >
           {isEnrichingNews ? (

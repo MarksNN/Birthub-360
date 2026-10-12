@@ -69,7 +69,7 @@ export const LeadTasksAndActivitySection: React.FC<LeadTasksAndActivitySectionPr
           }`}
         >
           <h4
-            className={`text-sm font-semibold mb-3 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}
+            className={`text-sm font-semibold mb-3 flex items-center gap-2 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
           >
             <ListChecks className="w-4 h-4 text-[var(--brand-primary)]" />
             Tarefas do Lead
@@ -174,7 +174,7 @@ export const LeadTasksAndActivitySection: React.FC<LeadTasksAndActivitySectionPr
               type="button"
               onClick={handleAddTask}
               disabled={isSavingTask || !newTaskDescription.trim()}
-              className="px-3 py-2 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition disabled:opacity-50 shrink-0"
+              className="px-3 py-2 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-[#F8F9FF] text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition disabled:opacity-50 shrink-0"
             >
               {isSavingTask ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -195,7 +195,7 @@ export const LeadTasksAndActivitySection: React.FC<LeadTasksAndActivitySectionPr
           }`}
         >
           <h4
-            className={`text-sm font-semibold mb-3 flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}
+            className={`text-sm font-semibold mb-3 flex items-center gap-2 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
           >
             Registro de Atividade (CRM)
           </h4>
@@ -256,7 +256,7 @@ export const LeadTasksAndActivitySection: React.FC<LeadTasksAndActivitySectionPr
                 type="button"
                 onClick={handleSaveLead}
                 disabled={isSaving}
-                className="px-4 py-1.5 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition disabled:opacity-50"
+                className="px-4 py-1.5 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-[#F8F9FF] text-xs font-semibold rounded-lg flex items-center gap-1.5 transition disabled:opacity-50"
               >
                 {isSaving ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
