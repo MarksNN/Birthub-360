@@ -91,7 +91,7 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition"
+            className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-[#F8F9FF] hover:bg-slate-700 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -105,7 +105,7 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
               <div className="flex items-center gap-2 text-[#FF5618] font-bold text-xs uppercase tracking-wider">
                 <Target className="w-4 h-4" /> Propósito da Marca
               </div>
-              <h3 className="text-lg font-bold text-white leading-snug">
+              <h3 className="text-lg font-bold text-[#F8F9FF] leading-snug">
                 "Nós conectamos pessoas e tecnologia gerando valores com segurança e inovação."
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed pt-1">
@@ -164,7 +164,7 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
                   <div
                     className={`h-16 rounded-xl ${col.bgClass} flex items-center justify-end p-2.5 shadow-inner border border-white/10`}
                   >
-                    <span className="text-[10px] opacity-0 group-hover:opacity-100 bg-black/60 text-white px-2 py-0.5 rounded transition flex items-center gap-1">
+                    <span className="text-[10px] opacity-0 group-hover:opacity-100 bg-black/60 text-[#F8F9FF] px-2 py-0.5 rounded transition flex items-center gap-1">
                       {copiedHex === col.hex ? (
                         <Check className="w-3 h-3 text-emerald-400" />
                       ) : (
@@ -174,7 +174,7 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
                     </span>
                   </div>
                   <div>
-                    <div className="font-bold text-xs text-white">{col.name}</div>
+                    <div className="font-bold text-xs text-[#F8F9FF]">{col.name}</div>
                     <div className="text-[11px] font-mono text-[#FF5618]">{col.pantone}</div>
                     <div className="text-[10px] font-mono text-slate-400 mt-1">HEX: {col.hex}</div>
                     <div className="text-[9px] text-slate-500">{col.cmyk}</div>
@@ -207,12 +207,12 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
                   <div
                     className={`h-12 rounded-xl ${col.bgClass} flex items-center justify-end p-2.5 shadow-inner border border-white/10`}
                   >
-                    <span className="text-[10px] opacity-0 group-hover:opacity-100 bg-black/60 text-white px-2 py-0.5 rounded transition">
+                    <span className="text-[10px] opacity-0 group-hover:opacity-100 bg-black/60 text-[#F8F9FF] px-2 py-0.5 rounded transition">
                       {copiedHex === col.hex ? 'Copiado!' : col.hex}
                     </span>
                   </div>
                   <div>
-                    <div className="font-bold text-xs text-white">{col.name}</div>
+                    <div className="font-bold text-xs text-[#F8F9FF]">{col.name}</div>
                     <div className="text-[11px] font-mono text-slate-400">{col.pantone}</div>
                     <div className="text-[10px] font-mono text-[#FF8008]">HEX: {col.hex}</div>
                   </div>
@@ -229,14 +229,14 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
               <div className="space-y-1">
-                <div className="font-bold text-white text-sm">Família Primária: Mont</div>
+                <div className="font-bold text-[#F8F9FF] text-sm">Família Primária: Mont</div>
                 <p className="text-slate-400 text-[11px] leading-relaxed">
                   Utilizada no logotipo, títulos e materiais impressos. Transmite solidez, inovação
                   e modernidade geométrica.
                 </p>
               </div>
               <div className="space-y-1">
-                <div className="font-bold text-white text-sm">Família Secundária: Montserrat</div>
+                <div className="font-bold text-[#F8F9FF] text-sm">Família Secundária: Montserrat</div>
                 <p className="text-slate-400 text-[11px] leading-relaxed">
                   Aplicada nesta aplicação web para garantir legibilidade de alta performance no
                   ecossistema digital.
@@ -251,7 +251,7 @@ export const BrandGuideModal: React.FC<BrandGuideModalProps> = ({ isOpen, onClos
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 bg-[#FF5618] hover:bg-[#FF6B10] text-white text-xs font-bold rounded-xl transition"
+            className="px-5 py-2 bg-[#FF5618] hover:bg-[#FF6B10] text-[#F8F9FF] text-xs font-bold rounded-xl transition"
           >
             Entendido
           </button>

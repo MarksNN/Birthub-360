@@ -186,7 +186,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
             <button
               type="button"
               onClick={createNewSession}
-              className="p-1.5 bg-[var(--brand-primary)] hover:bg-[#FF6B10] text-white rounded-lg transition"
+              className="p-1.5 bg-[var(--brand-primary)] hover:bg-[#FF6B10] text-[#F8F9FF] rounded-lg transition"
               title="Nova Conversa"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -207,7 +207,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
                     ? 'bg-[var(--brand-primary)]/15 border border-[var(--brand-primary)]/40 text-[var(--brand-primary)] font-bold'
                     : isDark
                       ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
+                      : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100 border border-transparent'
                 }`}
               >
                 <span className="truncate flex-1">{sess.title}</span>
@@ -247,7 +247,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
             </div>
             <div>
               <h3
-                className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}
+                className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
               >
                 <span>Assistente Atlas LLaMA3</span>
                 <span className="text-[10px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 px-1.5 py-0.2 rounded font-mono font-semibold">
@@ -288,7 +288,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
                 className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
               >
                 {!isUser && (
-                  <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md shadow-[var(--brand-primary)]/20">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] text-[#F8F9FF] flex items-center justify-center font-bold text-xs shrink-0 shadow-md shadow-[var(--brand-primary)]/20">
                     A
                   </div>
                 )}
@@ -296,7 +296,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
                 <div
                   className={`max-w-2xl rounded-2xl p-4 text-xs leading-relaxed space-y-1.5 ${
                     isUser
-                      ? 'bg-[var(--brand-primary)] text-white font-medium rounded-tr-sm shadow-md'
+                      ? 'bg-[var(--brand-primary)] text-[#F8F9FF] font-medium rounded-tr-sm shadow-md'
                       : isDark
                         ? 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-sm relative group'
                         : 'bg-white border border-slate-200 text-slate-800 shadow-sm rounded-tl-sm relative group'
@@ -355,7 +355,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
 
           {isLoading && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] text-white flex items-center justify-center font-bold text-xs shrink-0 animate-pulse">
+              <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] text-[#F8F9FF] flex items-center justify-center font-bold text-xs shrink-0 animate-pulse">
                 A
               </div>
               <div
@@ -388,8 +388,8 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
               onClick={() => handleSendMessage(qp)}
               className={`text-[11px] px-2.5 py-1 rounded-lg border whitespace-nowrap transition ${
                 isDark
-                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200'
+                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-[#F8F9FF] border-slate-700'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-800 border-slate-200'
               }`}
             >
               {qp}
@@ -418,13 +418,13 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
               className={`flex-1 border rounded-xl px-4 py-2.5 text-xs outline-none ${
                 isDark
                   ? 'bg-slate-900 border-slate-700 text-slate-100 placeholder-slate-500 focus:border-[var(--brand-primary)]'
-                  : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-[var(--brand-primary)]'
+                  : 'bg-slate-50 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-[var(--brand-primary)]'
               }`}
             />
             <button
               type="submit"
               disabled={isLoading || !inputPrompt.trim()}
-              className="p-2.5 bg-[var(--brand-primary)] hover:bg-[#FF6B10] disabled:opacity-50 text-white rounded-xl transition shadow-md shadow-[var(--brand-primary)]/20"
+              className="p-2.5 bg-[var(--brand-primary)] hover:bg-[#FF6B10] disabled:opacity-50 text-[#F8F9FF] rounded-xl transition shadow-md shadow-[var(--brand-primary)]/20"
             >
               <Send className="w-4 h-4" />
             </button>
