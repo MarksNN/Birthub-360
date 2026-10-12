@@ -10,8 +10,8 @@ import {
   Loader2,
   Lock,
   Mail,
-  ShieldCheck,
   Moon,
+  ShieldCheck,
   Sun,
 } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
@@ -191,7 +191,7 @@ function PillarStrip() {
 
           {/* Label + slug */}
           <span className="flex items-baseline gap-2 min-w-0">
-            <span className="font-sans text-sm font-semibold text-white/60 group-hover:text-white/90 transition-colors leading-tight">
+            <span className="font-sans text-sm font-semibold text-[#F8F9FF]/60 group-hover:text-[#F8F9FF]/90 transition-colors leading-tight">
               {p.label}
             </span>
             <span
@@ -443,10 +443,10 @@ export function LandingLoginSplitScreen() {
           >
             <BH360Mark size={56} animated />
             <div className="flex flex-col gap-0.5">
-              <span className="font-display text-2xl font-bold text-white leading-none tracking-tight">
+              <span className="font-display text-2xl font-bold text-[#F8F9FF] leading-none tracking-tight">
                 Birth Hub<span className="grad-text glow-text ml-1">360°</span>
               </span>
-              <span className="font-mono text-xs uppercase tracking-[0.3em] text-white/50">
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#F8F9FF]/50">
                 Command Center
               </span>
             </div>
@@ -464,15 +464,15 @@ export function LandingLoginSplitScreen() {
               <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-green-400">
                 LIVE
               </span>
-              <span className="w-px h-3 bg-white/10 mx-1" aria-hidden="true" />
-              <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">
+              <span className="w-px h-3 bg-[#F8F9FF]/10 mx-1" aria-hidden="true" />
+              <span className="font-mono text-[9px] uppercase tracking-widest text-[#F8F9FF]/40">
                 Sistema Online
               </span>
             </div>
-            <div className="hidden md:flex items-center gap-1.5 font-mono text-[9px] text-white/40 tabular-nums">
+            <div className="hidden md:flex items-center gap-1.5 font-mono text-[9px] text-[#F8F9FF]/40 tabular-nums">
               <span>{dateLabel}</span>
               <span className="opacity-40">|</span>
-              <span className="font-bold text-white/70">{timeLabel}</span>
+              <span className="font-bold text-[#F8F9FF]/70">{timeLabel}</span>
             </div>
           </div>
           <div className="h-px w-full bg-gradient-to-r from-[#00E5FF]/40 via-[#8B5CF6]/30 to-transparent" />
@@ -496,7 +496,7 @@ export function LandingLoginSplitScreen() {
           {/* Headline — conceito oficial */}
           <motion.h1
             variants={staggerItem}
-            className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[2.25rem] xl:text-[2.75rem] 2xl:text-[3.25rem] font-bold tracking-tight text-white leading-[1.25]"
+            className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-[2.25rem] xl:text-[2.75rem] 2xl:text-[3.25rem] font-bold tracking-tight text-[#F8F9FF] leading-[1.25]"
           >
             Dados que <span className="grad-text glow-text">Conectam.</span>
             <br />
@@ -518,8 +518,8 @@ export function LandingLoginSplitScreen() {
           {/* Tagline arquitetural */}
           <motion.p
             variants={staggerItem}
-            className="font-display text-base lg:text-lg font-light text-white/70 tracking-normal max-w-3xl"
-            style={{ textShadow: '0 0 20px rgba(255,255,255,0.3)' }}
+            className="font-display text-base lg:text-lg font-light text-[#F8F9FF]/70 tracking-normal max-w-3xl"
+            style={{ textShadow: '0 0 20px rgba(248,249,255,0.3)' }}
           >
             Conecte CRM, dados, processos e IA em um único Lugar.
             <br />
@@ -531,64 +531,64 @@ export function LandingLoginSplitScreen() {
           <motion.div variants={staggerItem} className="balloon-container my-4">
             <div className="flex flex-wrap gap-3 justify-center items-center">
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#00E5FF' }}
               >
                 CRM
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#3B82F6' }}
               >
                 Pipeline
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#8B5CF6' }}
               >
                 Inteligência
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#F59E0B' }}
               >
                 Forecast
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#22C55E' }}
               >
                 Automação
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#EF4444' }}
               >
                 IA
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#33EBFF' }}
               >
                 Voz
               </span>
-              <span className="text-white/30">·</span>
+              <span className="text-[#F8F9FF]/30">·</span>
               <span
-                className="balloon-item font-mono text-xs font-bold text-white tracking-wider cursor-pointer transition-all duration-300"
+                className="balloon-item font-mono text-xs font-bold text-[#F8F9FF] tracking-wider cursor-pointer transition-all duration-300"
                 style={{ color: '#94A3B8' }}
               >
                 Engajamento
               </span>
             </div>
             <p
-              className="balloon-item font-mono text-[10px] text-white/60 text-center mt-3 tracking-wide"
-              style={{ textShadow: '0 0 15px rgba(255,255,255,0.4)' }}
+              className="balloon-item font-mono text-[10px] text-[#F8F9FF]/60 text-center mt-3 tracking-wide"
+              style={{ textShadow: '0 0 15px rgba(248,249,255,0.4)' }}
             >
               Oito pilares. Um sistema operacional comercial integrado.
             </p>
@@ -597,7 +597,7 @@ export function LandingLoginSplitScreen() {
           {/* Separador com metáfora de fluxo */}
           <motion.div variants={staggerItem} className="flex items-center gap-4 my-3">
             <div className="h-px flex-1 bg-gradient-to-r from-[#00E5FF]/60 to-transparent" />
-            <span className="font-mono text-sm text-white/30 uppercase tracking-widest">
+            <span className="font-mono text-sm text-[#F8F9FF]/30 uppercase tracking-widest">
               8 pilares integrados
             </span>
             <div className="h-px flex-1 bg-gradient-to-l from-[#8B5CF6]/40 to-transparent" />
@@ -610,8 +610,8 @@ export function LandingLoginSplitScreen() {
         </motion.div>
 
         {/* ── Footer institucional ────────────────────────────────────────── */}
-        <div className="relative z-20 pt-6 border-t border-white/10">
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/30">
+        <div className="relative z-20 pt-6 border-t border-[#F8F9FF]/10">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#F8F9FF]/30">
             Birth Hub 360° · Sistema Operacional para Operações Comerciais
           </p>
         </div>
@@ -798,7 +798,7 @@ export function LandingLoginSplitScreen() {
                     <button
                       type="submit"
                       disabled={isSubmitting || !email}
-                      className="w-full h-[48px] rounded-[var(--radius-control)] bg-[#00E5FF] text-white text-base font-extrabold uppercase tracking-wide shadow-lg transition-all hover:bg-[#1565E0] disabled:opacity-50 flex items-center justify-center"
+                      className="w-full h-[48px] rounded-[var(--radius-control)] bg-[#00E5FF] text-[#0D0D0D] text-base font-extrabold uppercase tracking-wide shadow-lg transition-all hover:bg-[#1565E0] hover:text-[#F8F9FF] disabled:opacity-50 flex items-center justify-center"
                     >
                       {isSubmitting ? (
                         <Loader2 className="animate-spin mx-auto h-5 w-5" aria-hidden="true" />
@@ -952,7 +952,7 @@ export function LandingLoginSplitScreen() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !email || !password}
-                    className="w-full h-[48px] rounded-[var(--radius-control)] bg-[#00E5FF] text-white text-base font-extrabold uppercase tracking-wide shadow-lg transition-all hover:bg-[#1565E0] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00E5FF]"
+                    className="w-full h-[48px] rounded-[var(--radius-control)] bg-[#00E5FF] text-[#0D0D0D] text-base font-extrabold uppercase tracking-wide shadow-lg transition-all hover:bg-[#1565E0] hover:text-[#F8F9FF] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00E5FF]"
                   >
                     {isSubmitting ? (
                       <Loader2 className="animate-spin h-5 w-5" aria-hidden="true" />

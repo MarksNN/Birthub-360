@@ -5,7 +5,7 @@ export function OrbitalSystem() {
     <div className="relative w-[500px] h-[500px] flex items-center justify-center">
       {/* Center Node */}
       <div className="absolute z-20 flex flex-col items-center justify-center w-32 h-32 rounded-full bg-obsidian border border-line shadow-2xl">
-        <span className="text-white font-display font-bold text-xl">360&deg;</span>
+        <span className="text-[#F8F9FF] font-display font-bold text-xl">360&deg;</span>
         <span className="text-gold text-xs font-semibold tracking-widest mt-1">HUB</span>
       </div>
 

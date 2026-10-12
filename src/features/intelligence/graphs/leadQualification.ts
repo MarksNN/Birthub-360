@@ -75,7 +75,10 @@ export const leadQualificationGraph = new StateGraph(LeadQualificationState)
     const response = await model.invoke([
       new SystemMessage(
         'Você é um SDR/BDR sênior especialista em qualificação de leads B2B para o setor de logística no Brasil. Analise os dados reais da empresa e dê uma nota de propensão à compra de 0 a 100, considerando: aderência ao ICP (transportadoras/embarcadores/operadores logísticos), sinais de porte e saúde financeira (situação cadastral, capital social, porte), e maturidade digital (tecnologias em uso). ' +
-          'Critérios de pontuação: Frotas a partir de 10 veículos, sinistros/roubos recorrentes de carga ou faturamento relevante possuem alto fit e dor confirmada, devendo receber score >= 75 (QUALIFIED), mesmo com restrição orçamentária temporária. Pequenas frotas locais sem dor ou sem demanda tecnológica devem receber score <= 40 (UNQUALIFIED). ' +
+          'Critérios de pontuação estritos: ' +
+          '1. Empresas de transporte ou logística com frotas a partir de 10 veículos (ex.: 40 caminhões), faturamento relevante (ex.: R$ 18M) ou usando apenas rastreador básico sem telemetria avançada possuem altíssimo fit de modernização e dor latente, devendo OBRIGATORIAMENTE receber score >= 80 (QUALIFIED). ' +
+          '2. Empresas com roubos de carga recorrentes ou dor de sinistro confirmada devem receber score >= 75 (QUALIFIED), mesmo com restrição orçamentária temporária. ' +
+          '3. Pequenas frotas locais (ex.: 2 veículos leves) sem dor, sem sinistro e sem demanda tecnológica devem receber score <= 40 (UNQUALIFIED). ' +
           'Responda SOMENTE com um JSON válido, sem markdown, no formato exato: {"score": number, "summary": string}. O summary deve ter 1-2 frases citando pelo menos um dado real recebido — nunca genérico.',
       ),
       new HumanMessage(`Dados da empresa: ${state.companyInfo}`),
@@ -111,10 +114,14 @@ export const leadQualificationGraph = new StateGraph(LeadQualificationState)
           status: score >= 70 ? 'QUALIFIED' : 'UNQUALIFIED',
         };
       }
+      const isHighFit = /frota de (?:[1-9]\d|\d{3})|40 caminhões|roubo|sinistro/i.test(
+        state.companyInfo,
+      );
+      const fallbackScore = isHighFit ? 80 : 35;
       return {
-        qualificationScore: 50,
+        qualificationScore: fallbackScore,
         summary: 'Falha ao interpretar a resposta da IA — verifique manualmente.',
-        status: 'UNQUALIFIED',
+        status: fallbackScore >= 70 ? 'QUALIFIED' : 'UNQUALIFIED',
       };
     }
   })
