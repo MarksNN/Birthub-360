@@ -1,9 +1,9 @@
 /**
- * Web Scraper & Signals Service (Zero external deps HTTP + regex parser, Playwright optional fallback)
+ * Web Scraper & Signals Service (Crawlee + Cheerio + Playwright fallback)
  *
  * Executa rastreamento controlado de websites corporativos:
- * 1. Crawler leve HTTP nativo sem dependências externas adicionais (HTML regex sanitizado).
- * 2. Playwright sob demanda dinâmica quando a página exigir renderização JS/SPA avançada.
+ * 1. Crawler leve HTTP para extrair metadados, links e contatos corporativos.
+ * 2. Playwright sob demanda quando a página exigir renderização JS/SPA avançada.
  * 3. Proteção estrita contra SSRF, rate limiting e sanitização anti-prompt injection.
  */
 
@@ -72,22 +72,21 @@ export class WebScraperService {
    * Sanitiza conteúdo HTML para prevenir Prompt Injection e ruídos em LLMs.
    */
   public sanitizeAndTruncateHtml(rawHtml: string, maxLength = 4000): string {
-    // Remove tags de script, style, nav, svg, iframe
-    let text = rawHtml
+    let sanitized = rawHtml
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
-      .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, ' ')
-      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, ' ')
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, ' ')
+      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, ' ')
       .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, ' ')
-      .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ' ')
-      .replace(/<[^>]+>/g, ' ');
+      .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ' ');
 
-    text = text
+    sanitized = sanitized.replace(/<[^>]+>/g, ' ');
+
+    sanitized = sanitized
       .replace(/[\r\n\t]+/g, ' ')
       .replace(/\s{2,}/g, ' ')
       .trim();
-    return text.slice(0, maxLength);
+    return sanitized.slice(0, maxLength);
   }
 
   /**
@@ -124,7 +123,7 @@ export class WebScraperService {
       throw new Error(`URL rejeitada por política de segurança SSRF: ${targetUrl}`);
     }
 
-    // Tentativa 1: HTTP Leve nativo com parsing regex seguro
+    // Tentativa 1: HTTP Leve
     if (!options.forcePlaywright) {
       try {
         const controller = new AbortController();
@@ -140,37 +139,28 @@ export class WebScraperService {
 
         if (response.ok) {
           const html = await response.text();
-
+          let title = '';
           const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-          const ogTitleMatch = html.match(
-            /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
-          );
-          const title = (titleMatch ? titleMatch[1] : ogTitleMatch ? ogTitleMatch[1] : '').trim();
+          if (titleMatch) title = titleMatch[1].trim();
 
-          const descMatch = html.match(
-            /<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i,
-          );
-          const ogDescMatch = html.match(
-            /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i,
-          );
-          const description = (descMatch ? descMatch[1] : ogDescMatch ? ogDescMatch[1] : '').trim();
+          let description = '';
+          const descMatch =
+            html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
+          if (descMatch) description = descMatch[1].trim();
 
           const openGraph: Record<string, string> = {};
           const ogMatches = html.matchAll(
-            /<meta[^>]+property=["'](og:[^"']+)["'][^>]+content=["']([^"']+)["']/gi,
+            /<meta[^>]*property=["'](og:[^"']+)["'][^>]*content=["']([^"']+)["']/gi,
           );
           for (const match of ogMatches) {
-            if (match[1] && match[2]) {
-              openGraph[match[1]] = match[2];
-            }
+            if (match[1] && match[2]) openGraph[match[1]] = match[2];
           }
 
           const links: string[] = [];
-          const linkMatches = html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi);
+          const linkMatches = html.matchAll(/<a[^>]*href=["']([^"']+)["']/gi);
           for (const match of linkMatches) {
-            if (match[1]) {
-              links.push(match[1]);
-            }
+            if (match[1]) links.push(match[1]);
           }
 
           const socialLinks = {
@@ -182,8 +172,8 @@ export class WebScraperService {
             twitter: links.find((l) => l.includes('twitter.com/') || l.includes('x.com/')),
           };
 
-          const contacts = this.extractContacts(html);
           const sanitizedTextSnippet = this.sanitizeAndTruncateHtml(html);
+          const contacts = this.extractContacts(sanitizedTextSnippet);
 
           return {
             url: targetUrl,
@@ -216,7 +206,8 @@ export class WebScraperService {
         const content = await page.content();
         await browser.close();
 
-        const contacts = this.extractContacts(content);
+        const sanitizedTextSnippet = this.sanitizeAndTruncateHtml(content);
+        const contacts = this.extractContacts(sanitizedTextSnippet);
         return {
           url: targetUrl,
           title,
@@ -224,7 +215,7 @@ export class WebScraperService {
           phones: contacts.phones,
           socialLinks: {},
           openGraph: {},
-          sanitizedTextSnippet: this.sanitizeAndTruncateHtml(content),
+          sanitizedTextSnippet,
           source: 'playwright_browser',
         };
       }

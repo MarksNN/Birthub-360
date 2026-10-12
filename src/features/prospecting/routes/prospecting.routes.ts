@@ -581,21 +581,29 @@ router.get(
   },
 );
 
-// Enriquecimento web via scraper Crawlee — ainda não implementado (achado MEDIUM da auditoria de
-// release-readiness: respondia sempre `success:true` com dados fabricados, o que enganaria
-// qualquer integrador que a chamasse. 501 é honesto sobre o estado real; a rota fica reservada
-// para quando o scraper Crawlee for implementado de verdade.
+// Enriquecimento web via scraper seguro (Cheerio + Playwright fallback)
 router.post('/enrich', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { url } = req.body as { url?: string };
+    const { url, forceBrowser } = req.body as { url?: string; forceBrowser?: boolean };
     if (!url) {
       res.status(400).json({ success: false, error: 'A URL é obrigatória para o scraper' });
       return;
     }
 
-    res.status(501).json({
-      success: false,
-      error: 'Enriquecimento via scraper (Crawlee) ainda não foi implementado.',
+    const { webScraperService } = await import('../services/enrichment/webScraper.service.js');
+    if (!webScraperService.isSafeUrl(url)) {
+      res
+        .status(400)
+        .json({ success: false, error: 'URL bloqueada pela política de segurança SSRF' });
+      return;
+    }
+
+    const scrapedData = await webScraperService.scrapeWebsite(url, {
+      forcePlaywright: Boolean(forceBrowser),
+    });
+    res.json({
+      success: true,
+      data: scrapedData,
     });
   } catch (error: any) {
     next(error);

@@ -60,7 +60,8 @@ export function DiscoveryResultsPanel({
   onExport: (
     format: 'xlsx' | 'csv',
     columns: number[],
-    target: 'companies' | 'decisionMakers',
+    target: 'companies' | 'decisionMakers' | 'complete',
+    options?: { maskPersonalPhones?: boolean; csvDelimiter?: string },
   ) => void;
   selectedCandidates: Set<number>;
   toggleSelectAll: () => void;
@@ -76,7 +77,11 @@ export function DiscoveryResultsPanel({
   rejectingKey: string | null;
   onRejectCandidate: (candidate: ProspectCandidate, idx: number) => void;
 }) {
-  const [exportTarget, setExportTarget] = useState<'companies' | 'decisionMakers'>('companies');
+  const [exportTarget, setExportTarget] = useState<'companies' | 'decisionMakers' | 'complete'>(
+    'complete',
+  );
+  const [maskLgpd, setMaskLgpd] = useState(false);
+  const [csvDelimiter, setCsvDelimiter] = useState(';');
   const [exportColumns, setExportColumns] = useState<number[]>(
     Array.from({ length: 14 }, (_, i) => i),
   );
@@ -128,16 +133,24 @@ export function DiscoveryResultsPanel({
               type="button"
               onClick={() => {
                 SoundFX.play('click');
-                onExport('xlsx', exportColumns, exportTarget);
+                onExport('xlsx', exportColumns, exportTarget, {
+                  maskPersonalPhones: maskLgpd,
+                  csvDelimiter,
+                });
               }}
               className="bg-emerald-600 text-[#F8F9FF] px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
-              <Database size={14} /> Exportar Excel
+              <Database size={14} /> Exportar Excel {exportTarget === 'complete' ? '(3 Abas)' : ''}
             </button>
             <button
               type="button"
-              onClick={() => onExport('csv', exportColumns, exportTarget)}
-              className="px-4 py-2 rounded-xl border border-line text-xs text-ink"
+              onClick={() =>
+                onExport('csv', exportColumns, exportTarget, {
+                  maskPersonalPhones: maskLgpd,
+                  csvDelimiter,
+                })
+              }
+              className="px-4 py-2 rounded-xl border border-line text-xs text-ink hover:bg-surface-interactive transition-all cursor-pointer"
             >
               Exportar CSV
             </button>
@@ -154,40 +167,73 @@ export function DiscoveryResultsPanel({
           <summary className="cursor-pointer py-2">
             Configurar exportação e selecionar colunas
           </summary>
-          <label htmlFor="export-target" className="block py-2">
-            Exportar
-            <select
-              id="export-target"
-              value={exportTarget}
-              onChange={(e) => {
-                const target = e.target.value as typeof exportTarget;
-                setExportTarget(target);
-                setExportColumns(
-                  Array.from({ length: target === 'companies' ? 14 : 7 }, (_, i) => i),
-                );
-              }}
-              className="ml-2 p-2 rounded-lg border border-line bg-surface text-ink"
-            >
-              <option value="companies">Empresas</option>
-              <option value="decisionMakers">Decisores</option>
-            </select>
-          </label>
-          <div className="flex flex-wrap gap-3">
-            {columns.map((column, index) => (
-              <label key={column} className="flex gap-1 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 py-2">
+            <label htmlFor="export-target" className="block">
+              <span className="font-semibold block mb-1">Estrutura</span>
+              <select
+                id="export-target"
+                value={exportTarget}
+                onChange={(e) => {
+                  const target = e.target.value as typeof exportTarget;
+                  setExportTarget(target);
+                  setExportColumns(
+                    Array.from({ length: target === 'companies' ? 14 : 7 }, (_, i) => i),
+                  );
+                }}
+                className="w-full p-2 rounded-lg border border-line bg-surface text-ink"
+              >
+                <option value="complete">Completo (Empresas + Decisores + Histórico)</option>
+                <option value="companies">Apenas Empresas</option>
+                <option value="decisionMakers">Apenas Decisores</option>
+              </select>
+            </label>
+
+            <label htmlFor="csv-delimiter" className="block">
+              <span className="font-semibold block mb-1">Separador CSV</span>
+              <select
+                id="csv-delimiter"
+                value={csvDelimiter}
+                onChange={(e) => setCsvDelimiter(e.target.value)}
+                className="w-full p-2 rounded-lg border border-line bg-surface text-ink"
+              >
+                <option value=";">Ponto e vírgula (; - Padrão Excel BR)</option>
+                <option value=",">Vírgula (, - Padrão Internacional)</option>
+                <option value="\t">Tabulação (\t)</option>
+              </select>
+            </label>
+
+            <div className="flex items-center pt-5">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={exportColumns.includes(index)}
-                  onChange={(e) =>
-                    setExportColumns((prev) =>
-                      e.target.checked ? [...prev, index] : prev.filter((i) => i !== index),
-                    )
-                  }
+                  checked={maskLgpd}
+                  onChange={(e) => setMaskLgpd(e.target.checked)}
+                  className="rounded border-line text-brand"
                 />
-                {column}
+                <span className="font-medium text-ink">
+                  Proteção LGPD (Mascarar telefones pessoais)
+                </span>
               </label>
-            ))}
+            </div>
           </div>
+          {exportTarget !== 'complete' && (
+            <div className="flex flex-wrap gap-3 pt-2">
+              {columns.map((column, index) => (
+                <label key={column} className="flex gap-1 items-center">
+                  <input
+                    type="checkbox"
+                    checked={exportColumns.includes(index)}
+                    onChange={(e) =>
+                      setExportColumns((prev) =>
+                        e.target.checked ? [...prev, index] : prev.filter((i) => i !== index),
+                      )
+                    }
+                  />
+                  {column}
+                </label>
+              ))}
+            </div>
+          )}
         </details>
       )}
       {searchResult && !isSearching && (
