@@ -1,6 +1,6 @@
-﻿import type React from 'react';
+import { Mail, MessageSquare, Phone, Plus, Send } from 'lucide-react';
+import type React from 'react';
 import { useState } from 'react';
-import { Phone, MessageSquare, Mail, Plus, Send } from 'lucide-react';
 import type { LeadTouchHistory } from './types.js';
 
 export function LeadCardHistoryPreview({ leadId }: { leadId: string }): React.ReactElement {
@@ -61,7 +61,7 @@ export function LeadCardHistoryPreview({ leadId }: { leadId: string }): React.Re
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Adicionar nota rápida de alinhamento..."
-          className="flex-1 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand"
+          className="flex-1 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-[#F8F9FF]/10 text-xs text-slate-800 dark:text-[#F8F9FF] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand"
         />
         <button
           type="submit"
@@ -76,19 +76,19 @@ export function LeadCardHistoryPreview({ leadId }: { leadId: string }): React.Re
         {touches.map((touch) => (
           <div
             key={touch.id}
-            className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 text-xs"
+            className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 dark:bg-[#F8F9FF]/[0.02] border border-slate-100 dark:border-[#F8F9FF]/5 text-xs"
           >
-            <div className="p-1 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shrink-0 mt-0.5">
+            <div className="p-1 rounded-md bg-white dark:bg-[#F8F9FF]/5 border border-slate-200 dark:border-[#F8F9FF]/10 shrink-0 mt-0.5">
               {getChannelIcon(touch.channel)}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-white/40 mb-0.5">
-                <span className="font-semibold text-slate-700 dark:text-white/70">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-[#F8F9FF]/40 mb-0.5">
+                <span className="font-semibold text-slate-700 dark:text-[#F8F9FF]/70">
                   {touch.authorName}
                 </span>
                 <span>{touch.createdAt}</span>
               </div>
-              <p className="text-slate-600 dark:text-white/80 leading-relaxed text-[11px]">
+              <p className="text-slate-600 dark:text-[#F8F9FF]/80 leading-relaxed text-[11px]">
                 {touch.summary}
               </p>
             </div>
