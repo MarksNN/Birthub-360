@@ -26,6 +26,8 @@ const TOOL_TABS: {
   statusKey: keyof Omit<ToolsStatus, 'providerMode'>;
   iconBg: string;
   iconColor: string;
+  accentLine: string;
+  textHover: string;
 }[] = [
   {
     id: 'google-places',
@@ -37,6 +39,8 @@ const TOOL_TABS: {
     statusKey: 'googlePlaces',
     iconBg: 'bg-sky-50 dark:bg-sky-500/10 border-sky-200/80 dark:border-sky-500/20',
     iconColor: 'text-sky-600 dark:text-sky-400',
+    accentLine: 'via-sky-500',
+    textHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-400',
   },
   {
     id: 'apollo',
@@ -48,6 +52,8 @@ const TOOL_TABS: {
     statusKey: 'apollo',
     iconBg: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200/80 dark:border-indigo-500/20',
     iconColor: 'text-indigo-600 dark:text-indigo-400',
+    accentLine: 'via-indigo-500',
+    textHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
   },
   {
     id: 'hunter',
@@ -59,6 +65,8 @@ const TOOL_TABS: {
     statusKey: 'hunter',
     iconBg: 'bg-orange-50 dark:bg-orange-500/10 border-orange-200/80 dark:border-orange-500/20',
     iconColor: 'text-orange-600 dark:text-orange-400',
+    accentLine: 'via-orange-500',
+    textHover: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
   },
   {
     id: 'linkedin',
@@ -70,6 +78,8 @@ const TOOL_TABS: {
     statusKey: 'apollo',
     iconBg: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200/80 dark:border-blue-500/20',
     iconColor: 'text-blue-600 dark:text-blue-400',
+    accentLine: 'via-blue-500',
+    textHover: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
   },
   {
     id: 'github',
@@ -79,8 +89,10 @@ const TOOL_TABS: {
     description:
       'Busca organizações públicas no GitHub — sinal de maturidade técnica de uma empresa-alvo. Gratuita, sem chave.',
     statusKey: 'github',
-    iconBg: 'bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/60',
-    iconColor: 'text-slate-800 dark:text-slate-200',
+    iconBg: 'bg-purple-50 dark:bg-purple-500/10 border-purple-200/80 dark:border-purple-500/20',
+    iconColor: 'text-purple-600 dark:text-purple-400',
+    accentLine: 'via-purple-500',
+    textHover: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
   },
   {
     id: 'news',
@@ -92,6 +104,8 @@ const TOOL_TABS: {
     statusKey: 'news',
     iconBg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/80 dark:border-emerald-500/20',
     iconColor: 'text-emerald-600 dark:text-emerald-400',
+    accentLine: 'via-emerald-500',
+    textHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
   },
   {
     id: 'youtube',
@@ -103,6 +117,8 @@ const TOOL_TABS: {
     statusKey: 'youtube',
     iconBg: 'bg-rose-50 dark:bg-rose-500/10 border-rose-200/80 dark:border-rose-500/20',
     iconColor: 'text-rose-600 dark:text-rose-400',
+    accentLine: 'via-rose-500',
+    textHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
   },
 ];
 
@@ -127,7 +143,7 @@ export function ProspectingToolsHub() {
     return (
       <div className="space-y-6">
         <header>
-          <div className="text-[11px] font-bold uppercase tracking-wider text-brand-text dark:text-neon-blue">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-[#D97706] dark:text-[#FFC107]">
             Fontes & Conectores
           </div>
           <h2 className="font-display text-2xl font-bold text-ink tracking-tight mt-0.5">
@@ -162,7 +178,9 @@ export function ProspectingToolsHub() {
               >
                 <div className="h-full relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-surface border border-line hover:border-line-strong hover:shadow-lg transition-all duration-300">
                   {/* Top highlight accent */}
-                  <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand dark:via-neon-blue to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div
+                    className={`absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent ${tool.accentLine} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+                  />
 
                   <div>
                     {/* Header: Icon + Category + Badge */}
@@ -191,7 +209,9 @@ export function ProspectingToolsHub() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-display text-base font-bold text-ink group-hover:text-brand-text dark:group-hover:text-neon-blue transition-colors tracking-tight">
+                    <h3
+                      className={`font-display text-base font-bold text-ink ${tool.textHover} transition-colors tracking-tight`}
+                    >
                       {tool.label}
                     </h3>
 
@@ -202,7 +222,9 @@ export function ProspectingToolsHub() {
                   </div>
 
                   {/* Footer Action */}
-                  <div className="mt-4 pt-3.5 border-t border-line flex items-center justify-between text-xs font-semibold text-ink-2 group-hover:text-brand-text dark:group-hover:text-neon-blue transition-colors">
+                  <div
+                    className={`mt-4 pt-3.5 border-t border-line flex items-center justify-between text-xs font-semibold text-ink-2 ${tool.textHover} transition-colors`}
+                  >
                     <span>Acessar ferramenta</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </div>
