@@ -121,7 +121,11 @@ export async function callProvider<T>(
     await recordCircuitSuccess(provider);
     return result;
   } catch (error: any) {
-    await recordCircuitFailure(provider);
+    const msg = String(error?.message || error);
+    const isRateLimit = msg.includes('429') || msg.toLowerCase().includes('rate limit');
+    if (!isRateLimit) {
+      await recordCircuitFailure(provider);
+    }
     throw error;
   }
 }

@@ -19,8 +19,8 @@ const observed: Record<string, unknown> = {};
 for (const goldenCase of dataset.cases) {
   console.log(`▶ ${goldenCase.id}`);
   observed[goldenCase.id] = await runGoldenCaseAgainstProduction(goldenCase);
-  // Intervalo entre chamadas reais para respeitar rate limits (TPM) dos provedores no CI
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  // Intervalo entre chamadas reais para respeitar rate limits (TPM/RPM) dos provedores no CI
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 }
 
 const useJudge = process.env.GOLDEN_EVAL_USE_LLM_JUDGE !== 'false';
