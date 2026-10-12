@@ -1,38 +1,33 @@
-import type React from 'react';
-import { useEffect, useState, useId } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  Bot,
+  Check,
   CheckCircle2,
+  Compass,
+  Cpu,
   Eye,
   EyeOff,
+  Layers,
   Loader2,
   Lock,
   Mail,
-  ArrowLeft,
-  ArrowRight,
+  Network,
+  Server,
+  ShieldAlert,
   ShieldCheck,
   Sparkles,
-  Layers,
-  Cpu,
-  BarChart3,
-  Network,
-  Workflow,
-  Radio,
-  Clock,
-  Compass,
-  Check,
-  Zap,
   Target,
-  FileSpreadsheet,
-  Users2,
-  ShieldAlert,
-  Server,
-  MessageSquare,
-  Bot,
   TrendingUp,
+  Workflow,
+  Zap,
 } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useId, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import { useTheme } from '../../../contexts/ThemeContext.js';
 import { authClient } from '../../../lib/auth-client.js';
@@ -695,11 +690,11 @@ export function Landing360({
         >
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FFC107]/10 border border-[#FFC107]/40 text-[#FFC107] mb-3">
                 <Layers className="w-3.5 h-3.5" />
                 Arquitetura One OS
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-[#00D4FF] tracking-tight drop-shadow-[0_0_18px_rgba(0,212,255,0.4)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-[#FFC107] tracking-tight drop-shadow-[0_0_18px_rgba(255,193,7,0.4)]">
                 Um único sistema operacional para planejar, monitorar e acelerar
               </h2>
               <p className="mt-3 text-sm sm:text-base text-[#F8F9FF]/80 leading-relaxed">
@@ -901,11 +896,11 @@ export function Landing360({
         >
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FFC107]/10 border border-[#FFC107]/40 text-[#FFC107] mb-3">
                 <Workflow className="w-3.5 h-3.5" />
                 CICLO OPERACIONAL COMPLETO
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-[#00D4FF] tracking-tight drop-shadow-[0_0_18px_rgba(0,212,255,0.4)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#FFC107] via-[#FF2D9B] to-[#00D4FF] bg-clip-text text-transparent tracking-tight drop-shadow-[0_0_18px_rgba(255,193,7,0.35)]">
                 Como os dados fluem da prospecção ao fechamento
               </h2>
               <p className="mt-3 text-sm sm:text-base text-[#F8F9FF]/80">
@@ -946,16 +941,16 @@ export function Landing360({
               </div>
 
               <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-[#00D4FF] mb-2">ETAPA 04</div>
-                <h4 className="font-display text-sm font-bold text-[#00D4FF] mb-1">Apoio com IA</h4>
+                <div className="font-mono text-xs font-bold text-[#FF2D9B] mb-2">ETAPA 04</div>
+                <h4 className="font-display text-sm font-bold text-[#FF2D9B] mb-1">Apoio com IA</h4>
                 <p className="text-xs text-[#F8F9FF]/70">
                   Copiloto analisa objeções, histórico e recomenda a abordagem ideal.
                 </p>
               </div>
 
               <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-[#FF2D9B] mb-2">ETAPA 05</div>
-                <h4 className="font-display text-sm font-bold text-[#FF2D9B] mb-1">
+                <div className="font-mono text-xs font-bold text-[#FFC107] mb-2">ETAPA 05</div>
+                <h4 className="font-display text-sm font-bold text-[#FFC107] mb-1">
                   Fechamento &amp; Dados
                 </h4>
                 <p className="text-xs text-[#F8F9FF]/70">
@@ -1095,11 +1090,11 @@ export function Landing360({
         >
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FF2D9B]/10 border border-[#FF2D9B]/40 text-[#FF2D9B] mb-3">
                 <Workflow className="w-3.5 h-3.5" />
                 AUTOMAÇÃO OPERACIONAL
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-[#00D4FF] tracking-tight drop-shadow-[0_0_18px_rgba(0,212,255,0.4)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-[#FF2D9B] tracking-tight drop-shadow-[0_0_18px_rgba(255,45,155,0.4)]">
                 Eficiência sem desumanizar o contato comercial
               </h2>
               <p className="mt-3 text-sm sm:text-base text-[#F8F9FF]/80">
@@ -1387,7 +1382,7 @@ export function Landing360({
           className="px-5 py-20 sm:px-8 lg:px-14 bg-[#0D0D0D] text-center border-b border-[#232332]"
         >
           <div className="max-w-4xl mx-auto">
-            <h2 className="font-display text-3xl sm:text-5xl font-extrabold text-[#00D4FF] tracking-tight leading-tight drop-shadow-[0_0_24px_rgba(0,212,255,0.45)]">
+            <h2 className="font-display text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-[#FFC107] via-[#FF2D9B] to-[#00D4FF] bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_24px_rgba(255,193,7,0.35)]">
               Pronto para transformar sua operação comercial em um centro de comando inteligente?
             </h2>
             <p className="mt-4 text-base sm:text-lg text-[#F8F9FF]/80 max-w-2xl mx-auto">
@@ -1500,12 +1495,12 @@ export function Landing360({
         {/* Card Central de Login */}
         <div className="w-full max-w-[480px] mb-12">
           <div className="mb-6 text-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest mb-3.5 bg-[#00D4FF]/10 border border-[#00D4FF]/30 text-[#00D4FF] shadow-lg shadow-[#00D4FF]/10">
-              <ShieldCheck className="w-4 h-4 text-[#00D4FF]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest mb-3.5 bg-[#FFC107]/10 border border-[#FFC107]/30 text-[#FFC107] shadow-lg shadow-[#FFC107]/10">
+              <ShieldCheck className="w-4 h-4 text-[#FFC107]" />
               Acesso Seguro · Zero Trust Architecture
             </div>
 
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#00D4FF] drop-shadow-[0_0_20px_rgba(0,212,255,0.4)] tracking-tight mb-2 leading-tight">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#FFC107] drop-shadow-[0_0_20px_rgba(255,193,7,0.4)] tracking-tight mb-2 leading-tight">
               {authMode === 'signup'
                 ? 'Criar conta corporativa'
                 : authMode === 'forgot'
