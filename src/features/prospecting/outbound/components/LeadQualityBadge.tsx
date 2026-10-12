@@ -156,7 +156,7 @@ export const LeadQualityBadge: React.FC<LeadQualityBadgeProps> = ({
           <div className="space-y-1">
             <div className="flex justify-between text-[11px] font-medium text-slate-400">
               <span>Nível de Completude</span>
-              <span className="font-bold text-white">
+              <span className="font-bold text-[#F8F9FF]">
                 {metric.completionCount} de {metric.totalFields} critérios
               </span>
             </div>
