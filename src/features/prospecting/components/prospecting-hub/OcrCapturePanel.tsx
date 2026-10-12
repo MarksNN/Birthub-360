@@ -339,7 +339,7 @@ export function OcrCapturePanel() {
             <button
               type="button"
               onClick={stopCamera}
-              className="flex items-center gap-1.5 bg-white/10 text-white px-4 py-2.5 rounded-full font-bold text-sm hover:bg-white/20 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 bg-[#F8F9FF]/10 text-[#F8F9FF] px-4 py-2.5 rounded-full font-bold text-sm hover:bg-[#F8F9FF]/20 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" /> Fechar Câmera
             </button>

@@ -370,7 +370,7 @@ export function DecisionMakerSearch({
                 type="button"
                 onClick={() => togglePersona(persona)}
                 title={persona.nivel}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition-colors ${active ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-surface border-line text-ink-2 hover:border-indigo-300'}`}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition-colors ${active ? 'bg-indigo-600 border-indigo-600 text-[#F8F9FF]' : 'bg-surface border-line text-ink-2 hover:border-indigo-300'}`}
               >
                 {persona.label}
               </button>
@@ -530,7 +530,7 @@ export function DecisionMakerSearch({
         type="button"
         onClick={handleSearch}
         disabled={isSearching || !normalizeCompanyDomain(domainInput)}
-        className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-indigo-600 text-[#F8F9FF] py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSearching ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
         {isSearching ? 'Buscando pessoas...' : 'Buscar Pessoas'}
@@ -699,7 +699,7 @@ export function DecisionMakerSearch({
                           e.preventDefault();
                           handleGenerateIcebreaker(idx);
                         }}
-                        className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-wait text-white text-[10px] font-bold px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
+                        className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-wait text-[#F8F9FF] text-[10px] font-bold px-3 py-1 rounded-lg flex items-center gap-1 transition-colors"
                       >
                         {icebreakers[idx]?.loading ? 'Gerando...' : '🧊 Gerar Quebra-Gelo (IA)'}
                       </button>

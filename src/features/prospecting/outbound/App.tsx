@@ -503,7 +503,7 @@ export default function App() {
       <div
         data-brand={brand}
         className={`min-h-screen flex flex-col antialiased transition-colors duration-200 ${
-          isDark ? 'bg-[#090d16] text-slate-100' : 'bg-slate-50 text-slate-900'
+          isDark ? 'bg-[#090d16] text-slate-100' : 'bg-slate-50 text-slate-800'
         }`}
       >
         {/* Header */}
@@ -537,10 +537,10 @@ export default function App() {
                   onClick={() => setSellerView(tab.id)}
                   className={`px-4 py-1.5 text-xs font-semibold rounded-full transition ${
                     sellerView === tab.id
-                      ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                      ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                       : isDark
                         ? 'text-slate-400 hover:text-slate-200'
-                        : 'text-slate-600 hover:text-slate-900'
+                        : 'text-slate-600 hover:text-slate-800'
                   }`}
                 >
                   {tab.label}
@@ -567,7 +567,7 @@ export default function App() {
     <div
       data-brand={brand}
       className={`min-h-screen flex flex-col antialiased transition-colors duration-200 ${
-        isDark ? 'bg-[#090d16] text-slate-100' : 'bg-slate-50 text-slate-900'
+        isDark ? 'bg-[#090d16] text-slate-100' : 'bg-slate-50 text-slate-800'
       }`}
     >
       {/* Header */}

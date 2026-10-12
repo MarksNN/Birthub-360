@@ -130,7 +130,7 @@ export function DiscoveryResultsPanel({
                 SoundFX.play('click');
                 onExport('xlsx', exportColumns, exportTarget);
               }}
-              className="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+              className="bg-emerald-600 text-[#F8F9FF] px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 active:scale-95 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
               <Database size={14} /> Exportar Excel
             </button>

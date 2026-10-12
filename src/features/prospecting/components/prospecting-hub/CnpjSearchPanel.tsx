@@ -66,7 +66,7 @@ export function CnpjSearchPanel({
             <button
               type="button"
               onClick={() => onSearchWebInstead(cnpjInput)}
-              className="w-full bg-surface-2 text-ink py-3.5 rounded-[2rem] font-bold hover:bg-obsidian hover:text-white disabled:opacity-50 transition-colors flex items-center justify-center gap-2 mt-2"
+              className="w-full bg-surface-2 text-ink py-3.5 rounded-[2rem] font-bold hover:bg-obsidian hover:text-[#F8F9FF] disabled:opacity-50 transition-colors flex items-center justify-center gap-2 mt-2"
             >
               ✨ Buscar &quot;{cnpjInput}&quot; na web (Radar)
             </button>

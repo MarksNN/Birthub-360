@@ -157,7 +157,7 @@ export const LeadEvidenceModal: React.FC<LeadEvidenceModalProps> = ({
             <FileSearch className="w-5 h-5 text-[var(--brand-primary)] shrink-0" />
             <div className="min-w-0">
               <h3
-                className={`text-sm font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}
+                className={`text-sm font-bold truncate ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
               >
                 Evidências de campo — {leadName}
               </h3>
@@ -171,8 +171,8 @@ export const LeadEvidenceModal: React.FC<LeadEvidenceModalProps> = ({
             onClick={onClose}
             className={`p-2 rounded-xl shrink-0 transition ${
               isDark
-                ? 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-                : 'bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-slate-800 text-slate-400 hover:text-[#F8F9FF] hover:bg-slate-700'
+                : 'bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200'
             }`}
           >
             <X className="w-4 h-4" />
@@ -213,7 +213,7 @@ export const LeadEvidenceModal: React.FC<LeadEvidenceModalProps> = ({
                 <div key={ev.id} className={`p-3 rounded-xl border ${meta.bg} ${meta.border}`}>
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <span
-                      className={`text-xs font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}
+                      className={`text-xs font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
                     >
                       {FIELD_LABELS[ev.field] || ev.field}
                     </span>
