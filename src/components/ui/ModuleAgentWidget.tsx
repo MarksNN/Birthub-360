@@ -245,7 +245,7 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
 
         <div className="ml-3 flex flex-col items-start justify-center">
           <div className="flex items-center gap-1.5">
-            <span className="text-[13px] font-bold text-white leading-none">{agent.name}</span>
+            <span className="text-[13px] font-bold text-[#F8F9FF] leading-none">{agent.name}</span>
             <Sparkles className="w-3 h-3 text-brand opacity-80" />
           </div>
 
@@ -258,8 +258,8 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
                 exit={{ opacity: 0, y: -5 }}
                 className="flex items-center gap-1 mt-0.5"
               >
-                <Mic className="w-3 h-3 text-white/70 animate-pulse" />
-                <span className="text-[10px] font-semibold text-white/70 uppercase tracking-wide">
+                <Mic className="w-3 h-3 text-[#F8F9FF]/70 animate-pulse" />
+                <span className="text-[10px] font-semibold text-[#F8F9FF]/70 uppercase tracking-wide">
                   Diga "{agent.command}"
                 </span>
               </motion.div>
@@ -271,7 +271,7 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
                 exit={{ opacity: 0, y: -5 }}
                 className="mt-0.5"
               >
-                <span className="text-[10px] font-medium text-white/40 leading-none">
+                <span className="text-[10px] font-medium text-[#F8F9FF]/40 leading-none">
                   {agent.role}
                 </span>
               </motion.div>
@@ -288,14 +288,14 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="w-[360px] rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col"
+            className="w-[360px] rounded-2xl border border-[#F8F9FF]/10 shadow-2xl overflow-hidden flex flex-col"
             style={{
               background: 'rgba(6,13,26,0.97)',
               backdropFilter: 'blur(24px)',
             }}
           >
             {/* Header do Card */}
-            <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-[#F8F9FF]/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
                   className={`flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${agent.color}`}
@@ -307,10 +307,10 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
                   />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
+                  <h3 className="text-[#F8F9FF] font-bold text-sm flex items-center gap-1.5">
                     {agent.name} <Sparkles className="w-3.5 h-3.5 text-brand" />
                   </h3>
-                  <p className="text-white/40 text-[11px] font-mono mt-0.5">{agent.role}</p>
+                  <p className="text-[#F8F9FF]/40 text-[11px] font-mono mt-0.5">{agent.role}</p>
                 </div>
               </div>
               <button
@@ -319,15 +319,15 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
                   SoundFX.play('click');
                   setIsExpanded(false);
                 }}
-                className="p-1.5 rounded-md hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+                className="p-1.5 rounded-md hover:bg-[#F8F9FF]/10 text-[#F8F9FF]/40 hover:text-[#F8F9FF] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Contexto & Pipeline Animado */}
-            <div className="px-5 py-6 flex-1 border-b border-white/10">
-              <p className="text-white/70 text-sm mb-6 flex items-center gap-2">
+            <div className="px-5 py-6 flex-1 border-b border-[#F8F9FF]/10">
+              <p className="text-[#F8F9FF]/70 text-sm mb-6 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 {agent.contextMsg}...
               </p>
@@ -348,13 +348,13 @@ export function ModuleAgentWidget({ activeTab }: ModuleAgentWidgetProps) {
                     }
                   }}
                   placeholder={`Pergunte algo ao ${agent.name}...`}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-white/30 focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/50 resize-none h-16"
+                  className="w-full bg-[#F8F9FF]/5 border border-[#F8F9FF]/10 rounded-xl px-4 py-3 pr-12 text-sm text-[#F8F9FF] placeholder-[#F8F9FF]/30 focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/50 resize-none h-16"
                 />
                 <button
                   type="button"
                   onClick={handleSend}
                   disabled={!inputText.trim()}
-                  className="absolute right-2 bottom-2 p-2 rounded-lg bg-brand text-white hover:bg-brand-hover disabled:opacity-50 disabled:hover:bg-brand transition-colors"
+                  className="absolute right-2 bottom-2 p-2 rounded-lg bg-brand text-midnight font-bold hover:bg-brand-hover disabled:opacity-50 disabled:hover:bg-brand transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" />
                 </button>

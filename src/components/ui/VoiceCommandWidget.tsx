@@ -156,7 +156,7 @@ export function VoiceCommandWidget() {
           type="button"
           onClick={toggleListening}
           aria-label="Comando de Voz por Microfone"
-          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl text-white shadow-xl transition-all duration-300 border cursor-pointer ${
+          className={`relative flex items-center justify-center w-11 h-11 rounded-2xl text-[#F8F9FF] shadow-xl transition-all duration-300 border cursor-pointer ${
             isListening
               ? 'border-critical/60 bg-critical animate-pulse ring-4 ring-critical/40 shadow-[0_0_25px_rgba(239,68,68,0.5)]'
               : 'border-brand/40 bg-gradient-to-br from-brand via-brand-2 to-brand text-on-brand hover:scale-105 active:scale-95 shadow-[0_6px_25px_rgba(212,175,55,0.4)] hover:shadow-[0_8px_30px_rgba(212,175,55,0.55)]'
@@ -166,7 +166,7 @@ export function VoiceCommandWidget() {
           <div className="absolute inset-x-0 top-0 h-1/2 rounded-t-2xl bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
 
           {isListening ? (
-            <Volume2 className="w-5 h-5 animate-pulse text-white relative z-10" />
+            <Volume2 className="w-5 h-5 animate-pulse text-[#F8F9FF] relative z-10" />
           ) : (
             <Mic className="w-5 h-5 group-hover:scale-110 transition-transform relative z-10" />
           )}

@@ -91,7 +91,7 @@ export function AiReasoningPipeline({ currentStep, details }: AiReasoningPipelin
                   className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors duration-500`}
                 >
                   <Icon
-                    className={`w-3 h-3 ${isActive ? step.color : isPast ? 'text-white/50' : 'text-white/20'}`}
+                    className={`w-3 h-3 ${isActive ? step.color : isPast ? 'text-[#F8F9FF]/50' : 'text-[#F8F9FF]/20'}`}
                   />
                 </motion.div>
                 {isActive && (
@@ -107,7 +107,7 @@ export function AiReasoningPipeline({ currentStep, details }: AiReasoningPipelin
                 className={`flex flex-col pb-2 ${isActive ? 'opacity-100' : isPast ? 'opacity-50' : 'opacity-20'}`}
               >
                 <span
-                  className={`text-[11px] font-bold tracking-widest uppercase ${isActive ? step.color : 'text-white'}`}
+                  className={`text-[11px] font-bold tracking-widest uppercase ${isActive ? step.color : 'text-[#F8F9FF]'}`}
                 >
                   {step.label}
                 </span>
@@ -118,7 +118,7 @@ export function AiReasoningPipeline({ currentStep, details }: AiReasoningPipelin
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mt-1 text-[12px] font-sans text-white/70 max-w-sm overflow-hidden"
+                      className="mt-1 text-[12px] font-sans text-[#F8F9FF]/70 max-w-sm overflow-hidden"
                     >
                       {details[step.id as AiReasoningStep]}
                     </motion.div>

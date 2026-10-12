@@ -38,7 +38,7 @@ export function AiReasoningVisualizer() {
               <div
                 className={`flex items-center justify-center w-6 h-6 rounded-full border text-[10px] shrink-0 transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#7C3AED] border-[#7C3AED] text-white shadow-[0_0_10px_rgba(124,58,237,0.4)] scale-110'
+                    ? 'bg-[#7C3AED] border-[#7C3AED] text-[#F8F9FF] shadow-[0_0_10px_rgba(124,58,237,0.4)] scale-110'
                     : isPast
                       ? 'bg-[#7C3AED]/20 border-[#7C3AED]/30 text-[#7C3AED]'
                       : 'bg-surface-2 border-line text-ink-2'

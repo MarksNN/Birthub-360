@@ -45,7 +45,7 @@ export function LoginPage() {
             className="w-10 h-10 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/30 transition-colors"
             aria-label="Voltar"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
+            <ArrowLeft className="w-5 h-5 text-[#F8F9FF]" />
           </button>
         </div>
 
@@ -156,7 +156,7 @@ export function LoginPage() {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-black text-white py-3 px-4 rounded-xl font-medium hover:bg-gray-800 transition-colors"
+              className="w-full bg-[#0D0D0D] text-[#F8F9FF] border border-line-strong py-3 px-4 rounded-xl font-medium hover:bg-slate-800 transition-colors"
             >
               Sign In
             </button>

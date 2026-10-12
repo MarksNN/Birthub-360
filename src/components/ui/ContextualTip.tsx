@@ -40,7 +40,7 @@ export const ContextualTip: React.FC<ContextualTipProps> = ({
               <span className="text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
                 {badgeText}
               </span>
-              <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-[#F8F9FF] flex items-center gap-1">
                 {title}
               </h4>
             </div>
