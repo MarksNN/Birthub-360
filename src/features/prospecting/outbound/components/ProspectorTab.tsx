@@ -349,7 +349,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
         >
           <div>
             <h2
-              className={`text-base font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}
+              className={`text-base font-bold flex items-center gap-2 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
             >
               <Sparkles className="w-4 h-4 text-[var(--brand-primary)]" />
               <span>Painel de Busca Estruturada & Filtros Suspensos</span>
@@ -406,7 +406,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
                   className={`w-full border rounded-xl px-3 py-2 text-xs outline-none transition mt-2 ${
                     isDark
                       ? 'bg-slate-950 border-slate-700 text-slate-100 placeholder-slate-500 focus:border-[var(--brand-primary)]'
-                      : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-[var(--brand-primary)]'
+                      : 'bg-slate-50 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-[var(--brand-primary)]'
                   }`}
                 />
               )}
@@ -427,7 +427,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
                 className={`w-full border rounded-xl px-3 py-2.5 text-xs font-semibold outline-none transition ${
                   isDark
                     ? 'bg-slate-900 border-slate-700/80 text-slate-100 focus:border-[var(--brand-primary)]'
-                    : 'bg-white border-slate-300 text-slate-900 focus:border-[var(--brand-primary)]'
+                    : 'bg-white border-slate-300 text-slate-800 focus:border-[var(--brand-primary)]'
                 }`}
               >
                 {SEARCH_SCHEMA_CONFIG.regions.map((st) => (
@@ -468,7 +468,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
                 className={`w-full border rounded-xl px-3 py-2.5 text-xs font-semibold outline-none transition ${
                   isDark
                     ? 'bg-slate-900 border-slate-700/80 text-slate-100 focus:border-[var(--brand-primary)]'
-                    : 'bg-white border-slate-300 text-slate-900 focus:border-[var(--brand-primary)]'
+                    : 'bg-white border-slate-300 text-slate-800 focus:border-[var(--brand-primary)]'
                 }`}
               >
                 <option value="5">5 km</option>
@@ -598,7 +598,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
               </span>
             </div>
             <p
-              className={`text-xs sm:text-sm font-semibold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}
+              className={`text-xs sm:text-sm font-semibold truncate ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
             >
               {query || 'Selecione os parâmetros acima para compor a busca...'}
             </p>
@@ -623,7 +623,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
               type="button"
               onClick={onStartSearch}
               disabled={isSearching || !query.trim()}
-              className="py-2.5 px-6 bg-gradient-to-r from-[var(--brand-primary)] to-[#FF7010] hover:from-[var(--brand-secondary-hover)] hover:to-[var(--brand-secondary)] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition shadow-lg shadow-[var(--brand-primary)]/25 flex items-center justify-center gap-2 text-sm"
+              className="py-2.5 px-6 bg-gradient-to-r from-[var(--brand-primary)] to-[#FF7010] hover:from-[var(--brand-secondary-hover)] hover:to-[var(--brand-secondary)] disabled:opacity-50 disabled:cursor-not-allowed text-[#F8F9FF] font-bold rounded-xl transition shadow-lg shadow-[var(--brand-primary)]/25 flex items-center justify-center gap-2 text-sm"
             >
               {isSearching ? (
                 <>
@@ -710,7 +710,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
               <div>
-                <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`text-sm font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
                   {leads.length} Empresas Mapeadas (Places + CNPJ Oficial + Apollo)
                 </h3>
                 <p className="text-[11px] text-slate-400">

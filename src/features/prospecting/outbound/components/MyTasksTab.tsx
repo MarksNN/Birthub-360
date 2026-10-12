@@ -84,7 +84,7 @@ export function MyTasksTab({ user, isDark }: MyTasksTabProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+        <h2 className={`text-xl font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
           Minhas Tarefas
         </h2>
         <span
@@ -136,7 +136,7 @@ export function MyTasksTab({ user, isDark }: MyTasksTabProps) {
                         </button>
                         <div className="min-w-0 flex-1">
                           <p
-                            className={`text-sm ${isDone ? 'line-through text-slate-500' : isDark ? 'text-slate-100' : 'text-slate-900'}`}
+                            className={`text-sm ${isDone ? 'line-through text-slate-500' : isDark ? 'text-slate-100' : 'text-slate-800'}`}
                           >
                             {task.description}
                           </p>

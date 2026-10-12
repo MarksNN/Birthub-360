@@ -128,20 +128,20 @@ export function LoginScreen({ onLogin, isDark, setTheme }: LoginScreenProps) {
         <div className="relative z-10 w-full max-w-sm">
           <Logo size="xl" theme="dark" variant="full" />
 
-          <h2 className="mt-10 text-3xl font-black leading-tight text-white text-balance">
+          <h2 className="mt-10 text-3xl font-black leading-tight text-[#F8F9FF] text-balance">
             {brand.tagline}
           </h2>
-          <p className="mt-3 text-sm text-white/80">
+          <p className="mt-3 text-sm text-[#F8F9FF]/80">
             A central de prospecção e IA comercial da {brand.label}.
           </p>
 
           <ul className="mt-10 space-y-4">
             {FEATURES.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-start gap-3">
-                <span className="mt-0.5 grid place-items-center w-8 h-8 rounded-lg bg-white/15 shrink-0">
-                  <Icon className="w-4 h-4 text-white" />
+                <span className="mt-0.5 grid place-items-center w-8 h-8 rounded-lg bg-[#F8F9FF]/15 shrink-0">
+                  <Icon className="w-4 h-4 text-[#F8F9FF]" />
                 </span>
-                <span className="text-sm text-white/90 leading-snug pt-1.5">{text}</span>
+                <span className="text-sm text-[#F8F9FF]/90 leading-snug pt-1.5">{text}</span>
               </li>
             ))}
           </ul>
@@ -157,7 +157,7 @@ export function LoginScreen({ onLogin, isDark, setTheme }: LoginScreenProps) {
               <Logo size="lg" theme={isDark ? 'dark' : 'light'} variant="full" />
             </div>
             <h1
-              className={`text-2xl font-bold text-center lg:text-left ${isDark ? 'text-white' : 'text-slate-900'}`}
+              className={`text-2xl font-bold text-center lg:text-left ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
             >
               Bem-vindo de volta
             </h1>
@@ -189,8 +189,8 @@ export function LoginScreen({ onLogin, isDark, setTheme }: LoginScreenProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-colors border outline-none focus:ring-2 ${
                       isDark
-                        ? 'bg-slate-950 border-slate-800 text-white'
-                        : 'bg-slate-50 border-slate-200 text-slate-900'
+                        ? 'bg-slate-950 border-slate-800 text-[#F8F9FF]'
+                        : 'bg-slate-50 border-slate-200 text-slate-800'
                     }`}
                     style={{ '--tw-ring-color': `${brand.accent}33` } as React.CSSProperties}
                     onFocus={(e) => (e.currentTarget.style.borderColor = brand.accent)}
@@ -217,8 +217,8 @@ export function LoginScreen({ onLogin, isDark, setTheme }: LoginScreenProps) {
                     onChange={(e) => setPassword(e.target.value)}
                     className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-colors border outline-none focus:ring-2 ${
                       isDark
-                        ? 'bg-slate-950 border-slate-800 text-white'
-                        : 'bg-slate-50 border-slate-200 text-slate-900'
+                        ? 'bg-slate-950 border-slate-800 text-[#F8F9FF]'
+                        : 'bg-slate-50 border-slate-200 text-slate-800'
                     }`}
                     style={{ '--tw-ring-color': `${brand.accent}33` } as React.CSSProperties}
                     onFocus={(e) => (e.currentTarget.style.borderColor = brand.accent)}
@@ -237,7 +237,7 @@ export function LoginScreen({ onLogin, isDark, setTheme }: LoginScreenProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="group w-full mt-2 flex items-center justify-center gap-2 text-white font-medium py-2.5 rounded-xl transition-all disabled:opacity-50 shadow-lg"
+                className="group w-full mt-2 flex items-center justify-center gap-2 text-[#F8F9FF] font-medium py-2.5 rounded-xl transition-all disabled:opacity-50 shadow-lg"
                 style={{
                   background: `linear-gradient(to right, ${brand.gradientFrom}, ${brand.gradientTo})`,
                   boxShadow: `0 8px 20px -8px ${brand.accent}80`,

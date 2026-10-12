@@ -74,7 +74,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
             <Target className="w-5 h-5 text-emerald-500" />
           </div>
           <div className="flex items-end gap-2">
-            <span className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span className={`text-3xl font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
               {conversionRate}%
             </span>
             <span className="text-emerald-500 text-xs font-semibold mb-1 flex items-center">
@@ -93,7 +93,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
             <Activity className="w-5 h-5 text-[#008FCE]" />
           </div>
           <div className="flex items-end gap-2">
-            <span className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span className={`text-3xl font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
               18
             </span>
             <span
@@ -114,7 +114,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
             <CheckCircle2 className="w-5 h-5 text-[var(--brand-primary)]" />
           </div>
           <div className="flex items-end gap-2">
-            <span className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span className={`text-3xl font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
               {totalWon}
             </span>
             <span
@@ -135,7 +135,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
             <User className="w-5 h-5 text-purple-500" />
           </div>
           <div className="flex items-end gap-2">
-            <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span className={`text-xl font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
               Kaue
             </span>
             <span
@@ -153,7 +153,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
         <div
           className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
         >
-          <h3 className={`text-lg font-bold mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-lg font-bold mb-6 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
             Atividade Histórica por Marca
           </h3>
           <div className="h-72">
@@ -196,7 +196,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
         <div
           className={`p-6 rounded-2xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
         >
-          <h3 className={`text-lg font-bold mb-6 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-lg font-bold mb-6 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}>
             Velocidade do Funil de Vendas
           </h3>
           <div className="h-72">
@@ -222,7 +222,7 @@ export function PerformanceTab({ leads, isDark }: PerformanceTabProps) {
                 <Tooltip
                   cursor={{ fill: isDark ? '#334155' : '#F1F5F9' }}
                   contentStyle={{
-                    backgroundColor: isDark ? '#1E293B' : '#FFF',
+                    backgroundColor: isDark ? '#1E293B' : '#F8F9FF',
                     borderColor: isDark ? '#334155' : '#E2E8F0',
                     borderRadius: '12px',
                     color: isDark ? '#F8FAFC' : '#0F172A',

@@ -66,7 +66,7 @@ export function UserKanbanBoard({ user, isDark }: UserKanbanBoardProps) {
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="flex-1 space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-xl font-bold ${isDark ? 'text-[#FFC107]' : 'text-[#D97706]'}`}>
             Meus Leads (CRM / Bitrix)
           </h2>
           <span
@@ -161,10 +161,10 @@ export function UserKanbanBoard({ user, isDark }: UserKanbanBoardProps) {
         className={`w-full lg:w-80 shrink-0 p-4 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
       >
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--brand-primary)] to-[#008FCE] flex items-center justify-center">
-            <span className="text-white font-bold text-xs">AI</span>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF2D9B] to-[#8B5CF6] flex items-center justify-center">
+            <span className="text-[#F8F9FF] font-bold text-xs">AI</span>
           </div>
-          <h3 className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`font-bold ${isDark ? 'text-[#FF2D9B]' : 'text-[#E6007A]'}`}>
             Assistente LLaMA3
           </h3>
         </div>

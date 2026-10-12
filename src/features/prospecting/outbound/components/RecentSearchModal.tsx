@@ -70,7 +70,7 @@ export const RecentSearchModal: React.FC<RecentSearchModalProps> = ({
         className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ${
           isDark
             ? 'bg-slate-900 border-slate-700/80 text-slate-100 shadow-black/80'
-            : 'bg-white border-slate-300 text-slate-900 shadow-slate-400/40'
+            : 'bg-white border-slate-300 text-slate-800 shadow-slate-400/40'
         }`}
       >
         {/* Header */}
@@ -104,8 +104,8 @@ export const RecentSearchModal: React.FC<RecentSearchModalProps> = ({
             onClick={onClose}
             className={`p-2 rounded-xl transition ${
               isDark
-                ? 'text-slate-400 hover:text-white hover:bg-slate-800'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                ? 'text-slate-400 hover:text-[#F8F9FF] hover:bg-slate-800'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
             }`}
             title="Fechar"
           >
@@ -307,7 +307,7 @@ export const RecentSearchModal: React.FC<RecentSearchModalProps> = ({
                 onApplyAndSearch(search);
                 onClose();
               }}
-              className="text-xs font-bold px-4 py-2 rounded-xl bg-[var(--brand-primary)] hover:bg-[#e04a12] text-white shadow-lg shadow-[var(--brand-primary)]/25 transition flex items-center gap-1.5"
+              className="text-xs font-bold px-4 py-2 rounded-xl bg-[var(--brand-primary)] hover:bg-[#e04a12] text-[#F8F9FF] shadow-lg shadow-[var(--brand-primary)]/25 transition flex items-center gap-1.5"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Executar Prospecção Agora</span>

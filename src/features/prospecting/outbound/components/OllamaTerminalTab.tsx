@@ -87,7 +87,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#F8F9FF] flex items-center gap-2">
               <Terminal className="w-5 h-5 text-[var(--brand-primary)]" />
               <span>Execução & Diagnóstico do Modelo LLaMA3 com Ollama</span>
             </h2>
@@ -95,7 +95,10 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
               Painel de verificação e comunicação direta com o binário do Ollama local em{' '}
               <code className="text-[var(--brand-primary)] font-mono">{aiConfig.ollamaUrl}</code>{' '}
               rodando o modelo{' '}
-              <strong className="text-white font-mono">{aiConfig.ollamaModel || 'llama3'}</strong>.
+              <strong className="text-[#F8F9FF] font-mono">
+                {aiConfig.ollamaModel || 'llama3'}
+              </strong>
+              .
             </p>
           </div>
 
@@ -103,7 +106,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
             type="button"
             onClick={onCheckOllama}
             disabled={isChecking}
-            className="px-4 py-2 bg-[var(--brand-primary)] hover:bg-[#FF6B10] disabled:opacity-50 text-white font-bold text-xs rounded-xl transition flex items-center gap-2 shadow-lg shadow-[var(--brand-primary)]/20 self-start md:self-auto"
+            className="px-4 py-2 bg-[var(--brand-primary)] hover:bg-[#FF6B10] disabled:opacity-50 text-[#F8F9FF] font-bold text-xs rounded-xl transition flex items-center gap-2 shadow-lg shadow-[var(--brand-primary)]/20 self-start md:self-auto"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
             <span>Verificar Conexão</span>
@@ -121,7 +124,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
                 <XCircle className="w-4 h-4 text-amber-400" />
               )}
             </div>
-            <div className="text-sm font-bold text-white">
+            <div className="text-sm font-bold text-[#F8F9FF]">
               {ollamaStatus?.online ? 'Online & Pronto' : 'Offline / Emulado'}
             </div>
             <div className="text-[11px] text-slate-500 font-mono">
@@ -186,7 +189,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
               type="button"
               onClick={handleRunOllamaTest}
               disabled={isRunningTest}
-              className="py-2 px-5 bg-[var(--brand-primary)] hover:bg-[#FF6B10] disabled:opacity-50 text-white font-bold rounded-xl text-xs transition flex items-center gap-2 shadow-md shadow-[var(--brand-primary)]/20"
+              className="py-2 px-5 bg-[var(--brand-primary)] hover:bg-[#FF6B10] disabled:opacity-50 text-[#F8F9FF] font-bold rounded-xl text-xs transition flex items-center gap-2 shadow-md shadow-[var(--brand-primary)]/20"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>{isRunningTest ? 'Executando...' : 'Executar llama3'}</span>
@@ -216,7 +219,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
 
       {/* Guide: How to run Ollama locally */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
-        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <h3 className="text-sm font-bold text-[#F8F9FF] flex items-center gap-2">
           <Server className="w-4 h-4 text-[var(--brand-primary)]" />
           <span>Guia Rápido: Como Executar o Ollama e o Modelo LLaMA3 no seu Ambiente</span>
         </h3>
@@ -233,7 +236,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
               <button
                 type="button"
                 onClick={() => handleCopy('curl -fsSL https://ollama.com/install.sh | sh', 'c1')}
-                className="text-slate-400 hover:text-white flex items-center gap-1 text-[11px]"
+                className="text-slate-400 hover:text-[#F8F9FF] flex items-center gap-1 text-[11px]"
               >
                 {copiedCode === 'c1' ? (
                   <Check className="w-3 h-3 text-emerald-400" />
@@ -254,7 +257,7 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
               <button
                 type="button"
                 onClick={() => handleCopy('ollama run llama3', 'c2')}
-                className="text-slate-400 hover:text-white flex items-center gap-1 text-[11px]"
+                className="text-slate-400 hover:text-[#F8F9FF] flex items-center gap-1 text-[11px]"
               >
                 {copiedCode === 'c2' ? (
                   <Check className="w-3 h-3 text-emerald-400" />

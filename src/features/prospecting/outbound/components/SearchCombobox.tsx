@@ -186,7 +186,9 @@ export const SearchCombobox: React.FC<SearchComboboxProps> = ({
               }}
               placeholder={searchPlaceholder}
               className={`w-full bg-transparent text-xs outline-none ${
-                isDark ? 'text-white placeholder-slate-500' : 'text-slate-900 placeholder-slate-400'
+                isDark
+                  ? 'text-[#F8F9FF] placeholder-slate-500'
+                  : 'text-slate-800 placeholder-slate-400'
               }`}
             />
             {searchTerm && (
@@ -209,7 +211,7 @@ export const SearchCombobox: React.FC<SearchComboboxProps> = ({
                   <button
                     type="button"
                     onClick={handleCustomSubmit}
-                    className="px-3 py-1.5 rounded-lg bg-[var(--brand-primary)] text-white text-xs font-bold hover:bg-[#e04a12] transition"
+                    className="px-3 py-1.5 rounded-lg bg-[var(--brand-primary)] text-[#F8F9FF] text-xs font-bold hover:bg-[#e04a12] transition"
                   >
                     Usar "{searchTerm}" como valor
                   </button>
@@ -243,8 +245,8 @@ export const SearchCombobox: React.FC<SearchComboboxProps> = ({
                               ? 'bg-[var(--brand-primary)]/20 text-[var(--brand-primary)] font-bold border border-[var(--brand-primary)]/40'
                               : 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] font-bold border border-[var(--brand-primary)]/30'
                             : isDark
-                              ? 'hover:bg-slate-800 text-slate-300 hover:text-white'
-                              : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+                              ? 'hover:bg-slate-800 text-slate-300 hover:text-[#F8F9FF]'
+                              : 'hover:bg-slate-100 text-slate-700 hover:text-slate-800'
                         }`}
                       >
                         <div className="flex flex-col min-w-0 pr-2">

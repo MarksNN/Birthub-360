@@ -66,7 +66,7 @@ export function TasksOverviewTab({ isDark }: TasksOverviewTabProps) {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <ListChecks className={`w-5 h-5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`} />
-          <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-xl font-bold ${isDark ? 'text-[#FFC107]' : 'text-[#D97706]'}`}>
             Tarefas por Vendedor
           </h2>
         </div>
@@ -105,7 +105,7 @@ export function TasksOverviewTab({ isDark }: TasksOverviewTabProps) {
                   className={`flex items-center justify-between px-4 py-3 border-b ${isDark ? 'border-slate-800 bg-slate-900/60' : 'border-slate-200 bg-slate-50'}`}
                 >
                   <p
-                    className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}
+                    className={`font-semibold text-sm ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
                   >
                     {seller.userName}
                   </p>

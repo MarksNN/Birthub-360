@@ -55,7 +55,7 @@ export const ProspectRunSummary: React.FC<ProspectRunSummaryProps> = ({ meta, th
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-[var(--brand-primary)]" />
           <h3
-            className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}
+            className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
           >
             Resumo da busca (funil real)
           </h3>
@@ -130,7 +130,7 @@ export const ProspectRunSummary: React.FC<ProspectRunSummaryProps> = ({ meta, th
                     {STAGE_LABELS[stage.stage]}
                   </p>
                   <p
-                    className={`text-sm font-mono font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}
+                    className={`text-sm font-mono font-bold ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
                   >
                     {stage.candidatesIn} → {stage.candidatesOut}
                   </p>

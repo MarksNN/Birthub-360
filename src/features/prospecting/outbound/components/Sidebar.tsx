@@ -155,8 +155,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => setIsOpenMobile(false)}
               className={`lg:hidden p-1.5 rounded-lg transition ${
                 isDark
-                  ? 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  ? 'text-slate-400 hover:text-[#F8F9FF] hover:bg-slate-800'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200'
               }`}
             >
               ✕
@@ -323,10 +323,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => handleProviderChange('ollama')}
                 className={`py-1.5 px-2 rounded-md font-semibold transition ${
                   aiConfig.provider === 'ollama'
-                    ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                    ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                     : isDark
                       ? 'text-slate-400 hover:text-slate-200'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 hover:text-slate-800'
                 }`}
               >
                 Ollama
@@ -336,10 +336,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => handleProviderChange('groq')}
                 className={`py-1.5 px-2 rounded-md font-semibold transition ${
                   aiConfig.provider === 'groq'
-                    ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                    ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                     : isDark
                       ? 'text-slate-400 hover:text-slate-200'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 hover:text-slate-800'
                 }`}
               >
                 Groq
@@ -349,10 +349,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => handleProviderChange('gemini')}
                 className={`py-1.5 px-2 rounded-md font-semibold transition ${
                   aiConfig.provider === 'gemini'
-                    ? 'bg-[var(--brand-primary)] text-white shadow-sm'
+                    ? 'bg-[var(--brand-primary)] text-[#F8F9FF] shadow-sm'
                     : isDark
                       ? 'text-slate-400 hover:text-slate-200'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 hover:text-slate-800'
                 }`}
               >
                 Gemini
@@ -498,7 +498,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={`w-full flex items-center justify-between text-[11px] py-1 ${
                   isDark
                     ? 'text-slate-400 hover:text-slate-200'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-600 hover:text-slate-800'
                 }`}
               >
                 <span>Hiperparâmetros (Temperatura)</span>
@@ -787,7 +787,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div
                 className={`p-2 rounded-lg border ${
                   isDark
-                    ? 'bg-slate-900 border-slate-800 text-white'
+                    ? 'bg-slate-900 border-slate-800 text-[#F8F9FF]'
                     : 'bg-slate-100 border-slate-200 text-slate-800'
                 }`}
               >
@@ -797,7 +797,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div
                 className={`p-2 rounded-lg border ${
                   isDark
-                    ? 'bg-slate-900 border-slate-800 text-white'
+                    ? 'bg-slate-900 border-slate-800 text-[#F8F9FF]'
                     : 'bg-slate-100 border-slate-200 text-slate-800'
                 }`}
               >

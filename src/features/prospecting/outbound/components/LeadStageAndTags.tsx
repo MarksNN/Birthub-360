@@ -447,7 +447,7 @@ export const LeadStageAndTags: React.FC<LeadStageAndTagsProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsTagPopoverOpen(false)}
-                  className="hover:text-white"
+                  className="hover:text-[#F8F9FF]"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -468,15 +468,15 @@ export const LeadStageAndTags: React.FC<LeadStageAndTagsProps> = ({
                   placeholder="Nova tag personalizada..."
                   className={`w-full px-2.5 py-1 text-xs rounded-lg border outline-none ${
                     isDark
-                      ? 'bg-slate-950 border-slate-700 text-white placeholder-slate-500 focus:border-[var(--brand-primary)]'
-                      : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-[var(--brand-primary)]'
+                      ? 'bg-slate-950 border-slate-700 text-[#F8F9FF] placeholder-slate-500 focus:border-[var(--brand-primary)]'
+                      : 'bg-slate-50 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-[var(--brand-primary)]'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => handleAddTag(customTagInput)}
                   disabled={!customTagInput.trim()}
-                  className="px-2 py-1 bg-[var(--brand-primary)] hover:bg-[#e04a12] disabled:opacity-50 text-white rounded-lg text-xs font-bold transition"
+                  className="px-2 py-1 bg-[var(--brand-primary)] hover:bg-[#e04a12] disabled:opacity-50 text-[#F8F9FF] rounded-lg text-xs font-bold transition"
                 >
                   OK
                 </button>
