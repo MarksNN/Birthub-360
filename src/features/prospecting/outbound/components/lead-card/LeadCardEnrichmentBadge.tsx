@@ -1,5 +1,5 @@
-﻿import type React from 'react';
-import { Database, CheckCircle, AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Database } from 'lucide-react';
+import type React from 'react';
 import type { EnrichmentSource } from './types.js';
 
 interface LeadCardEnrichmentBadgeProps {
@@ -20,10 +20,10 @@ export function LeadCardEnrichmentBadge({
   const Icon = confidenceConfig.icon;
 
   return (
-    <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-white/50">
+    <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-[#F8F9FF]/50">
       <Database className="w-3 h-3 text-brand" />
       <span>
-        Fonte: <strong className="text-slate-700 dark:text-white/80">{source}</strong>
+        Fonte: <strong className="text-slate-700 dark:text-[#F8F9FF]/80">{source}</strong>
       </span>
       <span>•</span>
       <span className={`inline-flex items-center gap-1 ${confidenceConfig.color} font-medium`}>
