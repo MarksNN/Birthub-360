@@ -21,14 +21,12 @@ export const groqProvider: ProviderAdapter = {
     const primaryGroqModel = resolveGroqModelName(params.resolvedModel);
 
     // Lista de fallback de modelos compatíveis no Groq para tolerância a rate-limits específicos de modelo (TPD)
-    const modelCandidates = [primaryGroqModel];
-    if (primaryGroqModel === 'openai/gpt-oss-20b') {
-      modelCandidates.push('openai/gpt-oss-120b', 'llama-3.1-8b-instant');
-    } else if (primaryGroqModel === 'openai/gpt-oss-120b') {
-      modelCandidates.push('openai/gpt-oss-20b', 'llama-3.1-8b-instant');
-    } else {
-      modelCandidates.push('openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant');
-    }
+    const modelCandidates =
+      primaryGroqModel === 'openai/gpt-oss-20b'
+        ? ['openai/gpt-oss-20b', 'openai/gpt-oss-120b']
+        : primaryGroqModel === 'openai/gpt-oss-120b'
+          ? ['openai/gpt-oss-120b', 'openai/gpt-oss-20b']
+          : Array.from(new Set([primaryGroqModel, 'openai/gpt-oss-120b', 'openai/gpt-oss-20b']));
 
     let lastError: unknown;
     for (const groqModel of modelCandidates) {
@@ -50,8 +48,11 @@ export const groqProvider: ProviderAdapter = {
           params.retries,
         );
       } catch (err: any) {
-        lastError = err;
         const msg = String(err?.message || err);
+        // Preserva erro 429 útil caso um modelo posterior falhe com 404 genérico
+        if (!lastError || msg.includes('429')) {
+          lastError = err;
+        }
         // Se for erro de quota de modelo específico (429) ou modelo não acessível nesta chave (404 / does not exist), tenta o próximo modelo candidato
         if (
           msg.includes('429') ||
