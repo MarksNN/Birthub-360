@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, MotionConfig, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import {
   Sparkles,
   Shield,
@@ -19,20 +19,10 @@ import {
   Bot,
   BrainCircuit,
 } from 'lucide-react';
-import { useTheme, ThemeProvider } from '../components/design-system/ThemeContext.js';
+import { useTheme } from '../../../contexts/ThemeContext.js';
+import './LandingInnovative.css';
 import { useToast, ToastContainer } from '../components/design-system/index.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
-import { AnimatedBirthHubEmblem } from '../../../components/brand/AnimatedBirthHubEmblem.js';
-
-// Simplified background effect
-const ParticleBackground: React.FC = () => {
-  return (
-    <div className="absolute inset-0 pointer-events-none z-0">
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-brand/10 rounded-full blur-[150px]" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-iris/10 rounded-full blur-[120px]" />
-    </div>
-  );
-};
 
 // Sophisticated magnetic button component
 const MagneticButton: React.FC<{
@@ -42,18 +32,17 @@ const MagneticButton: React.FC<{
   variant?: 'primary' | 'secondary';
 }> = ({ children, onClick, className = '', variant = 'primary' }) => {
   const baseClasses =
-    'relative px-8 py-4 rounded-xl font-bold text-sm transition-all duration-300 transform-gpu';
+    'bh-landing-button relative px-8 py-4 font-bold text-sm transition-colors duration-200';
   const variantClasses =
-    variant === 'primary'
-      ? 'bg-brand text-white shadow-lg hover:shadow-2xl'
-      : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700';
+    variant === 'primary' ? 'bh-landing-button-primary' : 'bh-landing-button-secondary';
 
   return (
     <motion.button
+      type="button"
       onClick={onClick}
       className={`${baseClasses} ${variantClasses} ${className}`}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
     >
       {children}
     </motion.button>
@@ -66,7 +55,8 @@ const HolographicCard: React.FC<{
   title: string;
   description: string;
   delay: number;
-}> = ({ icon, title, description, delay }) => {
+  accent?: 'cyan' | 'iris' | 'blue' | 'success';
+}> = ({ icon, title, description, delay, accent = 'cyan' }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -76,11 +66,11 @@ const HolographicCard: React.FC<{
       className="relative group"
     >
       <motion.div
-        whileHover={{ y: -8 }}
+        whileHover={{ y: -3 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className="relative bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl hover:shadow-2xl transition-all duration-500"
+        data-accent={accent}
+        className="bh-platform-card bh-landing-card relative p-8 transition-shadow duration-200"
       >
-        <div className="absolute inset-0 bg-gradient-to-br /5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="relative z-10">
           <div className="w-14 h-14 rounded-xl bg-brand/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
             {icon}
@@ -135,8 +125,9 @@ const DataStream: React.FC = () => {
 
 // Main landing page component
 function LandingInnovativeContent() {
-  const { theme, setTheme } = useTheme();
-  const { toasts, showToast } = useToast();
+  const { theme, setThemeMode: setTheme } = useTheme();
+  const reducedMotion = useReducedMotion();
+  const { toasts } = useToast();
 
   const { scrollY } = useScroll();
   const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
@@ -168,18 +159,12 @@ function LandingInnovativeContent() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' });
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-brand selection:text-white relative overflow-hidden">
-      <ParticleBackground />
-
-      {/* Global ambient lighting */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-brand/10 rounded-full blur-[150px] pointer-events-none z-0" />
-      <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-iris/10 rounded-full blur-[120px] pointer-events-none z-0" />
-
+    <div className="bh-landing-new min-h-screen relative overflow-hidden">
       {/* Sticky Navigation */}
       <motion.header
         initial={{ y: -100 }}
@@ -190,7 +175,7 @@ function LandingInnovativeContent() {
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
               className="p-1.5 bg-white dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800"
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.01 }}
               transition={{ type: 'spring', stiffness: 400 }}
             >
               <BirthHubLogo variant="symbol" className="h-8 w-8" />
@@ -233,6 +218,8 @@ function LandingInnovativeContent() {
             <div className="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
               <button
                 type="button"
+                aria-label="Ativar modo claro"
+                aria-pressed={theme === 'light'}
                 onClick={() => setTheme('light')}
                 className={`p-2 rounded-md transition-all ${theme === 'light' ? 'bg-white shadow-sm text-brand' : 'text-slate-500'}`}
               >
@@ -240,6 +227,8 @@ function LandingInnovativeContent() {
               </button>
               <button
                 type="button"
+                aria-label="Ativar modo escuro"
+                aria-pressed={theme === 'dark'}
                 onClick={() => setTheme('dark')}
                 className={`p-2 rounded-md transition-all ${theme === 'dark' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500'}`}
               >
@@ -260,7 +249,7 @@ function LandingInnovativeContent() {
       {/* Immersive Hero Section */}
       <motion.section
         id="plataforma"
-        style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+        style={reducedMotion ? undefined : { opacity: heroOpacity, scale: heroScale, y: heroY }}
         className="relative min-h-screen flex items-center justify-center pt-20 z-10"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -279,20 +268,21 @@ function LandingInnovativeContent() {
             >
               {/* B360 Core */}
               <div className="absolute z-20">
-                <AnimatedBirthHubEmblem size={160} showCta={false} />
+                <BirthHubLogo variant="symbol" className="h-40 w-40" />
               </div>
 
               {/* Pulsing connection lines */}
               <svg
+                aria-hidden="true"
                 className="absolute inset-0 w-full h-full pointer-events-none z-10"
                 viewBox="0 0 400 400"
                 preserveAspectRatio="xMidYMid meet"
               >
                 <defs>
                   <linearGradient id="line-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--color-brand)" stopOpacity="0" />
-                    <stop offset="50%" stopColor="var(--color-brand)" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="var(--color-brand)" stopOpacity="0" />
+                    <stop offset="0%" stopColor="var(--color-brand-primary)" stopOpacity="0" />
+                    <stop offset="50%" stopColor="var(--color-brand-primary)" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="var(--color-brand-primary)" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <circle
@@ -417,7 +407,7 @@ function LandingInnovativeContent() {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="pt-12 max-w-4xl mx-auto"
             >
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl">
+              <div className="bh-platform-card bh-landing-card p-6" data-accent="cyan">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5 text-brand" />
@@ -430,6 +420,9 @@ function LandingInnovativeContent() {
                     <span className="text-xs text-slate-500">24/7 Monitoramento</span>
                   </div>
                 </div>
+                <p className="bh-landing-caption">
+                  Visualização ilustrativa de fluxo de dados; não representa métricas da operação.
+                </p>
                 <DataStream />
                 <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                   <div className="text-center">
@@ -458,7 +451,7 @@ function LandingInnovativeContent() {
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         >
           <motion.div
-            animate={{ y: [0, 10, 0] }}
+            animate={reducedMotion ? undefined : { y: [0, 6, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             className="flex flex-col items-center gap-2 text-slate-400"
           >
@@ -490,36 +483,42 @@ function LandingInnovativeContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <HolographicCard
               delay={0}
+              accent="iris"
               icon={<Bot className="h-7 w-7 text-brand" />}
               title="Agentes Autônomos"
               description="IA que opera 24/7 sem supervisão humana, qualificando leads, agendando reuniões e executando fluxos comerciais complexos."
             />
             <HolographicCard
               delay={0.1}
+              accent="iris"
               icon={<BrainCircuit className="h-7 w-7 text-iris" />}
               title="RAG Avançado"
               description="Sistema de recuperação de conhecimento que consulta seus documentos corporativos em milissegundos para respostas precisas e contextualizadas."
             />
             <HolographicCard
               delay={0.2}
+              accent="cyan"
               icon={<Radio className="h-7 w-7 text-slate-900 dark:text-white" />}
               title="Voz em Tempo Real"
               description="Latência sub-340ms com transcrição instantânea, síntese adaptativa e detecção de interrupção para conversas naturais."
             />
             <HolographicCard
               delay={0.3}
+              accent="success"
               icon={<Shield className="h-7 w-7 text-green-500" />}
               title="Segurança Enterprise"
               description="Criptografia AES-256, RBAC avançado, conformidade LGPD e auditorias permanentes para máxima proteção de dados."
             />
             <HolographicCard
               delay={0.4}
+              accent="blue"
               icon={<Network className="h-7 w-7 text-blue-500" />}
               title="Integrações Ilimitadas"
               description="Conecte-se com CRMs, ERPs, bancos de dados e APIs via webhooks bidirecionais e SDKs robustos."
             />
             <HolographicCard
               delay={0.5}
+              accent="blue"
               icon={<Globe className="h-7 w-7 text-purple-500" />}
               title="Multi-tenant White-label"
               description="Suporte a múltiplas organizações com branding customizável, subdomínios e faturamento segmentado por unidade."
@@ -599,8 +598,7 @@ function LandingInnovativeContent() {
               transition={{ duration: 0.8 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br /20 to-iris/20 rounded-3xl blur-3xl" />
-              <div className="relative bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-2xl">
+              <div className="bh-platform-card bh-landing-card relative p-8" data-accent="blue">
                 <div className="grid grid-cols-2 gap-6">
                   {[
                     { label: 'Criptografia', value: 'AES-256' },
@@ -697,8 +695,8 @@ const Play: React.FC<{ className?: string }> = ({ className }) => (
 
 export default function LandingInnovative() {
   return (
-    <ThemeProvider>
+    <MotionConfig reducedMotion="user">
       <LandingInnovativeContent />
-    </ThemeProvider>
+    </MotionConfig>
   );
 }

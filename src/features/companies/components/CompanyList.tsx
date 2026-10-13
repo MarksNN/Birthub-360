@@ -209,7 +209,7 @@ export function CompanyList() {
                 setViewMode('detail');
               }}
               aria-label={`Abrir perfil de ${companyLabel}`}
-              className="w-10 h-10 rounded-xl bg-[#1677FF]/5 border border-[#1677FF]/30 flex items-center justify-center text-[#1677FF] shrink-0 font-bold overflow-hidden cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-[var(--color-heading-blue)]/5 border border-[var(--color-heading-blue)]/30 flex items-center justify-center text-[var(--color-heading-blue)] shrink-0 font-bold overflow-hidden cursor-pointer"
             >
               {company.logoUrl ? (
                 <img
@@ -231,7 +231,7 @@ export function CompanyList() {
                   setViewMode('detail');
                 }}
                 aria-label={`Abrir perfil de ${companyLabel}`}
-                className="font-bold text-ink hover:text-[#1677FF] transition-colors text-left cursor-pointer"
+                className="font-bold text-ink hover:text-[var(--color-heading-blue)] transition-colors text-left cursor-pointer"
               >
                 {companyLabel}
               </button>
@@ -339,7 +339,7 @@ export function CompanyList() {
                 setSelectedCompany(company);
                 setIsFormOpen(true);
               }}
-              className="p-2 text-ink-2 hover:text-[#1677FF] hover:bg-[#1677FF]/10 rounded-lg transition-colors"
+              className="p-2 text-ink-2 hover:text-[var(--color-heading-blue)] hover:bg-[var(--color-heading-blue)]/10 rounded-lg transition-colors"
               title="Editar"
               aria-label={`Editar ${companyLabel}`}
             >
@@ -530,7 +530,7 @@ export function CompanyList() {
               return (
                 <div
                   key={company.id}
-                  className={`bg-surface hover:bg-surface-2 border border-line hover:border-[#1677FF]/40 rounded-3xl p-6 transition-colors duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-2xl flex flex-col justify-between group relative overflow-hidden ${selectedIds.has(company.id) ? 'ring-2 ring-[#1677FF] bg-[#1677FF]/5' : ''}`}
+                  className={`bg-surface hover:bg-surface-2 border border-line hover:border-[var(--color-heading-blue)]/40 rounded-[var(--radius-card)] p-6 transition-colors duration-300 transform hover:-translate-y-1 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] flex flex-col justify-between group relative overflow-hidden ${selectedIds.has(company.id) ? 'ring-2 ring-[var(--color-heading-blue)] bg-[var(--color-heading-blue)]/5' : ''}`}
                 >
                   {/* Top card info */}
                   <div className="space-y-4">
@@ -551,7 +551,7 @@ export function CompanyList() {
                             setViewMode('detail');
                           }}
                           aria-label={`Abrir perfil de ${companyLabel}`}
-                          className="w-12 h-12 rounded-2xl bg-[#1677FF]/5 border border-[#1677FF]/30 flex items-center justify-center text-[#1677FF] shrink-0 group-hover:scale-105 transition-transform overflow-hidden cursor-pointer"
+                          className="w-12 h-12 rounded-2xl bg-[var(--color-heading-blue)]/5 border border-[var(--color-heading-blue)]/30 flex items-center justify-center text-[var(--color-heading-blue)] shrink-0 group-hover:scale-105 transition-transform overflow-hidden cursor-pointer"
                         >
                           {company.logoUrl ? (
                             <img
@@ -688,7 +688,7 @@ export function CompanyList() {
                           setSelectedCompany(company);
                           setIsFormOpen(true);
                         }}
-                        className="p-2 text-ink-2 hover:text-[#1677FF] hover:bg-[#1677FF]/10 rounded-xl transition-colors"
+                        className="p-2 text-ink-2 hover:text-[var(--color-heading-blue)] hover:bg-[var(--color-heading-blue)]/10 rounded-xl transition-colors"
                         title="Editar"
                         aria-label={`Editar ${companyLabel}`}
                       >

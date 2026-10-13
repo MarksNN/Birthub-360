@@ -118,12 +118,11 @@ export function SinglePageDashboard() {
       <div className="w-full max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
         {/* ── COMMAND CENTER HEADER ────────────────────────────────────────── */}
         <motion.header
-          className="relative overflow-hidden rounded-2xl border border-brand/25 bg-surface/80 p-6 shadow-card backdrop-blur-sm transition-all duration-300 dark:border-brand/30 dark:bg-surface/60 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
+          className="relative border-b border-line bg-background p-6 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
           variants={staggerContainer(0.08, 0)}
           initial="hidden"
           animate="show"
         >
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
           <motion.div className="space-y-2" variants={staggerItem}>
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-brand/10 text-brand border border-brand/20">
@@ -176,18 +175,18 @@ export function SinglePageDashboard() {
           {/* Card 1: Pipeline Total */}
           <motion.div
             variants={metricReveal}
-            className="group relative bg-surface p-5 rounded-xl border border-line shadow-card hover:shadow-card-hover transition-all overflow-hidden"
+            data-accent="gold"
+            className="bh-platform-card group relative p-5 transition-colors overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/10 transition-colors pointer-events-none" />
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-2 flex items-center gap-2 font-sans">
-                <Target className="w-4 h-4 text-brand" /> Volume em Pipeline
+              <span className="bh-label text-sm font-bold uppercase tracking-wider text-[var(--card-accent)] flex items-center gap-2 font-sans">
+                <Target className="w-4 h-4 text-[var(--card-accent)]" /> Volume em Pipeline
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand/10 text-brand">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)]">
                 Ativo
               </span>
             </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-ink font-display tracking-tight">
+            <p className="text-2xl sm:text-3xl font-bold text-ink font-mono tracking-tight">
               {pipelineValue > 0
                 ? new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
@@ -200,7 +199,7 @@ export function SinglePageDashboard() {
               <span>{totalLeads} oportunidades ativas</span>
               <button
                 type="button"
-                className="text-brand font-semibold cursor-pointer hover:underline"
+                className="text-[var(--card-accent)] font-semibold cursor-pointer hover:underline"
                 onClick={() => navigate('/app/crm')}
               >
                 Ver kanban &rarr;
@@ -211,25 +210,25 @@ export function SinglePageDashboard() {
           {/* Card 2: Win Rate */}
           <motion.div
             variants={metricReveal}
-            className="group relative bg-surface p-5 rounded-xl border border-line shadow-card hover:shadow-card-hover transition-all overflow-hidden"
+            data-accent="success"
+            className="bh-platform-card group relative p-5 transition-colors overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors pointer-events-none" />
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-2 flex items-center gap-2 font-sans">
-                <TrendingUp className="w-4 h-4 text-emerald-500" /> Taxa de Conversão
+              <span className="bh-label text-sm font-bold uppercase tracking-wider text-[var(--card-accent)] flex items-center gap-2 font-sans">
+                <TrendingUp className="w-4 h-4 text-[var(--card-accent)]" /> Taxa de Conversão
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)] ">
                 Win Rate
               </span>
             </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-ink font-display tracking-tight">
+            <p className="text-2xl sm:text-3xl font-bold text-ink font-mono tracking-tight">
               {winRate}%
             </p>
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-line/40 text-xs text-ink-2">
               <span>{closedThisMonth} fechados no período</span>
               <button
                 type="button"
-                className="text-emerald-600 dark:text-emerald-400 font-semibold cursor-pointer hover:underline"
+                className="text-[var(--card-accent)]  font-semibold cursor-pointer hover:underline"
                 onClick={() => navigate('/app/analytics')}
               >
                 Métricas &rarr;
@@ -240,25 +239,25 @@ export function SinglePageDashboard() {
           {/* Card 3: Atividades Operacionais */}
           <motion.div
             variants={metricReveal}
-            className="group relative bg-surface p-5 rounded-xl border border-line shadow-card hover:shadow-card-hover transition-all overflow-hidden"
+            data-accent="iris"
+            className="bh-platform-card group relative p-5 transition-colors overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-iris/5 rounded-full blur-2xl group-hover:bg-iris/10 transition-colors pointer-events-none" />
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-2 flex items-center gap-2 font-sans">
-                <Activity className="w-4 h-4 text-iris" /> Atividades Pendentes
+              <span className="bh-label text-sm font-bold uppercase tracking-wider text-[var(--card-accent)] flex items-center gap-2 font-sans">
+                <Activity className="w-4 h-4 text-[var(--card-accent)]" /> Atividades Pendentes
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-iris/10 text-iris">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)]">
                 Prioridade
               </span>
             </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-ink font-display tracking-tight">
+            <p className="text-2xl sm:text-3xl font-bold text-ink font-mono tracking-tight">
               {pendingActivities}
             </p>
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-line/40 text-xs text-ink-2">
               <span>Ações na cadência</span>
               <button
                 type="button"
-                className="text-iris font-semibold cursor-pointer hover:underline"
+                className="text-[var(--card-accent)] font-semibold cursor-pointer hover:underline"
                 onClick={() => navigate('/app/calendar')}
               >
                 Agenda &rarr;
@@ -269,25 +268,25 @@ export function SinglePageDashboard() {
           {/* Card 4: Base Corporativa */}
           <motion.div
             variants={metricReveal}
-            className="group relative bg-surface p-5 rounded-xl border border-line shadow-card hover:shadow-card-hover transition-all overflow-hidden"
+            data-accent="cyan"
+            className="bh-platform-card group relative p-5 transition-colors overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-colors pointer-events-none" />
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-ink-2 flex items-center gap-2 font-sans">
-                <Users className="w-4 h-4 text-amber-500" /> Contas e Empresas
+              <span className="bh-label text-sm font-bold uppercase tracking-wider text-[var(--card-accent)] flex items-center gap-2 font-sans">
+                <Users className="w-4 h-4 text-[var(--card-accent)]" /> Contas e Empresas
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)] ">
                 Ecossistema
               </span>
             </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-ink font-display tracking-tight">
+            <p className="text-2xl sm:text-3xl font-bold text-ink font-mono tracking-tight">
               {totalCompanies}
             </p>
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-line/40 text-xs text-ink-2">
               <span>Organizações no radar</span>
               <button
                 type="button"
-                className="text-amber-600 dark:text-amber-400 font-semibold cursor-pointer hover:underline"
+                className="text-[var(--card-accent)]  font-semibold cursor-pointer hover:underline"
                 onClick={() => navigate('/app/companies')}
               >
                 Ver empresas &rarr;
@@ -514,20 +513,21 @@ export function SinglePageDashboard() {
               whileHover={{ y: -3 }}
               transition={{ duration: 0.15 }}
               onClick={() => navigate('/app/prospect')}
-              className="group p-5 bg-surface rounded-xl border border-line shadow-card hover:shadow-card-hover hover:border-brand/40 transition-all cursor-pointer flex flex-col justify-between"
+              data-accent="cyan"
+              className="bh-platform-card group p-5 transition-colors cursor-pointer flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-lg bg-brand/10 text-brand flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-lg bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Search className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-sm text-ink group-hover:text-brand transition-colors font-display">
+                <h3 className="bh-label font-bold text-base text-[var(--card-accent)] transition-colors font-display">
                   Prospecção ICP & Mercado
                 </h3>
-                <p className="text-xs text-ink-2 leading-relaxed font-sans">
+                <p className="text-sm text-ink-2 leading-relaxed font-sans">
                   Varredura de decisores corporativos, enriquecimento de dados e qualificação B2B.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-brand">
+              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-[var(--card-accent)]">
                 <span>Acessar busca</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -538,21 +538,22 @@ export function SinglePageDashboard() {
               whileHover={{ y: -3 }}
               transition={{ duration: 0.15 }}
               onClick={() => navigate('/app/crm')}
-              className="group p-5 bg-surface rounded-xl border border-line shadow-card hover:shadow-card-hover hover:border-brand/40 transition-all cursor-pointer flex flex-col justify-between"
+              data-accent="gold"
+              className="bh-platform-card group p-5 transition-colors cursor-pointer flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-lg bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Activity className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-sm text-ink group-hover:text-emerald-500 transition-colors font-display">
+                <h3 className="bh-label font-bold text-base text-[var(--card-accent)] transition-colors font-display">
                   Gestão Comercial 360°
                 </h3>
-                <p className="text-xs text-ink-2 leading-relaxed font-sans">
+                <p className="text-sm text-ink-2 leading-relaxed font-sans">
                   Kanban ágil de oportunidades, controle de propostas e avanço de estágios de
                   negociação.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-[var(--card-accent)] ">
                 <span>Abrir pipeline</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -563,21 +564,22 @@ export function SinglePageDashboard() {
               whileHover={{ y: -3 }}
               transition={{ duration: 0.15 }}
               onClick={() => navigate('/app/cadence')}
-              className="group p-5 bg-surface rounded-xl border border-line shadow-card hover:shadow-card-hover hover:border-brand/40 transition-all cursor-pointer flex flex-col justify-between"
+              data-accent="iris"
+              className="bh-platform-card group p-5 transition-colors cursor-pointer flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-lg bg-iris/10 text-iris flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-lg bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <PhoneCall className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-sm text-ink group-hover:text-iris transition-colors font-display">
+                <h3 className="bh-label font-bold text-base text-[var(--card-accent)] transition-colors font-display">
                   Cadência & Multicanal
                 </h3>
-                <p className="text-xs text-ink-2 leading-relaxed font-sans">
+                <p className="text-sm text-ink-2 leading-relaxed font-sans">
                   Regras automatizadas de follow-up, disparos via WhatsApp, e-mail e ligações
                   inteligentes.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-iris">
+              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-[var(--card-accent)]">
                 <span>Ver réguas</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -588,21 +590,22 @@ export function SinglePageDashboard() {
               whileHover={{ y: -3 }}
               transition={{ duration: 0.15 }}
               onClick={() => navigate('/app/intelligence')}
-              className="group p-5 bg-surface rounded-xl border border-line shadow-card hover:shadow-card-hover hover:border-brand/40 transition-all cursor-pointer flex flex-col justify-between"
+              data-accent="iris"
+              className="bh-platform-card group p-5 transition-colors cursor-pointer flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-lg bg-[color-mix(in_srgb,var(--card-accent)_10%,transparent)] text-[var(--card-accent)] flex items-center justify-center group-hover:scale-105 transition-transform">
                   <BrainCircuit className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-sm text-ink group-hover:text-amber-500 transition-colors font-display">
+                <h3 className="bh-label font-bold text-base text-[var(--card-accent)] transition-colors font-display">
                   Inteligência & Copiloto IA
                 </h3>
-                <p className="text-xs text-ink-2 leading-relaxed font-sans">
+                <p className="text-sm text-ink-2 leading-relaxed font-sans">
                   Diagnósticos preditivos de fechamento, análise de objeções e relatórios
                   executivos.
                 </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-amber-600 dark:text-amber-400">
+              <div className="mt-4 pt-3 border-t border-line/40 flex items-center justify-between text-xs font-semibold text-[var(--card-accent)] ">
                 <span>Iniciar Copiloto</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>

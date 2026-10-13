@@ -82,11 +82,11 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
   };
 
   return (
-    <header className="relative sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2.5 el-glass el-hairline px-4 sm:px-6">
+    <header className="relative sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2.5 bg-background border-b border-line px-4 sm:px-6">
       <button
         type="button"
         onClick={onOpenMobileNav}
-        className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[color:var(--el-ink-2)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--el-ink)] lg:hidden"
+        className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[color:var(--color-text-secondary)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--color-text-primary)] lg:hidden"
         aria-label="Abrir menu de navegação"
         data-testid="topbar-open-mobile-nav"
       >
@@ -97,7 +97,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         <button
           type="button"
           onClick={handleBack}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--el-line)] text-[color:var(--el-ink-2)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--el-ink)] hover:border-[color:var(--el-gold)] hover:-translate-x-0.5"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-brand-accent)] hover:-translate-x-0.5"
           aria-label="Voltar"
           title="Voltar"
           data-testid="topbar-back"
@@ -113,17 +113,20 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           className="h-8 w-8 shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.35)]"
         />
         <div
-          className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--el-line-strong)]"
+          className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--color-border-strong)]"
           style={{
             background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)',
           }}
         >
-          <Icon className="h-4 w-4 shrink-0 text-[color:var(--el-gold-deep)]" strokeWidth={1.5} />
+          <Icon
+            className="h-4 w-4 shrink-0 text-[color:var(--color-brand-accent)]"
+            strokeWidth={1.5}
+          />
         </div>
         <div className="flex flex-col leading-none">
           <AppBreadcrumbs className="mb-1 hidden sm:flex" />
           <h1
-            className="truncate font-display text-base text-[color:var(--el-ink)] mt-0.5"
+            className="truncate font-display text-base text-[color:var(--color-text-primary)] mt-0.5"
             style={{ fontWeight: 600 }}
           >
             {meta.label}
@@ -137,15 +140,15 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           SoundFX.play('focus');
           window.dispatchEvent(new Event(OPEN_COMMAND_PALETTE_EVENT));
         }}
-        className="group ml-5 hidden max-w-md flex-1 items-center gap-3 rounded-full border border-[color:var(--el-line-strong)] bg-[color:var(--surface)]/70 px-4 py-2.5 text-[color:var(--el-ink-2)] transition-all duration-500 hover:border-[color:var(--el-gold)] hover:bg-[color:var(--surface)] hover:text-[color:var(--el-ink)] hover:shadow-[var(--el-shadow-sm)] lg:flex"
+        className="group ml-5 hidden max-w-md flex-1 items-center gap-3 rounded-full border border-[color:var(--color-border-strong)] bg-[color:var(--surface)]/70 px-4 py-2.5 text-[color:var(--color-text-secondary)] transition-all duration-500 hover:border-[color:var(--color-brand-accent)] hover:bg-[color:var(--surface)] hover:text-[color:var(--color-text-primary)] hover:shadow-[var(--shadow-card)] lg:flex"
         data-testid="topbar-command-palette"
       >
         <Search
-          className="h-3.5 w-3.5 shrink-0 transition-all duration-500 group-hover:text-[color:var(--el-gold-deep)] group-hover:rotate-12"
+          className="h-3.5 w-3.5 shrink-0 transition-all duration-500 group-hover:text-[color:var(--color-brand-accent)] group-hover:rotate-12"
           strokeWidth={1.5}
         />
-        <span className="text-xs font-display italic">Buscar empresa, decisor ou comando…</span>
-        <kbd className="ml-auto rounded-full border border-[color:var(--el-line-strong)] bg-[color:var(--surface-2)] px-2 py-0.5 text-[9px] font-medium text-[color:var(--el-ink-3)] transition-colors group-hover:border-[color:var(--el-gold)]">
+        <span className="text-xs font-sans">Buscar empresa, decisor ou comando…</span>
+        <kbd className="ml-auto rounded-full border border-[color:var(--color-border-strong)] bg-[color:var(--surface-2)] px-2 py-0.5 text-[9px] font-medium text-[color:var(--color-text-muted)] transition-colors group-hover:border-[color:var(--color-brand-accent)]">
           ⌘K
         </kbd>
       </button>
@@ -154,11 +157,11 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         <SyncIndicator />
 
         <div className="hidden text-right leading-tight sm:block mr-2">
-          <p className="text-[9px] font-display italic uppercase tracking-[0.2em] text-[color:var(--el-ink-3)]">
+          <p className="text-[9px] font-sans uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
             {dateLabel}
           </p>
           <p
-            className="font-display text-sm text-[color:var(--el-ink)] [font-variant-numeric:tabular-nums]"
+            className="font-mono text-sm text-[color:var(--color-text-primary)] [font-variant-numeric:tabular-nums]"
             style={{ fontWeight: 400 }}
           >
             {timeLabel}
@@ -174,7 +177,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
             SoundFX.play('navigate');
             toggleTheme();
           }}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--el-line)] text-[color:var(--el-ink-2)] transition-all duration-300 hover:border-[color:var(--el-gold)] hover:text-[color:var(--el-gold-deep)]"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-accent)] hover:text-[color:var(--color-brand-accent)]"
           aria-label="Alternar tema"
           title={`Mudar para modo ${theme === 'dark' ? 'claro' : 'escuro'}`}
           data-testid="topbar-toggle-theme"
@@ -194,8 +197,8 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           onClick={toggleSound}
           className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-300 ${
             soundEnabled
-              ? 'border-[color:var(--el-gold)] bg-[color:var(--el-gold)]/10 text-[color:var(--el-gold-deep)]'
-              : 'border-[color:var(--el-line)] text-[color:var(--el-ink-2)] hover:border-[color:var(--el-gold)] hover:text-[color:var(--el-gold-deep)]'
+              ? 'border-[color:var(--color-brand-accent)] bg-[color:var(--color-brand-accent)]/10 text-[color:var(--color-brand-accent)]'
+              : 'border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] hover:border-[color:var(--color-brand-accent)] hover:text-[color:var(--color-brand-accent)]'
           }`}
           aria-pressed={soundEnabled}
           aria-label={soundEnabled ? 'Desativar sons' : 'Ativar sons'}
@@ -217,7 +220,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
             SoundFX.play('navigate');
             navigate('/app/notifications');
           }}
-          className="relative flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--el-line)] text-[color:var(--el-ink-2)] transition-all duration-300 hover:border-[color:var(--el-pink)] hover:text-[color:var(--el-pink)]"
+          className="relative flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-secondary)] hover:text-[color:var(--color-brand-secondary)]"
           aria-label={unreadCount > 0 ? `Notificações — ${unreadCount} não lidas` : 'Notificações'}
           data-testid="topbar-notifications"
         >
@@ -225,7 +228,10 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           {unreadCount > 0 && (
             <span
               className="absolute right-[7px] top-[7px] h-1.5 w-1.5 rounded-full motion-safe:animate-pulse"
-              style={{ background: 'var(--el-pink)', boxShadow: '0 0 0 3px var(--surface)' }}
+              style={{
+                background: 'var(--color-brand-secondary)',
+                boxShadow: '0 0 0 3px var(--surface)',
+              }}
               aria-hidden="true"
             />
           )}
@@ -236,8 +242,8 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           role="img"
           aria-label={`Avatar de ${currentUser?.name || 'Usuário'}`}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display italic text-sm text-[color:var(--el-ink)] cursor-pointer border border-[color:var(--el-gold)]"
-          style={{ background: 'var(--el-grad-gold)', boxShadow: 'var(--el-glow-gold)' }}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-sans text-sm text-[color:var(--color-text-primary)] cursor-pointer border border-[color:var(--color-brand-accent)]"
+          style={{ background: 'var(--color-surface-elevated)', boxShadow: 'var(--shadow-card)' }}
           title={`${currentUser?.name || 'Usuário'}`}
           data-testid="topbar-avatar"
         >
@@ -250,7 +256,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           whileTap={{ scale: 0.92 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           onClick={logout}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--el-line)] text-[color:var(--el-ink-2)] transition-all duration-300 hover:border-[color:var(--el-pink)] hover:text-[color:var(--el-pink)]"
+          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-secondary)] hover:text-[color:var(--color-brand-secondary)]"
           aria-label="Sair da conta"
           title="Sair da conta"
           data-testid="topbar-logout"

@@ -402,7 +402,7 @@ if __name__ == "__main__":
 
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-6">
           {/* App Origem */}
-          <div className="bg-surface-2 border border-line rounded-2xl p-6 backdrop-blur-md relative">
+          <div data-accent="iris" className="bh-platform-card p-6 relative">
             <p
               className={`flex items-center gap-2 text-[10px] tracking-widest font-black uppercase mb-3 ${accent.text}`}
             >
@@ -457,7 +457,7 @@ if __name__ == "__main__":
           </div>
 
           {/* App Destino */}
-          <div className="bg-surface-2 border border-line rounded-2xl p-6 backdrop-blur-md relative">
+          <div data-accent="iris" className="bh-platform-card p-6 relative">
             <p
               className={`flex items-center gap-2 text-[10px] tracking-widest font-black uppercase mb-3 ${accent.text}`}
             >
@@ -512,7 +512,7 @@ if __name__ == "__main__":
           </div>
 
           {/* Ferramenta de Orquestração */}
-          <div className="bg-surface-2 border border-line rounded-2xl p-6 backdrop-blur-md relative">
+          <div data-accent="iris" className="bh-platform-card p-6 relative">
             <p className="flex items-center gap-2 text-[10px] tracking-widest font-black uppercase mb-3 text-yellow-400">
               <Layers size={14} /> Ferramenta de Orquestração
             </p>
@@ -561,7 +561,7 @@ if __name__ == "__main__":
           </div>
 
           {/* Camada de IA */}
-          <div className="bg-surface-2 border border-line rounded-2xl p-6 backdrop-blur-md relative">
+          <div data-accent="iris" className="bh-platform-card p-6 relative">
             <p className="flex items-center gap-2 text-[10px] tracking-widest font-black uppercase mb-3 text-rose-400">
               <Bot size={14} /> Camada de Inteligência IA
             </p>
@@ -611,7 +611,10 @@ if __name__ == "__main__":
         </div>
 
         {/* Campo Objetivo */}
-        <div className="relative z-10 max-w-5xl mx-auto mb-8 bg-surface-2 border border-line rounded-2xl p-6 backdrop-blur-md">
+        <div
+          data-accent="iris"
+          className="bh-platform-card relative z-10 max-w-5xl mx-auto mb-8 p-6"
+        >
           <p className="block text-[10px] tracking-widest font-black uppercase mb-2 text-ink-2">
             Objetivo Principal da Automação
           </p>
@@ -651,7 +654,7 @@ if __name__ == "__main__":
         {error && (
           <div
             role="alert"
-            className="relative z-10 mx-auto mt-5 flex max-w-3xl flex-col gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200 sm:flex-row sm:items-center sm:justify-between"
+            className="relative z-10 mx-auto mt-5 flex max-w-3xl flex-col gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-danger-active sm:flex-row sm:items-center sm:justify-between"
           >
             <span className="flex items-start gap-2">
               <AlertCircle size={18} className="mt-0.5 shrink-0" />
@@ -660,7 +663,7 @@ if __name__ == "__main__":
             <button
               type="button"
               onClick={handleGenerateOffline}
-              className="shrink-0 rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-white/15"
+              className="shrink-0 rounded-xl border border-line bg-surface-elevated px-4 py-2 text-xs font-bold text-ink transition-colors hover:bg-surface-interactive"
             >
               Usar blueprint local
             </button>
@@ -755,7 +758,7 @@ if __name__ == "__main__":
               </button>
             </div>
 
-            <div className="bg-[#050811] rounded-2xl border border-white/10 p-6 shadow-inner relative">
+            <div data-accent="iris" className="bh-platform-card p-6 relative">
               <pre className="text-[13px] md:text-sm text-amber-200 whitespace-pre-wrap font-mono overflow-x-auto custom-scrollbar leading-relaxed max-h-[500px]">
                 {activeTabOutput === 'blueprint' && result.blueprint}
                 {activeTabOutput === 'json' && result.n8nJson}

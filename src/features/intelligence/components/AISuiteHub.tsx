@@ -471,7 +471,14 @@ export function AISuiteHub() {
         particleCount: 80,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#D4AF37', '#F3E5AB', '#ffffff'],
+        colors: [
+          '--color-brand-primary',
+          '--color-brand-secondary',
+          '--color-brand-accent',
+          '--color-success',
+          '--color-info',
+        ].map((token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim()),
+        disableForReducedMotion: true,
       });
     } catch (err: any) {
       setExecutionError((err as Error).message || 'Falha ao executar serviço de IA');
@@ -559,7 +566,8 @@ export function AISuiteHub() {
                 <div
                   className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10 rounded-xl"
                   style={{
-                    background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(212,175,55,0.08), transparent 40%)`,
+                    background: 'var(--grad-glow)',
+                    backgroundPosition: `${mousePos.x}px ${mousePos.y}px`,
                   }}
                   aria-hidden="true"
                 />
@@ -586,7 +594,7 @@ export function AISuiteHub() {
                         <span className="text-xs font-mono text-ink-3 mr-1.5">#{cap.id}</span>
                         {cap.title}
                       </h3>
-                      <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-surface-2 border border-border/50 text-ink-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                      <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-surface-2 border border-border/50 text-ink-3 shadow-[var(--shadow-card)]">
                         {cap.modelDefault}
                       </span>
                     </div>
@@ -610,7 +618,8 @@ export function AISuiteHub() {
             <div
               className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-500 group-hover/console:opacity-100 z-10 rounded-[inherit]"
               style={{
-                background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(212,175,55,0.05), transparent 40%)`,
+                background: 'var(--grad-glow)',
+                backgroundPosition: `${mousePos.x}px ${mousePos.y}px`,
               }}
               aria-hidden="true"
             />

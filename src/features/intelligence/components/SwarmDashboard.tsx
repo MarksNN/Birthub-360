@@ -86,11 +86,11 @@ const SLO_ROLE_LABEL: Record<AgentSloMetrics['role'], string> = {
 };
 
 const SLO_ROLE_COLOR: Record<AgentSloMetrics['role'], string> = {
-  SDR: '#00C2FF',
-  BDR: '#00FF9D',
-  CLOSER: '#FF5CA8',
-  CRM: '#B554FF',
-  OPS: '#FFB020',
+  SDR: 'var(--color-heading-cyan)',
+  BDR: 'var(--color-heading-success)',
+  CLOSER: 'var(--color-heading-pink)',
+  CRM: 'var(--color-heading-iris)',
+  OPS: 'var(--color-heading-gold)',
 };
 
 function formatPercent(rate: SloRate): string {
@@ -406,7 +406,14 @@ export function SwarmDashboard() {
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#D4AF37', '#F3E5AB', '#10b981', '#34d399', '#ffffff'],
+        colors: [
+          '--color-brand-primary',
+          '--color-brand-secondary',
+          '--color-brand-accent',
+          '--color-success',
+          '--color-info',
+        ].map((token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim()),
+        disableForReducedMotion: true,
       });
       setMessages((prev) => [
         ...prev,
@@ -428,15 +435,40 @@ export function SwarmDashboard() {
       case 'supervisor':
         return <ShieldAlert size={18} className={accent.text} />;
       case 'sdr':
-        return <Bot size={18} className="text-[#008cb8] dark:text-[#00C2FF]" />;
+        return (
+          <Bot
+            size={18}
+            className="text-[var(--color-heading-cyan)] dark:text-[var(--color-heading-cyan)]"
+          />
+        );
       case 'bdr':
-        return <Zap size={18} className="text-[#009e5c] dark:text-[#00FF9D]" />;
+        return (
+          <Zap
+            size={18}
+            className="text-[var(--color-heading-success)] dark:text-[var(--color-heading-success)]"
+          />
+        );
       case 'closer':
-        return <Handshake size={18} className="text-[#d12474] dark:text-[#FF5CA8]" />;
+        return (
+          <Handshake
+            size={18}
+            className="text-[var(--color-heading-pink)] dark:text-[var(--color-heading-pink)]"
+          />
+        );
       case 'crm':
-        return <Database size={18} className="text-[#8523cc] dark:text-[#B554FF]" />;
+        return (
+          <Database
+            size={18}
+            className="text-[var(--color-heading-iris)] dark:text-[var(--color-heading-iris)]"
+          />
+        );
       case 'ops':
-        return <Wrench size={18} className="text-[#cc7a00] dark:text-[#FFB020]" />;
+        return (
+          <Wrench
+            size={18}
+            className="text-[var(--color-heading-gold)] dark:text-[var(--color-heading-gold)]"
+          />
+        );
       default:
         return <Bot size={18} />;
     }
@@ -468,15 +500,15 @@ export function SwarmDashboard() {
       case 'supervisor':
         return `${accent.bgSofter} ${accent.borderSoft} text-ink`;
       case 'sdr':
-        return 'bg-[#00C2FF]/10 border-[#00C2FF]/30 text-ink';
+        return 'bg-[var(--color-heading-cyan)]/10 border-[var(--color-heading-cyan)]/30 text-ink';
       case 'bdr':
-        return 'bg-[#00FF9D]/10 border-[#00FF9D]/30 text-ink';
+        return 'bg-[var(--color-heading-success)]/10 border-[var(--color-heading-success)]/30 text-ink';
       case 'closer':
-        return 'bg-[#FF5CA8]/10 border-[#FF5CA8]/30 text-ink';
+        return 'bg-[var(--color-heading-pink)]/10 border-[var(--color-heading-pink)]/30 text-ink';
       case 'crm':
-        return 'bg-[#B554FF]/10 border-[#B554FF]/30 text-ink';
+        return 'bg-[var(--color-heading-iris)]/10 border-[var(--color-heading-iris)]/30 text-ink';
       case 'ops':
-        return 'bg-[#FFB020]/10 border-[#FFB020]/30 text-ink';
+        return 'bg-[var(--color-heading-gold)]/10 border-[var(--color-heading-gold)]/30 text-ink';
       default:
         return 'bg-surface-2 border-line text-ink';
     }
@@ -491,12 +523,12 @@ export function SwarmDashboard() {
   ];
 
   return (
-    <div className="flex flex-col h-[750px] bg-surface rounded-3xl border border-line overflow-hidden shadow-card relative">
+    <div className="flex flex-col h-[750px] bg-surface rounded-[var(--radius-card)] border border-[var(--color-heading-iris)] overflow-hidden shadow-card relative">
       {/* Efeitos Glow Suaves de Fundo */}
       <div
         className={`absolute top-[-10%] left-[-10%] w-[50%] h-[50%] ${accent.blobA} rounded-full blur-[120px] pointer-events-none opacity-30`}
       />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#00C2FF]/10 rounded-full blur-[120px] pointer-events-none opacity-30" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[var(--color-heading-cyan)]/10 rounded-full blur-[120px] pointer-events-none opacity-30" />
 
       {/* Cabeçalho */}
       <div className="px-8 py-6 border-b border-line bg-surface/80 backdrop-blur-xl flex items-center justify-between z-10 gap-4 flex-wrap">
@@ -643,7 +675,7 @@ export function SwarmDashboard() {
                     className="mr-0"
                   >
                     <div
-                      className={`p-6 rounded-2xl border-2 backdrop-blur-xl shadow-card ${accent.borderSoft} bg-surface-2/90`}
+                      className={`p-6 rounded-[var(--radius-card)] border backdrop-blur-xl shadow-card ${accent.borderSoft} bg-surface-2/90`}
                     >
                       <div className="flex items-center gap-2 mb-3">
                         <CheckCircle2 size={18} className={accent.text} />
@@ -683,7 +715,8 @@ export function SwarmDashboard() {
                     <div
                       className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover/message:opacity-100 z-10 rounded-[inherit]"
                       style={{
-                        background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.06), transparent 40%)`,
+                        background: 'var(--grad-glow)',
+                        backgroundPosition: `${mousePos.x}px ${mousePos.y}px`,
                       }}
                       aria-hidden="true"
                     />

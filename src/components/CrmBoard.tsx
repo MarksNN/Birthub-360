@@ -301,7 +301,16 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
             particleCount: 80,
             spread: 70,
             origin: { y: 0.6 },
-            colors: ['#D4AF37', '#10B981', '#3B82F6', '#F59E0B'],
+            colors: [
+              '--color-brand-primary',
+              '--color-brand-secondary',
+              '--color-brand-accent',
+              '--color-success',
+              '--color-info',
+            ].map((token) =>
+              getComputedStyle(document.documentElement).getPropertyValue(token).trim(),
+            ),
+            disableForReducedMotion: true,
           });
         } else {
           SoundFX.play('confirm');

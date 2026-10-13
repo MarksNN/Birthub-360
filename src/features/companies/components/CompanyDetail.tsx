@@ -152,7 +152,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
         />
 
         {/* Header Card da Empresa */}
-        <div className="bg-surface p-6 md:p-8 rounded-3xl border border-line shadow-xl backdrop-blur-xl flex flex-col md:flex-row items-start gap-6 relative overflow-hidden">
+        <div className="bh-platform-card bg-surface p-6 md:p-8 rounded-card border border-line shadow-xl backdrop-blur-xl flex flex-col md:flex-row items-start gap-6 relative overflow-hidden">
           <div className="w-24 h-24 rounded-3xl bg-soft border border-brand/30 flex items-center justify-center text-brand shrink-0 overflow-hidden shadow-inner">
             {company.logoUrl ? (
               <img
@@ -261,7 +261,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
         </div>
 
         {/* SEÇÃO PRINCIPAL: LOGOS DAS FERRAMENTAS DA EMPRESA */}
-        <div className="bg-surface p-6 md:p-8 rounded-3xl border border-line shadow-xl space-y-4">
+        <div className="bh-platform-card bg-surface p-6 md:p-8 rounded-card border border-line shadow-xl space-y-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-2xl bg-brand/10 border border-brand/20 text-brand-ink dark:text-brand">
@@ -289,7 +289,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
             </span>
           </div>
 
-          <div className="bg-surface-2 p-6 rounded-2xl border border-line flex flex-wrap gap-3 items-center">
+          <div className="bh-platform-card bg-surface-2 p-6 rounded-card border border-line flex flex-wrap gap-3 items-center">
             {hasDetectedTechnologies ? (
               technologiesList.map((tech, i) => (
                 <TechToolLogo
@@ -322,7 +322,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             {/* Lista de Contatos */}
-            <div className="bg-surface p-6 rounded-3xl border border-line shadow-xl space-y-4">
+            <div className="bh-platform-card bg-surface p-6 rounded-card border border-line shadow-xl space-y-4">
               <h2 className="text-lg font-bold text-ink flex items-center gap-2">
                 <Users className="w-5 h-5 text-ink/70 dark:text-ink-2" />👥 Decisores & Contatos
                 Mapeados ({company.contacts?.length || 0})
@@ -332,7 +332,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
                   {company.contacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className="p-4 bg-surface-2 border border-line rounded-2xl hover:border-brand/40 transition-colors flex justify-between items-center"
+                      className="bh-platform-card p-4 bg-surface-2 border border-line rounded-card hover:border-brand/40 transition-colors flex justify-between items-center"
                     >
                       <div>
                         <p className="font-bold text-ink">{contact.name}</p>
@@ -355,7 +355,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
                   ))}
                 </div>
               ) : (
-                <p className="text-ink/70 dark:text-ink-2 italic text-sm p-4 bg-surface-2 rounded-2xl border border-line">
+                <p className="bh-platform-card text-ink/70 dark:text-ink-2 italic text-sm p-4 bg-surface-2 rounded-card border border-line">
                   Nenhum contato diretamente vinculado. Execute o Enriquecimento com IA para
                   importar decisores via Apollo.
                 </p>
@@ -364,7 +364,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
 
             {/* Palavras-chave da empresa */}
             {company.keywords && company.keywords.length > 0 && (
-              <div className="bg-surface p-6 rounded-3xl border border-line shadow-xl space-y-3">
+              <div className="bh-platform-card bg-surface p-6 rounded-card border border-line shadow-xl space-y-3">
                 <h2 className="text-sm font-bold text-ink-2 uppercase tracking-wider flex items-center gap-2">
                   <Tag className="w-4 h-4 text-ink-2" />
                   Palavras-Chave de Atuação
@@ -382,11 +382,11 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
               </div>
             )}
 
-            <div className="bg-surface p-6 rounded-3xl border border-line shadow-xl">
+            <div className="bh-platform-card bg-surface p-6 rounded-card border border-line shadow-xl">
               <EntityNotes entityType="company" entityId={company.id} />
             </div>
 
-            <div className="bg-surface p-6 rounded-3xl border border-line shadow-xl">
+            <div className="bh-platform-card bg-surface p-6 rounded-card border border-line shadow-xl">
               <EntityAttachments entityType="company" entityId={company.id} />
             </div>
           </div>
@@ -394,7 +394,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
           {/* Sidebar lateral com Google Rating e Detalhes */}
           <div className="space-y-6">
             {(company.googleRating != null || company.businessHours) && (
-              <div className="bg-surface p-6 rounded-3xl border border-line shadow-xl space-y-3">
+              <div className="bh-platform-card bg-surface p-6 rounded-card border border-line shadow-xl space-y-3">
                 <h2 className="text-xs font-bold text-ink-2 uppercase tracking-wider flex items-center gap-1.5">
                   <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                   Google Meu Negócio
@@ -440,7 +440,7 @@ export function CompanyDetail({ companyId, onBack }: CompanyDetailProps) {
               </div>
             )}
 
-            <div className="bg-surface p-6 rounded-3xl border border-line shadow-xl space-y-3">
+            <div className="bh-platform-card bg-surface p-6 rounded-card border border-line shadow-xl space-y-3">
               <h2 className="text-xs font-bold text-ink-2 uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-ink/70 dark:text-ink-2" />
                 Dados Cadastrais

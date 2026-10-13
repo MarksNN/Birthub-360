@@ -1,11 +1,10 @@
-import * as React from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-import { BorderBeam, type BorderBeamProps } from './BorderBeam.js';
+import * as React from 'react';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
+import { BorderBeam, type BorderBeamProps } from './BorderBeam.js';
 
-const cardVariants = cva('relative overflow-hidden rounded-2xl text-ink', {
+const cardVariants = cva('bh-platform-card relative overflow-hidden rounded-card text-ink', {
   variants: {
     variant: {
       default:
@@ -58,7 +57,7 @@ export interface CardProps
   isLoading?: boolean;
   /** Ativa o feixe laser luminoso contínuo no perímetro do card (efeito BorderBeam). */
   borderBeam?: boolean;
-  /** Variação cromática do feixe laser (padrão: 'cyan', idêntico ao vídeo). */
+  /** Variação cromática do feixe laser (padrão: undefined, idêntico ao vídeo). */
   borderBeamVariant?: BorderBeamProps['variant'];
   /** Duração em segundos da volta completa do feixe. */
   borderBeamDuration?: number;
@@ -96,17 +95,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     },
     ref,
   ) => {
-    const [mousePos, setMousePos] = React.useState({ x: 0, y: 0 });
     const [isHovered, setIsHovered] = React.useState(false);
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-      if (spotlight) {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setMousePos({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        });
-      }
       onPointerMove?.(e);
     };
 
@@ -133,6 +124,17 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
+        data-accent={
+          accentBar
+            ? 'gold'
+            : variant === 'accent' || variant === 'feature'
+              ? 'pink'
+              : variant === 'metric' || variant === 'stat'
+                ? 'gold'
+                : variant === 'data'
+                  ? 'blue'
+                  : undefined
+        }
         className={cn(
           cardVariants({ variant, padding, className }),
           (isLoading || borderBeam || spotlight) && 'overflow-hidden isolate',
@@ -160,7 +162,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
             aria-hidden="true"
             className="pointer-events-none absolute -inset-px rounded-[inherit] transition-opacity duration-300"
             style={{
-              background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0, 229, 255, 0.12), transparent 70%)`,
+              background: 'var(--grad-glow)',
             }}
           />
         )}
@@ -169,8 +171,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
             variant="brand"
             size={200}
             duration={3.5}
-            borderWidth={2}
-            glow
+            borderWidth={1}
             radius="var(--radius-card)"
           />
         )}
@@ -179,16 +180,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
             variant={borderBeamVariant}
             size={borderBeamSize}
             duration={borderBeamDuration}
-            borderWidth={1.5}
-            glow
+            borderWidth={1}
             radius="var(--radius-card)"
           />
-        )}
-        {accentBar && (
-          <>
-            <span className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent" />
-            <span className="pointer-events-none absolute -right-12 -top-16 h-28 w-28 rounded-full bg-brand/10 blur-[38px]" />
-          </>
         )}
         <div
           className={cn(
@@ -215,7 +209,10 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('font-display font-semibold leading-tight tracking-tight text-ink', className)}
+      className={cn(
+        'font-display font-semibold leading-tight tracking-tight text-[color:var(--card-accent)]',
+        className,
+      )}
       {...props}
     />
   ),
@@ -226,7 +223,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-sm text-ink-2', className)} {...props} />
+  <p ref={ref} className={cn('text-sm leading-relaxed text-ink-2', className)} {...props} />
 ));
 CardDescription.displayName = 'CardDescription';
 
@@ -244,4 +241,4 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };

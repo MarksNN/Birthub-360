@@ -86,8 +86,10 @@ export function DiscoveryFilterPanel({
   };
 
   return (
-    <div className="xl:col-span-4 bg-surface p-6 sm:p-8 rounded-2xl border border-line shadow-sm relative overflow-hidden flex flex-col h-full xl:max-h-[900px]">
-      <div className="absolute top-0 right-0 w-40 h-40 bg-brand opacity-5 transform rotate-45 translate-x-20 -translate-y-20" />
+    <div
+      data-accent="cyan"
+      className="bh-platform-card xl:col-span-4 bg-surface p-6 sm:p-8 rounded-2xl border border-line shadow-sm relative overflow-hidden flex flex-col h-full xl:max-h-[900px]"
+    >
       <div className="flex items-center gap-2 mb-6 relative z-10">
         <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center text-brand-ink dark:text-brand">
           <Database size={18} />
@@ -482,7 +484,7 @@ export function DiscoveryFilterPanel({
             value={aiModel}
             onChange={setAiModel}
           />
-          <p className="text-xs text-ink-2">
+          <p className="text-sm leading-[1.7] text-ink-2">
             Deixe vazio para seleção automática. O modelo precisa estar disponível no provedor; Groq
             exige preço cadastrado. Consulte os modelos em Central de provedores → Testar conexões
             autorizadas.
@@ -516,7 +518,7 @@ export function DiscoveryFilterPanel({
               {interpretationMessage}
             </p>
           )}
-          <p className="text-xs text-ink-2">
+          <p className="text-sm leading-[1.7] text-ink-2">
             Confira os filtros preenchidos antes de pesquisar. A IA interpreta a solicitação; dados
             empresariais vêm das fontes consultadas.
           </p>
@@ -549,7 +551,7 @@ export function DiscoveryFilterPanel({
             />
             Autorizar provedores que podem consumir créditos, dentro dos limites configurados.
           </label>
-          <p className="text-xs text-ink-2">
+          <p className="text-sm leading-[1.7] text-ink-2">
             Sem autorização, operações pagas não são executadas. O modo não garante gratuidade ou
             completude. Os resultados são ampliados pela próxima página, respeitando cotas.
           </p>
@@ -648,7 +650,7 @@ export function DiscoveryFilterPanel({
               <summary className="cursor-pointer py-2 text-sm font-semibold text-ink">
                 Pesos do score ICP
               </summary>
-              <p className="text-xs text-ink-2">
+              <p className="text-sm leading-[1.7] text-ink-2">
                 Pesos relativos entre os critérios efetivamente avaliados. Dados não confirmados
                 recebem zero pontos.
               </p>
@@ -681,7 +683,7 @@ export function DiscoveryFilterPanel({
                 />
               ))}
             </details>
-            <p className="text-xs text-ink-2">
+            <p className="text-sm leading-[1.7] text-ink-2">
               Filtros Apollo dependem das permissões do plano. Filtros brasileiros são avaliados
               pelas fontes cadastrais, não enviados ao Apollo.
             </p>
@@ -773,7 +775,7 @@ export function DiscoveryFilterPanel({
               </p>
             </div>
             <div>
-              <p className="text-xs text-ink-2">
+              <p className="text-sm leading-[1.7] text-ink-2">
                 Exclusão de tecnologias indisponível no contrato atual Apollo.
               </p>
               <span

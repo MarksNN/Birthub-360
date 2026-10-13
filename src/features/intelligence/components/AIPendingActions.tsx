@@ -195,9 +195,10 @@ export function AIPendingActions() {
           return (
             <article
               key={action.id}
-              className="bg-surface rounded-xl shadow-sm border border-line overflow-hidden"
+              data-accent="iris"
+              className="bh-platform-card bg-surface rounded-card overflow-hidden"
             >
-              <header className="bg-surface-2 border-b border-line px-4 py-2.5 flex items-center gap-2 text-ink text-sm font-medium">
+              <header className="bg-surface-2 border-b border-line px-4 py-2.5 flex items-center gap-2 text-[color:var(--card-accent)] text-sm font-medium">
                 {presentation.icon}
                 <span className="truncate">{presentation.title}</span>
               </header>
@@ -298,10 +299,11 @@ export function AIPendingActions() {
             return (
               <article
                 key={action.id}
-                className="bg-surface rounded-xl shadow-sm border border-line overflow-hidden hover:shadow-md transition-shadow"
+                data-accent="iris"
+                className="bh-platform-card bg-surface rounded-card overflow-hidden hover:shadow-md transition-shadow"
               >
-                <header className="bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/40 px-4 py-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center text-indigo-800 dark:text-indigo-300 font-medium text-sm min-w-0">
+                <header className="bg-surface-elevated border-b border-line px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center text-[color:var(--card-accent)] font-medium text-sm min-w-0">
                     {presentation.icon}
                     <span className="truncate">{presentation.title}</span>
                   </div>

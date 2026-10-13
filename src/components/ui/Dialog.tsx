@@ -1,6 +1,6 @@
-import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '../../lib/utils.js';
 
@@ -20,7 +20,7 @@ export interface DialogProps extends React.ComponentPropsWithoutRef<typeof Dialo
    Mobile (A03-P1-04): margem lateral de 1rem, altura limitada à viewport dinâmica e rolagem
    interna, para o modal nunca estourar a tela em 390px. */
 const DIALOG_SURFACE =
-  'fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border border-line bg-surface-elevated p-6 text-ink duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95';
+  'fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[var(--radius-modal)] border border-line bg-surface-elevated p-6 text-ink duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95';
 
 const DIALOG_CLOSE_CLASS =
   'absolute right-4 top-4 rounded-sm text-ink-2 opacity-80 transition-opacity hover:opacity-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none';
@@ -55,7 +55,7 @@ const DialogContent = React.forwardRef<
       aria-modal="true"
       className={cn(
         DIALOG_SURFACE,
-        'max-w-lg shadow-card data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+        'max-w-lg shadow-[var(--shadow-elevated)] data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
         className,
       )}
       {...props}
@@ -159,7 +159,7 @@ function Dialog({
           onEscapeKeyDown={preventClose ? (event) => event.preventDefault() : undefined}
           onPointerDownOutside={preventClose ? (event) => event.preventDefault() : undefined}
           onInteractOutside={preventClose ? (event) => event.preventDefault() : undefined}
-          className={cn(DIALOG_SURFACE, 'shadow-xl', maxWidth || 'max-w-lg')}
+          className={cn(DIALOG_SURFACE, 'shadow-[var(--shadow-elevated)]', maxWidth || 'max-w-lg')}
         >
           {title || subtitle ? (
             <DialogHeader className={cn(!preventClose && 'pr-8')}>
@@ -187,13 +187,13 @@ function Dialog({
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTrigger,
   DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 };

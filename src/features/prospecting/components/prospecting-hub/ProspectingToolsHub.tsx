@@ -26,7 +26,6 @@ const TOOL_TABS: {
   statusKey: keyof Omit<ToolsStatus, 'providerMode'>;
   iconBg: string;
   iconColor: string;
-  accentLine: string;
   textHover: string;
 }[] = [
   {
@@ -39,7 +38,6 @@ const TOOL_TABS: {
     statusKey: 'googlePlaces',
     iconBg: 'bg-sky-50 dark:bg-sky-500/10 border-sky-200/80 dark:border-sky-500/20',
     iconColor: 'text-sky-600 dark:text-sky-400',
-    accentLine: 'via-sky-500',
     textHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-400',
   },
   {
@@ -52,7 +50,6 @@ const TOOL_TABS: {
     statusKey: 'apollo',
     iconBg: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200/80 dark:border-indigo-500/20',
     iconColor: 'text-indigo-600 dark:text-indigo-400',
-    accentLine: 'via-indigo-500',
     textHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400',
   },
   {
@@ -65,7 +62,6 @@ const TOOL_TABS: {
     statusKey: 'hunter',
     iconBg: 'bg-orange-50 dark:bg-orange-500/10 border-orange-200/80 dark:border-orange-500/20',
     iconColor: 'text-orange-600 dark:text-orange-400',
-    accentLine: 'via-orange-500',
     textHover: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
   },
   {
@@ -78,7 +74,6 @@ const TOOL_TABS: {
     statusKey: 'apollo',
     iconBg: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200/80 dark:border-blue-500/20',
     iconColor: 'text-blue-600 dark:text-blue-400',
-    accentLine: 'via-blue-500',
     textHover: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
   },
   {
@@ -91,7 +86,6 @@ const TOOL_TABS: {
     statusKey: 'github',
     iconBg: 'bg-purple-50 dark:bg-purple-500/10 border-purple-200/80 dark:border-purple-500/20',
     iconColor: 'text-purple-600 dark:text-purple-400',
-    accentLine: 'via-purple-500',
     textHover: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
   },
   {
@@ -104,7 +98,6 @@ const TOOL_TABS: {
     statusKey: 'news',
     iconBg: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/80 dark:border-emerald-500/20',
     iconColor: 'text-emerald-600 dark:text-emerald-400',
-    accentLine: 'via-emerald-500',
     textHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
   },
   {
@@ -117,7 +110,6 @@ const TOOL_TABS: {
     statusKey: 'youtube',
     iconBg: 'bg-rose-50 dark:bg-rose-500/10 border-rose-200/80 dark:border-rose-500/20',
     iconColor: 'text-rose-600 dark:text-rose-400',
-    accentLine: 'via-rose-500',
     textHover: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
   },
 ];
@@ -176,12 +168,10 @@ export function ProspectingToolsHub() {
                 onClick={() => setActiveTool(tool.id)}
                 className="text-left cursor-pointer group h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-2xl"
               >
-                <div className="h-full relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-surface border border-line hover:border-line-strong hover:shadow-lg transition-all duration-300">
-                  {/* Top highlight accent */}
-                  <div
-                    className={`absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent ${tool.accentLine} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                  />
-
+                <div
+                  data-accent="blue"
+                  className="bh-platform-card h-full relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-surface border border-line hover:border-line-strong hover:shadow-lg transition-all duration-300"
+                >
                   <div>
                     {/* Header: Icon + Category + Badge */}
                     <div className="flex items-start justify-between gap-2 mb-3">
@@ -216,7 +206,7 @@ export function ProspectingToolsHub() {
                     </h3>
 
                     {/* Description */}
-                    <p className="mt-1.5 text-xs leading-relaxed text-ink-2 line-clamp-3 font-normal">
+                    <p className="mt-1.5 text-sm leading-[1.7] text-ink-2 line-clamp-3 font-normal">
                       {tool.description}
                     </p>
                   </div>
