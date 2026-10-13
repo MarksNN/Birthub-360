@@ -1,4 +1,3 @@
-import { motion, useReducedMotion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowRight,
@@ -39,12 +38,12 @@ import {
   Zap,
 } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext.js';
-import { useTheme } from '../../../contexts/ThemeContext.js';
 import { authClient } from '../../../lib/auth-client.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
+import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
 import './NewLoginScreen.css';
 
 // 8 PILARES OFICIAIS DO BIRTH HUB 360°
@@ -54,7 +53,7 @@ const OFFICIAL_PILLARS = [
     slug: 'HUB',
     name: 'HUB COMERCIAL',
     desc: 'Centralização de contas, pipeline comercial unificado e visão 360° de cada oportunidade em negociação.',
-    color: '#0ea5e9',
+    color: 'var(--color-brand-primary)',
     tag: 'Pipeline Central',
     icon: Building2,
   },
@@ -63,7 +62,7 @@ const OFFICIAL_PILLARS = [
     slug: 'INTEL',
     name: 'INTELIGÊNCIA DE MERCADO',
     desc: 'Enriquecimento analítico de dados B2B, sinais de compra, qualificação precisa e inteligência de decisores.',
-    color: '#3b82f6',
+    color: 'var(--color-info)',
     tag: 'Decisão por Dados',
     icon: Search,
   },
@@ -72,7 +71,7 @@ const OFFICIAL_PILLARS = [
     slug: 'ORCH',
     name: 'ORQUESTRAÇÃO DE VENDAS',
     desc: 'Cadências multicanal coordenadas, regras de transição de bastão e alinhamento operacional de ponta a ponta.',
-    color: '#0284c7',
+    color: 'var(--color-brand-primary)',
     tag: 'Fluxos Integrados',
     icon: Workflow,
   },
@@ -81,7 +80,7 @@ const OFFICIAL_PILLARS = [
     slug: 'PERF',
     name: 'PERFORMANCE COMERCIAL',
     desc: 'Telemetria de conversão, velocidade de avanço no funil, metas operacionais e produtividade da equipe.',
-    color: '#16a34a',
+    color: 'var(--color-success)',
     tag: 'Metas & Velocidade',
     icon: BarChart3,
   },
@@ -90,7 +89,7 @@ const OFFICIAL_PILLARS = [
     slug: 'FORE',
     name: 'PREVISIBILIDADE COMERCIAL',
     desc: 'Modelagem estatística de probabilidade, análise de pipeline ponderado e cenários embasados no histórico real.',
-    color: '#d97706',
+    color: 'var(--color-brand-accent)',
     tag: 'Pipeline Ponderado',
     icon: TrendingUp,
   },
@@ -99,7 +98,7 @@ const OFFICIAL_PILLARS = [
     slug: 'AI',
     name: 'INTELIGÊNCIA ARTIFICIAL',
     desc: 'Copiloto comercial autônomo, transcrição de voz com diarização, análise de objeções e respostas contextuais.',
-    color: '#8b5cf6',
+    color: 'var(--color-heading-iris)',
     tag: 'Copiloto Autônomo',
     icon: BrainCircuit,
   },
@@ -108,7 +107,7 @@ const OFFICIAL_PILLARS = [
     slug: 'GOV',
     name: 'GOVERNANÇA COMERCIAL',
     desc: 'Mesa de tratamento de duplicidades, rastreabilidade de dados, controle de acessos (RBAC) e conformidade LGPD.',
-    color: '#dc2626',
+    color: 'var(--color-danger)',
     tag: 'Segurança & RLS',
     icon: ShieldCheck,
   },
@@ -117,71 +116,23 @@ const OFFICIAL_PILLARS = [
     slug: 'ENRICH',
     name: 'ENRIQUECIMENTO DE DADOS',
     desc: 'Sincronização bidirecional idempotente com Bitrix24, validação cadastral e extração automatizada de contatos.',
-    color: '#0d9488',
+    color: 'var(--color-brand-primary)',
     tag: 'Sincronização Bitrix',
     icon: Database,
   },
 ];
 
 function BH360LogoMark({ size = 44 }: { size?: number }) {
-  const uid = useId().replace(/:/g, '');
-  const reduceMotion = useReducedMotion();
-
   return (
-    <svg
-      viewBox="0 0 256 256"
-      width={size}
-      height={size}
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label="Birth Hub 360"
-    >
-      <defs>
-        <linearGradient id={`mark-arc-${uid}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#0ea5e9" />
-          <stop offset="50%" stopColor="#8b5cf6" />
-          <stop offset="100%" stopColor="#3b82f6" />
-        </linearGradient>
-        <radialGradient id={`mark-core-${uid}`} cx="50%" cy="45%" r="55%">
-          <stop offset="0%" stopColor="#1e293b" />
-          <stop offset="100%" stopColor="#0f172a" />
-        </radialGradient>
-      </defs>
-
-      <motion.circle
-        cx="128"
-        cy="128"
-        r="118"
-        fill="none"
-        stroke={`url(#mark-arc-${uid})`}
-        strokeWidth="10"
-        strokeDasharray="6 14"
-        animate={!reduceMotion ? { rotate: 360 } : undefined}
-        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        style={{ transformOrigin: '128px 128px' }}
-      />
-      <circle cx="128" cy="128" r="78" fill={`url(#mark-core-${uid})`} />
-      <circle cx="128" cy="128" r="64" fill="none" stroke="#38bdf8" strokeWidth="3" opacity="0.9" />
-      <line x1="64" y1="128" x2="192" y2="128" stroke="#7dd3fc" strokeWidth="2" opacity="0.6" />
-      <path
-        fill="#ffffff"
-        transform="matrix(0.0740 0 0 -0.0740 104.45 154.20)"
-        d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"
-      />
-    </svg>
+    <span style={{ width: size, height: size }} className="inline-block">
+      <BirthHubLogo variant="icon" title="Birth Hub 360º" className="h-full w-full" />
+    </span>
   );
 }
 
 export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {}) {
   const { currentUser } = useAuth();
-  const { setThemeMode } = useTheme();
   const navigate = useNavigate();
-
-  // Forçar Light Mode na landing Vancouver Plus
-  useEffect(() => {
-    setThemeMode('light');
-    document.documentElement.classList.remove('dark');
-  }, [setThemeMode]);
 
   // Se já autenticado, vai para o dashboard
   useEffect(() => {
@@ -281,7 +232,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-[#f8fafc] text-[#0b132b] font-sans overflow-x-hidden">
+    <div className="birthhub-auth relative w-full min-h-screen bg-surface text-brand font-sans overflow-x-hidden">
       {/* ════════════════════════════════════════════════════════════════════
           1. NAVBAR (VANCOUVER PLUS)
       ════════════════════════════════════════════════════════════════════ */}
@@ -291,10 +242,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           <a href="#" className="flex items-center gap-3 group text-decoration-none">
             <BH360LogoMark size={42} />
             <div className="flex flex-col">
-              <span className="font-display text-xl font-bold text-[#0b132b] tracking-tight flex items-center gap-1">
+              <span className="font-display text-xl font-bold text-brand tracking-tight flex items-center gap-1">
                 Birth Hub <span className="vancouver-gradient-text">360°</span>
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#64748b] font-semibold">
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-brand font-semibold">
                 Strategic Command Center
               </span>
             </div>
@@ -305,7 +256,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="nav-link-holder relative cursor-pointer py-1">
               <a
                 href="#recursos"
-                className="text-sm font-semibold text-[#475569] hover:text-[#0b132b] transition-colors"
+                className="text-sm font-semibold text-brand hover:text-brand transition-colors"
               >
                 Recursos
               </a>
@@ -314,7 +265,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="nav-link-holder relative cursor-pointer py-1">
               <a
                 href="#pilares"
-                className="text-sm font-semibold text-[#475569] hover:text-[#0b132b] transition-colors"
+                className="text-sm font-semibold text-brand hover:text-brand transition-colors"
               >
                 8 Pilares
               </a>
@@ -323,7 +274,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="nav-link-holder relative cursor-pointer py-1">
               <a
                 href="#plataforma"
-                className="text-sm font-semibold text-[#475569] hover:text-[#0b132b] transition-colors"
+                className="text-sm font-semibold text-brand hover:text-brand transition-colors"
               >
                 Plataforma
               </a>
@@ -332,7 +283,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="nav-link-holder relative cursor-pointer py-1">
               <a
                 href="#precos"
-                className="text-sm font-semibold text-[#475569] hover:text-[#0b132b] transition-colors"
+                className="text-sm font-semibold text-brand hover:text-brand transition-colors"
               >
                 Planos
               </a>
@@ -341,7 +292,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="nav-link-holder relative cursor-pointer py-1">
               <a
                 href="#ecossistema"
-                className="text-sm font-semibold text-[#475569] hover:text-[#0b132b] transition-colors"
+                className="text-sm font-semibold text-brand hover:text-brand transition-colors"
               >
                 Ecossistema
               </a>
@@ -350,7 +301,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="nav-link-holder relative cursor-pointer py-1">
               <a
                 href="#contato"
-                className="text-sm font-semibold text-[#475569] hover:text-[#0b132b] transition-colors"
+                className="text-sm font-semibold text-brand hover:text-brand transition-colors"
               >
                 Suporte
               </a>
@@ -395,19 +346,19 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           {/* Badge superior estilo pílula */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-[#0ea5e9] text-xs font-bold tracking-wide shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-brand text-xs font-bold tracking-wide shadow-xs">
             <Sparkles className="w-3.5 h-3.5" />
             <span>ARQUITETURA COMERCIAL & IA PREVENTIVA</span>
           </div>
 
           {/* Título Principal Vancouver Plus com Texto em Gradiente */}
-          <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0b132b] leading-[1.12]">
+          <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-brand leading-[1.12]">
             <span className="vancouver-gradient-text">Personalizado</span> para Gerenciar Toda sua
             Operação Comercial
           </h1>
 
           {/* Subtítulo */}
-          <p className="max-w-3xl mx-auto text-base sm:text-lg text-[#475569] leading-relaxed font-sans">
+          <p className="max-w-3xl mx-auto text-base sm:text-lg text-brand leading-relaxed font-sans">
             Opere com previsibilidade, segurança e inteligência artificial em um dashboard intuitivo
             e integrado de ponta a ponta. Projetado para transformar dados brutos em decisões que
             fecham negócios.
@@ -445,10 +396,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-brand">
                   Pipeline Previsto
                 </p>
-                <p className="text-base font-bold text-[#0b132b]">
+                <p className="text-base font-bold text-brand">
                   R$ 4.280.000 <span className="text-xs text-emerald-600 font-bold">+28.4%</span>
                 </p>
               </div>
@@ -462,11 +413,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-brand">
                   Inteligência Artificial
                 </p>
-                <p className="text-sm font-bold text-[#0b132b]">
-                  Taxa de Conversão: <span className="text-[#8b5cf6]">42.8%</span>
+                <p className="text-sm font-bold text-brand">
+                  Taxa de Conversão: <span className="text-brand">42.8%</span>
                 </p>
               </div>
             </div>
@@ -475,13 +426,13 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           {/* Moldura da Aplicação (Janela do Browser) */}
           <div className="vancouver-app-container">
             {/* Barra de título do browser */}
-            <div className="bg-[#f8fafc] px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+            <div className="bg-surface px-4 py-3 border-b border-line flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-rose-400" />
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
               </div>
-              <div className="bg-white px-6 py-1 rounded-full border border-slate-200 text-xs font-mono text-slate-500 flex items-center gap-2">
+              <div className="bg-surface px-6 py-1 rounded-full border border-line text-xs font-mono text-ink-2 flex items-center gap-2">
                 <Lock className="w-3 h-3 text-emerald-500" />
                 <span>birthhub360.com/app/dashboard</span>
               </div>
@@ -492,34 +443,30 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             </div>
 
             {/* Conteúdo Visual Interno da Aplicação */}
-            <div className="p-6 md:p-8 bg-[#ffffff] space-y-6">
+            <div className="p-6 md:p-8 bg-surface space-y-6">
               {/* KPIs de Destaque */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 rounded-xl bg-[#f8fafc] border border-slate-200">
-                  <p className="text-xs text-slate-500 font-semibold uppercase">
-                    Oportunidades Ativas
-                  </p>
-                  <p className="text-2xl font-bold text-[#0b132b] mt-1">1.240</p>
+                <div className="p-4 rounded-xl bg-surface border border-line">
+                  <p className="text-xs text-ink-2 font-semibold uppercase">Oportunidades Ativas</p>
+                  <p className="text-2xl font-bold text-brand mt-1">1.240</p>
                   <span className="text-[10px] text-emerald-600 font-bold">
                     ↑ 14% vs mês anterior
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-[#f8fafc] border border-slate-200">
-                  <p className="text-xs text-slate-500 font-semibold uppercase">
-                    Pipeline Ponderado
-                  </p>
-                  <p className="text-2xl font-bold text-[#0ea5e9] mt-1">R$ 8.940.000</p>
+                <div className="p-4 rounded-xl bg-surface border border-line">
+                  <p className="text-xs text-ink-2 font-semibold uppercase">Pipeline Ponderado</p>
+                  <p className="text-2xl font-bold text-brand mt-1">R$ 8.940.000</p>
                   <span className="text-[10px] text-sky-600 font-bold">Probabilidade 82%</span>
                 </div>
-                <div className="p-4 rounded-xl bg-[#f8fafc] border border-slate-200">
-                  <p className="text-xs text-slate-500 font-semibold uppercase">Sinais de Compra</p>
-                  <p className="text-2xl font-bold text-[#8b5cf6] mt-1">348</p>
+                <div className="p-4 rounded-xl bg-surface border border-line">
+                  <p className="text-xs text-ink-2 font-semibold uppercase">Sinais de Compra</p>
+                  <p className="text-2xl font-bold text-brand mt-1">348</p>
                   <span className="text-[10px] text-purple-600 font-bold">
                     14 prioritários hoje
                   </span>
                 </div>
-                <div className="p-4 rounded-xl bg-[#f8fafc] border border-slate-200">
-                  <p className="text-xs text-slate-500 font-semibold uppercase">Eficiência SDR</p>
+                <div className="p-4 rounded-xl bg-surface border border-line">
+                  <p className="text-xs text-ink-2 font-semibold uppercase">Eficiência SDR</p>
                   <p className="text-2xl font-bold text-emerald-600 mt-1">94.2%</p>
                   <span className="text-[10px] text-emerald-600 font-bold">Sem vazamentos</span>
                 </div>
@@ -527,49 +474,49 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
               {/* Grid Central: Kanban Preview + IA Insights */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-[#f8fafc] space-y-4">
+                <div className="lg:col-span-2 p-5 rounded-2xl border border-line bg-surface space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display text-sm font-bold text-[#0b132b]">
+                    <h3 className="font-display text-sm font-bold text-brand">
                       Fluxo de Negociação Unificado (CRM)
                     </h3>
-                    <span className="text-xs text-[#0ea5e9] font-bold">Tempo Real</span>
+                    <span className="text-xs text-brand font-bold">Tempo Real</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase">
+                    <div className="bg-surface p-3 rounded-xl border border-line space-y-2">
+                      <div className="text-[10px] font-bold text-ink-2 uppercase">
                         Qualificação (42)
                       </div>
                       <div className="p-2 rounded-lg bg-sky-50 border border-sky-100 text-xs font-bold text-sky-900">
                         Vibra Energia S/A
-                        <span className="block text-[10px] text-slate-500 font-normal">
+                        <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 350.000 · Decisor Validado
                         </span>
                       </div>
-                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+                      <div className="p-2 rounded-lg bg-surface border border-line text-xs font-bold text-ink">
                         Ambev Logística
-                        <span className="block text-[10px] text-slate-500 font-normal">
+                        <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 180.000 · Em contato
                         </span>
                       </div>
                     </div>
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase">
+                    <div className="bg-surface p-3 rounded-xl border border-line space-y-2">
+                      <div className="text-[10px] font-bold text-ink-2 uppercase">
                         Proposta (18)
                       </div>
                       <div className="p-2 rounded-lg bg-purple-50 border border-purple-100 text-xs font-bold text-purple-900">
                         Suzano Papel & Celulose
-                        <span className="block text-[10px] text-slate-500 font-normal">
+                        <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 820.000 · Apresentada
                         </span>
                       </div>
                     </div>
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase">
+                    <div className="bg-surface p-3 rounded-xl border border-line space-y-2">
+                      <div className="text-[10px] font-bold text-ink-2 uppercase">
                         Fechamento (12)
                       </div>
                       <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-xs font-bold text-emerald-900">
                         Gerdau Aços
-                        <span className="block text-[10px] text-slate-500 font-normal">
+                        <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 1.200.000 · Minuta Pronta
                         </span>
                       </div>
@@ -582,13 +529,13 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     <BrainCircuit className="w-4 h-4" />
                     <h3 className="font-display text-sm font-bold">Motor IA & Diagnóstico</h3>
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs text-ink-2 leading-relaxed">
                     Sinal preditivo detectou aumento de 3.2x no engajamento de decisores em 12
                     contas estratégicas no Bitrix24.
                   </p>
-                  <div className="p-3 bg-white rounded-xl border border-purple-100 text-xs space-y-1">
-                    <span className="font-bold text-[#0b132b] block">Ação Recomendada:</span>
-                    <span className="text-slate-600 block">
+                  <div className="p-3 bg-surface rounded-xl border border-purple-100 text-xs space-y-1">
+                    <span className="font-bold text-brand block">Ação Recomendada:</span>
+                    <span className="text-ink-2 block">
                       Disparar cadência multicanal via WhatsApp e agendar demonstração técnica.
                     </span>
                   </div>
@@ -599,7 +546,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
           {/* Logo Grid das Tecnologias Integradas */}
           <div className="mt-16 text-center space-y-4">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#64748b]">
+            <p className="text-xs font-mono uppercase tracking-widest text-brand">
               Conectado e integrado nativamente com os principais ecossistemas corporativos
             </p>
             <div className="vancouver-logo-grid">
@@ -621,14 +568,14 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       ════════════════════════════════════════════════════════════════════ */}
       <section
         id="recursos"
-        className="py-24 px-6 sm:px-12 bg-white border-t border-b border-slate-200"
+        className="py-24 px-6 sm:px-12 bg-surface border-t border-b border-line"
       >
         <div className="max-w-6xl mx-auto space-y-20">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0b132b]">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
               Ajudamos você a gerenciar de ponta a ponta, todas as camadas da sua receita.
             </h2>
-            <p className="text-base text-[#475569]">
+            <p className="text-base text-brand">
               Da inteligência de mercado à orquestração de cadências e previsão probabilística de
               fechamento.
             </p>
@@ -637,34 +584,34 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           {/* Bloco 1: Gestão Holística */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h3 className="font-display text-2xl font-bold text-[#0b132b]">
+              <h3 className="font-display text-2xl font-bold text-brand">
                 Gestão Estratégica para Visão Holística da Receita
               </h3>
-              <p className="text-sm text-[#475569] leading-relaxed">
+              <p className="text-sm text-brand leading-relaxed">
                 Centralize o pipeline e acompanhe em tempo real onde estão as melhores
                 oportunidades, eliminando planilhas fragmentadas e dados desatualizados.
               </p>
-              <ul className="space-y-3 font-sans text-sm text-[#0b132b]">
+              <ul className="space-y-3 font-sans text-sm text-brand">
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-sky-100 text-[#0ea5e9] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-sky-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Tudo em uma única plataforma integrada e sem silos.</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-sky-100 text-[#0ea5e9] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-sky-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Totalmente seguro com criptografia e conformidade LGPD.</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-sky-100 text-[#0ea5e9] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-sky-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Experiência do usuário ágil, moderna e responsiva.</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-sky-100 text-[#0ea5e9] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-sky-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Compatível com desktop e aplicativo móvel PWA.</span>
@@ -672,10 +619,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               </ul>
             </div>
 
-            <div className="vancouver-card p-6 bg-[#f8fafc] border border-slate-200">
+            <div className="vancouver-card p-6 bg-surface border border-line">
               <div className="space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                  <span className="font-mono text-xs font-bold text-slate-500 uppercase">
+                <div className="flex items-center justify-between pb-3 border-b border-line">
+                  <span className="font-mono text-xs font-bold text-ink-2 uppercase">
                     TELEMETRIA DE RECEITA
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
@@ -683,25 +630,25 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-bold text-slate-700">
+                  <div className="flex justify-between text-xs font-bold text-ink">
                     <span>Meta Mensal Atingida</span>
                     <span>78.4%</span>
                   </div>
-                  <div className="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                  <div className="w-full h-2.5 rounded-full bg-surface overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#0ea5e9] to-[#8b5cf6]"
+                      className="h-full bg-gradient-to-r from-brand to-pink"
                       style={{ width: '78.4%' }}
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <span className="text-[11px] text-slate-500 block">Velocidade Média</span>
-                    <span className="text-lg font-bold text-[#0b132b]">14 dias</span>
+                  <div className="p-3 bg-surface rounded-xl border border-line">
+                    <span className="text-[11px] text-ink-2 block">Velocidade Média</span>
+                    <span className="text-lg font-bold text-brand">14 dias</span>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-slate-200">
-                    <span className="text-[11px] text-slate-500 block">Ticket Médio</span>
-                    <span className="text-lg font-bold text-[#0b132b]">R$ 48.500</span>
+                  <div className="p-3 bg-surface rounded-xl border border-line">
+                    <span className="text-[11px] text-ink-2 block">Ticket Médio</span>
+                    <span className="text-lg font-bold text-brand">R$ 48.500</span>
                   </div>
                 </div>
               </div>
@@ -710,25 +657,25 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
           {/* Bloco 2: Microgestão Precisa */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-8">
-            <div className="order-2 lg:order-1 vancouver-card p-6 bg-[#f8fafc] border border-slate-200">
+            <div className="order-2 lg:order-1 vancouver-card p-6 bg-surface border border-line">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <BrainCircuit className="w-5 h-5 text-[#8b5cf6]" />
-                  <span className="font-display text-sm font-bold text-[#0b132b]">
+                  <BrainCircuit className="w-5 h-5 text-brand" />
+                  <span className="font-display text-sm font-bold text-brand">
                     Triagem & Qualificação Preditiva
                   </span>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1">
-                  <p className="font-bold text-slate-800">
+                <div className="p-3 bg-surface rounded-xl border border-line text-xs space-y-1">
+                  <p className="font-bold text-ink">
                     Decisor: Marcelo Nascimento (Diretor Comercial)
                   </p>
-                  <p className="text-slate-500">
+                  <p className="text-ink-2">
                     Telefone verificado, e-mail corporativo ativo, perfil decisor estratégico.
                   </p>
                 </div>
-                <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1">
-                  <p className="font-bold text-slate-800">Sincronização Bitrix24</p>
-                  <p className="text-slate-500">
+                <div className="p-3 bg-surface rounded-xl border border-line text-xs space-y-1">
+                  <p className="font-bold text-ink">Sincronização Bitrix24</p>
+                  <p className="text-ink-2">
                     Idempotência garantida: 0 duplicidades geradas nos últimos 90 dias.
                   </p>
                 </div>
@@ -736,28 +683,28 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             </div>
 
             <div className="order-1 lg:order-2 space-y-6">
-              <h3 className="font-display text-2xl font-bold text-[#0b132b]">
+              <h3 className="font-display text-2xl font-bold text-brand">
                 Microgestão de Cada Dado Sem Gargalos Operacionais
               </h3>
-              <p className="text-sm text-[#475569] leading-relaxed">
+              <p className="text-sm text-brand leading-relaxed">
                 Elimine o trabalho manual e o atrito na passagem de bastão entre pré-vendas (SDR),
                 vendas e pós-vendas com automações precisas e inteligência contextual.
               </p>
-              <ul className="space-y-3 font-sans text-sm text-[#0b132b]">
+              <ul className="space-y-3 font-sans text-sm text-brand">
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 text-[#8b5cf6] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Enriquecimento de contatos e validação de decisores reais.</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 text-[#8b5cf6] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Transição de bastão automatizada sem perda de contexto.</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 text-[#8b5cf6] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 text-brand flex items-center justify-center">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Sincronização bidirecional em tempo real com Bitrix24.</span>
@@ -771,16 +718,16 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       {/* ════════════════════════════════════════════════════════════════════
           4. SEÇÃO: 8 PILARES OFICIAIS (VANCOUVER FEATURE CARDS)
       ════════════════════════════════════════════════════════════════════ */}
-      <section id="pilares" className="py-24 px-6 sm:px-12 bg-[#f8fafc]">
+      <section id="pilares" className="py-24 px-6 sm:px-12 bg-surface">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-[#0ea5e9] text-xs font-bold font-mono">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-brand text-xs font-bold font-mono">
               METODOLOGIA OFICIAL
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0b132b]">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
               Os 8 Pilares Oficiais do Birth Hub 360°
             </h2>
-            <p className="text-base text-[#475569]">
+            <p className="text-base text-brand">
               Uma arquitetura modular robusta desenvolvida para governança, velocidade e
               previsibilidade na receita B2B.
             </p>
@@ -793,39 +740,43 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <div
                   key={p.id}
                   className="vancouver-card p-6 flex flex-col justify-between space-y-4"
+                  style={{ borderColor: p.color }}
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div
                         className="w-10 h-10 rounded-xl flex items-center justify-center border"
                         style={{
-                          backgroundColor: `${p.color}15`,
-                          borderColor: `${p.color}30`,
+                          backgroundColor: `color-mix(in srgb, ${p.color} 8%, transparent)`,
+                          borderColor: p.color,
                           color: p.color,
                         }}
                       >
                         <Icon className="w-5 h-5" />
                       </div>
-                      <span className="font-mono text-xs font-bold text-slate-400">
-                        PILAR {p.id}
-                      </span>
+                      <span className="font-mono text-xs font-bold text-ink-2">PILAR {p.id}</span>
                     </div>
 
                     <div>
-                      <h3 className="font-display text-base font-bold text-[#0b132b]">{p.name}</h3>
+                      <h3 className="font-display text-base font-bold" style={{ color: p.color }}>
+                        {p.name}
+                      </h3>
                       <span
                         className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mt-1"
-                        style={{ backgroundColor: `${p.color}15`, color: p.color }}
+                        style={{
+                          backgroundColor: `color-mix(in srgb, ${p.color} 8%, transparent)`,
+                          color: p.color,
+                        }}
                       >
                         {p.tag}
                       </span>
                     </div>
 
-                    <p className="text-xs text-[#475569] leading-relaxed">{p.desc}</p>
+                    <p className="text-xs text-brand leading-relaxed">{p.desc}</p>
                   </div>
 
                   <div
-                    className="pt-2 border-t border-slate-100 flex items-center text-xs font-bold"
+                    className="pt-2 border-t border-line flex items-center text-xs font-bold"
                     style={{ color: p.color }}
                   >
                     <span>Explorar Pilar</span>
@@ -843,14 +794,14 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       ════════════════════════════════════════════════════════════════════ */}
       <section
         id="plataforma"
-        className="py-24 px-6 sm:px-12 bg-white border-t border-b border-slate-200"
+        className="py-24 px-6 sm:px-12 bg-surface border-t border-b border-line"
       >
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0b132b]">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
               Tudo em uma única plataforma: do mobile ao desktop tudo o que você precisa está aqui
             </h2>
-            <p className="text-base text-[#475569]">
+            <p className="text-base text-brand">
               Alternância perfeita entre interfaces ricas para gestores e execução ágil na ponta
               para vendedores.
             </p>
@@ -882,19 +833,19 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           </div>
 
           {/* Conteúdo Dinâmico da Tab */}
-          <div className="vancouver-card p-8 bg-[#f8fafc] border border-slate-200">
+          <div className="vancouver-card p-8 bg-surface border border-line">
             {platformTab === 'crm' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  <h3 className="font-display text-2xl font-bold text-[#0b132b]">
+                  <h3 className="font-display text-2xl font-bold text-brand">
                     Painel Central com Visão 360° do Negócio
                   </h3>
-                  <p className="text-sm text-[#475569] leading-relaxed">
+                  <p className="text-sm text-brand leading-relaxed">
                     Acompanhe cada conta, contato e estágio de negociação com telemetria unificada.
                     O Kanban interativo reage em tempo real com regras de validação que impedem
                     perdas no funil.
                   </p>
-                  <div className="space-y-2 text-xs font-mono text-slate-600">
+                  <div className="space-y-2 text-xs font-mono text-ink-2">
                     <p className="flex items-center gap-2">
                       ✔ Visão tabular e em colunas por estágio de venda
                     </p>
@@ -906,20 +857,20 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     </p>
                   </div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase font-mono">
+                <div className="bg-surface p-5 rounded-2xl border border-line shadow-sm space-y-3">
+                  <span className="text-xs font-bold text-ink-2 uppercase font-mono">
                     MÉTRICAS DO CRM 360°
                   </span>
-                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-sm font-semibold text-slate-700">Contas Ativas</span>
-                    <span className="text-sm font-bold text-[#0ea5e9]">1.420 empresas</span>
+                  <div className="flex justify-between items-center py-2 border-b border-line">
+                    <span className="text-sm font-semibold text-ink">Contas Ativas</span>
+                    <span className="text-sm font-bold text-brand">1.420 empresas</span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-sm font-semibold text-slate-700">Negócios em Aberto</span>
-                    <span className="text-sm font-bold text-[#8b5cf6]">R$ 14.850.000,00</span>
+                  <div className="flex justify-between items-center py-2 border-b border-line">
+                    <span className="text-sm font-semibold text-ink">Negócios em Aberto</span>
+                    <span className="text-sm font-bold text-brand">R$ 14.850.000,00</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-sm font-semibold text-slate-700">
+                    <span className="text-sm font-semibold text-ink">
                       Tempo Médio de Fechamento
                     </span>
                     <span className="text-sm font-bold text-emerald-600">
@@ -933,14 +884,14 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {platformTab === 'intel' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  <h3 className="font-display text-2xl font-bold text-[#0b132b]">
+                  <h3 className="font-display text-2xl font-bold text-brand">
                     Enriquecimento de Decisores & Sinais B2B
                   </h3>
-                  <p className="text-sm text-[#475569] leading-relaxed">
+                  <p className="text-sm text-brand leading-relaxed">
                     Identifique decisores reais (C-Level, Diretores e Gerentes), e-mails
                     corporativos válidos e telefones diretos antes de iniciar o contato comercial.
                   </p>
-                  <div className="space-y-2 text-xs font-mono text-slate-600">
+                  <div className="space-y-2 text-xs font-mono text-ink-2">
                     <p className="flex items-center gap-2">
                       ✔ Pesquisa de mercado analítica por CNAE e região
                     </p>
@@ -952,15 +903,15 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     </p>
                   </div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase font-mono">
+                <div className="bg-surface p-5 rounded-2xl border border-line shadow-sm space-y-3">
+                  <span className="text-xs font-bold text-ink-2 uppercase font-mono">
                     SINAIS RECENTES
                   </span>
                   <div className="p-3 bg-sky-50 rounded-xl border border-sky-100 text-xs">
                     <span className="font-bold text-sky-900 block">
                       Sinal de Expansão · Petrobras Logística
                     </span>
-                    <span className="text-slate-600 block">
+                    <span className="text-ink-2 block">
                       Novas vagas abertas para compras corporativas detectadas.
                     </span>
                   </div>
@@ -968,7 +919,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     <span className="font-bold text-purple-900 block">
                       Sinal Tecnológico · Vale S.A.
                     </span>
-                    <span className="text-slate-600 block">
+                    <span className="text-ink-2 block">
                       Migração de infraestrutura para nuvem concluída.
                     </span>
                   </div>
@@ -979,14 +930,14 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {platformTab === 'voice' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  <h3 className="font-display text-2xl font-bold text-[#0b132b]">
+                  <h3 className="font-display text-2xl font-bold text-brand">
                     Copiloto de Voz & Transcrição Inteligente
                   </h3>
-                  <p className="text-sm text-[#475569] leading-relaxed">
+                  <p className="text-sm text-brand leading-relaxed">
                     Grave e transcreva chamadas comerciais com separação de interlocutores, extração
                     imediata de pontos de dor, objeções e preenchimento automático no Bitrix24.
                   </p>
-                  <div className="space-y-2 text-xs font-mono text-slate-600">
+                  <div className="space-y-2 text-xs font-mono text-ink-2">
                     <p className="flex items-center gap-2">
                       ✔ Resumo executivo da reunião gerado em segundos
                     </p>
@@ -998,15 +949,15 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     </p>
                   </div>
                 </div>
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-                  <span className="text-xs font-bold text-slate-400 uppercase font-mono">
+                <div className="bg-surface p-5 rounded-2xl border border-line shadow-sm space-y-3">
+                  <span className="text-xs font-bold text-ink-2 uppercase font-mono">
                     DIAGNÓSTICO DA ÚLTIMA CHAMADA
                   </span>
                   <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-xs space-y-1">
                     <span className="font-bold text-emerald-900 block">
                       Duração: 24m 12s · Sentimento: Muito Positivo
                     </span>
-                    <span className="text-slate-600 block">
+                    <span className="text-ink-2 block">
                       Cliente solicitou minuta contratual para 50 licenças da plataforma.
                     </span>
                   </div>
@@ -1020,23 +971,23 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       {/* ════════════════════════════════════════════════════════════════════
           6. SEÇÃO: PREÇOS & PLANOS (VANCOUVER EXPERIENCE CARD)
       ════════════════════════════════════════════════════════════════════ */}
-      <section id="precos" className="py-24 px-6 sm:px-12 bg-[#f8fafc]">
+      <section id="precos" className="py-24 px-6 sm:px-12 bg-surface">
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0b132b]">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
               Nossos planos são transparentes e fáceis de entender
             </h2>
-            <p className="text-base text-[#475569]">
+            <p className="text-base text-brand">
               Comece agora sem taxa de implantação oculta. Evolua conforme a sua operação expande.
             </p>
 
             {/* Toggle Mensal / Anual */}
-            <div className="inline-flex items-center gap-3 p-1.5 rounded-full bg-slate-200 mt-4">
+            <div className="inline-flex items-center gap-3 p-1.5 rounded-full bg-surface mt-4">
               <button
                 type="button"
                 onClick={() => setAnnualBilling(false)}
                 className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  !annualBilling ? 'bg-white text-[#0b132b] shadow-xs' : 'text-slate-600'
+                  !annualBilling ? 'bg-surface text-brand shadow-xs' : 'text-ink-2'
                 }`}
               >
                 Mensal
@@ -1045,7 +996,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 type="button"
                 onClick={() => setAnnualBilling(true)}
                 className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  annualBilling ? 'bg-white text-[#0ea5e9] shadow-xs' : 'text-slate-600'
+                  annualBilling ? 'bg-surface text-brand shadow-xs' : 'text-ink-2'
                 }`}
               >
                 Anual (2 Meses Grátis)
@@ -1059,17 +1010,17 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div className="space-y-4">
-                <span className="font-display text-xl font-bold text-[#0b132b] block">
+                <span className="font-display text-xl font-bold text-brand block">
                   Plano Enterprise Hub
                 </span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-sm font-bold text-slate-500">R$</span>
-                  <span className="text-5xl font-extrabold text-[#0b132b] tracking-tight">
+                  <span className="text-sm font-bold text-ink-2">R$</span>
+                  <span className="text-5xl font-extrabold text-brand tracking-tight">
                     {annualBilling ? '249' : '299'}
                   </span>
-                  <span className="text-xs text-slate-500 font-semibold">/ usuário / mês</span>
+                  <span className="text-xs text-ink-2 font-semibold">/ usuário / mês</span>
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-ink-2">
                   {annualBilling
                     ? 'Faturado anualmente com 2 meses gratuitos.'
                     : 'Faturamento mensal sem fidelidade.'}
@@ -1096,11 +1047,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 </div>
               </div>
 
-              <div className="space-y-3 border-t md:border-t-0 md:border-l border-slate-200 pt-6 md:pt-0 md:pl-8">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+              <div className="space-y-3 border-t md:border-t-0 md:border-l border-line pt-6 md:pt-0 md:pl-8">
+                <span className="text-xs font-bold uppercase tracking-wider text-ink-2 block">
                   O QUE ESTÁ INCLUSO:
                 </span>
-                <ul className="space-y-2.5 text-xs text-[#0b132b]">
+                <ul className="space-y-2.5 text-xs text-brand">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-600" />
                     <span>Acesso completo aos 8 Pilares Oficiais</span>
@@ -1137,14 +1088,14 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       ════════════════════════════════════════════════════════════════════ */}
       <section
         id="ecossistema"
-        className="py-24 px-6 sm:px-12 bg-white border-t border-b border-slate-200"
+        className="py-24 px-6 sm:px-12 bg-surface border-t border-b border-line"
       >
         <div className="max-w-5xl mx-auto text-center space-y-12">
           <div className="space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0b132b]">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
               Conecte-se ao que sua operação realmente precisa
             </h2>
-            <p className="text-base text-[#475569]">
+            <p className="text-base text-brand">
               Conectores robustos para o seu stack de vendas, mensageria e dados corporativos.
             </p>
           </div>
@@ -1152,7 +1103,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           {/* Grid de Avatares Circulares Vancouver Plus */}
           <div className="flex flex-wrap items-center justify-center gap-6 py-6">
             <div className="vancouver-ecosystem-circle" title="Bitrix24 CRM">
-              <span className="font-bold text-xs text-[#0ea5e9]">B24</span>
+              <span className="font-bold text-xs text-brand">B24</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="WhatsApp API">
               <span className="font-bold text-xs text-emerald-600">WPP</span>
@@ -1182,7 +1133,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       {/* ════════════════════════════════════════════════════════════════════
           8. SEÇÃO: ACESSO RÁPIDO & SUPORTE (VANCOUVER PLUS)
       ════════════════════════════════════════════════════════════════════ */}
-      <section id="contato" className="py-24 px-6 sm:px-12 bg-[#f8fafc]">
+      <section id="contato" className="py-24 px-6 sm:px-12 bg-surface">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card 1: Ajuda */}
@@ -1194,10 +1145,8 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-slate-800 dark:text-[#F8F9FF]">
-                  Ajuda
-                </h3>
-                <p className="text-xs text-slate-500 mt-2">
+                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">Ajuda</h3>
+                <p className="text-xs text-ink-2 mt-2">
                   Documentação técnica, manuais de uso e suporte aos pilares.
                 </p>
               </div>
@@ -1217,11 +1166,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-slate-800 dark:text-[#F8F9FF]">
-                  Contato
-                </h3>
-                <p className="text-xs text-slate-500 mt-2">comercial@birthhub360.com</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">Contato</h3>
+                <p className="text-xs text-ink-2 mt-2">comercial@birthhub360.com</p>
+                <p className="text-xs text-ink-2 mt-1">
                   Fale diretamente com nossa diretoria comercial.
                 </p>
               </div>
@@ -1235,10 +1182,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {/* Card 3: Newsletter / Novidades */}
             <div className="vancouver-quick-card">
               <div>
-                <h3 className="font-display text-xl font-bold text-slate-800 dark:text-[#F8F9FF]">
+                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">
                   Novidades
                 </h3>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-ink-2 mt-2">
                   Receba insights semanais sobre IA aplicada a vendas B2B.
                 </p>
               </div>
@@ -1246,7 +1193,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <input
                   type="email"
                   placeholder="Seu e-mail corporativo"
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+                  className="w-full px-3 py-2 text-xs border border-line rounded-lg focus:outline-none focus:border-brand"
                 />
               </div>
             </div>
@@ -1260,10 +1207,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-slate-800 dark:text-[#F8F9FF]">
+                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">
                   Segurança
                 </h3>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-ink-2 mt-2">
                   Auditorias de segurança, RLS multi-tenant e conformidade LGPD.
                 </p>
               </div>
@@ -1280,14 +1227,14 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       {/* ════════════════════════════════════════════════════════════════════
           9. FOOTER (VANCOUVER PLUS)
       ════════════════════════════════════════════════════════════════════ */}
-      <footer className="bg-white border-t border-slate-200 py-16 px-6 sm:px-12">
+      <footer className="bg-surface border-t border-line py-16 px-6 sm:px-12">
         <div className="max-w-6xl mx-auto space-y-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center pb-12 border-b border-slate-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center pb-12 border-b border-line">
             <div className="space-y-3">
-              <h3 className="font-display text-2xl font-bold text-slate-800 dark:text-[#F8F9FF]">
+              <h3 className="font-display text-2xl font-bold text-ink dark:text-brand">
                 Pronto para estruturar sua operação comercial com rigor e inteligência?
               </h3>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-2">
                 Conheça a única plataforma desenhada especificamente para conectar dados a
                 fechamentos reais.
               </p>
@@ -1311,23 +1258,23 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <BH360LogoMark size={32} />
-              <span className="font-display text-sm font-bold text-[#0b132b]">
+              <span className="font-display text-sm font-bold text-brand">
                 Birth Hub <span className="vancouver-gradient-text">360°</span>
               </span>
             </div>
 
-            <p className="text-xs text-slate-400 font-mono">
+            <p className="text-xs text-ink-2 font-mono">
               Crafted for modern revenue teams. © 2026 Birth Hub 360°. Todos os direitos reservados.
             </p>
 
-            <div className="flex items-center gap-6 text-xs text-slate-500 font-medium">
-              <a href="/privacy" className="hover:text-[#0ea5e9]">
+            <div className="flex items-center gap-6 text-xs text-ink-2 font-medium">
+              <a href="/privacy" className="hover:text-brand">
                 Privacidade
               </a>
-              <a href="/terms" className="hover:text-[#0ea5e9]">
+              <a href="/terms" className="hover:text-brand">
                 Termos de Uso
               </a>
-              <a href="#contato" className="hover:text-[#0ea5e9]">
+              <a href="#contato" className="hover:text-brand">
                 Contato
               </a>
             </div>
@@ -1345,13 +1292,13 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           aria-labelledby="auth-modal-title"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
         >
-          <div className="vancouver-card w-full max-w-md p-8 bg-white shadow-2xl relative">
+          <div className="vancouver-card w-full max-w-md p-8 bg-surface shadow-2xl relative">
             {/* Botão Fechar */}
             <button
               type="button"
               onClick={() => setShowAuthModal(false)}
               aria-label="Fechar janela de autenticação"
-              className="absolute top-5 right-5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+              className="absolute top-5 right-5 p-1 rounded-full text-ink-2 hover:text-ink-2 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1361,12 +1308,12 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <div className="flex justify-center mb-1">
                 <BH360LogoMark size={40} />
               </div>
-              <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#0b132b]">
+              <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-brand">
                 {authMode === 'signin' && 'Acessar o Hub'}
                 {authMode === 'signup' && 'Criar Nova Conta'}
                 {authMode === 'forgot' && 'Recuperar Senha'}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-ink-2">
                 {authMode === 'signin' && 'Informe suas credenciais corporativas para entrar.'}
                 {authMode === 'signup' && 'Solicite provisionamento para sua equipe comercial.'}
                 {authMode === 'forgot' && 'Enviaremos um link de recuperação para seu e-mail.'}
@@ -1376,8 +1323,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {/* Mensagens de Sucesso ou Erro */}
             {errorMessage && (
               <div
+                id="auth-modal-error"
                 role="alert"
-                className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2"
+                className="mb-4 p-3 rounded-xl bg-danger/10 border border-danger text-danger text-sm flex items-center gap-2"
               >
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
@@ -1386,7 +1334,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {successMessage && (
               <div
                 role="status"
-                className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2"
+                className="mb-4 p-3 rounded-xl bg-success/10 border border-success text-success text-xs flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{successMessage}</span>
@@ -1399,7 +1347,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <div>
                   <label
                     htmlFor="auth-modal-name"
-                    className="block text-xs font-bold text-slate-700 mb-1"
+                    className="block text-xs font-bold text-ink mb-1"
                   >
                     Nome Completo
                   </label>
@@ -1410,28 +1358,26 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Seu nome"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-sky-950 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-line text-sm bg-surface text-ink-2 placeholder:text-ink-2 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                   />
                 </div>
               )}
 
               <div>
-                <label
-                  htmlFor="auth-modal-email"
-                  className="block text-xs font-bold text-slate-700 mb-1"
-                >
+                <label htmlFor="auth-modal-email" className="block text-xs font-bold text-ink mb-1">
                   E-mail Corporativo
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Mail className="w-4 h-4 text-ink-2 absolute left-3.5 top-3" />
                   <input
                     id="auth-modal-email"
+                    aria-describedby={errorMessage ? 'auth-modal-error' : undefined}
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nome@empresa.com.br"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-sky-950 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-line text-sm bg-surface text-ink-2 placeholder:text-ink-2 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                   />
                 </div>
               </div>
@@ -1441,7 +1387,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                   <div className="flex items-center justify-between mb-1">
                     <label
                       htmlFor="auth-modal-password"
-                      className="block text-xs font-bold text-slate-700"
+                      className="block text-xs font-bold text-ink"
                     >
                       Senha
                     </label>
@@ -1456,21 +1402,22 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     )}
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                    <Lock className="w-4 h-4 text-ink-2 absolute left-3.5 top-3" />
                     <input
                       id="auth-modal-password"
+                      aria-describedby={errorMessage ? 'auth-modal-error' : undefined}
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/70 text-sky-950 placeholder:text-slate-400 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-line text-sm bg-surface text-ink-2 placeholder:text-ink-2 focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
                     />
                     <button
                       type="button"
                       aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded p-0.5"
+                      className="absolute right-1 top-0.5 min-h-11 min-w-11 flex items-center justify-center text-ink-2 hover:text-ink-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded p-0.5"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -1485,9 +1432,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     id="remember"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-slate-300 text-brand focus:ring-ring focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded border-line text-brand focus:ring-ring focus-visible:ring-2 focus-visible:ring-ring"
                   />
-                  <label htmlFor="remember" className="text-xs text-slate-600">
+                  <label htmlFor="remember" className="text-xs text-ink-2">
                     Lembrar deste dispositivo
                   </label>
                 </div>
@@ -1511,7 +1458,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             </form>
 
             {/* Alternador de Modos */}
-            <div className="text-center mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500">
+            <div className="text-center mt-6 pt-4 border-t border-line text-xs text-ink-2">
               {authMode === 'signin' ? (
                 <p>
                   Ainda não tem acesso?{' '}

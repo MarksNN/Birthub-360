@@ -1,263 +1,246 @@
-/* ==========================================================================
-   PALETA DE CORES NEON OFICIAL — BIRTH HUB 360°
-   Rosa Neon:    #FF2D9B (Energia, Criatividade, Atitude)
-   Azul Neon:    #00D4FF (Tecnologia, Confiança, Inovação)
-   Dourado Neon: #FFC107 (Sofisticação, Prosperidade, Destaque)
-   Azul Leitura: #70D6FF (Texto suave, alta legibilidade - SEM BRANCO)
-   Preto Neon:   #0D0D0D (Fundo escuro apenas - NUNCA em textos)
-   Fundo Cards:  #14141A (Superfícies e cartões)
-   
-   REGRA MANDATÓRIA ABSOLUTA: NENHUMA FONTE DE NENHUM TEXTO OU TÍTULO PODE SER BRANCA OU PRETA.
-   Todos os títulos e textos devem usar estritamente as cores da paleta neon.
-   ========================================================================== */
-
-:root {
-  --neon-pink: #ff2d9b;
-  --neon-blue: #00d4ff;
-  --neon-gold: #ffc107;
-  --neon-black: #0d0d0d;
-  --neon-white: #70d6ff;
-  --neon-text: #70d6ff;
-  --neon-card-bg: #14141a;
-  --neon-card-border: rgba(0, 212, 255, 0.22);
+.landing-neon-root .neon-title-blue,
+.landing-neon-root h1.neon-title-blue,
+.landing-neon-root h2.neon-title-blue,
+.landing-neon-root h3.neon-title-blue,
+.landing-neon-root h4.neon-title-blue {
+  color: var(--color-heading-cyan) !important;
+  text-shadow: none;
 }
-
-/* REGRA GLOBAL ABSOLUTA: Nenhum título nem texto pode ser branco ou preto */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  color: var(--neon-blue);
-  letter-spacing: -0.02em;
+.landing-neon-root .neon-title-pink,
+.landing-neon-root h1.neon-title-pink,
+.landing-neon-root h2.neon-title-pink,
+.landing-neon-root h3.neon-title-pink,
+.landing-neon-root h4.neon-title-pink {
+  color: var(--color-heading-pink) !important;
+  text-shadow: none;
 }
-
-.landing-neon-root {
-  color: #70d6ff !important;
+.landing-neon-root .neon-title-gold,
+.landing-neon-root h1.neon-title-gold,
+.landing-neon-root h2.neon-title-gold,
+.landing-neon-root h3.neon-title-gold,
+.landing-neon-root h4.neon-title-gold {
+  color: var(--color-heading-gold) !important;
+  text-shadow: none;
 }
-
-/* Cores Neon específicas para Títulos */
-.neon-title-blue,
-h1.neon-title-blue,
-h2.neon-title-blue,
-h3.neon-title-blue,
-h4.neon-title-blue {
-  color: #00d4ff !important;
-  text-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
-}
-
-.neon-title-pink,
-h1.neon-title-pink,
-h2.neon-title-pink,
-h3.neon-title-pink,
-h4.neon-title-pink {
-  color: #ff2d9b !important;
-  text-shadow: 0 0 18px rgba(255, 45, 155, 0.45);
-}
-
-.neon-title-gold,
-h1.neon-title-gold,
-h2.neon-title-gold,
-h3.neon-title-gold,
-h4.neon-title-gold {
-  color: #ffc107 !important;
-  text-shadow: 0 0 18px rgba(255, 193, 7, 0.45);
-}
-
-/* Gradientes Vibrantes de Título (Sem Branco e Sem Preto) */
-.neon-gradient-title {
-  background: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.landing-neon-root .neon-gradient-title {
+  color: var(--color-heading-gold);
+  background: none;
+  -webkit-text-fill-color: currentColor;
   display: inline-block;
-  filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.35));
 }
-
-.grad-text-blue {
-  color: #00d4ff !important;
-  text-shadow: 0 0 14px rgba(0, 212, 255, 0.5);
+.landing-neon-root .grad-text-blue {
+  color: var(--color-heading-cyan) !important;
+  text-shadow: none;
 }
-
-.grad-text-purple {
-  color: #ff2d9b !important;
-  text-shadow: 0 0 14px rgba(255, 45, 155, 0.5);
+.landing-neon-root .grad-text-purple {
+  color: var(--color-heading-iris) !important;
+  text-shadow: none;
 }
-
-.grad-text-cyan {
-  color: #ffc107 !important;
-  text-shadow: 0 0 14px rgba(255, 193, 7, 0.5);
+.landing-neon-root .grad-text-cyan {
+  color: var(--color-heading-gold) !important;
+  text-shadow: none;
 }
-
-/* Botões Neon - Sem texto preto ou branco */
-.vancouver-btn-gradient,
-.btn-cta-light {
+.landing-neon-root .vancouver-btn-gradient,
+.landing-neon-root .btn-cta-light {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
   padding: 0.85rem 2rem;
-  border-radius: 9999px;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  border-radius: var(--radius-card);
+  font-family: var(--font-interface);
   font-weight: 800;
   font-size: 0.95rem;
-  color: #00d4ff !important;
-  background: #14141a !important;
-  border: 2px solid #00d4ff !important;
-  box-shadow:
-    0 0 25px rgba(0, 212, 255, 0.45),
-    0 0 35px rgba(255, 45, 155, 0.35);
+  color: var(--color-heading-cyan) !important;
+  background: var(--color-surface) !important;
+  border: 2px solid var(--color-heading-cyan) !important;
+  box-shadow: var(--shadow-card);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
-
-.vancouver-btn-gradient:hover,
-.btn-cta-light:hover {
+.landing-neon-root .vancouver-btn-gradient:hover,
+.landing-neon-root .btn-cta-light:hover {
   transform: translateY(-2px) scale(1.02);
-  color: #ff2d9b !important;
-  border-color: #ff2d9b !important;
-  box-shadow:
-    0 0 35px rgba(255, 45, 155, 0.65),
-    0 0 50px rgba(0, 212, 255, 0.55);
+  color: var(--color-heading-pink) !important;
+  border-color: var(--color-heading-pink) !important;
+  box-shadow: var(--shadow-card);
   filter: brightness(1.1);
 }
-
-.vancouver-btn-gradient:active,
-.btn-cta-light:active {
+.landing-neon-root .vancouver-btn-gradient:active,
+.landing-neon-root .btn-cta-light:active {
   transform: translateY(0);
 }
-
-.vancouver-btn-outline {
+.landing-neon-root .vancouver-btn-outline {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  border-radius: var(--radius-card);
+  font-family: var(--font-interface);
   font-weight: 700;
   font-size: 0.925rem;
-  color: #00d4ff !important;
-  background: rgba(0, 212, 255, 0.08) !important;
-  border: 1.5px solid #00d4ff !important;
-  box-shadow: 0 0 18px rgba(0, 212, 255, 0.2);
+  color: var(--color-heading-cyan) !important;
+  background: var(--color-border-subtle) !important;
+  border: 1.5px solid var(--color-heading-cyan) !important;
+  box-shadow: var(--shadow-card);
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
-
-.vancouver-btn-outline:hover {
-  background: rgba(0, 212, 255, 0.16) !important;
-  box-shadow: 0 0 28px rgba(0, 212, 255, 0.45);
+.landing-neon-root .vancouver-btn-outline:hover {
+  background: var(--color-border-subtle) !important;
+  box-shadow: var(--shadow-card);
   transform: translateY(-2px);
 }
-
-/* Navbar Neon */
-.vancouver-navbar,
-.navbar-sticky {
+.landing-neon-root .vancouver-navbar,
+.landing-neon-root .navbar-sticky {
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
-  background: rgba(13, 13, 13, 0.94) !important;
+  background: var(--color-border-subtle) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+  border-bottom: 1px solid var(--color-border-subtle) !important;
   transition: all 0.3s ease;
 }
-
-/* Fundo Hero Neon */
-.vancouver-hero-bg {
+.landing-neon-root .vancouver-hero-bg {
   position: absolute;
   top: -150px;
   left: 50%;
   transform: translateX(-50%);
   width: 1000px;
   height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(0, 212, 255, 0.18) 0%,
-    rgba(255, 45, 155, 0.14) 45%,
-    transparent 70%
-  );
+  background: var(--grad-glow);
   filter: blur(90px);
   pointer-events: none;
   z-index: 0;
 }
-
-/* Cards de Seção e Pilares */
-.section-card {
-  background: #14141a !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.25rem;
+.landing-neon-root .section-card {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-card);
 }
-
-.section-card:hover {
-  border-color: rgba(0, 212, 255, 0.45) !important;
-  box-shadow:
-    0 0 25px rgba(0, 212, 255, 0.2),
-    0 12px 35px rgba(0, 0, 0, 0.6) !important;
+.landing-neon-root .section-card:hover {
+  border-color: var(--color-border-subtle) !important;
+  box-shadow: var(--shadow-card);
   transform: translateY(-3px);
 }
-
-.pillar-card {
-  background: #14141a !important;
-  border-radius: 1rem;
+.landing-neon-root .pillar-card {
+  background: var(--color-surface) !important;
+  border-radius: var(--radius-card);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-.pillar-card:hover {
+.landing-neon-root .pillar-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.25);
+  box-shadow: var(--shadow-card);
 }
-
-.flow-step-card {
-  background: #14141a !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
+.landing-neon-root .flow-step-card {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
   transition: all 0.3s ease;
 }
-
-.flow-step-card:hover {
-  border-color: rgba(255, 45, 155, 0.45) !important;
-  box-shadow: 0 0 25px rgba(255, 45, 155, 0.25);
+.landing-neon-root .flow-step-card:hover {
+  border-color: var(--color-border-subtle) !important;
+  box-shadow: var(--shadow-card);
   transform: translateY(-2px);
 }
-
-/* Card Glow no Modal / Login */
-.card-glow-light {
-  background: #14141a !important;
-  border: 1px solid rgba(0, 212, 255, 0.3) !important;
-  box-shadow:
-    0 0 40px rgba(0, 212, 255, 0.18),
-    0 15px 45px rgba(0, 0, 0, 0.6) !important;
+.landing-neon-root .card-glow-light {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  box-shadow: var(--shadow-card);
+}
+.landing-neon-root .neon-badge-blue {
+  background: var(--color-border-subtle) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  color: var(--color-heading-cyan) !important;
+}
+.landing-neon-root .neon-badge-pink {
+  background: var(--color-border-subtle) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  color: var(--color-heading-pink) !important;
+}
+.landing-neon-root .neon-badge-gold {
+  background: var(--color-border-subtle) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  color: var(--color-heading-gold) !important;
+}
+.landing-neon-root .logo-glow-light {
+  filter: none;
 }
 
-/* Badges e Kickers Neon */
-.neon-badge-blue {
-  background: rgba(0, 212, 255, 0.12) !important;
-  border: 1px solid rgba(0, 212, 255, 0.4) !important;
-  color: #00d4ff !important;
+.landing-neon-root {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+.landing-neon-root p {
+  color: var(--color-text-secondary);
+  line-height: 1.75;
+}
+.landing-neon-root :where(.section-card, .pillar-card, .flow-step-card) p {
+  font-size: 15px;
+}
+.landing-neon-root :where(.section-card, .pillar-card, .flow-step-card) {
+  border: 1px solid var(--color-brand-primary);
+  border-radius: var(--radius-card);
+}
+.landing-neon-root .neon-gradient-title {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--color-heading-gold);
+}
+.landing-neon-root :where(.vancouver-btn-gradient, .btn-cta-light) {
+  border-radius: var(--radius-control);
+  background: var(--color-interactive-primary) !important;
+  color: var(--on-brand) !important;
+}
+.landing-neon-root :where(.vancouver-btn-gradient, .btn-cta-light):hover {
+  background: var(--color-interactive-hover) !important;
+}
+.landing-neon-root .vancouver-btn-outline {
+  border-radius: var(--radius-control);
+  background: var(--color-surface) !important;
+}
+.landing-neon-root :where(.vancouver-navbar, .navbar-sticky) {
+  background: var(--color-background) !important;
+}
+.landing-neon-root input {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-control);
+}
+.landing-neon-root input:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-text-primary);
+  box-shadow: 0 0 0 1000px var(--color-surface-elevated) inset;
+}
+.landing-neon-root :focus-visible {
+  outline: var(--color-focus-ring);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-neon-root * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
-.neon-badge-pink {
-  background: rgba(255, 45, 155, 0.12) !important;
-  border: 1px solid rgba(255, 45, 155, 0.4) !important;
-  color: #ff2d9b !important;
+.landing-neon-root .capability-card {
+  padding: 24px 20px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-brand-primary);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  animation: capability-enter 360ms ease-out both;
+  transition: transform 160ms ease, background-color 160ms ease;
 }
-
-.neon-badge-gold {
-  background: rgba(255, 193, 7, 0.12) !important;
-  border: 1px solid rgba(255, 193, 7, 0.4) !important;
-  color: #ffc107 !important;
-}
-
-/* Logo glow */
-.logo-glow-light {
-  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.65));
-}
+.landing-neon-root .capability-card:hover { transform: translateY(-3px); background: var(--color-surface-hover); }
+@keyframes capability-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .landing-neon-root .capability-card { animation: none; transition: none; } .landing-neon-root .capability-card:hover { transform: none; } }

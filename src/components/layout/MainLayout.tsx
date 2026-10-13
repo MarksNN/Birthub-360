@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar.js';
 import { AppTopbar } from './AppTopbar.js';
@@ -21,6 +21,18 @@ export function MainLayout({ children, activeTab: activeTabProp }: MainLayoutPro
   // a prop explícita continua tendo precedência.
   const { pathname } = useLocation();
   const activeTab = activeTabProp ?? (pathname.split('/')[2] || 'dashboard');
+  const domainAccent =
+    /forecast|revenue|dashboard|analytics|pipeline|performance|metas|predictability/.test(activeTab)
+      ? 'gold'
+      : /copiloto|ai-suite|aisuite|agent|ai-hub/.test(activeTab)
+        ? 'iris'
+        : /prospect|market-intelligence|commercial-intelligence/.test(activeTab)
+          ? 'cyan'
+          : /automation|cadence/.test(activeTab)
+            ? 'iris'
+            : /voice|call|engagement/.test(activeTab)
+              ? 'pink'
+              : 'blue';
 
   return (
     <div className="relative flex flex-col h-screen h-[100dvh] w-full overflow-hidden bg-bg font-sans text-ink antialiased selection:bg-brand selection:text-on-brand">
@@ -41,7 +53,12 @@ export function MainLayout({ children, activeTab: activeTabProp }: MainLayoutPro
         <div className="flex flex-1 flex-col min-w-0 h-full overflow-hidden">
           <AppTopbar onOpenMobileNav={toggleMobileNav} activeTab={activeTab as TabType} />
 
-          <main className="relative flex-1 overflow-y-auto">
+          <main
+            className="relative flex-1 overflow-y-auto"
+            data-accent={domainAccent}
+            data-page-accent={domainAccent}
+            style={{ '--page-accent': `var(--color-heading-${domainAccent})` } as CSSProperties}
+          >
             <DataFlowLines />
             {children}
           </main>

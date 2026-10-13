@@ -1,8 +1,7 @@
 /**
  * Identidade da plataforma — fonte de verdade única em código.
  *
- * Espelha `identidade-visual/birthhub360/` (brand book "Birth Hub 360 Brand Book
- * Cinematic", V2.0). Qualquer texto institucional da aplicação (título da aba,
+ * Espelha `identidade-visual/birthhub360/` (Brandbook, Manual Visual, Manual de Produto e Catálogo oficiais de 2026). Qualquer texto institucional da aplicação (título da aba,
  * cabeçalho do login, assinatura de e-mail, prompt de IA, splash) sai daqui —
  * não escreva "Birth Hub 360" solto num componente.
  *
@@ -40,7 +39,7 @@ export const BRAND = {
     /** Azul Neon: Tecnologia, confiança, inovação. Cor padrão de títulos, bordas ativas e destaque */
     neonBlue: '#00D4FF',
     brand: '#00D4FF',
-    brandAccent: '#33EBFF',
+    brandAccent: '#00D4FF',
     /** Rosa Neon: Energia, criatividade, atitude. Destaques, tags, inteligência de mercado e gradientes */
     neonPink: '#FF2D9B',
     pink: '#FF2D9B',
@@ -65,7 +64,7 @@ export const BRAND = {
     neonCardBorder: 'rgba(0, 212, 255, 0.22)',
     glowBorder: 'rgba(0, 212, 255, 0.22)',
     /** Tons Light complementares */
-    lightPink: '#E6007A',
+    lightPink: '#D91B7C',
     lightBlue: '#0284C7',
     lightGold: '#D97706',
     /** Semânticos complementares */

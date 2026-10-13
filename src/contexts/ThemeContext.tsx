@@ -12,16 +12,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    // Prevent FOUC by reading from localStorage immediately
-    const savedTheme = localStorage.getItem('atlas_theme') as ThemeMode | null;
-    // Default to light mode if no preference exists
-    return savedTheme === 'dark' ? 'dark' : 'light';
-  });
+  const [theme, setTheme] = useState<ThemeMode>('light');
 
   useEffect(() => {
     localStorage.setItem('atlas_theme', theme);
     const root = document.documentElement;
+    root.dataset.theme = theme;
+    root.classList.toggle('light', theme === 'light');
     if (theme === 'light') {
       root.classList.remove('dark');
     } else {
