@@ -31,6 +31,8 @@ export class GatewayGoldenSemanticJudge implements GoldenSemanticJudge {
     goldenCase,
     actual,
   }: Parameters<GoldenSemanticJudge['judge']>[0]): Promise<SemanticJudgeResult> {
+    // Pacing entre chamadas de julgamento para respeitar rate limits (TPM/RPM) no CI
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     const model = getAiModel('local-llama3-fast', 0, 'golden-dataset-judge');
     const response = await model.invoke([
       new SystemMessage(

@@ -1,10 +1,10 @@
+import { GatewayGoldenSemanticJudge } from '../src/features/intelligence/evaluation/goldenDataset.llmJudge.js';
+import { runGoldenCaseAgainstProduction } from '../src/features/intelligence/evaluation/goldenDataset.runner.js';
+import { evaluateGoldenDataset } from '../src/features/intelligence/evaluation/goldenDataset.scoring.js';
 import {
   loadGoldenDataset,
   validateToolUseCases,
 } from '../src/features/intelligence/evaluation/goldenDataset.service.js';
-import { evaluateGoldenDataset } from '../src/features/intelligence/evaluation/goldenDataset.scoring.js';
-import { GatewayGoldenSemanticJudge } from '../src/features/intelligence/evaluation/goldenDataset.llmJudge.js';
-import { runGoldenCaseAgainstProduction } from '../src/features/intelligence/evaluation/goldenDataset.runner.js';
 
 const dataset = loadGoldenDataset();
 const toolSchemas = await validateToolUseCases();
@@ -57,5 +57,21 @@ console.log(
 console.log(
   `Overall: ${report.overallScore.toFixed(3)} | threshold ${report.thresholds.overallMinimum} | ${report.passed ? 'PASS' : 'FAIL'}`,
 );
+
+const failedCases = report.cases.filter((row) => !row.passed);
+if (failedCases.length > 0) {
+  console.log(
+    'Failing cases detail:',
+    JSON.stringify(
+      failedCases.map((c) => ({
+        id: c.caseId,
+        judge: c.judge,
+        reasons: c.reasons,
+      })),
+      null,
+      2,
+    ),
+  );
+}
 
 process.exit(report.passed ? 0 : 1);

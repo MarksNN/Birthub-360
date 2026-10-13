@@ -12,6 +12,8 @@ import type { AiTokenUsage } from './types.js';
 const PRICING_PER_MILLION_TOKENS: Record<string, { input: number; output: number }> = {
   'openai/gpt-oss-20b': { input: 0.075, output: 0.3 },
   'openai/gpt-oss-120b': { input: 0.15, output: 0.6 },
+  'qwen/qwen3.8-27b': { input: 0.1, output: 0.3 },
+  'allam-2-7b': { input: 0.05, output: 0.15 },
   'local-llama3': { input: 0.15, output: 0.6 },
   'local-llama3-fast': { input: 0.075, output: 0.3 },
   'qwen-coder': { input: 0.2, output: 0.6 },

@@ -21,16 +21,17 @@ export const groqProvider: ProviderAdapter = {
     const primaryGroqModel = resolveGroqModelName(params.resolvedModel);
 
     // Lista de fallback de modelos compatíveis no Groq para tolerância a rate-limits específicos de modelo (TPD)
-    const modelCandidates =
-      primaryGroqModel === 'openai/gpt-oss-20b'
-        ? ['openai/gpt-oss-20b', 'openai/gpt-oss-120b']
-        : primaryGroqModel === 'openai/gpt-oss-120b'
-          ? ['openai/gpt-oss-120b', 'openai/gpt-oss-20b']
-          : Array.from(new Set([primaryGroqModel, 'openai/gpt-oss-120b', 'openai/gpt-oss-20b']));
+    const modelCandidates = Array.from(
+      new Set([primaryGroqModel, 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b']),
+    );
 
     let lastError: unknown;
     for (const groqModel of modelCandidates) {
       try {
+        const effectiveMaxTokens =
+          groqModel === 'qwen/qwen3.8-27b'
+            ? Math.min(params.maxTokens ?? 1000, 1000)
+            : params.maxTokens;
         return await callProvider(
           'groq',
           () =>
@@ -43,7 +44,7 @@ export const groqProvider: ProviderAdapter = {
               params.agentContext,
               params.timeoutMs,
               false, // Groq ignora user/metadata — não vazamos agentContext para fora sem necessidade.
-              { maxTokens: params.maxTokens, jsonMode: params.jsonMode },
+              { maxTokens: effectiveMaxTokens, jsonMode: params.jsonMode },
             ),
           params.retries,
         );
@@ -63,6 +64,11 @@ export const groqProvider: ProviderAdapter = {
           msg.includes('TPD') ||
           msg.includes('Rate limit reached for model')
         ) {
+          if (msg.includes('429') && !msg.includes('TPD') && !msg.includes('tokens per day')) {
+            const match = msg.match(/try again in ([0-9.]+)s/i);
+            const waitMs = match ? Math.ceil(Number(match[1]) * 1000) + 200 : 1500;
+            await new Promise((resolve) => setTimeout(resolve, Math.min(waitMs, 5000)));
+          }
           continue;
         }
         throw err;
