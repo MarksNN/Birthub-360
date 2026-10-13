@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Acesse o Birth Hub 360º — Sistema Operacional de Revenue Intelligence." />
+  <title>Birth Hub 360º | Central de Comando 360º</title>
+  <link rel="icon" type="image/svg+xml" href="logos/birthhub360-icone.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;family=Sora:wght@600;700;800&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens/birthhub360.css" />
+  <style>
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    html.light { color-scheme: light; }
+    body { margin: 0; background: var(--color-background); color: var(--color-text-primary); font-family: var(--font-interface); font-feature-settings: var(--font-features-rounded); letter-spacing: var(--tracking-rounded); line-height: 1.5; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled, input:disabled { cursor: not-allowed; opacity: .65; }
+    button:focus-visible, input:focus-visible, a:focus-visible { outline: var(--color-focus-ring); outline-offset: var(--focus-offset); }
+    .hidden { display: none !important; }
+    .login-shell { min-height: 100svh; display: grid; place-items: center; padding: 28px 20px; }
+    .login-content { width: 100%; max-width: 460px; }
+    .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+    .brand-logo { width: 56px; height: 56px; flex-shrink: 0; }
+    .brand-name { margin: 0; font: 700 20px/1.2 var(--font-display); letter-spacing: var(--tracking-display); }
+    .brand-context { margin: 5px 0 0; color: var(--color-text-muted); font-size: 11px; }
+    .icon-button { display: inline-grid; place-items: center; width: 44px; min-height: 44px; padding: 0; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-control); color: var(--color-text-secondary); background: var(--color-surface); }
+    .icon-button:hover { background: var(--color-surface-hover); color: var(--color-text-primary); }
+    #btn-theme-toggle { margin-left: auto; flex-shrink: 0; }
+    .login-card { padding: 28px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-card); }
+    .section-label { margin: 0 0 10px; font: 500 10px/1.5 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-muted); }
+    h1 { margin: 0 0 10px; font: 700 clamp(24px, 5vw, 28px)/1.25 var(--font-heading); letter-spacing: var(--tracking-display); }
+    #form-subtitle { margin: 0 0 22px; font-size: 14px; color: var(--color-text-muted); }
+    #form-desc { margin: 0; }
+    .method-switch { display: flex; gap: 6px; padding: 4px; margin-bottom: 22px; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-control); background: var(--color-surface-elevated); }
+    .method-button { position: relative; flex: 1; min-height: 40px; border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-text-muted); font-size: 12px; font-weight: 600; }
+    .method-button:hover { background: var(--color-surface-hover); }
+    .method-button.active { background: var(--color-surface); color: var(--color-text-primary); }
+    .tab-indicator { position: absolute; height: 2px; bottom: 0; left: 14px; right: 14px; background: var(--color-interactive-primary); }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; margin-bottom: 7px; color: var(--color-text-primary); font-size: 13px; font-weight: 600; }
+    .app-input { display: block; width: 100%; min-width: 0; height: 48px; padding: 12px 14px; border: 1px solid var(--color-text-muted); border-radius: var(--radius-control); background: var(--color-surface-elevated); color: var(--color-text-primary); font-family: var(--font-interface); font-size: 16px; transition: border-color .15s ease; }
+    .app-input::placeholder { color: var(--color-text-muted); opacity: 1; }
+    .app-input:hover { border-color: var(--color-interactive-primary); }
+    .app-input:focus { outline: var(--color-focus-ring); outline-offset: var(--focus-offset); border-color: var(--color-focus); }
+    .app-input[aria-invalid="true"] { border-color: var(--color-danger); }
+    .app-input:disabled { background: var(--color-surface-hover); }
+    .app-input:is(:autofill, :-webkit-autofill) { -webkit-text-fill-color: var(--color-text-primary); caret-color: var(--color-text-primary); box-shadow: inset 0 0 0 1000px var(--color-surface-elevated); }
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 58px; }
+    #btn-toggle-password { position: absolute; top: 2px; right: 2px; border: 0; background: transparent; }
+    svg { width: 20px; height: 20px; }
+    .options { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 4px 0 20px; font-size: 12px; }
+    .remember { display: flex; align-items: center; gap: 7px; min-height: 44px; cursor: pointer; color: var(--color-text-muted); }
+    .remember input { width: 18px; height: 18px; margin: 0; accent-color: var(--color-interactive-primary); }
+    .text-button { min-height: 44px; padding: 4px 0; border: 0; background: transparent; color: var(--color-text-muted); font-size: 12px; font-weight: 600; }
+    .text-button:hover { color: var(--color-interactive-hover); text-decoration: underline; }
+    .submit-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 48px; padding: 12px 16px; border: 0; border-radius: var(--radius-control); background: var(--color-interactive-primary); color: var(--palette-neon-black); font-family: var(--font-interface); font-size: 14px; font-weight: 700; }
+    .submit-button:hover:not(:disabled) { background: var(--color-interactive-hover); filter: var(--interactive-hover-filter); }
+    .submit-button[aria-busy="true"] { cursor: progress; }
+    #signup-toggle-wrapper { margin-top: 12px; text-align: center; }
+    .alert { display: flex; align-items: flex-start; gap: 10px; padding: 12px; margin-bottom: 18px; border: 1px solid var(--color-danger); border-radius: var(--radius-control); background: var(--color-surface-elevated); color: var(--color-text-primary); font-size: 13px; }
+    .alert svg { flex-shrink: 0; color: var(--color-danger); }
+    .alert p { margin: 0; }
+    .footer-label { margin: 18px 0 0; text-align: center; color: var(--color-text-muted); font: 400 10px/1.5 var(--font-mono); }
+    @media (max-width: 480px) { .login-shell { padding: 18px 16px; } .brand-row { margin-bottom: 18px; gap: 9px; } .brand-logo { width: 44px; height: 44px; } .brand-name { font-size: 17px; } .brand-context { max-width: 205px; font-size: 10px; } .login-card { padding: 22px 20px; } .options { flex-wrap: wrap; gap: 0 10px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main class="login-shell">
+    <div class="login-content">
+      <header class="brand-row">
+        <img class="brand-logo" src="logos/birthhub360-simbolo.svg" alt="Símbolo oficial do Birth Hub 360º" width="56" height="56" />
+        <div><p class="brand-name bh-heading" data-accent="gold">Birth Hub 360º</p><p class="brand-context bh-heading" data-accent="gold">Sistema Operacional de Revenue Intelligence</p></div>
+        <button id="btn-theme-toggle" class="icon-button" type="button" aria-label="Ativar modo escuro"><span id="icon-sun" class="hidden" aria-hidden="true">☀</span><span id="icon-moon" aria-hidden="true">☾</span></button>
+      </header>
+      <section aria-labelledby="form-title" class="login-card bh-card" data-accent="gold">
+        <p class="section-label bh-kicker" data-accent="gold">Central de Comando 360º</p>
+        <h1 id="form-title" class="bh-heading" data-accent="gold">Acesse sua Central de Comando.</h1>
+        <p id="form-subtitle" class="bh-heading" data-accent="gold">Informe suas credenciais para continuar.</p>
+        <p id="form-desc" class="hidden"></p>
+        <div class="method-switch" role="group" aria-label="Método de acesso">
+          <button id="tab-email" type="button" class="method-button active" aria-pressed="true">E-mail corporativo<span id="tab-indicator-email" class="tab-indicator" aria-hidden="true"></span></button>
+          <button id="tab-sso" type="button" class="method-button" aria-pressed="false">SSO Empresarial<span id="tab-indicator-sso" class="tab-indicator hidden" aria-hidden="true"></span></button>
+        </div>
+        <div id="alert-box" class="alert hidden" role="alert"><svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><p id="alert-msg"></p></div>
+        <form id="auth-form" onsubmit="event.preventDefault(); handleFormSubmit();" novalidate>
+          <div id="field-name-group" class="field hidden"><label for="login-name">Nome completo</label><input id="login-name" type="text" class="app-input" placeholder="Seu nome completo" autocomplete="name" /></div>
+          <div class="field"><label for="login-email">E-mail</label><input id="login-email" name="email" type="email" class="app-input" placeholder="executivo@empresa.com.br" required autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" /></div>
+          <div id="field-password-group" class="field"><label for="login-password">Senha</label><div class="password-wrap"><input id="login-password" name="password" type="password" class="app-input" placeholder="Sua senha" required autocomplete="current-password" /><button type="button" id="btn-toggle-password" class="icon-button" aria-label="Mostrar senha" aria-pressed="false" aria-controls="login-password"><svg id="icon-eye" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg><svg id="icon-eye-off" class="hidden" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M10 5a12 12 0 012 0c7 0 10 7 10 7a16 16 0 01-3 4M6 6a18 18 0 00-4 6s3 7 10 7a12 12 0 006-2" /></svg></button></div></div>
+          <div id="options-row" class="options"><label class="remember"><input type="checkbox" checked />Manter sessão ativa</label><button type="button" id="btn-forgot-password" class="text-button">Esqueci minha senha</button></div>
+          <button type="submit" id="btn-submit" class="submit-button"><span>Entrar no Birth Hub</span><span aria-hidden="true">→</span></button>
+        </form>
+        <div id="signup-toggle-wrapper"><button type="button" id="btn-toggle-signup" class="text-button">Não tem conta? Criar conta</button></div>
+      </section>
+      <p class="footer-label">Birth Hub 360º · Revenue Intelligence</p>
+    </div>
+  </main>
+  <script>
+    // Toggle de Tema (Dark / Light)
+    const btnThemeToggle = document.getElementById('btn-theme-toggle');
+    const iconSun = document.getElementById('icon-sun');
+    const iconMoon = document.getElementById('icon-moon');
+    let isDark = false;
+
+    btnThemeToggle.addEventListener('click', () => {
+      isDark = !isDark;
+      btnThemeToggle.setAttribute('aria-label', isDark ? 'Ativar modo claro' : 'Ativar modo escuro');
+      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        iconSun.classList.remove('hidden');
+        iconMoon.classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        iconSun.classList.add('hidden');
+        iconMoon.classList.remove('hidden');
+      }
+    });
+
+    // Toggle de Mostrar/Ocultar Senha
+    const btnTogglePassword = document.getElementById('btn-toggle-password');
+    const inputPassword = document.getElementById('login-password');
+    const iconEye = document.getElementById('icon-eye');
+    const iconEyeOff = document.getElementById('icon-eye-off');
+
+    btnTogglePassword.addEventListener('click', () => {
+      const isPassword = inputPassword.getAttribute('type') === 'password';
+      inputPassword.setAttribute('type', isPassword ? 'text' : 'password');
+      btnTogglePassword.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+      btnTogglePassword.setAttribute('aria-pressed', String(isPassword));
+      if (isPassword) {
+        iconEye.classList.add('hidden');
+        iconEyeOff.classList.remove('hidden');
+      } else {
+        iconEye.classList.remove('hidden');
+        iconEyeOff.classList.add('hidden');
+      }
+    });
+
+    // Switch de Tabs (Email corporativo vs SSO Empresarial)
+    const tabEmail = document.getElementById('tab-email');
+    const tabSso = document.getElementById('tab-sso');
+    const tabIndicatorEmail = document.getElementById('tab-indicator-email');
+    const tabIndicatorSso = document.getElementById('tab-indicator-sso');
+    const inputEmail = document.getElementById('login-email');
+
+    tabEmail.addEventListener('click', () => {
+      tabEmail.className = "method-button active";
+      tabSso.className = "method-button";
+      tabEmail.setAttribute('aria-pressed', 'true');
+      tabSso.setAttribute('aria-pressed', 'false');
+      tabIndicatorEmail.classList.remove('hidden');
+      tabIndicatorSso.classList.add('hidden');
+      inputEmail.setAttribute('placeholder', 'executivo@empresa.com.br');
+    });
+
+    tabSso.addEventListener('click', () => {
+      tabSso.className = "method-button active";
+      tabEmail.className = "method-button";
+      tabSso.setAttribute('aria-pressed', 'true');
+      tabEmail.setAttribute('aria-pressed', 'false');
+      tabIndicatorSso.classList.remove('hidden');
+      tabIndicatorEmail.classList.add('hidden');
+      inputEmail.setAttribute('placeholder', 'seuemail@seudominio.com.br');
+    });
+
+    // Switch Login / Cadastro / Esqueci minha senha
+    let isSignUp = false;
+    let isForgotPassword = false;
+
+    const btnToggleSignUp = document.getElementById('btn-toggle-signup');
+    const btnForgotPassword = document.getElementById('btn-forgot-password');
+    const fieldNameGroup = document.getElementById('field-name-group');
+    const fieldPasswordGroup = document.getElementById('field-password-group');
+    const optionsRow = document.getElementById('options-row');
+    const formTitle = document.getElementById('form-title');
+    const formSubtitle = document.getElementById('form-subtitle');
+    const formDesc = document.getElementById('form-desc');
+    const btnSubmit = document.getElementById('btn-submit');
+    const alertBox = document.getElementById('alert-box');
+
+    btnToggleSignUp.addEventListener('click', () => {
+      isSignUp = isForgotPassword ? false : !isSignUp;
+      isForgotPassword = false;
+      clearFieldErrors();
+
+      if (isSignUp) {
+        formTitle.innerText = 'Criar conta';
+        formSubtitle.innerText = 'Preencha seus dados para começar';
+        formDesc.classList.add('hidden');
+        fieldNameGroup.classList.remove('hidden');
+        fieldPasswordGroup.classList.remove('hidden');
+        optionsRow.classList.add('hidden');
+
+        btnSubmit.innerHTML = '<span>Criar conta</span>';
+        inputPassword.setAttribute('autocomplete', 'new-password');
+        btnToggleSignUp.innerText = 'Já tem conta? Fazer login';
+      } else {
+        formTitle.innerText = 'Acesse sua Central de Comando.';
+        formSubtitle.innerText = 'Informe suas credenciais para continuar.';
+        formDesc.classList.remove('hidden');
+        fieldNameGroup.classList.add('hidden');
+        fieldPasswordGroup.classList.remove('hidden');
+        optionsRow.classList.remove('hidden');
+
+        btnSubmit.innerHTML = '<span>Entrar no Birth Hub</span><span aria-hidden="true">→</span>';
+        inputPassword.setAttribute('autocomplete', 'current-password');
+        btnToggleSignUp.innerText = 'Não tem conta? Criar conta';
+      }
+    });
+
+    btnForgotPassword.addEventListener('click', () => {
+      isForgotPassword = true;
+      isSignUp = false;
+      clearFieldErrors();
+
+      formTitle.innerText = 'Redefinir senha';
+      formSubtitle.innerText = 'Recupere o acesso à sua conta';
+      formDesc.classList.add('hidden');
+      fieldNameGroup.classList.add('hidden');
+      fieldPasswordGroup.classList.add('hidden');
+      optionsRow.classList.add('hidden');
+
+      btnSubmit.innerHTML = '<span>Enviar link de redefinição</span>';
+      btnToggleSignUp.innerText = 'Voltar para o login';
+    });
+
+    function handleFormSubmit() {
+      clearFieldErrors();
+      const emailVal = inputEmail.value.trim();
+      const passVal = inputPassword.value.trim();
+
+      if (!emailVal) {
+        document.getElementById('alert-msg').innerText = 'Por favor, informe seu e-mail corporativo.';
+        alertBox.classList.remove('hidden');
+        markFieldError(inputEmail);
+        return;
+      }
+
+      if (!isForgotPassword && !passVal) {
+        document.getElementById('alert-msg').innerText = 'Por favor, informe sua senha.';
+        alertBox.classList.remove('hidden');
+        markFieldError(inputPassword);
+        return;
+      }
+
+      alertBox.classList.add('hidden');
+      alert(`Demonstração: Solicitação enviada com sucesso para ${emailVal}!`);
+    }
+
+    function markFieldError(field) {
+      field.setAttribute('aria-invalid', 'true');
+      field.setAttribute('aria-describedby', 'alert-msg');
+      field.focus();
+    }
+    function clearFieldErrors() {
+      alertBox.classList.add('hidden');
+      [inputEmail, inputPassword].forEach(field => {
+        field.removeAttribute('aria-invalid');
+        field.removeAttribute('aria-describedby');
+      });
+    }
+    [inputEmail, inputPassword].forEach(field => field.addEventListener('input', () => {
+      if (field.getAttribute('aria-invalid') === 'true') clearFieldErrors();
+    }));
+  </script>
+</body>
+</html>

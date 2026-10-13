@@ -1,34 +1,346 @@
-/**
- * Birth Hub 360º — tokens de marca em TypeScript.
- *
- * Espelho de `birthhub360.css` / `birthhub360.json` para consumo em código que
- * precisa do valor bruto (geração de SVG, e-mail transacional, canvas, PDF).
- * Em componentes React use os tokens de produto (`bg-brand`, `text-ink` …) de
- * `src/styles/globals.css` — não importe hex daqui para estilizar UI.
- */
-export const BIRTHHUB_COLORS = {
-  /** Profundidade. Base institucional escura. */
-  obsidian: '#0B132B',
-  /** Fundo de página do brand book, um degrau abaixo do Obsidian. */
-  midnight: '#08090F',
-  /** Inteligência em movimento. Cor de apoio da órbita. */
-  iris: '#5B21B6',
-  /** Valor, foco e assinatura. Cor primária de marca. */
-  gold: '#D4AF37',
-  /** Respiro. Texto sobre superfícies escuras. */
-  snow: '#F8FAFC',
-  /** Terceira cor da órbita (`oklch(52% 0.19 255)` convertida para sRGB). */
-  blue: '#0065D2',
-  goldLight: '#F7E9B8',
-  goldDeep: '#8C6D1F',
-  goldSoft: '#EBD689',
-  /** Superfície clara institucional (páginas claras do brand book). */
-  parchment: '#E9E4D9',
+/** Birth Hub 360° — espelho de birthhub360.json e birthhub360.css. */
+
+export const BIRTHHUB_TYPOGRAPHY = {
+  "display": "Sora",
+  "interface": "Inter",
+  "mono": "IBM Plex Mono",
+  "openTypeFeatures": {
+    "inter": "\"cv05\", \"cv11\", \"ss01\""
+  },
+  "letterSpacing": {
+    "rounded": "-0.012em",
+    "display": "-0.02em"
+  },
+  "fontStacks": {
+    "display": "'Sora', system-ui, -apple-system, sans-serif",
+    "interface": "'Inter', system-ui, -apple-system, sans-serif",
+    "mono": "'IBM Plex Mono', ui-monospace, monospace"
+  },
+  "heading": "Sora",
+  "body": "Inter",
+  "data": "IBM Plex Mono",
+  "kpi": "IBM Plex Mono",
+  "code": "IBM Plex Mono"
 } as const;
 
-export const BIRTHHUB_FONTS = {
-  display: '"Bodoni Moda", Georgia, "Times New Roman", serif',
-  sans: '"Inter", ui-sans-serif, system-ui, sans-serif',
+export const BIRTHHUB_RADII = {
+  "control": "12px",
+  "card": "16px",
+  "modal": "20px",
+  "pill": "9999px"
 } as const;
 
+export const BIRTHHUB_GRADIENTS = {
+  "brand": "linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%)",
+  "cta": "linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%)",
+  "vancouver": "linear-gradient(135deg, #0EA5E9 0%, #3B82F6 50%, #8B5CF6 100%)",
+  "orbit": "conic-gradient(from 0deg, #FFC107, #FF2D9B, #00D4FF, #FFC107)",
+  "cyanPink": "linear-gradient(135deg, #00D4FF 0%, #FF2D9B 100%)",
+  "gold": "linear-gradient(135deg, #FFC107 0%, #FF8F00 100%)",
+  "glow": "radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.18), transparent 70%)"
+} as const;
+
+export const BIRTHHUB_GLOWS = {
+  "blue": "0 0 24px rgba(0, 212, 255, 0.45)",
+  "cyan": "0 0 24px rgba(0, 212, 255, 0.45)",
+  "pink": "0 0 24px rgba(255, 45, 155, 0.45)",
+  "gold": "0 0 24px rgba(255, 193, 7, 0.45)"
+} as const;
+
+export const BIRTHHUB_COLORS_DARK = {
+  "neonBlue": "#00D4FF",
+  "neonPink": "#FF2D9B",
+  "neonGold": "#FFC107",
+  "neonBlack": "#0D0D0D",
+  "neonCard": "#14141A",
+  "neonWhite": "#F8F9FF",
+  "surface2": "#1C1C24",
+  "surface3": "#252530",
+  "surfaceHover": "#252532",
+  "muted": "#9EADC8",
+  "mutedSubtle": "#A1A1B5",
+  "codeBg": "#09090D",
+  "success": "#22C55E",
+  "warning": "#FFC107",
+  "danger": "#EF4444",
+  "info": "#3B82F6",
+  "iris": "#8B7DFF",
+  "border": "rgba(0, 212, 255, 0.22)",
+  "borderSubtle": "rgba(0, 212, 255, 0.18)",
+  "borderStrong": "rgba(0, 212, 255, 0.45)",
+  "shadow": "rgba(0, 0, 0, 0.65)",
+  "borderPink": "rgba(255, 45, 155, 0.25)",
+  "borderGold": "rgba(255, 193, 7, 0.3)",
+  "chiliRed": "#E63946",
+  "vanilla": "#F1FAEE",
+  "nonPhotoBlue": "#A8DADC",
+  "cerulean": "#457B9D",
+  "berkeleyBlue": "#1D3557"
+} as const;
+
+export const BIRTHHUB_COLORS_LIGHT = {
+  "cyan": "#0284C7",
+  "pink": "#D91B7C",
+  "gold": "#D97706",
+  "bg": "#F4F7FB",
+  "surface": "#FFFFFF",
+  "surface2": "#EDF2F7",
+  "surface3": "#E2E8F0",
+  "surfaceHover": "#E2E8F0",
+  "ink": "#0F172A",
+  "muted": "#64748B",
+  "mutedSubtle": "#475569",
+  "codeBg": "#F8FAFC",
+  "success": "#22C55E",
+  "warning": "#FFC107",
+  "danger": "#EF4444",
+  "info": "#3B82F6",
+  "border": "rgba(2, 132, 199, 0.25)",
+  "borderSubtle": "rgba(11, 19, 43, 0.12)",
+  "borderStrong": "rgba(2, 132, 199, 0.5)",
+  "shadow": "rgba(15, 23, 42, 0.08)",
+  "borderPink": "rgba(217, 27, 124, 0.25)",
+  "borderGold": "rgba(217, 119, 6, 0.35)",
+  "chiliRed": "#E63946",
+  "vanilla": "#F1FAEE",
+  "nonPhotoBlue": "#A8DADC",
+  "cerulean": "#457B9D",
+  "berkeleyBlue": "#1D3557",
+  "iris": "#8B7DFF"
+} as const;
+
+export const BIRTHHUB_SEMANTICS_DARK = {
+  "background": "#0D0D0D",
+  "surface": "#14141A",
+  "surfaceElevated": "#1C1C24",
+  "surfaceHover": "#252532",
+  "textPrimary": "#F8F9FF",
+  "textSecondary": "#9EADC8",
+  "textMuted": "#A1A1B5",
+  "borderSubtle": "rgba(0, 212, 255, 0.18)",
+  "borderStrong": "rgba(0, 212, 255, 0.45)",
+  "brandPrimary": "#00D4FF",
+  "brandSecondary": "#FF2D9B",
+  "brandAccent": "#FFC107",
+  "interactivePrimary": "#00D4FF",
+  "interactiveHover": "#00D4FF",
+  "focusRing": "2px solid #00D4FF",
+  "success": "#22C55E",
+  "warning": "#FFC107",
+  "danger": "#EF4444",
+  "info": "#3B82F6",
+  "border": "rgba(0, 212, 255, 0.22)",
+  "focus": "#00D4FF",
+  "primary": "#00D4FF",
+  "accent": "#FFC107",
+  "headingCyan": "#00D4FF",
+  "headingBlue": "#3B82F6",
+  "headingGold": "#FFC107",
+  "headingPink": "#FF2D9B",
+  "headingIris": "#8B7DFF",
+  "headingSuccess": "#22C55E",
+  "headingDanger": "#EF4444"
+} as const;
+
+export const BIRTHHUB_SEMANTICS_LIGHT = {
+  "background": "#F4F7FB",
+  "surface": "#FFFFFF",
+  "surfaceElevated": "#EDF2F7",
+  "surfaceHover": "#E2E8F0",
+  "textPrimary": "#0F172A",
+  "textSecondary": "#64748B",
+  "textMuted": "#475569",
+  "borderSubtle": "rgba(11, 19, 43, 0.12)",
+  "borderStrong": "rgba(2, 132, 199, 0.5)",
+  "brandPrimary": "#0284C7",
+  "brandSecondary": "#D91B7C",
+  "brandAccent": "#D97706",
+  "interactivePrimary": "#0284C7",
+  "interactiveHover": "#0284C7",
+  "focusRing": "2px solid #0284C7",
+  "success": "#22C55E",
+  "warning": "#FFC107",
+  "danger": "#EF4444",
+  "info": "#3B82F6",
+  "border": "rgba(2, 132, 199, 0.25)",
+  "focus": "#0284C7",
+  "primary": "#0284C7",
+  "accent": "#D97706",
+  "headingCyan": "color-mix(in srgb, #0284C7 85%, #0D0D0D)",
+  "headingBlue": "color-mix(in srgb, #3B82F6 80%, #0D0D0D)",
+  "headingGold": "color-mix(in srgb, #D97706 70%, #0D0D0D)",
+  "headingPink": "#D91B7C",
+  "headingIris": "color-mix(in srgb, #8B7DFF 65%, #0D0D0D)",
+  "headingSuccess": "color-mix(in srgb, #22C55E 60%, #0D0D0D)",
+  "headingDanger": "color-mix(in srgb, #EF4444 80%, #0D0D0D)"
+} as const;
+
+export const BIRTHHUB_EFFECTS_DARK = {
+  "shadowCard": "0 6px 20px rgba(0, 0, 0, 0.25)",
+  "shadowElevated": "0 12px 30px rgba(0, 0, 0, 0.65)",
+  "interactiveHoverFilter": "brightness(1.1)",
+  "focusOffset": "3px",
+  "focusShadow": "0 0 0 3px rgba(0, 212, 255, 0.2)"
+} as const;
+
+export const BIRTHHUB_EFFECTS_LIGHT = {
+  "shadowCard": "0 6px 20px rgba(0, 0, 0, 0.25)",
+  "shadowElevated": "0 12px 30px rgba(15, 23, 42, 0.08)",
+  "interactiveHoverFilter": "brightness(1.1)",
+  "focusOffset": "3px",
+  "focusShadow": "0 0 0 3px rgba(0, 212, 255, 0.2)"
+} as const;
+
+export const BIRTHHUB_CSS_NAMES = {
+  "fontStacks": {
+    "display": "font-display",
+    "interface": "font-interface",
+    "mono": "font-mono"
+  },
+  "typography": {
+    "heading": "font-heading",
+    "body": "font-body",
+    "data": "font-data",
+    "kpi": "font-kpi",
+    "code": "font-code"
+  },
+  "openTypeFeatures": {
+    "inter": "font-features-rounded"
+  },
+  "letterSpacing": {
+    "rounded": "tracking-rounded",
+    "display": "tracking-display"
+  },
+  "radii": {
+    "control": "radius-control",
+    "card": "radius-card",
+    "modal": "radius-modal",
+    "pill": "radius-pill"
+  },
+  "gradients": {
+    "brand": "grad-brand",
+    "cta": "grad-cta",
+    "vancouver": "grad-vancouver",
+    "orbit": "grad-orbit",
+    "cyanPink": "grad-cyan-pink",
+    "gold": "grad-gold",
+    "glow": "grad-glow"
+  },
+  "glows": {
+    "blue": "glow-blue",
+    "cyan": "glow-cyan",
+    "pink": "glow-pink",
+    "gold": "glow-gold"
+  },
+  "colors": {
+    "neonBlue": "palette-neon-blue",
+    "neonPink": "palette-neon-pink",
+    "neonGold": "palette-neon-gold",
+    "neonBlack": "palette-neon-black",
+    "neonCard": "palette-neon-card",
+    "neonWhite": "palette-neon-white",
+    "surface2": "palette-surface2",
+    "surface3": "palette-surface3",
+    "surfaceHover": "palette-surface-hover",
+    "muted": "palette-muted",
+    "mutedSubtle": "palette-muted-subtle",
+    "codeBg": "palette-code-bg",
+    "success": "palette-success",
+    "warning": "palette-warning",
+    "danger": "palette-danger",
+    "info": "palette-info",
+    "iris": "palette-iris",
+    "border": "palette-border",
+    "borderSubtle": "palette-border-subtle",
+    "borderStrong": "palette-border-strong",
+    "shadow": "palette-shadow",
+    "borderPink": "palette-border-pink",
+    "borderGold": "palette-border-gold",
+    "chiliRed": "palette-chili-red",
+    "vanilla": "palette-vanilla",
+    "nonPhotoBlue": "palette-non-photo-blue",
+    "cerulean": "palette-cerulean",
+    "berkeleyBlue": "palette-berkeley-blue",
+    "cyan": "palette-cyan",
+    "pink": "palette-pink",
+    "gold": "palette-gold",
+    "bg": "palette-bg",
+    "surface": "palette-surface",
+    "ink": "palette-ink"
+  },
+  "semantics": {
+    "background": "color-background",
+    "surface": "color-surface",
+    "surfaceElevated": "color-surface-elevated",
+    "surfaceHover": "color-surface-hover",
+    "textPrimary": "color-text-primary",
+    "textSecondary": "color-text-secondary",
+    "textMuted": "color-text-muted",
+    "borderSubtle": "color-border-subtle",
+    "borderStrong": "color-border-strong",
+    "brandPrimary": "color-brand-primary",
+    "brandSecondary": "color-brand-secondary",
+    "brandAccent": "color-brand-accent",
+    "interactivePrimary": "color-interactive-primary",
+    "interactiveHover": "color-interactive-hover",
+    "focusRing": "color-focus-ring",
+    "success": "color-success",
+    "warning": "color-warning",
+    "danger": "color-danger",
+    "info": "color-info",
+    "border": "color-border",
+    "focus": "color-focus",
+    "primary": "color-primary",
+    "accent": "color-accent",
+    "headingCyan": "color-heading-cyan",
+    "headingBlue": "color-heading-blue",
+    "headingGold": "color-heading-gold",
+    "headingPink": "color-heading-pink",
+    "headingIris": "color-heading-iris",
+    "headingSuccess": "color-heading-success",
+    "headingDanger": "color-heading-danger"
+  },
+  "effects": {
+    "shadowCard": "shadow-card",
+    "shadowElevated": "shadow-elevated",
+    "interactiveHoverFilter": "interactive-hover-filter",
+    "focusOffset": "focus-offset",
+    "focusShadow": "focus-shadow"
+  }
+} as const;
+
+export const BIRTHHUB_TOKEN_NOTES = {
+  "precedence": "Brandbook > Manual Visual > Manual de Produto > Catálogo. Valores ausentes são complementados pelo próximo documento.",
+  "light": "Superfícies e variantes de marca: Brandbook. textMuted #475569 e borderSubtle rgba(11, 19, 43, 0.12): Manual Visual. Estados sem variantes claras documentadas mantêm as cores oficiais do Manual Visual.",
+  "hover": "Cor primária mantida; hover oficial usa brightness(1.1), não uma nova cor hexadecimal.",
+  "focus": "focusRing é outline; focusOffset é outline-offset; focusShadow é box-shadow de input do Catálogo.",
+  "shadows": "shadowCard: metric-card-demo do Manual Visual; shadowElevated: pillar-card:hover do Manual de Produto, com cor de sombra do Brandbook.",
+  "radii": "control para controles retangulares; pill apenas nas variantes oficiais pill. Nenhum raio global de botão.",
+  "inter": "Recursos OpenType centralizados como tokens; aplicar font-feature-settings: var(--font-features-rounded) nos consumidores Inter.",
+  "conflicts": "Light: Brandbook #F4F7FB/#EDF2F7/#0F172A/#64748B versus Visual/Catálogo #F8FAFC/#F1F5F9/#0B132B/#475569. Dark muted: Brandbook #9EADC8 versus Visual/Catálogo #A1A1B5. Hover: Brandbook #252532 versus Produto #242430. Shadow alpha: Brandbook .65 versus Produto .6 e Catálogo .45; light .08 com RGB diferentes. Border strong: Brandbook .45 versus Catálogo .5 (dark), e RGB/alpha diferentes (light). Glows: Visual .45 versus Produto .35. Code: Brandbook #09090D/#F8FAFC versus Catálogo #08090F/#0B132B.",
+  "headingVariants": "Novas regras visuais: headingCyan/Blue/Gold/Pink/Iris/Success/Danger derivam exclusivamente da paleta existente; light usa misturas com Neon Black para contraste. A paleta canônica permanece intacta. bh-card/bh-heading/bh-kicker + data-accent reutilizam as variantes em Landing/Login."
+} as const;
+
+export const BIRTHHUB_TOKEN_SOURCES = [
+  "BRANDBOOK-OFICIAL-BIRTH-HUB-360.html",
+  "MANUAL-DE-IDENTIDADE-VISUAL.html",
+  "MANUAL-DE-IDENTIDADE-DO-PRODUTO.html",
+  "CATALOGO-DE-COMPONENTES.html"
+] as const;
+
+export const BIRTHHUB_COLORS = BIRTHHUB_COLORS_DARK;
+/** @deprecated Chaves de compatibilidade usadas pela Landing/Login; referências semânticas. */
+export const DEPRECATED_BIRTHHUB_TOKENS = {
+  "bg": "background",
+  "ink": "textPrimary",
+  "ink-2": "textMuted",
+  "surface-2": "surfaceElevated",
+  "line": "borderSubtle",
+  "ok": "success",
+  "critical": "danger",
+  "surface": "surface"
+} as const;
 export type BirthHubColor = keyof typeof BIRTHHUB_COLORS;
+export type BirthHubRadius = keyof typeof BIRTHHUB_RADII;
+export type BirthHubGradient = keyof typeof BIRTHHUB_GRADIENTS;
+export type BirthHubSemanticToken = keyof typeof BIRTHHUB_SEMANTICS_DARK;
