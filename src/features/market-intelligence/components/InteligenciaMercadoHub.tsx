@@ -1,18 +1,18 @@
+import { AlertTriangle, ArrowUpRight, Building2, Target, TrendingUp, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Target, Zap, Building2, TrendingUp, ArrowUpRight, AlertTriangle } from 'lucide-react';
-import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
+import { Badge } from '../../../components/ui/Badge.js';
+import { BlockedState, SourceRequiredIcon } from '../../../components/ui/BlockedState.js';
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from '../../../components/ui/Card.js';
-import { KpiCard } from '../../../components/ui/KpiCard.js';
-import { Badge } from '../../../components/ui/Badge.js';
+import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import { EmptyState } from '../../../components/ui/EmptyState.js';
-import { BlockedState, SourceRequiredIcon } from '../../../components/ui/BlockedState.js';
+import { KpiCard } from '../../../components/ui/KpiCard.js';
 import { Skeleton } from '../../../components/ui/Skeleton.js';
 
 type CatalogCompany = {
@@ -184,7 +184,12 @@ export function InteligenciaMercadoHub() {
         if (!cancelled) {
           // Em caso de falha de rede/servidor offline, usa a amostra oficial para permitir visualização
           setCompanies(FALLBACK_SAMPLE_COMPANIES);
-          setMeta({ page: 1, pageSize: 25, total: FALLBACK_SAMPLE_COMPANIES.length, totalPages: 1 });
+          setMeta({
+            page: 1,
+            pageSize: 25,
+            total: FALLBACK_SAMPLE_COMPANIES.length,
+            totalPages: 1,
+          });
           setDataset(FALLBACK_SAMPLE_DATASET);
           setError(null);
         }
