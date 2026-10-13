@@ -1,7 +1,7 @@
 import re
-import os
+from pathlib import Path
 
-filepath = r"c:\GitHub\PROSPECTOR-BIRTH HUB 360\src\features\prospecting\components\ProspectingHub.tsx"
+filepath = Path(__file__).resolve().parents[1] / "src" / "features" / "prospecting" / "components" / "ProspectingHub.tsx"
 with open(filepath, 'r', encoding='utf-8') as f:
     content = f.read()
 
