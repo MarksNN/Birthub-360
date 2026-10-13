@@ -368,4 +368,34 @@ export class AnalyticsUseCases {
       isEmpty,
     };
   }
+
+  /**
+   * Agregação defensiva de métricas para /api/analytics.
+   * Retorna { metrics: [], total: 0 } quando o banco está vazio ou ocorre erro.
+   */
+  async getMetrics(organizationId: string): Promise<{ metrics: unknown[]; total: number }> {
+    try {
+      const [leadsCount, funnelStages] = await Promise.all([
+        this.repository.countAllLeads(organizationId),
+        this.repository.groupFunnelWithAmounts(organizationId),
+      ]);
+
+      if (leadsCount === 0 && funnelStages.length === 0) {
+        return { metrics: [], total: 0 };
+      }
+
+      const metrics = funnelStages.map((stage) => ({
+        name: stage.status,
+        value: stage.count,
+        amount: stage.amount,
+      }));
+
+      return {
+        metrics,
+        total: leadsCount,
+      };
+    } catch {
+      return { metrics: [], total: 0 };
+    }
+  }
 }

@@ -46,6 +46,10 @@ router.post('/products', writeRoles, (req, res, next) => {
   return container.resolve<Crm360Controller>('Crm360Controller').createProduct(req, res, next);
 });
 
+router.get('/deals', (req, res, next) =>
+  container.resolve<Crm360Controller>('Crm360Controller').getDeals(req, res, next),
+);
+
 router.get('/deals/:leadId/items', (req, res, next) =>
   container.resolve<Crm360Controller>('Crm360Controller').getDealItems(req, res, next),
 );

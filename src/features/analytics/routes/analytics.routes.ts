@@ -8,6 +8,7 @@ function resolve(): AnalyticsController {
   return container.resolve<AnalyticsController>('AnalyticsController');
 }
 
+router.get('/', (req, res, next) => resolve().getMetrics(req, res, next));
 router.get('/overview', (req, res, next) => resolve().getOverview(req, res, next));
 router.get('/dashboard', (req, res, next) => resolve().getDashboard(req, res, next));
 router.get('/sales-summary', (req, res, next) => resolve().getSalesSummary(req, res, next));

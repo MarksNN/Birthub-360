@@ -18,6 +18,7 @@ import type {
 export interface ICrm360Repository {
   getOverviewData(organizationId: string): Promise<CrmOverviewData>;
   getPipelines(organizationId: string, entity?: string): Promise<CrmPipeline[]>;
+  getDeals(organizationId: string): Promise<unknown[]>;
   getBoardLeads(
     organizationId: string,
     funnel?: string,

@@ -45,9 +45,18 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 
-    # Proxy para a aplicação Node.js
+    # Raiz do frontend SPA
+    root /home/ubuntu/birthhub-360/dist;
+    index index.html;
+
+    # Fallback SPA para permitir recarregamento (F5) e acesso direto por link sem retornar erro 403/500
     location / {
-        proxy_pass http://localhost:3000;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy para a API Node.js
+    location /api/ {
+        proxy_pass http://localhost:3024;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -62,7 +71,7 @@ server {
 
     # WebSocket support
     location /ws {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3024;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -124,9 +133,18 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 
-    # Proxy para a aplicação Node.js
+    # Raiz do frontend SPA
+    root /home/ubuntu/birthhub-360/dist;
+    index index.html;
+
+    # Fallback SPA para permitir recarregamento (F5) e acesso direto por link sem retornar erro 403/500
     location / {
-        proxy_pass http://localhost:3000;
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    # Proxy para a API Node.js
+    location /api/ {
+        proxy_pass http://localhost:3024;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -141,7 +159,7 @@ server {
 
     # WebSocket support
     location /ws {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3024;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "Upgrade";

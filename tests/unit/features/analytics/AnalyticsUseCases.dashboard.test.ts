@@ -256,3 +256,45 @@ describe('buildCohortCsv', () => {
     expect(buildCohortCsv([])).toBe('Mes,Total de Leads,Ganhos em 30 dias,Ganhos em 60 dias');
   });
 });
+
+describe('AnalyticsUseCases.getMetrics — agregação defensiva', () => {
+  it('retorna { metrics: [], total: 0 } quando o banco está vazio', async () => {
+    const repo = buildFakeRepository({
+      countAllLeads: vi.fn().mockResolvedValue(0),
+      groupFunnelWithAmounts: vi.fn().mockResolvedValue([]),
+    });
+    const useCases = new AnalyticsUseCases(repo);
+
+    const result = await useCases.getMetrics(ORG);
+
+    expect(result).toEqual({ metrics: [], total: 0 });
+  });
+
+  it('retorna { metrics: [], total: 0 } defensivamente quando o repositório lança erro', async () => {
+    const repo = buildFakeRepository({
+      countAllLeads: vi.fn().mockRejectedValue(new Error('Database empty or unavailable')),
+    });
+    const useCases = new AnalyticsUseCases(repo);
+
+    const result = await useCases.getMetrics(ORG);
+
+    expect(result).toEqual({ metrics: [], total: 0 });
+  });
+
+  it('retorna métricas agregadas e total quando existem leads', async () => {
+    const repo = buildFakeRepository({
+      countAllLeads: vi.fn().mockResolvedValue(10),
+      groupFunnelWithAmounts: vi.fn().mockResolvedValue([
+        { status: 'Lead_Recebido', count: 6, amount: 12000 },
+        { status: 'Negocios_Ganhos', count: 4, amount: 48000 },
+      ]),
+    });
+    const useCases = new AnalyticsUseCases(repo);
+
+    const result = await useCases.getMetrics(ORG);
+
+    expect(result.total).toBe(10);
+    expect(result.metrics).toHaveLength(2);
+    expect(result.metrics[0]).toEqual({ name: 'Lead_Recebido', value: 6, amount: 12000 });
+  });
+});

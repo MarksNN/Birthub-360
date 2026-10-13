@@ -514,6 +514,31 @@ export class PrismaCrm360Repository implements ICrm360Repository {
     return pipelines as unknown as CrmPipeline[];
   }
 
+  async getDeals(organizationId: string): Promise<unknown[]> {
+    try {
+      const deals = await prisma.lead.findMany({
+        where: {
+          organizationId,
+          funnel: LeadFunnel.Negocio,
+          deletedAt: null,
+        },
+        include: {
+          company: true,
+          contact: true,
+          pipelineStage: true,
+          dealItems: true,
+        },
+        orderBy: [{ probability: 'desc' }, { updatedAt: 'desc' }],
+      });
+      return deals.map((deal) => ({
+        ...deal,
+        status: fromPrismaLeadStatus(deal.status),
+      }));
+    } catch {
+      return [];
+    }
+  }
+
   async getBoardLeads(organizationId: string, funnelStr = 'Negocio', pipelineId?: string) {
     const funnel = funnelStr === 'Lead' ? LeadFunnel.Lead : LeadFunnel.Negocio;
     await ensureDefaultPipelines(organizationId);

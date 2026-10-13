@@ -18,6 +18,10 @@ export class Crm360UseCases {
     return this.crm360Repository.getPipelines(organizationId);
   }
 
+  async getDeals(organizationId: string) {
+    return this.crm360Repository.getDeals(organizationId);
+  }
+
   async getBoardLeads(organizationId: string, funnel?: string, pipelineId?: string) {
     return this.crm360Repository.getBoardLeads(organizationId, funnel, pipelineId);
   }
