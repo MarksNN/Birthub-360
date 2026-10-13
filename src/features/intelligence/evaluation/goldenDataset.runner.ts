@@ -49,14 +49,14 @@ export async function runGoldenCaseAgainstProduction(goldenCase: GoldenCase): Pr
     case 'rag':
       return knowledge.answerTechnicalQuestion(goldenCase.input);
     case 'tool_use': {
-      const model = getAiModel('local-llama3-fast', 0, 'golden-tool-router');
+      const model = getAiModel('local-llama3-fast', 0.2, 'golden-tool-router');
       const response = await model.invoke([
         new SystemMessage(
           'Selecione exatamente uma ferramenta para o cenário dentre as ferramentas disponíveis: ' +
             'get_lead_context (para consultar contexto ou dados de lead por leadId), ' +
             'update_lead_qualification (para atualizar qualificação, score, summary e status do lead), ' +
             'notify_team (para alertar ou notificar a equipe sobre eventos ou leads de alta prioridade). ' +
-            'Responda apenas JSON {"tool":"nome_exato","args":{}}. Não execute a ferramenta.',
+            'Responda apenas JSON {"tool":"nome_exato","args":{"campo":"valor"}}. Não execute a ferramenta.',
         ),
         new HumanMessage(goldenCase.input.scenario),
       ]);

@@ -106,6 +106,16 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
         {
           id: 'signals-risks',
           label: 'Sinais & Riscos',
+          icon: TAB_META['signals-risks'].icon,
+          primaryTab: 'signals-risks',
+          subItems: [
+            { tab: 'signals-risks', path: 'signals-risks/radar', label: 'Radar de Sinais' },
+            { tab: 'signals-risks', path: 'signals-risks/deal-risks', label: 'Riscos de Deals' },
+          ],
+        },
+        {
+          id: 'intelligence',
+          label: 'Hub de IA',
           icon: TAB_META.intelligence.icon,
           primaryTab: 'intelligence',
         },
