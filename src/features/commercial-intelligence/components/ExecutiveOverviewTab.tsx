@@ -547,7 +547,7 @@ export function ExecutiveOverviewTab({ filter }: ExecutiveOverviewTabProps) {
       {indicators && Array.isArray(indicators.indicators) && indicators.indicators.length > 0 && (
         <div>
           <h2 className="text-sm font-bold text-ink px-1 mb-2">
-            Leading Indicators — semana atual
+            Indicadores Antecedentes — semana atual
           </h2>
           <div className="flex flex-wrap items-stretch gap-2 overflow-x-auto pb-1">
             {indicators.indicators.map((point, i) => (

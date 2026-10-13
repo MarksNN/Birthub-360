@@ -529,7 +529,7 @@ export const DEFAULT_DAILY_PLAN: DailyTask[] = [
   {
     id: 'task-4',
     timeBlock: '14:00 - 16:00',
-    title: 'Bloco 4: Limpeza de Estoque (Aging Cut)',
+    title: 'Bloco 4: Limpeza de Estoque (Tempo de Permanência)',
     description:
       'Atacar a fila de 130 leads parados em "Em Cadência" (especialmente os 55 parados há > 30 dias). Decidir: aplicar cadência de 6-8 toques ou mover para Desqualificado (JUNK).',
     tool: 'Bitrix24 (Filtro Em Cadência > 15 dias)',

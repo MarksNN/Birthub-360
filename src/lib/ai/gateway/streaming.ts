@@ -20,6 +20,7 @@ import { toChatCompletionMessages } from './parsing.js';
 import { estimateCostUsd } from './pricing.js';
 import { readProviderError } from './redaction.js';
 import { traceAiGeneration } from './telemetry.js';
+import { groqTelemetryService } from './groqTelemetry.service.js';
 import type { AiStreamChunk, AiStreamResult, ChatCompletionResponse } from './types.js';
 
 export async function* streamChatCompletion(
@@ -44,6 +45,7 @@ export async function* streamChatCompletion(
   const requestMessages = toChatCompletionMessages(messages);
   const timeoutMs = resolveFallbackTimeoutMs();
   const startedAt = Date.now();
+  let firstTokenAt: number | null = null;
 
   let response: Response;
   try {
@@ -109,6 +111,9 @@ export async function* streamChatCompletion(
         if (parsed.usage) usage = parsed.usage;
         const delta = parsed.choices?.[0]?.delta?.content;
         if (delta) {
+          if (firstTokenAt === null) {
+            firstTokenAt = Date.now();
+          }
           fullContent += delta;
           yield { delta };
         }
@@ -121,15 +126,29 @@ export async function* streamChatCompletion(
 
   await recordCircuitSuccess('groq');
 
+  const tokenUsage = {
+    totalTokens: usage?.total_tokens ?? 0,
+    promptTokens: usage?.prompt_tokens ?? 0,
+    completionTokens: usage?.completion_tokens ?? 0,
+  };
+  const estimatedCost = estimateCostUsd(modelUsed, tokenUsage);
+  const ttftMs = firstTokenAt ? firstTokenAt - startedAt : Date.now() - startedAt;
+  const latencyMs = Date.now() - startedAt;
+
   recordAiUsageCost(
     'groq',
     requestContext.getStore()?.tenantId,
-    estimateCostUsd(modelUsed, {
-      totalTokens: usage?.total_tokens ?? 0,
-      promptTokens: usage?.prompt_tokens ?? 0,
-      completionTokens: usage?.completion_tokens ?? 0,
-    }),
+    estimatedCost,
   );
+
+  groqTelemetryService.recordGroqCall({
+    model: modelUsed,
+    ttftMs,
+    latencyMs,
+    usage: tokenUsage,
+    costUsd: estimatedCost,
+    organizationId: requestContext.getStore()?.tenantId ?? null,
+  });
 
   traceAiGeneration({
     provider: 'groq',

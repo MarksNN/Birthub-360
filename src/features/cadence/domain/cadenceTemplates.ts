@@ -17,7 +17,148 @@ export interface CadenceJourneyTemplate {
   }[];
 }
 
+export const DEFAULT_PLAYBOOK_TEMPLATES: CadenceJourneyTemplate[] = [
+  {
+    id: 'outbound-frio-logistica',
+    name: 'Outbound Frio Logística',
+    targetBrand: 'Ambas',
+    category: 'Outbound',
+    persona: 'Diretores de Logística, Gerentes de Frota e Decisores Operacionais de Transporte',
+    description:
+      'Cadência fria multicanal (WhatsApp, E-mail e Ligação SDR) focada em redução de custos com combustível, controle de sinistros e telemetria para transportadoras e operadores logísticos.',
+    touches: [
+      {
+        order: 1,
+        channel: 'whatsapp',
+        delayHoursFromPrevious: 0,
+        stepTitle: 'Quebra-Gelo WhatsApp Operacional',
+        templateRef:
+          'Olá {{contact_name}}, tudo bem? Vi que você lidera as operações na {{company_name}}. Desenvolvemos um benchmark de redução de sinistros e economia de combustível em transportadoras que tem gerado até 12% de economia operacional. Vale uma troca rápida de 10 minutos?',
+      },
+      {
+        order: 2,
+        channel: 'email',
+        delayHoursFromPrevious: 4,
+        stepTitle: 'Estudo de Caso & ROI Logístico',
+        templateRef:
+          'Assunto: Benchmark de Eficiência Logística para a {{company_name}}\n\nOlá {{contact_name}},\n\nComplementando minha mensagem, compartilhamos com operações semelhantes à {{company_name}} nossa análise de telemetria e segurança rodoviária com resultados em menos de 45 dias.\n\nPodemos agendar uma breve conversa esta semana?',
+      },
+      {
+        order: 3,
+        channel: 'voice',
+        delayHoursFromPrevious: 24,
+        stepTitle: 'Ligação de Conexão SDR',
+        templateRef:
+          'Contato telefônico consultivo para validar o dimensionamento da frota da transportadora e dores com rotas críticas.',
+      },
+      {
+        order: 4,
+        channel: 'whatsapp',
+        delayHoursFromPrevious: 48,
+        stepTitle: 'Vídeo Demonstrativo de Telemetria',
+        templateRef:
+          '{{contact_name}}, gravei uma demonstração rápida de 1 minuto mostrando como a plataforma alerta o gestor sobre infrações e manutenções preditivas. Consegue dar uma olhada?',
+      },
+      {
+        order: 5,
+        channel: 'email',
+        delayHoursFromPrevious: 72,
+        stepTitle: 'Convite para Teste Piloto & Agenda',
+        templateRef:
+          'Assunto: Proposta de Piloto Operacional — {{company_name}}\n\nOlá {{contact_name}},\n\nCaso queira avaliar a aderência em 3 veículos da sua frota sem custo de implantação, você pode selecionar o melhor horário na minha agenda:\n\n👉 {{booking_link}}\n\nAbraço,\nEquipe Comercial',
+      },
+    ],
+  },
+  {
+    id: 'reativacao-perdidos',
+    name: 'Reativação de Perdidos',
+    targetBrand: 'Ambas',
+    category: 'Reativação',
+    persona: 'Leads e oportunidades perdidas nos últimos meses por timing, preço ou prioridade',
+    description:
+      'Sequência de resgate para reaquecer leads perdidos com abordagem empática, novidades do produto e condição comercial exclusiva de reativação.',
+    touches: [
+      {
+        order: 1,
+        channel: 'whatsapp',
+        delayHoursFromPrevious: 0,
+        stepTitle: 'Retomada de Contato Empática',
+        templateRef:
+          'Olá {{contact_name}}! Estava revendo nossas conversas sobre a operação da {{company_name}}. Sei que na época o timing não era o ideal. Como estão os projetos da frota para este trimestre?',
+      },
+      {
+        order: 2,
+        channel: 'email',
+        delayHoursFromPrevious: 24,
+        stepTitle: 'Atualizações de Produto & Novo Modelo',
+        templateRef:
+          'Assunto: Novidades operacionais e novo formato para a {{company_name}}\n\nOlá {{contact_name}},\n\nDesde nosso último contato, implementamos melhorias significativas na telemetria e uma nova política comercial com implantação facilitada.\n\nSeria produtivo batermos um papo de 15 minutos para atualizar seu cenário?',
+      },
+      {
+        order: 3,
+        channel: 'voice',
+        delayHoursFromPrevious: 48,
+        stepTitle: 'Ligação SDR de Reativação',
+        templateRef:
+          'Ligação rápida para entender se as dores operacionais anteriores ainda persistem e apresentar condições exclusivas.',
+      },
+      {
+        order: 4,
+        channel: 'whatsapp',
+        delayHoursFromPrevious: 96,
+        stepTitle: 'Condição Especial de Retomada',
+        templateRef:
+          '{{contact_name}}, conseguimos liberar uma condição especial sem taxa de adesão para retomarmos a parceria com a {{company_name}} ainda este mês. Consegue falar 5 minutinhos hoje?',
+      },
+    ],
+  },
+  {
+    id: 'passagem-bastao-sdr-closer',
+    name: 'Passagem de Bastão SDR/Closer',
+    targetBrand: 'Ambas',
+    category: 'Fechamento',
+    persona: 'Leads qualificados e reuniões agendadas que necessitam de confirmação e passagem para o Closer',
+    description:
+      'Fluxo de passagem de bastão garantindo presença do decisor (anti no-show), envio de briefing pré-call e alinhamento com o especialista de fechamento.',
+    touches: [
+      {
+        order: 1,
+        channel: 'whatsapp',
+        delayHoursFromPrevious: 0,
+        stepTitle: 'Confirmação e Apresentação do Closer',
+        templateRef:
+          'Olá {{contact_name}}! Reunião agendada com sucesso! Quem irá conduzir nossa conversa será nosso especialista de contas estratégicas. Ele já está a par de todos os detalhes da {{company_name}}.',
+      },
+      {
+        order: 2,
+        channel: 'email',
+        delayHoursFromPrevious: 2,
+        stepTitle: 'Pauta Executiva & Acesso à Sala',
+        templateRef:
+          'Assunto: Confirmação de Demonstração & Pauta Executiva — {{company_name}}\n\nOlá {{contact_name}},\n\nPara garantir máximo aproveitamento do seu tempo, segue o link da sala e a pauta da nossa reunião:\n\n1. Diagnóstico do cenário atual da frota\n2. Demonstração prática da solução\n3. Simulação de ROI e próximos passos\n\nLink da reunião: {{meeting_url}}\n\nNos falamos em breve!',
+      },
+      {
+        order: 3,
+        channel: 'whatsapp',
+        delayHoursFromPrevious: 20,
+        stepTitle: 'Lembrete Pré-Call (Anti No-Show)',
+        templateRef:
+          'Oi {{contact_name}}, passando para confirmar nossa reunião hoje às {{meeting_time}}. Segue o link de acesso direto: {{meeting_url}}. Nos vemos lá!',
+      },
+      {
+        order: 4,
+        channel: 'voice',
+        delayHoursFromPrevious: 24,
+        stepTitle: 'Call de Execução e Follow-up Closer',
+        templateRef:
+          'Reunião de apresentação comercial e envio imediato de proposta formal com os termos alinhados.',
+      },
+    ],
+  },
+];
+
 export const CADENCE_JOURNEY_TEMPLATES: CadenceJourneyTemplate[] = [
+  ...DEFAULT_PLAYBOOK_TEMPLATES,
   {
     id: 'outbound-frota-pesada-can',
     name: 'Outbound B2B Frota Pesada (Telemetria CAN & Diesel - Birth Hub 360)',

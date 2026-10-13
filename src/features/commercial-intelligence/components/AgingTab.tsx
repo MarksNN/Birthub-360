@@ -52,7 +52,7 @@ export function AgingTab({ filter }: { filter: CommercialFilter }) {
     return (
       <EmptyState
         title="Nenhum negócio aberto"
-        description="Aging é calculado sobre negócios abertos do funil Negócio."
+        description="O tempo de permanência é calculado sobre negócios abertos do funil Negócio."
       />
     );
   }
@@ -61,7 +61,7 @@ export function AgingTab({ filter }: { filter: CommercialFilter }) {
     <div className="space-y-6">
       <Card padding="sm">
         <h3 className="text-sm font-bold text-ink mb-3">
-          Aging de oportunidades (desde a criação)
+          Tempo de permanência de oportunidades (desde a criação)
         </h3>
         <div className="space-y-2">
           {data.buckets.map((bucket) => (
@@ -87,7 +87,7 @@ export function AgingTab({ filter }: { filter: CommercialFilter }) {
       </Card>
 
       <Card padding="sm">
-        <h3 className="text-sm font-bold text-ink mb-1">Aging por etapa</h3>
+        <h3 className="text-sm font-bold text-ink mb-1">Tempo de permanência por etapa</h3>
         <p className="text-[11px] text-ink-2 mb-3">
           Limiar crítico: {data.criticalThresholdDays} dias na etapa atual.
           {data.trackingSince
@@ -122,7 +122,7 @@ export function AgingTab({ filter }: { filter: CommercialFilter }) {
                         className="text-critical font-semibold underline decoration-dotted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
                         onClick={() =>
                           setDrillDown({
-                            title: `Acima do aging crítico — ${stage.stageName}`,
+                            title: `Acima do tempo crítico de permanência — ${stage.stageName}`,
                             stageId: stage.stageId,
                             agingCritical: true,
                           })

@@ -9,6 +9,7 @@ import {
   Cpu,
   Database,
   FileText,
+  Gauge,
   GraduationCap,
   Loader2,
   Search,
@@ -31,6 +32,7 @@ import { type KnowledgeDocumentSummary, knowledgeApi } from '../../knowledge/kno
 import { AgentQualityPanel } from './AgentQualityPanel.js';
 import { AIPendingActions } from './AIPendingActions.js';
 import { AISuiteHub } from './AISuiteHub.js';
+import { GroqTelemetryPanel } from './GroqTelemetryPanel.js';
 import { CopilotoIaHub } from '../../copiloto-ia/components/CopilotoIaHub.js';
 import { AutomationGuide } from './AutomationGuide.js';
 import { B2BGenerator } from './B2BGenerator.js';
@@ -40,6 +42,7 @@ import { SuperagentCreator } from './SuperagentCreator.js';
 import { SwarmDashboard } from './SwarmDashboard.js';
 
 export type IntelligenceTab =
+  | 'telemetry'
   | 'ai_suite'
   | 'swarm'
   | 'methodologies'
@@ -64,9 +67,16 @@ interface IntelligenceHubProps {
 const TOOL_TABS: {
   id: IntelligenceTab;
   label: string;
-  icon: typeof Bot | typeof Cpu;
+  icon: typeof Bot | typeof Cpu | typeof Gauge;
   description: string;
 }[] = [
+  {
+    id: 'telemetry',
+    label: 'Telemetria Groq Cloud',
+    icon: Gauge,
+    description:
+      'Métricas de TTFT (Time to First Token), consumo de tokens e custo estimado das chamadas aos modelos da Groq Cloud.',
+  },
   {
     id: 'ai_suite',
     label: 'Suíte dos 20 Motores de IA',
@@ -305,6 +315,7 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
       </button>
 
       <motion.div key={activeTab} initial="hidden" animate="show" variants={fadeInUp}>
+        {activeTab === 'telemetry' && <GroqTelemetryPanel />}
         {activeTab === 'ai_suite' && <AISuiteHub />}
         {activeTab === 'swarm' && <SwarmDashboard />}
         {activeTab === 'quality' && <AgentQualityPanel />}

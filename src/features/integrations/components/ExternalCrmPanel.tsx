@@ -19,6 +19,7 @@ import {
   Link2,
   Loader2,
   Lock,
+  PlugZap,
   PlusCircle,
   RefreshCw,
   Share2,
@@ -203,6 +204,11 @@ export function ExternalCrmPanel({ providerKey, displayName, authType }: Externa
 
   // Action States
   const [saving, setSaving] = useState(false);
+  const [testingBeforeSave, setTestingBeforeSave] = useState(false);
+  const [pingResult, setPingResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
   const [testingId, setTestingId] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{
     id: string;
@@ -280,12 +286,58 @@ export function ExternalCrmPanel({ providerKey, displayName, authType }: Externa
     setFormInboundEvents(false);
     setShowTokenText(false);
     setFormValidationErrors({});
+    setTestingBeforeSave(false);
+    setPingResult(null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    if (saving) return;
+    if (saving || testingBeforeSave) return;
     setIsModalOpen(false);
+  };
+
+  // Ping / Test connection before saving
+  const handlePingBeforeSave = async () => {
+    if (!validateForm()) {
+      SoundFX.play('error');
+      return;
+    }
+
+    setTestingBeforeSave(true);
+    setPingResult(null);
+    try {
+      const res = await fetch(`/api/integrations/${providerKey}/ping`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: providerKey,
+          token: formToken.trim(),
+          apiKey: formToken.trim(),
+          accessToken: formToken.trim(),
+          domain: formDomain.trim(),
+          boardId: formBoardId.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        throw new Error(data.error || 'Credenciais inválidas ou rejeitadas pelo provedor.');
+      }
+
+      SoundFX.play('success');
+      setPingResult({
+        success: true,
+        message: data.message || `Conexão com ${displayName} validada com sucesso!`,
+      });
+      toast.success(data.message || `Conexão com ${displayName} validada com sucesso!`);
+    } catch (err: unknown) {
+      SoundFX.play('error');
+      const msg = err instanceof Error ? err.message : 'Falha na validação em tempo real.';
+      setPingResult({ success: false, message: msg });
+      toast.error(msg);
+    } finally {
+      setTestingBeforeSave(false);
+    }
   };
 
   // Save connection
@@ -937,24 +989,58 @@ export function ExternalCrmPanel({ providerKey, displayName, authType }: Externa
                 </label>
               </div>
 
+              {/* Banner de Resultado do Teste em Tempo Real */}
+              {pingResult && (
+                <div
+                  className={`p-3 rounded-xl border text-xs flex items-start gap-2.5 transition-all ${
+                    pingResult.success
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20'
+                      : 'bg-red-50 text-red-800 border-red-200 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/20'
+                  }`}
+                >
+                  {pingResult.success ? (
+                    <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600 dark:text-red-400" />
+                  )}
+                  <p className="font-medium leading-relaxed">{pingResult.message}</p>
+                </div>
+              )}
+
               {/* Botões do Modal */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-line">
+              <div className="flex items-center justify-between gap-3 pt-3 border-t border-line">
                 <button
                   type="button"
-                  onClick={handleCloseModal}
-                  disabled={saving}
-                  className="px-4 py-2 text-sm font-medium text-ink-2 hover:text-ink hover:bg-surface-2 rounded-xl transition-colors disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  disabled={testingBeforeSave || saving}
+                  onClick={handlePingBeforeSave}
+                  className="px-4 py-2 bg-surface-2 hover:bg-surface-3 text-ink font-semibold text-sm rounded-xl border border-line flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
-                  Cancelar
+                  {testingBeforeSave ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-brand" />
+                  ) : (
+                    <PlugZap className="w-4 h-4 text-brand" />
+                  )}
+                  {testingBeforeSave ? 'Testando Conexão...' : 'Testar Conexão'}
                 </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-5 py-2 bg-brand text-on-brand font-bold text-sm rounded-xl shadow-sm hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                >
-                  {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {saving ? 'Validando e Salvando...' : 'Salvar Conexão'}
-                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    disabled={saving || testingBeforeSave}
+                    className="px-4 py-2 text-sm font-medium text-ink-2 hover:text-ink hover:bg-surface-2 rounded-xl transition-colors disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving || testingBeforeSave}
+                    className="px-5 py-2 bg-brand text-on-brand font-bold text-sm rounded-xl shadow-sm hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  >
+                    {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {saving ? 'Validando e Salvando...' : 'Salvar Conexão'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -1,5 +1,4 @@
 import type { Express } from 'express';
-import { unavailableLegacyModule } from './legacyModuleGate.js';
 import { activityRoutes } from '../features/activities/routes/activity.routes.js';
 import { analyticsRoutes } from '../features/analytics/routes/analytics.routes.js';
 import { eventsRoutes } from '../features/analytics/routes/events.routes.js';
@@ -26,18 +25,18 @@ import { featureFlagsRouter } from '../features/feature-flags/routes/featureFlag
 import { gamificationRoutes } from '../features/gamification/routes/gamification.routes.js';
 import { birthVoiceRoutes } from '../features/integrations/birth-voice/birthVoice.routes.js';
 import { bitrixRoutes } from '../features/integrations/bitrix/bitrix.routes.js';
-import { externalCrmRoutes } from '../features/integrations/shared/externalCrm.routes.js';
 import { hubTasksRoutes } from '../features/integrations/bitrix/hubTasks.routes.js';
 import { emailRoutes } from '../features/integrations/email/email.routes.js';
 import { googleRoutes } from '../features/integrations/google/google.routes.js';
 import { omieRoutes } from '../features/integrations/omie/omie.routes.js';
+import { integrationsPingRoutes } from '../features/integrations/routes/integrationsPing.routes.js';
+import { externalCrmRoutes } from '../features/integrations/shared/externalCrm.routes.js';
 import { slackRoutes } from '../features/integrations/slack/slack.routes.js';
 import { stripeRoutes } from '../features/integrations/stripe/stripe.routes.js';
 import { threecxRoutes } from '../features/integrations/threecx/threecx.routes.js';
 import { whatsappRoutes } from '../features/integrations/whatsapp/whatsapp.routes.js';
 import { agentRoutes } from '../features/intelligence/routes/agent.routes.js';
 import { commercialAgentRoutes } from '../features/intelligence/routes/commercial-agent.routes.js';
-import { salesOrchestrationRoutes } from '../features/sales-orchestration/server/salesOrchestration.routes.js';
 import { intelligenceRoutes } from '../features/intelligence/routes/intelligence.routes.js';
 import { promptRoutes } from '../features/intelligence/routes/prompt.routes.js';
 import { accessRequestRoutes } from '../features/job-roles/routes/accessRequest.routes.js';
@@ -56,19 +55,22 @@ import { marketIntelligenceCompanyRoutes } from '../features/market-intelligence
 import { mesaTratamentoRoutes } from '../features/mesa-tratamento/routes/mesaTratamento.routes.js';
 import { moduleAccessRoutes } from '../features/module-access/routes/moduleAccess.routes.js';
 import { noteRoutes } from '../features/notes/routes/note.routes.js';
-import { organizationModulesRoutes } from '../features/organization-modules/routes/organizationModules.routes.js';
 import { notificationRoutes } from '../features/notifications/notification.routes.js';
 import { sseService } from '../features/notifications/sse.service.js';
+import { organizationModulesRoutes } from '../features/organization-modules/routes/organizationModules.routes.js';
 import { livingPlaybookRoutes } from '../features/playbook/living-playbook/routes/living-playbook.routes.js';
 import { objectionMatrixRoutes } from '../features/playbook/objection-matrix/routes/objection-matrix.routes.js';
 import { qualificationMatrixRoutes } from '../features/playbook/qualification-matrix/routes/qualification-matrix.routes.js';
 import { prospectingRoutes } from '../features/prospecting/routes/prospecting.routes.js';
 import { prospectingToolsRoutes } from '../features/prospecting/routes/prospecting-tools.routes.js';
+import { roleplayRoutes } from '../features/roleplay/routes/roleplay.routes.js';
+import { salesOrchestrationRoutes } from '../features/sales-orchestration/server/salesOrchestration.routes.js';
 import { teamRoutes } from '../features/team/routes/team.routes.js';
 import { COMMERCIAL_INTELLIGENCE_ROLES, COPILOTO_IA_ROLES } from '../lib/auth/authorization.js';
 import { type AuthRequest, authenticateToken } from '../shared/middlewares/authenticateToken.js';
 import { requireTenant } from '../shared/middlewares/authorization.js';
 import { requireRole } from '../shared/middlewares/requireRole.js';
+import { unavailableLegacyModule } from './legacyModuleGate.js';
 
 /**
  * Monta todas as rotas de API protegidas (autenticação + tenant + papel, conforme o módulo) e o
@@ -162,6 +164,7 @@ export function mountFeatureRoutes(app: Express): void {
     requireRole([...COPILOTO_IA_ROLES]),
     copilotoIaRoutes,
   );
+  app.use('/api/roleplay', authenticateToken, requireTenant, roleplayRoutes);
   app.use('/api/knowledge', requireTenant, knowledgeRoutes);
   app.use('/api/lgpd', authenticateToken, requireTenant, lgpdRouter);
   app.use('/api/feature-flags', authenticateToken, requireTenant, featureFlagsRouter);
@@ -210,6 +213,7 @@ export function mountFeatureRoutes(app: Express): void {
   app.use('/api/google', authenticateToken, requireTenant, googleRoutes);
   app.use('/api/bitrix', authenticateToken, requireTenant, bitrixRoutes);
   app.use('/api/integrations/external-crm', authenticateToken, requireTenant, externalCrmRoutes);
+  app.use('/api/integrations', authenticateToken, requireTenant, integrationsPingRoutes);
   app.use('/api/bitrix', authenticateToken, requireTenant, hubTasksRoutes);
   app.use('/api/team', authenticateToken, requireTenant, teamRoutes);
   app.use('/api/module-access', authenticateToken, requireTenant, moduleAccessRoutes);
