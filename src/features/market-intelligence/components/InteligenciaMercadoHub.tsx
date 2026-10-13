@@ -170,14 +170,19 @@ export function InteligenciaMercadoHub() {
           setCompanies(Array.isArray(payload.data) ? payload.data : []);
           setMeta(payload.meta ?? null);
           setDataset(payload.dataset);
-        } else {
-          setCompanies(FALLBACK_SAMPLE_COMPANIES);
-          setMeta({ page: 1, pageSize: 25, total: FALLBACK_SAMPLE_COMPANIES.length, totalPages: 1 });
+        } else if (payload.data && payload.data.length > 0) {
+          setCompanies(payload.data);
+          setMeta(payload.meta ?? null);
           setDataset(FALLBACK_SAMPLE_DATASET);
+        } else {
+          // Quando o backend responde que dataset é nulo e não há dados (ex: teste honestHubs B-06)
+          setCompanies([]);
+          setMeta(payload.meta ?? null);
+          setDataset(null);
         }
       } catch (_reason: unknown) {
         if (!cancelled) {
-          // Ativa o snapshot de amostra oficial da Receita Federal para não deixar a tela bloqueada
+          // Em caso de falha de rede/servidor offline, usa a amostra oficial para permitir visualização
           setCompanies(FALLBACK_SAMPLE_COMPANIES);
           setMeta({ page: 1, pageSize: 25, total: FALLBACK_SAMPLE_COMPANIES.length, totalPages: 1 });
           setDataset(FALLBACK_SAMPLE_DATASET);
