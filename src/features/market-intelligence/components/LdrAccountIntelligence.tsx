@@ -128,13 +128,13 @@ function CapabilityCard({
   const available = capability.status === 'AVAILABLE';
   const partial = capability.status === 'PARTIAL';
   const tone = available
-    ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+    ? 'border-[var(--color-heading-success)] bg-[color-mix(in_srgb,var(--color-heading-success)_10%,var(--color-surface))] text-[var(--color-heading-success)]'
     : partial
-      ? 'border-amber-200 bg-amber-50 text-amber-900'
+      ? 'border-[var(--color-heading-gold)] bg-[color-mix(in_srgb,var(--color-heading-gold)_10%,var(--color-surface))] text-[var(--color-heading-gold)]'
       : 'border-line bg-surface-2 text-ink';
 
   return (
-    <article className={`rounded-2xl border p-4 ${tone}`}>
+    <article className={`rounded-[var(--radius-card)] border p-4 ${tone}`}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4" />
@@ -144,7 +144,7 @@ function CapabilityCard({
           {capability.status.replaceAll('_', ' ')}
         </span>
       </div>
-      <p className="mt-3 text-xs leading-5 opacity-80">{capability.message}</p>
+      <p className="mt-3 text-sm leading-5 opacity-80">{capability.message}</p>
     </article>
   );
 }
@@ -199,7 +199,7 @@ export function LdrAccountIntelligence() {
 
   return (
     <div className="space-y-5 p-4 md:p-6 lg:p-8">
-      <header className="overflow-hidden rounded-[28px] bg-obsidian px-5 py-6 text-white md:px-8 md:py-8">
+      <header className="overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-heading-cyan)] bg-[var(--color-surface)] px-5 py-6 text-[var(--color-text-primary)] md:px-8 md:py-8">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className="flex items-center gap-2 text-brand">
@@ -208,42 +208,33 @@ export function LdrAccountIntelligence() {
                 LDR · Account Intelligence
               </span>
             </div>
-            {/* Achado real de finalização (2026-09-04, axe-core/color-contrast): a regra global
-                `h1 { color: var(--ink) }` (@layer base, globals.css) sempre vence sobre a cor
-                herdada de um ancestral (`text-white` no <header> acima é aplicado ao <header>, não
-                ao <h1> — o navegador só herda uma cor quando nenhuma regra mais específica mira o
-                próprio elemento; um seletor de tag em @layer base já mira o <h1> diretamente).
-                Sem `text-white` explícito aqui, este h1 renderizava quase preto (--ink, #1a1513)
-                sobre o fundo escuro do header (bg-obsidian, #333333) — contraste 1.43:1, muito
-                abaixo do mínimo de 3:1 pra texto grande (mesma classe de bug do precedente DQA-19:
-                texto de baixo contraste sobre cor sólida). Título sobre superfície escura precisa
-                de cor explícita, não pode depender de herança. */}
-            <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] text-white md:text-4xl">
+            <h1 className="mt-2 text-3xl font-black tracking-[-0.04em] text-[var(--color-heading-cyan)] md:text-4xl">
               Empresa real → inteligência → próxima ação
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/70">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">
               Primeiro corte funcional do LDR. Fit, proveniência e cadastro oficial entram como
               evidência; sinais, decisores e ações só aparecem quando houver fonte real e contexto
               do tenant.
             </p>
           </div>
           <div className="flex flex-col items-start gap-3 xl:items-end">
-            <div className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-xs text-white/70">
-              <div className="flex items-center gap-2 font-black text-white">
-                <ShieldCheck className="h-4 w-4 text-emerald-300" /> Sem recomendação fabricada
+            <div className="rounded-[var(--radius-card)] border border-[var(--color-heading-cyan)] bg-[var(--color-surface-elevated)] px-4 py-3 text-xs text-[var(--color-text-primary)]">
+              <div className="flex items-center gap-2 font-black text-[var(--color-text-primary)]">
+                <ShieldCheck className="h-4 w-4 text-[var(--color-heading-success)]" /> Sem
+                recomendação fabricada
               </div>
               <p className="mt-1">Ausência de dado permanece como NÃO DISPONÍVEL.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
                 to="/app/market-intelligence/hub"
-                className="inline-flex items-center gap-2 rounded-xl bg-brand-active px-4 py-2 text-xs font-black text-on-brand hover:brightness-110"
+                className="inline-flex items-center gap-2 rounded-[var(--radius-control)] bg-brand-active px-4 py-2 text-xs font-black text-on-brand hover:brightness-110"
               >
                 <Zap className="h-4 w-4" /> Radar / Hub
               </Link>
               <Link
                 to="/app/prospect/inteligente"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-black text-white hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-border-subtle)] bg-[var(--color-surface-elevated)] px-4 py-2 text-xs font-black text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)]"
               >
                 Prospecção Inteligente
               </Link>
@@ -252,10 +243,13 @@ export function LdrAccountIntelligence() {
         </div>
       </header>
 
-      <form onSubmit={submit} className="rounded-3xl border border-line bg-surface p-5 shadow-sm">
+      <form
+        onSubmit={submit}
+        className="rounded-[var(--radius-card)] border border-[var(--color-heading-cyan)] bg-surface p-5 shadow-[var(--shadow-card)]"
+      >
         <label className="block max-w-3xl">
           <span className="text-xs font-black text-ink">CNPJ da empresa</span>
-          <div className="mt-1 flex items-center gap-2 rounded-xl border border-line px-3 focus-within:border-brand">
+          <div className="mt-1 flex items-center gap-2 rounded-[var(--radius-control)] border border-line px-3 focus-within:border-brand">
             <Search className="h-4 w-4 text-ink-2" />
             <input
               value={draftCnpj}
@@ -282,7 +276,7 @@ export function LdrAccountIntelligence() {
       {error && (
         <div
           role="alert"
-          className="flex gap-3 rounded-3xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-800"
+          className="flex gap-3 rounded-[var(--radius-card)] border border-[var(--color-heading-danger)] bg-[color-mix(in_srgb,var(--color-heading-danger)_10%,var(--color-surface))] p-5 text-sm text-[var(--color-heading-danger)]"
         >
           <AlertTriangle className="h-5 w-5 shrink-0" />
           {error}
@@ -290,9 +284,11 @@ export function LdrAccountIntelligence() {
       )}
 
       {!account && !error && !loading && (
-        <section className="rounded-3xl border border-dashed border-line bg-surface p-10 text-center">
+        <section className="rounded-[var(--radius-card)] border border-dashed border-[var(--color-heading-cyan)] bg-surface p-10 text-center">
           <FileSearch className="mx-auto h-9 w-9 text-brand" />
-          <h2 className="mt-3 text-xl font-black text-ink">Account 360 aguardando uma empresa</h2>
+          <h2 className="mt-3 text-xl font-black text-[var(--color-heading-cyan)]">
+            Account 360 aguardando uma empresa
+          </h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-ink-2">
             Consulte um CNPJ real do catálogo. O LDR vai mostrar o que já sabe, o que é derivado e,
             principalmente, o que ainda não pode afirmar.
@@ -303,16 +299,16 @@ export function LdrAccountIntelligence() {
       {account && (
         <>
           <section className="grid gap-4 xl:grid-cols-[1.4fr_.6fr]">
-            <article className="rounded-3xl border border-line bg-surface p-5 shadow-sm md:p-6">
+            <article className="rounded-[var(--radius-card)] border border-[var(--color-heading-cyan)] bg-surface p-5 shadow-[var(--shadow-card)] md:p-6">
               <div className="flex items-start gap-3">
-                <div className="rounded-2xl bg-orange-50 p-3 text-[#C43E0E]">
+                <div className="rounded-[var(--radius-card)] bg-[color-mix(in_srgb,var(--color-heading-gold)_10%,var(--color-surface))] p-3 text-[var(--color-heading-gold)]">
                   <Building2 className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-mono text-xs font-bold text-ink-2">
+                  <p className="font-mono text-sm font-bold text-ink-2">
                     {formatCnpj(account.identity.cnpj)}
                   </p>
-                  <h2 className="mt-1 text-2xl font-black text-ink">
+                  <h2 className="mt-1 text-2xl font-black text-[var(--color-heading-cyan)]">
                     {account.identity.legalName}
                   </h2>
                   <p className="mt-1 text-sm text-ink-2">
@@ -327,26 +323,26 @@ export function LdrAccountIntelligence() {
                     <span className="rounded-full bg-surface-2 px-3 py-1.5 text-ink">
                       {label(account.identity.branchType)}
                     </span>
-                    <span className="rounded-full bg-orange-50 px-3 py-1.5 text-orange-800">
+                    <span className="rounded-full bg-[color-mix(in_srgb,var(--color-heading-gold)_10%,var(--color-surface))] px-3 py-1.5 text-[var(--color-heading-gold)]">
                       ICP {label(account.qualification.icpTier)}
                     </span>
                   </div>
                 </div>
               </div>
               <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-2xl bg-surface-2 p-4">
+                <div className="rounded-[var(--radius-card)] bg-surface-2 p-4">
                   <dt className="text-[10px] font-black uppercase text-ink-2">CNAE</dt>
                   <dd className="mt-1 text-sm font-bold text-ink">
                     {label(account.identity.primaryCnae)}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-surface-2 p-4">
+                <div className="rounded-[var(--radius-card)] bg-surface-2 p-4">
                   <dt className="text-[10px] font-black uppercase text-ink-2">Porte</dt>
                   <dd className="mt-1 text-sm font-bold text-ink">
                     {label(account.identity.size)}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-surface-2 p-4">
+                <div className="rounded-[var(--radius-card)] bg-surface-2 p-4">
                   <dt className="text-[10px] font-black uppercase text-ink-2">Capital social</dt>
                   <dd className="mt-1 text-sm font-bold text-ink">
                     {account.identity.capitalSocial
@@ -354,7 +350,7 @@ export function LdrAccountIntelligence() {
                       : 'NÃO DISPONÍVEL'}
                   </dd>
                 </div>
-                <div className="rounded-2xl bg-surface-2 p-4">
+                <div className="rounded-[var(--radius-card)] bg-surface-2 p-4">
                   <dt className="text-[10px] font-black uppercase text-ink-2">Competência</dt>
                   <dd className="mt-1 text-sm font-bold text-ink">
                     {account.provenance.competencia}
@@ -363,26 +359,31 @@ export function LdrAccountIntelligence() {
               </dl>
             </article>
 
-            <article className="rounded-3xl border border-orange-200 bg-orange-50 p-5 md:p-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-orange-700">
+            <article className="rounded-[var(--radius-card)] border border-[var(--color-heading-gold)] bg-[color-mix(in_srgb,var(--color-heading-gold)_10%,var(--color-surface))] p-5 md:p-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[var(--color-heading-gold)]">
                 Account Score
               </p>
               <div className="mt-2 flex items-end gap-2">
-                <span className="text-5xl font-black tracking-[-0.06em] text-[#C43E0E]">
+                <span className="text-5xl font-black tracking-[-0.06em] text-[var(--color-heading-gold)]">
                   {scoreLabel(account.accountScore.total)}
                 </span>
-                <span className="pb-1 text-xs font-bold text-orange-800">
+                <span className="pb-1 text-xs font-bold text-[var(--color-heading-gold)]">
                   /100 · {account.accountScore.status}
                 </span>
               </div>
-              <p className="mt-3 text-xs leading-5 text-orange-900">
+              <p className="mt-3 text-sm leading-5 text-[var(--color-heading-gold)]">
                 {account.accountScore.explanation}
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                 {Object.entries(account.accountScore.components).map(([key, value]) => (
-                  <div key={key} className="rounded-xl bg-white/70 p-3">
-                    <div className="font-black uppercase text-orange-700">{key}</div>
-                    <div className="mt-1 text-lg font-black text-orange-900">
+                  <div
+                    key={key}
+                    className="rounded-[var(--radius-control)] bg-[var(--color-surface-elevated)] p-3"
+                  >
+                    <div className="font-black uppercase text-[var(--color-heading-gold)]">
+                      {key}
+                    </div>
+                    <div className="mt-1 text-lg font-black text-[var(--color-heading-gold)]">
                       {scoreLabel(value)}
                     </div>
                   </div>
@@ -402,15 +403,20 @@ export function LdrAccountIntelligence() {
           </section>
 
           <section className="grid gap-4 xl:grid-cols-[1fr_.8fr]">
-            <article className="rounded-3xl border border-line bg-surface p-5 md:p-6">
+            <article className="rounded-[var(--radius-card)] border border-[var(--color-heading-cyan)] bg-surface p-5 md:p-6">
               <div className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-brand" />
-                <h3 className="text-lg font-black text-ink">Por que essa conta tem esse fit?</h3>
+                <h3 className="text-lg font-black text-[var(--color-heading-cyan)]">
+                  Por que essa conta tem esse fit?
+                </h3>
               </div>
               {account.qualification.reasons.length ? (
                 <ul className="mt-4 space-y-2 text-sm text-ink">
                   {account.qualification.reasons.map((reason) => (
-                    <li key={reason} className="rounded-xl bg-surface-2 px-3 py-2">
+                    <li
+                      key={reason}
+                      className="rounded-[var(--radius-control)] bg-surface-2 px-3 py-2"
+                    >
                       {reason}
                     </li>
                   ))}
@@ -420,14 +426,14 @@ export function LdrAccountIntelligence() {
                   Razões ICP não foram publicadas para esta conta.
                 </p>
               )}
-              <p className="mt-4 text-xs text-ink-2">
+              <p className="mt-4 text-sm text-ink-2">
                 Taxonomia: {label(account.qualification.taxonomyVersion)} · Campos cadastrais:{' '}
                 {account.provenance.companyFields} · ICP: {account.provenance.icp}
               </p>
             </article>
 
             <article
-              className={`rounded-3xl border p-5 md:p-6 ${account.nextBestAction.status === 'READY' ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-amber-200 bg-amber-50 text-amber-900'}`}
+              className={`rounded-[var(--radius-card)] border p-5 md:p-6 ${account.nextBestAction.status === 'READY' ? 'border-[var(--color-heading-success)] bg-[color-mix(in_srgb,var(--color-heading-success)_10%,var(--color-surface))] text-[var(--color-heading-success)]' : 'border-[var(--color-heading-gold)] bg-[color-mix(in_srgb,var(--color-heading-gold)_10%,var(--color-surface))] text-[var(--color-heading-gold)]'}`}
             >
               <div className="flex items-center gap-2">
                 <Bot className="h-5 w-5" />
@@ -447,10 +453,12 @@ export function LdrAccountIntelligence() {
             </article>
           </section>
 
-          <section className="rounded-3xl border border-line bg-surface p-5 md:p-6">
+          <section className="rounded-[var(--radius-card)] border border-[var(--color-heading-cyan)] bg-surface p-5 md:p-6">
             <div className="flex items-center gap-2">
               <Database className="h-5 w-5 text-brand" />
-              <h3 className="font-black text-ink">Proveniência e governança</h3>
+              <h3 className="font-black text-[var(--color-heading-cyan)]">
+                Proveniência e governança
+              </h3>
             </div>
             <div className="mt-4 grid gap-3 text-xs md:grid-cols-4">
               <div>
@@ -471,7 +479,7 @@ export function LdrAccountIntelligence() {
               </div>
             </div>
             {dataset && (
-              <p className="mt-4 text-xs text-ink-2">
+              <p className="mt-4 text-sm text-ink-2">
                 Snapshot ativo: {dataset.competencia} · {number.format(dataset.recordsImported)}{' '}
                 importados · {number.format(dataset.recordsActive)} ativos.
               </p>

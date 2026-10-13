@@ -50,7 +50,10 @@ export function CnpjResultCard({
   const isActive = d.situacaoCadastral?.toUpperCase() === 'ATIVA';
 
   return (
-    <div className="bg-surface rounded-2xl border border-line shadow-sm p-6 sm:p-8 space-y-6">
+    <div
+      data-accent="cyan"
+      className="bh-platform-card bg-surface rounded-2xl border border-line shadow-sm p-6 sm:p-8 space-y-6"
+    >
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -120,7 +123,7 @@ export function CnpjResultCard({
                   : ''}
                 .
               </p>
-              <p className="text-xs text-ink-2">
+              <p className="text-sm leading-[1.7] text-ink-2">
                 Indicador de intensidade do mercado de transporte rodoviário de cargas na UF (fonte
                 ANTT, mesmo dado já publicado em Market Intelligence) — não é uma medida de
                 sinistralidade (roubo/furto).

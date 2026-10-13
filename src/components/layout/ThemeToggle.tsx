@@ -8,7 +8,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="fixed bottom-6 left-6 z-50 p-3 rounded-full bg-[var(--surface)] border border-[var(--line)] shadow-lg hover:shadow-xl transition-all text-[var(--ink-2)] hover:text-[var(--brand)]"
+      className="bh-official-control fixed bottom-6 left-6 z-50 p-3 rounded-full bg-[var(--surface)] border border-[var(--line)] shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-colors text-[var(--ink-2)] hover:text-[var(--brand)]"
       aria-label="Alternar tema"
     >
       {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

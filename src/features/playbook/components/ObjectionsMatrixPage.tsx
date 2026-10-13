@@ -234,7 +234,7 @@ export function ObjectionsMatrixPage() {
           }
         />
 
-        <div className="bg-surface/80 p-4 rounded-2xl border border-line flex flex-wrap items-center gap-3">
+        <div className="bh-platform-card bg-surface/80 p-4 rounded-card border border-line flex flex-wrap items-center gap-3">
           <span className="text-xs font-bold text-ink flex items-center gap-1.5 shrink-0">
             <Filter size={14} className="text-brand" /> Filtros
           </span>
@@ -307,7 +307,7 @@ export function ObjectionsMatrixPage() {
         ) : (
           <div className="space-y-4">
             {filtered.length === 0 ? (
-              <div className="text-center py-12 text-sm text-ink-2 bg-surface/60 rounded-2xl border border-dashed border-line">
+              <div className="bh-platform-card text-center py-12 text-sm text-ink-2 bg-surface/60 rounded-card border border-dashed border-line">
                 {items.length === 0
                   ? 'Nenhuma objeção cadastrada ainda para esta marca.'
                   : 'Nenhuma objeção encontrada para os filtros selecionados.'}
@@ -316,7 +316,7 @@ export function ObjectionsMatrixPage() {
               filtered.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-surface/80 p-6 rounded-2xl border border-line space-y-3 shadow-sm"
+                  className="bh-platform-card bg-surface/80 p-6 rounded-card border border-line space-y-3 shadow-sm"
                 >
                   <div className="flex items-center justify-between pb-3 border-b border-line flex-wrap gap-2">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -408,7 +408,7 @@ export function ObjectionsMatrixPage() {
         )}
 
         {!loading && !error && (meta?.totalPages ?? 1) > 1 && (
-          <div className="bg-surface/80 rounded-2xl border border-line overflow-hidden">
+          <div className="bh-platform-card bg-surface/80 rounded-card border border-line overflow-hidden">
             <Pagination
               page={page}
               totalPages={meta?.totalPages ?? 1}

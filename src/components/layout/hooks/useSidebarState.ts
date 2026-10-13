@@ -59,6 +59,7 @@ export function useSidebarState({
     const groupTabs: Record<string, TabType[]> = {
       revenue_tree: ['crm', 'crm360', 'propostas', 'forecast'],
       'market-intelligence': ['market-intelligence'],
+      'signals-risks': ['signals-risks'],
       prospecting: ['prospect'],
     };
     for (const [groupId, tabs] of Object.entries(groupTabs)) {

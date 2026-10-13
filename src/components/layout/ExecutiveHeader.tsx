@@ -46,8 +46,7 @@ export function ExecutiveHeader({
   ].filter((hub) => grantedModules.includes(hub.id));
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-brand/25 bg-surface/80 p-4 shadow-card backdrop-blur-sm transition-all duration-300 dark:border-brand/30 dark:bg-surface/60 space-y-3">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/40 to-transparent" />
+    <div className="relative border-b border-line bg-background p-4 space-y-3">
       {/* Top Banner & Hub Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 bg-soft/30 px-3 py-1.5 rounded-xl border border-line">
         <div className="flex items-center gap-2 text-[11px] font-semibold text-ink-2">

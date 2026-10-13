@@ -27,7 +27,10 @@ export function CnpjSearchPanel({
 }) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-      <div className="xl:col-span-4 bg-surface p-6 sm:p-8 rounded-2xl border border-line shadow-sm">
+      <div
+        data-accent="cyan"
+        className="bh-platform-card xl:col-span-4 bg-surface p-6 sm:p-8 rounded-2xl border border-line shadow-sm"
+      >
         <div className="flex items-center gap-2 mb-6">
           <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center text-brand-ink dark:text-brand">
             <Landmark size={18} />

@@ -130,17 +130,6 @@ export function CandidateCard({
     candidate.icebreakerHook ?? null,
   );
   const [isLoadingIcebreaker, setIsLoadingIcebreaker] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
   const handleFetchIcebreaker = async () => {
     setIsLoadingIcebreaker(true);
     try {
@@ -161,30 +150,12 @@ export function CandidateCard({
 
   return (
     <div
-      onPointerMove={handlePointerMove}
       onMouseEnter={() => {
-        setIsHovered(true);
         SoundFX.play('hover');
       }}
-      onMouseLeave={() => setIsHovered(false)}
-      className="relative bg-surface/90 backdrop-blur-md p-6 rounded-2xl border border-line hover:border-brand/40 transition-all duration-300 shadow-sm hover:shadow-card-elevated group overflow-hidden"
+      data-accent="cyan"
+      className="bh-platform-card relative p-6 rounded-2xl border border-line transition-all duration-300 shadow-sm group overflow-hidden"
     >
-      {/* 2026 Bento Spotlight */}
-      {isHovered && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -inset-px rounded-[inherit] transition-opacity duration-300 z-10"
-          style={{
-            background: `radial-gradient(240px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0,229,255,0.1), transparent 70%)`,
-          }}
-        />
-      )}
-
-      {/* Luz especular de topo 2026 */}
-      <div
-        className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20"
-        aria-hidden="true"
-      />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-20">
         <div className="mt-1 mr-3">
           <input
@@ -210,7 +181,7 @@ export function CandidateCard({
             <div
               className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase transition-all ${
                 finalScore >= 75
-                  ? 'bg-success/15 text-success-active dark:text-success border border-success/30 shadow-[0_0_10px_rgba(34,197,94,0.15)]'
+                  ? 'bg-success/15 text-success-active dark:text-success border border-success/30'
                   : finalScore >= 45
                     ? 'bg-info/15 text-info-active dark:text-info border border-info/30'
                     : 'bg-warning/15 text-warning-active dark:text-warning border border-warning/30'
@@ -384,7 +355,9 @@ export function CandidateCard({
                 ))}
           </details>
           {!enrichment && candidate.rationale && (
-            <p className="text-xs text-ink-2 italic mb-2">&quot;{candidate.rationale}&quot;</p>
+            <p className="text-sm leading-[1.7] text-ink-2 italic mb-2">
+              &quot;{candidate.rationale}&quot;
+            </p>
           )}
 
           {icebreakerText || (candidate.webInsights && candidate.webInsights.length > 0) ? (
@@ -519,9 +492,7 @@ export function CandidateCard({
               <p className="text-[10px] tracking-wider font-bold uppercase text-indigo-300 mb-1 flex items-center gap-1">
                 <Sparkles size={12} /> 📝 Resumo do Enriquecimento
               </p>
-              <p className="text-xs text-ink-2 leading-relaxed">
-                {enrichment.company.observations}
-              </p>
+              <p className="text-sm text-ink-2 leading-[1.7]">{enrichment.company.observations}</p>
             </div>
           )}
 
@@ -570,7 +541,7 @@ export function CandidateCard({
           )}
         </div>
         {promoted ? (
-          <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm shrink-0 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1.5 rounded-xl shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+          <span className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm shrink-0 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1.5 rounded-xl">
             <CheckCircle2 size={16} className="text-emerald-500" /> ✅ No CRM
           </span>
         ) : (
@@ -601,7 +572,7 @@ export function CandidateCard({
                 onPromote();
               }}
               disabled={isPromoting || isRejecting || candidate.source === 'googlePlaces'}
-              className="relative overflow-hidden bg-gradient-to-r from-brand via-brand-2 to-brand text-on-brand px-5 py-2.5 rounded-xl font-bold text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 shadow-[0_4px_16px_rgba(0,229,255,0.25)] hover:shadow-glow-brand hover:scale-[1.02] w-full sm:w-auto justify-center disabled:opacity-60 cursor-pointer"
+              className="relative overflow-hidden bg-[var(--color-interactive-primary)] hover:bg-[var(--color-interactive-hover)] text-on-brand px-5 py-2.5 rounded-xl font-bold text-xs hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 shadow-card hover:scale-[1.02] w-full sm:w-auto justify-center disabled:opacity-60 cursor-pointer"
             >
               <div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-1000 pointer-events-none"

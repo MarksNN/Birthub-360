@@ -116,7 +116,7 @@ export function LeadCopilotoPanel({ leadId }: { leadId: string }) {
       <h3 className="text-xs font-bold uppercase tracking-wider text-ink-2 flex items-center gap-2">
         <Mic className="w-4 h-4 text-brand animate-pulse" /> Copiloto IA
       </h3>
-      <div className="relative bg-surface-2/60 backdrop-blur-md p-4 rounded-2xl border border-line hover:border-brand/40 transition-all duration-300 shadow-sm overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-brand/35 before:to-transparent space-y-3">
+      <div className="bh-platform-card relative bg-surface-2/60 backdrop-blur-md p-4 rounded-card border border-line hover:border-brand/40 transition-all duration-300 shadow-sm overflow-hidden space-y-3">
         {loading ? (
           <Skeleton className="h-6 w-full" />
         ) : (

@@ -69,6 +69,6 @@ describe('Sidebar — destinos de MI e prospecção (handoff 05)', () => {
     renderAt('/app/dashboard', 'dashboard');
     expect(screen.getByRole('button', { name: 'Copiloto IA' })).toBeInTheDocument();
     expect(screen.queryByText(/7 sinais/)).not.toBeInTheDocument();
-    expect(screen.getByTestId('sidebar-intelligence-cta')).toHaveTextContent('Ver sinais e riscos');
+    expect(screen.getByTestId('sidebar-intelligence-cta')).toHaveTextContent('Ver Hub de IA');
   });
 });

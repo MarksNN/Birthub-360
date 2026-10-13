@@ -350,7 +350,7 @@ export function Sidebar({
           ))}
         </nav>
 
-        {/* ── Rodapé: atalho honesto para Sinais & Riscos (sem contagem fabricada) ── */}
+        {/* ── Rodapé: atalho para o Hub de IA ── */}
         <div className="shrink-0 border-t border-line p-2">
           {!isCollapsed ? (
             <button
@@ -359,7 +359,7 @@ export function Sidebar({
               className={`group flex h-8 w-full items-center justify-between rounded-md px-2 text-[12px] font-medium text-ink-2 transition-colors hover:bg-surface hover:text-ink ${FOCUS_RING}`}
               data-testid="sidebar-intelligence-cta"
             >
-              <span>Ver sinais e riscos</span>
+              <span>Ver Hub de IA</span>
               <ArrowRight size={12} strokeWidth={1.75} aria-hidden="true" />
             </button>
           ) : (
@@ -367,8 +367,8 @@ export function Sidebar({
               type="button"
               onClick={() => openTab('intelligence')}
               className={`mx-auto flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-2 transition-colors hover:bg-surface hover:text-ink ${FOCUS_RING}`}
-              title="Ver sinais e riscos"
-              aria-label="Ver sinais e riscos"
+              title="Ver Hub de IA"
+              aria-label="Ver Hub de IA"
               data-testid="sidebar-intelligence-icon"
             >
               <ArrowRight size={14} strokeWidth={1.75} aria-hidden="true" />

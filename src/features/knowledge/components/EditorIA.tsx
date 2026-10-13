@@ -37,7 +37,7 @@ export function EditorIA() {
   };
 
   return (
-    <div className="bg-surface rounded-2xl border border-line p-5 space-y-4">
+    <div className="bh-platform-card bg-surface rounded-card border border-line p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-ink flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-brand" /> Assistente de Redação IA

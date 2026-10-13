@@ -120,7 +120,16 @@ export function CadenceHub() {
             particleCount: 50,
             spread: 60,
             origin: { y: 0.6 },
-            colors: ['#D4AF37', '#1677FF', '#C53678', '#10B981'],
+            colors: [
+              '--color-brand-primary',
+              '--color-brand-secondary',
+              '--color-brand-accent',
+              '--color-success',
+              '--color-info',
+            ].map((token) =>
+              getComputedStyle(document.documentElement).getPropertyValue(token).trim(),
+            ),
+            disableForReducedMotion: true,
           });
           setRunsKey((k) => k + 1);
         }}

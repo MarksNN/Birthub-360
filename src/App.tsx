@@ -164,6 +164,12 @@ const CommercialIntelligenceHub = lazy(() =>
   ),
 );
 
+const SignalsAndRisksHub = lazy(() =>
+  import('./features/signals-risks/components/SignalsAndRisksHub.js').then((m) => ({
+    default: m.SignalsAndRisksHub,
+  })),
+);
+
 // PILAR 05
 const ForecastHub = lazy(() =>
   import('./features/predictability/components/ForecastHub.js').then((m) => ({
@@ -387,6 +393,9 @@ function AppLayout() {
                 </RequireRole>
               }
             />
+            <Route path="signals-risks" element={<SignalsAndRisksHub />} />
+            <Route path="signals-risks/radar" element={<SignalsAndRisksHub initialView="radar" />} />
+            <Route path="signals-risks/deal-risks" element={<SignalsAndRisksHub initialView="deal-risks" />} />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
             {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,

@@ -220,8 +220,11 @@ export function LinkedInTool({ configured }: { configured: boolean }) {
 
       {subTab === 'empresas' && (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-          <div className="xl:col-span-4 bg-surface p-6 rounded-2xl border border-line shadow-sm space-y-4">
-            <p className="text-xs text-ink-2">
+          <div
+            data-accent="blue"
+            className="bh-platform-card xl:col-span-4 bg-surface p-6 rounded-2xl border border-line shadow-sm space-y-4"
+          >
+            <p className="text-sm leading-[1.7] text-ink-2">
               Busca empresas via Apollo e mostra só as que têm página real de LinkedIn confirmada.
             </p>
             <div>
@@ -327,8 +330,11 @@ export function LinkedInTool({ configured }: { configured: boolean }) {
 
       {subTab === 'decisores' && (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-          <div className="xl:col-span-4 bg-surface p-6 rounded-2xl border border-line shadow-sm space-y-4">
-            <p className="text-xs text-ink-2">
+          <div
+            data-accent="blue"
+            className="bh-platform-card xl:col-span-4 bg-surface p-6 rounded-2xl border border-line shadow-sm space-y-4"
+          >
+            <p className="text-sm leading-[1.7] text-ink-2">
               Busca decisores via Apollo (com fallback Hunter) e mostra só os que têm perfil real de
               LinkedIn.
             </p>
@@ -403,14 +409,15 @@ export function LinkedInTool({ configured }: { configured: boolean }) {
               return (
                 <div
                   key={key}
-                  className="bg-surface p-5 rounded-2xl border border-line shadow-sm flex flex-wrap items-center gap-x-4 gap-y-2"
+                  data-accent="blue"
+                  className="bh-platform-card bg-surface p-5 rounded-2xl border border-line shadow-sm flex flex-wrap items-center gap-x-4 gap-y-2"
                 >
                   <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center text-brand-ink dark:text-brand shrink-0">
                     <User size={16} />
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-sm text-ink">{dm.name}</p>
-                    {dm.title && <p className="text-xs text-ink-2">{dm.title}</p>}
+                    {dm.title && <p className="text-sm leading-[1.7] text-ink-2">{dm.title}</p>}
                   </div>
                   <a
                     href={dm.linkedinUrl}
@@ -448,7 +455,10 @@ export function LinkedInTool({ configured }: { configured: boolean }) {
         </div>
       )}
 
-      <div className="bg-surface-2 p-5 rounded-2xl border border-line space-y-3">
+      <div
+        data-accent="blue"
+        className="bh-platform-card bg-surface-2 p-5 rounded-2xl border border-line space-y-3"
+      >
         <p className="text-[10px] tracking-wider font-bold uppercase text-ink-2 flex items-center gap-1.5">
           <Wand2 size={12} /> Gerador manual (quando a Apollo não encontrou o perfil)
         </p>

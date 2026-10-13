@@ -34,6 +34,7 @@ import {
   Repeat,
   Settings as SettingsIcon,
   Shield,
+  ShieldAlert,
   ShieldCheck,
   Stethoscope,
   Target,
@@ -81,6 +82,7 @@ export type TabType =
   | 'activities'
   | 'cadence'
   | 'prospect'
+  | 'signals-risks'
   | 'intelligence'
   | 'market-intelligence'
   | 'propostas'
@@ -203,7 +205,8 @@ export const TAB_META: Record<TabType, { label: string; icon: any; accent: NavAc
     accent: 'violet',
   },
   copiloto_ia: { label: 'Copiloto IA', icon: Mic, accent: 'iris' },
-  intelligence: { label: 'Assistente de Vendas', icon: Zap, accent: 'gold' },
+  'signals-risks': { label: 'Sinais & Riscos', icon: ShieldAlert, accent: 'gold' },
+  intelligence: { label: 'Hub de IA', icon: Zap, accent: 'gold' },
   knowledge: { label: 'Base de Conhecimento', icon: Database, accent: 'green' },
   'sdr-diagnostic': { label: 'Diagnóstico SDR', icon: Stethoscope, accent: 'green' },
   settings_ai: { label: 'Ajustes de IA', icon: SettingsIcon, accent: 'slate' },

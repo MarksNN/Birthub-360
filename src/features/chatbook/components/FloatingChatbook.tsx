@@ -123,15 +123,15 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed top-0 right-0 h-full w-[540px] max-w-[95vw] bg-surface-elevated/95 backdrop-blur-2xl border-l border-line/80 shadow-[0_25px_70px_rgba(0,0,0,0.6)] z-[1000] flex flex-col overflow-hidden text-ink"
+            className="fixed top-0 right-0 h-full w-[540px] max-w-[95vw] bg-surface-elevated/95 backdrop-blur-2xl border-l border-line/80 shadow-[var(--shadow-elevated)] z-[1000] flex flex-col overflow-hidden text-ink"
           >
             {/* Linha de luz especular 2026 */}
-            <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#7C3AED] to-transparent pointer-events-none z-20" />
+            <div className="absolute top-0 inset-x-0 h-[2px] [background:var(--grad-brand)] pointer-events-none z-20" />
 
             {/* Header Superior */}
             <div className="p-5 border-b border-line/80 bg-surface/70 backdrop-blur-md flex items-center justify-between sticky top-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-[#7C3AED] flex items-center justify-center text-on-brand shadow-[0_0_20px_rgba(124,58,237,0.35)]">
+                <div className="w-11 h-11 rounded-2xl bg-[var(--color-heading-iris)] flex items-center justify-center text-on-brand shadow-[var(--shadow-card)]">
                   <Bot className="w-6 h-6" />
                 </div>
                 <div>
@@ -173,7 +173,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                 aria-pressed={activeTab === 'assistant'}
                 className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeTab === 'assistant'
-                    ? 'bg-brand text-on-brand shadow-[0_0_12px_rgba(212,175,55,0.3)] font-extrabold scale-[1.02]'
+                    ? 'bg-brand text-on-brand shadow-[var(--shadow-card)] font-extrabold scale-[1.02]'
                     : 'text-ink-2 hover:text-ink hover:bg-surface-2'
                 }`}
               >
@@ -188,7 +188,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                 aria-pressed={activeTab === 'roleplay'}
                 className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeTab === 'roleplay'
-                    ? 'bg-brand text-on-brand shadow-[0_0_12px_rgba(212,175,55,0.3)] font-extrabold scale-[1.02]'
+                    ? 'bg-brand text-on-brand shadow-[var(--shadow-card)] font-extrabold scale-[1.02]'
                     : 'text-ink-2 hover:text-ink hover:bg-surface-2'
                 }`}
               >
@@ -203,7 +203,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                 aria-pressed={activeTab === 'playbook'}
                 className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeTab === 'playbook'
-                    ? 'bg-brand text-on-brand shadow-[0_0_12px_rgba(212,175,55,0.3)] font-extrabold scale-[1.02]'
+                    ? 'bg-brand text-on-brand shadow-[var(--shadow-card)] font-extrabold scale-[1.02]'
                     : 'text-ink-2 hover:text-ink hover:bg-surface-2'
                 }`}
               >
@@ -233,7 +233,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                       aria-pressed={searchMode === 'general'}
                       className={`px-3 py-1 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer ${
                         searchMode === 'general'
-                          ? 'bg-[#1677FF] text-white shadow-sm'
+                          ? 'bg-[var(--color-heading-blue)] text-white shadow-sm'
                           : 'text-ink-2 hover:text-ink'
                       }`}
                     >
@@ -245,7 +245,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                       aria-pressed={searchMode === 'internal'}
                       className={`px-3 py-1 rounded-lg font-bold transition-colors flex items-center gap-1 cursor-pointer ${
                         searchMode === 'internal'
-                          ? 'bg-[#1677FF] text-white shadow-sm'
+                          ? 'bg-[var(--color-heading-blue)] text-white shadow-sm'
                           : 'text-ink-2 hover:text-ink'
                       }`}
                     >
@@ -264,7 +264,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                       <div
                         className={`max-w-[88%] p-4 rounded-2xl text-xs space-y-2 leading-relaxed shadow-md ${
                           msg.sender === 'user'
-                            ? 'bg-[#1677FF] text-white rounded-br-none font-medium'
+                            ? 'bg-[var(--color-heading-blue)] text-white rounded-br-none font-medium'
                             : 'bg-surface-2 text-ink-2 border border-line rounded-bl-none'
                         }`}
                       >
@@ -509,7 +509,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                         onClick={() => setPlaybookView('objections')}
                         className={`px-3 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
                           playbookView === 'objections'
-                            ? 'bg-[#1677FF] text-white'
+                            ? 'bg-[var(--color-heading-blue)] text-white'
                             : 'text-ink-2 hover:text-ink'
                         }`}
                       >
@@ -520,7 +520,7 @@ export function FloatingChatbook({ isOpen, onClose }: FloatingChatbookProps) {
                         onClick={() => setPlaybookView('qualifications')}
                         className={`px-3 py-1 rounded-lg font-bold transition-colors cursor-pointer ${
                           playbookView === 'qualifications'
-                            ? 'bg-[#1677FF] text-white'
+                            ? 'bg-[var(--color-heading-blue)] text-white'
                             : 'text-ink-2 hover:text-ink'
                         }`}
                       >

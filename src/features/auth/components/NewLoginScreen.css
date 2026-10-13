@@ -1,12 +1,12 @@
 /* ==========================================================================
-   Vancouver Plus Template Styles (Modulify) — Birth Hub 360°
-   Preserves 100% of Brand Colors while recreating the exact Vancouver Plus layout
+   Birth Hub 360º — entry components consuming official tokens
+   Shared entry layout; no independent palette or logo geometry.
    ========================================================================== */
 
 /* Vancouver Gradient Text */
 .vancouver-gradient-text,
 .gradient-text {
-  background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #3b82f6 100%);
+  background: var(--grad-glow);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
@@ -20,14 +20,14 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
   font-weight: 700;
   font-size: 0.925rem;
-  color: #00d4ff !important;
-  background: #14141a !important;
-  border: 2px solid #00d4ff !important;
-  box-shadow: 0 4px 18px rgba(14, 165, 233, 0.35);
+  color: var(--color-brand-primary) !important;
+  background: var(--color-brand-primary) !important;
+  border: 1px solid var(--color-brand-primary) !important;
+  box-shadow: var(--shadow-card);
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
@@ -35,9 +35,9 @@
 
 .vancouver-btn-gradient:hover {
   transform: translateY(-2px);
-  color: #ff2d9b !important;
-  border-color: #ff2d9b !important;
-  box-shadow: 0 8px 26px rgba(14, 165, 233, 0.5);
+  color: var(--color-brand-primary) !important;
+  border-color: var(--color-brand-primary) !important;
+  box-shadow: var(--shadow-card);
   filter: brightness(1.05);
 }
 
@@ -52,23 +52,23 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
   font-weight: 700;
   font-size: 0.925rem;
-  color: #00d4ff;
-  background: #14141a;
-  border: 1.5px solid rgba(14, 165, 233, 0.3);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  color: var(--color-brand-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-card);
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
 
 .vancouver-btn-outline:hover {
-  border-color: #0ea5e9;
+  border-color: var(--color-brand-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.15);
+  box-shadow: var(--shadow-card);
 }
 
 /* Vancouver Navbar */
@@ -77,10 +77,10 @@
   top: 0;
   z-index: 100;
   width: 100%;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--color-surface-elevated);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(11, 19, 43, 0.08);
+  border-bottom: 1px solid var(--color-border-subtle);
   transition: all 0.3s ease;
 }
 
@@ -90,8 +90,8 @@
   left: 0;
   width: 0%;
   height: 2px;
-  background: linear-gradient(90deg, #0ea5e9, #8b5cf6);
-  border-radius: 9999px;
+  background: var(--grad-glow);
+  border-radius: var(--radius-control);
   transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -107,12 +107,7 @@
   transform: translateX(-50%);
   width: 1000px;
   height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(14, 165, 233, 0.12) 0%,
-    rgba(139, 92, 246, 0.08) 45%,
-    transparent 70%
-  );
+  background: var(--grad-glow);
   filter: blur(80px);
   pointer-events: none;
   z-index: 0;
@@ -128,12 +123,10 @@
 
 .vancouver-app-container {
   position: relative;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(11, 19, 43, 0.1);
-  background: #ffffff;
-  box-shadow:
-    0 25px 70px -15px rgba(11, 19, 43, 0.12),
-    0 0 0 1px rgba(14, 165, 233, 0.08);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -143,12 +136,12 @@
   top: 10%;
   right: -25px;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface-elevated);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(14, 165, 233, 0.25);
-  border-radius: 1.25rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 20px 45px -10px rgba(11, 19, 43, 0.14);
+  box-shadow: var(--shadow-card);
   animation: vancouverFloat 6s ease-in-out infinite;
 }
 
@@ -157,12 +150,12 @@
   bottom: 8%;
   left: -25px;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface-elevated);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(139, 92, 246, 0.25);
-  border-radius: 1.25rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 20px 45px -10px rgba(11, 19, 43, 0.14);
+  box-shadow: var(--shadow-card);
   animation: vancouverFloatReverse 7s ease-in-out infinite;
 }
 
@@ -202,43 +195,39 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: #ffffff;
-  border: 1px solid rgba(11, 19, 43, 0.08);
-  border-radius: 9999px;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
   font-size: 0.825rem;
   font-weight: 600;
-  color: #475569;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  color: var(--color-brand-primary);
+  box-shadow: var(--shadow-card);
   transition: all 0.25s ease;
 }
 
 .vancouver-logo-pill:hover {
-  border-color: #0ea5e9;
-  color: #0ea5e9;
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.1);
+  box-shadow: var(--shadow-card);
 }
 
 /* Vancouver Feature Cards */
 .vancouver-card {
   position: relative;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface-elevated);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(11, 19, 43, 0.09);
-  border-radius: 1.25rem;
-  box-shadow:
-    0 4px 20px -2px rgba(11, 19, 43, 0.05),
-    0 12px 32px -8px rgba(11, 19, 43, 0.06);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-card);
   transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vancouver-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(14, 165, 233, 0.4);
-  box-shadow:
-    0 12px 36px -6px rgba(14, 165, 233, 0.15),
-    0 20px 48px -10px rgba(11, 19, 43, 0.08);
+  border-color: var(--color-border-subtle);
+  box-shadow: var(--shadow-card);
 }
 
 /* Vancouver Sticky Slider Section */
@@ -246,18 +235,18 @@
   display: inline-flex;
   gap: 0.5rem;
   padding: 0.375rem;
-  background: #f1f5f9;
-  border-radius: 9999px;
-  border: 1px solid rgba(11, 19, 43, 0.06);
+  background: var(--color-surface);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .vancouver-tab-btn {
   padding: 0.5rem 1.25rem;
-  border-radius: 9999px;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
   font-size: 0.85rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-brand-primary);
   transition: all 0.2s ease;
   cursor: pointer;
   border: none;
@@ -265,19 +254,19 @@
 }
 
 .vancouver-tab-btn-active {
-  background: #ffffff;
-  color: #0ea5e9;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  background: var(--color-surface);
+  color: var(--color-brand-primary);
+  box-shadow: var(--shadow-card);
 }
 
 /* Vancouver Pricing Highlight Box */
 .vancouver-pricing-card {
   position: relative;
-  background: #ffffff;
-  border: 2px solid #0ea5e9;
-  border-radius: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-brand-primary);
+  border-radius: var(--radius-control);
   padding: 2.5rem;
-  box-shadow: 0 20px 50px -10px rgba(14, 165, 233, 0.2);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -286,13 +275,13 @@
   top: 1.5rem;
   right: 1.5rem;
   padding: 0.35rem 0.85rem;
-  background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
-  color: #00d4ff;
-  font-family: var(--font-brand-display, "Sora", sans-serif);
+  background: var(--grad-glow);
+  color: var(--color-brand-primary);
+  font-family: var(--font-interface);
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  border-radius: 9999px;
+  border-radius: var(--radius-control);
   text-transform: uppercase;
 }
 
@@ -300,27 +289,27 @@
 .vancouver-ecosystem-circle {
   width: 58px;
   height: 58px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1.5px solid rgba(11, 19, 43, 0.1);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vancouver-ecosystem-circle:hover {
   transform: scale(1.15);
-  border-color: #0ea5e9;
-  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--shadow-card);
 }
 
 /* Vancouver Quick Access Cards */
 .vancouver-quick-card {
-  background: #ffffff;
-  border: 1px solid rgba(11, 19, 43, 0.08);
-  border-radius: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -333,16 +322,16 @@
 
 .vancouver-quick-card:hover {
   transform: translateY(-4px);
-  border-color: #0ea5e9;
-  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.12);
+  border-color: var(--color-brand-primary);
+  box-shadow: var(--shadow-card);
 }
 
 .vancouver-arrow-icon {
   width: 38px;
   height: 38px;
-  border-radius: 50%;
-  background: rgba(14, 165, 233, 0.1);
-  color: #0ea5e9;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-elevated);
+  color: var(--color-brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -350,7 +339,122 @@
 }
 
 .vancouver-quick-card:hover .vancouver-arrow-icon {
-  background: #0ea5e9;
-  color: #f8f9ff;
+  background: var(--color-surface);
+  color: var(--color-brand-primary);
   transform: translateX(4px);
+}
+
+.birthhub-auth {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-feature-settings: var(--font-features-rounded);
+}
+.birthhub-auth :where(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+  color: var(--color-heading-cyan);
+}
+.birthhub-auth p {
+  color: var(--color-text-secondary);
+  line-height: 1.75;
+}
+.birthhub-auth .vancouver-card p {
+  font-size: 15px;
+}
+.vancouver-gradient-text,
+.gradient-text {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--color-heading-gold);
+}
+.vancouver-navbar {
+  background: var(--color-background);
+}
+.vancouver-card,
+.vancouver-quick-card,
+.vancouver-pricing-card,
+.vancouver-app-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-brand-primary);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.vancouver-card:hover,
+.vancouver-quick-card:hover {
+  background: var(--color-surface-hover);
+  box-shadow: var(--shadow-elevated);
+}
+.vancouver-logo-pill,
+.vancouver-tab-nav,
+.vancouver-tab-btn-active,
+.vancouver-ecosystem-circle {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+}
+.vancouver-logo-pill,
+.vancouver-pricing-badge,
+.vancouver-ecosystem-circle,
+.vancouver-arrow-icon {
+  border-radius: var(--radius-pill);
+}
+.vancouver-btn-gradient {
+  background: var(--color-interactive-primary) !important;
+  color: var(--on-brand) !important;
+  border-color: var(--color-interactive-primary) !important;
+}
+.vancouver-btn-gradient:hover {
+  background: var(--color-interactive-hover) !important;
+  color: var(--on-brand) !important;
+  border-color: var(--color-interactive-hover) !important;
+}
+.vancouver-btn-outline {
+  background: var(--color-surface);
+  color: var(--color-interactive-primary);
+  border-color: var(--color-border-strong);
+}
+.birthhub-auth [role="dialog"] > .vancouver-card {
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--color-border-strong);
+}
+.birthhub-auth :where(input:not([type="checkbox"]), button) {
+  border-radius: var(--radius-control);
+}
+.birthhub-auth input:not([type="checkbox"]) {
+  min-height: 44px;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+.birthhub-auth input::placeholder {
+  color: var(--color-text-muted);
+}
+.birthhub-auth input:autofill,
+.birthhub-auth input:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-text-primary);
+  box-shadow: 0 0 0 1000px var(--color-surface-elevated) inset;
+  caret-color: var(--color-text-primary);
+}
+.birthhub-auth :focus-visible {
+  outline: var(--color-focus-ring);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .birthhub-auth *,
+  .birthhub-auth *::before,
+  .birthhub-auth *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .birthhub-auth .vancouver-navbar .vancouver-btn-gradient {
+    display: none;
+  }
+  .birthhub-auth .vancouver-navbar {
+    padding-inline: 1rem;
+  }
+  .birthhub-auth .vancouver-navbar > div {
+    gap: 0.75rem;
+  }
 }

@@ -33,7 +33,7 @@ export function Trophy3DIcon({ size = 40, className, animate = true, ...props }:
       <defs>
         <linearGradient id="gold-cup" x1="12" y1="8" x2="36" y2="28" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#FFF2B2" />
-          <stop offset="35%" stopColor="#D4AF37" />
+          <stop offset="35%" stopColor="var(--color-heading-gold)" />
           <stop offset="70%" stopColor="#997A15" />
           <stop offset="100%" stopColor="#5E4B0D" />
         </linearGradient>
@@ -46,7 +46,7 @@ export function Trophy3DIcon({ size = 40, className, animate = true, ...props }:
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.1" />
+          <stop offset="100%" stopColor="var(--color-heading-gold)" stopOpacity="0.1" />
         </linearGradient>
         <linearGradient
           id="gold-base"
@@ -56,14 +56,14 @@ export function Trophy3DIcon({ size = 40, className, animate = true, ...props }:
           y2="44"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0%" stopColor="#D4AF37" />
+          <stop offset="0%" stopColor="var(--color-heading-gold)" />
           <stop offset="50%" stopColor="#7A5E10" />
           <stop offset="100%" stopColor="#3D2E05" />
         </linearGradient>
         <radialGradient id="star-sparkle" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#FFFFFF" />
           <stop offset="60%" stopColor="#FFF2B2" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
+          <stop offset="100%" stopColor="var(--color-heading-gold)" stopOpacity="0" />
         </radialGradient>
       </defs>
 
@@ -148,7 +148,7 @@ export function Gem3DIcon({ size = 40, className, animate = true, ...props }: Ic
       <defs>
         <linearGradient id="gem-top" x1="12" y1="8" x2="36" y2="18" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#70BFFF" />
-          <stop offset="50%" stopColor="#1677FF" />
+          <stop offset="50%" stopColor="var(--color-heading-blue)" />
           <stop offset="100%" stopColor="#0B3E8C" />
         </linearGradient>
         <linearGradient id="gem-left" x1="6" y1="18" x2="24" y2="40" gradientUnits="userSpaceOnUse">
@@ -314,7 +314,7 @@ export function ShieldSecurityIcon({
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0%" stopColor="#FFF2B2" />
-          <stop offset="50%" stopColor="#D4AF37" />
+          <stop offset="50%" stopColor="var(--color-heading-gold)" />
           <stop offset="100%" stopColor="#6E5507" />
         </linearGradient>
         <linearGradient
@@ -326,7 +326,7 @@ export function ShieldSecurityIcon({
           gradientUnits="userSpaceOnUse"
         >
           <stop offset="0%" stopColor="#1E2A4A" />
-          <stop offset="100%" stopColor="#0B132B" />
+          <stop offset="100%" stopColor="var(--color-background)" />
         </linearGradient>
         <linearGradient
           id="shield-right"
@@ -356,7 +356,7 @@ export function ShieldSecurityIcon({
       {/* Ícone de Check / Segurança Central */}
       <path
         d="M18 23L22 27L30 19"
-        stroke="#D4AF37"
+        stroke="var(--color-heading-gold)"
         strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"

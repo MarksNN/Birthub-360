@@ -30,29 +30,17 @@ export interface BorderBeamProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const PRESET_PALETTES = {
   cyan: {
-    from: '#38bdf8', // Sky-400 luminoso
-    mid: '#00f0ff', // Ciano laser elétrico
+    from: 'var(--color-brand-primary)',
+    mid: 'var(--color-brand-primary)',
     to: 'transparent',
-    glow: 'rgba(0, 240, 255, 0.55)',
   },
-  brand: {
-    from: '#fef08a', // Ouro claro
-    mid: '#d4af37', // Cosmic Gold institucional
-    to: 'transparent',
-    glow: 'rgba(212, 175, 55, 0.55)',
-  },
+  brand: { from: 'var(--color-brand-accent)', mid: 'var(--color-brand-accent)', to: 'transparent' },
   violet: {
-    from: '#f3e8ff', // Íris iluminada
-    mid: '#a855f7', // Roxo de inteligência comercial
+    from: 'var(--color-heading-iris)',
+    mid: 'var(--color-heading-iris)',
     to: 'transparent',
-    glow: 'rgba(168, 85, 247, 0.55)',
   },
-  emerald: {
-    from: '#d1fae5', // Menta brilhante
-    mid: '#10b981', // Esmeralda de operação ativa
-    to: 'transparent',
-    glow: 'rgba(16, 185, 129, 0.55)',
-  },
+  emerald: { from: 'var(--color-success)', mid: 'var(--color-success)', to: 'transparent' },
 } as const;
 
 export const BorderBeam = React.forwardRef<HTMLDivElement, BorderBeamProps>(
@@ -61,7 +49,7 @@ export const BorderBeam = React.forwardRef<HTMLDivElement, BorderBeamProps>(
       className,
       size = 220,
       duration = 12,
-      borderWidth = 1.5,
+      borderWidth = 1,
       anchor = 90,
       colorFrom,
       colorMid,
@@ -69,8 +57,8 @@ export const BorderBeam = React.forwardRef<HTMLDivElement, BorderBeamProps>(
       variant = 'cyan',
       delay = 0,
       reverse = false,
-      glow = true,
-      radius = 16,
+      glow = false,
+      radius = 'var(--radius-card)',
       style,
       ...props
     },
@@ -117,7 +105,7 @@ export const BorderBeam = React.forwardRef<HTMLDivElement, BorderBeamProps>(
             <div
               className="absolute aspect-square w-[var(--beam-size)] [offset-anchor:var(--beam-anchor)_50%] [offset-path:rect(0_auto_auto_0_round_var(--beam-radius))] animate-[border-beam_var(--beam-duration)_infinite_linear]"
               style={{
-                background: `linear-gradient(to left, #ffffff, ${activeFrom}, ${activeMid}, ${activeTo})`,
+                background: 'var(--grad-brand)',
                 animationDelay: 'var(--beam-delay)',
                 animationDirection: reverse ? 'reverse' : 'normal',
               }}
@@ -142,7 +130,7 @@ export const BorderBeam = React.forwardRef<HTMLDivElement, BorderBeamProps>(
           <div
             className="absolute aspect-square w-[var(--beam-size)] [offset-anchor:var(--beam-anchor)_50%] [offset-path:rect(0_auto_auto_0_round_var(--beam-radius))] animate-[border-beam_var(--beam-duration)_infinite_linear]"
             style={{
-              background: `linear-gradient(to left, #ffffff, ${activeFrom}, ${activeMid}, ${activeTo})`,
+              background: 'var(--grad-brand)',
               animationDelay: 'var(--beam-delay)',
               animationDirection: reverse ? 'reverse' : 'normal',
             }}

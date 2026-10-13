@@ -37,6 +37,7 @@ const TAB_ROUTE_SET: Record<TabType, true> = {
   activities: true,
   cadence: true,
   prospect: true,
+  'signals-risks': true,
   intelligence: true,
   'market-intelligence': true,
   chatbook: true,

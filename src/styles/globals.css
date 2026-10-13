@@ -965,10 +965,7 @@
     color: var(--ink);
   }
 
-  /* REGRA MANDATÓRIA ABSOLUTA DO DESIGN — BIRTH HUB 360°:
-     NENHUMA FONTE DE NENHUM TEXTO OU TÍTULO PODE SER BRANCA OU PRETA.
-     Todos os títulos (h1 ao h6) usam cores neon (#00D4FF, #FF2D9B ou #FFC107) ou gradientes neon.
-     Todos os textos de corpo e parágrafos usam tons neon (#70D6FF, #00D4FF, #38BDF8, #FFC107). */
+  /* Headings consume semantic accents; descriptions remain neutral. */
   h1,
   h2,
   h3,
@@ -976,7 +973,7 @@
   h5,
   h6 {
     font-family: var(--font-display);
-    color: var(--neon-blue);
+    color: var(--card-accent, var(--color-heading-cyan));
     letter-spacing: -0.02em;
   }
 
@@ -989,8 +986,8 @@
   h4.neon-title-blue,
   h5.neon-title-blue,
   h6.neon-title-blue {
-    color: #00d4ff;
-    text-shadow: 0 0 18px rgba(0, 212, 255, 0.45);
+    color: var(--color-heading-cyan);
+    text-shadow: none;
   }
 
   .neon-title-pink,
@@ -1000,8 +997,8 @@
   h4.neon-title-pink,
   h5.neon-title-pink,
   h6.neon-title-pink {
-    color: #ff2d9b;
-    text-shadow: 0 0 18px rgba(255, 45, 155, 0.45);
+    color: var(--color-heading-pink);
+    text-shadow: none;
   }
 
   .neon-title-gold,
@@ -1011,8 +1008,8 @@
   h4.neon-title-gold,
   h5.neon-title-gold,
   h6.neon-title-gold {
-    color: #ffc107;
-    text-shadow: 0 0 18px rgba(255, 193, 7, 0.45);
+    color: var(--color-heading-gold);
+    text-shadow: none;
   }
 
   .neon-gradient-title {
@@ -1031,7 +1028,7 @@
     justify-content: center;
     gap: 0.65rem;
     font-weight: 700;
-    color: #00d4ff;
+    color: var(--color-heading-cyan);
     background: #14141a;
     border: 2px solid #00d4ff;
     box-shadow:

@@ -165,7 +165,12 @@ export function Gamified3DOrb({
       particleCount: 35,
       spread: 55,
       origin: { y: 0.7 },
-      colors: ['#D4AF37', '#F0D77B', '#C53678', '#1677FF', '#FFFFFF'],
+      colors: [
+        '--color-brand-accent',
+        '--color-brand-primary',
+        '--color-brand-secondary',
+        '--color-success',
+      ].map((token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim()),
     });
 
     onOrbClick?.();

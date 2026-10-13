@@ -54,7 +54,7 @@ export const groqProvider: ProviderAdapter = {
         if (!lastError || msg.includes('429')) {
           lastError = err;
         }
-        // Se for erro de quota de modelo específico (429) ou modelo não acessível nesta chave (404 / does not exist), tenta o próximo modelo candidato
+        // Se for erro de quota de modelo específico (429), modelo não acessível nesta chave (404 / does not exist) ou resposta vazia/degenerada, tenta o próximo modelo candidato
         if (
           msg.includes('429') ||
           msg.includes('404') ||
@@ -62,7 +62,8 @@ export const groqProvider: ProviderAdapter = {
           msg.includes('not have access') ||
           msg.includes('tokens per day') ||
           msg.includes('TPD') ||
-          msg.includes('Rate limit reached for model')
+          msg.includes('Rate limit reached for model') ||
+          msg.includes('resposta vazia')
         ) {
           if (msg.includes('429') && !msg.includes('TPD') && !msg.includes('tokens per day')) {
             const match = msg.match(/try again in ([0-9.]+)s/i);

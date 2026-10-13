@@ -126,7 +126,7 @@ export function KpiCard({
   };
 
   const sharedClassName = cn(
-    'group relative w-full overflow-hidden rounded-2xl border border-line bg-surface p-5 text-left text-ink shadow-sm transition-all duration-300',
+    'bh-platform-card group relative w-full overflow-hidden rounded-card border border-line bg-surface p-5 text-left text-ink shadow-sm transition-all duration-300',
     onSelect &&
       'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-line-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     active &&
@@ -170,7 +170,7 @@ export function KpiCard({
         </div>
 
         <div>
-          <h3 className="mb-1.5 font-display text-[26px] font-bold leading-none tracking-tight text-ink">
+          <h3 className="mb-1.5 font-mono text-[26px] font-bold leading-none tracking-tight text-ink">
             {value}
           </h3>
           <p className="text-[13px] font-medium text-ink-2">{displayLabel}</p>
@@ -179,14 +179,14 @@ export function KpiCard({
         {(trend || displaySubtitle) && (
           <div className="mt-2 flex items-center gap-1.5">
             {trend && (
-              <span className={cn('text-[11px] font-semibold', t.trend)}>
+              <span className={cn('text-xs leading-relaxed font-semibold', t.trend)}>
                 {trend.isPositive !== false ? '+' : '-'}
                 {trend.value}
                 {trend.text ? ` ${trend.text}` : ''}
               </span>
             )}
             {displaySubtitle && (
-              <span className={cn('text-[11px] text-ink-2', !trend && t.trend)}>
+              <span className={cn('text-xs leading-relaxed text-ink-2', !trend && t.trend)}>
                 {displaySubtitle}
               </span>
             )}
@@ -205,6 +205,19 @@ export function KpiCard({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         aria-pressed={active}
+        data-accent={
+          rawTone === 'ok'
+            ? 'success'
+            : rawTone === 'critical'
+              ? 'danger'
+              : rawTone === 'pulse'
+                ? 'pink'
+                : rawTone === 'orange'
+                  ? 'gold'
+                  : rawTone === 'ink'
+                    ? 'blue'
+                    : rawTone
+        }
         className={sharedClassName}
       >
         {content}
@@ -215,5 +228,24 @@ export function KpiCard({
   // Ramo sem onSelect: puramente apresentacional (sem role/teclado/ponteiro).
   // Sem onSelect?.() aqui — após o early-return, TS estreita onSelect a undefined (TS2349, #702).
   // Sem handlers de ponteiro (Biome noStaticElementInteractions); spotlight/hover SFX só no <button>.
-  return <div className={sharedClassName}>{content}</div>;
+  return (
+    <div
+      data-accent={
+        rawTone === 'ok'
+          ? 'success'
+          : rawTone === 'critical'
+            ? 'danger'
+            : rawTone === 'pulse'
+              ? 'pink'
+              : rawTone === 'orange'
+                ? 'gold'
+                : rawTone === 'ink'
+                  ? 'blue'
+                  : rawTone
+      }
+      className={sharedClassName}
+    >
+      {content}
+    </div>
+  );
 }

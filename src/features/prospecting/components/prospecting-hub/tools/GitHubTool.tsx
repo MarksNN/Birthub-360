@@ -74,14 +74,17 @@ export function GitHubTool(_props: { configured: boolean }) {
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-      <div className="xl:col-span-4 bg-surface p-6 rounded-2xl border border-line shadow-sm space-y-4">
+      <div
+        data-accent="blue"
+        className="bh-platform-card xl:col-span-4 bg-surface p-6 rounded-2xl border border-line shadow-sm space-y-4"
+      >
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center text-brand">
             <Github size={18} />
           </div>
           <h2 className="font-black text-lg text-ink">GitHub</h2>
         </div>
-        <p className="text-xs text-ink-2">
+        <p className="text-sm leading-[1.7] text-ink-2">
           Busca organizações públicas no GitHub — sinal de maturidade técnica de uma empresa-alvo
           (site institucional, repositórios públicos). Gratuita, sem chave de API.
         </p>
@@ -141,7 +144,8 @@ export function GitHubTool(_props: { configured: boolean }) {
           return (
             <div
               key={org.login}
-              className="bg-surface p-5 rounded-2xl border border-line shadow-sm flex flex-wrap items-center gap-x-4 gap-y-2"
+              data-accent="blue"
+              className="bh-platform-card bg-surface p-5 rounded-2xl border border-line shadow-sm flex flex-wrap items-center gap-x-4 gap-y-2"
             >
               <img
                 src={org.avatarUrl}

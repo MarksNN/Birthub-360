@@ -168,14 +168,15 @@ export function BitrixGuideHub() {
           {practices.map((p, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-surface-2 border border-line flex items-start gap-4"
+              data-accent="blue"
+              className="bh-platform-card p-5 flex items-start gap-4"
             >
               <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="font-extrabold text-xs text-ink">{p.title}</h4>
-                <p className="text-xs text-ink-2 mt-1 font-medium leading-relaxed">{p.detail}</p>
+                <p className="text-sm text-ink-2 mt-1 font-medium leading-[1.7]">{p.detail}</p>
               </div>
             </div>
           ))}
@@ -216,7 +217,7 @@ export function BitrixGuideHub() {
             </ol>
           </div>
 
-          <div className="p-5 rounded-2xl bg-surface-2 border border-line flex items-start gap-4">
+          <div data-accent="blue" className="bh-platform-card p-5 flex items-start gap-4">
             <div
               className={`p-2.5 rounded-xl shrink-0 ${accent.bgSoft} ${accent.text} border ${accent.borderSoft}`}
             >
@@ -226,7 +227,7 @@ export function BitrixGuideHub() {
               <h4 className="font-extrabold text-xs text-ink">
                 Regra real de elegibilidade de pipeline (Comercial Inteligente)
               </h4>
-              <p className="text-xs text-ink-2 mt-1 font-medium leading-relaxed">
+              <p className="text-sm text-ink-2 mt-1 font-medium leading-[1.7]">
                 Um negócio só entra no forecast do Comercial Inteligente quando, no Bitrix24, ele
                 tem: negócio aberto (não ganho/perdido), valor preenchido (maior que zero), data
                 prevista de fechamento, responsável definido e próxima ação registrada — e quando o
@@ -317,7 +318,8 @@ export function BitrixGuideHub() {
           {tutorials.map((t, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-3xl bg-surface border border-line shadow-sm space-y-3 flex flex-col justify-between"
+              data-accent="blue"
+              className="bh-platform-card p-5 space-y-3 flex flex-col justify-between"
             >
               <div>
                 <span

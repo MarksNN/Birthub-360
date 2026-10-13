@@ -1,0 +1,150 @@
+/* The public alternate landing consumes the same runtime tokens as the platform. */
+.bh-landing-new {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-interface);
+  font-feature-settings: var(--font-features-rounded);
+}
+.bh-landing-new header {
+  background: var(--color-surface-elevated);
+  border-color: var(--color-border-subtle);
+}
+.bh-landing-new h1 {
+  color: var(--color-heading-gold);
+}
+.bh-landing-new h2 {
+  color: var(--color-heading-cyan);
+}
+.bh-landing-new #segurança h2,
+.bh-landing-new #segurança h3 {
+  color: var(--color-heading-blue);
+}
+.bh-landing-new section:last-of-type h2 {
+  color: var(--color-heading-pink);
+}
+.bh-landing-new :is(h1, h2, h3) {
+  font-family: var(--font-heading);
+}
+.bh-landing-new p {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+.bh-landing-new .bh-landing-card {
+  --card-accent: var(--color-heading-cyan);
+  height: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--card-accent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.bh-landing-new .bh-landing-card[data-accent="iris"] {
+  --card-accent: var(--color-heading-iris);
+}
+.bh-landing-new .bh-landing-card[data-accent="blue"] {
+  --card-accent: var(--color-heading-blue);
+}
+.bh-landing-new .bh-landing-card[data-accent="success"] {
+  --card-accent: var(--color-heading-success);
+}
+.bh-landing-new .bh-landing-card p {
+  font-size: 15px;
+}
+.bh-landing-new .bh-landing-card:hover {
+  box-shadow: var(--shadow-elevated);
+}
+.bh-landing-new .bh-landing-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
+}
+.bh-landing-new .bh-landing-button-primary {
+  background: var(--color-interactive-primary);
+  color: var(--on-brand);
+}
+.bh-landing-new .bh-landing-button-primary:hover {
+  background: var(--color-interactive-hover);
+}
+.bh-landing-new .bh-landing-button-secondary {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
+}
+.bh-landing-new :is(button, a):focus-visible {
+  outline: var(--color-focus-ring);
+  outline-offset: var(--focus-offset);
+}
+.bh-landing-new [class*="text-slate"] {
+  color: var(--color-text-secondary);
+}
+.bh-landing-new :where(h1, h2, h3)[class*="text-slate"] {
+  color: var(--color-heading-gold);
+}
+.bh-landing-new #inteligência h2 {
+  color: var(--color-heading-iris);
+}
+.bh-landing-new [class*="bg-slate"] {
+  background-color: var(--color-surface-elevated);
+}
+.bh-landing-new [class*="border-slate"] {
+  border-color: var(--color-border-subtle);
+}
+.bh-landing-new [class*="rounded-xl"],
+.bh-landing-new [class*="rounded-lg"],
+.bh-landing-new [class*="rounded-md"] {
+  border-radius: var(--radius-control);
+}
+.bh-landing-new [class*="rounded-full"] {
+  border-radius: var(--radius-pill);
+}
+.bh-landing-new .font-mono {
+  font-family: var(--font-data);
+}
+.bh-landing-new .bh-landing-caption {
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bh-landing-new *,
+  .bh-landing-new *::before,
+  .bh-landing-new *::after {
+    animation: none;
+    transition: none;
+    scroll-behavior: auto;
+  }
+}
+@media (max-width: 640px) {
+  .bh-landing-new header .bh-landing-button {
+    padding: 12px;
+    font-size: 12px;
+  }
+  .bh-landing-new header > div {
+    gap: 8px;
+  }
+  .bh-landing-new header h1 {
+    font-size: 14px;
+  }
+  .bh-landing-new header .gap-4 {
+    gap: 4px;
+  }
+  .bh-landing-new .bh-landing-card {
+    padding: 24px;
+  }
+}
+
+.bh-landing-new .bh-landing-card h3 {
+  color: var(--card-accent);
+}
+.bh-landing-new .text-green-500 {
+  color: var(--color-heading-success);
+}
+.bh-landing-new .text-blue-500 {
+  color: var(--color-heading-blue);
+}
+.bh-landing-new .text-purple-500 {
+  color: var(--color-heading-iris);
+}
+.bh-landing-new .bg-green-500 {
+  background: var(--color-success);
+}

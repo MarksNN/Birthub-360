@@ -4,31 +4,19 @@
 <head><script>window.process = { env: {} };</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Obsidian: cor institucional escura da marca (identidade-visual/birthhub360).
-         BrandProvider troca este valor conforme o tema ativo. -->
-  <meta name="theme-color" content="#0B132B" />
+  <!-- Cor inicial do tema light oficial; ThemeProvider acompanha a alternância. -->
+  <meta name="theme-color" content="#F4F7FB" />
   <meta name="description"
     content="Birth Hub 360° conecta dados, inteligência artificial, CRM, automação e execução comercial em um único centro de comando." />
   <!-- Variante de ícone (não o símbolo completo): abaixo de ~96px a coroa de traços
          do emblema vira ruído. Ver identidade-visual/birthhub360/README.md. -->
   <link rel="icon" type="image/svg+xml" href="/brand/birthhub360-icone.svg" />
   <title>Birth Hub 360° | Commercial Intelligence & Execution Platform</title>
-  <!-- Google Fonts: Plus Jakarta Sans, JetBrains Mono e Sora -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- Prevent FOUC: apply theme class immediately before React loads -->
+  <!-- Fontes oficiais self-hosted são carregadas por globals.css. -->
   <script>
-    (function() {
-      try {
-        var theme = localStorage.getItem('atlas_theme');
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      } catch (e) {}
-    })();
+    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.add("light");
+    document.documentElement.dataset.theme = "light";
   </script>
 </head>
 

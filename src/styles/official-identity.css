@@ -1,0 +1,195 @@
+@import "../../identidade-visual/birthhub360/tokens/birthhub360.css";
+
+/* Compatibility adapters: existing platform utilities consume the official tokens.
+   Import after globals.css; never redefine the canonical palette here. */
+:root,
+html.light,
+html.dark,
+[data-theme] {
+  --bg: var(--color-background);
+  --surface: var(--color-surface);
+  --surface-2: var(--color-surface-elevated);
+  --surface-subtle: var(--color-surface-elevated);
+  --surface-elevated: var(--color-surface-elevated);
+  --surface-interactive: var(--color-surface-hover);
+  --ink: var(--color-text-primary);
+  --ink-2: var(--color-text-secondary);
+  --line: var(--color-border-subtle);
+  --line-strong: var(--color-border-strong);
+  --border-input: color-mix(in srgb, var(--color-text-primary) 50%, var(--color-surface));
+  --brand: var(--color-interactive-primary);
+  --brand-2: var(--color-brand-secondary);
+  --brand-text: var(--color-heading-cyan);
+  --on-brand: var(--palette-neon-black);
+  --focus-ring: var(--color-focus);
+  --iris: var(--color-heading-iris);
+  --red-violet: var(--color-heading-iris);
+  --red-violet-active: var(--color-heading-iris);
+  --orbit-blue: var(--color-heading-blue);
+  --gold: var(--color-heading-gold);
+  --pink: var(--color-heading-pink);
+  --red: var(--color-heading-danger);
+  --warn: var(--color-warning);
+  --ok: var(--color-success);
+  --info: var(--palette-info);
+  --critical: var(--color-heading-danger);
+  --accent-violet: var(--color-heading-iris);
+  --accent-cyan: var(--color-heading-cyan);
+  --pulse: var(--color-heading-pink);
+  --font-brand-sans: var(--font-interface);
+  --font-brand-display: var(--font-heading);
+  --font-brand-mono: var(--font-data);
+  --shadow-card-value: var(--shadow-card);
+  --shadow-card-hover-value: var(--shadow-elevated);
+  --radius-nav-item-value: var(--radius-control);
+  --neon-blue: var(--color-heading-cyan);
+  --neon-pink: var(--color-heading-pink);
+  --neon-gold: var(--color-heading-gold);
+  --neon-white: var(--color-text-primary);
+  --neon-text: var(--color-text-secondary);
+  --neon-card-bg: var(--color-surface);
+  --neon-card-border: var(--color-border-subtle);
+  --coolors-yellow: var(--color-heading-gold);
+  --coolors-orange: var(--color-heading-gold);
+  --coolors-pink: var(--color-heading-pink);
+  --coolors-purple: var(--color-heading-iris);
+  --coolors-blue: var(--color-heading-blue);
+}
+html.dark,
+[data-theme="dark"] {
+  --on-brand: var(--palette-neon-black);
+}
+
+/* Utility compatibility without changing the official focus shorthand. */
+.text-brand-ink {
+  color: var(--color-heading-cyan);
+}
+.text-gold {
+  color: var(--color-heading-gold);
+}
+.text-pink {
+  color: var(--color-heading-pink);
+}
+.text-iris-active {
+  color: var(--color-heading-iris);
+}
+body {
+  font-feature-settings: var(--font-features-rounded);
+  letter-spacing: var(--tracking-rounded);
+}
+.bh-platform-card {
+  --card-accent: var(--page-accent, var(--color-heading-cyan));
+  background: var(--color-surface);
+  border: 1px solid var(--card-accent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.bh-platform-card:hover {
+  border-color: var(--card-accent);
+  box-shadow: var(--shadow-elevated);
+}
+.bh-platform-card :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--card-accent);
+}
+.bh-platform-card[data-accent="gold"] {
+  --card-accent: var(--color-heading-gold);
+}
+.bh-platform-card[data-accent="pink"] {
+  --card-accent: var(--color-heading-pink);
+}
+.bh-platform-card[data-accent="iris"] {
+  --card-accent: var(--color-heading-iris);
+}
+.bh-platform-card[data-accent="success"] {
+  --card-accent: var(--color-heading-success);
+}
+.bh-platform-card[data-accent="danger"] {
+  --card-accent: var(--color-heading-danger);
+}
+.bh-platform-card[data-accent="blue"] {
+  --card-accent: var(--color-heading-blue);
+}
+.bh-platform-card[data-accent="neutral"] {
+  --card-accent: var(--color-heading-blue);
+}
+.bh-official-control {
+  border-radius: var(--radius-control);
+  font-family: var(--font-interface);
+}
+.bh-official-control:focus-visible {
+  outline: var(--color-focus-ring);
+  outline-offset: var(--focus-offset);
+  box-shadow: none;
+}
+.bh-official-control[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+.bh-official-control:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-text-primary);
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bh-platform-card,
+  .bh-official-control {
+    transition: none;
+    animation: none;
+    transform: none;
+  }
+}
+/* Ring utilities expect a color, whereas the canonical token is an outline. */
+[class*="ring-focus-ring"],
+[class*="ring-ring"] {
+  --tw-ring-color: var(--color-focus);
+}
+html.dark,
+[data-theme="dark"] {
+  --ok-active: var(--color-heading-success);
+  --info-active: var(--color-heading-blue);
+  --critical-active: var(--color-heading-danger);
+  --warn-active: var(--color-heading-gold);
+  --success-active: var(--color-heading-success);
+  --warning-active: var(--color-heading-gold);
+  --danger-active: var(--color-heading-danger);
+}
+
+/* Domain accent is supplied by the application shell; body text stays neutral. */
+[data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--card-accent, var(--page-accent));
+  text-shadow: none;
+}
+.bh-platform-card .bh-label {
+  color: var(--card-accent);
+}
+:root,
+html.light,
+html.dark,
+[data-theme] {
+  --color-white: var(--palette-neon-white);
+  --color-snow: var(--palette-neon-white);
+  --color-gold: var(--color-heading-gold);
+  --color-neon-white: var(--color-text-primary);
+  --color-neon-text: var(--color-text-secondary);
+  --color-neon-blue: var(--color-heading-cyan);
+  --color-neon-pink: var(--color-heading-pink);
+  --color-neon-gold: var(--color-heading-gold);
+  --color-red-violet: var(--color-heading-iris);
+  --color-iris-active: var(--color-heading-iris);
+  --color-brand-ink: var(--color-heading-cyan);
+  --color-brand-active: var(--color-interactive-hover);
+  --radius-card-lg: var(--radius-card);
+  --glow-brand: var(--glow-cyan);
+  --glow-iris: var(--glow-pink);
+  --grad-titles: var(--grad-brand);
+}
+/* Existing neutral utility surfaces follow theme inside the product shell. */
+[data-page-accent] .bg-white {
+  background-color: var(--color-surface);
+}
+
+.bh-platform-card[data-accent="brand"] {
+  --card-accent: var(--color-heading-cyan);
+}
+
+.bh-platform-card[data-accent="cyan"] {
+  --card-accent: var(--color-heading-cyan);
+}

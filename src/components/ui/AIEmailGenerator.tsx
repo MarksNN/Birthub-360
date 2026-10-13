@@ -144,7 +144,12 @@ export function AIEmailGenerator({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.65 },
-        colors: ['#D4AF37', '#1677FF', '#C53678', '#10B981'],
+        colors: [
+          '--color-brand-accent',
+          '--color-brand-primary',
+          '--color-brand-secondary',
+          '--color-success',
+        ].map((token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim()),
       });
     } catch (generationError: any) {
       SoundFX.play('error');
