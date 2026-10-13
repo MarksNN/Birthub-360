@@ -184,11 +184,69 @@ router.get('/runs', async (req: Request, res: Response, next: NextFunction): Pro
 });
 
 import { routeParam } from '../../shared/http/routeParams.js';
-import { CADENCE_JOURNEY_TEMPLATES } from './domain/cadenceTemplates.js';
+import {
+  CADENCE_JOURNEY_TEMPLATES,
+  DEFAULT_PLAYBOOK_TEMPLATES,
+} from './domain/cadenceTemplates.js';
 
 router.get('/templates', (_req: Request, res: Response): void => {
   res.json({ success: true, data: CADENCE_JOURNEY_TEMPLATES });
 });
+
+const handleSeedDefaultPlaybooks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { organizationId, id: userId } = (req as AuthRequest).user;
+    const existing = await prisma.cadenceSequence.findMany({
+      where: {
+        organizationId,
+        active: true,
+        deletedAt: null,
+      },
+      select: { name: true },
+    });
+    const existingNames = new Set(existing.map((s) => s.name));
+
+    const toCreate = DEFAULT_PLAYBOOK_TEMPLATES.filter((tpl) => !existingNames.has(tpl.name));
+
+    const createdSequences = [];
+    for (const template of toCreate) {
+      const seq = await prisma.cadenceSequence.create({
+        data: {
+          organizationId,
+          name: template.name,
+          description: template.description,
+          touches: template.touches.map((t) => ({
+            order: t.order,
+            channel: t.channel,
+            delayHoursFromPrevious: t.delayHoursFromPrevious,
+            templateRef: t.templateRef,
+            stepTitle: t.stepTitle,
+            maxAttempts: t.maxAttempts || 1,
+            fallbackTouchOrder: t.fallbackTouchOrder,
+          })),
+          createdBy: userId,
+        },
+      });
+      createdSequences.push(seq);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `${createdSequences.length} playbook(s) padrão carregado(s) com sucesso.`,
+      count: createdSequences.length,
+      data: createdSequences,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+router.post('/templates/seed-defaults', writeRoles, handleSeedDefaultPlaybooks);
+router.post('/playbooks/load-defaults', writeRoles, handleSeedDefaultPlaybooks);
 
 router.post(
   '/sequences/from-template/:templateId',

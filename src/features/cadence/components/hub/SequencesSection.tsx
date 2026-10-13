@@ -1,4 +1,4 @@
-import { AlertTriangle, ListChecks, PowerOff, RefreshCw } from 'lucide-react';
+import { AlertTriangle, ListChecks, PowerOff, RefreshCw, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Card } from '../../../../components/ui/Card.js';
 import { useConfirmDialog } from '../../../../components/ui/ConfirmDialog.js';
@@ -67,6 +67,21 @@ export function SequencesSection({ canManage }: { canManage: boolean }) {
     }
   };
 
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeedDefaults = async () => {
+    setSeeding(true);
+    try {
+      const res = await cadenceApi.seedDefaultPlaybooks();
+      toast.success(res.message || 'Playbooks padrão carregados com sucesso!');
+      load();
+    } catch (err: any) {
+      toast.error((err as Error).message || 'Falha ao carregar playbooks padrão.');
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   return (
     <Card padding="sm" variant="bento" spotlight className="relative overflow-hidden">
       {/* 2026 Top Specular Highlight */}
@@ -81,18 +96,35 @@ export function SequencesSection({ canManage }: { canManage: boolean }) {
             </span>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            SoundFX.play('navigate');
-            load();
-          }}
-          className="p-1.5 text-ink-2 hover:text-ink hover:bg-surface-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-          title="Atualizar"
-          aria-label="Atualizar sequências"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          {canManage && (
+            <button
+              type="button"
+              disabled={seeding}
+              onClick={() => {
+                SoundFX.play('click');
+                handleSeedDefaults();
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-brand bg-brand/10 hover:bg-brand/20 border border-brand/20 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-60"
+              title="Injetar 3 playbooks padrão (Outbound, Reativação, Passagem de Bastão)"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{seeding ? 'Carregando…' : 'Carregar Playbooks Padrão'}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              SoundFX.play('navigate');
+              load();
+            }}
+            className="p-1.5 text-ink-2 hover:text-ink hover:bg-surface-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            title="Atualizar"
+            aria-label="Atualizar sequências"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {loading ? (

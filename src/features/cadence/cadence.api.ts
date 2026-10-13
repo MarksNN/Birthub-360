@@ -147,6 +147,11 @@ export const cadenceApi = {
   templates: () => api.get<CadenceJourneyTemplate[]>('/api/cadence/templates'),
   createSequenceFromTemplate: (templateId: string) =>
     api.post<CadenceSequenceDTO>(`/api/cadence/sequences/from-template/${templateId}`, {}),
+  seedDefaultPlaybooks: () =>
+    api.post<{ success: boolean; count: number; message: string; data: CadenceSequenceDTO[] }>(
+      '/api/cadence/templates/seed-defaults',
+      {},
+    ),
   scheduleMeeting: (leadId: string, input: { proposedStart: string; proposedEnd: string }) =>
     api.post<ScheduleMeetingResponse>(`/api/cadence/leads/${leadId}/schedule-meeting`, input),
 };

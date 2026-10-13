@@ -121,10 +121,10 @@ export const METRICS_DICTIONARY: MetricDefinition[] = [
     description:
       'Subconjunto do Pipeline Total com condição mínima real de fechar — nunca "pipeline aberto = forecast".',
     formula:
-      'Pipeline Total filtrado por: valor válido (>0), responsável preenchido, data prevista preenchida, próxima ação preenchida, e aging na etapa atual dentro do limiar crítico.',
+      'Pipeline Total filtrado por: valor válido (>0), responsável preenchido, data prevista preenchida, próxima ação preenchida, e tempo de permanência na etapa atual dentro do limiar crítico.',
     source: 'application/pipelineEligibility.ts',
     period: 'Instantâneo',
-    inclusionRules: `Limiar de aging crítico atual: ${STAGE_AGING_CRITICAL_DAYS} dias na etapa (política inicial única — não há SLA por etapa configurado ainda).`,
+    inclusionRules: `Limiar de tempo de permanência crítico atual: ${STAGE_AGING_CRITICAL_DAYS} dias na etapa (política inicial única — não há SLA por etapa configurado ainda).`,
     exclusionRules:
       'Qualquer critério que falhe remove o negócio da lista elegível (motivo fica disponível no drill-down).',
   },
@@ -236,7 +236,7 @@ export const METRICS_DICTIONARY: MetricDefinition[] = [
   },
   {
     key: 'aging',
-    name: 'Aging de Oportunidades',
+    name: 'Tempo de Permanência das Oportunidades',
     description: 'Idade dos negócios abertos desde a criação, em faixas.',
     formula: 'AGORA − createdAt, agrupado em 0–15/16–30/31–45/46–60/61–90/90+ dias.',
     source: 'Lead',
@@ -246,7 +246,7 @@ export const METRICS_DICTIONARY: MetricDefinition[] = [
   },
   {
     key: 'aging_etapa',
-    name: 'Aging por Etapa',
+    name: 'Tempo de Permanência por Etapa',
     description: 'Tempo dentro da etapa atual.',
     formula:
       'AGORA − data de entrada na etapa atual (LeadStageHistory.enteredAt da linha sem exitedAt).',
@@ -270,7 +270,7 @@ export const METRICS_DICTIONARY: MetricDefinition[] = [
   },
   {
     key: 'leading_indicators',
-    name: 'Leading Indicators',
+    name: 'Indicadores Antecedentes',
     description: 'Indicadores semanais de atividade comercial que antecedem receita.',
     formula:
       'Reuniões concluídas (Activity), oportunidades qualificadas (conversão Lead→Negócio), pipeline criado, avanços de etapa, propostas enviadas e ganhos — todos por semana.',
@@ -509,7 +509,7 @@ export const METRICS_DICTIONARY: MetricDefinition[] = [
     name: 'Health Score composto',
     description:
       'Agrega, em 6 pilares nomeados (Pipeline, Conversão, Produtividade, Qualidade do CRM, Follow-up, Confiabilidade de Forecast), métricas que já existem em outros relatórios — nunca um cálculo paralelo/duplicado.',
-    formula: `Pipeline = Coverage do mês / Coverage recomendado (ou ${COVERAGE_PROTECTION_FALLBACK_HEALTHY}x sem Win Rate ainda). Conversão = Win Rate do período. Produtividade = média da razão (semana atual / média móvel 4 semanas) dos Leading Indicators. Qualidade do CRM = Confiabilidade dos Dados (dataReadiness.overallScore). Follow-up = % do pipeline aberto fora do aging crítico (${STAGE_AGING_CRITICAL_DAYS} dias). Confiabilidade de Forecast = 100 − Erro Percentual Absoluto Médio (forecast_erro_historico). Score geral = média simples dos pilares com dado disponível.`,
+    formula: `Pipeline = Coverage do mês / Coverage recomendado (ou ${COVERAGE_PROTECTION_FALLBACK_HEALTHY}x sem Win Rate ainda). Conversão = Win Rate do período. Produtividade = média da razão (semana atual / média móvel 4 semanas) dos Indicadores Antecedentes. Qualidade do CRM = Confiabilidade dos Dados (dataReadiness.overallScore). Follow-up = % do pipeline aberto fora do tempo crítico de permanência (${STAGE_AGING_CRITICAL_DAYS} dias). Confiabilidade de Forecast = 100 − Erro Percentual Absoluto Médio (forecast_erro_historico). Score geral = média simples dos pilares com dado disponível.`,
     source: 'application/healthScore.ts',
     period: 'Mesmo período do filtro do Cockpit (mensal)',
     inclusionRules: `Limiares por pilar documentados em HEALTH_SCORE_RULES (ex.: Conversão saudável ≥${HEALTH_SCORE_RULES.WIN_RATE_HEALTHY_PCT}%, atenção ≥${HEALTH_SCORE_RULES.WIN_RATE_WARNING_PCT}%).`,

@@ -15,7 +15,7 @@ import {
   Users,
   WifiOff,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button.js';
 import { useConfirmDialog } from '../../../components/ui/ConfirmDialog.js';
@@ -24,6 +24,7 @@ import { LinkedinIcon as Linkedin } from '../../../components/ui/icons/LinkedinI
 import { Input } from '../../../components/ui/Input.js';
 import { Pagination } from '../../../components/ui/Pagination.js';
 import { PageTitleCard } from '../../../components/ui/PageTitleCard.js';
+import { type ColumnDef, VirtualTable } from '../../../components/ui/VirtualTable.js';
 import { useContacts } from '../../../hooks/useDatabase.js';
 import { clientLogger } from '../../../lib/clientLogger.js';
 import { contactsDB } from '../../../lib/db.js';
@@ -49,44 +50,11 @@ const SENIORITY_COLORS: Record<string, string> = {
   Analyst: 'bg-surface-2 text-ink-2 border-line',
 };
 
-function SkeletonRow() {
-  return (
-    <tr className="border-b border-line animate-pulse">
-      <td className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-surface-2" />
-          <div className="space-y-2">
-            <div className="h-3 bg-surface-2 rounded-full w-32" />
-            <div className="h-2.5 bg-surface-2 rounded-full w-20" />
-          </div>
-        </div>
-      </td>
-      <td className="p-4 hidden md:table-cell">
-        <div className="h-3 bg-surface-2 rounded-full w-28" />
-      </td>
-      <td className="p-4 hidden lg:table-cell">
-        <div className="space-y-1.5">
-          <div className="h-2.5 bg-surface-2 rounded-full w-36" />
-          <div className="h-2.5 bg-surface-2 rounded-full w-24" />
-        </div>
-      </td>
-      <td className="p-4 hidden xl:table-cell">
-        <div className="h-5 bg-surface-2 rounded-full w-20" />
-      </td>
-      <td className="p-4">
-        <div className="flex justify-end gap-2">
-          <div className="w-8 h-8 bg-surface-2 rounded-xl" />
-          <div className="w-8 h-8 bg-surface-2 rounded-xl" />
-        </div>
-      </td>
-    </tr>
-  );
-}
-
 export function ContactList() {
   const [inputValue, setInputValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [enrichingId, setEnrichingId] = useState<string | null>(null);
@@ -123,54 +91,218 @@ export function ContactList() {
 
   const { contacts, meta, loading, error, refetch, deleteContact } = useContacts({
     page,
-    limit: 20,
+    limit: pageSize,
     search: searchTerm || undefined,
   });
 
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1);
+  };
+
   const totalPages = meta?.totalPages ?? 1;
 
-  const handleDelete = async (id: string) => {
-    if (
-      !(await confirm({
-        title: 'Excluir contato',
-        description: 'Excluir este contato?',
-        confirmLabel: 'Excluir',
-        variant: 'danger',
-      }))
-    )
-      return;
-    try {
-      await deleteContact(id);
-      toast.success('Contato excluído.');
-    } catch (error: any) {
-      clientLogger.error({ err: error }, 'Error deleting contact');
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Falha ao excluir o contato — confira se você tem permissão.',
-      );
-    }
-  };
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (
+        !(await confirm({
+          title: 'Excluir contato',
+          description: 'Excluir este contato?',
+          confirmLabel: 'Excluir',
+          variant: 'danger',
+        }))
+      )
+        return;
+      try {
+        await deleteContact(id);
+        toast.success('Contato excluído.');
+      } catch (error: any) {
+        clientLogger.error({ err: error }, 'Error deleting contact');
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Falha ao excluir o contato — confira se você tem permissão.',
+        );
+      }
+    },
+    [confirm, deleteContact],
+  );
 
-  const handleEnrich = async (id: string) => {
-    setEnrichingId(id);
-    try {
-      await contactsDB.enrich(id);
-      await refetch();
-      toast.success('Contato enriquecido com sucesso.');
-    } catch (error: any) {
-      clientLogger.error({ err: error }, 'Error enriching contact');
-      toast.error(error instanceof Error ? error.message : 'Falha ao enriquecer o contato.');
-    } finally {
-      setEnrichingId(null);
-    }
-  };
+  const handleEnrich = useCallback(
+    async (id: string) => {
+      setEnrichingId(id);
+      try {
+        await contactsDB.enrich(id);
+        await refetch();
+        toast.success('Contato enriquecido com sucesso.');
+      } catch (error: any) {
+        clientLogger.error({ err: error }, 'Error enriching contact');
+        toast.error(error instanceof Error ? error.message : 'Falha ao enriquecer o contato.');
+      } finally {
+        setEnrichingId(null);
+      }
+    },
+    [refetch],
+  );
 
   const handleSave = () => {
     setIsFormOpen(false);
     setSelectedContact(null);
     refetch();
   };
+
+  const columns: ColumnDef<Contact>[] = useMemo(
+    () => [
+      {
+        key: 'contato',
+        header: 'Contato',
+        width: '28%',
+        render: (contact) => (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center text-brand-ink dark:text-brand font-black text-sm shrink-0 border border-brand/20 shadow-sm">
+              {contact.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="font-extrabold text-ink text-sm truncate">{contact.name}</p>
+              <p className="text-xs text-ink-2 font-medium truncate">
+                {contact.role || contact.department || '—'}
+              </p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: 'empresa',
+        header: 'Empresa',
+        width: '20%',
+        render: (contact) => (
+          <div className="flex items-center gap-1.5 text-xs text-ink-2 font-semibold">
+            <Building className="w-3.5 h-3.5 text-ink-2 shrink-0" />
+            <span className="truncate max-w-[180px]">
+              {contact.company?.tradeName || contact.company?.legalName || '—'}
+            </span>
+          </div>
+        ),
+      },
+      {
+        key: 'canais',
+        header: 'Canais',
+        width: '24%',
+        render: (contact) => (
+          <div className="space-y-0.5">
+            {contact.email && (
+              <div className="flex items-center gap-1.5 text-[11px] text-ink-2">
+                <Mail className="w-3 h-3 text-brand shrink-0" />
+                <span className="truncate max-w-[160px] font-medium">{contact.email}</span>
+              </div>
+            )}
+            {contact.phone && (
+              <div className="flex items-center gap-1.5 text-[11px] text-ink-2">
+                <Phone className="w-3 h-3 text-sky-500 shrink-0" />
+                <span className="font-medium">{contact.phone}</span>
+              </div>
+            )}
+            {(contact.whatsapp || contact.phone) &&
+              getWhatsAppLink(contact.whatsapp || contact.phone) && (
+                <a
+                  href={getWhatsAppLink(contact.whatsapp || contact.phone)}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Número coletado — a existência de WhatsApp não foi verificada"
+                  className="flex items-center gap-1.5 text-[11px] text-emerald-600 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MessageCircle className="w-3 h-3 shrink-0" />
+                  <span className="font-medium">WhatsApp</span>
+                </a>
+              )}
+            {contact.linkedin && (
+              <a
+                href={contact.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 text-[11px] text-info-active dark:text-info hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Linkedin className="w-3 h-3 shrink-0" />
+                <span className="font-medium">LinkedIn</span>
+              </a>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: 'seniority',
+        header: 'Seniority',
+        width: 120,
+        render: (contact) =>
+          contact.seniority ? (
+            <span
+              className={`text-[10px] font-black px-2.5 py-1 rounded-full border ${SENIORITY_COLORS[contact.seniority] ?? 'bg-surface-2 text-ink-2 border-line'}`}
+            >
+              {contact.seniority}
+            </span>
+          ) : (
+            <span className="text-xs text-ink-2">—</span>
+          ),
+      },
+      {
+        key: 'acoes',
+        header: <span className="text-right block w-full">Ações</span>,
+        width: 160,
+        align: 'right',
+        render: (contact) => (
+          <div className="flex items-center justify-end gap-1.5">
+            <button
+              type="button"
+              onClick={() => setDetailContactId(contact.id)}
+              className="p-2 rounded-xl bg-surface-2 text-ink-2 border border-line hover:bg-line transition-colors cursor-pointer"
+              title="Ver detalhes"
+              aria-label={`Ver detalhes de ${contact.name}`}
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleEnrich(contact.id)}
+              disabled={!!enrichingId}
+              className="p-2 rounded-xl bg-brand/10 text-brand-ink dark:text-brand border border-brand/20 hover:bg-brand/20 transition-colors cursor-pointer disabled:opacity-40"
+              title="Validar e enriquecer contato"
+              aria-label={`Validar e enriquecer ${contact.name}`}
+            >
+              {enrichingId === contact.id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedContact(contact);
+                setIsFormOpen(true);
+              }}
+              className="p-2 rounded-xl bg-info/10 text-info-active dark:text-info border border-info/20 hover:bg-info/20 transition-colors cursor-pointer"
+              title="Editar contato"
+              aria-label={`Editar ${contact.name}`}
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDelete(contact.id)}
+              className="p-2 rounded-xl bg-danger/10 text-danger-active dark:text-danger border border-danger/20 hover:bg-danger/20 transition-colors cursor-pointer"
+              title="Excluir contato"
+              aria-label={`Excluir ${contact.name}`}
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [enrichingId, handleDelete, handleEnrich],
+  );
 
   return (
     <motion.div
@@ -217,204 +349,50 @@ export function ContactList() {
           }
         />
 
-        {/* Table */}
-        <div className="bg-surface/95 backdrop-blur-2xl rounded-2xl border border-line shadow-card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-line bg-surface-2/60">
-                  <th className="p-4 text-[11px] font-black text-ink-2 uppercase tracking-wider">
-                    Contato
-                  </th>
-                  <th className="p-4 text-[11px] font-black text-ink-2 uppercase tracking-wider hidden md:table-cell">
-                    Empresa
-                  </th>
-                  <th className="p-4 text-[11px] font-black text-ink-2 uppercase tracking-wider hidden lg:table-cell">
-                    Canais
-                  </th>
-                  <th className="p-4 text-[11px] font-black text-ink-2 uppercase tracking-wider hidden xl:table-cell">
-                    Seniority
-                  </th>
-                  <th className="p-4 text-[11px] font-black text-ink-2 uppercase tracking-wider text-right">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {loading ? (
-                  [...Array(6)].map((_, i) => <SkeletonRow key={i} />)
-                ) : error ? (
-                  <tr>
-                    <td colSpan={5}>
-                      <EmptyState
-                        icon={<WifiOff className="w-8 h-8 text-brand" />}
-                        title="Não foi possível carregar os contatos"
-                        description={error}
-                        actionLabel="Tentar novamente"
-                        onAction={refetch}
-                      />
-                    </td>
-                  </tr>
-                ) : contacts.length === 0 ? (
-                  <tr>
-                    <td colSpan={5}>
-                      <EmptyState
-                        icon={<User className="w-8 h-8 text-brand" />}
-                        title="Nenhum contato encontrado"
-                        description="Cadastre o primeiro decisor pra começar a acompanhar essa conta."
-                        actionLabel="Adicionar Primeiro Contato"
-                        onAction={() => {
-                          setSelectedContact(null);
-                          setIsFormOpen(true);
-                        }}
-                      />
-                    </td>
-                  </tr>
+        {/* Virtualized Table Container */}
+        <div className="bg-surface/95 backdrop-blur-2xl rounded-2xl border border-line shadow-card overflow-hidden flex flex-col">
+          <div className="h-[600px] flex flex-col">
+            <VirtualTable
+              data={contacts}
+              columns={columns}
+              getRowKey={(contact) => contact.id}
+              rowHeight={72}
+              loading={loading}
+              emptyState={
+                error ? (
+                  <EmptyState
+                    icon={<WifiOff className="w-8 h-8 text-brand" />}
+                    title="Não foi possível carregar os contatos"
+                    description={error}
+                    actionLabel="Tentar novamente"
+                    onAction={refetch}
+                  />
                 ) : (
-                  contacts.map((contact, idx) => (
-                    <motion.tr
-                      key={contact.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: idx * 0.02 }}
-                      className="hover:bg-surface-2 transition-colors group"
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center text-brand-ink dark:text-brand font-black text-sm shrink-0 border border-brand/20 shadow-sm">
-                            {contact.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-extrabold text-ink text-sm">{contact.name}</p>
-                            <p className="text-xs text-ink-2 font-medium">
-                              {contact.role || contact.department || '—'}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden md:table-cell">
-                        <div className="flex items-center gap-1.5 text-xs text-ink-2 font-semibold">
-                          <Building className="w-3.5 h-3.5 text-ink-2 shrink-0" />
-                          <span className="truncate max-w-[150px]">
-                            {contact.company?.tradeName || contact.company?.legalName || '—'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden lg:table-cell">
-                        <div className="space-y-0.5">
-                          {contact.email && (
-                            <div className="flex items-center gap-1.5 text-[11px] text-ink-2">
-                              <Mail className="w-3 h-3 text-brand shrink-0" />
-                              <span className="truncate max-w-[160px] font-medium">
-                                {contact.email}
-                              </span>
-                            </div>
-                          )}
-                          {contact.phone && (
-                            <div className="flex items-center gap-1.5 text-[11px] text-ink-2">
-                              <Phone className="w-3 h-3 text-sky-500 shrink-0" />
-                              <span className="font-medium">{contact.phone}</span>
-                            </div>
-                          )}
-                          {(contact.whatsapp || contact.phone) &&
-                            getWhatsAppLink(contact.whatsapp || contact.phone) && (
-                              <a
-                                href={getWhatsAppLink(contact.whatsapp || contact.phone)}
-                                target="_blank"
-                                rel="noreferrer"
-                                title="Número coletado — a existência de WhatsApp não foi verificada"
-                                className="flex items-center gap-1.5 text-[11px] text-emerald-600 hover:underline"
-                              >
-                                <MessageCircle className="w-3 h-3 shrink-0" />
-                                <span className="font-medium">WhatsApp</span>
-                              </a>
-                            )}
-                          {contact.linkedin && (
-                            <a
-                              href={contact.linkedin}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex items-center gap-1.5 text-[11px] text-info-active dark:text-info hover:underline"
-                            >
-                              <Linkedin className="w-3 h-3 shrink-0" />
-                              <span className="font-medium">LinkedIn</span>
-                            </a>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-4 hidden xl:table-cell">
-                        {contact.seniority && (
-                          <span
-                            className={`text-[10px] font-black px-2.5 py-1 rounded-full border ${SENIORITY_COLORS[contact.seniority] ?? 'bg-surface-2 text-ink-2 border-line'}`}
-                          >
-                            {contact.seniority}
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                          <button
-                            type="button"
-                            onClick={() => setDetailContactId(contact.id)}
-                            className="p-2 rounded-xl bg-surface-2 text-ink-2 border border-line hover:bg-line transition-colors cursor-pointer"
-                            title="Ver detalhes"
-                            aria-label={`Ver detalhes de ${contact.name}`}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleEnrich(contact.id)}
-                            disabled={!!enrichingId}
-                            className="p-2 rounded-xl bg-brand/10 text-brand-ink dark:text-brand border border-brand/20 hover:bg-brand/20 transition-colors cursor-pointer disabled:opacity-40"
-                            title="Validar e enriquecer contato"
-                            aria-label={`Validar e enriquecer ${contact.name}`}
-                          >
-                            {enrichingId === contact.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <Sparkles className="w-4 h-4" />
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedContact(contact);
-                              setIsFormOpen(true);
-                            }}
-                            className="p-2 rounded-xl bg-info/10 text-info-active dark:text-info border border-info/20 hover:bg-info/20 transition-colors cursor-pointer"
-                            title="Editar contato"
-                            aria-label={`Editar ${contact.name}`}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(contact.id)}
-                            className="p-2 rounded-xl bg-danger/10 text-danger-active dark:text-danger border border-danger/20 hover:bg-danger/20 transition-colors cursor-pointer"
-                            title="Excluir contato"
-                            aria-label={`Excluir ${contact.name}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  <EmptyState
+                    icon={<User className="w-8 h-8 text-brand" />}
+                    title="Nenhum contato encontrado"
+                    description="Cadastre o primeiro decisor pra começar a acompanhar essa conta."
+                    actionLabel="Adicionar Primeiro Contato"
+                    onAction={() => {
+                      setSelectedContact(null);
+                      setIsFormOpen(true);
+                    }}
+                  />
+                )
+              }
+            />
           </div>
 
-          {!loading && (
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-              totalItems={meta?.total}
-              itemLabel="contatos"
-            />
-          )}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            totalItems={meta?.total}
+            itemLabel="contatos"
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            loading={loading}
+          />
         </div>
       </div>
 

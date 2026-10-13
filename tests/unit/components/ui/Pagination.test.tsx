@@ -76,4 +76,65 @@ describe('Pagination', () => {
     await user.click(screen.getByRole('button', { name: /Anterior/ }));
     expect(onPageChange).not.toHaveBeenCalled();
   });
+
+  it('permite alterar a quantidade de itens por página via seletor para cargas de 10.000+ registros', async () => {
+    const user = userEvent.setup();
+    const onPageSizeChange = vi.fn();
+    render(
+      <Pagination
+        page={1}
+        totalPages={500}
+        totalItems={10000}
+        itemLabel="empresas"
+        pageSize={20}
+        onPageSizeChange={onPageSizeChange}
+        onPageChange={vi.fn()}
+      />,
+    );
+
+    const select = screen.getByLabelText('Exibir:');
+    await user.selectOptions(select, '50');
+    expect(onPageSizeChange).toHaveBeenCalledWith(50);
+  });
+
+  it('executa salto direto de página ao submeter o formulário de pulo', async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn();
+    render(
+      <Pagination
+        page={1}
+        totalPages={500}
+        totalItems={10000}
+        itemLabel="contatos"
+        onPageChange={onPageChange}
+      />,
+    );
+
+    const jumpInput = screen.getByLabelText('Ir para a página');
+    await user.clear(jumpInput);
+    await user.type(jumpInput, '250{enter}');
+    expect(onPageChange).toHaveBeenCalledWith(250);
+  });
+
+  it('navega para a primeira e última página através de botões de atalho rápido', async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn();
+    render(
+      <Pagination
+        page={50}
+        totalPages={100}
+        totalItems={10000}
+        itemLabel="contatos"
+        onPageChange={onPageChange}
+      />,
+    );
+
+    const firstBtn = screen.getByTitle('Primeira página');
+    await user.click(firstBtn);
+    expect(onPageChange).toHaveBeenCalledWith(1);
+
+    const lastBtn = screen.getByTitle('Última página');
+    await user.click(lastBtn);
+    expect(onPageChange).toHaveBeenCalledWith(100);
+  });
 });

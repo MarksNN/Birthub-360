@@ -34,6 +34,22 @@ export function JourneyTemplatesDialog({
       .finally(() => setLoadingTemplates(false));
   }, [isOpen, templates.length]);
 
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeedDefaults = async () => {
+    setSeeding(true);
+    try {
+      const res = await cadenceApi.seedDefaultPlaybooks();
+      toast.success(res.message || '3 playbooks padrão carregados com sucesso!');
+      onCreated();
+      onClose();
+    } catch (err: any) {
+      toast.error((err as Error).message || 'Falha ao carregar playbooks padrão.');
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const handleUseTemplate = async (templateId: string) => {
     setInstantiating(templateId);
     try {
@@ -56,6 +72,26 @@ export function JourneyTemplatesDialog({
       maxWidth="max-w-3xl"
     >
       <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-brand/30 bg-brand/5">
+          <div>
+            <h4 className="text-xs font-bold text-ink">Playbooks de Cadência Padrão</h4>
+            <p className="text-[11px] text-ink-2">
+              Injete os 3 templates prontos (Outbound Frio Logística, Reativação de Perdidos e
+              Passagem de Bastão SDR/Closer) para acelerar a ativação da equipe.
+            </p>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="cosmic"
+            disabled={seeding}
+            onClick={handleSeedDefaults}
+            className="shrink-0"
+          >
+            {seeding ? 'Carregando Playbooks…' : 'Carregar 3 Playbooks Padrão'}
+          </Button>
+        </div>
+
         <p className="text-xs text-ink-2">
           Modelos estruturados de cadência prontos para uso imediato em campanhas de prospecção,
           inbound, reativação ou recuperação de negócios.

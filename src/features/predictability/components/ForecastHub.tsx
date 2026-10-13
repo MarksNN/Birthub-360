@@ -1,4 +1,4 @@
-import { DollarSign, LineChart, Target, TrendingUp } from 'lucide-react';
+import { Calculator, DollarSign, Info, Layers, LineChart, Scale, Target, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
@@ -190,6 +190,202 @@ export function ForecastHub() {
                   }
                 />
               )}
+            </CardContent>
+          </Card>
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calculator className="w-5 h-5 text-indigo-400" />
+                    Explicabilidade do Modelo de Forecast & Pesos do Funil
+                  </CardTitle>
+                  <p className="text-xs text-[var(--ink-2)] mt-1">
+                    Cálculo determinístico transparente: fórmula matemática e pesos de probabilidade oficiais por etapa do funil (ativo mesmo com funil zerado).
+                  </p>
+                </div>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 self-start sm:self-auto">
+                  Motor Determinístico v2
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent className="border-t border-[var(--line)] pt-6 space-y-6">
+              {/* Bloco 1: Fórmula Matemática */}
+              <div className="p-4 rounded-xl bg-[var(--surface-subtle,#1A1D24)] border border-[var(--line)] space-y-3">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--ink-2)] uppercase tracking-wider">
+                  <Info className="w-4 h-4 text-indigo-400" />
+                  Fórmula Matemática do Forecast Total
+                </div>
+                <div className="font-mono text-sm sm:text-base font-semibold px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] text-indigo-300 overflow-x-auto">
+                  Forecast Total = Fechado + Commit + Best Case + Σ (Valor × Probabilidade)
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
+                  <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
+                    <div className="font-semibold text-emerald-400">1. Fechado (Won)</div>
+                    <p className="text-[var(--ink-2)] mt-0.5">
+                      100% do valor dos negócios já formalizados e ganhos no período corrente.
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
+                    <div className="font-semibold text-blue-400">2. Commit (P ≥ 70%)</div>
+                    <p className="text-[var(--ink-2)] mt-0.5">
+                      100% do valor integral dos negócios com alta convicção e prontos para assinatura.
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
+                    <div className="font-semibold text-amber-400">3. Best Case (40% ≤ P &lt; 70%)</div>
+                    <p className="text-[var(--ink-2)] mt-0.5">
+                      100% do valor dos negócios em proposta ou negociação avançada.
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
+                    <div className="font-semibold text-purple-400">4. Pipeline (10% ≤ P &lt; 40%)</div>
+                    <p className="text-[var(--ink-2)] mt-0.5">
+                      Valor ponderado estatisticamente pelo produto exato (Valor × P%).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bloco 2: Pesos de Probabilidade por Etapa do Funil */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-indigo-400" />
+                    Pesos de Probabilidade Base por Etapa do Funil
+                  </h4>
+                  <span className="text-xs text-[var(--ink-2)]">Referência padrão do CRM</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-xs text-[var(--ink-3)] border-b border-[var(--line)]">
+                        <th className="py-2 font-medium">Etapa do Funil</th>
+                        <th className="py-2 font-medium text-center">Peso Base</th>
+                        <th className="py-2 font-medium text-center">Tier Típico</th>
+                        <th className="py-2 font-medium">Critério &amp; Evidência de Avanço</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--line)]">
+                      <tr>
+                        <td className="py-2.5 font-medium">Qualificação (SDR)</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-zinc-500/10 text-zinc-300">
+                            10%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Pipeline</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Fit de ICP validado, decisores mapeados e necessidade confirmada.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-medium">Contato &amp; Diagnóstico</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-indigo-500/10 text-indigo-300">
+                            20%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Pipeline</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Primeiro contato efetivo realizado, dor do cliente e orçamento confirmados.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-medium">Apresentação / Demonstração</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-indigo-500/10 text-indigo-300">
+                            40%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Best Case</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Solução apresentada aos decisores e alinhamento técnico concluído.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-medium">Proposta Comercial</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-amber-500/10 text-amber-300">
+                            50%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Best Case</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Proposta formal enviada com valores, escopo e prazos em análise executiva.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-medium">Negociação &amp; Alinhamento</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-amber-500/10 text-amber-300">
+                            60%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Best Case</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Contorno de objeções concluído, negociação de valores e termos aprovados.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-medium">Contrato &amp; Formalização</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-emerald-500/10 text-emerald-300">
+                            80%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Commit</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Minuta em compliance/jurídico, aguardando assinatura do comitê de compras.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2.5 font-medium">Fechamento Ganho</td>
+                        <td className="py-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-emerald-500/15 text-emerald-400">
+                            100%
+                          </span>
+                        </td>
+                        <td className="py-2.5 text-center text-xs text-emerald-400 font-semibold">Fechado</td>
+                        <td className="py-2.5 text-xs text-[var(--ink-2)]">
+                          Contrato devidamente assinado, ordem de faturamento e onboarding iniciado.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Bloco 3: Calibração Dinâmica por Sinais */}
+              <div className="p-4 rounded-xl bg-[var(--surface-subtle,#1A1D24)] border border-[var(--line)] space-y-3">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--ink-2)] uppercase tracking-wider">
+                  <Scale className="w-4 h-4 text-indigo-400" />
+                  Calibração Dinâmica do Motor (Ajuste Explicável por Sinais)
+                </div>
+                <p className="text-xs text-[var(--ink-2)]">
+                  Cada oportunidade parte da probabilidade base da etapa e recebe ajustes objetivos de acordo com sinais observáveis em tempo real:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+                  <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
+                    <span className="font-semibold text-emerald-400">+10%</span> Próxima ação agendada nos próximos 14 dias
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
+                    <span className="font-semibold text-rose-400">-15%</span> Próxima ação vencida há &gt;7 dias ou sem ação
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
+                    <span className="font-semibold text-emerald-400">+5%</span> Interação recente registrada nos últimos 7 dias
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
+                    <span className="font-semibold text-rose-400">-10%</span> Sem nenhuma interação há mais de 30 dias
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
+                    <span className="font-semibold text-emerald-400">+5%</span> Previsão de fechamento para os próximos 30 dias
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
+                    <span className="font-semibold text-rose-400">-5% a -15%</span> Penalidade por adiamento da data prevista
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

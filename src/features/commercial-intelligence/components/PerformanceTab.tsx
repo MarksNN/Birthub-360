@@ -191,13 +191,13 @@ export function PerformanceTab({ filter }: { filter: CommercialFilter }) {
           tone={data.opportunities.atRisk > 0 ? 'critical' : undefined}
         />
         <KpiTile
-          label="Paradas (aging crítico)"
+          label="Paradas (tempo crítico)"
           value={String(data.opportunities.stalled)}
           tone={data.opportunities.stalled > 0 ? 'critical' : undefined}
           onClick={
             data.opportunities.stalled > 0
               ? () =>
-                  setDrillDown({ title: 'Negócios parados (aging crítico)', agingCritical: true })
+                  setDrillDown({ title: 'Negócios parados (tempo crítico)', agingCritical: true })
               : undefined
           }
         />

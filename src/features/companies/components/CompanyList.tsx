@@ -73,12 +73,18 @@ export function CompanyList() {
   const [activeToolPopover, setActiveToolPopover] = useState<TechToolInfo | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [pageSize, setPageSize] = useState(20);
 
   const { companies, meta, loading, error, refetch, deleteCompany } = useCompanies({
     page,
-    limit: 20,
+    limit: pageSize,
     search: searchTerm || undefined,
   });
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(1);
+  };
 
   const totalPages = meta?.totalPages ?? 1;
 
@@ -727,6 +733,9 @@ export function CompanyList() {
           onPageChange={setPage}
           totalItems={meta?.total}
           itemLabel="empresas"
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          loading={loading}
         />
       </div>
 

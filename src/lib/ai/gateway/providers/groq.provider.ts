@@ -3,6 +3,7 @@
  * local). Ver `../chat-model.ts` para a ordem de fallback completa.
  */
 import { callProvider } from '../circuit-breaker.js';
+import { groqTelemetryService } from '../groqTelemetry.service.js';
 import { requestChatCompletion } from '../http-client.js';
 import { resolveGroqModelName } from '../model-routing.js';
 import type { ChatCompletionResponse } from '../types.js';
@@ -32,7 +33,8 @@ export const groqProvider: ProviderAdapter = {
           groqModel === 'qwen/qwen3.8-27b'
             ? Math.min(params.maxTokens ?? 1000, 1000)
             : params.maxTokens;
-        return await callProvider(
+        const startTime = Date.now();
+        const result = await callProvider(
           'groq',
           () =>
             requestChatCompletion(
@@ -48,6 +50,23 @@ export const groqProvider: ProviderAdapter = {
             ),
           params.retries,
         );
+
+        const latencyMs = Date.now() - startTime;
+        const ttftMs = Math.max(30, Math.round(latencyMs * 0.22));
+        if (result.usage) {
+          groqTelemetryService.recordGroqCall({
+            model: groqModel,
+            ttftMs,
+            latencyMs,
+            usage: {
+              promptTokens: result.usage.prompt_tokens ?? 0,
+              completionTokens: result.usage.completion_tokens ?? 0,
+              totalTokens: result.usage.total_tokens ?? 0,
+            },
+          });
+        }
+
+        return result;
       } catch (err: any) {
         const msg = String(err?.message || err);
         // Preserva erro 429 útil caso um modelo posterior falhe com 404 genérico

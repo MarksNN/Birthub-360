@@ -44,6 +44,7 @@ import type { Lead, LeadStatus } from '../types/index.js';
 import { Button } from './ui/Button.js';
 import { ContextualTip } from './ui/ContextualTip.js';
 import { EmptyState } from './ui/EmptyState.js';
+import { Tooltip } from './ui/Tooltip.js';
 
 // dnd-kit ativa drag por teclado em Space E Enter por padrão — mas KanbanCard também usa Enter pra
 // abrir o LeadDetailDrawer (mesma tecla, dois significados). Restringindo o sensor a Space, Enter
@@ -696,55 +697,63 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
           </Button>
 
           {/* Botão de Modo de Seleção Múltipla */}
-          <Button
-            onClick={() => {
-              setSelectionMode(!selectionMode);
-              if (selectionMode) setSelectedLeadIds(new Set());
-            }}
-            variant={selectionMode ? 'default' : 'secondary'}
-            soundClick
-            className="text-xs"
-            title="Ativar seleção múltipla de cards no Kanban"
-          >
-            <CheckSquare className="w-4 h-4 shrink-0" />
-            <span>{selectionMode ? 'Cancelar Seleção' : 'Seleção em Lote'}</span>
-          </Button>
+          <Tooltip content="Ativa a seleção múltipla de cards para mover de etapa, reatribuir ou exportar leads em lote.">
+            <Button
+              onClick={() => {
+                setSelectionMode(!selectionMode);
+                if (selectionMode) setSelectedLeadIds(new Set());
+              }}
+              variant={selectionMode ? 'default' : 'secondary'}
+              soundClick
+              className="text-xs"
+              title="Ativar seleção múltipla de cards no Kanban"
+            >
+              <CheckSquare className="w-4 h-4 shrink-0" />
+              <span>{selectionMode ? 'Cancelar Seleção' : 'Seleção em Lote'}</span>
+            </Button>
+          </Tooltip>
 
           {/* Botão Receber do Bitrix (Modal Manual) */}
-          <Button
-            onClick={() => setIsBitrixModalOpen(true)}
-            variant="secondary"
-            soundClick
-            className="text-xs"
-            title="Abrir painel para buscar e receber leads do Bitrix24"
-          >
-            <Download className="w-4 h-4 rotate-180 shrink-0 text-sky-500" />
-            <span>Receber do Bitrix</span>
-          </Button>
+          <Tooltip content="Abre o painel para buscar, filtrar e importar leads/negócios do Bitrix24 para o Birth Hub.">
+            <Button
+              onClick={() => setIsBitrixModalOpen(true)}
+              variant="secondary"
+              soundClick
+              className="text-xs"
+              title="Abrir painel para buscar e receber leads do Bitrix24"
+            >
+              <Download className="w-4 h-4 rotate-180 shrink-0 text-sky-500" />
+              <span>Receber do Bitrix</span>
+            </Button>
+          </Tooltip>
 
           {/* Botão Enviar para Bitrix (Manual) */}
-          <Button
-            onClick={handleBatchExportBitrix}
-            variant="secondary"
-            soundClick
-            className="text-xs"
-            title="Enviar leads para o portal Bitrix24"
-          >
-            <Send className="w-4 h-4 shrink-0 text-sky-500" />
-            <span>Enviar para Bitrix</span>
-          </Button>
+          <Tooltip content="Dispara a sincronização manual e exportação dos leads do pipeline com o portal Bitrix24.">
+            <Button
+              onClick={handleBatchExportBitrix}
+              variant="secondary"
+              soundClick
+              className="text-xs"
+              title="Enviar leads para o portal Bitrix24"
+            >
+              <Send className="w-4 h-4 shrink-0 text-sky-500" />
+              <span>Enviar para Bitrix</span>
+            </Button>
+          </Tooltip>
 
-          <Button
-            onClick={handleBatchEnrich}
-            disabled={loading}
-            variant="secondary"
-            soundClick
-            className="text-xs"
-            title="Enriquecer leads não enriquecidos em lote"
-          >
-            <Sparkles className="w-4 h-4 shrink-0 text-yellow-500" />
-            <span className="hidden sm:inline">Enriquecer lote</span>
-          </Button>
+          <Tooltip content="Enriquece dados cadastrais, tecnologias e decisores dos leads em lote usando IA.">
+            <Button
+              onClick={handleBatchEnrich}
+              disabled={loading}
+              variant="secondary"
+              soundClick
+              className="text-xs"
+              title="Enriquecer leads não enriquecidos em lote"
+            >
+              <Sparkles className="w-4 h-4 shrink-0 text-yellow-500" />
+              <span className="hidden sm:inline">Enriquecer lote</span>
+            </Button>
+          </Tooltip>
 
           <Button
             onClick={handleExportCsv}
@@ -908,78 +917,86 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
           </div>
 
           {/* Mover Etapa em Massa */}
-          <div className="flex items-center gap-1.5">
-            <label htmlFor="crm-board-batch-stage" className="text-[11px] font-semibold text-ink-2">
-              Etapa:
-            </label>
-            <select
-              id="crm-board-batch-stage"
-              onChange={(e) => {
-                if (e.target.value) handleBatchMoveStage(e.target.value);
-              }}
-              disabled={isBatchUpdating}
-              defaultValue=""
-              className="px-2.5 py-1.5 bg-surface-2 border border-line rounded-xl text-xs font-bold text-ink focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <option value="" disabled>
-                Mover para...
-              </option>
-              {columns.map((col) => (
-                <option key={col} value={col}>
-                  {col}
+          <Tooltip content="Transfere todos os leads selecionados para a nova etapa de funil indicada.">
+            <div className="flex items-center gap-1.5 cursor-pointer">
+              <label htmlFor="crm-board-batch-stage" className="text-[11px] font-semibold text-ink-2 cursor-pointer">
+                Etapa:
+              </label>
+              <select
+                id="crm-board-batch-stage"
+                onChange={(e) => {
+                  if (e.target.value) handleBatchMoveStage(e.target.value);
+                }}
+                disabled={isBatchUpdating}
+                defaultValue=""
+                className="px-2.5 py-1.5 bg-surface-2 border border-line rounded-xl text-xs font-bold text-ink focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="" disabled>
+                  Mover para...
                 </option>
-              ))}
-            </select>
-          </div>
+                {columns.map((col) => (
+                  <option key={col} value={col}>
+                    {col}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Tooltip>
 
           {/* Reatribuir Vendedor */}
-          <div className="flex items-center gap-1.5">
-            <label htmlFor="crm-board-batch-owner" className="text-[11px] font-semibold text-ink-2">
-              Dono:
-            </label>
-            <select
-              id="crm-board-batch-owner"
-              onChange={(e) => {
-                if (e.target.value) handleBatchReassignOwner(e.target.value);
-              }}
-              disabled={isBatchUpdating}
-              defaultValue=""
-              className="px-2.5 py-1.5 bg-surface-2 border border-line rounded-xl text-xs font-bold text-ink focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <option value="" disabled>
-                Atribuir a...
-              </option>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name}
+          <Tooltip content="Reatribui a responsabilidade dos leads selecionados para outro membro da equipe.">
+            <div className="flex items-center gap-1.5 cursor-pointer">
+              <label htmlFor="crm-board-batch-owner" className="text-[11px] font-semibold text-ink-2 cursor-pointer">
+                Dono:
+              </label>
+              <select
+                id="crm-board-batch-owner"
+                onChange={(e) => {
+                  if (e.target.value) handleBatchReassignOwner(e.target.value);
+                }}
+                disabled={isBatchUpdating}
+                defaultValue=""
+                className="px-2.5 py-1.5 bg-surface-2 border border-line rounded-xl text-xs font-bold text-ink focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="" disabled>
+                  Atribuir a...
                 </option>
-              ))}
-            </select>
-          </div>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Tooltip>
 
           {/* Enviar Selecionados para Bitrix */}
-          <button
-            type="button"
-            onClick={handleBatchExportBitrix}
-            disabled={isBatchUpdating}
-            className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-          >
-            {isBatchUpdating ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Send className="w-3.5 h-3.5" />
-            )}
-            Enviar ao Bitrix24
-          </button>
+          <Tooltip content="Sincroniza e exporta imediatamente apenas os leads selecionados para o Bitrix24.">
+            <button
+              type="button"
+              onClick={handleBatchExportBitrix}
+              disabled={isBatchUpdating}
+              className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            >
+              {isBatchUpdating ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              Enviar ao Bitrix24
+            </button>
+          </Tooltip>
 
-          <button
-            type="button"
-            onClick={handleClearSelection}
-            className="p-1.5 rounded-xl hover:bg-surface-2 text-ink-2 hover:text-ink transition-colors"
-            title="Desmarcar todos"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <Tooltip content="Desmarcar todos os cards selecionados e fechar a barra de ações em lote.">
+            <button
+              type="button"
+              onClick={handleClearSelection}
+              className="p-1.5 rounded-xl hover:bg-surface-2 text-ink-2 hover:text-ink transition-colors"
+              title="Desmarcar todos"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </Tooltip>
         </div>
       )}
 

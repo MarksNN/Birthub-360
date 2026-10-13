@@ -24,7 +24,7 @@ export function getTenantPrisma(organizationId: string) {
             return query(args);
           }
 
-          // Se a operação for find/update/delete, precisamos forçar o organizationId no where
+          // Se a operação for find/update/delete/aggregate/groupBy, precisamos forçar o organizationId no where
           if (
             operation === 'findUnique' ||
             operation === 'findUniqueOrThrow' ||
@@ -32,6 +32,8 @@ export function getTenantPrisma(organizationId: string) {
             operation === 'findFirstOrThrow' ||
             operation === 'findMany' ||
             operation === 'count' ||
+            operation === 'aggregate' ||
+            operation === 'groupBy' ||
             operation === 'update' ||
             operation === 'updateMany' ||
             operation === 'delete' ||
@@ -59,6 +61,30 @@ export function getTenantPrisma(organizationId: string) {
               ...item,
               organizationId,
             })) as typeof args.data;
+          }
+
+          // Se for upsert, garantir organizationId no create e no where, e blindar o update
+          if (operation === 'upsert') {
+            const a = args as Record<string, unknown>;
+            if (a.create) {
+              a.create = { ...(a.create as Record<string, unknown>), organizationId };
+            }
+            if (a.where) {
+              a.where = { ...(a.where as Record<string, unknown>), organizationId };
+            }
+            if (a.update && typeof a.update === 'object' && 'organizationId' in a.update) {
+              // biome-ignore lint/performance/noDelete: remoção obrigatória para segurança multi-tenant
+              delete (a.update as Record<string, unknown>).organizationId;
+            }
+          }
+
+          // Em update e updateMany, garantir que organizationId nunca possa ser alterado no payload
+          if (operation === 'update' || operation === 'updateMany') {
+            const a = args as Record<string, unknown>;
+            if (a.data && typeof a.data === 'object' && 'organizationId' in a.data) {
+              // biome-ignore lint/performance/noDelete: remoção obrigatória para segurança multi-tenant
+              delete (a.data as Record<string, unknown>).organizationId;
+            }
           }
 
           return query(args);
