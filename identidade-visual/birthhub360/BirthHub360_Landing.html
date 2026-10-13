@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birth Hub 360° — Business Command Center</title>
+
+  <link rel="stylesheet" href="tokens/birthhub360.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles (Light Mode Exclusivo) -->
+  <style>
+    :root {
+      --bg-light: #f8fafc;
+      --surface-light: #ffffff;
+      --surface-2-light: #f1f5f9;
+      --ink-light: #0f172a;
+      --ink-2-light: #334155;
+      --ink-3-light: #64748b;
+      --line-light: #e2e8f0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* NAVBAR FIXA COM BLUR */
+    .navbar-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: rgba(248, 250, 252, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      transition: all 0.3s ease;
+    }
+
+    /* CARDS COLORIDOS DOS 8 PILARES */
+
+
+
+    /* CARDS DE SEÇÃO COM SUPERFÍCIE ELEVADA */
+
+
+    /* PÍLULAS DE CAPACIDADES */
+    .capability-pill {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .capability-pill:hover {
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    /* STEP CARD NO FLUXO OPERACIONAL */
+
+
+    /* INPUTS PROFISSIONAIS MODO LIGHT */
+    .app-input-pro {
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      background-color: #ffffff;
+      color: #0f172a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      padding: 0 1rem;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .app-input-pro::placeholder {
+      color: #94a3b8;
+      opacity: 0.8;
+    }
+
+    .app-input-pro:focus {
+      outline: none;
+      border-color: #0284c7;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12), 0 4px 15px rgba(2, 132, 199, 0.08);
+      transform: translateY(-1px);
+    }
+
+    /* BOTÃO CTA DE ALTA ENERGIA */
+    .btn-cta-light {
+      color: #ffffff;
+      background-image: linear-gradient(110deg, #0284c7 0%, #2563eb 50%, #7c3aed 100%);
+      background-size: 200% 100%;
+      background-position: 0% 50%;
+      box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.35), 0 4px 12px rgba(124, 58, 237, 0.2);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-cta-light:hover {
+      background-position: 100% 50%;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px -4px rgba(2, 132, 199, 0.45), 0 6px 18px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-cta-light:active {
+      transform: translateY(0);
+    }
+
+    /* GRADIENTES DE TEXTO */
+    .grad-text-blue {
+      background-image: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .grad-text-purple {
+      background-image: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .grad-text-cyan {
+      background-image: linear-gradient(135deg, #00b4d8 0%, #0284c7 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* MODAL OVERLAY */
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Theme surfaces supporting the shared card/heading variants; geometry unchanged. */
+    body { background: var(--color-background) !important; color: var(--color-text-primary); }
+    html.dark section { background: var(--color-background) !important; }
+    html.light section[class*="bg-[#F8FAFC]"] { background-color: var(--color-background); }
+    .navbar-sticky { background: var(--color-background) !important; border-color: var(--color-border-subtle); }
+    :is([class*="text-[#0F172A]"], [class*="text-[#334155]"], [class*="text-[#475569]"]) { color: var(--color-text-primary) !important; }
+    :is([class*="text-[#64748B]"], .text-slate-500) { color: var(--color-text-muted) !important; }
+    html.dark :is(.bg-white, .bg-slate-50, [class*="bg-[#FFFFFF]"], [class*="bg-[#F8FAFC]"]) { background-color: var(--color-surface); }
+    html.dark #login-modal > div { background: var(--color-surface); }
+    .bh-card p { color: var(--color-text-muted) !important; }
+    .bh-card > :is(div, span).bh-heading { color: var(--bh-accent) !important; }
+    .pillar-card:hover { transform: translateY(-3px); }
+    .flow-step-card:hover { transform: translateY(-3px); }
+
+    /* Refinamento: status, metadados, kickers e leitura, sem alterar o conteúdo. */
+    section:not(#command-center) .bh-card p { font-size: 14px; line-height: 1.65; }
+    section:not(#command-center) .bh-card [class*="text-[10px]"], section:not(#command-center) .bh-card [class*="text-[11px]"] { font-size: 12px; line-height: 1.5; }
+    .pillar-card .pillar-metadata { display: block; padding: 0; margin-top: 8px; background: transparent; border: 0; border-radius: 0; color: var(--color-text-muted) !important; font-size: 12px; line-height: 1.6; }
+    .pillar-card .pillar-metadata::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 7px; vertical-align: middle; border-radius: var(--radius-pill); background: var(--bh-accent); }
+    section.border-b { border-bottom-color: color-mix(in srgb, var(--color-border-subtle) 25%, transparent); }
+    .section-kicker { background: color-mix(in srgb, var(--bh-accent) 6%, var(--color-surface)) !important; border-color: color-mix(in srgb, var(--bh-accent) 35%, transparent) !important; box-shadow: none; }
+    .section-kicker [data-lucide], .section-kicker svg { color: inherit !important; }
+    #ecossistema .grid { grid-auto-rows: 1fr; }
+    #ecossistema .bh-card { padding: 24px; height: 100%; }
+    #ecossistema .bh-card p { font-size: 14px; line-height: 1.65; }
+    @media (max-width: 640px) { #ecossistema .bh-card { padding: 20px; } }
+
+    /* Polimento pontual; Forecast, headings e composição permanecem preservados. */
+    :is(#pilares, #fluxo, #ecossistema) .bh-card p { font-size: 15px; line-height: 1.76; }
+    #command-center .bh-card p { font-size: 13px; line-height: 1.6; }
+    #command-center .bh-card p[class*="text-[11px]"] { font-size: 12px; line-height: 1.6; }
+    html.light section:not(#previsibilidade) .bh-card:is([data-accent="cyan"], [data-accent="success"]) { border-color: color-mix(in srgb, var(--bh-accent) 95%, var(--palette-neon-black)) !important; }
+    #ecossistema .bh-card > div:last-child { margin-top: auto; padding-top: 12px; }
+
+    /* Capacidades: cards compactos, sem interação fictícia ou novos conteúdos. */
+    .capability-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 16px; width: 100%; margin-inline: auto; }
+    .capability-grid .capability-pill { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px 20px; min-height: 220px; text-align: center; border-radius: var(--radius-card); box-shadow: none !important; transition: transform .18s ease, box-shadow .18s ease; }
+    .capability-grid .capability-pill:hover { transform: translateY(-3px); box-shadow: var(--shadow-card) !important; }
+    .capability-grid .bh-heading { font-family: var(--font-interface); font-feature-settings: var(--font-features-rounded); font-size: 17px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+    .capability-marker { width: 8px; height: 8px; flex-shrink: 0; border-radius: var(--radius-pill); background: var(--bh-accent); }
+    @media (max-width: 1023px) { .capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 479px) { .capability-grid { grid-template-columns: 1fr; gap: 10px; } .capability-grid .capability-pill { min-height: 180px; padding: 22px 20px; } }
+    #hero .capability-grid .capability-description { margin: 0; font-size: 15px; line-height: 1.65; color: var(--color-text-muted); }
+    .capability-grid[data-motion="ready"]:not(.is-visible) .capability-pill { opacity: 0; transform: translateY(12px); }
+    .capability-grid[data-motion="ready"].is-visible .capability-pill { animation: capability-enter .45s ease backwards; animation-delay: calc(var(--capability-index, 0) * 50ms); }
+    @keyframes capability-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { .capability-grid .capability-pill { opacity: 1 !important; animation: none !important; transition: none !important; transform: none !important; } }
+  </style>
+</head>
+<body class="w-full min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-sky-100 selection:text-sky-900">
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      1. NAVBAR
+  ════════════════════════════════════════════════════════════════════ -->
+  <header class="navbar-sticky w-full px-5 py-3 sm:px-8 lg:px-14">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#hero" class="flex items-center gap-3 group">
+        <!-- SVG LOGOMARK BH360 -->
+        <svg viewBox="0 0 256 256" width="46" height="46" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Birth Hub 360">
+          <defs>
+            <linearGradient id="mark-arc" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0284C7" />
+              <stop offset="55%" stop-color="#7C3AED" />
+              <stop offset="100%" stop-color="#2563EB" />
+            </linearGradient>
+            <radialGradient id="mark-core" cx="50%" cy="45%" r="55%">
+              <stop offset="0%" stop-color="#1E293B" />
+              <stop offset="100%" stop-color="#0F172A" />
+            </radialGradient>
+          </defs>
+          <circle cx="128" cy="128" r="118" fill="none" stroke="url(#mark-arc)" stroke-width="10" stroke-dasharray="6 14" />
+          <circle cx="128" cy="128" r="78" fill="url(#mark-core)" />
+          <circle cx="128" cy="128" r="64" fill="none" stroke="#38BDF8" stroke-width="3" opacity="0.9" />
+          <line x1="64" y1="128" x2="192" y2="128" stroke="#7DD3FC" stroke-width="2" opacity="0.6" />
+          <path fill="#FFFFFF" transform="matrix(0.0740 0 0 -0.0740 104.45 154.20)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z" />
+        </svg>
+        <div class="flex flex-col">
+          <span class="font-display text-xl font-bold text-[#0F172A] leading-tight tracking-tight bh-heading" data-accent="gold">
+            Birth Hub<span class="grad-text-blue ml-1 font-extrabold">360°</span>
+          </span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.25em] text-[#64748B] font-semibold bh-heading" data-accent="gold">
+            Command Center
+          </span>
+        </div>
+      </a>
+
+      <!-- Links de Navegação -->
+      <nav class="hidden xl:flex items-center gap-6 font-mono text-xs font-semibold text-[#475569]">
+        <a href="#problema" class="hover:text-[#0284C7] transition-colors">Problema</a>
+        <a href="#plataforma" class="hover:text-[#0284C7] transition-colors">Plataforma</a>
+        <a href="#pilares" class="hover:text-[#0284C7] transition-colors">8 Pilares</a>
+        <a href="#fluxo" class="hover:text-[#0284C7] transition-colors">Fluxo</a>
+        <a href="#ia" class="hover:text-[#0284C7] transition-colors">IA</a>
+        <a href="#automacao" class="hover:text-[#0284C7] transition-colors">Automação</a>
+        <a href="#performance" class="hover:text-[#0284C7] transition-colors">Performance</a>
+        <a href="#previsibilidade" class="hover:text-[#0284C7] transition-colors">Previsibilidade</a>
+        <a href="#ecossistema" class="hover:text-[#0284C7] transition-colors">Ecossistema</a>
+        <a href="#command-center" class="hover:text-[#0284C7] transition-colors">Cockpit</a>
+      </nav>
+
+</div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      2. HERO
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="hero" class="relative px-5 py-12 sm:px-8 lg:px-14 overflow-hidden border-b border-slate-200">
+    <div class="pointer-events-none absolute inset-0 z-0 opacity-70" style="background-image: linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px); background-size: 48px 48px;"></div>
+    <div class="pointer-events-none absolute top-10 right-10 w-[500px] h-[500px] rounded-full blur-[120px] bg-sky-200/40"></div>
+    <div class="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full blur-[120px] bg-purple-200/35"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto flex flex-col items-center text-center">
+      <!-- Status Bar ao Vivo com Relógio High-Tech -->
+<!-- Badge -->
+      <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 text-[#0284C7] shadow-xs mb-4" data-accent="gold">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+        SISTEMA OPERACIONAL COMERCIAL
+      </div>
+
+      <!-- Headlines -->
+      <h1 class="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.15] max-w-4xl bh-heading" data-accent="gold">
+        Dados que <span class="grad-text-blue">Conectam.</span><br />
+        Inteligência que <span class="grad-text-purple">Decide.</span><br />
+        Execução que <span class="grad-text-cyan">Acontece.</span>
+      </h1>
+
+      <!-- Subheadline Oficial -->
+      <p class="mt-6 text-base sm:text-lg md:text-xl font-normal text-[#334155] max-w-3xl leading-relaxed bh-heading" data-accent="cyan">
+        Conecte CRM, dados, inteligência artificial e automação em um único centro de comando para planejar, monitorar, prever e acelerar suas operações comerciais.
+      </p>
+
+      <!-- CTAs Hero -->
+      <div class="mt-8 flex flex-col sm:flex-row items-center gap-4">
+        <button onclick="openLoginModal()" type="button" class="btn-cta-light inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider cursor-pointer shadow-md">
+          <span>Acessar Plataforma</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+        <a href="#pilares" class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-[#0F172A] font-mono text-sm font-bold uppercase tracking-wider transition-colors shadow-xs">
+          <span>Ver os 8 Pilares</span>
+          <i data-lucide="compass" class="w-4 h-4 text-[#0284C7]"></i>
+        </a>
+      </div>
+
+      <!-- Capacidades Reais -->
+      <div class="mt-10 pt-6 border-t border-slate-200/80 w-full max-w-4xl">
+        <p class="font-mono text-[11px] font-bold uppercase tracking-widest text-[#64748B] mb-3 bh-heading" data-accent="cyan">Capacidades Operacionais Integradas</p>
+        <div class="capability-grid">
+          <div class="capability-pill bh-card" data-accent="cyan"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="cyan">Pipeline Centralizado</span><p class="capability-description">Reúna oportunidades, etapas e histórico comercial em uma visão organizada.</p></div>
+          <div class="capability-pill bh-card" data-accent="cyan"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="cyan">Inteligência B2B</span><p class="capability-description">Contextualize empresas e contatos com dados para apoiar a qualificação.</p></div>
+          <div class="capability-pill bh-card" data-accent="iris"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="iris">Cadências Automatizadas</span><p class="capability-description">Organize sequências de contato e próximos passos ao longo da negociação.</p></div>
+          <div class="capability-pill bh-card" data-accent="success"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="success">Velocidade de Ciclo</span><p class="capability-description">Acompanhe o tempo entre etapas e identifique pontos de estagnação.</p></div>
+          <div class="capability-pill bh-card" data-accent="gold"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="gold">Cenários Ponderados</span><p class="capability-description">Compare projeções considerando etapas, probabilidades e histórico do pipeline.</p></div>
+          <div class="capability-pill bh-card" data-accent="iris"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="iris">Copiloto Comercial IA</span><p class="capability-description">Apoie diagnósticos e próximas ações com o contexto das negociações.</p></div>
+          <div class="capability-pill bh-card" data-accent="blue"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="blue">Conectividade com os Melhores CRM´S do Mercado</span><p class="capability-description">Conecte registros e fluxos comerciais entre o CRM e a operação.</p></div>
+          <div class="capability-pill bh-card" data-accent="pink"><span class="capability-marker" aria-hidden="true"></span><span class="bh-heading" data-accent="pink">Telefonia & Voz Ativa</span><p class="capability-description">Integre interações de voz ao acompanhamento das oportunidades comerciais.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      3. PROBLEMA
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="problema" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#FFFFFF] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-rose-50 border border-rose-200 text-rose-700 mb-3" data-accent="danger">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> O Gargalo Estrutural das Empresas
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="danger">
+          A realidade de operar com dados fragmentados e equipes no escuro
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569] leading-relaxed">
+          Empresas investem em múltiplas ferramentas, mas continuam sem clareza sobre onde o pipeline está travado, quais negócios realmente têm chance de fechar e o que cada vendedor deve fazer a seguir.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="section-card p-6 bh-card" data-accent="blue">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold mb-4 bh-kicker">01</div>
+          <h3 class="font-display text-lg font-bold text-[#0F172A] mb-2 bh-heading" data-accent="blue">Silos e Ferramentas Desconectadas</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            O CRM não fala em tempo real com a telefonia, as trocas de WhatsApp ficam perdidas no celular do vendedor e os dados de prospecção não retroalimentam o time de fechamento.
+          </p>
+        </div>
+
+        <div class="section-card p-6 bh-card" data-accent="gold">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold mb-4 bh-kicker">02</div>
+          <h3 class="font-display text-lg font-bold text-[#0F172A] mb-2 bh-heading" data-accent="gold">Gestão Reativa & Decisões Tardias</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Gestores passam o dia cobrando preenchimento manual de planilhas e só descobrem que a meta não será atingida nos últimos dias do mês, quando já não há tempo hábil para corrigir o curso.
+          </p>
+        </div>
+
+        <div class="section-card p-6 bh-card" data-accent="danger">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold mb-4 bh-kicker">03</div>
+          <h3 class="font-display text-lg font-bold text-[#0F172A] mb-2 bh-heading" data-accent="danger">Perda Invisível de Oportunidades</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Sem orquestração e alertas preditivos, leads esfriam na fila sem follow-up tempestivo, objeções críticas não são tratadas e a taxa de conversão despenca sem causa raiz evidente.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      4. PLATAFORMA
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="plataforma" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#F8FAFC] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 text-[#0284C7] mb-3" data-accent="blue">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i> Arquitetura One OS
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="blue">
+          Um único sistema operacional para planejar, monitorar e acelerar
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569] leading-relaxed">
+          O Birth Hub 360° unifica a governança de dados, os algoritmos de diagnóstico e o centro de comando diário da sua equipe comercial.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="section-card p-6 bg-white bh-card" data-accent="blue">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-sky-100 text-[#0284C7] flex items-center justify-center">
+              <i data-lucide="server" class="w-5 h-5"></i>
+            </div>
+            <span class="font-mono text-xs font-bold uppercase text-[#0284C7] bh-kicker">Camada 1</span>
+          </div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="blue">Dados & Integração Contínua</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Conexão com os melhores CRM´S do mercado, e-mails corporativos, canais de mensageria e dados enriquecidos de empresas B2B consolidados em uma única fonte de verdade.
+          </p>
+        </div>
+
+        <div class="section-card p-6 bg-white bh-card" data-accent="iris">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#7C3AED] flex items-center justify-center">
+              <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <span class="font-mono text-xs font-bold uppercase text-[#7C3AED] bh-kicker">Camada 2</span>
+          </div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="iris">Motor de Diagnóstico & IA</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Algoritmos contextuais que avaliam a saúde de cada deal, detectam riscos em tempo real e sugerem a próxima melhor ação para fechar com maior margem.
+          </p>
+        </div>
+
+        <div class="section-card p-6 bg-white bh-card" data-accent="pink">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-[#16A34A] flex items-center justify-center">
+              <i data-lucide="zap" class="w-5 h-5"></i>
+            </div>
+            <span class="font-mono text-xs font-bold uppercase text-[#16A34A] bh-kicker">Camada 3</span>
+          </div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="pink">Execução & Orquestração</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Cockpit de trabalho ágil para pré-vendas (SDR), vendas (Closer) e liderança, com automações de tarefas repetitivas e cadências sem atrito.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      5. 8 PILARES OFICIAIS (CARDS COLORIDOS COMPLETOS)
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="pilares" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#FFFFFF] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 text-[#0284C7] mb-3" data-accent="gold">
+          <i data-lucide="target" class="w-3.5 h-3.5"></i> ESTRUTURA OFICIAL DO PRODUTO
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="gold">
+          As 8 capacidades do Birth Hub 360º
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569] leading-relaxed">
+          Cada pilar resolve uma dimensão estratégica da operação comercial, operando de forma independente ou em perfeita sinergia sistêmica.
+        </p>
+      </div>
+
+      <!-- Grid dos 8 Cards Coloridos com Nomes Oficiais Completos -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+
+        <!-- PILAR 01 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="cyan">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #0284C7 0%, #0284C788 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #0284C715; color: #0284C7; border: 1px solid #0284C735;">01</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #0284C712; color: #0284C7;">HUB</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #0284C718; color: #0284C7; border: 1px solid #0284C740;">◉</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="cyan">HUB COMERCIAL</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Centralização de contas, pipeline comercial unificado e visão 360° de cada oportunidade em negociação.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Gestão Unificada de Oportunidades</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #0284C7;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #0284C7;">Pipeline Central</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #0284C7;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 02 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="cyan">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #2563EB 0%, #2563EB88 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #2563EB15; color: #2563EB; border: 1px solid #2563EB35;">02</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #2563EB12; color: #2563EB;">INTEL</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #2563EB18; color: #2563EB; border: 1px solid #2563EB40;">◎</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="cyan">INTELIGÊNCIA DE MERCADO</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Enriquecimento analítico de dados B2B, sinais de compra, qualificação precisa e inteligência de decisores.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Sinais & Qualificação Preditiva</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #2563EB;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #2563EB;">Decisão por Dados</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #2563EB;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 03 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="blue">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #0EA5E9 0%, #0EA5E988 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #0EA5E915; color: #0EA5E9; border: 1px solid #0EA5E935;">03</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #0EA5E912; color: #0EA5E9;">ORCH</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #0EA5E918; color: #0EA5E9; border: 1px solid #0EA5E940;">⟶</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="blue">ORQUESTRAÇÃO DE VENDAS</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Cadências multicanal coordenadas, regras de transição de bastão e alinhamento operacional de ponta a ponta.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Cadências & Passagem de Bastão</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #0EA5E9;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #0EA5E9;">Fluxos Integrados</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #0EA5E9;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 04 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="gold">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #16A34A 0%, #16A34A88 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #16A34A15; color: #16A34A; border: 1px solid #16A34A35;">04</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #16A34A12; color: #16A34A;">PERF</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #16A34A18; color: #16A34A; border: 1px solid #16A34A40;">▥</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="gold">PERFORMANCE COMERCIAL</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Telemetria de conversão, velocidade de avanço no funil, metas operacionais e produtividade da equipe.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Métricas & Conversão em Tempo Real</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #16A34A;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #16A34A;">Metas & Velocidade</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #16A34A;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 05 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="gold">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #D97706 0%, #D9770688 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #D9770615; color: #D97706; border: 1px solid #D9770635;">05</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #D9770612; color: #D97706;">FORE</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #D9770618; color: #D97706; border: 1px solid #D9770640;">⌁</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="gold">PREVISIBILIDADE COMERCIAL</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Modelagem estatística de probabilidade, análise de pipeline ponderado e cenários embasados no histórico real.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Cenários & Probabilidade Real</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #D97706;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #D97706;">Pipeline Ponderado</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #D97706;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 06 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="iris">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #7C3AED 0%, #7C3AED88 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #7C3AED15; color: #7C3AED; border: 1px solid #7C3AED35;">06</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #7C3AED12; color: #7C3AED;">AI</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #7C3AED18; color: #7C3AED; border: 1px solid #7C3AED40;">✦</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="iris">INTELIGÊNCIA ARTIFICIAL</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Copiloto comercial ancorado nos dados da empresa, diagnóstico de entraves e suporte ativo em negociações.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Agentes & Diagnóstico Contextual</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #7C3AED;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #7C3AED;">Copiloto & Modelos</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #7C3AED;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 07 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="iris">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #EA580C 0%, #EA580C88 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #EA580C15; color: #EA580C; border: 1px solid #EA580C35;">07</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #EA580C12; color: #EA580C;">AUTO</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #EA580C18; color: #EA580C; border: 1px solid #EA580C40;">◇</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="iris">AUTOMAÇÃO & CONECTIVIDADE</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Sincronização contínua bidirecional, gatilhos de follow-up em tempo real e integração profunda com os melhores CRM´S do mercado.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Integrações & Ações Instantâneas</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #EA580C;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #EA580C;">Gatilhos & os melhores CRM´S do mercado.</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #EA580C;">CONECTADO →</span>
+          </div>
+        </div>
+
+        <!-- PILAR 08 -->
+        <div class="pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border bh-card" data-accent="pink">
+          <div class="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2" style="background: linear-gradient(90deg, #E11D48 0%, #E11D4888 100%);"></div>
+          <div class="flex items-center justify-between mb-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded-md bh-kicker" style="background-color: #E11D4815; color: #E11D48; border: 1px solid #E11D4835;">08</span>
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bh-kicker" style="background-color: #E11D4812; color: #E11D48;">ENG</span>
+            </div>
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base bh-kicker" style="background-color: #E11D4818; color: #E11D48; border: 1px solid #E11D4840;">◌</div>
+          </div>
+          <div class="flex-1 my-1">
+            <h3 class="font-display text-sm sm:text-base font-bold text-[#0F172A] leading-tight mb-1 bh-heading" data-accent="pink">ENGAJAMENTO COMERCIAL</h3>
+            <p class="font-sans text-xs text-[#64748B] leading-snug mb-3">Comunicação integrada, telefonia em nuvem, histórico de interações e rastreabilidade total de contatos.</p>
+            <div class="pillar-metadata font-mono font-semibold">Foco: Telefonia & Registro de Contato</div>
+          </div>
+          <div class="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #E11D48;"></span>
+              <span class="font-mono text-[10px] font-bold uppercase tracking-wider bh-kicker" style="color: #E11D48;">Voz & Omnichannel</span>
+            </div>
+            <span class="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold bh-kicker" style="color: #E11D48;">CONECTADO →</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      6. FLUXO OPERACIONAL
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="fluxo" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#F8FAFC] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 text-[#0284C7] mb-3" data-accent="blue">
+          <i data-lucide="workflow" class="w-3.5 h-3.5"></i> CICLO OPERACIONAL COMPLETO
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="blue">
+          Como os dados fluem da prospecção ao fechamento
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569]">
+          Um processo ponta a ponta estruturado com governança de dados, rastreamento de interações e transições claras entre etapas.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="flow-step-card p-5 bh-card" data-accent="blue">
+          <div class="font-mono text-xs font-bold text-[#0284C7] mb-2 bh-kicker">ETAPA 01</div>
+          <h4 class="font-display text-sm font-bold text-[#0F172A] mb-1 bh-heading" data-accent="blue">Captura & Ingestão</h4>
+          <p class="text-xs text-[#64748B]">Entrada de contas e contatos através de formulários, listas prospectadas ou sincronização direta com os melhores CRM´S do mercado. e CRMs integrados.</p>
+        </div>
+
+        <div class="flow-step-card p-5 bh-card" data-accent="cyan">
+          <div class="font-mono text-xs font-bold text-[#2563EB] mb-2 bh-kicker">ETAPA 02</div>
+          <h4 class="font-display text-sm font-bold text-[#0F172A] mb-1 bh-heading" data-accent="cyan">Enriquecimento Cadastral</h4>
+          <p class="text-xs text-[#64748B]">Validação de CNPJ e dados corporativos, identificação de decisores e confirmação de e-mails via provedores analíticos.</p>
+        </div>
+
+        <div class="flow-step-card p-5 bh-card" data-accent="cyan">
+          <div class="font-mono text-xs font-bold text-[#0EA5E9] mb-2 bh-kicker">ETAPA 03</div>
+          <h4 class="font-display text-sm font-bold text-[#0F172A] mb-1 bh-heading" data-accent="cyan">Triagem & Distribuição</h4>
+          <p class="text-xs text-[#64748B]">Atribuição aos responsáveis de pré-vendas (SDR) e execução de réguas de contato com controle de horário e opt-out.</p>
+        </div>
+
+        <div class="flow-step-card p-5 bh-card" data-accent="iris">
+          <div class="font-mono text-xs font-bold text-[#7C3AED] mb-2 bh-kicker">ETAPA 04</div>
+          <h4 class="font-display text-sm font-bold text-[#0F172A] mb-1 bh-heading" data-accent="iris">Negociação Assistida</h4>
+          <p class="text-xs text-[#64748B]">Apoio em tempo real com matriz de objeções, sugestões do copiloto comercial e histórico unificado de chamadas e mensagens.</p>
+        </div>
+
+        <div class="flow-step-card p-5 bh-card" data-accent="success">
+          <div class="font-mono text-xs font-bold text-[#16A34A] mb-2 bh-kicker">ETAPA 05</div>
+          <h4 class="font-display text-sm font-bold text-[#0F172A] mb-1 bh-heading" data-accent="success">Conclusão & Aprendizado</h4>
+          <p class="text-xs text-[#64748B]">Registro formal de fechamento com auditoria de causas de perda (Win/Loss) para calibração contínua do processo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      7. IA CONTEXTUAL
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="ia" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#FFFFFF] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10">
+      <div class="lg:w-1/2">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-purple-50 border border-purple-200 text-[#7C3AED] mb-3" data-accent="iris">
+          <i data-lucide="bot" class="w-3.5 h-3.5"></i> IA CONTEXTUAL ESPECIALIZADA
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-4 bh-heading" data-accent="iris">
+          Inteligência Artificial orientada a processos e dados comerciais
+        </h2>
+        <p class="text-sm sm:text-base text-[#475569] leading-relaxed mb-6">
+          Modelos de linguagem conectados à base de conhecimento da sua empresa para apoiar o vendedor em momentos decisivos da negociação, respeitando o contexto e a governança de cada conta.
+        </p>
+        <div class="space-y-3 font-sans text-xs sm:text-sm text-[#334155]">
+          <div class="flex items-start gap-3">
+            <div class="w-5 h-5 rounded-full bg-purple-100 text-[#7C3AED] flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>
+            <span><strong>Diagnóstico de Negociações:</strong> Análise dos fatores de avanço e detecção de riscos de estagnação com base no tempo de permanência em cada estágio.</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-5 h-5 rounded-full bg-purple-100 text-[#7C3AED] flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>
+            <span><strong>Playbooks & Simulação (Roleplay):</strong> Treinamento ativo da equipe contra objeções típicas de mercado com avaliações orientadas por IA.</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-5 h-5 rounded-full bg-purple-100 text-[#7C3AED] flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>
+            <span><strong>Sugestão de Próxima Ação:</strong> Recomendações fundamentadas no histórico de interações registradas no CRM, auxiliando no avanço do pipeline.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:w-1/2 w-full">
+        <div class="section-card p-6 border-2 border-purple-100 bg-gradient-to-br from-white to-purple-50/30 bh-card" data-accent="iris">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#7C3AED]"></span>
+              <span class="font-mono text-xs font-bold text-[#7C3AED] bh-kicker">COPILOTO COMERCIAL ATIVO</span>
+            </div>
+            <span class="font-mono text-[10px] text-slate-500 font-semibold">Análise Contextual</span>
+          </div>
+          <div class="space-y-3 font-mono text-xs">
+            <div class="p-3.5 rounded-xl bg-purple-50/70 border border-purple-100 text-[#475569] bh-card" data-accent="iris">
+              <div class="text-[#7C3AED] font-bold mb-1 flex items-center gap-1.5 bh-heading" data-accent="iris"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Diagnóstico Operacional:</div>
+              Negociação em fase de Proposta Comercial com 5 dias sem nova interação registrada pelo responsável.
+            </div>
+            <div class="p-3.5 rounded-xl bg-white border border-slate-200 text-[#334155] bh-card" data-accent="pink">
+              <div class="text-[#0284C7] font-bold mb-1 flex items-center gap-1.5 bh-heading" data-accent="pink"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Recomendação de Próxima Ação:</div>
+              Reengajamento via WhatsApp Corporativo abordando critérios de decisão técnica validados na última reunião.
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[#475569] bh-card" data-accent="iris">
+              <div class="text-[#16A34A] font-bold mb-1 flex items-center gap-1.5 bh-heading" data-accent="iris"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Living Playbook Ativo:</div>
+              Matriz de Objeções: Justificativa de retorno sobre investimento e comparativo de prazo de implantação.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      8. AUTOMAÇÃO & CONECTIVIDADE
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="automacao" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#F8FAFC] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-orange-50 border border-orange-200 text-[#EA580C] mb-3" data-accent="iris">
+          <i data-lucide="workflow" class="w-3.5 h-3.5"></i> MOTOR DE REGRAS E WORKERS
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="iris">
+          Automação precisa para eliminar gargalos operacionais
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569]">
+          Regras determinísticas e filas assíncronas que garantem consistência nas rotinas comerciais sem depender de lembretes manuais.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="section-card p-6 bg-white bh-card" data-accent="pink">
+          <div class="w-9 h-9 rounded-xl bg-orange-100 text-[#EA580C] flex items-center justify-center font-bold mb-3 bh-kicker"><i data-lucide="zap" class="w-4 h-4"></i></div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="pink">Gatilhos por Eventos</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">Disparo imediato de rotinas na criação de leads, avanço de etapas no pipeline ou conclusão de atividades da equipe.</p>
+        </div>
+
+        <div class="section-card p-6 bg-white bh-card" data-accent="danger">
+          <div class="w-9 h-9 rounded-xl bg-orange-100 text-[#EA580C] flex items-center justify-center font-bold mb-3 bh-kicker"><i data-lucide="clock" class="w-4 h-4"></i></div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="danger">Escaneamento de Estagnação</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">Rotinas em segundo plano que identificam negociações paradas e alertam o responsável antes da perda de tração.</p>
+        </div>
+
+        <div class="section-card p-6 bg-white bh-card" data-accent="blue">
+          <div class="w-9 h-9 rounded-xl bg-orange-100 text-[#EA580C] flex items-center justify-center font-bold mb-3 bh-kicker"><i data-lucide="network" class="w-4 h-4"></i></div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="blue">Sincronização Bidirecional</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">Atualização contínua de status, tarefas e contatos entre o Birth Hub 360° e CRMs legados sem digitação dupla.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      9. PERFORMANCE COMERCIAL
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="performance" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#FFFFFF] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-emerald-50 border border-emerald-200 text-[#16A34A] mb-3" data-accent="gold">
+          <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> TELEMETRIA E GESTÃO DE METAS
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="gold">
+          Visibilidade analítica sobre a tração da sua equipe
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569]">
+          Acompanhe métricas essenciais de pipeline, conversão por fase e motivos de perda com precisão cirúrgica.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="section-card p-5 bh-card" data-accent="success">
+          <div class="font-mono text-xs text-[#64748B] uppercase bh-kicker">Taxa de Conversão</div>
+          <div class="font-display text-2xl font-extrabold text-[#0F172A] my-1 bh-heading" data-accent="success">Funil 360°</div>
+          <p class="text-xs text-[#64748B]">Visualização clara das passagens de fase no funil para identificar onde a operação perde volume.</p>
+        </div>
+
+        <div class="section-card p-5 bh-card" data-accent="cyan">
+          <div class="font-mono text-xs text-[#64748B] uppercase bh-kicker">Velocidade de Vendas</div>
+          <div class="font-display text-2xl font-extrabold text-[#0F172A] my-1 bh-heading" data-accent="cyan">Ciclo Médio</div>
+          <p class="text-xs text-[#64748B]">Acompanhamento do ciclo médio de vendas e do tempo que oportunidades permanecem em cada etapa.</p>
+        </div>
+
+        <div class="section-card p-5 bh-card" data-accent="blue">
+          <div class="font-mono text-xs text-[#64748B] uppercase bh-kicker">Gestão de Metas</div>
+          <div class="font-display text-2xl font-extrabold text-[#0F172A] my-1 bh-heading" data-accent="blue">Ritmo & Pace</div>
+          <p class="text-xs text-[#64748B]">Monitoramento contínuo do faturamento realizado frente aos objetivos traçados para o período.</p>
+        </div>
+
+        <div class="section-card p-5 bh-card" data-accent="danger">
+          <div class="font-mono text-xs text-[#64748B] uppercase bh-kicker">Motivos de Perda</div>
+          <div class="font-display text-2xl font-extrabold text-[#0F172A] my-1 bh-heading" data-accent="danger">Win / Loss</div>
+          <p class="text-xs text-[#64748B]">Diagnóstico estruturado sobre as razões de ganho e perda de contas para aprimorar a estratégia de produto e abordagem.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      10. PREVISIBILIDADE COMERCIAL
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="previsibilidade" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#F8FAFC] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-amber-50 border border-amber-200 text-[#D97706] mb-3" data-accent="gold">
+          <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> RIGOR ANALÍTICO E PROBABILIDADE
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="gold">
+          Previsibilidade construída sobre a maturidade dos seus dados
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569] leading-relaxed">
+          Modelagem explicável de pipeline ponderado baseada em probabilidades de fechamento e taxas históricas, sem ilusões de previsões automáticas sem dados.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="section-card p-6 bg-white bh-card" data-accent="gold">
+          <div class="w-8 h-8 rounded-lg bg-amber-100 text-[#D97706] flex items-center justify-center font-bold mb-3 bh-kicker">1</div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="gold">Pipeline Ponderado Explicável</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">Cálculo transparente que ajusta a probabilidade de fechamento conforme o histórico de adiamentos e a etapa real da negociação.</p>
+        </div>
+
+        <div class="section-card p-6 bg-white bh-card" data-accent="cyan">
+          <div class="w-8 h-8 rounded-lg bg-amber-100 text-[#D97706] flex items-center justify-center font-bold mb-3 bh-kicker">2</div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="cyan">Dependência de Dados Declarada</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">O sistema é honesto com a liderança: a acurácia de projeções futuras exige disciplina e preenchimento consistente do time.</p>
+        </div>
+
+        <div class="section-card p-6 bg-white bh-card" data-accent="gold">
+          <div class="w-8 h-8 rounded-lg bg-amber-100 text-[#D97706] flex items-center justify-center font-bold mb-3 bh-kicker">3</div>
+          <h3 class="font-display text-base font-bold text-[#0F172A] mb-2 bh-heading" data-accent="gold">Cenários de Projeção</h3>
+          <p class="text-xs sm:text-sm text-[#64748B] leading-relaxed">Comparação entre cenários conservadores e prováveis para embasar decisões de alocação de recursos e metas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      11. ECOSSISTEMA MULTIPLATAFORMA
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="ecossistema" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#FFFFFF] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 text-[#0284C7] mb-3" data-accent="blue">
+          <i data-lucide="network" class="w-3.5 h-3.5"></i> CONECTIVIDADE MULTI-PLATAFORMA
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight bh-heading" data-accent="blue">
+          Conectado ao ecossistema tecnológico corporativo
+        </h2>
+        <p class="mt-3 text-sm sm:text-base text-[#475569]">
+          O Birth Hub 360° integra-se nativamente com as principais ferramentas do seu fluxo de vendas, gestão e comunicação.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="blue">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="database" class="w-4 h-4 text-[#0284C7]"></i>
+              <span class="font-mono text-sm font-bold text-[#0284C7] bh-kicker">os melhores CRM´S do mercado.</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="blue">CRM Central</div>
+            <p class="text-xs text-[#64748B]">Sincronização bidirecional de leads, deals, tarefas e writeback estruturado.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#0284C7]">Nativo · Webhooks</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="blue">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="building-2" class="w-4 h-4 text-[#2563EB]"></i>
+              <span class="font-mono text-sm font-bold text-[#2563EB] bh-kicker">CRMs Externos</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="blue">HubSpot, Pipedrive, RD</div>
+            <p class="text-xs text-[#64748B]">Barramento unificado para espelhamento e transição de contatos entre sistemas.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#2563EB]">Conectores Ativos</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="gold">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="server" class="w-4 h-4 text-[#0EA5E9]"></i>
+              <span class="font-mono text-sm font-bold text-[#0EA5E9] bh-kicker">Omie ERP</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="gold">Faturamento & Contas</div>
+            <p class="text-xs text-[#64748B]">Consulta e conciliação de faturamento e dados cadastrais de clientes.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#0EA5E9]">Financeiro · Cadastros</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="pink">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-[#16A34A]"></i>
+              <span class="font-mono text-sm font-bold text-[#16A34A] bh-kicker">WhatsApp Corporativo</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="pink">Baileys Engine</div>
+            <p class="text-xs text-[#64748B]">Sessão isolada via QR Code por organização com trava distribuída e opt-out.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#16A34A]">Multi-Tenant · Opt-Out</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="pink">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="phone-call" class="w-4 h-4 text-[#E11D48]"></i>
+              <span class="font-mono text-sm font-bold text-[#E11D48] bh-kicker">Telefonia & Voz</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="pink">3CX & Birth Voice</div>
+            <p class="text-xs text-[#64748B]">Integração com centrais PBX e discador ativo com controle de supressão.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#E11D48]">PBX · Discagem Ativa</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="cyan">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="search" class="w-4 h-4 text-[#D97706]"></i>
+              <span class="font-mono text-sm font-bold text-[#D97706] bh-kicker">Enriquecimento B2B</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="cyan">Apollo, Hunter, CNPJ</div>
+            <p class="text-xs text-[#64748B]">Identificação de decisores, validação de e-mails e dados na Receita Federal.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#D97706]">Cascata Inteligente</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="blue">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="mail" class="w-4 h-4 text-[#EA580C]"></i>
+              <span class="font-mono text-sm font-bold text-[#EA580C] bh-kicker">Google & Slack</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="blue">Workspace & Alertas</div>
+            <p class="text-xs text-[#64748B]">Leitura de interações no Gmail, agendamento no Calendar e avisos no Slack.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#EA580C]">OAuth2 · Canais</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-[#F8FAFC] border border-slate-200 flex flex-col justify-between bh-card" data-accent="iris">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="cpu" class="w-4 h-4 text-[#7C3AED]"></i>
+              <span class="font-mono text-sm font-bold text-[#7C3AED] bh-kicker">Infraestrutura de IA</span>
+            </div>
+            <div class="font-display text-xs font-bold text-[#0F172A] mb-1 bh-heading" data-accent="iris">LiteLLM, Ollama, Qdrant</div>
+            <p class="text-xs text-[#64748B]">Gateway para múltiplos modelos, IA self-hosted e banco vetorial semântico.</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-200 text-[10px] font-mono font-semibold text-[#7C3AED]">RAG · Vetores</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      12. COMMAND CENTER
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="command-center" class="px-5 py-16 sm:px-8 lg:px-14 bg-[#F8FAFC] border-b border-slate-200">
+    <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10">
+      <div class="lg:w-1/2">
+        <div class="section-kicker bh-kicker inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-sky-50 border border-sky-200 text-[#0284C7] mb-3" data-accent="gold">
+          <i data-lucide="compass" class="w-3.5 h-3.5"></i> COCKPIT OPERACIONAL UNIFICADO
+        </div>
+        <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight mb-4 bh-heading" data-accent="gold">
+          O centro de comando desenhado para cada função comercial
+        </h2>
+        <p class="text-sm sm:text-base text-[#475569] leading-relaxed mb-6">
+          Ambientes especializados com foco na execução diária de SDRs, no fechamento de negócios por Closers e na governança estratégica de Gestores.
+        </p>
+        <div class="space-y-3 font-sans text-xs sm:text-sm text-[#334155]">
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 bh-card" data-accent="cyan">
+            <span class="font-mono font-bold text-[#0284C7] uppercase text-xs block mb-1 bh-heading" data-accent="cyan">Mesa de Tratamento (SDR / BDR)</span>
+            <p class="text-xs text-[#64748B]">Fila de oportunidades ordenada por prioridade, dados de contato enriquecidos e sugestões imediatas de abordagem.</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 bh-card" data-accent="success">
+            <span class="font-mono font-bold text-[#16A34A] uppercase text-xs block mb-1 bh-heading" data-accent="success">Gestão de Oportunidades (Closer)</span>
+            <p class="text-xs text-[#64748B]">Visão completa do histórico de interações, suporte a objeções e diagnóstico de saúde da negociação.</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 bh-card" data-accent="gold">
+            <span class="font-mono font-bold text-[#7C3AED] uppercase text-xs block mb-1 bh-heading" data-accent="gold">Central de Inteligência (Gestor)</span>
+            <p class="text-xs text-[#64748B]">Visão agregada do funil, alertas de estagnação de negócios e acompanhamento do cumprimento de metas em tempo real.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:w-1/2 w-full">
+        <div class="section-card p-6 bg-white border-2 border-slate-200 shadow-sm bh-card" data-accent="gold">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#0284C7]"></span>
+              <span class="font-mono text-xs font-bold text-[#0F172A] bh-kicker">BIRTH HUB 360° · COCKPIT</span>
+            </div>
+            <span class="font-mono text-[10px] px-2.5 py-0.5 rounded bg-sky-50 text-[#0284C7] font-bold border border-sky-200 bh-kicker">ARQUITETURA UNIFICADA</span>
+          </div>
+          <div class="space-y-3 font-mono text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 bh-card" data-accent="cyan">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-[#0F172A] bh-heading" data-accent="cyan">Mesa de Tratamento (SDR)</span>
+                <span class="text-[10px] text-[#0284C7] font-semibold">Priorização Ativa</span>
+              </div>
+              <p class="text-[11px] text-[#64748B] font-sans">Triagem contínua por qualificação, prioridade de atendimento e controle de janela comercial.</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 bh-card" data-accent="cyan">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-[#0F172A] bh-heading" data-accent="cyan">Pipeline Comercial Unificado</span>
+                <span class="text-[10px] text-[#16A34A] font-semibold">Passagem de Bastão</span>
+              </div>
+              <p class="text-[11px] text-[#64748B] font-sans">Governança de etapas, regras de transição e checklist de qualificação entre equipes.</p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 bh-card" data-accent="gold">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-[#0F172A] bh-heading" data-accent="gold">Central Executiva de Governança</span>
+                <span class="text-[10px] text-[#7C3AED] font-semibold">Visão Estratégica</span>
+              </div>
+              <p class="text-[11px] text-[#64748B] font-sans">Diagnóstico de estagnação, ritmo de atingimento de metas e calibração de previsibilidade.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      13. CTA
+  ════════════════════════════════════════════════════════════════════ -->
+  <section id="cta" class="px-5 py-20 sm:px-8 lg:px-14 bg-gradient-to-br from-sky-50 via-white to-purple-50/40 text-center border-b border-slate-200">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="font-display text-3xl sm:text-5xl font-extrabold text-[#0F172A] tracking-tight leading-tight bh-heading" data-accent="pink">
+        Pronto para estruturar sua operação comercial com rigor e inteligência?
+      </h2>
+      <p class="mt-4 text-base sm:text-lg text-[#475569] max-w-2xl mx-auto">
+        Acesse o centro de comando do Birth Hub 360° e conecte equipe, processos e decisões em uma única plataforma.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <button onclick="openLoginModal()" type="button" class="btn-cta-light inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-mono text-base font-bold uppercase tracking-wider cursor-pointer shadow-lg">
+          <span>Acessar Plataforma</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-4 font-mono text-xs text-[#64748B]">
+        <span class="inline-flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#0284C7]"></i> Acesso Corporativo Seguro</span>
+        <span>·</span>
+        <span class="inline-flex items-center gap-1.5"><i data-lucide="server" class="w-3.5 h-3.5 text-[#16A34A]"></i> Isolamento por Organização</span>
+        <span>·</span>
+        <span class="inline-flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5 text-[#7C3AED]"></i> Criptografia AES-256</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      14. FOOTER
+  ════════════════════════════════════════════════════════════════════ -->
+  <footer class="px-5 py-10 sm:px-8 lg:px-14 bg-[#FFFFFF]">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-200 pb-8 mb-6">
+      <div class="flex items-center gap-3">
+        <svg viewBox="0 0 256 256" width="42" height="42" xmlns="http://www.w3.org/2000/svg">
+          <use href="#mark-arc"></use>
+          <circle cx="128" cy="128" r="118" fill="none" stroke="url(#mark-arc)" stroke-width="10" stroke-dasharray="6 14" />
+          <circle cx="128" cy="128" r="78" fill="url(#mark-core)" />
+          <circle cx="128" cy="128" r="64" fill="none" stroke="#38BDF8" stroke-width="3" opacity="0.9" />
+          <line x1="64" y1="128" x2="192" y2="128" stroke="#7DD3FC" stroke-width="2" opacity="0.6" />
+          <path fill="#FFFFFF" transform="matrix(0.0740 0 0 -0.0740 104.45 154.20)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z" />
+        </svg>
+        <div>
+          <div class="font-display text-lg font-bold text-[#0F172A] bh-heading" data-accent="gold">Birth Hub 360°</div>
+          <div class="font-mono text-[10px] uppercase tracking-widest text-[#64748B] bh-heading" data-accent="gold">Business Command Center</div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-6 font-mono text-xs text-[#64748B]">
+        <a href="#problema" class="hover:text-[#0284C7]">Problema</a>
+        <a href="#plataforma" class="hover:text-[#0284C7]">Plataforma</a>
+        <a href="#pilares" class="hover:text-[#0284C7]">8 Pilares</a>
+        <a href="#fluxo" class="hover:text-[#0284C7]">Fluxo</a>
+        <a href="#ia" class="hover:text-[#0284C7]">IA</a>
+        <a href="#ecossistema" class="hover:text-[#0284C7]">Ecossistema</a>
+        <a href="#command-center" class="hover:text-[#0284C7]">Cockpit</a>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-[#64748B]">
+      <div>© 2026 Birth Hub 360°. Todos os direitos reservados.</div>
+      <div class="flex items-center gap-4">
+        <span>Privacidade & LGPD</span>
+        <span>·</span>
+        <span>Termos de Uso</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      MODAL INTERATIVO DE LOGIN / ACESSO
+  ════════════════════════════════════════════════════════════════════ -->
+  <div id="login-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-md w-full p-6 sm:p-8 relative animate-in fade-in zoom-in duration-200">
+      <button onclick="closeLoginModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-2xl bg-sky-100 text-[#0284C7] flex items-center justify-center font-bold">
+          <i data-lucide="lock" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-display text-xl font-bold text-[#0F172A] bh-heading" data-accent="gold">Acessar Plataforma</h3>
+          <p class="font-mono text-xs text-[#64748B] bh-heading" data-accent="gold">Birth Hub 360° Command Center</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block font-mono text-xs font-bold text-[#334155] uppercase tracking-wider mb-1">E-mail Corporativo</label>
+          <input type="email" required placeholder="seu.nome@empresa.com.br" class="app-input-pro" />
+        </div>
+
+        <div>
+          <label class="block font-mono text-xs font-bold text-[#334155] uppercase tracking-wider mb-1">Senha de Acesso</label>
+          <input type="password" required placeholder="••••••••••••" class="app-input-pro" />
+        </div>
+
+        <button type="submit" class="w-full btn-cta-light py-3.5 rounded-xl font-mono text-sm font-bold uppercase tracking-wider cursor-pointer shadow-md mt-2 flex items-center justify-center gap-2">
+          <span>Entrar no Hub</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 text-center font-mono text-xs text-[#64748B]">
+        Protegido por Criptografia AES-256 e RLS Multi-Tenant.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+      JAVASCRIPT DA PÁGINA (RELÓGIO + MODAL + LUCIDE)
+  ════════════════════════════════════════════════════════════════════ -->
+  <script>
+    // Inicializar ícones Lucide
+    lucide.createIcons();
+
+    // Entrada discreta dos cards; conteúdo permanece visível sem suporte a animação.
+    {
+      const capabilityGrid = document.querySelector('.capability-grid');
+      if (capabilityGrid && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        capabilityGrid.querySelectorAll('.capability-pill').forEach((card, index) => card.style.setProperty('--capability-index', index));
+        capabilityGrid.dataset.motion = 'ready';
+        const capabilityObserver = new IntersectionObserver(entries => {
+          if (entries.some(entry => entry.isIntersecting)) {
+            capabilityGrid.classList.add('is-visible');
+            capabilityObserver.disconnect();
+          }
+        }, { threshold: 0.1 });
+        capabilityObserver.observe(capabilityGrid);
+      }
+    }
+
+    // Modal Control
+    function openLoginModal() {
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      alert('Autenticação simulada. No ambiente integrado, isso abre a aplicação autenticada.');
+      closeLoginModal();
+    }
+
+  </script>
+</body>
+</html>

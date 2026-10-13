@@ -1,63 +1,276 @@
-/**
- * Birth Hub 360º — tokens de marca (fonte de verdade cromática)
- *
- * Extraídos do brand book "Birth Hub 360 Brand Book Cinematic" (V2.0, edição
- * reformulada), páginas 07 (Color Palette) e 08 (Sistema Cromático 360º).
- *
- * Estes tokens descrevem a MARCA. Os tokens de PRODUTO (--bg, --surface, --ink,
- * --brand …) vivem em `src/styles/globals.css` e consomem os valores daqui — não
- * duplique um hex de marca direto num componente.
+/** Birth Hub 360° — tokens oficiais 2026.
+ * Hierarquia: Brandbook > Manual Visual > Manual de Produto > Catálogo.
+ * focus-ring: outline; focus-offset: outline-offset; focus-shadow: box-shadow.
+ * Inter: font-feature-settings: var(--font-features-rounded).
+ * Hover primário: filter: var(--interactive-hover-filter).
+ * Raios pill somente nas variantes oficiais correspondentes.
  */
+
 :root {
-  /* --- Paleta oficial (brand book, p. 07) ------------------------------- */
-  /* Obsidian Black — profundidade. Base institucional escura. */
-  --bh-obsidian: #0b132b;
-  /* Midnight — fundo de página do brand book, um degrau abaixo do Obsidian.
-     Usado como --bg do tema escuro do produto. */
-  --bh-midnight: #08090f;
-  /* Deep Iris — inteligência em movimento. Cor de apoio da órbita. */
-  --bh-iris: #5b21b6;
-  /* Antique Gold — valor, foco e assinatura. Cor primária de marca. */
-  --bh-gold: #d4af37;
-  /* Snow White — respiro. Texto sobre superfícies escuras. */
-  --bh-snow: #f8fafc;
+  --color-heading-cyan: #00D4FF;
+  --color-heading-blue: #3B82F6;
+  --color-heading-gold: #FFC107;
+  --color-heading-pink: #FF2D9B;
+  --color-heading-iris: #8B7DFF;
+  --color-heading-success: #22C55E;
+  --color-heading-danger: #EF4444;
 
-  /* --- Extensões do sistema (brand book, p. 08 "Sistema Cromático 360º") -- */
-  /* Terceira cor da órbita: no brand book é `oklch(52% 0.19 255)`. Convertida
-     para sRGB aqui porque os assets de marca (SVG, e-mail, material impresso)
-     precisam de um hex — o produto pode voltar a usar oklch onde quiser. */
-  --bh-blue: #0065d2;
-  /* Rampa metálica do logotipo: linear-gradient(180deg, …) do wordmark. */
-  --bh-gold-light: #f7e9b8;
-  --bh-gold-deep: #8c6d1f;
-  --bh-gold-soft: #ebd689;
-  /* Superfície clara institucional (páginas claras do brand book). */
-  --bh-parchment: #e9e4d9;
-
-  /* --- Gradiente 360º ---------------------------------------------------- */
-  /* "O gradiente é movimento, não decoração." Um gradiente dominante por
-     composição; base sempre Obsidian ou Snow White. */
-  --bh-orbit: conic-gradient(
-    from 0deg,
-    var(--bh-gold),
-    var(--bh-iris),
-    var(--bh-blue),
-    var(--bh-gold)
-  );
-  --bh-gold-metal: linear-gradient(
-    180deg,
-    var(--bh-gold-light) 0%,
-    var(--bh-gold) 42%,
-    var(--bh-gold-deep) 68%,
-    var(--bh-gold-soft) 100%
-  );
-
-  /* --- Tipografia (brand book, p. 06) ------------------------------------ */
-  /* Bodoni Moda: headlines, títulos institucionais, branding.
-     Inter: Produto/Interface, menus, dashboards (Alta legibilidade).
-     JetBrains Mono: Dados, KPIs, precisão estrutural e tabular.
-     Playfair Display italic: exclusivamente o "B" do emblema. */
-  --bh-font-display: 'Bodoni Moda', Georgia, 'Times New Roman', serif;
-  --bh-font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --bh-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-display: 'Sora', system-ui, -apple-system, sans-serif;
+  --font-interface: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-heading: var(--font-display);
+  --font-body: var(--font-interface);
+  --font-data: var(--font-mono);
+  --font-kpi: var(--font-mono);
+  --font-code: var(--font-mono);
+  --font-sans: var(--font-interface);
+  --font-features-rounded: "cv05", "cv11", "ss01";
+  --tracking-rounded: -0.012em;
+  --tracking-display: -0.02em;
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-modal: 20px;
+  --radius-pill: 9999px;
+  --grad-brand: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+  --grad-cta: linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%);
+  --grad-vancouver: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 50%, #8B5CF6 100%);
+  --grad-orbit: conic-gradient(from 0deg, #FFC107, #FF2D9B, #00D4FF, #FFC107);
+  --grad-cyan-pink: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 100%);
+  --grad-gold: linear-gradient(135deg, #FFC107 0%, #FF8F00 100%);
+  --grad-glow: radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.18), transparent 70%);
+  --glow-blue: 0 0 24px rgba(0, 212, 255, 0.45);
+  --glow-cyan: 0 0 24px rgba(0, 212, 255, 0.45);
+  --glow-pink: 0 0 24px rgba(255, 45, 155, 0.45);
+  --glow-gold: 0 0 24px rgba(255, 193, 7, 0.45);
+  --palette-neon-blue: #00D4FF;
+  --palette-neon-pink: #FF2D9B;
+  --palette-neon-gold: #FFC107;
+  --palette-neon-black: #0D0D0D;
+  --palette-neon-card: #14141A;
+  --palette-neon-white: #F8F9FF;
+  --palette-surface2: #1C1C24;
+  --palette-surface3: #252530;
+  --palette-surface-hover: #252532;
+  --palette-muted: #9EADC8;
+  --palette-muted-subtle: #A1A1B5;
+  --palette-code-bg: #09090D;
+  --palette-success: #22C55E;
+  --palette-warning: #FFC107;
+  --palette-danger: #EF4444;
+  --palette-info: #3B82F6;
+  --palette-iris: #8B7DFF;
+  --palette-border: rgba(0, 212, 255, 0.22);
+  --palette-border-subtle: rgba(0, 212, 255, 0.18);
+  --palette-border-strong: rgba(0, 212, 255, 0.45);
+  --palette-shadow: rgba(0, 0, 0, 0.65);
+  --palette-border-pink: rgba(255, 45, 155, 0.25);
+  --palette-border-gold: rgba(255, 193, 7, 0.3);
+  --palette-chili-red: #E63946;
+  --palette-vanilla: #F1FAEE;
+  --palette-non-photo-blue: #A8DADC;
+  --palette-cerulean: #457B9D;
+  --palette-berkeley-blue: #1D3557;
+  --color-background: #0D0D0D;
+  --color-surface: #14141A;
+  --color-surface-elevated: #1C1C24;
+  --color-surface-hover: #252532;
+  --color-text-primary: #F8F9FF;
+  --color-text-secondary: #9EADC8;
+  --color-text-muted: #A1A1B5;
+  --color-border-subtle: rgba(0, 212, 255, 0.18);
+  --color-border-strong: rgba(0, 212, 255, 0.45);
+  --color-brand-primary: #00D4FF;
+  --color-brand-secondary: #FF2D9B;
+  --color-brand-accent: #FFC107;
+  --color-interactive-primary: #00D4FF;
+  --color-interactive-hover: #00D4FF;
+  --color-focus-ring: 2px solid #00D4FF;
+  --color-success: #22C55E;
+  --color-warning: #FFC107;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+  --color-border: rgba(0, 212, 255, 0.22);
+  --color-focus: #00D4FF;
+  --color-primary: #00D4FF;
+  --color-accent: #FFC107;
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 12px 30px rgba(0, 0, 0, 0.65);
+  --interactive-hover-filter: brightness(1.1);
+  --focus-offset: 3px;
+  --focus-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+  /* @deprecated Use --color-surface */
+  --surface: var(--color-surface);
+  /* @deprecated Use --color-background */
+  --bg: var(--color-background);
+  /* @deprecated Use --color-text-primary */
+  --ink: var(--color-text-primary);
+  /* @deprecated Use --color-text-muted */
+  --ink-2: var(--color-text-muted);
+  /* @deprecated Use --color-surface-elevated */
+  --surface-2: var(--color-surface-elevated);
+  /* @deprecated Use --color-border-subtle */
+  --line: var(--color-border-subtle);
+  /* @deprecated Use --color-success */
+  --ok: var(--color-success);
+  /* @deprecated Use --color-danger */
+  --critical: var(--color-danger);
 }
+
+[data-theme="light"],
+html.light,
+:root.light {
+  --color-heading-cyan: color-mix(in srgb, #0284C7 85%, #0D0D0D);
+  --color-heading-blue: color-mix(in srgb, #3B82F6 80%, #0D0D0D);
+  --color-heading-gold: color-mix(in srgb, #D97706 70%, #0D0D0D);
+  --color-heading-pink: #D91B7C;
+  --color-heading-iris: color-mix(in srgb, #8B7DFF 65%, #0D0D0D);
+  --color-heading-success: color-mix(in srgb, #22C55E 60%, #0D0D0D);
+  --color-heading-danger: color-mix(in srgb, #EF4444 80%, #0D0D0D);
+
+  --palette-cyan: #0284C7;
+  --palette-pink: #D91B7C;
+  --palette-gold: #D97706;
+  --palette-bg: #F4F7FB;
+  --palette-surface: #FFFFFF;
+  --palette-surface2: #EDF2F7;
+  --palette-surface3: #E2E8F0;
+  --palette-surface-hover: #E2E8F0;
+  --palette-ink: #0F172A;
+  --palette-muted: #64748B;
+  --palette-muted-subtle: #475569;
+  --palette-code-bg: #F8FAFC;
+  --palette-success: #22C55E;
+  --palette-warning: #FFC107;
+  --palette-danger: #EF4444;
+  --palette-info: #3B82F6;
+  --palette-border: rgba(2, 132, 199, 0.25);
+  --palette-border-subtle: rgba(11, 19, 43, 0.12);
+  --palette-border-strong: rgba(2, 132, 199, 0.5);
+  --palette-shadow: rgba(15, 23, 42, 0.08);
+  --palette-border-pink: rgba(217, 27, 124, 0.25);
+  --palette-border-gold: rgba(217, 119, 6, 0.35);
+  --palette-chili-red: #E63946;
+  --palette-vanilla: #F1FAEE;
+  --palette-non-photo-blue: #A8DADC;
+  --palette-cerulean: #457B9D;
+  --palette-berkeley-blue: #1D3557;
+  --palette-iris: #8B7DFF;
+  --color-background: #F4F7FB;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EDF2F7;
+  --color-surface-hover: #E2E8F0;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #475569;
+  --color-border-subtle: rgba(11, 19, 43, 0.12);
+  --color-border-strong: rgba(2, 132, 199, 0.5);
+  --color-brand-primary: #0284C7;
+  --color-brand-secondary: #D91B7C;
+  --color-brand-accent: #D97706;
+  --color-interactive-primary: #0284C7;
+  --color-interactive-hover: #0284C7;
+  --color-focus-ring: 2px solid #0284C7;
+  --color-success: #22C55E;
+  --color-warning: #FFC107;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+  --color-border: rgba(2, 132, 199, 0.25);
+  --color-focus: #0284C7;
+  --color-primary: #0284C7;
+  --color-accent: #D97706;
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --interactive-hover-filter: brightness(1.1);
+  --focus-offset: 3px;
+  --focus-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+}
+
+[data-theme="dark"],
+html.dark,
+:root.dark {
+  --color-heading-cyan: #00D4FF;
+  --color-heading-blue: #3B82F6;
+  --color-heading-gold: #FFC107;
+  --color-heading-pink: #FF2D9B;
+  --color-heading-iris: #8B7DFF;
+  --color-heading-success: #22C55E;
+  --color-heading-danger: #EF4444;
+
+  --palette-surface2: #1C1C24;
+  --palette-surface3: #252530;
+  --palette-surface-hover: #252532;
+  --palette-muted: #9EADC8;
+  --palette-muted-subtle: #A1A1B5;
+  --palette-code-bg: #09090D;
+  --palette-success: #22C55E;
+  --palette-warning: #FFC107;
+  --palette-danger: #EF4444;
+  --palette-info: #3B82F6;
+  --palette-iris: #8B7DFF;
+  --palette-border: rgba(0, 212, 255, 0.22);
+  --palette-border-subtle: rgba(0, 212, 255, 0.18);
+  --palette-border-strong: rgba(0, 212, 255, 0.45);
+  --palette-shadow: rgba(0, 0, 0, 0.65);
+  --palette-border-pink: rgba(255, 45, 155, 0.25);
+  --palette-border-gold: rgba(255, 193, 7, 0.3);
+  --palette-chili-red: #E63946;
+  --palette-vanilla: #F1FAEE;
+  --palette-non-photo-blue: #A8DADC;
+  --palette-cerulean: #457B9D;
+  --palette-berkeley-blue: #1D3557;
+  --color-background: #0D0D0D;
+  --color-surface: #14141A;
+  --color-surface-elevated: #1C1C24;
+  --color-surface-hover: #252532;
+  --color-text-primary: #F8F9FF;
+  --color-text-secondary: #9EADC8;
+  --color-text-muted: #A1A1B5;
+  --color-border-subtle: rgba(0, 212, 255, 0.18);
+  --color-border-strong: rgba(0, 212, 255, 0.45);
+  --color-brand-primary: #00D4FF;
+  --color-brand-secondary: #FF2D9B;
+  --color-brand-accent: #FFC107;
+  --color-interactive-primary: #00D4FF;
+  --color-interactive-hover: #00D4FF;
+  --color-focus-ring: 2px solid #00D4FF;
+  --color-success: #22C55E;
+  --color-warning: #FFC107;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+  --color-border: rgba(0, 212, 255, 0.22);
+  --color-focus: #00D4FF;
+  --color-primary: #00D4FF;
+  --color-accent: #FFC107;
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 12px 30px rgba(0, 0, 0, 0.65);
+  --interactive-hover-filter: brightness(1.1);
+  --focus-offset: 3px;
+  --focus-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+}
+
+/* Assinatura compartilhada de títulos e cards; novas regras visuais. */
+.bh-card[data-accent="cyan"], .bh-heading[data-accent="cyan"], .bh-kicker[data-accent="cyan"] { --bh-accent: var(--color-heading-cyan); }
+.bh-card[data-accent="blue"], .bh-heading[data-accent="blue"], .bh-kicker[data-accent="blue"] { --bh-accent: var(--color-heading-blue); }
+.bh-card[data-accent="gold"], .bh-heading[data-accent="gold"], .bh-kicker[data-accent="gold"] { --bh-accent: var(--color-heading-gold); }
+.bh-card[data-accent="pink"], .bh-heading[data-accent="pink"], .bh-kicker[data-accent="pink"] { --bh-accent: var(--color-heading-pink); }
+.bh-card[data-accent="iris"], .bh-heading[data-accent="iris"], .bh-kicker[data-accent="iris"] { --bh-accent: var(--color-heading-iris); }
+.bh-card[data-accent="success"], .bh-heading[data-accent="success"], .bh-kicker[data-accent="success"] { --bh-accent: var(--color-heading-success); }
+.bh-card[data-accent="danger"], .bh-heading[data-accent="danger"], .bh-kicker[data-accent="danger"] { --bh-accent: var(--color-heading-danger); }
+
+.bh-heading.bh-heading, .bh-kicker.bh-kicker { color: var(--bh-accent) !important; }
+.bh-heading :where(span, strong, em) { color: inherit; }
+.bh-heading :where([class*="grad-text"]) { background-image: none !important; color: inherit !important; }
+.bh-card {
+  border: 1px solid var(--bh-accent) !important;
+  border-radius: var(--radius-card) !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-card) !important;
+}
+.bh-card:hover { box-shadow: var(--shadow-elevated) !important; }
+.bh-card .bh-heading, .bh-card .bh-kicker { color: var(--bh-accent) !important; }
+@media (prefers-reduced-motion: reduce) {
+  .bh-card, .bh-card:hover, .bh-card:active { transition: none !important; transform: none !important; }
+}
+
+.bh-card .bh-kicker:is(div, [class*="bg-"]) { background-color: var(--color-surface-elevated); }
