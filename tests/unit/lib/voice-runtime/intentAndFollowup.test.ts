@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { intentEngine } from '../../../../src/lib/voice-runtime/intelligence/IntentEngine.js';
 import { postCallFollowupAutomation } from '../../../../src/lib/voice-runtime/automation/PostCallFollowupAutomation.js';
+import { sessionManager } from '../../../../src/lib/voice-runtime/SessionManager.js';
 import type { VoiceSession } from '../../../../src/lib/voice-runtime/types.js';
 
 describe('VoiceRuntime IntentEngine & PostCallFollowupAutomation', () => {
@@ -54,5 +55,32 @@ describe('VoiceRuntime IntentEngine & PostCallFollowupAutomation', () => {
     expect(followup.taskSuggested.priority).toBe('Alta');
     expect(followup.followupDraft?.channel).toBe('whatsapp');
     expect(followup.followupDraft?.content).toContain('confirmar data e horário');
+  });
+
+  it('manages session intents via sessionManager lifecycle', () => {
+    const runtimeConfig = {
+      providerStt: 'whisper',
+      providerLlm: 'OpenAI',
+      providerTts: 'Voicebox',
+      model: 'gpt-4o',
+      fallbacks: ['Anthropic'],
+      timeoutMs: 15000,
+      retryCount: 3,
+      temperature: 0.2,
+      silenceThresholdMs: 800,
+      speed: 1.0,
+      bargeInEnabled: true,
+      streamingEnabled: true,
+    };
+
+    const session = sessionManager.createSession('agent_test', 'caller_1', runtimeConfig, 'tenant_test');
+    expect(session.sessionId).toBeDefined();
+
+    const intentsBefore = sessionManager.getSessionIntents(session.sessionId);
+    expect(intentsBefore).toEqual([]);
+
+    sessionManager.endSession(session.sessionId);
+    const intentsAfter = sessionManager.getSessionIntents(session.sessionId);
+    expect(intentsAfter).toEqual([]);
   });
 });
