@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birth Hub 360° — Manual de Identidade do Produto</title>
+  <meta name="description" content="Manual de Identidade do Produto, Diretrizes de Experiência, Pilares Funcionais e Arquitetura de Design System do Birth Hub 360°.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Paleta Neon & Superfícies */
+      --cyan: #00D4FF;
+      --pink: #FF2D9B;
+      --gold: #FFC107;
+      --bg: #0D0D0D;
+      --surface: #14141A;
+      --surface2: #1C1C24;
+      --surface-hover: #242430;
+      --ink: #F8F9FF;
+      --muted: #9EADC8;
+      --border: rgba(0, 212, 255, 0.22);
+      --border-pink: rgba(255, 45, 155, 0.25);
+      --border-strong: rgba(0, 212, 255, 0.45);
+      --shadow: rgba(0, 0, 0, 0.6);
+      --accent-text: #00D4FF;
+      --code-bg: #09090D;
+      
+      /* Coolors Navigation & Accents */
+      --chili-red: #E63946;
+      --vanilla: #F1FAEE;
+      --non-photo-blue: #A8DADC;
+      --cerulean: #457B9D;
+      --berkeley-blue: #1D3557;
+
+      /* Gradientes Oficiais */
+      --grad-brand: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+      --grad-cyan-pink: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 100%);
+      --grad-gold: linear-gradient(135deg, #FFC107 0%, #FF8F00 100%);
+      --glow-cyan: 0 0 24px rgba(0, 212, 255, 0.35);
+      --glow-pink: 0 0 24px rgba(255, 45, 155, 0.35);
+
+      /* Trinca Tipográfica Exclusiva com Toque Arredondado */
+      --font-display: 'Sora', system-ui, -apple-system, sans-serif;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+      /* Geometria Arredondada */
+      --r-control: 12px;
+      --r-card: 16px;
+      --r-modal: 20px;
+      --r-pill: 9999px;
+    }
+
+    [data-theme="light"] {
+      --cyan: #0284C7;
+      --pink: #D91B7C;
+      --gold: #D97706;
+      --bg: #F4F7FB;
+      --surface: #FFFFFF;
+      --surface2: #EDF2F7;
+      --surface-hover: #E2E8F0;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --border: rgba(2, 132, 199, 0.25);
+      --border-pink: rgba(217, 27, 124, 0.25);
+      --border-strong: rgba(2, 132, 199, 0.5);
+      --shadow: rgba(15, 23, 42, 0.08);
+      --accent-text: #0284C7;
+      --code-bg: #F8FAFC;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-feature-settings: "cv05", "cv11", "ss01";
+      letter-spacing: -0.012em;
+      line-height: 1.65;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Header e Navegação */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: color-mix(in srgb, var(--surface) 85%, transparent);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo-svg {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.45));
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .brand-name span {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-category {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-action {
+      background: var(--surface2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: var(--r-pill);
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .btn-action.primary {
+      background: var(--cyan);
+      color: #0D0D0D;
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.35);
+    }
+
+    .btn-action.primary:hover {
+      filter: brightness(1.1);
+      color: #0D0D0D;
+    }
+
+    /* Container Principal */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 40px 0 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pink);
+      background: rgba(255, 45, 155, 0.12);
+      border: 1px solid var(--border-pink);
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      max-width: 980px;
+    }
+
+    .hero h1 .grad {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 17px;
+      max-width: 860px;
+      line-height: 1.7;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .kpi-card .num {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--cyan);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-card .num.pink { color: var(--pink); }
+    .kpi-card .num.gold { color: var(--gold); }
+
+    .kpi-card .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Seções */
+    .section {
+      margin-top: 64px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-header {
+      margin-bottom: 36px;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 780px;
+      line-height: 1.65;
+    }
+
+    /* Pilares de Produto */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .pillar-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px var(--shadow);
+    }
+
+    .pillar-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--grad-cyan-pink);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .pillar-card:hover::before {
+      opacity: 1;
+    }
+
+    .pillar-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pillar-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--r-control);
+      background: rgba(0, 212, 255, 0.12);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .pillar-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .pillar-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .pillar-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--ink);
+    }
+
+    .pillar-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pillar-features li::before {
+      content: '✓';
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    /* Módulos do Sistema */
+    .modules-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .modules-table th {
+      background: var(--surface2);
+      padding: 14px 20px;
+      text-align: left;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modules-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .modules-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .modules-table tr:hover td {
+      background: var(--surface-hover);
+    }
+
+    .module-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--cyan);
+      border: 1px solid var(--border);
+    }
+
+    .module-badge.pink {
+      background: rgba(255, 45, 155, 0.15);
+      color: var(--pink);
+      border-color: var(--border-pink);
+    }
+
+    .module-badge.gold {
+      background: rgba(255, 193, 7, 0.15);
+      color: var(--gold);
+      border-color: rgba(255, 193, 7, 0.3);
+    }
+
+    /* Tom de Voz e UX Writing */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .voice-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+    }
+
+    .voice-card h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .voice-comparison {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    .voice-do {
+      background: rgba(34, 197, 94, 0.1);
+      border-left: 3px solid #22C55E;
+      padding: 10px 14px;
+      border-radius: 0 var(--r-control) var(--r-control) 0;
+      color: var(--ink);
+    }
+
+    .voice-dont {
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid #EF4444;
+      padding: 10px 14px;
+      border-radius: 0 var(--r-control) var(--r-control) 0;
+      color: var(--muted);
+    }
+
+    /* Estados de Interface */
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .state-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .state-box .state-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .state-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .state-preview {
+      background: var(--surface2);
+      border: 1px dashed var(--border);
+      border-radius: var(--r-control);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 120px;
+      gap: 8px;
+    }
+
+    /* Regras de Engenharia & Acessibilidade */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .rule-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+    }
+
+    .rule-card h4 {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .rule-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Rodapé */
+    footer {
+      margin-top: 80px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media(max-width: 768px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .nav-actions { width: 100%; justify-content: flex-end; }
+      .modules-table { display: block; overflow-x: auto; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar Oficial com Logotipo Vetorial SVG -->
+  <header>
+    <div class="header-inner">
+      <a href="#" class="brand-logo-link">
+        <svg class="brand-logo-svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="orbit-grad-top" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4FF"/>
+              <stop offset="50%" stop-color="#FF2D9B"/>
+              <stop offset="100%" stop-color="#FFC107"/>
+            </linearGradient>
+            <radialGradient id="sheen-grad-top" cx="0.3" cy="0.25" r="0.55">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="10" opacity="0.6" stroke-dasharray="1.5 10"/>
+          <g fill="none" stroke-width="15">
+            <path stroke="url(#orbit-grad-top)" d="M127 46 A82 82 0 0 1 199 87"/>
+            <path stroke="url(#orbit-grad-top)" d="M198 86 A82 82 0 0 1 198 170"/>
+            <path stroke="url(#orbit-grad-top)" d="M199 168 A82 82 0 0 1 127 210"/>
+          </g>
+          <circle cx="128" cy="128" r="90" fill="url(#sheen-grad-top)"/>
+          <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+          <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="4.5"/>
+          <line x1="64" y1="128" x2="192" y2="128" stroke="#FFC107" stroke-width="2.5" opacity="0.45"/>
+          <!-- B Caligráfico Oficial -->
+          <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+        </svg>
+        <div class="brand-titles">
+          <div class="brand-name">BIRTH HUB <span>360°</span></div>
+          <div class="brand-category">Manual de Identidade do Produto</div>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <button id="themeToggle" class="btn-action" type="button">
+          <span id="themeIcon">☀️</span> <span id="themeLabel">Modo Claro</span>
+        </button>
+        <button id="exportManual" class="btn-action primary" type="button">
+          ↓ Baixar Manual
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="eyebrow">Diretrizes de Experiência & Filosofia Operacional</div>
+      <h1>A Essência do Produto: <span class="grad">Central de Comando 360°</span></h1>
+      <p>
+        O <strong>Birth Hub 360°</strong> transcende a definição de um CRM convencional: é o Sistema Operacional de Revenue Intelligence projetado para unificar inteligência preditiva, orquestração de vendas e execução em tempo real. Este manual define os princípios de produto, linguagem, hierarquia e comportamento para squads de design, engenharia e produto.
+      </p>
+
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="num">8</div>
+          <div class="label">Pilares Funcionais</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num pink">40+</div>
+          <div class="label">Módulos Nativos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num gold">100%</div>
+          <div class="label">WCAG 2.2 AA Alinhado</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">0ms</div>
+          <div class="label">Latência de Decisão</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01. PRINCÍPIOS FUNDAMENTAIS DE PRODUTO -->
+    <section class="section" id="principios">
+      <div class="section-header">
+        <div class="section-eyebrow">Capítulo 01 · Fundamentos</div>
+        <h2 class="section-title">Princípios Norteadores do Produto</h2>
+        <p class="section-desc">
+          Todo recurso, botão, relatório ou agente autônomo desenhado para o Birth Hub 360° deve responder rigorosamente a quatro imperativos funcionais:
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="pillar-title">1. Dados em Movimento, Não Arquivados</div>
+          </div>
+          <p class="pillar-desc">
+            Informações no CRM não existem para morrer em tabelas. Cada lead, deal ou atividade alimenta em tempo real os motores de score preditivo e cadências ativas.
+          </p>
+          <ul class="pillar-features">
+            <li>Sync bidirecional resiliente com Bitrix24</li>
+            <li>Enriquecimento automático contínuo</li>
+            <li>Eliminação de inputs manuais repetitivos</li>
+          </ul>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--pink); background:rgba(255,45,155,0.12); border-color:var(--border-pink);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            </div>
+            <div class="pillar-title">2. IA Ativa e Co-piloto Contextual</div>
+          </div>
+          <p class="pillar-desc">
+            A IA não é uma aba lateral esquecida ou um chatbot genérico; ela é copiloto proativo operando no mesmo espaço da decisão comercial (HUD ao vivo).
+          </p>
+          <ul class="pillar-features">
+            <li>Detecção preditiva de objeções em tempo real</li>
+            <li>Recomendação da Próxima Melhor Ação (NBA)</li>
+            <li>Síntese executiva automatizada de reuniões</li>
+          </ul>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--gold); background:rgba(255,193,7,0.12); border-color:rgba(255,193,7,0.3);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div class="pillar-title">3. Velocidade e Foco Operacional</div>
+          </div>
+          <p class="pillar-desc">
+            Interfaces hiper-responsivas com tempos de resposta sub-segundo. A micro-interação precisa devolver feedback tátil instantâneo.
+          </p>
+          <ul class="pillar-features">
+            <li>Command Palette global acessível via ⌘K</li>
+            <li>Navegação fluida sem recarregamentos pesados</li>
+            <li>Layouts de alta densidade informativa (Bento Grids)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. OS 8 PILARES DO PRODUTO -->
+    <section class="section" id="pilares">
+      <div class="section-header">
+        <div class="section-eyebrow">Capítulo 02 · Arquitetura Funcional</div>
+        <h2 class="section-title">Os 8 Pilares do Ecossistema 360°</h2>
+        <p class="section-desc">
+          O produto é estruturado em torno de 8 macro-domínios interdependentes que cobrem do primeiro contato à previsibilidade de faturamento:
+        </p>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <div class="pillar-title">Hub Central</div>
+          </div>
+          <p class="pillar-desc">Visão consolidada 360°, feed de alertas inteligentes e ponto de partida diário dos executivos e closers.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--pink); background:rgba(255,45,155,0.12);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h5l3-9 4 18 3-9h5"/></svg>
+            </div>
+            <div class="pillar-title">Intelligence & Scoring</div>
+          </div>
+          <p class="pillar-desc">Modelos preditivos de propensão de compra, ICP Matching, diagnósticos avançados e inteligência de mercado.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--gold); background:rgba(255,193,7,0.12);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+            </div>
+            <div class="pillar-title">Sales Orchestration</div>
+          </div>
+          <p class="pillar-desc">Playbooks vivos, roteiros dinâmicos, matriz de objeções e jornadas guiadas passo a passo.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            </div>
+            <div class="pillar-title">Real-time Performance</div>
+          </div>
+          <p class="pillar-desc">Métricas ao vivo, ranking de metas, gamificação motivacional e monitoramento de saúde do pipeline.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--pink); background:rgba(255,45,155,0.12);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+            </div>
+            <div class="pillar-title">Revenue Forecast</div>
+          </div>
+          <p class="pillar-desc">Projeções ponderadas de receita, análise de dispersão, win/loss e cálculo de probabilidade por estágio.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--gold); background:rgba(255,193,7,0.12);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </div>
+            <div class="pillar-title">Copiloto IA</div>
+          </div>
+          <p class="pillar-desc">Agente conversacional especializado em vendas B2B, análise de transcrições e simulações com Roleplay.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+            </div>
+            <div class="pillar-title">Automações & Gatilhos</div>
+          </div>
+          <p class="pillar-desc">Fluxos automatizados de distribuição de leads, notificações de estagnação e sincronizações em segundo plano.</p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-top">
+            <div class="pillar-icon-box" style="color:var(--pink); background:rgba(255,45,155,0.12);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="pillar-title">Cadência & Engajamento</div>
+          </div>
+          <p class="pillar-desc">Sequenciamento multicanal (E-mail, WhatsApp, LinkedIn e Voz via 3CX/Baileys) com disparos inteligentes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03. MAPEAMENTO DE MÓDULOS DE PRODUTO -->
+    <section class="section" id="modulos">
+      <div class="section-header">
+        <div class="section-eyebrow">Capítulo 03 · Inventário do Sistema</div>
+        <h2 class="section-title">Matriz de Módulos & Recursos</h2>
+        <p class="section-desc">
+          Relação dos principais subsistemas ativos na plataforma, suas personas alvo e papéis operacionais:
+        </p>
+      </div>
+
+      <table class="modules-table">
+        <thead>
+          <tr>
+            <th>Módulo</th>
+            <th>Código / Domínio</th>
+            <th>Pilar</th>
+            <th>Público Alvo</th>
+            <th>Entrega de Valor Principal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Pipeline Ponderado</strong></td>
+            <td><code>features/predictability</code></td>
+            <td><span class="module-badge">Forecast</span></td>
+            <td>Liderança / Diretores</td>
+            <td>Cálculo matemático de fechamento baseado em taxas históricas por vendedor e segmento.</td>
+          </tr>
+          <tr>
+            <td><strong>Live Copilot HUD</strong></td>
+            <td><code>features/copiloto-ia</code></td>
+            <td><span class="module-badge pink">Copiloto IA</span></td>
+            <td>Closers / SDRs</td>
+            <td>Interface suspensa com detecção de voz em call ao vivo gerando argumentos em tempo real.</td>
+          </tr>
+          <tr>
+            <td><strong>Mesa de Tratamento</strong></td>
+            <td><code>features/mesa-tratamento</code></td>
+            <td><span class="module-badge gold">Orchestration</span></td>
+            <td>Qualificadores / BDRs</td>
+            <td>Triagem ultrarrápida de leads com enriquecimento por IA e distribuição ponderada.</td>
+          </tr>
+          <tr>
+            <td><strong>Roleplay Simulator</strong></td>
+            <td><code>features/roleplay</code></td>
+            <td><span class="module-badge pink">IA & Treinamento</span></td>
+            <td>SDRs / Gestores</td>
+            <td>Simulador interativo de vendas contra personas virtuais de clientes difíceis para treino.</td>
+          </tr>
+          <tr>
+            <td><strong>Matriz de Objeções</strong></td>
+            <td><code>features/playbook</code></td>
+            <td><span class="module-badge gold">Orchestration</span></td>
+            <td>Todo o time comercial</td>
+            <td>Respostas validadas, contrapontos de preço e concorrentes indexados com busca instantânea.</td>
+          </tr>
+          <tr>
+            <td><strong>Bitrix Sync Rules</strong></td>
+            <td><code>features/integrations</code></td>
+            <td><span class="module-badge">Hub Central</span></td>
+            <td>Engenharia / Ops</td>
+            <td>Monitoramento em tempo real do espelhamento de dados, webhooks e dead-letter queues.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 04. TOM DE VOZ E UX WRITING -->
+    <section class="section" id="voz">
+      <div class="section-header">
+        <div class="section-eyebrow">Capítulo 04 · Linguagem do Produto</div>
+        <h2 class="section-title">Tom de Voz & UX Writing</h2>
+        <p class="section-desc">
+          O Birth Hub 360° comunica-se como um consultor sênior de alto impacto: preciso, direto, analítico e resolutivo. Evitamos rodeios, adjetivos inflados e jargões vazios.
+        </p>
+      </div>
+
+      <div class="voice-grid">
+        <div class="voice-card">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Microcopy & Botões de Ação
+          </h3>
+          <p style="font-size:13px; color:var(--muted);">Ações devem usar verbos diretos no infinitivo ou primeira pessoa objetiva que deixem claro o que o usuário vai obter.</p>
+          <div class="voice-comparison">
+            <div class="voice-do"><strong>✓ Correto:</strong> "Gerar Proposta Comercial", "Avançar Etapa", "Sincronizar Agora"</div>
+            <div class="voice-dont"><strong>✕ Errado:</strong> "Clique aqui", "Submeter", "OK", "Fazer Mágica"</div>
+          </div>
+        </div>
+
+        <div class="voice-card">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Tratamento de Falhas & Erros
+          </h3>
+          <p style="font-size:13px; color:var(--muted);">Erros devem apontar a causa raiz de forma transparente e oferecer o próximo passo imediato de recuperação.</p>
+          <div class="voice-comparison">
+            <div class="voice-do"><strong>✓ Correto:</strong> "Não foi possível sincronizar com o Bitrix24 devido a um token expirado. Reconecte em Configurações > Integrações."</div>
+            <div class="voice-dont"><strong>✕ Errado:</strong> "Ocorreu um erro inesperado. Tente mais tarde."</div>
+          </div>
+        </div>
+
+        <div class="voice-card">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Insights de IA & Recomendações
+          </h3>
+          <p style="font-size:13px; color:var(--muted);">A IA nunca fala como entidade onipotente; ela apresenta hipóteses baseadas em evidências concretas de dados.</p>
+          <div class="voice-comparison">
+            <div class="voice-do"><strong>✓ Correto:</strong> "Probabilidade de fechamento em 78% baseada no histórico de 12 reuniões no mesmo segmento."</div>
+            <div class="voice-dont"><strong>✕ Errado:</strong> "Eu acho que este cliente vai fechar porque é muito qualificado."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05. ESTADOS OBRIGATÓRIOS DE INTERFACE -->
+    <section class="section" id="estados">
+      <div class="section-header">
+        <div class="section-eyebrow">Capítulo 05 · Resiliência de UX</div>
+        <h2 class="section-title">Os 4 Estados Obrigatórios de Todo Módulo</h2>
+        <p class="section-desc">
+          Conforme estabelecido pela governança do produto (AGENTS.md), nenhum painel, dashboard ou lista pode passar para produção sem implementar explicitamente todos os 4 estados:
+        </p>
+      </div>
+
+      <div class="states-grid">
+        <div class="state-box">
+          <div class="state-header">
+            <span class="state-name">1. Loading State</span>
+            <span class="module-badge">Carregando</span>
+          </div>
+          <div class="state-preview">
+            <div style="width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--cyan); border-radius:50%; animation:spin 1s linear infinite;"></div>
+            <span style="font-size:11px; color:var(--muted); font-family:var(--font-mono);">Sincronizando pipeline...</span>
+          </div>
+          <p style="font-size:12px; color:var(--muted);">Usar Skeletons pulsantes no formato exato dos cards ao invés de telas em branco.</p>
+        </div>
+
+        <div class="state-box">
+          <div class="state-header">
+            <span class="state-name">2. Empty State</span>
+            <span class="module-badge pink">Vazio</span>
+          </div>
+          <div class="state-preview">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+            <span style="font-size:11px; color:var(--ink); font-weight:700;">Nenhum lead qualificado</span>
+            <button class="btn-action" style="padding:4px 10px; font-size:10px;">+ Importar Lista</button>
+          </div>
+          <p style="font-size:12px; color:var(--muted);">Sempre prover um Call-to-Action (CTA) claro para o usuário superar o estado vazio.</p>
+        </div>
+
+        <div class="state-box">
+          <div class="state-header">
+            <span class="state-name">3. Error State</span>
+            <span class="module-badge" style="color:var(--chili-red); background:rgba(230,57,70,0.15);">Falha</span>
+          </div>
+          <div class="state-preview">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--chili-red)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span style="font-size:11px; color:var(--ink); font-weight:700;">Falha de comunicação</span>
+            <button class="btn-action" style="padding:4px 10px; font-size:10px; border-color:var(--chili-red); color:var(--chili-red);">Tentar Novamente</button>
+          </div>
+          <p style="font-size:12px; color:var(--muted);">Exibir mensagem clara com ação de retentativa (retry) sem deslogar o usuário.</p>
+        </div>
+
+        <div class="state-box">
+          <div class="state-header">
+            <span class="state-name">4. Stale State</span>
+            <span class="module-badge gold">Desatualizado</span>
+          </div>
+          <div class="state-preview">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span style="font-size:11px; color:var(--gold); font-weight:700;">Cache offline há 45m</span>
+            <span style="font-size:10px; color:var(--muted);">Reconectando background...</span>
+          </div>
+          <p style="font-size:12px; color:var(--muted);">Manter dados prévios visíveis informando quando a última checagem ocorreu.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06. ENGENHARIA DE PRODUTO, SEGURANÇA E LGPD -->
+    <section class="section" id="governanca">
+      <div class="section-header">
+        <div class="section-eyebrow">Capítulo 06 · Governança & Conformidade</div>
+        <h2 class="section-title">Diretrizes de Segurança, Multi-tenancy e LGPD</h2>
+        <p class="section-desc">
+          O Birth Hub 360° opera com dados corporativos de receita e informações sensíveis. As regras abaixo são intransigíveis em qualquer entrega de código:
+        </p>
+      </div>
+
+      <div class="rules-grid">
+        <div class="rule-card">
+          <h4>Multi-tenancy Rigoroso</h4>
+          <p>
+            Separação visual não comprova isolamento. Toda query no PostgreSQL/Prisma deve possuir cláusula explícita de tenant e políticas de Row-Level Security (RLS). Nenhum dado de empresa A pode vazar para empresa B sob qualquer hipótese.
+          </p>
+        </div>
+
+        <div class="rule-card">
+          <h4 style="color:var(--pink);">LGPD & Minimização de Dados</h4>
+          <p>
+            Dados pessoais (telefone, e-mail, nomes) devem passar por sanitização e expurgos periódicos. O titular possui direito a esquecimento garantido por rotas dedicadas de anonimização no sistema.
+          </p>
+        </div>
+
+        <div class="rule-card">
+          <h4 style="color:var(--gold);">Zero Mock em Produção</h4>
+          <p>
+            É estritamente proibido inventar valores ou criar dados fictícios para preencher métricas comerciais em ambientes de homologação ou produção. Quando não há dados, o módulo deve reportar Zero State de forma explícita.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div>
+        <strong>Birth Hub 360°</strong> · Sistema Operacional de Revenue Intelligence · Edição Oficial 2026
+      </div>
+      <div>
+        Desenvolvido pelo Coordenador Comercial <strong>Marcelo do Nascimento</strong>
+      </div>
+    </footer>
+
+  </main>
+
+  <style>
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+
+  <script>
+    // Theme Switcher
+    const themeBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    const html = document.documentElement;
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      if (theme === 'light') {
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Modo Escuro';
+      } else {
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Modo Claro';
+      }
+      localStorage.setItem('bh360_product_theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('bh360_product_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Exportação do Documento
+    document.getElementById('exportManual').addEventListener('click', () => {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'MANUAL-DE-IDENTIDADE-DO-PRODUTO-BIRTH-HUB-360.html';
+      a.click();
+    });
+  </script>
+</body>
+</html>

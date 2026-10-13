@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birth Hub 360° — Brandbook Oficial da Marca & Produto</title>
+  <meta name="description" content="Brandbook Oficial do Birth Hub 360° — Sistema Operacional de Revenue Intelligence. Diretrizes de marca, trinca tipográfica exclusiva, sistema cromático neon e governança.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Paleta Primária Neon */
+      --cyan: #00D4FF;
+      --pink: #FF2D9B;
+      --gold: #FFC107;
+      --bg: #0D0D0D;
+      --surface: #14141A;
+      --surface2: #1C1C24;
+      --surface-hover: #252532;
+      --ink: #F8F9FF;
+      --muted: #9EADC8;
+      --border: rgba(0, 212, 255, 0.22);
+      --border-pink: rgba(255, 45, 155, 0.25);
+      --border-gold: rgba(255, 193, 7, 0.3);
+      --border-strong: rgba(0, 212, 255, 0.45);
+      --shadow: rgba(0, 0, 0, 0.65);
+      --code-bg: #09090D;
+
+      /* Acentos Coolors */
+      --chili-red: #E63946;
+      --vanilla: #F1FAEE;
+      --non-photo-blue: #A8DADC;
+      --cerulean: #457B9D;
+      --berkeley-blue: #1D3557;
+
+      /* Gradientes Oficiais */
+      --grad-brand: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+      --grad-cyan-pink: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 100%);
+      --grad-glow: radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.18), transparent 70%);
+
+      /* Trinca Tipográfica Oficial (Toque Arredondado) */
+      --font-display: 'Sora', system-ui, -apple-system, sans-serif;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+      /* Geometria Arredondada */
+      --r-control: 12px;
+      --r-card: 16px;
+      --r-modal: 20px;
+      --r-pill: 9999px;
+    }
+
+    [data-theme="light"] {
+      --cyan: #0284C7;
+      --pink: #D91B7C;
+      --gold: #D97706;
+      --bg: #F4F7FB;
+      --surface: #FFFFFF;
+      --surface2: #EDF2F7;
+      --surface-hover: #E2E8F0;
+      --ink: #0F172A;
+      --muted: #64748B;
+      --border: rgba(2, 132, 199, 0.25);
+      --border-pink: rgba(217, 27, 124, 0.25);
+      --border-gold: rgba(217, 119, 6, 0.35);
+      --border-strong: rgba(2, 132, 199, 0.5);
+      --shadow: rgba(15, 23, 42, 0.08);
+      --code-bg: #F8FAFC;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-feature-settings: "cv05", "cv11", "ss01";
+      letter-spacing: -0.012em;
+      line-height: 1.65;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Topbar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: color-mix(in srgb, var(--surface) 85%, transparent);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo-svg {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.45));
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .brand-name span {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: var(--surface2);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      padding: 9px 18px;
+      border-radius: var(--r-pill);
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: var(--cyan);
+      color: #0D0D0D;
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.35);
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.1);
+      color: #0D0D0D;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 40px 0 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pink);
+      background: rgba(255, 45, 155, 0.12);
+      border: 1px solid var(--border-pink);
+      padding: 6px 14px;
+      border-radius: var(--r-pill);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(34px, 5.5vw, 64px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      max-width: 1020px;
+    }
+
+    .hero h1 .grad {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 880px;
+      line-height: 1.7;
+    }
+
+    /* Seções */
+    .section {
+      margin-top: 64px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 820px;
+      line-height: 1.65;
+      margin-bottom: 32px;
+    }
+
+    /* Grid de Cores */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .color-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    }
+
+    .color-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .color-swatch {
+      height: 110px;
+      width: 100%;
+      position: relative;
+    }
+
+    .color-info {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .color-name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .color-hex {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .color-role {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Tipografia Showcase */
+    .typo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 24px;
+    }
+
+    .typo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .typo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.12);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      align-self: flex-start;
+    }
+
+    .typo-tag.pink { color: var(--pink); border-color: var(--border-pink); background: rgba(255, 45, 155, 0.12); }
+    .typo-tag.gold { color: var(--gold); border-color: var(--border-gold); background: rgba(255, 193, 7, 0.12); }
+
+    .typo-sample {
+      margin: 8px 0;
+    }
+
+    .typo-meta {
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Exibição de Logos */
+    .logo-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .logo-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 20px;
+      min-height: 220px;
+    }
+
+    .logo-box.light-preview {
+      background: #F4F7FB;
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    /* Regras de Uso & Governança */
+    .governance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .gov-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+    }
+
+    .gov-card h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--cyan);
+    }
+
+    .gov-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Rodapé */
+    footer {
+      margin-top: 80px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media(max-width: 768px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .header-actions { width: 100%; justify-content: flex-end; }
+      .typo-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar Oficial -->
+  <header>
+    <div class="header-inner">
+      <a href="#" class="brand-link">
+        <svg class="brand-logo-svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="orbit-grad-brandbook" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4FF"/>
+              <stop offset="50%" stop-color="#FF2D9B"/>
+              <stop offset="100%" stop-color="#FFC107"/>
+            </linearGradient>
+            <radialGradient id="sheen-grad-brandbook" cx="0.3" cy="0.25" r="0.55">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="10" opacity="0.6" stroke-dasharray="1.5 10"/>
+          <g fill="none" stroke-width="15">
+            <path stroke="url(#orbit-grad-brandbook)" d="M127 46 A82 82 0 0 1 199 87"/>
+            <path stroke="url(#orbit-grad-brandbook)" d="M198 86 A82 82 0 0 1 198 170"/>
+            <path stroke="url(#orbit-grad-brandbook)" d="M199 168 A82 82 0 0 1 127 210"/>
+          </g>
+          <circle cx="128" cy="128" r="90" fill="url(#sheen-grad-brandbook)"/>
+          <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+          <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="4.5"/>
+          <line x1="64" y1="128" x2="192" y2="128" stroke="#FFC107" stroke-width="2.5" opacity="0.45"/>
+          <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+        </svg>
+        <div>
+          <div class="brand-name">BIRTH HUB <span>360°</span></div>
+          <div class="brand-sub">Brandbook Oficial da Marca</div>
+        </div>
+      </a>
+      <div class="header-actions">
+        <button id="themeToggle" class="btn" type="button">
+          <span id="themeIcon">☀️</span> <span id="themeLabel">Modo Claro</span>
+        </button>
+        <button id="downloadBrandbook" class="btn primary" type="button">
+          ↓ Baixar Brandbook
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="eyebrow">Edição Oficial 2026 · Fonte Única da Verdade</div>
+      <h1>Manual Global de Marca: <span class="grad">Birth Hub 360°</span></h1>
+      <p>
+        Este brandbook estabelece os parâmetros de identidade visual, construção geométrica do logotipo, sistema de cores neon calibrado para alto contraste e a trinca tipográfica exclusiva: <strong>Sora</strong>, <strong>Inter</strong> (toque arredondado) e <strong>IBM Plex Mono</strong>.
+      </p>
+    </section>
+
+    <!-- 01. O LOGOTIPO OFICIAL -->
+    <section class="section" id="logotipo">
+      <div class="section-eyebrow">Capítulo 01 · Identidade Central</div>
+      <h2 class="section-title">O Logotipo & Emblema Vetorial</h2>
+      <p class="section-desc">
+        O símbolo reúne o anel concêntrico dourado, a órbita de gradiente tridimensional neon e a caligrafia clássica da letra "B" monograma, sintetizando a união de tecnologia de ponta e elegância executiva:
+      </p>
+
+      <div class="logo-showcase">
+        <!-- Emblema Dark -->
+        <div class="logo-box">
+          <svg viewBox="0 0 256 256" width="96" height="96" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 24px rgba(0, 212, 255, 0.45));">
+            <defs>
+              <linearGradient id="o-brand-0" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF"/><stop offset="50%" stop-color="#FF2D9B"/><stop offset="100%" stop-color="#FFC107"/></linearGradient>
+              <radialGradient id="o-sheen-0" cx="0.3" cy="0.25" r="0.55"><stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/><stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+            </defs>
+            <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="10" opacity="0.6" stroke-dasharray="1.5 10"/>
+            <g fill="none" stroke-width="15">
+              <path stroke="url(#o-brand-0)" d="M127 46 A82 82 0 0 1 199 87"/>
+              <path stroke="url(#o-brand-0)" d="M198 86 A82 82 0 0 1 198 170"/>
+              <path stroke="url(#o-brand-0)" d="M199 168 A82 82 0 0 1 127 210"/>
+            </g>
+            <circle cx="128" cy="128" r="90" fill="url(#o-sheen-0)"/>
+            <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+            <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="4.5"/>
+            <line x1="64" y1="128" x2="192" y2="128" stroke="#FFC107" stroke-width="2.5" opacity="0.45"/>
+            <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+          </svg>
+          <div style="font-family:var(--font-display); font-size:14px; font-weight:700;">Emblema Oficial Dark</div>
+        </div>
+
+        <!-- Logo Horizontal Completo -->
+        <div class="logo-box" style="grid-column: span 2;">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <svg viewBox="0 0 256 256" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="10" opacity="0.6" stroke-dasharray="1.5 10"/>
+              <g fill="none" stroke-width="15">
+                <path stroke="url(#o-brand-0)" d="M127 46 A82 82 0 0 1 199 87"/>
+                <path stroke="url(#o-brand-0)" d="M198 86 A82 82 0 0 1 198 170"/>
+                <path stroke="url(#o-brand-0)" d="M199 168 A82 82 0 0 1 127 210"/>
+              </g>
+              <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+              <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="4.5"/>
+              <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+            </svg>
+            <div style="display:flex; flex-direction:column; line-height:1.1;">
+              <span style="font-family:var(--font-display); font-size:28px; font-weight:800; letter-spacing:-0.02em;">BIRTH HUB <span style="background:var(--grad-brand); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">360°</span></span>
+              <span style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--cyan); letter-spacing:0.12em; text-transform:uppercase;">Revenue Intelligence</span>
+            </div>
+          </div>
+          <div style="font-family:var(--font-display); font-size:14px; font-weight:700;">Assinatura Horizontal Institucional</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. SISTEMA CROMÁTICO OFICIAL -->
+    <section class="section" id="cores">
+      <div class="section-eyebrow">Capítulo 02 · Paleta de Cores</div>
+      <h2 class="section-title">O Sistema Cromático Neon</h2>
+      <p class="section-desc">
+        A paleta é estruturada com base no preto profundo `#0D0D0D`, contrastado pelos acentos vibrantes de alta tecnologia (Azul, Rosa e Dourado Neon), devidamente calibrados para contraste WCAG AA:
+      </p>
+
+      <div class="color-grid">
+        <div class="color-card">
+          <div class="color-swatch" style="background:#00D4FF; box-shadow:inset 0 0 30px rgba(0,0,0,0.2);"></div>
+          <div class="color-info">
+            <span class="color-name">Neon Blue</span>
+            <span class="color-hex">#00D4FF</span>
+            <span class="color-role">Tecnologia, confiança e foco analítico. Cor primária para títulos e bordas ativas.</span>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-swatch" style="background:#FF2D9B;"></div>
+          <div class="color-info">
+            <span class="color-name">Neon Pink</span>
+            <span class="color-hex">#FF2D9B</span>
+            <span class="color-role">Energia, atitude e inteligência de mercado. Tags de destaque e alertas.</span>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-swatch" style="background:#FFC107;"></div>
+          <div class="color-info">
+            <span class="color-name">Neon Gold</span>
+            <span class="color-hex">#FFC107</span>
+            <span class="color-role">Previsibilidade, prosperidade e métricas de receita. Decisões estratégicas.</span>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-swatch" style="background:#0D0D0D; border-bottom:1px solid var(--border);"></div>
+          <div class="color-info">
+            <span class="color-name">Neon Black</span>
+            <span class="color-hex">#0D0D0D</span>
+            <span class="color-role">Base escura imersiva (Dark Mode). Conforto visual contínuo sem reflexo.</span>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-swatch" style="background:#14141A; border-bottom:1px solid var(--border);"></div>
+          <div class="color-info">
+            <span class="color-name">Neon Card (Surface)</span>
+            <span class="color-hex">#14141A</span>
+            <span class="color-role">Superfície de cards e painéis interativos. Elevação visual sutil.</span>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-swatch" style="background:#F8F9FF;"></div>
+          <div class="color-info">
+            <span class="color-name">Neon White (Ink)</span>
+            <span class="color-hex">#F8F9FF</span>
+            <span class="color-role">Texto de leitura e tipografia institucional com contraste ótimo.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03. TRINCA TIPOGRÁFICA OFICIAL -->
+    <section class="section" id="tipografia">
+      <div class="section-eyebrow">Capítulo 03 · Tipografia</div>
+      <h2 class="section-title">A Trinca Tipográfica com Toque Arredondado</h2>
+      <p class="section-desc">
+        A hierarquia tipográfica foi rigorosamente reduzida e refinada para apenas 3 famílias exclusivas, eliminando qualquer fonte legada:
+      </p>
+
+      <div class="typo-grid">
+        <!-- Sora -->
+        <div class="typo-card">
+          <span class="typo-tag">Display & Títulos</span>
+          <div style="font-family:var(--font-display); font-size:32px; font-weight:800; line-height:1.15;" class="typo-sample">
+            Sora Display
+          </div>
+          <p style="font-size:14px; color:var(--muted); font-family:var(--font-display);">
+            O ecossistema que conecta inteligência, decisão e receita em uma única mesa.
+          </p>
+          <div class="typo-meta">
+            <span><strong>Uso:</strong> Headlines, nomes de marca, números de destaque e modais.</span>
+            <span><strong>Pesos:</strong> 600 (Semi-Bold), 700 (Bold), 800 (Extra-Bold).</span>
+          </div>
+        </div>
+
+        <!-- Inter (Toque Arredondado) -->
+        <div class="typo-card">
+          <span class="typo-tag pink">Interface & Leitura</span>
+          <div style="font-family:var(--font-sans); font-size:24px; font-weight:600; line-height:1.3;" class="typo-sample">
+            Inter (Toque Arredondado)
+          </div>
+          <p style="font-size:14px; color:var(--muted);">
+            Configurado via <code>font-feature-settings: "cv05", "cv11", "ss01"</code> com <code>letter-spacing: -0.012em</code>, proporcionando curvas suaves e leitura acolhedora sem perder autoridade executiva.
+          </p>
+          <div class="typo-meta">
+            <span><strong>Uso:</strong> Menus, parágrafos, formulários, tabelas e botões.</span>
+            <span><strong>Pesos:</strong> 400 (Regular), 500 (Medium), 600 (Semi-Bold).</span>
+          </div>
+        </div>
+
+        <!-- IBM Plex Mono -->
+        <div class="typo-card">
+          <span class="typo-tag gold">Dados & KPIs</span>
+          <div style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--cyan);" class="typo-sample">
+            IBM Plex Mono
+          </div>
+          <p style="font-size:14px; color:var(--muted); font-family:var(--font-mono);">
+            R$ 1.840.000,00 · +38.4% ARR · 0ms Latência
+          </p>
+          <div class="typo-meta">
+            <span><strong>Uso:</strong> Métricas financeiras, contadores, tags técnicas e código.</span>
+            <span><strong>Pesos:</strong> 500 (Medium), 700 (Bold).</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04. GOVERNANÇA DE MARCA E REGRAS -->
+    <section class="section" id="regras">
+      <div class="section-eyebrow">Capítulo 04 · Governança</div>
+      <h2 class="section-title">Diretrizes de Aplicação & Integridade</h2>
+      <p class="section-desc">
+        Padrões mandatórios para designers, engenheiros e parceiros que utilizam a marca Birth Hub 360°:
+      </p>
+
+      <div class="governance-grid">
+        <div class="gov-card">
+          <h3>Geometria Arredondada Consistente</h3>
+          <p>
+            Todos os componentes interativos devem respeitar os tokens de raio: botões e inputs (`12px`), cards de conteúdo (`16px`), modais e overlays (`20px`), e pílulas (`9999px`).
+          </p>
+        </div>
+
+        <div class="gov-card">
+          <h3 style="color:var(--pink);">Proibição de Tipografias Órfãs</h3>
+          <p>
+            É estritamente proibido incluir fontes como Bodoni Moda, Cabin, JetBrains Mono ou Playfair Display em qualquer novo layout ou componente. O ecossistema é 100% Sora, Inter e IBM Plex Mono.
+          </p>
+        </div>
+
+        <div class="gov-card">
+          <h3 style="color:var(--gold);">Proteção do Emblema Vetorial</h3>
+          <p>
+            O emblema oficial não pode sofrer distorções de proporção, rotação arbitrária dos anéis de órbita ou alteração dos gradientes neon que formam a assinatura ótica da marca.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div>
+        <strong>Birth Hub 360°</strong> · Brandbook Oficial da Marca · Edição 2026
+      </div>
+      <div>
+        Desenvolvido pelo Coordenador Comercial <strong>Marcelo do Nascimento</strong>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    const themeBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    const html = document.documentElement;
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      if (theme === 'light') {
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Modo Escuro';
+      } else {
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Modo Claro';
+      }
+      localStorage.setItem('bh360_brandbook_theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('bh360_brandbook_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    document.getElementById('downloadBrandbook').addEventListener('click', () => {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'BRANDBOOK-OFICIAL-BIRTH-HUB-360.html';
+      a.click();
+    });
+  </script>
+</body>
+</html>

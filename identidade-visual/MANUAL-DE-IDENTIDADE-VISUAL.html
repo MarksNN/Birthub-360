@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Birth Hub 360° — Manual Oficial de Identidade Visual 2026</title>
+  
+  <!-- Fontes Oficiais Exclusivas: Sora, Inter e IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       MANUAL DE IDENTIDADE VISUAL — BIRTH HUB 360°
+       Sistema Operacional de Revenue Intelligence
+       ========================================================================== */
+    :root {
+      /* Paleta Neon Canônica */
+      --neon-blue: #00d4ff;
+      --neon-pink: #ff2d9b;
+      --neon-gold: #ffc107;
+      --neon-black: #0d0d0d;
+      --neon-card: #14141a;
+      --neon-white: #f8f9ff;
+      --neon-border: rgba(0, 212, 255, 0.22);
+
+      /* Gradientes */
+      --grad-brand: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #ffc107 100%);
+      --grad-cta: linear-gradient(135deg, #ff2d9b 0%, #00d4ff 100%);
+      --grad-vancouver: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #8b5cf6 100%);
+      --grad-orbit: conic-gradient(from 0deg, #ffc107, #ff2d9b, #00d4ff, #ffc107);
+
+      /* Fontes Oficiais Exclusivas */
+      --font-display: "Sora", sans-serif;
+      --font-interface: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+
+      /* Toque Arredondado */
+      --font-features-rounded: "cv05", "cv11", "ss01";
+      --tracking-rounded: -0.012em;
+      --tracking-display: -0.02em;
+
+      /* Raios de Borda Suavizados */
+      --radius-control: 12px;
+      --radius-card: 16px;
+      --radius-modal: 20px;
+      --radius-pill: 9999px;
+
+      /* Superfícies — Modo Claro */
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-subtle: #f1f5f9;
+      --ink: #0b132b;
+      --ink-muted: #475569;
+      --line: rgba(11, 19, 43, 0.12);
+
+      /* Semânticas */
+      --ok: #22c55e;
+      --warn: #ffc107;
+      --critical: #ef4444;
+      --info: #3b82f6;
+      --iris: #8b7dff;
+
+      --glow-blue: 0 0 24px rgba(0, 212, 255, 0.45);
+      --glow-pink: 0 0 24px rgba(255, 45, 155, 0.45);
+      --glow-gold: 0 0 24px rgba(255, 193, 7, 0.45);
+    }
+
+    html.dark {
+      --bg: #0d0d0d;
+      --surface: #14141a;
+      --surface-subtle: #1c1c24;
+      --ink: #f8f9ff;
+      --ink-muted: #a1a1b5;
+      --line: rgba(0, 212, 255, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-interface);
+      font-feature-settings: var(--font-features-rounded);
+      letter-spacing: var(--tracking-rounded);
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      padding-bottom: 60px;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-display);
+      letter-spacing: var(--tracking-display);
+      font-weight: 800;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Topbar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: color-mix(in srgb, var(--surface) 85%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 0;
+    }
+
+    .topbar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-symbol {
+      width: 42px;
+      height: 42px;
+      background: #0d0d0d;
+      border: 1.5px solid var(--neon-blue);
+      box-shadow: var(--glow-blue);
+      border-radius: var(--radius-control);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--neon-blue);
+    }
+    .logo-symbol span { color: var(--neon-pink); }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .brand-title span {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-theme {
+      background: var(--surface-subtle);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-theme:hover { border-color: var(--neon-blue); }
+
+    .btn-download {
+      background: var(--grad-cta);
+      color: #0d0d0d !important;
+      border: 0;
+      padding: 9px 20px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .btn-download:hover { transform: translateY(-2px); }
+
+    /* Hero */
+    .hero {
+      padding: 64px 0 48px;
+      position: relative;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(0, 212, 255, 0.12);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      color: var(--neon-blue);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(34px, 5.5vw, 64px);
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: var(--ink-muted);
+      max-width: 780px;
+      line-height: 1.7;
+    }
+
+    /* Seções */
+    .section {
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-header {
+      margin-bottom: 32px;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--neon-pink);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-size: 32px;
+      margin: 6px 0 10px;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--ink-muted);
+      max-width: 740px;
+    }
+
+    /* Cards e Grids */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-color-swatch {
+      height: 100px;
+      border-radius: var(--radius-control);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.25);
+    }
+
+    .token-chip {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--line);
+      margin-top: 6px;
+      margin-right: 4px;
+    }
+
+    /* Tipografia Showcase */
+    .typo-specimen {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .typo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--neon-blue);
+      margin-bottom: 16px;
+    }
+
+    .typo-headline {
+      font-size: clamp(24px, 3.5vw, 42px);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .typo-body {
+      font-size: 15px;
+      color: var(--ink-muted);
+      line-height: 1.7;
+    }
+
+    .typo-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-muted);
+      flex-wrap: wrap;
+    }
+
+    /* Toque Arredondado Comparativo */
+    .rounded-touch-box {
+      background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(255,45,155,0.06));
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: var(--radius-modal);
+      padding: 32px;
+      margin-top: 24px;
+    }
+
+    .rounded-touch-box h3 {
+      font-size: 22px;
+      color: var(--neon-blue);
+      margin-bottom: 12px;
+    }
+
+    /* Componentes Reais */
+    .component-box {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      background: var(--surface-subtle);
+      border-radius: var(--radius-control);
+    }
+
+    .btn-cta-demo {
+      background: var(--grad-cta);
+      color: #0d0d0d !important;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 14px;
+      padding: 12px 28px;
+      border-radius: var(--radius-pill);
+      border: 0;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+      cursor: pointer;
+    }
+
+    .btn-outline-demo {
+      background: transparent;
+      border: 1.5px solid var(--neon-blue);
+      color: var(--neon-blue);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 11px 26px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+    }
+
+    .metric-card-demo {
+      background: var(--surface);
+      border: 1px solid var(--neon-border);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      width: 100%;
+      max-width: 280px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .metric-card-demo .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--ink-muted);
+    }
+
+    .metric-card-demo .num {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--neon-gold);
+      margin: 6px 0;
+    }
+
+    .metric-card-demo .status {
+      font-size: 12px;
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .manual-footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="container topbar-content">
+      <a href="#" class="brand-logo" style="display:inline-flex; align-items:center; gap:14px; text-decoration:none;">
+        <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px; filter:drop-shadow(0 0 14px rgba(0,212,255,0.45)); flex-shrink:0;">
+          <defs>
+            <linearGradient id="orbit-grad-manual" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4FF"/>
+              <stop offset="50%" stop-color="#FF2D9B"/>
+              <stop offset="100%" stop-color="#FFC107"/>
+            </linearGradient>
+            <radialGradient id="halo-glow-manual" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(0, 212, 255, 0.28)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+          <circle cx="50" cy="50" r="48" fill="#0D0D0D" stroke="rgba(0, 212, 255, 0.28)" stroke-width="1.5"/>
+          <circle cx="50" cy="50" r="42" fill="url(#halo-glow-manual)"/>
+          <circle cx="50" cy="50" r="39" stroke="url(#orbit-grad-manual)" stroke-width="2" stroke-dasharray="8 4" opacity="0.9"/>
+          <circle cx="50" cy="50" r="45" stroke="#FFC107" stroke-width="1.2" stroke-dasharray="3 14" opacity="0.75"/>
+          <path d="M450.4 707Q574.2 707 639.6 648.7Q705 590.4 705 487.6Q705 425.2 676.8 375.4Q648.6 325.6 595.6 295.2Q666.2 265.4 700.7 207Q735.2 148.6 735.2 67.8Q735.2 -48.4 661.3 -118.5Q587.4 -188.6 443 -188.6L126 -188.6L126 707L450.4 707ZM429.6 401.4L299.8 401.4L299.8 600.4L429.6 600.4Q497.8 600.4 532.7 568.1Q567.6 535.8 567.6 480.8Q567.6 444.8 546.7 423.1Q525.8 401.4 429.6 401.4ZM448.2 -82.2Q547.4 -82.2 579.5 -55.8Q611.6 -29.4 611.6 39.4Q611.6 96.4 577.6 130.6Q543.6 164.8 471.8 164.8L299.8 164.8L299.8 -82.2L448.2 -82.2Z"
+                transform="matrix(0.046 0 0 -0.046 31 62)" fill="#00D4FF"/>
+          <circle cx="50" cy="9.5" r="3.2" fill="#00D4FF" filter="drop-shadow(0 0 6px #00D4FF)"/>
+          <circle cx="89" cy="50" r="3.2" fill="#FF2D9B" filter="drop-shadow(0 0 6px #FF2D9B)"/>
+          <circle cx="50" cy="90.5" r="3" fill="#FFC107" filter="drop-shadow(0 0 6px #FFC107)"/>
+        </svg>
+        <div class="brand-title" style="display:flex; flex-direction:column; line-height:1.05;">
+          <span style="font-family:var(--font-display); font-size:19px; font-weight:800; letter-spacing:-0.02em; color:var(--ink);">BIRTH HUB <span style="background:var(--grad-brand); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">360°</span></span>
+          <span style="font-family:var(--font-mono); font-size:10px; color:var(--neon-blue); letter-spacing:0.12em; text-transform:uppercase; font-weight:700;">Revenue Intelligence</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <button id="themeToggle" class="btn-theme" type="button">
+          <span id="themeIcon">☀️</span> <span id="themeLabel">Modo Claro</span>
+        </button>
+        <button id="downloadManual" class="btn-download" type="button">↓ Exportar Manual</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-tag">Manual Oficial de Identidade Visual · Edição 2026</div>
+      <h1>O Sistema Visual de <span>Revenue Intelligence</span></h1>
+      <p>
+        Este documento é a <strong>única fonte da verdade</strong> para o ecossistema Birth Hub 360°.
+        Ele estabelece a paleta oficial neon, os tokens de contraste calibrados para WCAG AA, e a trinca tipográfica
+        exclusiva composta por <strong>Sora</strong>, <strong>Inter</strong> e <strong>IBM Plex Mono</strong>, com acabamento e toques arredondados.
+      </p>
+    </section>
+
+    <!-- 01. Paleta de Cores Oficial -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">01 / Sistema Cromático</span>
+        <h2 class="section-title">Paleta Oficial Neon & Superfícies</h2>
+        <p class="section-desc">Cores calibradas com energia tecnológica, legibilidade e alto contraste para operação ininterrupta.</p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Azul Neon -->
+        <div class="card">
+          <div class="card-color-swatch" style="background: #00D4FF; color: #0d0d0d;">#00D4FF</div>
+          <h3>Azul Neon (Neon Blue)</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Tecnologia, inovação, confiança e halos da órbita 360°.</p>
+          <span class="token-chip">--neon-blue</span>
+          <span class="token-chip">--brand</span>
+          <span class="token-chip">text-neon-blue</span>
+        </div>
+
+        <!-- Rosa Neon -->
+        <div class="card">
+          <div class="card-color-swatch" style="background: #FF2D9B; color: #fff;">#FF2D9B</div>
+          <h3>Rosa Neon (Neon Pink)</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Energia, atitude, criatividade e assinatura de conversão.</p>
+          <span class="token-chip">--neon-pink</span>
+          <span class="token-chip">--brand-2</span>
+          <span class="token-chip">text-neon-pink</span>
+        </div>
+
+        <!-- Dourado Neon -->
+        <div class="card">
+          <div class="card-color-swatch" style="background: #FFC107; color: #0d0d0d;">#FFC107</div>
+          <h3>Dourado Neon (Neon Gold)</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Prosperidade, sofisticação, métricas e alertas de atenção.</p>
+          <span class="token-chip">--neon-gold</span>
+          <span class="token-chip">--warn</span>
+          <span class="token-chip">text-neon-gold</span>
+        </div>
+
+        <!-- Preto Neon -->
+        <div class="card">
+          <div class="card-color-swatch" style="background: #0D0D0D; color: #fff; border: 1px solid #333;">#0D0D0D</div>
+          <h3>Preto Neon (Fundo Dark)</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Fundo principal (Canvas) no modo escuro oficial.</p>
+          <span class="token-chip">--neon-black</span>
+          <span class="token-chip">--bg</span>
+        </div>
+
+        <!-- Fundo Cards -->
+        <div class="card">
+          <div class="card-color-swatch" style="background: #14141A; color: #fff; border: 1px solid #333;">#14141A</div>
+          <h3>Fundo Cards (Card Surface)</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Superfície de conteúdo, modais e cartões operacionais.</p>
+          <span class="token-chip">--neon-card</span>
+          <span class="token-chip">--surface</span>
+        </div>
+
+        <!-- Branco Neon -->
+        <div class="card">
+          <div class="card-color-swatch" style="background: #F8F9FF; color: #0d0d0d;">#F8F9FF</div>
+          <h3>Branco Neon (Neon White)</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Textos de leitura e respiro sobre fundos escuros.</p>
+          <span class="token-chip">--neon-white</span>
+          <span class="token-chip">--ink</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. Semântica e Acentos Coolors -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">02 / Semântica & Módulos</span>
+        <h2 class="section-title">Cores Funcionais & Navegação</h2>
+        <p class="section-desc">Padrão cromático para feedback de sistema e categorização visual dos módulos da Sidebar.</p>
+      </div>
+
+      <div class="grid-4">
+        <div class="card" style="border-left: 4px solid #22c55e;">
+          <strong style="color: #22c55e;">Sucesso (Ok)</strong>
+          <div style="font-family: var(--font-mono); font-size: 13px; margin: 4px 0;">#22C55E</div>
+          <p style="font-size: 12px; color: var(--ink-muted);">Metas batidas, status ativo e sincronização bem-sucedida.</p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #ef4444;">
+          <strong style="color: #ef4444;">Crítico / Risco</strong>
+          <div style="font-family: var(--font-mono); font-size: 13px; margin: 4px 0;">#EF4444</div>
+          <p style="font-size: 12px; color: var(--ink-muted);">Perdas de negócio, alertas urgentes e desconexões de API.</p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #3b82f6;">
+          <strong style="color: #3b82f6;">Informativo (Info)</strong>
+          <div style="font-family: var(--font-mono); font-size: 13px; margin: 4px 0;">#3B82F6</div>
+          <p style="font-size: 12px; color: var(--ink-muted);">Avisos de andamento, dicas e metadados contextuais.</p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #8b7dff;">
+          <strong style="color: #8b7dff;">Íris / Inteligência IA</strong>
+          <div style="font-family: var(--font-mono); font-size: 13px; margin: 4px 0;">#8B7DFF</div>
+          <p style="font-size: 12px; color: var(--ink-muted);">Agentes autônomos, copiloto de vendas e automações.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03. Tipografia Oficial com Toque Arredondado -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">03 / Tipografia Exclusiva</span>
+        <h2 class="section-title">Sora, Inter e IBM Plex Mono</h2>
+        <p class="section-desc">Trinca tipográfica oficial. Todas as demais fontes foram descontinuadas do ecossistema.</p>
+      </div>
+
+      <!-- Espécime Sora -->
+      <div class="typo-specimen">
+        <span class="typo-badge">Display & Títulos</span>
+        <h3 class="typo-headline" style="font-family: var(--font-display);">Sora: Força Geométrica com Curvas Amigáveis</h3>
+        <p class="typo-body" style="font-family: var(--font-display);">
+          Utilizada em todos os títulos (H1–H6), heros de impacto, botões de ação e números de destaque comercial.
+          Sua construção geométrica possui terminais naturalmente circulares que humanizam o design do centro de comando.
+        </p>
+        <div class="typo-meta">
+          <span>Pesos Oficiais: 400 (Regular), 600 (SemiBold), 700 (Bold), 800 (ExtraBold)</span>
+          <span>Tracking: -0.02em</span>
+          <span>CSS: --font-brand-display</span>
+        </div>
+      </div>
+
+      <!-- Espécime Inter -->
+      <div class="typo-specimen">
+        <span class="typo-badge" style="background: rgba(255,45,155,0.15); color: var(--neon-pink);">Interface & Leitura</span>
+        <h3 class="typo-headline" style="font-family: var(--font-interface); font-weight: 700;">Inter: Alta Densidade com Toque Arredondado</h3>
+        <p class="typo-body" style="font-family: var(--font-interface);">
+          Fonte de trabalho da interface: formulários, tabelas, menus, painéis de CRM, modais e corpo de texto.
+          Configurada com os recursos tipográficos OpenType <code>font-feature-settings: "cv05", "cv11", "ss01"</code>,
+          que ativam glifos com curvas arredondadas (como 'a' de forma suave e pontuações arredondadas), conferindo harmonia total com a Sora.
+        </p>
+        <div class="typo-meta">
+          <span>Pesos Oficiais: 400 (Regular), 500 (Medium), 600 (SemiBold), 700 (Bold)</span>
+          <span>Features: "cv05", "cv11", "ss01"</span>
+          <span>CSS: --font-brand-sans</span>
+        </div>
+      </div>
+
+      <!-- Espécime IBM Plex Mono -->
+      <div class="typo-specimen">
+        <span class="typo-badge" style="background: rgba(255,193,7,0.15); color: var(--neon-gold);">Dados, Código & KPIs</span>
+        <h3 class="typo-headline" style="font-family: var(--font-mono); font-weight: 700;">IBM Plex Mono: Rigor Métrico & Tabular</h3>
+        <p class="typo-body" style="font-family: var(--font-mono);">
+          Reservada para contadores de faturamento (R$ 148.900), badges técnicos, logs de IA, hashes de transação e tabelas comparativas.
+          Garante alinhamento vertical exato entre números e símbolos de moeda.
+        </p>
+        <div class="typo-meta">
+          <span>Pesos Oficiais: 400 (Regular), 500 (Medium), 600 (SemiBold), 700 (Bold)</span>
+          <span>CSS: --font-brand-mono</span>
+        </div>
+      </div>
+
+      <!-- Caixa de Destaque: Toque Arredondado -->
+      <div class="rounded-touch-box">
+        <h3>✨ O Conceito do "Toque Arredondado"</h3>
+        <p style="font-size: 14px; color: var(--ink); margin-bottom: 16px;">
+          Para garantir que o design não pareça frio ou excessivamente rígido, o Birth Hub 360 aplica uma tríade de suavização:
+        </p>
+        <ul style="font-size: 14px; margin-left: 20px; line-height: 1.8;">
+          <li><strong>Geometria Amigável da Sora:</strong> Aberturas circulares e vértices suavizados nos títulos.</li>
+          <li><strong>Stylistic Sets no Inter:</strong> Glifos arredondados ativados via CSS (<code>cv05, cv11, ss01</code>).</li>
+          <li><strong>Raio de Borda Unificado:</strong> Controles com <code>12px</code>, Cards com <code>16px</code>, Modais com <code>20px</code> e Botões em Pílula <code>9999px</code>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 04. Gradientes de Assinatura -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">04 / Gradientes & Movimento</span>
+        <h2 class="section-title">Gradientes Oficiais de Marca</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div style="height: 80px; border-radius: 12px; background: var(--grad-brand); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0d0d0d;">
+            Gradiente de Títulos (Brand)
+          </div>
+          <h3>Azul Neon → Rosa Neon → Dourado Neon</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Usado em títulos principais com efeito de texto cortado.</p>
+          <span class="token-chip">linear-gradient(135deg, #00d4ff, #ff2d9b, #ffc107)</span>
+        </div>
+
+        <div class="card">
+          <div style="height: 80px; border-radius: 12px; background: var(--grad-cta); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0d0d0d;">
+            Gradiente de Ação (CTA)
+          </div>
+          <h3>Rosa Neon → Azul Neon</h3>
+          <p style="font-size: 13px; color: var(--ink-muted); margin-top: 4px;">Usado nos botões principais de alta conversão e atalhos rápidos.</p>
+          <span class="token-chip">linear-gradient(135deg, #ff2d9b, #00d4ff)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05. Demonstração de Componentes -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">05 / Componentes em Ação</span>
+        <h2 class="section-title">Aplicações Práticas no Produto</h2>
+      </div>
+
+      <div class="grid-3">
+        <!-- Botão CTA -->
+        <div class="card">
+          <h4 style="margin-bottom: 12px;">Botão de Alta Conversão</h4>
+          <div class="component-box">
+            <button class="btn-cta-demo" type="button">Ativar Operação 360°</button>
+            <button class="btn-outline-demo" type="button">Explorar Módulos</button>
+          </div>
+        </div>
+
+        <!-- Métrica KPI -->
+        <div class="card">
+          <h4 style="margin-bottom: 12px;">Card de KPI Operacional</h4>
+          <div class="component-box" style="align-items: center;">
+            <div class="metric-card-demo">
+              <span class="label">Receita Prevista (ARR)</span>
+              <div class="num">R$ 1.482.000</div>
+              <span class="status">↗ +28.4% de crescimento</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="card">
+          <h4 style="margin-bottom: 12px;">Pílulas de Status & Tags</h4>
+          <div class="component-box">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; background: rgba(0,212,255,0.15); color: #00d4ff; border: 1px solid rgba(0,212,255,0.3);">● Online</span>
+              <span style="font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; background: rgba(255,45,155,0.15); color: #ff2d9b; border: 1px solid rgba(255,45,155,0.3);">● IA Ativa</span>
+              <span style="font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.3);">● Finanças</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="manual-footer">
+      Birth Hub 360° · Sistema Operacional de Revenue Intelligence · Manual Oficial de Identidade Visual 2026.
+    </footer>
+
+  </main>
+
+  <script>
+    (function() {
+      "use strict";
+      const toggle = document.getElementById("themeToggle");
+      const icon = document.getElementById("themeIcon");
+      const label = document.getElementById("themeLabel");
+      const downloadBtn = document.getElementById("downloadManual");
+
+      function updateTheme(isDark) {
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+          icon.textContent = "☀️";
+          label.textContent = "Modo Claro";
+        } else {
+          document.documentElement.classList.remove("dark");
+          icon.textContent = "🌙";
+          label.textContent = "Modo Escuro";
+        }
+      }
+
+      toggle.addEventListener("click", () => {
+        const isDark = !document.documentElement.classList.contains("dark");
+        updateTheme(isDark);
+        localStorage.setItem("atlas_theme", isDark ? "dark" : "light");
+      });
+
+      const saved = localStorage.getItem("atlas_theme");
+      if (saved === "light") updateTheme(false);
+
+      downloadBtn.addEventListener("click", () => {
+        const blob = new Blob(["<!doctype html>\n" + document.documentElement.outerHTML], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "BirthHub360_Manual_Visual_da_Plataforma.html";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+    })();
+  </script>
+</body>
+</html>

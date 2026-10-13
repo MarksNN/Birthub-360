@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Birth Hub 360° — Catálogo Oficial de Componentes & Design System</title>
+
+<!-- Fontes Oficiais Exclusivas: Sora, Inter e IBM Plex Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  /* Paleta Neon Canônica */
+  --cyan: #00D4FF;
+  --pink: #FF2D9B;
+  --gold: #FFC107;
+  --bg: #0D0D0D;
+  --surface: #14141A;
+  --surface2: #1C1C24;
+  --surface3: #252530;
+  --ink: #F8F9FF;
+  --muted: #A1A1B5;
+  --border: rgba(0, 212, 255, 0.22);
+  --border-strong: rgba(0, 212, 255, 0.5);
+  --accent-text: #00D4FF;
+  --code: #08090F;
+  --shadow: rgba(0, 0, 0, 0.45);
+
+  /* Trinca Tipográfica Exclusiva */
+  --font-display: "Sora", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* Toque Arredondado */
+  --font-features-rounded: "cv05", "cv11", "ss01";
+  --tracking-rounded: -0.012em;
+  --tracking-display: -0.02em;
+
+  /* Raios de Borda Suavizados */
+  --r-control: 12px;
+  --r-card: 16px;
+  --r-modal: 20px;
+  --r-pill: 9999px;
+
+  /* Gradientes de Assinatura */
+  --grad-brand: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%);
+  --grad-cta: linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%);
+  --grad-vancouver: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 50%, #8B5CF6 100%);
+  --grad-orbit: conic-gradient(from 0deg, #FFC107, #FF2D9B, #00D4FF, #FFC107);
+}
+
+html.light, :root.light {
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface2: #F1F5F9;
+  --surface3: #E2E8F0;
+  --ink: #0B132B;
+  --muted: #475569;
+  --border: rgba(11, 19, 43, 0.12);
+  --border-strong: rgba(0, 125, 155, 0.45);
+  --accent-text: #0284C7;
+  --code: #0B132B;
+  --shadow: rgba(11, 19, 43, 0.08);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-feature-settings: var(--font-features-rounded);
+  letter-spacing: var(--tracking-rounded);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+header {
+  padding: 16px clamp(16px, 4vw, 55px);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1360px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand-header-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Logotipo Oficial Vetorial no Header */
+.official-header-logo {
+  height: 48px;
+  width: auto;
+  display: flex;
+  align-items: center;
+}
+
+.brand-text-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.2;
+}
+
+.brand-title span {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero {
+  max-width: 1360px;
+  margin: auto;
+  padding: 38px clamp(16px, 4vw, 55px) 24px;
+}
+
+.eyebrow {
+  color: var(--accent-text);
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4.2vw, 46px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: var(--tracking-display);
+  margin: 12px 0;
+}
+
+.gradient {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+  max-width: 840px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0 10px;
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 18px;
+  border-radius: var(--r-control);
+  min-width: 135px;
+}
+
+.stat strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.stat span {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+main {
+  max-width: 1360px;
+  margin: auto;
+  padding: 0 clamp(16px, 4vw, 55px) 60px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 16px;
+}
+
+.search {
+  flex: 1;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  padding: 13px 18px;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+}
+
+.action {
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  padding: 12px 18px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action.primary {
+  background: var(--grad-cta);
+  border: 0;
+  color: #0D0D0D !important;
+  font-family: var(--font-display);
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.35);
+}
+
+.action:hover {
+  transform: translateY(-2px);
+  border-color: var(--cyan);
+}
+.action.primary:hover {
+  box-shadow: 0 6px 22px rgba(255, 45, 155, 0.45);
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0 24px;
+}
+
+.filter {
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.filter:hover {
+  color: var(--ink);
+  border-color: var(--cyan);
+}
+
+.filter.active {
+  border-color: var(--cyan);
+  color: #0D0D0D;
+  background: var(--cyan);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.35);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  box-shadow: 0 8px 24px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px 20px 10px;
+}
+
+.card h2 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ink);
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: var(--r-pill);
+  padding: 4px 9px;
+  background: var(--surface2);
+  color: var(--accent-text);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.demo {
+  min-height: 120px;
+  margin: 8px 18px 14px;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-control);
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.demo button {
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 9px 18px;
+  background: var(--cyan);
+  color: #0D0D0D;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  transition: all 0.2s ease;
+}
+.demo button:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+.demo .outline {
+  background: transparent;
+  border: 1.5px solid var(--cyan);
+  color: var(--accent-text);
+}
+
+.demo input, .demo select {
+  max-width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--r-control);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.demo .chip {
+  background: rgba(34, 197, 94, 0.16);
+  color: #22C55E;
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.demo .box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  padding: 14px;
+  font-size: 12px;
+  max-width: 100%;
+}
+
+.application {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  padding: 0 20px 14px;
+}
+.application b { color: var(--ink); }
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+.card-actions button {
+  background: var(--surface2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+.card-actions button:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+pre {
+  margin: 0 16px 16px;
+  background: var(--code);
+  color: #E2EDFF;
+  padding: 16px;
+  border-radius: var(--r-control);
+  overflow: auto;
+  font: 11px/1.65 var(--font-mono);
+  white-space: pre;
+  border: 1px solid var(--border);
+}
+pre[hidden] { display: none; }
+
+footer {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  background: var(--cyan);
+  color: #0D0D0D;
+  padding: 12px 22px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.45);
+  display: none;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media(max-width: 800px) {
+  .grid { grid-template-columns: 1fr; }
+  .toolbar .action { flex: 1; }
+  .stat { min-width: 100px; flex: 1; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="#" class="brand-header-link">
+      <!-- LOGO OFICIAL VETORIAL DE ALTA RESOLUÇÃO -->
+      <div class="official-header-logo">
+        <svg viewBox="0 0 256 256" width="46" height="46" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="hdr-o0" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#FF2D9B"/></linearGradient>
+            <linearGradient id="hdr-o1" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF2D9B"/><stop offset="100%" stop-color="#FFC107"/></linearGradient>
+            <linearGradient id="hdr-o2" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#FFC107"/><stop offset="100%" stop-color="#00D4FF"/></linearGradient>
+            <radialGradient id="hdr-sheen" cx="0.3" cy="0.25" r="0.55"><stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/><stop offset="1%" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+          </defs>
+          <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="10" opacity="0.6" stroke-dasharray="1.5 10"/>
+          <g fill="none" stroke-width="15">
+            <path stroke="url(#hdr-o0)" d="M127 46 A82 82 0 0 1 199 87"/>
+            <path stroke="url(#hdr-o1)" d="M198 86 A82 82 0 0 1 198 170"/>
+            <path stroke="url(#hdr-o2)" d="M199 168 A82 82 0 0 1 127 210"/>
+          </g>
+          <circle cx="128" cy="128" r="90" fill="url(#hdr-sheen)"/>
+          <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+          <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="4.5"/>
+          <line x1="64" y1="128" x2="192" y2="128" stroke="#FFC107" stroke-width="2.5" opacity="0.45"/>
+          <!-- Letra B Caligráfica Oficial da Marca -->
+          <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+        </svg>
+      </div>
+      <div class="brand-text-block">
+        <div class="brand-title">Birth Hub <span>360°</span></div>
+        <div class="brand-subtitle">Catálogo Oficial de Componentes</div>
+      </div>
+    </a>
+    <div class="header-controls">
+      <button class="action" id="theme" type="button">☀ Modo Claro</button>
+      <button class="action primary" id="download" type="button">↓ Baixar Catálogo</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">SISTEMA OPERACIONAL DE REVENUE INTELLIGENCE</div>
+  <h1>Catálogo Oficial & <span class="gradient">Design System Vivo</span></h1>
+  <p class="subtitle">
+    Biblioteca completa de componentes, logotipos vetoriais SVG oficiais, ícones funcionais, formulários, tabelas, métricas e navegação.
+    Alinhado com a paleta Neon e a trinca tipográfica exclusiva: <strong>Sora</strong>, <strong>Inter</strong> (toque arredondado) e <strong>IBM Plex Mono</strong>.
+  </p>
+  <div class="stats">
+    <div class="stat"><strong id="stat-total">58</strong><span>Componentes</span></div>
+    <div class="stat"><strong>8</strong><span>Categorias</span></div>
+    <div class="stat"><strong>SVG</strong><span>Logos & Ícones</span></div>
+    <div class="stat"><strong>TSX</strong><span>Código Copiável</span></div>
+  </div>
+</section>
+
+<main>
+  <div class="toolbar">
+    <input class="search" id="search" type="search" placeholder="Buscar componente, logo, ícone ou código (ex: Button, Logo, Radar, KPI, Dialog)..." aria-label="Buscar componentes">
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  Birth Hub 360° · Design System Oficial · Diretrizes: Sora, Inter, IBM Plex Mono & Paleta Neon.
+  <p style="margin-top: 8px;">Stack: React + TypeScript + Tailwind CSS v4 + Framer Motion</p>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+
+const components = [];
+function add(cat, name, app, code, previewHtml) {
+  components.push({ cat, name, app, code, previewHtml });
+}
+
+/* ==========================================================================
+   01. MARCA & LOGOTIPOS VETORIAIS SVG OFICIAIS
+   ========================================================================== */
+add("Marca & Logos", "Birth Hub 360 — Logotipo Horizontal Completo",
+  "Wordmark institucional oficial com anel orbital e tipografia de precisão.",
+`<!-- Logotipo Horizontal Oficial Birth Hub 360° -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 946 256" width="380" height="auto" role="img" aria-label="Birth Hub 360">
+  <defs>
+    <linearGradient id="bh-o0" gradientUnits="userSpaceOnUse" x1="127" y1="46" x2="199" y2="87"><stop offset="0" stop-color="#00D4FF"/><stop offset="1" stop-color="#FF2D9B"/></linearGradient>
+    <linearGradient id="bh-o1" gradientUnits="userSpaceOnUse" x1="198" y1="86" x2="198" y2="170"><stop offset="0" stop-color="#FF2D9B"/><stop offset="1" stop-color="#FFC107"/></linearGradient>
+    <linearGradient id="bh-o2" gradientUnits="userSpaceOnUse" x1="199" y1="168" x2="127" y2="210"><stop offset="0" stop-color="#FFC107"/><stop offset="1" stop-color="#00D4FF"/></linearGradient>
+    <radialGradient id="bh-sheen" cx="0.3" cy="0.25" r="0.55"><stop offset="0" stop-color="#FFF" stop-opacity="0.34"/><stop offset="1" stop-color="#FFF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="bh-gold-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7E9B8"/><stop offset="0.42" stop-color="#FFC107"/><stop offset="0.68" stop-color="#D97706"/><stop offset="1" stop-color="#FDE68A"/></linearGradient>
+  </defs>
+  <g id="bh-emblem">
+    <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="11" opacity="0.6" stroke-dasharray="1.5 10"/>
+    <g fill="none" stroke-width="16">
+      <path stroke="url(#bh-o0)" d="M127 46 A82 82 0 0 1 199 87"/>
+      <path stroke="url(#bh-o1)" d="M198 86 A82 82 0 0 1 198 170"/>
+      <path stroke="url(#bh-o2)" d="M199 168 A82 82 0 0 1 127 210"/>
+    </g>
+    <circle cx="128" cy="128" r="90" fill="url(#bh-sheen)"/>
+    <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+    <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="5"/>
+    <line x1="64" y1="128" x2="192" y2="128" stroke="#FFC107" stroke-width="3" opacity="0.5"/>
+    <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+  </g>
+  <text x="280" y="155" font-family='Sora, sans-serif' font-weight='800' font-size='82' fill='url(#bh-gold-metal)' letter-spacing='-2'>BIRTH HUB <tspan fill='#00D4FF'>360°</tspan></text>
+</svg>`,
+`<div style="width:100%;text-align:center;padding:14px;background:#0D0D0D;border-radius:12px;border:1px solid var(--border)">
+  <svg viewBox="0 0 946 256" style="max-width:320px;height:auto">
+    <defs>
+      <linearGradient id="d-arc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="50%" stop-color="#FF2D9B"/><stop offset="100%" stop-color="#FFC107"/></linearGradient>
+    </defs>
+    <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" stroke-width="11" opacity="0.6" stroke-dasharray="1.5 10"/>
+    <circle cx="128" cy="128" r="90" fill="none" stroke="url(#d-arc)" stroke-width="16"/>
+    <circle cx="128" cy="128" r="74" fill="#0D0D0D"/>
+    <circle cx="128" cy="128" r="61" fill="none" stroke="#FFC107" stroke-width="5"/>
+    <line x1="64" y1="128" x2="192" y2="128" stroke="#FFC107" stroke-width="3" opacity="0.5"/>
+    <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+    <text x="280" y="155" font-family='Sora, sans-serif' font-weight='800' font-size='82' fill='#FFC107' letter-spacing='-2'>BIRTH HUB <tspan fill='#00D4FF'>360°</tspan></text>
+  </svg>
+</div>`);
+
+add("Marca & Logos", "Birth Hub 360 — Emblema Orbital (Core Icon)",
+  "Símbolo circular autônomo com anel de órbita 360° e monograma 'B'.",
+`<!-- Emblema Orbital Oficial -->
+<svg viewBox="0 0 256 256" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="emblem-arc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00D4FF"/>
+      <stop offset="50%" stop-color="#FF2D9B"/>
+      <stop offset="100%" stop-color="#FFC107"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="118" fill="none" stroke="url(#emblem-arc)" stroke-width="12" stroke-dasharray="6 14"/>
+  <circle cx="128" cy="128" r="82" fill="#0D0D0D"/>
+  <circle cx="128" cy="128" r="66" fill="none" stroke="#FFC107" stroke-width="3" opacity="0.6"/>
+  <line x1="62" y1="128" x2="194" y2="128" stroke="#FFC107" stroke-width="2" opacity="0.4"/>
+  <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+</svg>`,
+`<div style="display:flex;align-items:center;gap:16px">
+  <div style="width:72px;height:72px;background:#0D0D0D;border-radius:16px;border:1.5px solid var(--border);display:grid;place-items:center;box-shadow:0 0 20px rgba(0,212,255,0.3)">
+    <svg viewBox="0 0 256 256" style="width:56px;height:56px">
+      <defs><linearGradient id="p-arc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00D4FF"/><stop offset="50%" stop-color="#FF2D9B"/><stop offset="100%" stop-color="#FFC107"/></linearGradient></defs>
+      <circle cx="128" cy="128" r="118" fill="none" stroke="url(#p-arc)" stroke-width="12" stroke-dasharray="6 14"/>
+      <circle cx="128" cy="128" r="82" fill="#0D0D0D"/>
+      <circle cx="128" cy="128" r="66" fill="none" stroke="#FFC107" stroke-width="3" opacity="0.6"/>
+      <line x1="62" y1="128" x2="194" y2="128" stroke="#FFC107" stroke-width="2" opacity="0.4"/>
+      <path fill="#F8F9FF" transform="matrix(0.074 0 0 -0.074 104.45 154.2)" d="M450.4 707Q574.2 707 627.9 670.8Q681.6 634.6 681.6 573.4Q681.6 520.8 646.8 476.7Q612 432.6 547 404.5Q482 376.4 391 370.8Q511 369.4 573.8 326.1Q636.6 282.8 636.6 218.2Q636.6 165.8 612.2 125.1Q587.8 84.4 543.2 56.4Q498.6 28.4 436 14.2Q373.4 0 297 0Q267.8 0 227.6 1.5Q187.4 3 121 3Q94.8 3 63.8 2.5Q32.8 2 3.7 1.5Q-25.4 1 -45 0L-41 20Q-7 22 12 28Q31 34 42 52Q53 70 62 106L194 602Q201.8 632.8 202.4 651.3Q203 669.8 188.5 678.5Q174 687.2 135 688L140 708Q159.6 707 188.2 706.5Q216.8 706 247.7 705.5Q278.6 705 303 705Q353.2 705 385.7 706Q418.2 707 450.4 707ZM266 359 270 376H339.2Q393.8 376 430.6 407.9Q467.4 439.8 486.2 490.8Q505 541.8 505 596.8Q505 636.6 491.5 662.3Q478 688 438.6 688Q413 688 401 674.1Q389 660.2 378 617L243 106Q238.2 86.4 235.7 67.1Q233.2 47.8 242.2 35.4Q251.2 23 278.8 23Q331.6 23 368.9 53.4Q406.2 83.8 426.6 132.9Q447 182 447 237.2Q447 270.4 437.2 297.9Q427.4 325.4 404.3 342.2Q381.2 359 341.6 359Z"/>
+    </svg>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">Emblema com anel orbital pontilhado<br>e núcleo Obsidian</div>
+</div>`);
+
+/* ==========================================================================
+   02. ÍCONES NATIVOS DOS 8 PILARES & MARCA
+   ========================================================================== */
+add("Ícones SVG", "8 Ícones Oficiais dos Pilares (PillarIcons)",
+  "Ícones circulares SVG com geometria contínua para os 8 módulos principais.",
+`import { HubIcon, IntelligenceIcon, OrchestrationIcon, PerformanceIcon, ForecastIcon, AiIcon, AutomationIcon, EngagementIcon } from '@/components/brand/PillarIcons';
+<div className="flex gap-4">
+  <HubIcon className="w-6 h-6 text-cyan" />
+  <IntelligenceIcon className="w-6 h-6 text-pink" />
+  <AiIcon className="w-6 h-6 text-gold" />
+</div>`,
+`<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+  <div style="text-align:center" title="01 Hub"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="#00D4FF"/></svg><div style="font-size:9px;color:var(--muted)">Hub</div></div>
+  <div style="text-align:center" title="02 Intelligence"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF2D9B" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5" stroke-dasharray="2 2"/><circle cx="12" cy="12" r="1.5" fill="#FF2D9B"/></svg><div style="font-size:9px;color:var(--muted)">Radar</div></div>
+  <div style="text-align:center" title="03 Orchestration"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M7 12h10M13 8l4 4-4 4"/></svg><div style="font-size:9px;color:var(--muted)">Fluxo</div></div>
+  <div style="text-align:center" title="04 Performance"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFC107" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M8 15v-2M12 15V9M16 15v-4"/></svg><div style="font-size:9px;color:var(--muted)">Métricas</div></div>
+  <div style="text-align:center" title="05 Forecast"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M8 14s2-4 4-4 4 4 4 4"/></svg><div style="font-size:9px;color:var(--muted)">Projeção</div></div>
+  <div style="text-align:center" title="06 AI"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B7DFF" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.5" fill="#8B7DFF"/><circle cx="15" cy="10" r="1.5" fill="#8B7DFF"/><path d="M9 15h6"/></svg><div style="font-size:9px;color:var(--muted)">IA</div></div>
+  <div style="text-align:center" title="07 Automation"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M12 7v3m0 4v3M7 12h3m4 0h3"/></svg><div style="font-size:9px;color:var(--muted)">Conexão</div></div>
+  <div style="text-align:center" title="08 Engagement"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF2D9B" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg><div style="font-size:9px;color:var(--muted)">Voz</div></div>
+</div>`);
+
+add("Ícones SVG", "BrandIcons — Biblioteca de Traço Redondo 24x24",
+  "Ícones nativos com grid 24x24, traço 1.75 e cantos arredondados (round caps).",
+`import { IconHome, IconBuilding, IconPipeline, IconSparkles } from '@/components/icons/BrandIcons';
+<IconHome className="w-5 h-5 text-cyan" />
+<IconPipeline className="w-5 h-5 text-gold" />`,
+`<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cyan)"><path d="M4 11.5 11.2 4.2a1.1 1.1 0 0 1 1.6 0L20 11.5"/><path d="M6 9.8V19a1 1 0 0 0 1 1h3.2v-4.6a1 1 0 0 1 1-1h1.6a1 1 0 0 1 1 1V20H17a1 1 0 0 0 1-1V9.8"/></svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold)"><rect x="3.5" y="12.5" width="4.4" height="7.5" rx="1.2"/><rect x="9.8" y="7.5" width="4.4" height="12.5" rx="1.2"/><rect x="16.1" y="4" width="4.4" height="16" rx="1.2"/></svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--pink)"><path d="m12 3 1.9 4.3 4.6.4-3.5 3 1 4.5-4-2.3-4 2.3 1-4.5-3.5-3 4.6-.4z"/></svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:#8B7DFF"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+</div>`);
+
+/* ==========================================================================
+   03. AÇÕES & BOTÕES
+   ========================================================================== */
+add("Ações", "Button — Primário CTA Neon", "Botão de conversão principal com gradiente e pílula.",
+`import { Button } from '@/components/ui/Button';
+<Button variant="brand" className="rounded-full font-display">Ativar Operação 360°</Button>`,
+`<button style="background:var(--grad-cta);color:#0D0D0D;border:0;padding:10px 22px;border-radius:9999px;font-family:var(--font-display);font-weight:800;box-shadow:0 4px 18px rgba(0,212,255,0.4)">Ativar Operação 360°</button>`);
+
+add("Ações", "Button — Vancouver Outline", "Ações secundárias com borda neon e hover luminoso.",
+`import { Button } from '@/components/ui/Button';
+<Button variant="outline" className="border-cyan text-cyan rounded-full">Explorar Módulos</Button>`,
+`<button class="outline" style="border-radius:9999px;padding:9px 20px">Explorar Módulos</button>`);
+
+add("Ações", "IconButton — Ação Rápida Redonda", "Botões compactos circulares para linhas e cabeçalhos.",
+`import { IconButton } from '@mui/material';
+<IconButton className="w-10 h-10 rounded-full border border-border">✎</IconButton>`,
+`<button class="outline" style="border-radius:50%;width:38px;height:38px;padding:0">✎</button><button class="outline" style="border-radius:50%;width:38px;height:38px;padding:0">⋯</button>`);
+
+add("Ações", "ButtonGroup — Pílula Segmentada", "Agrupamento de períodos (Dia, Semana, Mês).",
+`import { ButtonGroup, Button } from '@mui/material';
+<ButtonGroup variant="outlined" className="rounded-full">
+  <Button>Dia</Button><Button>Semana</Button><Button>Mês</Button>
+</ButtonGroup>`,
+`<div style="display:inline-flex;border:1px solid var(--border);border-radius:9999px;overflow:hidden"><button class="outline" style="border:0;border-radius:0;background:var(--surface2)">Dia</button><button class="outline" style="border:0;border-radius:0">Semana</button><button class="outline" style="border:0;border-radius:0">Mês</button></div>`);
+
+add("Ações", "ToggleButtonGroup — Modo de Visualização", "Alternar entre Lista, Funil e Cards.",
+`<ToggleButtonGroup value="lista" exclusive className="rounded-full">
+  <ToggleButton value="lista">☷ Lista</ToggleButton>
+  <ToggleButton value="cards">▦ Cards</ToggleButton>
+</ToggleButtonGroup>`,
+`<button style="border-radius:9999px">☷ Lista</button><button class="outline" style="border-radius:9999px">▦ Cards</button>`);
+
+add("Ações", "Fab — Floating Action Button", "Criação rápida flutuante de oportunidades.",
+`<Fab color="primary" className="shadow-glow-blue">+</Fab>`,
+`<button style="border-radius:50%;width:48px;height:48px;font-size:24px;background:var(--grad-cta);color:#0D0D0D;box-shadow:0 0 20px rgba(0,212,255,0.5)">+</button>`);
+
+/* ==========================================================================
+   04. FORMULÁRIOS & ENTRADAS
+   ========================================================================== */
+add("Formulários", "CyberInput — Input com Anel Neon", "Campo de texto com 12px de raio e anel de foco WCAG 3:1.",
+`import { Input } from '@/components/ui/Input';
+<Input placeholder="Nome do lead..." className="rounded-xl border-border focus:ring-cyan" />`,
+`<input placeholder="Nome do lead..." style="border-radius:12px;width:80%">`);
+
+add("Formulários", "TextField Multiline / Observações", "Descrições, anotações de reunião e comentários do CRM.",
+`<textarea rows="3" className="rounded-xl border-border bg-surface p-3" placeholder="Anotações do lead..."></textarea>`,
+`<textarea style="background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:10px;width:85%" rows="2" placeholder="Observações do lead..."></textarea>`);
+
+add("Formulários", "Select — Status & Responsável", "Seleção de opções com borda e lista estilizada.",
+`<select className="rounded-xl border-border bg-surface"><option>Ativo</option><option>Em Negociação</option></select>`,
+`<select style="border-radius:12px"><option>● Ativo (Bitrix)</option><option>Pausado</option></select>`);
+
+add("Formulários", "Autocomplete — Busca Preditiva", "Localizar clientes e empresas em tempo real.",
+`<Autocomplete options={['Empresa A','Empresa B']} renderInput={p => <TextField {...p} label="Empresa" />} />`,
+`<input placeholder="Buscar empresa..." style="border-radius:12px">`);
+
+add("Formulários", "Switch — Alternador Redondo", "Ativar agentes de IA e notificações.",
+`<Switch defaultChecked className="accent-cyan" />`,
+`<label style="display:flex;align-items:center;gap:8px;font-size:12px"><input type="checkbox" role="switch" checked style="accent-color:var(--cyan);width:18px;height:18px"> Copiloto Ativo</label>`);
+
+add("Formulários", "Slider — Meta Comercial", "Ajuste deslizante para projeções financeiras.",
+`<Slider defaultValue={75} className="accent-cyan" />`,
+`<input type="range" value="75" style="accent-color:var(--cyan);width:75%">`);
+
+add("Formulários", "DatePicker — Seleção de Data", "Prazos, reuniões e fechamento comercial.",
+`<DatePicker label="Fechamento Previsto" />`,
+`<input type="date" value="2026-10-15" style="border-radius:12px">`);
+
+/* ==========================================================================
+   05. NAVEGAÇÃO & MENUS
+   ========================================================================== */
+add("Navegação", "Sidebar Accents — Módulos Coloridos", "Paleta funcional de identificação visual da Sidebar.",
+`/* Cores Coolors da Sidebar */
+--nav-c-gold: #FFC107; --nav-c-red: #FF6B35; --nav-c-iris: #FF2D9B; --nav-c-blue: #00D4FF;`,
+`<div style="display:flex;gap:8px;padding:8px;background:var(--surface);border-radius:9999px;border:1px solid var(--border)">
+  <span style="width:14px;height:14px;border-radius:50%;background:#FFC107" title="Finanças"></span>
+  <span style="width:14px;height:14px;border-radius:50%;background:#FF6B35" title="Pipeline"></span>
+  <span style="width:14px;height:14px;border-radius:50%;background:#FF2D9B" title="Marketing"></span>
+  <span style="width:14px;height:14px;border-radius:50%;background:#8B7DFF" title="IA"></span>
+  <span style="width:14px;height:14px;border-radius:50%;background:#00D4FF" title="Bitrix24"></span>
+  <span style="width:14px;height:14px;border-radius:50%;background:#4ADE80" title="Sucesso"></span>
+</div>`);
+
+add("Navegação", "Tabs — Navegação em Pílula", "Alternar visão geral, atividades e arquivos.",
+`<Tabs value={0} className="rounded-full bg-surface2"><Tab label="Visão Geral" /><Tab label="Deals" /></Tabs>`,
+`<div style="display:flex;gap:6px;background:var(--surface2);padding:4px;border-radius:9999px"><button style="padding:6px 14px;font-size:11px">Visão Geral</button><button class="outline" style="border:0;padding:6px 14px;font-size:11px">Atividades</button></div>`);
+
+add("Navegação", "Stepper — Fluxo em Etapas", "Onboarding guiado e funil de qualificação.",
+`<Stepper activeStep={1}><Step>Dados</Step><Step>Configuração</Step></Stepper>`,
+`<div style="display:flex;align-items:center;gap:8px;font-size:11px"><span class="chip">✓ 1 Dados</span><span>→</span><span style="color:var(--cyan);font-weight:700">● 2 Funil</span><span>→</span><span style="color:var(--muted)">3 Finalizar</span></div>`);
+
+add("Navegação", "Breadcrumbs — Trilhas", "Localização hierárquica do usuário.",
+`<Breadcrumbs><Link href="/">Início</Link><Typography>Pipeline CRM</Typography></Breadcrumbs>`,
+`<span style="font-size:11px;color:var(--muted)">Início › CRM › <b style="color:var(--cyan)">Conta 360°</b></span>`);
+
+/* ==========================================================================
+   06. DADOS & MÉTRICAS (IBM PLEX MONO)
+   ========================================================================== */
+add("Dados & Métricas", "BentoMetric — Card de KPI Financeiro", "Métricas com números tabulares em IBM Plex Mono.",
+`import { BentoMetric } from '@/components/ui/bento/BentoMetric';
+<BentoMetric title="Receita Prevista (ARR)" value="R$ 1.482.000" trend="+28.4%" />`,
+`<div class="box" style="width:100%;max-width:240px;border-radius:16px">
+  <div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700">Receita Prevista</div>
+  <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--gold);margin:4px 0">R$ 1.482.000</div>
+  <span style="font-size:11px;color:#22C55E;font-weight:700">↗ +28.4% este mês</span>
+</div>`);
+
+add("Dados & Métricas", "Badges Coolors — Status de Deals", "Pílulas arredondadas com fundo translúcido e borda.",
+`<span className="badge-coolors-yellow">● Ganho</span>
+<span className="badge-coolors-blue">● Sincronizado</span>`,
+`<div style="display:flex;gap:6px;flex-wrap:wrap">
+  <span style="font-size:11px;padding:4px 10px;border-radius:9999px;background:rgba(255,193,7,0.15);color:#FFC107;border:1px solid rgba(255,193,7,0.3)">● R$ 54.000</span>
+  <span style="font-size:11px;padding:4px 10px;border-radius:9999px;background:rgba(0,212,255,0.15);color:#00D4FF;border:1px solid rgba(0,212,255,0.3)">● Bitrix24</span>
+  <span style="font-size:11px;padding:4px 10px;border-radius:9999px;background:rgba(255,45,155,0.15);color:#FF2D9B;border:1px solid rgba(255,45,155,0.3)">● IA Ativa</span>
+</div>`);
+
+add("Dados & Métricas", "BarChart — Comparativo Mensal", "Gráficos de barras com paleta neon.",
+`<BarChart series={[{ data: [28, 45, 62], color: '#00D4FF' }]} />`,
+`<div style="display:flex;align-items:flex-end;gap:8px;height:65px">
+  <i style="background:var(--cyan);height:40%;width:18px;border-radius:4px 4px 0 0"></i>
+  <i style="background:var(--cyan);height:70%;width:18px;border-radius:4px 4px 0 0"></i>
+  <i style="background:var(--pink);height:95%;width:18px;border-radius:4px 4px 0 0"></i>
+  <i style="background:var(--gold);height:80%;width:18px;border-radius:4px 4px 0 0"></i>
+</div>`);
+
+add("Dados & Métricas", "Table — Listagem de Oportunidades", "Tabela compacta com linhas delimitadas e hover suave.",
+`<Table><TableHeader><TableRow><TableHead>Cliente</TableHead><TableHead>Valor</TableHead></TableRow></TableHeader></Table>`,
+`<div class="box" style="width:100%;font-size:11px">
+  <div style="display:flex;justify-content:space-between;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:4px"><span>Empresa</span><span>Valor (ARR)</span></div>
+  <div style="display:flex;justify-content:space-between;padding-top:6px"><span>Hospital São Lucas</span><b style="font-family:var(--font-mono);color:var(--cyan)">R$ 145.000</b></div>
+</div>`);
+
+/* ==========================================================================
+   07. FEEDBACK & ALERTAS
+   ========================================================================== */
+add("Feedback & Alertas", "Alert — Confirmação & Sucesso", "Mensagem de operação realizada com sucesso.",
+`<Alert severity="success" className="rounded-xl">Sincronização Bitrix24 concluída.</Alert>`,
+`<div class="box" style="color:#22C55E;border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.08);border-radius:12px">✓ Sincronização Bitrix24 concluída com sucesso.</div>`);
+
+add("Feedback & Alertas", "Dialog — Confirmação de Ação", "Modal de decisão com raio de 20px e foco contido.",
+`<Dialog open={true}><DialogTitle>Excluir Lead?</DialogTitle><DialogActions><Button>Confirmar</Button></DialogActions></Dialog>`,
+`<div class="box" style="border-radius:16px;text-align:center"><div style="font-weight:700;margin-bottom:6px">Confirmar Operação?</div><button class="outline" style="font-size:10px;padding:6px 12px">Cancelar</button> <button style="font-size:10px;padding:6px 12px">Confirmar</button></div>`);
+
+add("Feedback & Alertas", "Command Palette — Busca Rápida (Ctrl+K)", "Paleta de comandos universal da plataforma.",
+`<CommandPalette placeholder="Buscar telas, clientes, agentes..." />`,
+`<div class="box" style="border-radius:12px;width:100%"><span style="color:var(--muted)">⌕ Digite um comando...</span> <span style="float:right;background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:10px">⌘K</span></div>`);
+
+/* ==========================================================================
+   08. EFEITOS & SUPERFÍCIES DA MARCA
+   ========================================================================== */
+add("Efeitos & Superfícies", "Glassmorphism Card & Border Glow", "Card de alta tecnologia com efeito de vidro e brilho neon.",
+`<div className="bh-glass border-glow-brand rounded-2xl p-6">Conteúdo com blur e borda iluminada</div>`,
+`<div style="padding:16px;background:rgba(20,20,26,0.7);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;box-shadow:0 0 20px rgba(0,212,255,0.25)">
+  <div style="font-weight:800;color:var(--cyan)">Card Holográfico 360°</div>
+  <div style="font-size:11px;color:var(--muted);margin-top:4px">Backdrop-blur com borda translúcida</div>
+</div>`);
+
+add("Efeitos & Superfícies", "Anel de Órbita Cônico 360°", "Gradiente de rotação cônica para status e selos de validação.",
+`<div className="rounded-full p-1" style={{ background: 'var(--grad-orbit)' }}>...</div>`,
+`<div style="width:54px;height:54px;border-radius:50%;background:var(--grad-orbit);display:grid;place-items:center;padding:3px">
+  <div style="width:100%;height:100%;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:10px;font-weight:800;color:var(--cyan)">360°</div>
+</div>`);
+
+const escapeHTML = s => String(s)
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;");
+
+let selectedCat = "Todos";
+let searchStr = "";
+
+const gridEl = document.getElementById("grid");
+const filtersEl = document.getElementById("filters");
+const countEl = document.getElementById("count");
+const statTotalEl = document.getElementById("stat-total");
+const toastEl = document.getElementById("toast");
+
+const categories = [
+  "Todos",
+  "Marca & Logos",
+  "Ícones SVG",
+  "Ações",
+  "Formulários",
+  "Navegação",
+  "Dados & Métricas",
+  "Feedback & Alertas",
+  "Efeitos & Superfícies"
+];
+
+statTotalEl.textContent = components.length;
+
+function renderFilters() {
+  filtersEl.innerHTML = categories.map(cat => {
+    const total = cat === "Todos"
+      ? components.length
+      : components.filter(c => c.cat === cat).length;
+    return `<button class="filter ${selectedCat === cat ? "active" : ""}" data-category="${cat}">${cat} (${total})</button>`;
+  }).join("");
+}
+
+function render() {
+  const filtered = components
+    .map((component, index) => ({ ...component, index }))
+    .filter(c => selectedCat === "Todos" || c.cat === selectedCat)
+    .filter(c => (c.name + " " + c.app + " " + c.cat)
+      .toLocaleLowerCase("pt-BR")
+      .includes(searchStr.toLocaleLowerCase("pt-BR")));
+
+  countEl.textContent = `${filtered.length} de ${components.length} itens encontrados`;
+
+  gridEl.innerHTML = filtered.map(c => `
+    <article class="card">
+      <div class="card-head">
+        <h2>${escapeHTML(c.name)}</h2>
+        <span class="tag">${escapeHTML(c.cat)}</span>
+      </div>
+      <div class="demo">${c.previewHtml || '<div class="box">Prévia</div>'}</div>
+      <div class="application"><b>Aplicação:</b> ${escapeHTML(c.app)}</div>
+      <div class="card-actions">
+        <button data-show="${c.index}">⌘ Ver Código</button>
+        <button data-copy="${c.index}">⧉ Copiar Trecho</button>
+      </div>
+      <pre id="code-${c.index}" hidden><code>${escapeHTML(c.code)}</code></pre>
+    </article>
+  `).join("");
+
+  if (!filtered.length) {
+    gridEl.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Nenhum componente encontrado para esta busca.</p>';
+  }
+  renderFilters();
+}
+
+function notify(message) {
+  toastEl.textContent = message;
+  toastEl.style.display = "block";
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => toastEl.style.display = "none", 2400);
+}
+
+async function copyText(value) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = value;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const ok = document.execCommand("copy");
+      textarea.remove();
+      if (!ok) throw new Error("Cópia indisponível");
+    }
+    notify("✓ Código copiado!");
+  } catch (error) {
+    notify("Não foi possível copiar automaticamente.");
+  }
+}
+
+filtersEl.addEventListener("click", e => {
+  const btn = e.target.closest("[data-category]");
+  if (!btn) return;
+  selectedCat = btn.dataset.category;
+  render();
+});
+
+gridEl.addEventListener("click", e => {
+  const show = e.target.closest("[data-show]");
+  if (show) {
+    const pre = document.getElementById("code-" + show.dataset.show);
+    pre.hidden = !pre.hidden;
+    show.textContent = pre.hidden ? "⌘ Ver Código" : "⌃ Ocultar";
+    return;
+  }
+  const copy = e.target.closest("[data-copy]");
+  if (copy) {
+    copyText(components[Number(copy.dataset.copy)].code);
+  }
+});
+
+document.getElementById("search").addEventListener("input", e => {
+  searchStr = e.target.value;
+  render();
+});
+
+document.getElementById("theme").addEventListener("click", () => {
+  document.documentElement.classList.toggle("light");
+  const isLight = document.documentElement.classList.contains("light");
+  document.getElementById("theme").textContent = isLight ? "☾ Modo Escuro" : "☀ Modo Claro";
+  notify(isLight ? "Modo Claro ativado" : "Modo Escuro ativado");
+});
+
+document.getElementById("download").addEventListener("click", () => {
+  const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "BirthHub360_Catalogo_de_Componentes.html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  notify("Download do catálogo iniciado!");
+});
+
+render();
+</script>
+</body>
+</html>
