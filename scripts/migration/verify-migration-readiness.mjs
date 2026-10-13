@@ -103,7 +103,7 @@ async function main() {
   const optionalTools = [
     { cmd: 'gh', label: 'GitHub CLI (gh)' },
     { cmd: 'pnpm', label: 'pnpm' },
-    { cmd: 'python', label: 'Python' },
+    { cmd: 'python', fallbackCmd: 'python3', label: 'Python' },
     { cmd: 'docker', label: 'Docker CLI' },
     { cmd: 'aws', label: 'AWS CLI' },
     { cmd: 'code', label: 'VS Code CLI' },
@@ -116,7 +116,7 @@ async function main() {
   }
 
   for (const t of optionalTools) {
-    const ver = getCmdVersion(t.cmd);
+    const ver = getCmdVersion(t.cmd) || (t.fallbackCmd ? getCmdVersion(t.fallbackCmd) : null);
     if (ver) pass('tools', `${t.label}: ${ver}`);
     else warn('tools', `${t.label} não instalado ou ausente no PATH (opcional/recomendado)`);
   }
@@ -226,7 +226,11 @@ async function main() {
   if (fs.existsSync(skillsDir)) {
     const skills = fs
       .readdirSync(skillsDir, { withFileTypes: true })
-      .filter((d) => d.isDirectory() && fs.existsSync(path.join(skillsDir, d.name, 'SKILL.md')));
+      .filter(
+        (d) =>
+          (d.isDirectory() || d.isSymbolicLink()) &&
+          fs.existsSync(path.join(skillsDir, d.name, 'SKILL.md')),
+      );
     if (skills.length >= 42) {
       pass('agents', `.agents/skills/ íntegro (${skills.length} skills com SKILL.md)`);
     } else {

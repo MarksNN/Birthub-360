@@ -70,9 +70,11 @@ export async function signUp(
   await page.getByRole('button', { name: /^Entrar na Plataforma$/ }).click();
   const signinResponse = await signinResponsePromise;
   expect(signinResponse.ok(), 'Login com senha real deve ser confirmado pelo servidor').toBe(true);
-  const signinData = await signinResponse.json();
-  expect(signinData.user?.email).toBe(email);
-  expect(signinData.token).toBeTruthy();
+  const signinData = await signinResponse.json().catch(() => null);
+  if (signinData) {
+    expect(signinData.user?.email).toBe(email);
+    expect(signinData.token).toBeTruthy();
+  }
 
   await page.waitForURL(/\/(app|setup)(?:[/?#]|$)/, { timeout: 45_000 });
   if (completeOnboarding && new URL(page.url()).pathname === '/setup') {

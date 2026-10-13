@@ -97,7 +97,7 @@ describe('ProspectingSearchExecution — Search-ID rastreável (Postgres real, R
     expect(persisted?.savedSearchId).toBe(saved.id);
     expect(persisted?.status).toBe('partial');
     expect(persisted?.totalResults).toBe(1);
-    expect(persisted?.costUsd).toBe(0);
+    expect(Number(persisted?.costUsd)).toBe(0);
     expect(persisted?.providersCalled).toEqual([
       expect.objectContaining({provider: 'nominatim', status: 'ok', resultCount: 1}),
       expect.objectContaining({provider: 'brasilapi', status: 'error', resultCount: 0}),

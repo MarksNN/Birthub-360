@@ -53,6 +53,7 @@ backups/*.backup
 backups/*.tar
 backups/*.tar.gz
 backups/*.gz
+BACKUP-RESTORE-DRILL-RESULT.json
 
 # Artefatos de vídeo/imagem gerados sob demanda por script na raiz do repo — a documentação
 # oficial vive em documentacao-aplicacao/ (versionada de propósito, não afetada por esta regra).
