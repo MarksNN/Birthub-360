@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditoria Completa da Plataforma — Birth Hub 360º</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --neon-black: #0D0D0D;
+      --surface: #14141A;
+      --surface-2: #1C1C26;
+      --surface-3: #232330;
+      --neon-white: #F8F9FF;
+      --muted: #9EADC8;
+      --neon-blue: #00D4FF;
+      --neon-pink: #FF2D9B;
+      --neon-gold: #FFC107;
+      --ok: #10B981;
+      --warn: #FFC107;
+      --danger: #FF3B5C;
+      --line: rgba(255, 255, 255, 0.09);
+      --line-neon: rgba(0, 212, 255, 0.25);
+      --grad-brand: linear-gradient(135deg, #00D4FF 0%, #FF2D9B 52%, #FFC107 100%);
+      --grad-cta: linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%);
+      --font-display: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --r-md: 12px;
+      --r-lg: 16px;
+      --r-xl: 20px;
+      --r-pill: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--neon-black);
+      color: var(--neon-white);
+      font-family: var(--font-sans);
+      font-feature-settings: "cv05", "cv11", "ss01";
+      letter-spacing: -0.012em;
+      line-height: 1.65;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* Header / Hero */
+    .hero {
+      position: relative;
+      padding: 64px 0 48px;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(0, 212, 255, 0.10), transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(255, 45, 155, 0.10), transparent 45%),
+        var(--neon-black);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--r-pill);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--neon-white);
+    }
+
+    .badge.cyan {
+      border-color: rgba(0, 212, 255, 0.4);
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--neon-blue);
+    }
+
+    .badge.pink {
+      border-color: rgba(255, 45, 155, 0.4);
+      background: rgba(255, 45, 155, 0.12);
+      color: var(--neon-pink);
+    }
+
+    .badge.gold {
+      border-color: rgba(255, 193, 7, 0.4);
+      background: rgba(255, 193, 7, 0.12);
+      color: var(--neon-gold);
+    }
+
+    .badge.ok {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--ok);
+    }
+
+    .badge.danger {
+      border-color: rgba(255, 59, 92, 0.45);
+      background: rgba(255, 59, 92, 0.14);
+      color: var(--danger);
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.6vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-bottom: 16px;
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 920px;
+      margin-bottom: 28px;
+    }
+
+    .sources-box {
+      background: var(--surface);
+      border: 1px solid var(--line-neon);
+      border-radius: var(--r-lg);
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .sources-box h4 {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--neon-blue);
+      margin-bottom: 8px;
+    }
+
+    .sources-box ul {
+      list-style: none;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .sources-box li {
+      margin-bottom: 4px;
+    }
+
+    /* Navigation TOC */
+    .toc-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(13, 13, 13, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 0;
+    }
+
+    .toc-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      padding-bottom: 4px;
+    }
+
+    .toc-link {
+      white-space: nowrap;
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      transition: all 0.2s ease;
+    }
+
+    .toc-link:hover {
+      color: var(--neon-white);
+      border-color: var(--neon-blue);
+      background: rgba(0, 212, 255, 0.08);
+    }
+
+    /* Sections */
+    section {
+      margin-top: 48px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-xl);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--grad-brand);
+      opacity: 0.75;
+    }
+
+    h2 {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--neon-white);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2 .sec-num {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--neon-blue);
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      padding: 3px 10px;
+      border-radius: var(--r-pill);
+    }
+
+    h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--neon-gold);
+      margin: 24px 0 12px;
+    }
+
+    p {
+      color: #D9E2F2;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+      margin-bottom: 16px;
+      color: #D9E2F2;
+      font-size: 0.94rem;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.84em;
+      background: var(--surface-2);
+      color: var(--neon-blue);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    strong {
+      color: var(--neon-white);
+      font-weight: 600;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 18px 0;
+      border-radius: var(--r-md);
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+      background: var(--surface-2);
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      color: #E2E8F0;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(0, 212, 255, 0.03);
+    }
+
+    /* Callouts & Cards */
+    .callout {
+      background: var(--surface-2);
+      border-left: 4px solid var(--neon-blue);
+      border-radius: 0 var(--r-md) var(--r-md) 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .callout.danger {
+      border-left-color: var(--danger);
+      background: rgba(255, 59, 92, 0.06);
+    }
+
+    .callout.warn {
+      border-left-color: var(--neon-gold);
+      background: rgba(255, 193, 7, 0.06);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .card-box {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 20px;
+    }
+
+    .card-box h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--neon-white);
+    }
+
+    .score-pill {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      display: inline-block;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-high { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .score-mid  { background: rgba(255, 193, 7, 0.15); color: #FBBF24; border: 1px solid rgba(255, 193, 7, 0.35); }
+    .score-low  { background: rgba(255, 59, 92, 0.15); color: #FB7185; border: 1px solid rgba(255, 59, 92, 0.35); }
+
+    .swatch {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 5px;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    footer {
+      margin-top: 64px;
+      text-align: center;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="container">
+      <div class="badge-row">
+        <span class="badge cyan">BIRTH HUB 360º</span>
+        <span class="badge pink">AUDITORIA FORENSE 100% READ-ONLY</span>
+        <span class="badge gold">ANALISAR → COMPARAR → CLASSIFICAR → DOCUMENTAR</span>
+        <span class="badge ok">SCORE GERAL: 6.7 / 10</span>
+      </div>
+      <h1>AUDITORIA COMPLETA DA PLATAFORMA BIRTH HUB 360º</h1>
+      <p class="hero-sub">
+        Escopo &amp; Regra de Execução: Auditoria forense 100% somente-leitura. Nenhum arquivo de código, estilo, componente, token ou copy foi alterado. Comparação integral entre o repositório real e os documentos mestres de Identidade Visual, Identidade de Produto, Brandbook e Catálogo de Componentes.
+      </p>
+
+      <div class="sources-box">
+        <div>
+          <h4>1. Documentos Oficiais (Verdade)</h4>
+          <ul>
+            <li>1. <code>BRANDBOOK-OFICIAL-BIRTH-HUB-360.html</code></li>
+            <li>2. <code>MANUAL-DE-IDENTIDADE-VISUAL.html</code></li>
+            <li>3. <code>MANUAL-DE-IDENTIDADE-DO-PRODUTO.html</code></li>
+            <li>4. <code>CATALOGO-DE-COMPONENTES.html</code></li>
+          </ul>
+        </div>
+        <div>
+          <h4>2. Assets Mestres SVG Auditados</h4>
+          <ul>
+            <li>• <code>logos/birthhub360-icone.svg</code></li>
+            <li>• <code>logos/birthhub360-logo-horizontal.svg</code></li>
+            <li>• <code>logos/birthhub360-simbolo.svg</code></li>
+          </ul>
+        </div>
+        <div>
+          <h4>3. Implementação Técnica de Tokens</h4>
+          <ul>
+            <li>• <code>tokens/birthhub360.css</code></li>
+            <li>• <code>tokens/birthhub360.json</code></li>
+            <li>• <code>tokens/birthhub360.ts</code></li>
+            <li>• <code>src/styles/globals.css</code> &amp; <code>elegance.css</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc-bar">
+    <div class="container toc-scroll">
+      <a class="toc-link" href="#sec-1">01. Resumo Executivo</a>
+      <a class="toc-link" href="#sec-2">02. Mapa da Plataforma</a>
+      <a class="toc-link" href="#sec-3">03. Manual de Produto</a>
+      <a class="toc-link" href="#sec-4">04. Nomenclatura</a>
+      <a class="toc-link" href="#sec-5">05. Tipografia</a>
+      <a class="toc-link" href="#sec-6">06. Cores &amp; Tokens</a>
+      <a class="toc-link" href="#sec-7">07. Gradientes &amp; Glow</a>
+      <a class="toc-link" href="#sec-8">08. Logotipo &amp; Emblema</a>
+      <a class="toc-link" href="#sec-9">09. Componentes</a>
+      <a class="toc-link" href="#sec-10">10. Radius &amp; Densidade</a>
+      <a class="toc-link" href="#sec-11">11. Sidebar &amp; Navegação</a>
+      <a class="toc-link" href="#sec-12">12–20. Módulos &amp; Governança</a>
+      <a class="toc-link" href="#sec-21">21–23. Copy, Estados &amp; Jornada</a>
+      <a class="toc-link" href="#sec-24">24. Matriz &amp; Scorecard</a>
+      <a class="toc-link" href="#sec-25">25. Prioridades P0–P3</a>
+      <a class="toc-link" href="#sec-26">26. Plano em 12 Fases</a>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- 1. RESUMO EXECUTIVO -->
+    <section id="sec-1">
+      <h2><span class="sec-num">01</span> Resumo Executivo</h2>
+      <h3>Diagnóstico Geral</h3>
+      <p>
+        A plataforma <strong>Birth Hub 360º</strong> possui uma fundação funcional e arquitetural robusta (com mais de 45 rotas reais em <code>src/App.tsx</code>, isolamento multi-tenant com PostgreSQL RLS e <code>authenticateToken.ts</code>, motores de Forecast, IA, CRM 360 e Integrações), mas sofre de uma <strong>fragmentação severa de identidade visual, tipográfica e de produto</strong> causada pela sobreposição de <strong>quatro gerações distintas de design</strong> convivendo simultaneamente no código:
+      </p>
+      <ol>
+        <li><strong>Geração V2.0 "Obsidian &amp; Antique Gold" (Legado):</strong> Presente nos arquivos de tokens técnicos (<code>birthhub360.css</code>, <code>birthhub360.json</code>, <code>birthhub360.ts</code>), nos SVGs em <code>logos/</code> (<code>#0B132B</code>, <code>#D4AF37</code>, <code>#5B21B6</code>) e no componente <code>BirthHubLogo.tsx</code>.</li>
+        <li><strong>Geração "Elegance / Champagne" (Legado Parcial):</strong> Presente em <code>elegance.css</code> e vazando na barra superior <code>AppTopbar.tsx</code> através de variáveis <code>--el-*</code> indefinidas no tema padrão.</li>
+        <li><strong>Geração "Vancouver Plus / Modulify Light SaaS" (Intrusa):</strong> Presente em <code>/login</code> e <code>/welcome</code> via <code>NewLoginScreen.tsx</code>, que força <code>setThemeMode('light')</code>, usa uma landing page paralela de 1.554 linhas com paleta estranha (<code>#0ea5e9</code>, <code>#8b5cf6</code>), mockups com <strong>dados falsos de grandes empresas</strong> ("Vibra Energia R$ 350.000", "Ambev Logística", "Gerdau Aços") e nomes de pilares divergentes do Manual de Produto.</li>
+        <li><strong>Geração Oficial 2026 "Neon Dark-First" (Brandbook Oficial):</strong> Presente nos 4 documentos HTML oficiais (<code>#0D0D0D</code>, <code>#00D4FF</code>, <code>#FF2D9B</code>, <code>#FFC107</code>, <code>Sora</code> + <code>Inter</code> + <code>IBM Plex Mono</code>), parcialmente aplicada em <code>Landing360.tsx</code> e <code>globals.css</code>, porém <strong>distorcida</strong> em <code>globals.css</code> por uma regra extrema que proíbe texto branco/off-white (<code>#F8F9FF</code>) e força todo texto corrido do modo escuro a ficar azul-celeste (<code>#70d6ff</code>).</li>
+      </ol>
+
+      <h3>Principais Achados Críticos (P0 / P1)</h3>
+      <ul>
+        <li><strong>Divergência entre Fontes Oficiais e Arquivos de Tokens (P1):</strong> Os 4 documentos HTML oficiais definem a paleta Neon 2026 e proíbem expressamente <code>Bodoni Moda</code>, <code>JetBrains Mono</code> e <code>Playfair Display</code>. Contudo, <code>birthhub360.css</code>, <code>birthhub360.json</code> e <code>birthhub360.ts</code> ainda declaram as fontes proibidas (<code>Bodoni Moda</code>, <code>JetBrains Mono</code>) e a paleta antiga (<code>#0B132B</code>, <code>#D4AF37</code>).</li>
+        <li><strong>Fontes Proibidas Carregadas em Produção (P1):</strong> <code>index.html</code> carrega via Google Fonts <code>JetBrains Mono</code> e <code>Plus Jakarta Sans</code>, ambas expressamente banidas pelo Brandbook Oficial.</li>
+        <li><strong>5 Versões Diferentes do Logotipo/Emblema (P1):</strong> Os SVGs em <code>logos/</code> usam ouro antigo (<code>#D4AF37</code>), os SVGs inline do Brandbook usam Neon (<code>#00D4FF</code>/<code>#FF2D9B</code>/<code>#FFC107</code>), <code>BirthHubLogo.tsx</code> usa um terceiro gradiente (<code>#1677FF → #7C3AED → #D4AF37</code>), <code>AnimatedBirthHubEmblem.tsx</code> usa um quarto gradiente de 6 paradas, e <code>NewLoginScreen.tsx</code> desenha um quinto SVG inline roxo/azul.</li>
+        <li><strong>Quebra de Identidade em <code>/login</code> e <code>/welcome</code> + Dados Fictícios (P1):</strong> <code>NewLoginScreen.tsx</code> renderiza uma segunda landing page em modo claro forçado com cards falsos de clientes enterprise e redefine os Pilares 07 e 08 como <em>"Governança Comercial"</em> e <em>"Enriquecimento de Dados"</em>, contradizendo o <code>MANUAL-DE-IDENTIDADE-DO-PRODUTO.html</code> (<em>"07. Automação &amp; Conectividade"</em> e <em>"08. Engajamento Comercial"</em>).</li>
+        <li><strong>8 Telas de Configuração de Pilares São Placeholders Sem Persistência (P0/P1):</strong> As rotas <code>/app/settings_hub</code> a <code>/app/settings_engagement</code> renderizam <code>PillarSettingsPlaceholder.tsx</code>, onde os controles são apenas estados locais (<code>useState</code>) e o botão Salvar está desabilitado por ausência de contrato no backend.</li>
+        <li><strong>23 Rotas Implementadas Órfãs da Sidebar (P1):</strong> Módulos inteiros como <code>/app/playbooks</code>, <code>/app/jornadas</code>, <code>/app/processos</code>, <code>/app/roteiros</code>, <code>/app/chatbook</code>, <code>/app/reports</code>, <code>/app/winloss</code>, <code>/app/knowledge</code>, <code>/app/propostas</code>, <code>/app/pipeline_ponderado</code>, <code>/app/mesa-tratamento</code> e <code>/app/calendar</code> existem em <code>App.tsx</code>, mas não constam em <code>sidebarSections.ts</code>.</li>
+      </ul>
+    </section>
+
+    <!-- 2. MAPA COMPLETO DA PLATAFORMA ATUAL -->
+    <section id="sec-2">
+      <h2><span class="sec-num">02</span> Mapa Completo da Plataforma Atual</h2>
+      <h3>2.1 Entry Points, Contextos e Layouts</h3>
+      <ul>
+        <li><strong>HTML Entry:</strong> <code>index.html</code> (<code>lang="pt-BR"</code>, <code>theme-color="#0B132B"</code>, script anti-FOUC lendo <code>localStorage.getItem('atlas_theme')</code>).</li>
+        <li><strong>React Entry:</strong> <code>src/main.tsx</code> (Sentry, PostHog, PWA Service Worker, <code>BrowserRouter</code>, <code>globals.css</code>).</li>
+        <li><strong>Árvore de Contextos em <code>src/App.tsx</code>:</strong> <code>MotionConfig</code> → <code>ThemeProvider</code> → <code>ExperienceModeProvider</code> → <code>BrandProvider</code> → <code>AuthProvider</code> → <code>DailyClosingProvider</code> → <code>ActiveRecordProvider</code> → <code>ClickSpark</code>.</li>
+        <li><strong>Shell Autenticado:</strong> <code>MainLayout.tsx</code> (integra <code>Sidebar.tsx</code>, <code>AppTopbar.tsx</code>, <code>AppBreadcrumbs.tsx</code>, <code>MobileNavDrawer.tsx</code>, <code>CommandPalette.tsx</code>, <code>LiveCopilotHUD.tsx</code> e <code>OnboardingTour.tsx</code>).</li>
+      </ul>
+
+      <h3>2.2 Inventário Completo de Rotas e Telas Reais</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rota</th>
+              <th>Componente Real</th>
+              <th>Função Real na Plataforma</th>
+              <th>Visível na Sidebar?</th>
+              <th>Guard / Permissão</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/</code></td>
+              <td><code>Landing360.tsx</code></td>
+              <td>Landing page institucional dark/neon com os 8 pilares</td>
+              <td>Público</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/welcome</code></td>
+              <td><code>WelcomeScreen.tsx</code> → <code>NewLoginScreen.tsx</code></td>
+              <td>Segunda landing page light mode + modal de login</td>
+              <td>Público</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/login</code></td>
+              <td><code>LoginScreen.tsx</code> → <code>NewLoginScreen.tsx</code></td>
+              <td>Autenticação (abre <code>NewLoginScreen</code> com modal ativo)</td>
+              <td>Público</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/landing-new</code></td>
+              <td><code>LandingInnovative.tsx</code></td>
+              <td>Landing page experimental legada de Voice Hub</td>
+              <td>Público (oculta)</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/reset-password</code></td>
+              <td><code>ResetPasswordScreen.tsx</code></td>
+              <td>Recuperação e redefinição de senha</td>
+              <td>Público</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/privacy</code>, <code>/terms</code></td>
+              <td><code>PrivacyPolicy.tsx</code>, <code>TermsOfUse.tsx</code></td>
+              <td>Políticas legais e termos de uso</td>
+              <td>Público</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/book/:slug</code></td>
+              <td><code>PublicBookingPage.tsx</code></td>
+              <td>Página pública de agendamento de reuniões</td>
+              <td>Público</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>/setup</code></td>
+              <td><code>SetupWizard.tsx</code></td>
+              <td>Wizard de onboarding inicial da organização</td>
+              <td>Fora do <code>/app</code></td>
+              <td><code>ADMIN</code></td>
+            </tr>
+            <tr>
+              <td><code>/social-selling</code></td>
+              <td><code>SocialSellingHub.tsx</code></td>
+              <td>Prospecção social e engajamento</td>
+              <td>Fora do <code>/app</code></td>
+              <td><code>RequireModuleAccess</code></td>
+            </tr>
+            <tr>
+              <td><code>/design-lab/*</code></td>
+              <td><code>DesignLabPage.tsx</code></td>
+              <td>Showcase interno de design/componentes</td>
+              <td>Não</td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/dashboard</code></td>
+              <td><code>AdaptiveDashboard.tsx</code> → <code>SinglePageDashboard.tsx</code></td>
+              <td>Command Center 360° com KPIs, funil, sinais IA e arquitetura</td>
+              <td><span class="badge ok">Sim (COMMAND CENTER)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/workspace</code></td>
+              <td><code>WorkspaceHome.tsx</code></td>
+              <td>Minha Mesa: fila diária de tarefas, sinais e prioridades do operador</td>
+              <td><span class="badge ok">Sim (COMMAND CENTER)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/notifications</code></td>
+              <td><code>Notifications.tsx</code></td>
+              <td>Central de alertas e notificações em tempo real</td>
+              <td><span class="badge ok">Sim (COMMAND CENTER)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/market-intelligence</code></td>
+              <td><code>Ldr.tsx</code></td>
+              <td>Inteligência de Mercado, ICP, enriquecimento CNPJ e sinais</td>
+              <td><span class="badge ok">Sim (INTELLIGENCE)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/market-intelligence/hub</code></td>
+              <td><code>InteligenciaMercadoHub.tsx</code></td>
+              <td>Hub expandido de Inteligência de Mercado</td>
+              <td>Sub-rota</td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/market-intelligence/accounts/:id</code></td>
+              <td><code>Account360.tsx</code></td>
+              <td>Dossiê 360° de conta enriquecida</td>
+              <td>Sub-rota</td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/market-intelligence/deck</code></td>
+              <td><code>LeadApprovalDeck.tsx</code></td>
+              <td>Deck de aprovação rápida de leads (Tinder-style/triage)</td>
+              <td>Sub-rota</td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/intelligence</code></td>
+              <td><code>IntelligenceHub.tsx</code></td>
+              <td>Hub de IA: gravações, coaching, insights preditivos e biblioteca</td>
+              <td><span class="badge ok">Sim (INTELLIGENCE)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/intelligence/elite-agent</code></td>
+              <td><code>EliteCommercialAgentWorkspace.tsx</code></td>
+              <td>Workspace de agente autônomo comercial</td>
+              <td>Sub-rota</td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/copiloto_ia</code></td>
+              <td><code>CopilotoIaHub.tsx</code></td>
+              <td>Copiloto IA: chat contextual, recomendações, gerador de abordagem</td>
+              <td><span class="badge ok">Sim (INTELLIGENCE)</span></td>
+              <td><code>COPILOTO_IA_ROLES</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/commercial_intelligence</code></td>
+              <td><code>CommercialIntelligenceHub.tsx</code></td>
+              <td>Inteligência Comercial e análise estratégica</td>
+              <td><span class="badge ok">Sim (INTELLIGENCE)</span></td>
+              <td><code>COMMERCIAL_INTELLIGENCE_ROLES</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/prospect</code></td>
+              <td><code>ProspectingHub.tsx</code></td>
+              <td>Fila de prospecção outbound e qualificação SDR</td>
+              <td><span class="badge ok">Sim (EXECUTION)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/prospect/inteligente</code></td>
+              <td><code>ProspeccaoInteligenteHub.tsx</code></td>
+              <td>Prospecção assistida por IA</td>
+              <td>Sub-rota</td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/cadence</code></td>
+              <td><code>CadenceHub.tsx</code></td>
+              <td>Cadências multicanal (E-mail, WhatsApp, Ligação, LinkedIn)</td>
+              <td><span class="badge ok">Sim (EXECUTION)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/crm</code></td>
+              <td><code>CrmBoard.tsx</code></td>
+              <td>Pipeline Kanban de negócios, BANT, MEDDIC, calculadora ROI</td>
+              <td><span class="badge ok">Sim (EXECUTION)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/automations</code></td>
+              <td><code>Automations.tsx</code></td>
+              <td>Regras e workflows de automação (<code>Trigger → Action</code>)</td>
+              <td><span class="badge ok">Sim (EXECUTION)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/crm360</code></td>
+              <td><code>CrmOverview.tsx</code></td>
+              <td>Visão executiva unificada do CRM 360°</td>
+              <td><span class="badge ok">Sim (RELATIONSHIPS)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/companies</code></td>
+              <td><code>CompanyList.tsx</code></td>
+              <td>Base de contas/empresas B2B</td>
+              <td><span class="badge ok">Sim (RELATIONSHIPS)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/contacts</code></td>
+              <td><code>ContactList.tsx</code></td>
+              <td>Base de contatos e decisores (mapeada 2x na sidebar!)</td>
+              <td><span class="badge gold">Sim (2x em RELATIONSHIPS)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/forecast</code></td>
+              <td><code>ForecastHub.tsx</code></td>
+              <td>Previsibilidade de receita (Commit / Best Case / Pipeline)</td>
+              <td><span class="badge ok">Sim (RECEITA)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/metas</code></td>
+              <td><code>MetasHub.tsx</code></td>
+              <td>Desdobramento e atingimento de metas comerciais</td>
+              <td><span class="badge ok">Sim (RECEITA)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/analytics</code></td>
+              <td><code>Analytics.tsx</code></td>
+              <td>Performance Comercial, coortes, conversão, velocidade e motivos de perda</td>
+              <td><span class="badge ok">Sim (PERFORMANCE)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/roleplay</code></td>
+              <td><code>RoleplayHub.tsx</code></td>
+              <td>Simulador de vendas por IA e gamificação</td>
+              <td><span class="badge gold">Sim (2x em PERFORMANCE)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/integrations</code></td>
+              <td><code>Integrations.tsx</code></td>
+              <td>Hub de conectores (Bitrix24, HubSpot, WhatsApp, Google, etc.)</td>
+              <td><span class="badge ok">Sim (GOVERNANÇA)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/team</code></td>
+              <td><code>Team.tsx</code></td>
+              <td>Gestão de membros, convites e papéis RBAC</td>
+              <td><span class="badge ok">Sim (GOVERNANÇA)</span></td>
+              <td><code>ADMIN</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/settings</code></td>
+              <td><code>Settings.tsx</code></td>
+              <td>Configurações gerais da conta/organização</td>
+              <td><span class="badge ok">Sim (GOVERNANÇA)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/playbooks</code>, <code>/app/jornadas</code>, <code>/app/processos</code>, <code>/app/roteiros</code></td>
+              <td><code>PlaybooksHub</code>, <code>JornadasComerciaisHub</code>, <code>ProcessosVendasHub</code>, <code>RoteirosHub</code></td>
+              <td>Telas de Orquestração de Vendas (Pilar 03)</td>
+              <td><span class="badge danger">Não (Órfãs da Sidebar)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/activities</code>, <code>/app/propostas</code>, <code>/app/pipeline_ponderado</code>, <code>/app/mesa-tratamento</code></td>
+              <td><code>ActivityList</code>, <code>PropostasList</code>, <code>PipelinePonderadoHub</code>, <code>MesaTratamento</code></td>
+              <td>Operação comercial complementar</td>
+              <td><span class="badge danger">Não (Órfãs da Sidebar)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/reports</code>, <code>/app/winloss</code>, <code>/app/knowledge</code>, <code>/app/chatbook</code>, <code>/app/bitrix</code></td>
+              <td><code>ReportsHub</code>, <code>WinLossAnalysis</code>, <code>KnowledgeBase</code>, <code>ChatbookHub</code>, <code>BitrixGuideHub</code></td>
+              <td>Relatórios, Win/Loss, Base de Conhecimento, Chatbook</td>
+              <td><span class="badge danger">Não (Órfãs da Sidebar)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/calendar</code>, <code>/app/editor</code>, <code>/app/usage</code>, <code>/app/module-access</code></td>
+              <td><code>Calendar</code>, <code>DocumentEditor</code>, <code>Billing</code>, <code>ModuleAccessAdmin</code></td>
+              <td>Agenda, Editor de Documentos, Billing/Uso, Permissão de Módulos</td>
+              <td><span class="badge danger">Não (Órfãs da Sidebar)</span></td>
+              <td><code>ADMIN</code> (usage/module-access)</td>
+            </tr>
+            <tr>
+              <td><code>/app/settings_hub</code> ... <code>/app/settings_engagement</code> (8 rotas)</td>
+              <td><code>PillarSettingsPlaceholder.tsx</code></td>
+              <td>Telas de configuração por pilar (somente pré-visualização, sem backend)</td>
+              <td><span class="badge danger">Não (Placeholder)</span></td>
+              <td><code>ProtectedRoute</code></td>
+            </tr>
+            <tr>
+              <td><code>/app/voice-hub/*</code>, <code>/app/outbound/*</code>, <code>/app/dialer</code></td>
+              <td>Redirect para <code>/app/dashboard</code> ou <code>/app/cadence</code></td>
+              <td>Desativados no frontend pois o backend retorna <code>503 MODULE_NOT_READY</code> por isolamento multi-tenant pendente</td>
+              <td><span class="badge danger">Ocultos (NAV_HIDDEN_TABS)</span></td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. COMPARAÇÃO COM O MANUAL DE IDENTIDADE DO PRODUTO -->
+    <section id="sec-3">
+      <h2><span class="sec-num">03</span> Comparação com o Manual de Identidade do Produto</h2>
+      <p>Comparação direta entre os <strong>8 Pilares Arquiteturais</strong> definidos no <code>MANUAL-DE-IDENTIDADE-DO-PRODUTO.html</code> e a implementação real:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pilar Oficial (Manual de Produto)</th>
+              <th>Módulos Reais Correspondentes</th>
+              <th>Classificação</th>
+              <th>Diagnóstico Técnico e Funcional</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>01. Hub Comercial (CRM 360°)</strong><br/>Visão unificada de contas, contatos, negócios, histórico e contexto.</td>
+              <td><code>/app/crm</code> (<code>CrmBoard.tsx</code>), <code>/app/crm360</code> (<code>CrmOverview.tsx</code>), <code>/app/companies</code>, <code>/app/contacts</code>, <code>/app/activities</code>, <code>/app/propostas</code></td>
+              <td><span class="badge gold">PARCIALMENTE ALINHADO</span></td>
+              <td>Possui Kanban, visão 360, empresas, contatos, notas e anexos reais. Porém, está fragmentado na sidebar entre <code>EXECUTION</code> (Negócios) e <code>RELATIONSHIPS</code> (CRM 360, Empresas, Contatos, Decisores), e <code>CrmBoard.tsx</code> contém estágios legados hardcoded (<code>Piloto VTECH</code>, <code>Piloto Logística</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>02. Inteligência de Mercado</strong><br/>Mapeamento de ICP, descoberta de contas, sinais de compra e enriquecimento.</td>
+              <td><code>/app/market-intelligence</code> (<code>Ldr.tsx</code>), <code>InteligenciaMercadoHub</code>, <code>Account360</code>, <code>LeadApprovalDeck</code></td>
+              <td><span class="badge ok">ALINHADO</span></td>
+              <td>Implementa consulta CNPJ, sinais de mercado, dossiê 360 de conta e deck de aprovação de leads conectado ao backend <code>/api/ldr</code> e <code>/api/market-intelligence</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>03. Orquestração de Vendas</strong><br/>Playbooks dinâmicos, roteiros, distribuição de leads, SLAs e etapas.</td>
+              <td><code>/app/playbooks</code>, <code>/app/jornadas</code>, <code>/app/processos</code>, <code>/app/roteiros</code>, <code>/app/qualification_matrix</code>, <code>/app/objections_matrix</code></td>
+              <td><span class="badge gold">PARCIALMENTE ALINHADO</span></td>
+              <td>As telas existem em <code>src/features/sales-orchestration/</code> e <code>src/features/playbook/</code>, mas <strong>nenhuma delas está listada na Sidebar principal</strong> (<code>sidebarSections.ts</code>), tornando o pilar invisível na navegação primária.</td>
+            </tr>
+            <tr>
+              <td><strong>04. Performance Comercial</strong><br/>Produtividade por operador, conversão por etapa, velocidade do funil e gargalos.</td>
+              <td><code>/app/analytics</code> (<code>Analytics.tsx</code>), <code>/app/winloss</code> (<code>WinLossAnalysis.tsx</code>)</td>
+              <td><span class="badge ok">ALINHADO</span></td>
+              <td><code>Analytics.tsx</code> consome <code>/api/analytics/dashboard</code>, exibe KPIs reais, tabela-gêmea acessível (<code>TableTwin</code>), coortes, heatmap, TMQ e motivos de perda. Porém, <code>/app/winloss</code> e <code>/app/reports</code> estão fora da sidebar.</td>
+            </tr>
+            <tr>
+              <td><strong>05. Previsibilidade Comercial</strong><br/>Forecast ponderado, cobertura de pipeline, metas vs realizado e risco de receita.</td>
+              <td><code>/app/forecast</code> (<code>ForecastHub.tsx</code>), <code>/app/metas</code> (<code>MetasHub.tsx</code>), <code>/app/pipeline_ponderado</code></td>
+              <td><span class="badge ok">ALINHADO</span></td>
+              <td><code>ForecastHub</code> calcula Commit, Best Case, Pipeline Total, Gap para Meta e Cobertura a partir de deals reais (<code>/api/deals</code>) e metas (<code>/api/goals</code>), com simulação auditável.</td>
+            </tr>
+            <tr>
+              <td><strong>06. Inteligência Artificial (Copiloto 360°)</strong><br/>Recomendações de próxima ação, resumo de contas, geração de mensagens e análise de risco.</td>
+              <td><code>/app/intelligence</code> (<code>IntelligenceHub.tsx</code>), <code>/app/copiloto_ia</code> (<code>CopilotoIaHub.tsx</code>), <code>LiveCopilotHUD.tsx</code></td>
+              <td><span class="badge ok">ALINHADO</span></td>
+              <td>Integrado ao backend <code>/api/ai/*</code> e <code>/api/intelligence/*</code>, com chat contextual, análise de chamadas, gerador de abordagem e HUD flutuante.</td>
+            </tr>
+            <tr>
+              <td><strong>07. Automação &amp; Conectividade</strong><br/>Integrações nativas, webhooks, sincronização bidirecional e workflows.</td>
+              <td><code>/app/integrations</code> (<code>Integrations.tsx</code>), <code>/app/automations</code> (<code>Automations.tsx</code>)</td>
+              <td><span class="badge gold">PARCIALMENTE ALINHADO</span></td>
+              <td>Possui conectores reais (Bitrix24 com sync/logs/Mappers, WhatsApp, Google, etc.) e motor de regras. Separado na sidebar entre <code>EXECUTION</code> (Automações) e <code>GOVERNANÇA</code> (Integrações).</td>
+            </tr>
+            <tr>
+              <td><strong>08. Engajamento Comercial</strong><br/>Cadências multicanal, e-mail, WhatsApp, telefonia e registro automático de touchpoints.</td>
+              <td><code>/app/cadence</code> (<code>CadenceHub.tsx</code>), <code>/app/prospect</code> (<code>ProspectingHub.tsx</code>), <code>/social-selling</code></td>
+              <td><span class="badge gold">PARCIALMENTE ALINHADO</span></td>
+              <td><code>CadenceHub</code> e <code>ProspectingHub</code> funcionam com API real, mas <strong>Telefonia / Discador (<code>/app/dialer</code>, <code>/app/voice-hub</code>, <code>/app/outbound</code>) estão desativados e redirecionados</strong> por bloqueio multi-tenant no backend (<code>503 MODULE_NOT_READY</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>Módulos Extras no Código</strong><br/>(<code>sdr-diagnostic</code>, <code>daily-plan</code>, <code>editor</code>, <code>chatbook</code>, <code>topic_training</code>)</td>
+              <td><code>JoaoReisDiagnosticHub</code>, <code>DailyPlanHub</code>, <code>DocumentEditor</code>, <code>ChatbookHub</code>, <code>TopicTrainingAcademy</code></td>
+              <td><span class="badge pink">NÃO DOCUMENTADO</span></td>
+              <td>Existem como rotas em <code>App.tsx</code>, mas não fazem parte da taxonomia oficial do <code>MANUAL-DE-IDENTIDADE-DO-PRODUTO.html</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. NOMENCLATURA -->
+    <section id="sec-4">
+      <h2><span class="sec-num">04</span> Auditoria de Nomenclatura e Taxonomia</h2>
+      <h3>4.1 Divergências Críticas de Nomenclatura</h3>
+      <ol>
+        <li>
+          <strong>Nome da Marca Grafado de 4 Formas Diferentes:</strong>
+          <ul>
+            <li><strong>Oficial (<code>BRANDBOOK</code>):</strong> <code>Birth Hub 360º</code> ou <code>BIRTH HUB 360°</code> (com espaço entre Birth e Hub).</li>
+            <li><strong><code>Sidebar.tsx</code>:</strong> <code>BirthHub 360°</code> (sem espaço) + subtítulo <code>Operate</code>.</li>
+            <li><strong><code>AppTopbar.tsx</code>:</strong> <code>BirthHub</code> / <code>360°</code>.</li>
+            <li><strong><code>CrmBoard.tsx</code>:</strong> <code>Piloto Birthub 360 Profile</code> (com "h" minúsculo e um único "h").</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Mistura de Inglês e Português nos Grupos da Sidebar (<code>sidebarSections.ts</code>):</strong>
+          <ul>
+            <li>5 seções estão em inglês (<code>COMMAND CENTER</code>, <code>INTELLIGENCE</code>, <code>EXECUTION</code>, <code>RELATIONSHIPS</code>, <code>PERFORMANCE</code>) e 2 estão em português (<code>RECEITA</code>, <code>GOVERNANÇA</code>).</li>
+            <li>O <code>MANUAL-DE-IDENTIDADE-DO-PRODUTO.html</code> define os grupos oficiais da sidebar 100% em português: <code>Visão Geral</code>, <code>Operação</code>, <code>Inteligência</code>, <code>Governança</code>.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Nomes de Pilares Adulterados em <code>/login</code> e <code>/welcome</code> (<code>NewLoginScreen.tsx</code>):</strong>
+          <ul>
+            <li>No Manual de Produto: Pilar 07 = <code>Automação &amp; Conectividade</code>, Pilar 08 = <code>Engajamento Comercial</code>.</li>
+            <li>Em <code>NewLoginScreen.tsx</code>: Pilar 07 foi renomeado para <code>Governança Comercial</code> e Pilar 08 para <code>Enriquecimento de Dados</code>.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Duplicação de Conceitos e Rotas na Sidebar (<code>sidebarSections.ts</code>):</strong>
+          <ul>
+            <li><code>Contatos</code> (linha 145) e <code>Decisores</code> (linha 151) apontam ambos para a mesmíssima rota <code>primaryTab: 'contacts'</code> (<code>/app/contacts</code>).</li>
+            <li><code>Roleplay IA</code> (linha 179) e <code>Gamificação</code> (linha 185) apontam ambos para <code>primaryTab: 'roleplay'</code> (<code>/app/roleplay</code>).</li>
+            <li><code>IA Hub</code> (<code>/app/intelligence</code>), <code>Copiloto IA</code> (<code>/app/copiloto_ia</code>) e <code>Inteligência Comercial</code> (<code>/app/commercial_intelligence</code>) coexistem na seção <code>INTELLIGENCE</code> com sobreposição de escopo percebida pelo usuário.</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Nomes Legados / Internos Expostos:</strong>
+          <ul>
+            <li>Rota <code>/app/sdr-diagnostic</code> carrega <code>JoaoReisDiagnosticHub.tsx</code> (nome de pessoa física no componente).</li>
+            <li>Em <code>CrmBoard.tsx</code> (linha 41), os estágios default do pipeline incluem <code>'Piloto VTECH'</code>, <code>'Piloto Birthub 360 Profile'</code> e <code>'Piloto Logística'</code>.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <!-- 5. TIPOGRAFIA -->
+    <section id="sec-5">
+      <h2><span class="sec-num">05</span> Auditoria de Tipografia</h2>
+      <h3>5.1 Regra Oficial (Brandbook &amp; Manual Visual)</h3>
+      <ul>
+        <li><strong>Display / Títulos (<code>--font-display</code>):</strong> <code>Sora</code> (pesos 600, 700, 800; tracking <code>-0.02em</code> a <code>-0.03em</code>).</li>
+        <li><strong>Interface / Corpo (<code>--font-sans</code>):</strong> <code>Inter</code> com variantes arredondadas obrigatórias (<code>font-feature-settings: "cv05", "cv11", "ss01"</code>, tracking <code>-0.012em</code>).</li>
+        <li><strong>Dados / KPIs / Tabelas / Timestamps (<code>--font-mono</code>):</strong> <code>IBM Plex Mono</code> (<code>font-variant-numeric: tabular-nums</code>).</li>
+        <li><strong>Fontes Expressamente Proibidas pelo Brandbook (linha 458):</strong> <code>Bodoni Moda</code>, <code>Cabin</code>, <code>JetBrains Mono</code>, <code>Playfair Display</code> ou qualquer fonte fora da tríade <code>Sora</code> / <code>Inter</code> / <code>IBM Plex Mono</code>.</li>
+      </ul>
+
+      <h3>5.2 Divergências Encontradas no Código</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Arquivo / Local</th>
+              <th>Fonte Encontrada</th>
+              <th>Classificação</th>
+              <th>Detalhe da Violação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>index.html</code> (linha 19)</td>
+              <td><code>JetBrains Mono</code> e <code>Plus Jakarta Sans</code></td>
+              <td><span class="badge danger">PROIBIDA (P1)</span></td>
+              <td>Carrega via Google Fonts CDN <code>family=JetBrains+Mono:wght@500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800</code>, desperdiçando banda e violando a cláusula de proibição de tipografias órfãs.</td>
+            </tr>
+            <tr>
+              <td><code>birthhub360.css</code>, <code>birthhub360.json</code>, <code>birthhub360.ts</code></td>
+              <td><code>Bodoni Moda</code>, <code>JetBrains Mono</code>, <code>Playfair Display</code></td>
+              <td><span class="badge danger">PROIBIDA (P1)</span></td>
+              <td>Os 3 arquivos na pasta <code>tokens/</code> estão desatualizados (V2.0) e definem <code>--bh-font-accent: 'Bodoni Moda'</code>, <code>--bh-font-mono: 'JetBrains Mono'</code> e <code>--bh-font-Editorial: 'Playfair Display'</code>.</td>
+            </tr>
+            <tr>
+              <td><code>birthhub360-logo-horizontal.svg</code></td>
+              <td><code>Plus Jakarta Sans</code></td>
+              <td><span class="badge danger">PROIBIDA (P1)</span></td>
+              <td>O SVG oficial horizontal usa <code>font-family="'Sora', 'Plus Jakarta Sans', -apple-system, sans-serif"</code>.</td>
+            </tr>
+            <tr>
+              <td><code>src/styles/globals.css</code> (linhas 1286 e 1481)</td>
+              <td><code>.bh-metric</code> e <code>.bh-data</code> usam <code>var(--font-sans)</code> (<code>Inter</code>)</td>
+              <td><span class="badge gold">FORA DO PADRÃO (P2)</span></td>
+              <td>Classes semânticas de métricas e dados usam <code>var(--font-sans)</code> em vez de <code>var(--font-mono)</code> (<code>IBM Plex Mono</code>).</td>
+            </tr>
+            <tr>
+              <td><code>src/components/ui/KpiCard.tsx</code> (linha 173)</td>
+              <td><code>font-display</code> (<code>Sora</code>) sem <code>font-mono</code> nos deltas</td>
+              <td><span class="badge gold">FORA DO PADRÃO (P2)</span></td>
+              <td>Os deltas e badges numéricos do <code>KpiCard</code> não utilizam <code>IBM Plex Mono</code> (<code>font-mono</code>).</td>
+            </tr>
+            <tr>
+              <td><code>BirthHub360-DesignSystem-Bible.html</code> e <code>design-tokens-manual.json</code></td>
+              <td><code>Plus Jakarta Sans</code>, <code>JetBrains Mono</code>, <code>Bodoni Moda</code></td>
+              <td><span class="badge gold">ARTEFATO LEGADO (P2)</span></td>
+              <td>Artefatos de captura na raiz do repositório documentam o design system legado e confundem agentes/desenvolvedores.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. CORES E TOKENS -->
+    <section id="sec-6">
+      <h2><span class="sec-num">06</span> Auditoria de Cores e Tokens</h2>
+      <h3>6.1 Comparativo: Documentos Oficiais vs. <code>tokens/</code> vs. <code>globals.css</code></h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Token Semântico</th>
+              <th>Documentos Oficiais HTML (Verdade 2026)</th>
+              <th><code>identidade-visual/birthhub360/tokens/*</code> (V2.0)</th>
+              <th><code>src/styles/globals.css</code> (Real)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Primary / Brand Cyan</strong></td>
+              <td><span class="swatch" style="background:#00D4FF"></span><code>--neon-blue: #00D4FF</code></td>
+              <td><span class="swatch" style="background:#0065D2"></span><code>--bh-blue: #0065D2</code></td>
+              <td><span class="swatch" style="background:#00d4ff"></span><code>--neon-blue: #00d4ff</code></td>
+              <td><span class="badge danger">tokens/ DIVERGENTE</span></td>
+            </tr>
+            <tr>
+              <td><strong>Secondary / Brand Pink</strong></td>
+              <td><span class="swatch" style="background:#FF2D9B"></span><code>--neon-pink: #FF2D9B</code></td>
+              <td><span class="swatch" style="background:#FF3158"></span><code>--bh-coral: #FF3158</code> / <code>#5B21B6</code></td>
+              <td><span class="swatch" style="background:#ff2d9b"></span><code>--neon-pink: #ff2d9b</code></td>
+              <td><span class="badge danger">tokens/ DIVERGENTE</span></td>
+            </tr>
+            <tr>
+              <td><strong>Accent / Brand Gold</strong></td>
+              <td><span class="swatch" style="background:#FFC107"></span><code>--neon-gold: #FFC107</code></td>
+              <td><span class="swatch" style="background:#D4AF37"></span><code>--bh-gold: #D4AF37</code> (Antique Gold)</td>
+              <td><span class="swatch" style="background:#ffc107"></span><code>--neon-gold: #ffc107</code></td>
+              <td><span class="badge danger">tokens/ DIVERGENTE</span></td>
+            </tr>
+            <tr>
+              <td><strong>Canvas Dark (<code>--bg</code>)</strong></td>
+              <td><span class="swatch" style="background:#0D0D0D"></span><code>--neon-black: #0D0D0D</code></td>
+              <td><span class="swatch" style="background:#0B132B"></span><code>--bh-obsidian: #0B132B</code></td>
+              <td><span class="swatch" style="background:#0d0d0d"></span><code>.dark --bg: #0d0d0d</code></td>
+              <td><span class="badge danger">tokens/ DIVERGENTE</span></td>
+            </tr>
+            <tr>
+              <td><strong>Surface Dark (<code>--surface</code>)</strong></td>
+              <td><span class="swatch" style="background:#14141A"></span><code>--surface: #14141A</code></td>
+              <td><span class="swatch" style="background:#162447"></span><code>--bh-midnight: #162447</code></td>
+              <td><span class="swatch" style="background:#14141a"></span><code>.dark --surface: #14141a</code></td>
+              <td><span class="badge ok">ALINHADO em globals.css</span></td>
+            </tr>
+            <tr>
+              <td><strong>Texto Primário Dark (<code>--ink</code>)</strong></td>
+              <td><span class="swatch" style="background:#F8F9FF"></span><code>--neon-white: #F8F9FF</code></td>
+              <td><span class="swatch" style="background:#F8FAFC"></span><code>--bh-cloud: #F8FAFC</code></td>
+              <td><span class="swatch" style="background:#70d6ff"></span><code>.dark --ink: #70d6ff</code></td>
+              <td><span class="badge danger">VIOLAÇÃO EM globals.css</span></td>
+            </tr>
+            <tr>
+              <td><strong>Texto Secundário Dark</strong></td>
+              <td><span class="swatch" style="background:#9EADC8"></span><code>--muted: #9EADC8</code></td>
+              <td><span class="swatch" style="background:#475569"></span><code>--bh-slate: #475569</code></td>
+              <td><span class="swatch" style="background:#38bdf8"></span><code>.dark --ink-2: #38bdf8</code></td>
+              <td><span class="badge danger">VIOLAÇÃO EM globals.css</span></td>
+            </tr>
+            <tr>
+              <td><strong>Semânticas de Status</strong></td>
+              <td>Success <code>#10B981</code>, Warn <code>#FFC107</code>, Danger <code>#FF3B5C</code></td>
+              <td>Success <code>#10B981</code>, Warn <code>#F59E0B</code>, Danger <code>#EF4444</code></td>
+              <td><code>--ok: #22c55e</code>, <code>--warn: #ffc107</code>, <code>--red: #ef4444</code></td>
+              <td><span class="badge gold">PARCIALMENTE CONFORME</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6.2 Violações Graves de Cores na Plataforma</h3>
+      <div class="callout danger">
+        <p><strong>1. Distorção de <code>--neon-white</code> e <code>--ink</code> para <code>#70d6ff</code> em <code>globals.css</code> (P1):</strong><br/>
+        Na linha 969 de <code>globals.css</code>, há um comentário em caixa alta: <code>/* REGRA GLOBAL: NENHUMA FONTE DE NENHUM TEXTO OU TÍTULO PODE SER BRANCA OU PRETA */</code>, que redefiniu <code>--neon-white: #70d6ff</code>, <code>.dark --ink: #70d6ff</code> e <code>.dark --ink-2: #38bdf8</code>, além de forçar todos os <code>h1..h6</code> para <code>color: var(--neon-blue)</code>. Isso contradiz frontalmente os 4 documentos oficiais, que definem <code>--neon-white: #F8F9FF</code> para leitura confortável em fundo escuro e <code>--muted: #9EADC8</code> para texto secundário. Transformar 100% dos textos e parágrafos em azul-ciano destrói a hierarquia figura-fundo e causa fadiga visual severa.</p>
+      </div>
+      <ul>
+        <li><strong>2. Vazamento de Variáveis <code>--el-*</code> Indefinidas em <code>AppTopbar.tsx</code> (P1):</strong> <code>AppTopbar.tsx</code> utiliza classes como <code>text-[var(--el-ink)]</code>, <code>border-[var(--el-line)]</code>, <code>bg-[var(--el-gold)]</code>, <code>text-[var(--el-gold-deep)]</code>, <code>bg-[var(--el-pink)]</code>, <code>el-glass</code> e <code>el-hairline</code>. Como <code>elegance.css</code> não é importado em <code>main.tsx</code>, essas variáveis CSS não existem no tema padrão.</li>
+        <li><strong>3. Hardcodes de Cores Fora do Sistema:</strong>
+          <ul>
+            <li><code>Analytics.tsx</code>: <code>bg-[#1C1D24]</code>, <code>via-[#8B7DFF]/40</code>, <code>text-[#22c55e]</code>, <code>text-[#EF4444]</code>.</li>
+            <li><code>ForecastHub.tsx</code>: <code>bg-amber-950/60</code>, <code>border-amber-500/40</code>, <code>text-amber-200</code>, <code>text-emerald-400</code>.</li>
+            <li><code>NewLoginScreen.tsx</code>: <code>#0ea5e9</code>, <code>#6366f1</code>, <code>#8b5cf6</code>, <code>#16a34a</code>, <code>#d97706</code>, <code>#dc2626</code>, <code>#0284c7</code>, <code>#4f46e5</code>.</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 7. GRADIENTES, SOMBRAS, GLOW E EFEITOS -->
+    <section id="sec-7">
+      <h2><span class="sec-num">07</span> Auditoria de Gradientes, Sombras, Glow e Efeitos</h2>
+      <ul>
+        <li><strong>Regra Oficial (<code>MANUAL-DE-IDENTIDADE-VISUAL.html</code>):</strong>
+          <ul>
+            <li><code>--grad-brand</code> / <code>--grad-titles</code>: <code>linear-gradient(135deg, #00D4FF 0%, #FF2D9B 52%, #FFC107 100%)</code> — uso exclusivo em títulos hero (<code>.bh-title</code>), emblema e destaques estratégicos.</li>
+            <li><code>--grad-cta</code>: <code>linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%)</code> — uso em CTAs primários de alto impacto.</li>
+            <li><strong>Proporção Áurea de Cor:</strong> <strong>75% Neutros Escuros</strong> (<code>#0D0D0D</code>, <code>#14141A</code>), <strong>18% Textos Claros</strong> (<code>#F8F9FF</code>, <code>#9EADC8</code>) e <strong>apenas 7% Acentos Neon</strong> (<code>#00D4FF</code>, <code>#FF2D9B</code>, <code>#FFC107</code>).</li>
+          </ul>
+        </li>
+        <li><strong>O que ocorre na plataforma real:</strong>
+          <ul>
+            <li>Em <code>globals.css</code>, como <code>--ink</code> e <code>--ink-2</code> foram trocados por <code>#70d6ff</code> e <code>#38bdf8</code> e todas as bordas <code>.dark --line</code> usam <code>rgba(0, 212, 255, 0.18)</code>, a proporção de 7% de neon foi violada: <strong>quase toda a tela brilha em ciano</strong>.</li>
+            <li>Em contrapartida, telas como <code>Analytics.tsx</code> e <code>NewLoginScreen.tsx</code> abandonam completamente os tokens do Birth Hub e usam cinzas/azuis genéricos de templates Tailwind (<code>slate-400</code>, <code>#1C1D24</code>, <code>#8B7DFF</code>).</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 8. LOGOTIPO E EMBLEMA -->
+    <section id="sec-8">
+      <h2><span class="sec-num">08</span> Auditoria do Logotipo, Emblema e Ativos de Marca</h2>
+      <p>Foram identificadas <strong>5 implementações conflitantes do logotipo</strong> no projeto:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Local / Arquivo</th>
+              <th>Cores do Arco / Símbolo</th>
+              <th>Cores do Núcleo / Wordmark</th>
+              <th>Veredito</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Documentos HTML Oficiais</strong><br/>(<code>BRANDBOOK</code>, <code>MANUAL VISUAL</code>)</td>
+              <td>Gradiente Neon: <code>#00D4FF → #FF2D9B → #FFC107</code></td>
+              <td>Núcleo <code>#14141A</code> / <code>#0D0D0D</code>; Wordmark <code>#F8F9FF</code> + <code>360°</code> em gradiente neon</td>
+              <td><span class="badge ok">FONTE DE VERDADE 2026</span></td>
+            </tr>
+            <tr>
+              <td><strong>2. Pasta <code>logos/</code> e <code>public/brand/</code></strong><br/>(<code>birthhub360-icone.svg</code>, <code>birthhub360-logo-horizontal.svg</code>, <code>birthhub360-simbolo.svg</code>)</td>
+              <td>Gradiente Legado V2.0: <code>#00C6FF → #0065D2 → #5B21B6 → #D4AF37</code> (Antique Gold)</td>
+              <td>Núcleo <code>#162447 → #0B132B</code> (Obsidian); fonte <code>Plus Jakarta Sans</code> no SVG horizontal</td>
+              <td><span class="badge gold">DESATUALIZADO (V2.0)</span></td>
+            </tr>
+            <tr>
+              <td><strong>3. <code>BirthHubLogo.tsx</code></strong><br/>(usado na Sidebar e Topbar)</td>
+              <td>Gradiente customizado: <code>#1677FF → #7C3AED → #D4AF37</code></td>
+              <td>Núcleo <code>#1B2B64 → #0B132B</code></td>
+              <td><span class="badge danger">DIVERGENTE</span></td>
+            </tr>
+            <tr>
+              <td><strong>4. <code>AnimatedBirthHubEmblem.tsx</code></strong></td>
+              <td>Gradiente de 6 paradas com <code>#D4AF37</code> e <code>#FF3158</code></td>
+              <td>Anéis orbitais animados</td>
+              <td><span class="badge gold">DIVERGENTE (Legado V2.0)</span></td>
+            </tr>
+            <tr>
+              <td><strong>5. <code>NewLoginScreen.tsx</code></strong><br/>(<code>BH360LogoMark</code>)</td>
+              <td><code>#38bdf8 → #0284c7</code> e <code>#a855f7 → #ec4899</code></td>
+              <td>Sem letra "B" central; geometria totalmente redesenhada</td>
+              <td><span class="badge danger">VIOLAÇÃO GRAVE (Redesenhado)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 9. COMPONENTES -->
+    <section id="sec-9">
+      <h2><span class="sec-num">09</span> Auditoria do Catálogo de Componentes vs Componentes Reais</h2>
+      <p>Comparação entre o <code>CATALOGO-DE-COMPONENTES.html</code> e <code>src/components/ui/</code>:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Componente</th>
+              <th>Especificação no Catálogo Oficial</th>
+              <th>Implementação Real</th>
+              <th>Classificação</th>
+              <th>Divergências Específicas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Button</strong></td>
+              <td>Primário CTA: <code>border-radius: 9999px</code> (<code>--r-pill</code>), <code>background: var(--grad-cta)</code>, <code>Sora 700</code>. Secundário/Ghost: <code>12px</code> ou <code>9999px</code>.</td>
+              <td><code>Button.tsx</code></td>
+              <td><span class="badge gold">PARCIALMENTE CONFORME</span></td>
+              <td>Usa <code>rounded-xl</code> (<code>12px</code>) em todas as variantes (não tem variante pill <code>9999px</code> nem <code>--grad-cta</code> por padrão; <code>primary</code> usa <code>bg-brand text-on-brand</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>Input / Select / Textarea</strong></td>
+              <td>Altura <code>42px</code>, <code>border-radius: 12px</code> (<code>--r-md</code>), fundo <code>rgba(255,255,255,0.03)</code>, focus ring <code>#00D4FF</code>.</td>
+              <td><code>Input.tsx</code>, <code>Select.tsx</code>, <code>Textarea.tsx</code></td>
+              <td><span class="badge ok">CONFORME</span></td>
+              <td>Usam <code>h-10</code> (<code>40px</code>), <code>rounded-control</code> (<code>12px</code>), <code>focus-visible:ring-brand/30</code> e suporte a <code>error</code>/<code>aria-invalid</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Badge</strong></td>
+              <td><code>border-radius: 9999px</code> (<code>--r-pill</code>), <code>IBM Plex Mono</code> / <code>11px</code> uppercase, variantes Cyan, Pink, Gold, Success, Danger.</td>
+              <td><code>Badge.tsx</code></td>
+              <td><span class="badge gold">PARCIALMENTE CONFORME</span></td>
+              <td>Usa <code>rounded-full</code> (<code>9999px</code>), mas tipografia padrão é <code>Inter</code> sem <code>font-mono</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Card</strong></td>
+              <td><code>border-radius: 16px</code> (<code>--r-lg</code>), fundo <code>#14141A</code>, borda <code>1px solid rgba(255,255,255,0.08)</code>, hover <code>rgba(0,212,255,0.28)</code>.</td>
+              <td><code>Card.tsx</code></td>
+              <td><span class="badge ok">CONFORME</span></td>
+              <td>Usa <code>rounded-card</code> (<code>16px</code>), <code>bg-surface</code>, <code>border-line</code> e variantes <code>default</code>, <code>interactive</code>, <code>stat</code>, <code>glass</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>KPI Card</strong></td>
+              <td>Topo com linha gradiente <code>2px</code>, label uppercase, valor principal grande, badge de variação em <code>IBM Plex Mono</code> com <code>tabular-nums</code>.</td>
+              <td><code>KpiCard.tsx</code></td>
+              <td><span class="badge gold">PARCIALMENTE CONFORME</span></td>
+              <td>Excelente estrutura com sparkline, meta e delta, mas o delta badge não aplica <code>font-mono</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Modal / Dialog</strong></td>
+              <td><code>border-radius: 20px</code> (<code>--r-xl</code>), backdrop blur <code>16px</code>, borda <code>rgba(0,212,255,0.22)</code>.</td>
+              <td><code>Dialog.tsx</code></td>
+              <td><span class="badge gold">PARCIALMENTE CONFORME</span></td>
+              <td>Usa <code>rounded-2xl</code> (<code>16px</code>) em vez de <code>20px</code> (<code>rounded-card-lg</code>), mas possui focus trap, <code>Escape</code> e <code>aria-modal="true"</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Drawer</strong></td>
+              <td>Painel lateral <code>420px–540px</code>, fundo <code>#14141A</code>, header fixo e body scrollável.</td>
+              <td><code>Drawer.tsx</code></td>
+              <td><span class="badge ok">CONFORME</span></td>
+              <td>Implementado com animações suaves, foco acessível e fechamento via <code>Escape</code>/overlay.</td>
+            </tr>
+            <tr>
+              <td><strong>Table</strong></td>
+              <td>Header uppercase <code>11px</code> <code>#9EADC8</code>, hover de linha <code>rgba(0,212,255,0.04)</code>, células numéricas em <code>IBM Plex Mono</code>.</td>
+              <td><code>Table.tsx</code></td>
+              <td><span class="badge gold">PARCIALMENTE CONFORME</span></td>
+              <td>Estrutura limpa e responsiva, mas não aplica <code>font-mono tabular-nums</code> automaticamente em colunas numéricas.</td>
+            </tr>
+            <tr>
+              <td><strong>Toggle / Switch</strong></td>
+              <td>Track <code>44x24px</code>, <code>border-radius: 9999px</code>, ativo com <code>#00D4FF</code>.</td>
+              <td><code>Toggle.tsx</code></td>
+              <td><span class="badge ok">CONFORME</span></td>
+              <td>Usa <code>role="switch"</code>, <code>aria-checked</code>, <code>rounded-full</code> e cor <code>bg-brand</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Empty State &amp; Skeleton</strong></td>
+              <td>Estados explícitos com ícone orbital, título <code>Sora</code>, descrição clara e CTA opcional.</td>
+              <td><code>EmptyState.tsx</code>, <code>Skeleton.tsx</code></td>
+              <td><span class="badge ok">CONFORME</span></td>
+              <td>Bem implementados e reutilizados nos módulos principais.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10. BORDER RADIUS, SPACING E DENSIDADE -->
+    <section id="sec-10">
+      <h2><span class="sec-num">10</span> Auditoria de Border Radius, Spacing e Densidade</h2>
+      <h3>10.1 Border Radius (Catálogo Oficial vs Código)</h3>
+      <ul>
+        <li><strong>Tokens Oficiais:</strong> <code>--r-sm: 8px</code>, <code>--r-md: 12px</code> (inputs/nav items), <code>--r-lg: 16px</code> (cards), <code>--r-xl: 20px</code> (modais/containers hero), <code>--r-pill: 9999px</code> (badges/CTAs primários).</li>
+        <li><strong>Divergências encontradas:</strong>
+          <ul>
+            <li><code>Sidebar.tsx</code> (linha 218): Os itens de navegação usam <code>rounded-md</code> (<code>6px</code>), ignorando o token <code>--radius-nav-item: 12px</code> definido no próprio <code>globals.css</code>.</li>
+            <li><code>SinglePageDashboard.tsx</code>: Mistura <code>rounded-xl</code> (<code>12px</code>), <code>rounded-2xl</code> (<code>16px</code>) e <code>rounded-3xl</code> (<code>24px</code>) na mesma dobra.</li>
+            <li><code>Dialog.tsx</code>: Usa <code>rounded-2xl</code> (<code>16px</code>) em vez de <code>20px</code>.</li>
+          </ul>
+        </li>
+      </ul>
+      <h3>10.2 Spacing e Densidade</h3>
+      <ul>
+        <li>O modo <code>operate-dense</code> em <code>MainLayout.tsx</code> aplica boa densidade operacional para telas de trabalho contínuo.</li>
+        <li>Contudo, no <strong>Command Center (<code>/app/dashboard</code>)</strong>, o componente <code>SinglePageDashboard.tsx</code> empilha mais de <strong>12 seções verticais densas</strong> na mesma página (Hero + 6 KPIs + 4 Sinais + Funil + 8 Pilares + 9 Ferramentas + Integrações + Saúde da Operação), gerando sobrecarga cognitiva e rolagem excessiva.</li>
+      </ul>
+    </section>
+
+    <!-- 11. SIDEBAR E NAVEGAÇÃO -->
+    <section id="sec-11">
+      <h2><span class="sec-num">11</span> Auditoria da Sidebar e Navegação</h2>
+      <p>Arquivos auditados: <code>Sidebar.tsx</code>, <code>sidebarSections.ts</code> e <code>AppTopbar.tsx</code>.</p>
+      <ol>
+        <li><strong>A navegação comunica a arquitetura dos 8 pilares do Birth Hub 360º?</strong><br/>
+          <strong>Parcialmente.</strong> Embora o Command Center explique os 8 pilares, a Sidebar divide a plataforma em 7 grupos híbridos EN/PT (<code>COMMAND CENTER</code>, <code>INTELLIGENCE</code>, <code>EXECUTION</code>, <code>RELATIONSHIPS</code>, <code>RECEITA</code>, <code>PERFORMANCE</code>, <code>GOVERNANÇA</code>) e <strong>omite completamente o Pilar 03 (Orquestração de Vendas: Playbooks, Jornadas, Processos, Roteiros)</strong> da barra lateral.</li>
+        <li><strong>Itens Duplicados na Sidebar (P1):</strong>
+          <ul>
+            <li>Em <code>RELATIONSHIPS</code>, <code>Contatos</code> e <code>Decisores</code> abrem exatamente a mesma tela (<code>/app/contacts</code>).</li>
+            <li>Em <code>PERFORMANCE</code>, <code>Roleplay IA</code> e <code>Gamificação</code> abrem exatamente a mesma tela (<code>/app/roleplay</code>).</li>
+          </ul>
+        </li>
+        <li><strong>23 Rotas Sem Entrada na Sidebar (P1):</strong> <code>playbooks</code>, <code>jornadas</code>, <code>processos</code>, <code>roteiros</code>, <code>chatbook</code>, <code>qualification_matrix</code>, <code>objections_matrix</code>, <code>topic_training</code>, <code>bitrix</code>, <code>reports</code>, <code>knowledge</code>, <code>winloss</code>, <code>daily-plan</code>, <code>sdr-diagnostic</code>, <code>calendar</code>, <code>editor</code>, <code>pipeline_ponderado</code>, <code>propostas</code>, <code>mesa-tratamento</code>, <code>activities</code>, <code>usage</code>, <code>module-access</code> + as 8 rotas <code>settings_*</code>.</li>
+        <li><strong>Topbar (<code>AppTopbar.tsx</code>):</strong> Possui busca global (<code>⌘K</code>), seletor de modo (<code>Explorar</code> vs <code>Operar</code>), indicadores e menu de usuário, mas está estilizada com classes órfãs <code>--el-*</code> de <code>elegance.css</code>.</li>
+      </ol>
+    </section>
+
+    <!-- 12 a 20. AUDITORIA DOS MÓDULOS OPERACIONAIS E GOVERNANÇA -->
+    <section id="sec-12">
+      <h2><span class="sec-num">12–20</span> Auditoria Profunda dos Módulos Operacionais e Governança</h2>
+      <div class="grid-2">
+        <div class="card-box">
+          <h4>12. Command Center / Dashboard Principal</h4>
+          <p><strong>Arquivos:</strong> <code>AdaptiveDashboard.tsx</code>, <code>SinglePageDashboard.tsx</code></p>
+          <p>Apresenta-se como Central de Comando 360° conectada a APIs reais (<code>/api/deals</code>, <code>/api/activities</code>, <code>/api/leads</code>, <code>/api/integrations</code>) com estados reais de loading/error/empty. <strong>Problema (P2):</strong> Empilha mais de 12 seções na mesma página, misturando operação em tempo real com catálogo arquitetural.</p>
+        </div>
+
+        <div class="card-box">
+          <h4>13. Inteligência de Mercado e Scoring</h4>
+          <p><strong>Arquivos:</strong> <code>Ldr.tsx</code>, <code>InteligenciaMercadoHub.tsx</code>, <code>Account360.tsx</code>, <code>LeadApprovalDeck.tsx</code></p>
+          <p>Consulta e enriquecimento de CNPJ, score de ICP, dossiê 360° da conta e deck de aprovação de leads. <strong>Divergência:</strong> Duas telas principais concorrentes (<code>/app/market-intelligence</code> em <code>Ldr.tsx</code> vs <code>/app/market-intelligence/hub</code>).</p>
+        </div>
+
+        <div class="card-box">
+          <h4>14. Orquestração, Cadências e Execução</h4>
+          <p><strong>Arquivos:</strong> <code>ProspectingHub.tsx</code>, <code>CadenceHub.tsx</code>, <code>src/features/sales-orchestration/*</code></p>
+          <p>Prospecção e Cadências multicanal funcionam com API real. Porém, <code>PlaybooksHub</code>, <code>JornadasComerciaisHub</code>, <code>ProcessosVendasHub</code> e <code>RoteirosHub</code> estão fora da Sidebar, e Telefonia/Discador retorna <code>503 MODULE_NOT_READY</code>.</p>
+        </div>
+
+        <div class="card-box">
+          <h4>15. Performance Comercial</h4>
+          <p><strong>Arquivos:</strong> <code>Analytics.tsx</code>, <code>CohortAnalysis.tsx</code>, <code>WinLossAnalysis.tsx</code></p>
+          <p>Consome <code>/api/analytics/dashboard</code>, exibe funil, evolução mensal, performance por operador, motivos de perda, coortes e tabelas-gêmeas acessíveis (<code>TableTwin</code>). <strong>Problema (P2):</strong> Cores hardcoded (<code>#1C1D24</code>, <code>#8B7DFF</code>) fora dos tokens.</p>
+        </div>
+
+        <div class="card-box">
+          <h4>16. Forecast e Previsibilidade</h4>
+          <p><strong>Arquivos:</strong> <code>ForecastHub.tsx</code>, <code>MetasHub.tsx</code>, <code>PipelinePonderadoHub.tsx</code></p>
+          <p>Calcula Commit (<code>&gt;=80%</code>), Best Case (<code>&gt;=50%</code>), Pipeline Ponderado, Cobertura e Gap de Meta com dados reais e banner explícito no modo simulação. <code>PipelinePonderadoHub</code> está sem link na Sidebar.</p>
+        </div>
+
+        <div class="card-box">
+          <h4>17. Copiloto IA e Inteligência Artificial</h4>
+          <p><strong>Arquivos:</strong> <code>IntelligenceHub.tsx</code>, <code>CopilotoIaHub.tsx</code>, <code>LiveCopilotHUD.tsx</code></p>
+          <p>Opera como Copiloto contextual integrado ao negócio ativo (<code>ActiveRecordContext</code>), gerando resumos, análise de chamadas, matriz de objeções e Next Best Action. Possui 3 entradas separadas na Sidebar que poderiam ser melhor unificadas.</p>
+        </div>
+
+        <div class="card-box">
+          <h4>18. CRM / Hub Comercial</h4>
+          <p><strong>Arquivos:</strong> <code>CrmBoard.tsx</code>, <code>CrmOverview.tsx</code>, <code>CompanyList.tsx</code>, <code>ContactList.tsx</code></p>
+          <p>Kanban drag-and-drop com persistência e rollback, BANT/MEDDIC e ROI. <strong>Problema (P1):</strong> <code>CrmBoard.tsx</code> (linha 41) define estágios hardcoded de clientes antigos: <code>'Piloto VTECH'</code>, <code>'Piloto Birthub 360 Profile'</code>, <code>'Piloto Logística'</code>.</p>
+        </div>
+
+        <div class="card-box">
+          <h4>19 &amp; 20. Integrações, Governança e Multi-Tenancy</h4>
+          <p><strong>Arquivos:</strong> <code>Integrations.tsx</code>, <code>authenticateToken.ts</code>, <code>authorization.ts</code>, <code>PillarSettingsPlaceholder.tsx</code></p>
+          <p>Integrações (Bitrix24, OAuth, logs) e segurança multi-tenant (PostgreSQL RLS + RBAC <code>ADMIN/GESTOR/CLOSER/SDR/VISUALIZADOR</code> + LGPD erasure) estão sólidas. <strong>Problema (P0):</strong> As 8 rotas <code>/app/settings_*</code> são placeholders sem persistência no servidor.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 a 23. COPYWRITING, ESTADOS E COERÊNCIA DE JORNADA -->
+    <section id="sec-21">
+      <h2><span class="sec-num">21–23</span> Copywriting, Estados de Interface e Coerência da Jornada</h2>
+      <h3>21. Auditoria de Copywriting e Microcopy</h3>
+      <ul>
+        <li><strong>Onde acerta:</strong> <code>Landing360.tsx</code>, <code>SinglePageDashboard.tsx</code> e <code>ForecastHub.tsx</code> usam tom executivo, preciso e orientado a Revenue Operations.</li>
+        <li><strong>Onde falha (P0/P1):</strong> <code>NewLoginScreen.tsx</code> contém dados comerciais fictícios chumbados na interface de login/boas-vindas (<em>"Vibra Energia S/A — R$ 350.000 — Score IA 96%"</em>, <em>"Ambev Logística — R$ 180.000"</em>, <em>"Suzano Papel &amp; Celulose — R$ 820.000"</em>, <em>"Gerdau Aços — R$ 1.200.000"</em>), além de mistura de idiomas nos rótulos da Sidebar (<code>COMMAND CENTER</code> vs <code>RECEITA</code>).</li>
+      </ul>
+
+      <h3>22. Estados de Interface e Responsividade</h3>
+      <ul>
+        <li>Bem implementados nos módulos principais através de <code>Skeleton.tsx</code>, <code>EmptyState.tsx</code>, <code>BlockedState.tsx</code>, <code>VisualState.tsx</code> e <code>OfflineBanner.tsx</code>, além de <code>Skip to content</code>, <code>MobileNavDrawer</code> e <code>MotionConfig reducedMotion="user"</code>.</li>
+        <li>Porém, o contraste cromático no modo escuro foi prejudicado pela substituição de <code>#F8F9FF</code> por <code>#70d6ff</code> em textos corridos.</li>
+      </ul>
+
+      <h3>23. Coerência entre Landing, Login, Onboarding e Plataforma</h3>
+      <div class="callout warn">
+        <p><strong>A Maior Ruptura de Experiência do Usuário Hoje na Plataforma:</strong></p>
+        <ol>
+          <li><strong>Passo 1 — Usuário acessa <code>/</code> (<code>Landing360.tsx</code>):</strong> Vê o universo <strong>Dark-First Neon (<code>#0D0D0D</code>, <code>#00D4FF</code>, <code>#FF2D9B</code>, <code>#FFC107</code>)</strong>, tipografia <code>Sora</code>, e os 8 pilares oficiais do Birth Hub 360º.</li>
+          <li><strong>Passo 2 — Usuário clica em "Entrar" e vai para <code>/login</code> ou <code>/welcome</code> (<code>NewLoginScreen.tsx</code>):</strong> O sistema executa <code>setThemeMode('light')</code> (linha 641) e joga o usuário em uma <strong>outra landing page inteira em Modo Claro (<code>#F8FAFC</code>)</strong>, com um logotipo diferente, cores diferentes (<code>#0ea5e9</code>, <code>#8b5cf6</code>), cards falsos da Ambev/Gerdau/Suzano e um modal branco sobreposto!</li>
+          <li><strong>Passo 3 — Usuário faz login e entra em <code>/app/dashboard</code> (<code>MainLayout.tsx</code>):</strong> Como o <code>/login</code> forçou <code>setThemeMode('light')</code> no <code>ThemeContext</code> (que grava em <code>localStorage</code>), o usuário entra na plataforma em Modo Claro (ou se voltar para o modo escuro, encontra textos em azul <code>#70d6ff</code>, uma Topbar com variáveis <code>--el-*</code> de um tema champagne e uma Sidebar com um terceiro logotipo <code>#1677FF → #D4AF37</code>).</li>
+        </ol>
+        <p><strong>Conclusão da Coerência de Jornada:</strong> Parecem <strong>3 produtos diferentes construídos por 3 equipes diferentes</strong>.</p>
+      </div>
+    </section>
+
+    <!-- 24. MATRIZ DE CONFORMIDADE & SCORECARD FINAL -->
+    <section id="sec-24">
+      <h2><span class="sec-num">24</span> Matriz de Conformidade &amp; Scorecard Final (0 a 10)</h2>
+      <h3>24.1 Classificação de Claims Documentais vs Realidade</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Capacidade / Item</th>
+              <th>Status de Evidência</th>
+              <th>Evidência Técnica Encontrada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Paleta Neon 2026 (<code>#00D4FF</code>, <code>#FF2D9B</code>, <code>#FFC107</code>, <code>#0D0D0D</code>) nos arquivos <code>tokens/</code></td>
+              <td><span class="badge danger">DOCUMENTADO, NÃO IMPLEMENTADO EM tokens/</span></td>
+              <td><code>identidade-visual/birthhub360/tokens/*</code> ainda contém a paleta V2.0 (<code>#0B132B</code>, <code>#D4AF37</code>).</td>
+            </tr>
+            <tr>
+              <td>SVGs em <code>logos/</code> com gradiente Neon 2026</td>
+              <td><span class="badge danger">DOCUMENTADO, NÃO IMPLEMENTADO EM logos/</span></td>
+              <td>Os 3 SVGs em <code>logos/</code> ainda usam o gradiente V2.0 (<code>#D4AF37</code> Antique Gold / <code>#0B132B</code> Obsidian).</td>
+            </tr>
+            <tr>
+              <td>8 Pilares Operacionais (CRM, Mercado, Performance, Forecast, IA, Integrações)</td>
+              <td><span class="badge ok">IMPLEMENTADO E DOCUMENTADO</span></td>
+              <td>Rotas, componentes e APIs reais verificados.</td>
+            </tr>
+            <tr>
+              <td>Pilar 03 (Playbooks, Jornadas, Processos, Roteiros) na Sidebar</td>
+              <td><span class="badge gold">IMPLEMENTADO, NÃO LINKADO NA SIDEBAR</span></td>
+              <td>Rotas existem em <code>App.tsx</code>, mas estão ausentes de <code>sidebarSections.ts</code>.</td>
+            </tr>
+            <tr>
+              <td>Telefonia Nativa / Voice Hub / Discador (<code>/app/dialer</code>, <code>/app/voice-hub</code>)</td>
+              <td><span class="badge danger">DOCUMENTADO, BLOQUEADO NO BACKEND</span></td>
+              <td>Redirecionado no frontend e bloqueado com <code>503 MODULE_NOT_READY</code> no backend por pendência de tenancy.</td>
+            </tr>
+            <tr>
+              <td>Persistência de Configurações por Pilar (<code>/app/settings_*</code>)</td>
+              <td><span class="badge danger">DOCUMENTADO, NÃO IMPLEMENTADO</span></td>
+              <td><code>PillarSettingsPlaceholder.tsx</code> exibe apenas controles locais com botão Salvar desabilitado.</td>
+            </tr>
+            <tr>
+              <td>Rotas extras (<code>sdr-diagnostic</code>, <code>chatbook</code>, <code>topic_training</code>, <code>daily-plan</code>)</td>
+              <td><span class="badge pink">IMPLEMENTADO, NÃO DOCUMENTADO</span></td>
+              <td>Presentes em <code>App.tsx</code> sem correspondência no Manual de Produto.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>24.2 Scorecard Oficial da Auditoria (0 a 10)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Dimensão Auditada</th>
+              <th>Nota (0–10)</th>
+              <th>Justificativa Técnica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>01</td><td><strong>Identidade de Marca</strong></td><td><span class="score-pill score-low">5.5 / 10</span></td><td>Forte nos 4 manuais HTML e na <code>Landing360</code>, mas diluída por 4 gerações visuais conflitantes no app.</td></tr>
+            <tr><td>02</td><td><strong>Alinhamento ao Manual de Produto</strong></td><td><span class="score-pill score-mid">7.5 / 10</span></td><td>Os 8 pilares existem no código, mas Orquestração está fora da sidebar e Telefonia está bloqueada (<code>503</code>).</td></tr>
+            <tr><td>03</td><td><strong>Arquitetura da Plataforma</strong></td><td><span class="score-pill score-high">8.0 / 10</span></td><td>Excelente estrutura modular em React + Express + Prisma + RLS, prejudicada por 23 rotas órfãs de menu.</td></tr>
+            <tr><td>04</td><td><strong>Nomenclatura</strong></td><td><span class="score-pill score-low">5.0 / 10</span></td><td>Mistura EN/PT na sidebar, 4 grafias de <code>Birth Hub 360º</code>, itens duplicados (<code>Contatos</code>/<code>Decisores</code>) e pilares renomeados no Login.</td></tr>
+            <tr><td>05</td><td><strong>Tipografia</strong></td><td><span class="score-pill score-low">5.5 / 10</span></td><td><code>Sora</code>, <code>Inter</code> e <code>IBM Plex Mono</code> estão auto-hospedadas, mas <code>index.html</code> e <code>tokens/</code> carregam <code>JetBrains Mono</code>, <code>Plus Jakarta Sans</code> e <code>Bodoni Moda</code> (proibidas).</td></tr>
+            <tr><td>06</td><td><strong>Cores e Tokens</strong></td><td><span class="score-pill score-low">4.5 / 10</span></td><td><code>tokens/</code> está na V2.0 (<code>#D4AF37</code>), <code>globals.css</code> força texto <code>#70d6ff</code> no lugar de <code>#F8F9FF</code>, e <code>AppTopbar</code> usa <code>--el-*</code> indefinidas.</td></tr>
+            <tr><td>07</td><td><strong>Gradientes e Efeitos</strong></td><td><span class="score-pill score-mid">6.0 / 10</span></td><td>Gradientes oficiais existem em <code>globals.css</code>, mas o excesso de ciano no texto dark viola a regra 75/18/7.</td></tr>
+            <tr><td>08</td><td><strong>Uso do Logo</strong></td><td><span class="score-pill score-low">4.0 / 10</span></td><td>5 versões diferentes do logo/emblema entre Brandbook HTML, <code>logos/*.svg</code>, <code>BirthHubLogo.tsx</code>, <code>AnimatedBirthHubEmblem</code> e <code>NewLoginScreen</code>.</td></tr>
+            <tr><td>09</td><td><strong>Componentes</strong></td><td><span class="score-pill score-mid">7.5 / 10</span></td><td>Primitivos sólidos e acessíveis em <code>src/components/ui/</code>, precisando apenas alinhar radius de CTA/Modal e <code>font-mono</code> em dados.</td></tr>
+            <tr><td>10</td><td><strong>Layout e Densidade</strong></td><td><span class="score-pill score-mid">7.0 / 10</span></td><td>Bom suporte a modo denso (<code>Operar</code>), mas <code>SinglePageDashboard</code> empilha seções demais.</td></tr>
+            <tr><td>11</td><td><strong>Sidebar e Navegação</strong></td><td><span class="score-pill score-low">5.5 / 10</span></td><td>2 itens duplicados, 23 rotas órfãs, mistura de idiomas e <code>rounded-md</code> (6px) em vez de <code>12px</code>.</td></tr>
+            <tr><td>12</td><td><strong>Command Center</strong></td><td><span class="score-pill score-high">8.0 / 10</span></td><td>Conecta indicadores reais, funil, alertas de IA e saúde de integrações sem dados falsos.</td></tr>
+            <tr><td>13</td><td><strong>Inteligência &amp; Scoring</strong></td><td><span class="score-pill score-high">8.0 / 10</span></td><td>Enriquecimento CNPJ, ICP score, <code>Account360</code> e <code>LeadApprovalDeck</code> bem construídos.</td></tr>
+            <tr><td>14</td><td><strong>Orquestração &amp; Cadência</strong></td><td><span class="score-pill score-mid">7.0 / 10</span></td><td><code>CadenceHub</code> e <code>ProspectingHub</code> fortes; <code>Playbooks</code>/<code>Jornadas</code>/<code>Roteiros</code> escondidos da sidebar; Discador em <code>503</code>.</td></tr>
+            <tr><td>15</td><td><strong>Performance Comercial</strong></td><td><span class="score-pill score-high">8.0 / 10</span></td><td><code>Analytics.tsx</code> completo com coortes, heatmap e tabelas-gêmeas, mas com cores hardcoded fora do tema.</td></tr>
+            <tr><td>16</td><td><strong>Forecast</strong></td><td><span class="score-pill score-high">8.5 / 10</span></td><td><code>ForecastHub</code> e <code>MetasHub</code> fiéis ao Manual de Produto e com governança explícita de simulação.</td></tr>
+            <tr><td>17</td><td><strong>Copiloto IA</strong></td><td><span class="score-pill score-high">8.5 / 10</span></td><td>Contextual, acionável e integrado aos registros reais sem parecer um chatbot solto.</td></tr>
+            <tr><td>18</td><td><strong>CRM / Hub Comercial</strong></td><td><span class="score-pill score-mid">7.5 / 10</span></td><td>Kanban + BANT/MEDDIC + CRM 360 sólidos; penalizado por estágios hardcoded (<code>Piloto VTECH</code>) em <code>CrmBoard.tsx</code>.</td></tr>
+            <tr><td>19</td><td><strong>Integrações e Automação</strong></td><td><span class="score-pill score-high">8.5 / 10</span></td><td><code>Integrations.tsx</code> (Bitrix24, OAuth, logs, mapeamento) e <code>Automations.tsx</code> muito maduros.</td></tr>
+            <tr><td>20</td><td><strong>Governança</strong></td><td><span class="score-pill score-mid">7.5 / 10</span></td><td>RBAC + RLS + LGPD excelentes no backend, mas as 8 telas <code>settings_*</code> de pilares são placeholders sem save.</td></tr>
+            <tr><td>21</td><td><strong>Copywriting</strong></td><td><span class="score-pill score-mid">6.5 / 10</span></td><td>Forte no app, mas comprometido pelos cards falsos (Vibra/Ambev/Gerdau) em <code>NewLoginScreen.tsx</code>.</td></tr>
+            <tr><td>22</td><td><strong>Consistência Visual</strong></td><td><span class="score-pill score-low">4.5 / 10</span></td><td>Ruptura severa entre <code>Landing360</code> (Dark Neon), <code>NewLoginScreen</code> (Light SaaS forçado) e <code>/app</code> (Texto azul + Topbar elegance).</td></tr>
+            <tr><td>23</td><td><strong>Fidelidade Geral ao Birth Hub 360º</strong></td><td><span class="score-pill score-mid">6.7 / 10</span></td><td>O motor de Revenue Operations existe e funciona, mas a camada de identidade visual e navegação precisa de unificação cirúrgica.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 25. LISTA PRIORIZADA DE PROBLEMAS (P0 / P1 / P2 / P3) -->
+    <section id="sec-25">
+      <h2><span class="sec-num">25</span> Lista Priorizada de Problemas (P0 / P1 / P2 / P3)</h2>
+
+      <h3>🔴 P0 — Quebra Funcional ou de Governança de Produto</h3>
+      <ul>
+        <li><strong>[P0-01] 8 Telas de Configuração de Pilares (<code>/app/settings_*</code>) sem Persistência:</strong> <code>PillarSettingsPlaceholder.tsx</code> possui dezenas de controles que não salvam no backend.</li>
+        <li><strong>[P0-02] Módulos de Voz/Discador (<code>/app/voice-hub</code>, <code>/app/outbound</code>, <code>/app/dialer</code>) Bloqueados (<code>503 MODULE_NOT_READY</code>):</strong> Pendência de isolamento multi-tenant no backend impede operação de telefonia prometida no Pilar 08.</li>
+        <li><strong>[P0-03] Login/Welcome Forçando <code>setThemeMode('light')</code> e Exibindo Dados Falsos de Clientes:</strong> <code>NewLoginScreen.tsx</code> sobrescreve o tema do usuário para Light Mode ao abrir <code>/login</code> ou <code>/welcome</code> e exibe pipeline fictício de empresas reais (Vibra, Ambev, Suzano, Gerdau).</li>
+      </ul>
+
+      <h3>🟠 P1 — Desalinhamento Forte de Identidade, Marca ou Arquitetura</h3>
+      <ul>
+        <li><strong>[P1-01] Arquivos <code>identidade-visual/birthhub360/tokens/*</code> e <code>logos/*.svg</code> na Versão Legada V2.0:</strong> Usam <code>#D4AF37</code> (Antique Gold), <code>#0B132B</code> (Obsidian), <code>Bodoni Moda</code> e <code>JetBrains Mono</code> em vez da paleta Neon 2026 e tríade tipográfica dos 4 manuais HTML oficiais.</li>
+        <li><strong>[P1-02] Fontes Proibidas Carregadas em <code>index.html</code>:</strong> Remoção necessária de <code>JetBrains Mono</code> e <code>Plus Jakarta Sans</code> do link do Google Fonts.</li>
+        <li><strong>[P1-03] Texto Primário Dark (<code>--ink</code> / <code>--neon-white</code>) Distorcido para Azul <code>#70d6ff</code> em <code>globals.css</code>:</strong> Deve voltar a ser <code>#F8F9FF</code> (<code>--ink</code>) e <code>#9EADC8</code>/<code>#A1A1B5</code> (<code>--ink-2</code>), conforme o Brandbook Oficial.</li>
+        <li><strong>[P1-04] 5 Versões Diferentes do Logotipo/Emblema:</strong> Unificar <code>logos/*.svg</code>, <code>BirthHubLogo.tsx</code>, <code>AnimatedBirthHubEmblem.tsx</code> e o logo de <code>/login</code> com o SVG mestre Neon 2026.</li>
+        <li><strong>[P1-05] Vazamento de Variáveis <code>--el-*</code> Indefinidas em <code>AppTopbar.tsx</code>:</strong> Substituir <code>--el-ink</code>, <code>--el-gold</code>, <code>--el-line</code>, <code>el-glass</code> pelos tokens oficiais <code>--ink</code>, <code>--neon-gold</code>, <code>--line</code>, <code>--surface</code>.</li>
+        <li><strong>[P1-06] 23 Rotas Órfãs da Sidebar e 2 Itens Duplicados em <code>sidebarSections.ts</code>:</strong> Incluir o Pilar 03 (Orquestração: Playbooks, Jornadas, Processos, Roteiros), eliminar a duplicação <code>Contatos</code>/<code>Decisores</code> e <code>Roleplay IA</code>/<code>Gamificação</code>, e padronizar os títulos das seções em português.</li>
+        <li><strong>[P1-07] Estágios de Pipeline Legados Hardcoded em <code>CrmBoard.tsx</code>:</strong> Remover <code>'Piloto VTECH'</code>, <code>'Piloto Birthub 360 Profile'</code> e <code>'Piloto Logística'</code> dos estágios default do CRM.</li>
+      </ul>
+
+      <h3>🟡 P2 — Inconsistência Visual e de Componentes</h3>
+      <ul>
+        <li><strong>[P2-01] <code>IBM Plex Mono</code> Ausente em <code>.bh-metric</code>, <code>.bh-data</code> (<code>globals.css</code>) e Badges/Deltas de KPI (<code>KpiCard.tsx</code>).</strong></li>
+        <li><strong>[P2-02] Divergências de Border Radius:</strong> Itens da <code>Sidebar.tsx</code> com <code>rounded-md</code> (<code>6px</code> em vez de <code>12px</code>), <code>Dialog.tsx</code> com <code>16px</code> (em vez de <code>20px</code>), e falta da variante CTA pill (<code>9999px</code> + <code>--grad-cta</code>) em <code>Button.tsx</code>.</li>
+        <li><strong>[P2-03] Cores Hardcoded em <code>Analytics.tsx</code> (<code>#1C1D24</code>, <code>#8B7DFF</code>) e <code>ForecastHub.tsx</code>.</strong></li>
+      </ul>
+
+      <h3>🔵 P3 — Refinamento e Limpeza de Artefatos</h3>
+      <ul>
+        <li><strong>[P3-01] Artefatos de Documentação Legada na Raiz:</strong> <code>BirthHub360-DesignSystem-Bible.html</code> e <code>design-system-capture/design-tokens-manual.json</code> documentam a versão V2.0 antiga (<code>Bodoni Moda</code>, <code>#D4AF37</code>).</li>
+        <li><strong>[P3-02] Padronização da Grafia <code>Birth Hub 360º</code></strong> em todos os títulos, headers e metadados.</li>
+      </ul>
+    </section>
+
+    <!-- 26. PLANO DE CORREÇÃO EM 12 FASES -->
+    <section id="sec-26">
+      <h2><span class="sec-num">26</span> Plano de Correção em 12 Fases (Para Execução Futura)</h2>
+      <p>Quando autorizado a iniciar as modificações, a convergência total da plataforma deve seguir exatamente estas <strong>12 fases sequenciais</strong>:</p>
+      <ol>
+        <li><strong>Fase 1 — Alinhamento de Tokens (<code>tokens/</code> + <code>globals.css</code>):</strong> Atualizar <code>birthhub360.css</code>, <code>birthhub360.json</code> e <code>birthhub360.ts</code> para a paleta Neon 2026 e tríade <code>Sora</code>/<code>Inter</code>/<code>IBM Plex Mono</code>; corrigir <code>.dark --ink</code> (<code>#F8F9FF</code>) e <code>.dark --ink-2</code> (<code>#9EADC8</code>) em <code>globals.css</code>; remover <code>elegance.css</code> / <code>--el-*</code>.</li>
+        <li><strong>Fase 2 — Alinhamento de Tipografia:</strong> Remover <code>JetBrains Mono</code> e <code>Plus Jakarta Sans</code> de <code>index.html</code>; vincular <code>.bh-metric</code>, <code>.bh-data</code>, tabelas numéricas e badges técnicos a <code>var(--font-mono)</code> (<code>IBM Plex Mono</code> com <code>tabular-nums</code>).</li>
+        <li><strong>Fase 3 — Alinhamento de Cores e Proporção 75/18/7:</strong> Substituir cores hardcoded em <code>Analytics.tsx</code>, <code>ForecastHub.tsx</code> e <code>AppTopbar.tsx</code> pelos tokens semânticos oficiais, devolvendo o neon aos pontos focais (7%).</li>
+        <li><strong>Fase 4 — Alinhamento de Logo e Emblemas:</strong> Atualizar os 3 SVGs mestres em <code>identidade-visual/birthhub360/logos/</code> e <code>public/brand/</code> para o gradiente Neon 2026 (<code>#00D4FF → #FF2D9B → #FFC107</code>) e fonte <code>Sora</code>, unificando <code>BirthHubLogo.tsx</code> e <code>AnimatedBirthHubEmblem.tsx</code>.</li>
+        <li><strong>Fase 5 — Unificação de <code>/login</code> e <code>/welcome</code> com a Identidade Oficial:</strong> Refatorar <code>LoginScreen.tsx</code> / <code>WelcomeScreen.tsx</code> para respeitar o tema Dark-First Neon, remover o <code>setThemeMode('light')</code> forçado, eliminar os cards falsos (Vibra/Ambev/Gerdau) e corrigir os nomes dos Pilares 07 e 08.</li>
+        <li><strong>Fase 6 — Alinhamento de Componentes Base (<code>src/components/ui/</code>):</strong> Adicionar variante CTA pill (<code>9999px</code> + <code>--grad-cta</code> + <code>Sora</code>) em <code>Button.tsx</code>, ajustar modal radius para <code>20px</code> em <code>Dialog.tsx</code> e aplicar <code>font-mono</code> nos deltas de <code>KpiCard.tsx</code>.</li>
+        <li><strong>Fase 7 — Alinhamento de Sidebar, Topbar e Navegação:</strong> Padronizar seções de <code>sidebarSections.ts</code> em português, corrigir radius dos itens para <code>12px</code>, remover duplicações (<code>Decisores</code>/<code>Contatos</code>, <code>Gamificação</code>/<code>Roleplay</code>) e organizar o acesso às rotas de Orquestração de Vendas (Playbooks, Jornadas, Processos, Roteiros).</li>
+        <li><strong>Fase 8 — Alinhamento de Nomenclatura e Taxonomia:</strong> Padronizar a grafia <code>Birth Hub 360º</code> em toda a interface e substituir os estágios legados hardcoded de <code>CrmBoard.tsx</code> por estágios B2B canônicos (<code>Descoberta</code>, <code>Qualificação</code>, <code>Diagnóstico</code>, <code>Proposta Comercial</code>, <code>Negociação</code>, <code>Fechado Ganho</code>).</li>
+        <li><strong>Fase 9 — Alinhamento do Command Center (<code>/app/dashboard</code>):</strong> Enxugar a rolagem vertical de <code>SinglePageDashboard.tsx</code> separando claramente a operação em tempo real (<code>Operar</code>) do tour arquitetural (<code>Explorar</code>).</li>
+        <li><strong>Fase 10 — Alinhamento dos Módulos de Receita, Inteligência e CRM:</strong> Consolidar os pontos de entrada de Inteligência de Mercado (<code>Ldr.tsx</code> vs <code>InteligenciaMercadoHub.tsx</code>) e de IA (<code>IntelligenceHub</code> vs <code>CopilotoIaHub</code>).</li>
+        <li><strong>Fase 11 — Resolução de Placeholders e Módulos Bloqueados:</strong> Conectar ou ocultar formalmente as 8 rotas <code>settings_*</code> de <code>PillarSettingsPlaceholder.tsx</code> e concluir o isolamento multi-tenant das rotas de Voz/Discador.</li>
+        <li><strong>Fase 12 — QA Visual, Acessibilidade WCAG AA e Testes E2E:</strong> Executar validação visual automatizada em Desktop (<code>1440px</code>) e Mobile (<code>390px</code>), modos Dark e Light, garantindo zero regressões em <code>npx tsc --noEmit</code>, <code>npm run lint</code> e <code>npm run build</code>.</li>
+      </ol>
+    </section>
+
+    <footer>
+      BIRTH HUB 360º • RELATÓRIO OFICIAL DE AUDITORIA COMPLETA DA PLATAFORMA • GERADO EM MODO READ-ONLY
+    </footer>
+
+  </main>
+</body>
+</html>
