@@ -9,7 +9,7 @@ import { cn } from '../../lib/utils.js';
 import { Magnetic } from './Magnetic.js';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:bg-surface-subtle disabled:text-ink-2 disabled:border-transparent',
+  'bh-official-control inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control text-sm font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:bg-surface-subtle disabled:text-ink-2 disabled:border-transparent',
   {
     variants: {
       variant: {
@@ -20,10 +20,10 @@ const buttonVariants = cva(
         tertiary:
           'bg-surface border-transparent text-ink hover:bg-surface-interactive hover:text-ink hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
         success:
-          'bg-ok-solid text-[#F8F9FF] font-bold shadow-sm hover:brightness-110 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
+          'bg-ok-solid text-[color:var(--palette-neon-white)] font-bold shadow-sm hover:brightness-110 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
         destructive:
           // A03-P1-07: bg-btn-danger (globals.css) garante >= 4.5:1 com texto branco; #EF4444 cru dava 3.76:1.
-          'bg-btn-danger text-[#F8F9FF] font-bold shadow-sm hover:bg-btn-danger-hover hover:-translate-y-0.5 active:bg-btn-danger-hover',
+          'bg-btn-danger text-[color:var(--palette-neon-white)] font-bold shadow-sm hover:bg-btn-danger-hover hover:-translate-y-0.5 active:bg-btn-danger-hover',
         outline:
           'border border-input bg-transparent text-ink hover:border-line-strong hover:bg-surface-interactive active:bg-surface-subtle',
         secondary:

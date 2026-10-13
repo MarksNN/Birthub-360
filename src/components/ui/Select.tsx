@@ -3,7 +3,7 @@ import * as React from 'react';
 import { cn } from '../../lib/utils.js';
 
 const selectVariants = cva(
-  'flex w-full rounded-xl border bg-surface text-sm text-ink transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-60 disabled:hover:border-line disabled:hover:scale-100 disabled:focus-visible:scale-100',
+  'bh-official-control flex w-full rounded-control border bg-surface text-sm text-ink transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-60 disabled:hover:border-line disabled:hover:scale-100 disabled:focus-visible:scale-100',
   {
     variants: {
       variant: {

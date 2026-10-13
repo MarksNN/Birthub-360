@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { useState, type PointerEvent, type MouseEvent } from 'react';
+import { type MouseEvent, type PointerEvent, useState } from 'react';
 import { useTilt } from '../../../lib/motion.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { cn } from '../../../lib/utils.js';
@@ -58,10 +58,9 @@ export function BentoCard({
       'bg-surface-elevated/85 backdrop-blur-xl border border-line/80 shadow-card hover:border-brand/35',
     glass: 'bh-glass hover:border-brand/40 shadow-card',
     accent: 'bg-surface-elevated/90 border border-brand/40 shadow-glow-brand',
-    cosmic:
-      'bg-surface-elevated/90 border border-brand/50 shadow-[0_10px_35px_rgba(212,175,55,0.2)]',
+    cosmic: 'bg-surface-elevated/90 border border-brand/50 shadow-card',
     specular:
-      'bg-surface/75 backdrop-blur-2xl border border-line/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_10px_30px_rgba(0,0,0,0.25)] hover:border-brand/35',
+      'bg-surface/75 backdrop-blur-2xl border border-line/60 shadow-card hover:border-brand/35',
   }[variant];
 
   const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -98,13 +97,13 @@ export function BentoCard({
       aria-hidden="true"
       className="pointer-events-none absolute -inset-px rounded-[inherit] transition-opacity duration-300"
       style={{
-        background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0, 229, 255, 0.12), transparent 70%)`,
+        background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, color-mix(in srgb, var(--color-brand-primary) 12%, transparent), transparent 70%)`,
       }}
     />
   );
 
   const sharedClasses = cn(
-    'group relative rounded-2xl p-6 transition-all duration-300 overflow-hidden flex flex-col justify-between hover:shadow-card-hover',
+    'bh-platform-card group relative rounded-card p-6 transition-all duration-300 overflow-hidden flex flex-col justify-between hover:shadow-card-hover',
     colSpanClasses,
     rowSpanClasses,
     variantClasses,
@@ -120,6 +119,7 @@ export function BentoCard({
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
         style={{ ...tiltStyle, ...style }}
+        data-accent={variant === 'accent' ? 'pink' : variant === 'cosmic' ? 'iris' : undefined}
         className={sharedClasses}
         {...(props as React.ComponentProps<typeof motion.div>)}
       >
@@ -147,6 +147,7 @@ export function BentoCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
+      data-accent={variant === 'accent' ? 'pink' : variant === 'cosmic' ? 'iris' : undefined}
       className={sharedClasses}
       style={style}
       {...props}

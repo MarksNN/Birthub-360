@@ -3,7 +3,7 @@ import * as React from 'react';
 import { cn } from '../../lib/utils.js';
 
 const textareaVariants = cva(
-  'flex min-h-[80px] w-full rounded-xl border text-sm text-ink placeholder:text-ink-2 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-60 disabled:hover:border-input',
+  'bh-official-control flex min-h-[80px] w-full rounded-control border text-sm text-ink placeholder:text-ink-2 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-60 disabled:hover:border-input',
   {
     variants: {
       variant: {

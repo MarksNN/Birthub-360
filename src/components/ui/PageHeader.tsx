@@ -15,13 +15,6 @@ interface PageHeaderProps {
 /** Cabeçalho padrão de tela — delega ao PageTitleCard (título colorido dentro de card). */
 export function PageHeader({ title, subtitle, icon, badge, actions }: PageHeaderProps) {
   return (
-    <PageTitleCard
-      title={title}
-      subtitle={subtitle}
-      icon={icon}
-      badge={badge}
-      actions={actions}
-      accent="brand"
-    />
+    <PageTitleCard title={title} subtitle={subtitle} icon={icon} badge={badge} actions={actions} />
   );
 }

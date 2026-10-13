@@ -23,18 +23,18 @@ const ACCENTS: Record<
     card: 'border-brand/25 bg-brand/[0.04]',
   },
   pink: {
-    bar: 'bg-[#FF2D9B]',
-    chip: 'bg-[#FF2D9B]/10 border-[#FF2D9B]/25 text-[#E6007A] dark:text-[#FF2D9B]',
-    title: 'text-[#E6007A] dark:text-[#FF2D9B]',
-    eyebrow: 'text-[#E6007A] dark:text-[#FF2D9B]',
-    card: 'border-[#FF2D9B]/25 bg-[#FF2D9B]/[0.04]',
+    bar: 'bg-[color:var(--color-heading-pink)]',
+    chip: 'bg-[color:var(--color-heading-pink)]/10 border-[color:var(--color-heading-pink)]/25 text-[color:var(--color-heading-pink)] dark:text-[color:var(--color-heading-pink)]',
+    title: 'text-[color:var(--color-heading-pink)] dark:text-[color:var(--color-heading-pink)]',
+    eyebrow: 'text-[color:var(--color-heading-pink)] dark:text-[color:var(--color-heading-pink)]',
+    card: 'border-[color:var(--color-heading-pink)]/25 bg-[color:var(--color-heading-pink)]/[0.04]',
   },
   gold: {
-    bar: 'bg-[#FFC107]',
-    chip: 'bg-[#FFC107]/10 border-[#FFC107]/30 text-[#D97706] dark:text-[#FFC107]',
-    title: 'text-[#D97706] dark:text-[#FFC107]',
-    eyebrow: 'text-[#D97706] dark:text-[#FFC107]',
-    card: 'border-[#FFC107]/25 bg-[#FFC107]/[0.04]',
+    bar: 'bg-[color:var(--color-heading-gold)]',
+    chip: 'bg-[color:var(--color-heading-gold)]/10 border-[color:var(--color-heading-gold)]/30 text-[color:var(--color-heading-gold)] dark:text-[color:var(--color-heading-gold)]',
+    title: 'text-[color:var(--color-heading-gold)] dark:text-[color:var(--color-heading-gold)]',
+    eyebrow: 'text-[color:var(--color-heading-gold)] dark:text-[color:var(--color-heading-gold)]',
+    card: 'border-[color:var(--color-heading-gold)]/25 bg-[color:var(--color-heading-gold)]/[0.04]',
   },
   iris: {
     bar: 'bg-iris',
@@ -92,22 +92,22 @@ export function PageTitleCard({
   icon,
   badge,
   actions,
-  accent = 'brand',
+  accent,
   as: Heading = 'h1',
   className,
 }: PageTitleCardProps) {
-  const a = ACCENTS[accent];
+  const a = ACCENTS[accent ?? 'brand'];
   const iconNode = icon;
 
   return (
     <header
+      data-accent={accent === 'brand' ? 'cyan' : accent === 'warning' ? 'gold' : accent}
       className={cn(
-        'relative flex flex-col gap-4 overflow-hidden rounded-card border bg-surface p-5 shadow-card sm:flex-row sm:items-center sm:justify-between',
+        'bh-platform-card relative flex flex-col gap-4 overflow-hidden rounded-card border bg-surface p-5 shadow-card sm:flex-row sm:items-center sm:justify-between',
         a.card,
         className,
       )}
     >
-      <span aria-hidden="true" className={cn('absolute inset-x-0 top-0 h-[2px]', a.bar)} />
       <div className="flex min-w-0 items-center gap-4">
         {iconNode && (
           <span

@@ -32,51 +32,51 @@ interface VisualStateMeta {
 const STATE_META: Record<VisualStateType, VisualStateMeta> = {
   LIVE: {
     label: 'Live',
-    color: 'text-[#22c55e]',
-    bgColor: 'bg-[#22c55e]/10',
-    borderColor: 'border-[#22c55e]/30',
+    color: 'text-[color:var(--color-heading-success)]',
+    bgColor: 'bg-[color:var(--color-heading-success)]/10',
+    borderColor: 'border-[color:var(--color-heading-success)]/30',
   },
   SYNCING: {
     label: 'Syncing',
-    color: 'text-[#1677FF]',
-    bgColor: 'bg-[#1677FF]/10',
-    borderColor: 'border-[#1677FF]/30',
+    color: 'text-[color:var(--color-heading-blue)]',
+    bgColor: 'bg-[color:var(--color-heading-blue)]/10',
+    borderColor: 'border-[color:var(--color-heading-blue)]/30',
   },
   PROCESSING: {
     label: 'Processing',
-    color: 'text-[#7C3AED]',
-    bgColor: 'bg-[#7C3AED]/10',
-    borderColor: 'border-[#7C3AED]/30',
+    color: 'text-[color:var(--color-heading-iris)]',
+    bgColor: 'bg-[color:var(--color-heading-iris)]/10',
+    borderColor: 'border-[color:var(--color-heading-iris)]/30',
   },
   RECOMMENDED: {
     label: 'Recommended',
-    color: 'text-[#D4AF37]',
-    bgColor: 'bg-[#D4AF37]/10',
-    borderColor: 'border-[#D4AF37]/30',
+    color: 'text-[color:var(--color-heading-gold)]',
+    bgColor: 'bg-[color:var(--color-heading-gold)]/10',
+    borderColor: 'border-[color:var(--color-heading-gold)]/30',
   },
   ACTION_REQUIRED: {
     label: 'Action Required',
-    color: 'text-[#F59E0B]',
-    bgColor: 'bg-[#F59E0B]/10',
-    borderColor: 'border-[#F59E0B]/40',
+    color: 'text-[color:var(--color-heading-gold)]',
+    bgColor: 'bg-[color:var(--color-heading-gold)]/10',
+    borderColor: 'border-[color:var(--color-heading-gold)]/40',
   },
   BLOCKED: {
     label: 'Blocked',
-    color: 'text-[#EF4444]',
-    bgColor: 'bg-[#EF4444]/10',
-    borderColor: 'border-[#EF4444]/30',
+    color: 'text-[color:var(--color-heading-danger)]',
+    bgColor: 'bg-[color:var(--color-heading-danger)]/10',
+    borderColor: 'border-[color:var(--color-heading-danger)]/30',
   },
   BETA: {
     label: 'Beta',
-    color: 'text-[#8B5CF6]',
-    bgColor: 'bg-[#8B5CF6]/10',
-    borderColor: 'border-[#8B5CF6]/30',
+    color: 'text-[color:var(--color-heading-iris)]',
+    bgColor: 'bg-[color:var(--color-heading-iris)]/10',
+    borderColor: 'border-[color:var(--color-heading-iris)]/30',
   },
   PLANNED: {
     label: 'Planned',
-    color: 'text-[#64748B]',
-    bgColor: 'bg-[#64748B]/10',
-    borderColor: 'border-[#64748B]/30',
+    color: 'text-[color:var(--color-text-muted)]',
+    bgColor: 'bg-[color:var(--color-text-muted)]/10',
+    borderColor: 'border-[color:var(--color-text-muted)]/30',
   },
   NO_DATA: {
     label: 'No Data',
@@ -132,8 +132,8 @@ export function VisualState({ state, label, size = 'md', className }: VisualStat
 function LiveDot({ className }: { className?: string }) {
   return (
     <span className={cn('relative inline-flex', className)}>
-      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22c55e] opacity-60" />
-      <span className="relative inline-flex h-full w-full rounded-full bg-[#22c55e]" />
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[color:var(--color-heading-success)] opacity-60" />
+      <span className="relative inline-flex h-full w-full rounded-full bg-[color:var(--color-heading-success)]" />
     </span>
   );
 }

@@ -1,10 +1,10 @@
-import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 import { cn } from '../../lib/utils.js';
 
 const inputVariants = cva(
-  'flex w-full rounded-xl border border-input bg-surface text-ink placeholder:text-ink-2 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-line-strong focus-visible:outline-none focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-60 disabled:hover:border-input',
+  'bh-official-control flex w-full rounded-control border border-input bg-surface text-ink placeholder:text-ink-2 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-line-strong focus-visible:outline-none focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-60 disabled:hover:border-input',
   {
     variants: {
       inputSize: {
@@ -45,12 +45,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         className={cn(
           inputVariants({ variant, inputSize }),
-          error &&
-            'border-danger focus-visible:ring-danger focus-visible:shadow-[0_0_15px_rgba(239,68,68,0.4)]',
+          error && 'border-danger focus-visible:ring-danger',
           className,
         )}
         ref={ref}
         {...props}
+        aria-invalid={error || props['aria-invalid'] || undefined}
       />
     );
   },
