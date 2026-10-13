@@ -24,11 +24,12 @@
 - `prompts/18-contratos-api-docs.md`
 - `prompts/24-revisao-independente.md` — auditor obrigatório de toda entrega, com parecer rastreável
 - `prompts/01A-dados-rls-retencao.md` — especialista interno do Agente 01, mesmo slot
+- *Especialistas de governança 21 (Privacidade e LGPD), 22 (Verificação de Realidade) e 23 (Custo, Performance e Limites de IA):* regidos diretamente pelas diretrizes de `/AGENTS.md` (§3, §26, §27) em conjunto com os prompts de domínio correlatos (`01A`, `14`, `15`, `07`).
 - `COMO-CHAMAR-OS-AGENTES.md` — prompts prontos para colar, um por agente, para abrir a sessão correspondente em qualquer ferramenta de agente de código
 
 ## Pastas de execução (criadas em runtime, não versionadas com conteúdo sensível)
 - `runs/` — relatórios de onda do Coordenador (`baseline.md`, `onda-2.md`, `onda-2.5.md`, `onda-4.md`, `onda-5.md`, …). Somente o Coordenador escreve aqui. Inclui a matriz de propriedade que `/AGENTS.md` → "Regra de concorrência" exige antes de disparar uma onda com mais de 3 especialistas.
-- `completion/` — mapa da plataforma, inventário, bloqueadores e o plano das Ondas 6–8 de finalização.
+- `PLAN-V4/` (substitui a antiga referência `completion/`) — mapa da plataforma, inventário, bloqueadores e planos estruturados das ondas de finalização.
 - `handoffs/onda-<n>/` — um arquivo por handoff, formato definido em `/AGENTS.md` → "Protocolo de handoff". Qualquer agente cria o próprio arquivo.
 
 ## Como executar
