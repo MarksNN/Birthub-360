@@ -156,6 +156,9 @@ export function validateSequence(sequence: CadenceSequenceDefinition): string[] 
 
   const validOrders = new Set(sequence.touches.map((t) => t.order));
   for (const touch of sequence.touches) {
+    if ((touch.channel === 'email' || touch.channel === 'whatsapp') && !touch.templateRef?.trim()) {
+      errors.push(`Toque ${touch.order}: conteúdo obrigatório para ${touch.channel}.`);
+    }
     if (touch.fallbackTouchOrder == null) continue;
     if (touch.fallbackTouchOrder === touch.order) {
       errors.push(
