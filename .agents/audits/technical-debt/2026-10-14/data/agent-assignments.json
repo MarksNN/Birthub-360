@@ -1,0 +1,496 @@
+{
+  "schemaVersion": 1,
+  "inventoryId": "technical-debt-2026-10-14",
+  "note": "Responsáveis primários e participantes extraídos de agentsRoster do pacote forense. Participar não transfere a propriedade do achado.",
+  "agents": [
+    {
+      "id": "00",
+      "name": "Coordenador e Orquestrador",
+      "slot": "00 (Coordenação)",
+      "prompt": ".agents/prompts/00-coordenador.md",
+      "domain": "Orquestração global, planejamento de ondas, dependências, propriedade, integração, gates e consolidação",
+      "mode": "Acionado na auditoria (Orquestrador e Auditor DT-07/08/11/12/13/14/15/17/22/40)",
+      "checksAssignedCount": 12,
+      "primaryFindingsCount": 3,
+      "primaryFindingIds": [
+        "DEBT-GOV-002",
+        "DEBT-GOV-003",
+        "DEBT-GOV-001"
+      ],
+      "participatingFindingsCount": 17,
+      "participatingFindingIds": [
+        "DEBT-GATE-001",
+        "DEBT-LGPD-001",
+        "DEBT-LGPD-002",
+        "DEBT-OPS-004",
+        "DEBT-OPS-006",
+        "DEBT-OPS-007",
+        "DEBT-QUEUE-001",
+        "DEBT-OPS-001",
+        "DEBT-GOV-004",
+        "DEBT-OPS-002",
+        "DEBT-OPS-003",
+        "DEBT-CAD-001",
+        "DEBT-MOB-001",
+        "DEBT-NOT-001",
+        "DEBT-INT-001",
+        "DEBT-AI-001",
+        "DEBT-FIN-001"
+      ]
+    },
+    {
+      "id": "01",
+      "name": "Plataforma, Segurança e Dados",
+      "slot": "Slot Exclusivo 01/01A",
+      "prompt": ".agents/prompts/01-plataforma-dados.md",
+      "domain": "Arquitetura backend, autenticação, Prisma ORM, criptografia de campos, multi-tenancy e contratos base",
+      "mode": "Acionado na auditoria (Auditor DT-01/02/04/05/06/24/28/29/30/38)",
+      "checksAssignedCount": 57,
+      "primaryFindingsCount": 6,
+      "primaryFindingIds": [
+        "DEBT-DB-001",
+        "DEBT-DB-002",
+        "DEBT-LGPD-001",
+        "DEBT-ONB-001",
+        "DEBT-PERF-001",
+        "DEBT-CODE-001"
+      ],
+      "participatingFindingsCount": 5,
+      "participatingFindingIds": [
+        "DEBT-LGPD-002",
+        "DEBT-SEC-001",
+        "DEBT-API-001",
+        "DEBT-NOT-001",
+        "DEBT-BILL-003"
+      ]
+    },
+    {
+      "id": "01A",
+      "name": "Confiabilidade de Dados, RLS e Retenção",
+      "slot": "Slot Exclusivo 01/01A",
+      "prompt": ".agents/prompts/01A-dados-rls-retencao.md",
+      "domain": "Políticas PostgreSQL RLS, isolamento de dados por tenant, retenção temporal, migrations e expurgo LGPD",
+      "mode": "Consultado / Destinatário de handoffs (mesmo slot do 01)",
+      "checksAssignedCount": 3,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-LGPD-002"
+      ],
+      "participatingFindingsCount": 2,
+      "participatingFindingIds": [
+        "DEBT-DB-001",
+        "DEBT-DB-002"
+      ]
+    },
+    {
+      "id": "02",
+      "name": "Produto e UX",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/02-produto-ux.md",
+      "domain": "Jornadas de usuário, App shell, roteamento React, navegação, estados de tela e honestidade funcional",
+      "mode": "Acionado na auditoria (Auditor DT-03/18/23/31/32/33/34/36/37/39)",
+      "checksAssignedCount": 8,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-NOT-001"
+      ],
+      "participatingFindingsCount": 8,
+      "participatingFindingIds": [
+        "DEBT-UX-001",
+        "DEBT-UX-003",
+        "DEBT-UX-002",
+        "DEBT-UX-004",
+        "DEBT-UX-005",
+        "DEBT-UX-006",
+        "DEBT-UX-008",
+        "DEBT-UX-007"
+      ]
+    },
+    {
+      "id": "03",
+      "name": "Design System e Acessibilidade",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/03-design-a11y.md",
+      "domain": "Tokens visuais, componentes UI (Card, Button, Dialog, Tooltip), CSS, contraste WCAG 2.2 AA e foco por teclado",
+      "mode": "Consultado / Destinatário de handoffs",
+      "checksAssignedCount": 5,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "04",
+      "name": "CRM, BI e Analytics",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/04-crm-bi.md",
+      "domain": "Funil Kanban, empresas, contatos, agregações analíticas, calendário comercial Brasília e integridade de KPIs",
+      "mode": "Destinatário de handoffs (3 achados sob sua propriedade)",
+      "checksAssignedCount": 12,
+      "primaryFindingsCount": 3,
+      "primaryFindingIds": [
+        "DEBT-UX-003",
+        "DEBT-UX-002",
+        "DEBT-UX-004"
+      ],
+      "participatingFindingsCount": 1,
+      "participatingFindingIds": [
+        "DEBT-AI-002"
+      ]
+    },
+    {
+      "id": "05",
+      "name": "Prospecção Comercial",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/05-prospeccao.md",
+      "domain": "Descoberta de leads, enriquecimento Apollo/Google Places/CNPJ, cold-email e ferramentas de prospecção",
+      "mode": "Consultado / Correlato em supressão cold-email (FND-01)",
+      "checksAssignedCount": 2,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "06",
+      "name": "Integrações e Bitrix24",
+      "slot": "Slot Exclusivo 06/06A",
+      "prompt": ".agents/prompts/06-integracoes-bitrix.md",
+      "domain": "Cliente HTTP Bitrix24, webhooks, OAuth, sincronização CRM externo, WhatsApp, 3CX, Omie e Google",
+      "mode": "Acionado na auditoria (Auditor DT-09/10/16/19/20/21/25/26/27/35)",
+      "checksAssignedCount": 7,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-INT-001"
+      ],
+      "participatingFindingsCount": 6,
+      "participatingFindingIds": [
+        "DEBT-OPS-006",
+        "DEBT-OPS-007",
+        "DEBT-QUEUE-001",
+        "DEBT-NOT-001",
+        "DEBT-AI-001",
+        "DEBT-FIN-001"
+      ]
+    },
+    {
+      "id": "06A",
+      "name": "Extrações e Reconciliação Bitrix",
+      "slot": "Slot Exclusivo 06/06A",
+      "prompt": ".agents/prompts/06A-extracoes-bitrix.md",
+      "domain": "Jobs de extração paginada Bitrix24, armazenamento local de extrações e worker de expurgo",
+      "mode": "Consultado / Mesmo slot do 06",
+      "checksAssignedCount": 0,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "07",
+      "name": "IA, LLMs, Agentes e Automações",
+      "slot": "Slot Especialista (Exclusivo em filas c/ 16)",
+      "prompt": ".agents/prompts/07-ia-automacoes.md",
+      "domain": "Gateway LLM (Groq/LiteLLM/OpenAI), Copiloto Executivo, RAG/Knowledge, memória de agentes e guardrails",
+      "mode": "Destinatário de handoffs (6 achados sob sua propriedade)",
+      "checksAssignedCount": 13,
+      "primaryFindingsCount": 5,
+      "primaryFindingIds": [
+        "DEBT-AI-002",
+        "DEBT-AI-003",
+        "DEBT-AI-004",
+        "DEBT-UX-008",
+        "DEBT-UX-007"
+      ],
+      "participatingFindingsCount": 3,
+      "participatingFindingIds": [
+        "DEBT-LGPD-002",
+        "DEBT-QUEUE-001",
+        "DEBT-FIN-001"
+      ]
+    },
+    {
+      "id": "08",
+      "name": "QA, Testes, Performance e Release",
+      "slot": "Slot Exclusivo 08/08A",
+      "prompt": ".agents/prompts/08-qa-release.md",
+      "domain": "Gates de qualidade, suítes Vitest/Playwright, Dockerfile, workflows CI e controle de qualidade da auditoria",
+      "mode": "Acionado na auditoria (Verificador de Qualidade Fase 10 + 4 achados)",
+      "checksAssignedCount": 15,
+      "primaryFindingsCount": 4,
+      "primaryFindingIds": [
+        "DEBT-GATE-001",
+        "DEBT-OPS-002",
+        "DEBT-OPS-003",
+        "DEBT-DOC-001"
+      ],
+      "participatingFindingsCount": 5,
+      "participatingFindingIds": [
+        "DEBT-DB-001",
+        "DEBT-API-001",
+        "DEBT-GOV-004",
+        "DEBT-MOB-001",
+        "DEBT-GOV-003"
+      ]
+    },
+    {
+      "id": "08A",
+      "name": "Operações Git, CI/CD e Deploy AWS",
+      "slot": "Slot Exclusivo 08/08A",
+      "prompt": ".agents/prompts/08A-git-deploy-aws.md",
+      "domain": "Higiene de branches, PRs, merges seguros, promoção por SHA e pipelines de publicação/deploy",
+      "mode": "Consultado / Destinatário de handoff de higiene de PR/branch",
+      "checksAssignedCount": 5,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-GOV-004"
+      ],
+      "participatingFindingsCount": 1,
+      "participatingFindingIds": [
+        "DEBT-API-001"
+      ]
+    },
+    {
+      "id": "09",
+      "name": "Mobile e PWA (Capacitor/Android/iOS)",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/09-mobile.md",
+      "domain": "Configuração Capacitor, WebView Android/iOS, deep links nativos, manifest PWA e Service Worker",
+      "mode": "Destinatário de handoffs (4 achados sob sua propriedade)",
+      "checksAssignedCount": 8,
+      "primaryFindingsCount": 4,
+      "primaryFindingIds": [
+        "DEBT-UX-001",
+        "DEBT-MOB-001",
+        "DEBT-UX-005",
+        "DEBT-UX-006"
+      ],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "10",
+      "name": "Infraestrutura, Observabilidade e SRE",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/10-infraestrutura-sre.md",
+      "domain": "Docker Compose, Kubernetes/Helm, Prometheus/Alertmanager, healthchecks e drill de backup/restore",
+      "mode": "Destinatário de handoffs (2 achados principais + co-responsável OPS)",
+      "checksAssignedCount": 19,
+      "primaryFindingsCount": 2,
+      "primaryFindingIds": [
+        "DEBT-OPS-004",
+        "DEBT-FIN-001"
+      ],
+      "participatingFindingsCount": 3,
+      "participatingFindingIds": [
+        "DEBT-MOB-001",
+        "DEBT-DOC-001",
+        "DEBT-GOV-003"
+      ]
+    },
+    {
+      "id": "11",
+      "name": "Marca e Ativos Institucionais",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/11-marca-institucional.md",
+      "domain": "Identidade visual oficial Birth Hub 360°, SVGs mestres, ícones de manifest e documentação institucional",
+      "mode": "Destinatário de handoff de dependência (ícones PWA)",
+      "checksAssignedCount": 5,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "12",
+      "name": "Voz e Telefonia (Birthub Voices)",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/12-voz-telefonia.md",
+      "domain": "Discador, chamadas de voz IA, webhooks de telefonia e módulos legados de voice-hub",
+      "mode": "Destinatário de handoff (1 achado em módulo legado desativado)",
+      "checksAssignedCount": 2,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-BILL-003"
+      ],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "13",
+      "name": "Enxame Autônomo e Governança de Agentes Runtime",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/13-enxame-governanca-agentes.md",
+      "domain": "Orquestração de agentes de negócio (SDR/BDR/Closer), traces de missão e ações pendentes (AIPendingAction)",
+      "mode": "Co-responsável em handoffs de trace e NBA (PROD-02, PROD-03)",
+      "checksAssignedCount": 1,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 2,
+      "participatingFindingIds": [
+        "DEBT-AI-003",
+        "DEBT-AI-004"
+      ]
+    },
+    {
+      "id": "14",
+      "name": "Ambiente de Execução e Test Harness",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/14-ambiente-execucao-harness.md",
+      "domain": "Provisionamento reprodutível de testes, descoberta Vitest, configuração de containers de teste e ambiente local",
+      "mode": "Destinatário de handoffs (descoberta de 62 testes e baseline isolado)",
+      "checksAssignedCount": 4,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-OPS-001"
+      ],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "15",
+      "name": "Segurança Aplicada e Rotação de Segredos",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/15-seguranca-aplicada.md",
+      "domain": "Sanitização de logs, proteção de credenciais/tokens, Gitleaks/Trivy, cabeçalhos HTTP e prevenção de vazamentos",
+      "mode": "Responsável/co-responsável por segurança de autenticação em logs (DEBT-SEC-001)",
+      "checksAssignedCount": 7,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-SEC-001"
+      ],
+      "participatingFindingsCount": 1,
+      "participatingFindingIds": [
+        "DEBT-GOV-003"
+      ]
+    },
+    {
+      "id": "16",
+      "name": "Runtime, Workers e Escala",
+      "slot": "Slot Especialista (Exclusivo em filas c/ 06/07)",
+      "prompt": ".agents/prompts/16-runtime-workers-escala.md",
+      "domain": "Workers BullMQ, conexão Redis, detecção de processo web/worker, process-guards e graceful shutdown HTTP/SSE",
+      "mode": "Destinatário de handoffs (3 achados P1 de runtime/workers)",
+      "checksAssignedCount": 7,
+      "primaryFindingsCount": 3,
+      "primaryFindingIds": [
+        "DEBT-OPS-006",
+        "DEBT-OPS-007",
+        "DEBT-QUEUE-001"
+      ],
+      "participatingFindingsCount": 0,
+      "participatingFindingIds": []
+    },
+    {
+      "id": "17",
+      "name": "Cadência Multicanal e Ciclo de Receita",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/17-cadencia-ciclo-receita.md",
+      "domain": "Motor de cadência comercial, dispatchers de e-mail/WhatsApp/voz e repositórios do discador",
+      "mode": "Destinatário de handoffs (validação de cadência e repositórios SQL do dialer)",
+      "checksAssignedCount": 1,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-CAD-001"
+      ],
+      "participatingFindingsCount": 3,
+      "participatingFindingIds": [
+        "DEBT-DB-002",
+        "DEBT-LGPD-001",
+        "DEBT-AI-003"
+      ]
+    },
+    {
+      "id": "18",
+      "name": "Contratos, API e Documentação Viva",
+      "slot": "Slot Especialista",
+      "prompt": ".agents/prompts/18-contratos-api-docs.md",
+      "domain": "Especificação OpenAPI (docs/openapi.yaml), paridade de contratos backend/frontend e documentação técnica",
+      "mode": "Destinatário de handoffs (regressão OpenAPI /organization-modules e contratos de busca/NBA)",
+      "checksAssignedCount": 5,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-API-001"
+      ],
+      "participatingFindingsCount": 6,
+      "participatingFindingIds": [
+        "DEBT-DB-001",
+        "DEBT-AI-002",
+        "DEBT-AI-003",
+        "DEBT-AI-004",
+        "DEBT-NOT-001",
+        "DEBT-DOC-001"
+      ]
+    },
+    {
+      "id": "21",
+      "name": "Privacidade e LGPD",
+      "slot": "Especialista de Governança",
+      "prompt": "AGENTS.md §3 / §27",
+      "domain": "Direitos do titular, anonimização (eraseDataSubject), registro de opt-out, consentimento e inventário PII",
+      "mode": "Co-responsável em handoffs de exclusão LGPD e memória de agentes (FND-01, FND-03)",
+      "checksAssignedCount": 2,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 4,
+      "participatingFindingIds": [
+        "DEBT-LGPD-001",
+        "DEBT-LGPD-002",
+        "DEBT-AI-004",
+        "DEBT-GOV-003"
+      ]
+    },
+    {
+      "id": "22",
+      "name": "Verificação de Realidade",
+      "slot": "Especialista de Governança",
+      "prompt": "AGENTS.md §3",
+      "domain": "Comprovação ponta a ponta de persistência real de ações de UI, isolamento entre sessões/tenants e ausência de mocks",
+      "mode": "Verificador exigido nos critérios de aceite de UI/persistência/tenancy",
+      "checksAssignedCount": 1,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 4,
+      "participatingFindingIds": [
+        "DEBT-DB-002",
+        "DEBT-AI-002",
+        "DEBT-AI-003",
+        "DEBT-AI-004"
+      ]
+    },
+    {
+      "id": "23",
+      "name": "Custo, Performance e Limites de IA",
+      "slot": "Especialista de Governança",
+      "prompt": "AGENTS.md §3",
+      "domain": "Orçamento de tokens por tier, quotas de streaming, métricas FinOps e prevenção de consultas O(n)/N+1",
+      "mode": "Responsável/co-responsável por quotas de IA e performance de consumo (DEBT-AI-001, DEBT-PERF-001)",
+      "checksAssignedCount": 10,
+      "primaryFindingsCount": 1,
+      "primaryFindingIds": [
+        "DEBT-AI-001"
+      ],
+      "participatingFindingsCount": 1,
+      "participatingFindingIds": [
+        "DEBT-FIN-001"
+      ]
+    },
+    {
+      "id": "24",
+      "name": "Revisão Independente",
+      "slot": "Auditor Independente Obrigatório",
+      "prompt": ".agents/prompts/24-revisao-independente.md",
+      "domain": "Auditoria independente somente-leitura de todas as entregas, evidências, hashes SHA-256, escopo e P1-P4",
+      "mode": "Acionado na auditoria (Revisão Independente Fase 10)",
+      "checksAssignedCount": 5,
+      "primaryFindingsCount": 0,
+      "primaryFindingIds": [],
+      "participatingFindingsCount": 3,
+      "participatingFindingIds": [
+        "DEBT-GATE-001",
+        "DEBT-GOV-004",
+        "DEBT-GOV-003"
+      ]
+    }
+  ]
+}

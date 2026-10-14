@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "inventoryId": "technical-debt-2026-10-14",
+  "title": "Auditoria Forense de Dívidas Técnicas — Birthub 360°",
+  "date": "2026-10-14",
+  "importedAt": "2026-10-14T13:02:12-03:00",
+  "importCommit": null,
+  "importCommitNote": "Preenchido no commit seguinte ao commit que introduziu este inventário, para citar um SHA que já existe.",
+  "auditedCommit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+  "baselineSnapshotCommit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+  "repository": "https://github.com/MaarkssN/Birthub-360",
+  "origin": {
+    "package": "C:/Github/Pacote de auditoria de 14-10-2026/birthub360-pacote-auditoria-forense.zip",
+    "extractedTo": "C:/Users/Marks/AppData/Local/Temp/birthub-forensic-20261014",
+    "desktopZipNotUsedAsCanonical": "C:/Users/Marks/Desktop/BirthHub360-Auditoria-Forense-Dividas-2026-10-14.zip contém a auditoria incremental de 24 achados e 200 verificações, já versionada em docs/audits/debt-2026-10-14/. Não substitui este inventário de 40/216.",
+    "rejectedSource": "PR #741 (branch tech-debt-audit-1898280509423632042) e os 176 achados de varredura textual. Não importados."
+  },
+  "inventoryVersion": "2026-10-14.1",
+  "counts": {
+    "categories": 40,
+    "checks": 216,
+    "findings": 40,
+    "waves": 10,
+    "priorities": {
+      "P0": 0,
+      "P1": 17,
+      "P2": 20,
+      "P3": 3
+    },
+    "results": {
+      "Conforme": 125,
+      "Não conforme": 41,
+      "Parcialmente conforme": 4,
+      "Não verificado": 46
+    }
+  },
+  "sourceFiles": [
+    {
+      "file": "source/birthub360-auditoria-dividas-executivo.md",
+      "originalName": "birthub360-auditoria-dividas-executivo.md",
+      "bytes": 13233,
+      "sha256": "7b9e28832eb52df7c0e3aa6a242f770656766a00921ea9b7d74871a9f1ca6197",
+      "sha256Lf": "7b9e28832eb52df7c0e3aa6a242f770656766a00921ea9b7d74871a9f1ca6197"
+    },
+    {
+      "file": "source/birthub360-auditoria-dividas-tecnicas.md",
+      "originalName": "birthub360-auditoria-dividas-tecnicas.md",
+      "bytes": 211086,
+      "sha256": "9c689b632743a2bb7ed2db4c43fe74e1011b1e77a28ed6bce3ccb46350f75b14",
+      "sha256Lf": "9c689b632743a2bb7ed2db4c43fe74e1011b1e77a28ed6bce3ccb46350f75b14"
+    },
+    {
+      "file": "source/birthub360-auditoria-dividas.json",
+      "originalName": "birthub360-auditoria-dividas.json",
+      "bytes": 470040,
+      "sha256": "591b640c1d33e07fdc263bd5eee51a6ca26cc90e0613953457a93c75b3d9acde",
+      "sha256Lf": "591b640c1d33e07fdc263bd5eee51a6ca26cc90e0613953457a93c75b3d9acde"
+    },
+    {
+      "file": "source/birthub360-checklist-dividas-tecnicas.html",
+      "originalName": "birthub360-checklist-dividas-tecnicas.html",
+      "bytes": 444438,
+      "sha256": "e9c32af56cae1c22ed5d2cb263c80812dd1161ad5ee92dfe440f4bd2a0f15099",
+      "sha256Lf": "e9c32af56cae1c22ed5d2cb263c80812dd1161ad5ee92dfe440f4bd2a0f15099"
+    },
+    {
+      "file": "source/birthub360-matriz-agentes-dividas.md",
+      "originalName": "birthub360-matriz-agentes-dividas.md",
+      "bytes": 13550,
+      "sha256": "65663c89a56bd6fa417601bbd8d2d8dbdada7db896787d4eba708701cc201a75",
+      "sha256Lf": "65663c89a56bd6fa417601bbd8d2d8dbdada7db896787d4eba708701cc201a75"
+    },
+    {
+      "file": "source/birthub360-plano-saneamento-dividas.md",
+      "originalName": "birthub360-plano-saneamento-dividas.md",
+      "bytes": 51406,
+      "sha256": "6a50787f9433d8b2ff22aebf336cef18c1d5efab4622a577c4d8d0bedaa461bf",
+      "sha256Lf": "6a50787f9433d8b2ff22aebf336cef18c1d5efab4622a577c4d8d0bedaa461bf"
+    }
+  ],
+  "files": [
+    "source/birthub360-auditoria-dividas.json",
+    "source/birthub360-auditoria-dividas-executivo.md",
+    "source/birthub360-auditoria-dividas-tecnicas.md",
+    "source/birthub360-checklist-dividas-tecnicas.html",
+    "source/birthub360-matriz-agentes-dividas.md",
+    "source/birthub360-plano-saneamento-dividas.md",
+    "data/findings.json",
+    "data/checks.json",
+    "data/categories.json",
+    "data/waves.json",
+    "data/agent-assignments.json",
+    "reports/executive-summary.md",
+    "reports/forensic-report.md",
+    "reports/remediation-plan.md",
+    "reports/agent-matrix.md",
+    "evidence/evidence-index.json",
+    "progress/remediation-status.json",
+    "progress/change-log.md",
+    "progress/README.md",
+    "dashboard/index.html",
+    "validation/consistency-report.md",
+    "validation/provenance-report.md",
+    "manifest.json",
+    "README.md"
+  ],
+  "limitations": [
+    "Análise executada em modo estritamente não-destrutivo e somente-leitura, respeitando a proibição de alterar código funcional, rodar migrations ou acionar provedores externos pagos.",
+    "No snapshot de auditoria sem node_modules instalado e sem daemon Docker ativo, os gates dinâmicos globais (typecheck, lint, test:unit, test:integration, test:e2e, build) não puderam ser executados integralmente; mecanismos críticos foram comprovados via extração fiel de funções e execução isolada no runtime Node.js v22.",
+    "46 verificações que dependem de infraestrutura ativa, credenciais de produção, restauração física de banco ou tráfego real permanecem classificadas como 'Não verificado' até o provisionamento do ambiente isolado na Onda 00.",
+    "Contratos marcados como 'Conforme' certificam exclusivamente a propriedade estática verificada na linha/arquivo citado, não substituindo o gate de integração/E2E antes do release."
+  ],
+  "patchProposalIds": [
+    "DEBT-GATE-001",
+    "DEBT-DB-001",
+    "DEBT-LGPD-001",
+    "DEBT-QUEUE-001",
+    "DEBT-AI-003",
+    "DEBT-CAD-001",
+    "DEBT-UX-008",
+    "DEBT-DOC-001"
+  ],
+  "blockedIds": [
+    "DEBT-GOV-004"
+  ],
+  "candidatePatchesDeclaredBySummary": 6,
+  "resolvedInThisImport": 0
+}
