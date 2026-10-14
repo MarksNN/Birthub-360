@@ -1,7 +1,0 @@
-
-> react-example@0.0.1 test:unit
-> vitest run -c vitest.unit.config.ts --no-file-parallelism
-
-
-'vitest' não é reconhecido como um comando interno
-ou externo, um programa operável ou um arquivo em lotes.
