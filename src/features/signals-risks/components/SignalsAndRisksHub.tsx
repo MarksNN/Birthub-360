@@ -1,17 +1,13 @@
-import {
-  Radio,
-  RefreshCw,
-  ShieldAlert,
-} from 'lucide-react';
+import { Radio, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PageTitleCard } from '../../../components/ui/PageTitleCard.js';
-import type { HealthScoreResult, ExecutiveAlert } from '../../commercial-intelligence/commercialIntelligence.api.js';
+import type {
+  HealthScoreResult,
+  ExecutiveAlert,
+} from '../../commercial-intelligence/commercialIntelligence.api.js';
 import type { NotificationItem } from '../../notifications/notifications.api.js';
-import {
-  type DataQualityReportData,
-  signalsRisksApi,
-} from '../signalsRisks.api.js';
+import { type DataQualityReportData, signalsRisksApi } from '../signalsRisks.api.js';
 import { DealRisksTab } from './DealRisksTab.js';
 import { SignalsRadarTab } from './SignalsRadarTab.js';
 

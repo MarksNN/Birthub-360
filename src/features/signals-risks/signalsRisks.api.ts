@@ -37,9 +37,10 @@ export interface MarketSignalItem {
 export const signalsRisksApi = {
   getSignalCoverage: async (): Promise<DataQualityReportData | null> => {
     try {
-      const response = await api.get<{ success: boolean; data: { signalCoverage: DataQualityReportData } }>(
-        '/api/market-intelligence/data-quality-report',
-      );
+      const response = await api.get<{
+        success: boolean;
+        data: { signalCoverage: DataQualityReportData };
+      }>('/api/market-intelligence/data-quality-report');
       return response.data?.signalCoverage ?? null;
     } catch {
       return null;
@@ -59,9 +60,7 @@ export const signalsRisksApi = {
 
   getExecutiveAlerts: async (): Promise<ExecutiveAlert[]> => {
     try {
-      const response = await api.get<ExecutiveAlert[]>(
-        '/api/commercial-intelligence/alerts',
-      );
+      const response = await api.get<ExecutiveAlert[]>('/api/commercial-intelligence/alerts');
       return Array.isArray(response) ? response : [];
     } catch {
       return [];
