@@ -404,7 +404,8 @@ export function Landing360({
                       className="font-display font-semibold text-[17px] leading-snug"
                       style={{ color: tag.color }}
                     >
-                      {tag.label}</h2>
+                      {tag.label}
+                    </h2>
                     <p className="mt-3 text-[15px] leading-[1.7]">{OFFICIAL_PILLARS[index].desc}</p>
                   </div>
                 ))}
