@@ -8,3 +8,8 @@
 - Transições para `RESOLVED` ou `VERIFIED`: nenhuma.
 - Commit de correção: nenhum.
 - Testes executados nesta importação: `node scripts/verify-technical-debt-inventory.cjs` após a geração dos arquivos. Gates de produto não foram executados.
+
+## 2026-10-14 — commit de registro
+
+- Commit que introduziu o inventário: `02ffe4587232bbe4abfbe10c5ff1114cc6b06043`.
+- Nenhuma transição de status de achado.

@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const SNAP = path.join(ROOT, '.agents/audits/technical-debt/2026-10-14');
@@ -237,7 +238,12 @@ if (manifest) {
     if (!accepted.has(raw) && !accepted.has(normalized)) fail(`hash divergente em ${entry.file}`);
   }
   if (manifest.importCommit) {
-    NOTES.push(`importCommit registrado: ${manifest.importCommit}`);
+    try {
+      execFileSync('git', ['cat-file', '-t', manifest.importCommit], { cwd: ROOT, stdio: 'pipe' });
+      NOTES.push(`importCommit registrado: ${manifest.importCommit}`);
+    } catch {
+      fail(`importCommit inexistente: ${manifest.importCommit}`);
+    }
   } else {
     NOTES.push('importCommit ainda nulo; esperado até o commit de registro existir');
   }
