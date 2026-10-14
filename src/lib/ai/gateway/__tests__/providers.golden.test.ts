@@ -22,6 +22,7 @@ const originalEnv = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   LITELLM_URL: process.env.LITELLM_URL,
   OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL,
+  VLLM_API_URL: process.env.VLLM_API_URL,
 };
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -31,7 +32,9 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-const PROVIDERS: ProviderAdapter[] = [groqProvider, openaiProvider, litellmProvider];
+import { vllmProvider } from '../providers/vllm.provider.js';
+
+const PROVIDERS: ProviderAdapter[] = [groqProvider, openaiProvider, litellmProvider, vllmProvider];
 
 const BASE_PARAMS = {
   messages: [{ role: 'user' as const, content: 'Analise este lead.' }],
@@ -46,8 +49,9 @@ describe('golden dataset — adapters de provedor de IA', () => {
     process.env.GROQ_API_KEY = 'gsk_golden_test_key';
     process.env.OPENAI_API_KEY = 'sk-golden-test-key';
     process.env.LITELLM_URL = 'http://litellm.golden.test';
-    delete process.env.OLLAMA_BASE_URL;
+    process.env.VLLM_API_URL = 'http://vllm.golden.test';
     await __resetCircuitBreakerForTests();
+    delete process.env.OLLAMA_BASE_URL;
   });
 
   afterEach(() => {
@@ -137,6 +141,7 @@ describe('golden dataset — adapters de provedor de IA', () => {
     delete process.env.GROQ_API_KEY;
     delete process.env.OPENAI_API_KEY;
     delete process.env.LITELLM_URL;
+    delete process.env.VLLM_API_URL;
     delete process.env.OLLAMA_BASE_URL;
 
     for (const provider of PROVIDERS) {

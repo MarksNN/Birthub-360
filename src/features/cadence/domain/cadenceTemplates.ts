@@ -117,7 +117,8 @@ export const DEFAULT_PLAYBOOK_TEMPLATES: CadenceJourneyTemplate[] = [
     name: 'Passagem de Bastão SDR/Closer',
     targetBrand: 'Ambas',
     category: 'Fechamento',
-    persona: 'Leads qualificados e reuniões agendadas que necessitam de confirmação e passagem para o Closer',
+    persona:
+      'Leads qualificados e reuniões agendadas que necessitam de confirmação e passagem para o Closer',
     description:
       'Fluxo de passagem de bastão garantindo presença do decisor (anti no-show), envio de briefing pré-call e alinhamento com o especialista de fechamento.',
     touches: [

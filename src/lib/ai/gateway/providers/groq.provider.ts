@@ -81,8 +81,7 @@ export const groqProvider: ProviderAdapter = {
           msg.includes('not have access') ||
           msg.includes('tokens per day') ||
           msg.includes('TPD') ||
-          msg.includes('Rate limit reached for model') ||
-          msg.includes('resposta vazia')
+          msg.includes('Rate limit reached for model')
         ) {
           if (msg.includes('429') && !msg.includes('TPD') && !msg.includes('tokens per day')) {
             const match = msg.match(/try again in ([0-9.]+)s/i);
