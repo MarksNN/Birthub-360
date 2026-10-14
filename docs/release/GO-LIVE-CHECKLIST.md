@@ -1,14 +1,15 @@
 # Checklist de Go-Live (Birth Hub 360)
 
 ## PRE-DEPLOY
-- [ ] CI final verde no mesmo SHA candidato (`npm run release:check`)
+- [ ] CI canônico (`ci.yml`, check `build`) verde no mesmo SHA candidato; `npm run release:check` verifica gates locais e não consulta o resultado do CI
+- [ ] Parecer APROVADO do Agente 24 para a revisão exata, com varredura de segredos do diff acumulado
 - [ ] Security scan aprovado (ausência de criticals/highs não justificados)
 - [ ] Variaveis de ambiente (`.env`) validadas em produção
 
 ## DEPLOY
-- [ ] `docker compose up -d` executado com sucesso
-- [ ] Aplicação acessível externamente via Proxy
-- [ ] Migrations testadas e aplicadas (`prisma migrate deploy`)
+- [ ] Infraestrutura local iniciada (`docker compose -f docker-compose.yml -f docker-compose.postgres-local.yml up -d`); este comando não inicia a aplicação
+- [ ] Migrations testadas e aplicadas antes de iniciar a aplicação (`prisma migrate deploy`); falha interrompe a publicação
+- [ ] Aplicação e worker iniciados pelo caminho aprovado para o ambiente, com acesso externo via Proxy verificado
 
 ## POST-DEPLOY
 - [ ] `GET /health/live` OK

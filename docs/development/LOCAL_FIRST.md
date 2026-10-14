@@ -36,7 +36,7 @@ O `docker-compose.yml` é a base da infraestrutura local de apoio (Redis, Meilis
 ## Subida local
 
 1. Copie `.env.example` para `.env`.
-2. Configure `DATABASE_URL=postgresql://prospector:prospector_pass@localhost:5434/prospectordb`.
+2. Configure `DATABASE_URL` para `localhost:5434`, banco `prospectordb`, usando o papel `prospector_app` e a senha definida em `APP_DB_PASSWORD`. Esse papel é `NOSUPERUSER` e preserva RLS; o papel `prospector` é reservado ao bootstrap. Configure `DIRECT_URL` com a conexão de migração autorizada, separada do papel usado pela aplicação (o Prisma CLI prioriza essa variável).
 3. Para storage local, configure:
 
 ```env
@@ -65,7 +65,7 @@ ENABLE_SEARCH=true
 6. Suba a infraestrutura:
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.postgres-local.yml up -d
 ```
 
 7. Instale as dependências e aplique as migrations:
