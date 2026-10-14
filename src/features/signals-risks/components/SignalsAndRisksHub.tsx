@@ -2,12 +2,13 @@ import { Radio, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PageTitleCard } from '../../../components/ui/PageTitleCard.js';
-import type {
-  HealthScoreResult,
-  ExecutiveAlert,
-} from '../../commercial-intelligence/commercialIntelligence.api.js';
 import type { NotificationItem } from '../../notifications/notifications.api.js';
-import { type DataQualityReportData, signalsRisksApi } from '../signalsRisks.api.js';
+import {
+  type DataQualityReportData,
+  type SignalRiskExecutiveAlert,
+  type SignalRiskHealthScore,
+  signalsRisksApi,
+} from '../signalsRisks.api.js';
 import { DealRisksTab } from './DealRisksTab.js';
 import { SignalsRadarTab } from './SignalsRadarTab.js';
 
@@ -44,8 +45,8 @@ export function SignalsAndRisksHub({ initialView }: SignalsAndRisksHubProps) {
 
   // Estados de dados compartilhados
   const [coverage, setCoverage] = useState<DataQualityReportData | null>(null);
-  const [healthScore, setHealthScore] = useState<HealthScoreResult | null>(null);
-  const [overviewAlerts, setOverviewAlerts] = useState<ExecutiveAlert[]>([]);
+  const [healthScore, setHealthScore] = useState<SignalRiskHealthScore | null>(null);
+  const [overviewAlerts, setOverviewAlerts] = useState<SignalRiskExecutiveAlert[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
 

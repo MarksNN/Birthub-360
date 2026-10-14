@@ -146,6 +146,8 @@ tags:
     description: >-
       Matriz de Qualificação (SPIN/BANT/MEDDPICC) e Matriz de Objeções, editáveis por
       organização — consumidas pelas telas do Playbook e pelo Chatbook (assistente, roleplay)
+  - name: Roleplay
+    description: Simulações de vendas com personas, sessões, turnos e avaliação
   - name: Orquestração Comercial
     description: >-
       Módulo de Orquestração Comercial — playbooks, roteiros, jornadas comerciais e processos de vendas
@@ -2275,6 +2277,32 @@ paths:
         '400':
           description: brand ausente ou inválido
 
+  /intelligence/telemetry/groq:
+    get:
+      tags: [Intelligence]
+      summary: Consulta a telemetria atual da Groq Cloud para a organização autenticada
+      responses:
+        '200':
+          description: Snapshot da telemetria da Groq
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    description: Snapshot retornado pelo serviço de telemetria da Groq
+                    additionalProperties: true
+        '401': { description: Não autenticado }
+        '500':
+          description: Falha ao obter a telemetria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /intelligence/studio/stream:
     post:
       tags: [Intelligence]
@@ -3796,6 +3824,42 @@ paths:
           $ref: '#/components/responses/NotFound'
 
   # ───────────────────────────── Analytics ─────────────────────────────
+  /analytics:
+    get:
+      tags: [Analytics]
+      summary: Lista as métricas agregadas do CRM
+      description: >-
+        Mantém o formato legado da resposta: `metrics` e `total` no nível superior e novamente
+        dentro de `data`. Retorna HTTP 200 com listas e total vazios quando a consulta falha ou
+        não há métricas.
+      responses:
+        '200':
+          description: Métricas agregadas; em estado vazio, metrics é [] e total é 0
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, metrics, total, data]
+                properties:
+                  success: { type: boolean }
+                  metrics:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  total: { type: integer }
+                  data:
+                    type: object
+                    required: [metrics, total]
+                    properties:
+                      metrics:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      total: { type: integer }
+        '401': { description: Não autenticado }
+
   /analytics/overview:
     get:
       tags: [Analytics]
@@ -4670,6 +4734,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
 
+  /cadence/templates/seed-defaults:
+    post:
+      tags: [Cadence]
+      summary: Carrega os playbooks padrão como sequências da organização
+      description: >-
+        Restrito a ADMIN/GESTOR/CLOSER/SDR. A operação não cria novamente playbooks padrão que já
+        existam como sequências ativas na organização. Não recebe corpo.
+      responses:
+        '201':
+          description: Playbooks padrão carregados (count pode ser zero)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, message, count, data]
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '401': { description: Não autenticado }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /cadence/playbooks/load-defaults:
+    post:
+      tags: [Cadence]
+      summary: Carrega os playbooks padrão como sequências da organização
+      description: >-
+        Restrito a ADMIN/GESTOR/CLOSER/SDR. Usa o mesmo handler idempotente de
+        `/cadence/templates/seed-defaults` e não recebe corpo.
+      responses:
+        '201':
+          description: Playbooks padrão carregados (count pode ser zero)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, message, count, data]
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '401': { description: Não autenticado }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /cadence/sequences:
     get:
       tags: [Cadence]
@@ -5314,6 +5438,91 @@ paths:
         '401': { description: Não autenticado }
         '403': { $ref: '#/components/responses/Forbidden' }
         '500': { $ref: '#/components/responses/InternalError' }
+
+  /integrations/{id}/ping:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador do provider ou de uma conexão persistida
+        schema: { type: string }
+    post:
+      tags: [CRM Externo]
+      summary: Testa um provider ou uma conexão de integração
+      description: Restrito a ADMIN/GESTOR.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationPingRequest'
+      responses:
+        '200':
+          description: Conexão ou provider testado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingResponse'
+        '400':
+          description: Credenciais ou dados de conexão inválidos ou ausentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingErrorResponse'
+        '401':
+          description: Sessão autenticada sem organização disponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingErrorResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Provider ou conexão não encontrado ou não suportado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingErrorResponse'
+
+  /integrations/ping:
+    post:
+      tags: [CRM Externo]
+      summary: Testa um provider de integração informado no corpo
+      description: Restrito a ADMIN/GESTOR; usa o mesmo handler de `/integrations/{id}/ping`.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationPingRequest'
+      responses:
+        '200':
+          description: Provider testado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingResponse'
+        '400':
+          description: Credenciais ou dados de conexão inválidos ou ausentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingErrorResponse'
+        '401':
+          description: Sessão autenticada sem organização disponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingErrorResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Provider não encontrado ou não suportado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationPingErrorResponse'
+
   /integrations/birth-voice/calls:
     get:
       tags: [Birth Voice]
@@ -5536,6 +5745,25 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /crm/deals:
+    get:
+      tags: [CRM 360]
+      summary: Lista os negócios do CRM
+      description: >-
+        A resposta é um array JSON cru, sem envelope `success`/`data`. O handler retorna `[]`
+        com HTTP 200 se a consulta falhar.
+      responses:
+        '200':
+          description: Lista de negócios; vazia quando não há dados ou a consulta falha
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        '401': { description: Não autenticado }
+
   /crm/deals/{leadId}/items:
     parameters:
       - name: leadId
@@ -5756,6 +5984,139 @@ paths:
               schema: { $ref: '#/components/schemas/DataEnvelope' }
         '404':
           description: Token inexistente ou documento excluído
+
+  # ───────────────────────────── Roleplay ─────────────────────────────
+  /roleplay/personas:
+    get:
+      tags: [Roleplay]
+      summary: Lista as personas disponíveis para simulação
+      responses:
+        '200':
+          description: Personas disponíveis
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/RoleplayPersona' }
+        '401': { description: Não autenticado }
+
+  /roleplay/sessions:
+    post:
+      tags: [Roleplay]
+      summary: Inicia uma sessão de simulação com uma persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [personaId]
+              properties:
+                personaId: { type: string }
+      responses:
+        '200':
+          description: Sessão iniciada com saudação inicial
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    required: [session, persona, initialGreeting]
+                    properties:
+                      session: { $ref: '#/components/schemas/RoleplaySession' }
+                      persona: { $ref: '#/components/schemas/RoleplayPersona' }
+                      initialGreeting: { type: string }
+        '400':
+          description: personaId ausente ou inválido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401': { description: Não autenticado }
+
+  /roleplay/sessions/{id}/messages:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [Roleplay]
+      summary: Envia uma mensagem e recebe a resposta da persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: Turno da simulação processado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    required: [response, turnCount]
+                    properties:
+                      response: { type: string }
+                      turnCount: { type: integer }
+        '400':
+          description: message ausente
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401': { description: Não autenticado }
+
+  /roleplay/sessions/{id}/evaluate:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [Roleplay]
+      summary: Avalia uma sessão de simulação concluída
+      responses:
+        '200':
+          description: Avaliação da sessão
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/RoleplayFeedback' }
+        '401': { description: Não autenticado }
+
+  /roleplay/history:
+    get:
+      tags: [Roleplay]
+      summary: Lista as últimas 20 sessões do usuário autenticado
+      responses:
+        '200':
+          description: Histórico de sessões da organização e usuário autenticados
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/RoleplaySession' }
+        '401': { description: Não autenticado }
 
   # ───────────────────────────── Playbook (Matrizes) ─────────────────────────────
   # Fase 4 do roadmap de melhorias: Matriz de Qualificação/Objeções saíram do arquivo estático
@@ -10334,6 +10695,40 @@ components:
             a mesma requisição pode funcionar. `false` para os demais 4xx (validação, autenticação,
             autorização, conflito, não encontrado) — o pedido em si precisa mudar antes de repetir.
 
+    IntegrationPingRequest:
+      type: object
+      description: Campos opcionais aceitos pelo schema do endpoint de teste de integração
+      properties:
+        provider: { type: string }
+        token: { type: string }
+        apiKey: { type: string }
+        accessToken: { type: string }
+        domain: { type: string }
+        boardId: { type: string }
+        webhookUrl: { type: string }
+        config:
+          type: object
+          additionalProperties: true
+
+    IntegrationPingResponse:
+      type: object
+      required: [success, valid, provider, message]
+      properties:
+        success: { type: boolean, enum: [true] }
+        valid: { type: boolean, enum: [true] }
+        id: { type: string }
+        provider: { type: string }
+        portalDomain: { type: string }
+        message: { type: string }
+
+    IntegrationPingErrorResponse:
+      type: object
+      required: [success, error]
+      properties:
+        success: { type: boolean, enum: [false] }
+        valid: { type: boolean, enum: [false] }
+        error: { type: string }
+
     DataEnvelope:
       type: object
       description: Envelope de resposta genérico usado pela maioria dos endpoints
@@ -10985,6 +11380,66 @@ components:
         webhookUrl: { type: string, format: uri }
         action: { type: string, enum: [notify_only, enforce_fallback, throttle] }
 
+    RoleplayPersona:
+      type: object
+      required:
+        [id, name, title, companyType, difficulty, scenario, coreObjections, personalityTraits]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        title: { type: string }
+        companyType: { type: string }
+        difficulty: { type: string, enum: [INICIANTE, INTERMEDIARIO, AVANCADO] }
+        scenario: { type: string }
+        coreObjections: { type: array, items: { type: string } }
+        personalityTraits: { type: array, items: { type: string } }
+
+    RoleplayMessage:
+      type: object
+      required: [id, role, content, timestamp]
+      properties:
+        id: { type: string }
+        role: { type: string, enum: [user, assistant, system] }
+        content: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    RoleplayFeedback:
+      type: object
+      required: [overallScore, spinSellingScores, objectionHandlingScore, strengths, improvementAreas, summary]
+      properties:
+        overallScore: { type: number }
+        spinSellingScores:
+          type: object
+          required: [situation, problem, implication, needPayoff]
+          properties:
+            situation: { type: number }
+            problem: { type: number }
+            implication: { type: number }
+            needPayoff: { type: number }
+        objectionHandlingScore: { type: number }
+        strengths: { type: array, items: { type: string } }
+        improvementAreas: { type: array, items: { type: string } }
+        summary: { type: string }
+
+    RoleplaySession:
+      type: object
+      required: [id, organizationId, userId, personaId, status, messages, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        organizationId: { type: string }
+        userId: { type: string }
+        personaId: { type: string }
+        status: { type: string, enum: [ACTIVE, COMPLETED] }
+        messages:
+          type: array
+          items: { $ref: '#/components/schemas/RoleplayMessage' }
+        feedback:
+          allOf:
+            - $ref: '#/components/schemas/RoleplayFeedback'
+          nullable: true
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
     # ── Módulos da Organização (/setup) ──
     OrganizationModuleView:
       type: object
@@ -11016,4 +11471,3 @@ components:
         modules:
           type: array
           items: { $ref: '#/components/schemas/OrganizationModuleView' }
-
