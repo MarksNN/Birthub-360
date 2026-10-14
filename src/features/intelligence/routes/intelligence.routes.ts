@@ -26,8 +26,7 @@ import {
   summarizeMeetingNotes,
   translateText,
 } from '../../../lib/ai/features.js';
-import { getAiModel, logAiUsage } from '../../../lib/ai/gateway.js';
-import { groqTelemetryService } from '../../../lib/ai/gateway/groqTelemetry.service.js';
+import { getAiModel, getGroqTelemetrySnapshot, logAiUsage } from '../../../lib/ai/gateway.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { leadsQueue } from '../../../lib/queue/index.js';
@@ -79,7 +78,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const organizationId = (req as AuthRequest).user?.organizationId;
-      const snapshot = await groqTelemetryService.getSnapshot(organizationId);
+      const snapshot = await getGroqTelemetrySnapshot(organizationId);
       res.json({ success: true, data: snapshot });
     } catch (error) {
       next(error);

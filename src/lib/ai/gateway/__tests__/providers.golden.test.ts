@@ -121,10 +121,12 @@ describe('golden dataset — adapters de provedor de IA', () => {
       it('rejeita resposta de sucesso com conteúdo vazio — nenhum adapter aceita "sucesso" sem texto', async () => {
         vi.stubGlobal(
           'fetch',
-          vi.fn().mockResolvedValue(
-            jsonResponse({
-              choices: [{ message: { content: '   ' } }],
-            }),
+          vi.fn().mockImplementation(() =>
+            Promise.resolve(
+              jsonResponse({
+                choices: [{ message: { content: '   ' } }],
+              }),
+            ),
           ),
         );
 
