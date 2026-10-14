@@ -62,10 +62,10 @@ MEILI_MASTER_KEY=birthhub_meili_master_key
 ENABLE_SEARCH=true
 ```
 
-6. Suba a infraestrutura:
+6. Suba somente a infraestrutura local (Redis, Meilisearch, MinIO, LiteLLM, Ollama e PostgreSQL). Este comando não aplica migrations e não inicia a aplicação:
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.postgres-local.yml up -d
 ```
 
 7. Instale as dependências e aplique as migrations:

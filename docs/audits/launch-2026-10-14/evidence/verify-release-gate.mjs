@@ -24,7 +24,10 @@ function evaluate(source, failCommand, missingScript) {
   vm.runInNewContext(source.replace(/^import .*;\r?\n/gm, ''), context);
   return { exitCode, calls, logs };
 }
-const original = execFileSync('git', ['show', 'HEAD:scripts/release-gate.js'], { encoding: 'utf8' });
+// Baseline pinado no commit em que o gate ainda era permissivo (main após o
+// inventário, antes da correção). HEAD deixa de reproduzir o defeito depois do fix.
+const baselineRef = process.env.RELEASE_GATE_BASELINE || 'b2fb5a6f';
+const original = execFileSync('git', ['show', baselineRef + ':scripts/release-gate.js'], { encoding: 'utf8' });
 const before = evaluate(original, 'npm run typecheck');
 assert.equal(before.exitCode, 0);
 assert(before.logs.includes('STATUS: GO'));

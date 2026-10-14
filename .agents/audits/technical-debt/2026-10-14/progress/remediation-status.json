@@ -28,22 +28,31 @@
         "00",
         "24"
       ],
-      "remediationStatus": "PATCH_PROPOSED",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "IN_REVIEW",
+      "validationStatus": "TESTED_ISOLATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "BLOCKED",
       "originalCorrectionState": "Patch candidato isolado (não integrado em main)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-14T18:40:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "fix/debt-wave-00-release-gates",
       "pullRequest": null,
       "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
+      "testsExecuted": [
+        "node docs/audits/launch-2026-10-14/evidence/verify-release-gate.mjs"
+      ],
+      "validationResult": "exit 0; baseline GO com typecheck falhando reproduzido em b2fb5a6f; 8 falhas obrigatórias NO-GO; sucesso GO; script ausente NO-GO",
       "closureEvidence": null,
       "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-08-ops-001.md",
-      "notes": "Patch candidato identificado na auditoria e não integrado. Não é correção concluída nem validada."
+      "notes": "2026-10-14 PATCH_PROPOSED historico preservado. Lint e typecheck deixaram de ser opcionais. Gates obrigatorios: lint, typecheck, test:architecture, test:unit, test:integration, test:e2e, build, npm audit. Script ausente nao e executado e reprova. Spawn com status nulo reprova. Nao integrado.",
+      "statusHistory": [
+        {
+          "at": "2026-10-14T13:02:12-03:00",
+          "remediationStatus": "PATCH_PROPOSED",
+          "note": "estado anterior preservado"
+        }
+      ]
     },
     {
       "id": "DEBT-DB-001",
@@ -533,22 +542,29 @@
       "participants": [
         "00"
       ],
-      "remediationStatus": "OPEN",
+      "remediationStatus": "IN_REVIEW",
       "validationStatus": "NOT_VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "BLOCKED",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-14T18:40:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "fix/debt-wave-00-release-gates",
       "pullRequest": null,
       "fixCommit": null,
       "testsExecuted": [],
-      "validationResult": null,
+      "validationResult": "Build Docker NÃO EXECUTADO nesta sessão. O Dockerfile passa a reinstalar prisma na versão já resolvida em node_modules/prisma e falha o build se CLI, client e lock divergirem.",
       "closureEvidence": null,
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-08-debt-20261014-ops-002.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "2026-10-14 OPEN. Causa: npm install prisma@range de devDependencies. Correcao proposta no Dockerfile. Imagem nao foi construida aqui.",
+      "statusHistory": [
+        {
+          "at": "2026-10-14T13:02:12-03:00",
+          "remediationStatus": "OPEN",
+          "note": "estado anterior preservado"
+        }
+      ]
     },
     {
       "id": "DEBT-OPS-003",
@@ -559,22 +575,31 @@
       "participants": [
         "00"
       ],
-      "remediationStatus": "OPEN",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "IN_REVIEW",
+      "validationStatus": "TESTED_ISOLATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "BLOCKED",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-14T18:40:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "fix/debt-wave-00-release-gates",
       "pullRequest": null,
       "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
+      "testsExecuted": [
+        "node scripts/verify-docker-context.mjs"
+      ],
+      "validationResult": "exit 0; fixtures .worktrees .tmp tmp temp *.tmp excluidas; prisma/migrations e fontes preservadas. docker build completo NÃO EXECUTADO.",
       "closureEvidence": null,
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-08-debt-20261014-ops-003.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "2026-10-14 OPEN. .dockerignore agora exclui worktrees e temporarios sem remover a excecao de prisma/migrations.",
+      "statusHistory": [
+        {
+          "at": "2026-10-14T13:02:12-03:00",
+          "remediationStatus": "OPEN",
+          "note": "estado anterior preservado"
+        }
+      ]
     },
     {
       "id": "DEBT-CAD-001",
@@ -969,22 +994,31 @@
         "10",
         "18"
       ],
-      "remediationStatus": "PATCH_PROPOSED",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "IN_REVIEW",
+      "validationStatus": "TESTED_ISOLATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "BLOCKED",
       "originalCorrectionState": "Patch candidato isolado (não integrado em main)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-14T18:40:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "fix/debt-wave-00-release-gates",
       "pullRequest": null,
       "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
+      "testsExecuted": [
+        "node docs/audits/launch-2026-10-14/evidence/verify-release-gate.mjs"
+      ],
+      "validationResult": "O verificador do gate exige o comando composto em LOCAL_FIRST.md e passou. GO-LIVE-CHECKLIST.md recebeu o mesmo comando. Compose sobe so infraestrutura.",
       "closureEvidence": null,
       "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-08-ops-003.md",
-      "notes": "Patch candidato identificado na auditoria e não integrado. Não é correção concluída nem validada."
+      "notes": "Achado da Onda 09 antecipado porque o verificador da Onda 00 exige a string. Nao marcar RESOLVED antes do merge e da revisao 24.",
+      "statusHistory": [
+        {
+          "at": "2026-10-14T13:02:12-03:00",
+          "remediationStatus": "PATCH_PROPOSED",
+          "note": "estado anterior preservado"
+        }
+      ]
     },
     {
       "id": "DEBT-GOV-002",

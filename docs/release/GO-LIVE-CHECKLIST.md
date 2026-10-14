@@ -6,7 +6,7 @@
 - [ ] Variaveis de ambiente (`.env`) validadas em produção
 
 ## DEPLOY
-- [ ] `docker compose up -d` executado com sucesso
+- [ ] Infraestrutura local subiu com `docker compose -f docker-compose.yml -f docker-compose.postgres-local.yml up -d` (somente infraestrutura; migrations ficam no item seguinte)
 - [ ] Aplicação acessível externamente via Proxy
 - [ ] Migrations testadas e aplicadas (`prisma migrate deploy`)
 

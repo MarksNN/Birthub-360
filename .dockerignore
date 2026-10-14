@@ -11,6 +11,14 @@ coverage
 .git
 .github
 
+# Cópias efêmeras locais. Não entram no contexto de build.
+# Migrations em prisma/migrations continuam incluídas pela exceção mais abaixo.
+.worktrees
+.tmp
+tmp
+temp
+**/*.tmp
+
 # Ambientes, segredos e dumps (Segurança Bloqueador #4, #14)
 .env
 .env.*

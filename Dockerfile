@@ -30,6 +30,11 @@ RUN npm run build:worker
 # Remove devDependencies (typescript, eslint, vitest, prisma CLI, etc.) antes de copiar
 # node_modules pro estágio final — nada disso é necessário em runtime, só incha a imagem
 # de produção (DEVOPS-005 na auditoria de dívida técnica).
+# A versão exata da CLI já resolvida pelo npm ci fica em node_modules/prisma.
+# Capturá-la antes do prune evita reinstalar o range semver de devDependencies
+# (ex.: ^7.10.0), que pode resolver uma versão diferente do package-lock.json.
+RUN node -p "require('./node_modules/prisma/package.json').version" > /tmp/prisma-cli-version
+
 RUN npm prune --omit=dev
 
 # npm prune acima remove também a CLI do prisma (devDependency), que o Job de migração
@@ -38,9 +43,12 @@ RUN npm prune --omit=dev
 # (Render, render.yaml) não usa este Dockerfile e não é afetado, mas o caminho
 # k8s/Helm/ArgoCD (charts/prospector-atlas/templates/migration-job.yaml,
 # k8s/migration-job.yaml — aspiracional) precisa da CLI presente na imagem final.
-# Reinstala só a CLI, na mesma versão fixada em devDependencies, sem tocar em
+# Reinstala só a CLI, na versão exata já instalada pelo lockfile, sem tocar em
 # package.json/lockfile (--no-save) e sem reintroduzir o restante das devDependencies.
-RUN npm install --no-save prisma@$(node -p "require('./package.json').devDependencies.prisma")
+# O build falha se a CLI instalada divergir do lock ou do client.
+RUN prisma_version="$(tr -d '\r\n' < /tmp/prisma-cli-version)" \
+ && npm install --no-save --ignore-scripts "prisma@${prisma_version}" \
+ && node -e "const lock=require('./package-lock.json').packages['node_modules/prisma'].version; const cli=require('prisma/package.json').version; const client=require('@prisma/client/package.json').version; if (cli!==lock || cli!==client) { console.error('Prisma CLI/client/lock divergentes', {cli, client, lock}); process.exit(1);} console.log('prisma CLI/client/lock', cli);"
 
 # Stage 2: Production
 FROM node:22-slim AS runner
