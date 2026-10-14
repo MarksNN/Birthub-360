@@ -1,0 +1,16 @@
+{
+  "method": "Expressão pass extraída sem executar run ou banco",
+  "input": {
+    "tableCounts": [],
+    "invalidIndexes": 0,
+    "orphanContacts": 0,
+    "orphanLeads": 0,
+    "corruptSqlDetected": true,
+    "missingFileDetected": true,
+    "migrateStatusOutput": "migration failed",
+    "rtoMeasuredSec": 901
+  },
+  "observed": true,
+  "expected": false,
+  "limitations": "Comprova predicado isolado; não comprova restauração real"
+}

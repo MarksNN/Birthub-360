@@ -1,0 +1,1679 @@
+{
+  "checks": [
+    {
+      "id": "DT-03-01",
+      "category": "DT-03",
+      "title": "Rotas de negócio são carregadas via lazy e Suspense",
+      "agent": "02",
+      "module": "Frontend",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/App.tsx",
+          "lineStart": 46,
+          "lineEnd": 46,
+          "detail": "Registro de módulos lazy na composição."
+        }
+      ],
+      "approvalCriterion": "Todas rotas principais evitam import inicial eager de feature.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-03-02",
+      "category": "DT-03",
+      "title": "Layout principal possui landmark main",
+      "agent": "03",
+      "module": "Layout",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/components/layout/MainLayout.tsx",
+          "lineStart": 56,
+          "lineEnd": 56,
+          "detail": "Landmark semântico na região da página."
+        }
+      ],
+      "approvalCriterion": "Conteúdo principal exposto como landmark único do layout.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-03-03",
+      "category": "DT-03",
+      "title": "Modal compartilhado usa primitivas e nome de fechamento",
+      "agent": "03",
+      "module": "UI / Dialog",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/components/ui/Dialog.tsx",
+          "lineStart": 64,
+          "lineEnd": 64,
+          "detail": "Primitiva Radix e botão com nome acessível."
+        }
+      ],
+      "approvalCriterion": "Contrato semântico de modal e nome de fechamento presentes; gesto verificado separadamente.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-03-04",
+      "category": "DT-03",
+      "title": "Foco visual global existe no CSS",
+      "agent": "03",
+      "module": "Estilos",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/styles/globals.css",
+          "lineStart": 1106,
+          "lineEnd": 1106,
+          "detail": "Regra global de foco visível."
+        }
+      ],
+      "approvalCriterion": "Elementos focáveis possuem indicador de foco em estilos base.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-03-05",
+      "category": "DT-03",
+      "title": "Jornada de teclado e contraste em telas principais",
+      "agent": "03",
+      "module": "Frontend",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/components/ui/Dialog.tsx",
+          "lineStart": 48,
+          "lineEnd": 48,
+          "detail": "Harness/gesto não executado."
+        }
+      ],
+      "approvalCriterion": "Tab/ShiftTab/Escape/restauração de foco e contraste WCAG2.2AA medidos.",
+      "automatable": true,
+      "limitation": "Sem browser/app isolado/dependências. Não equivale a axe/teclado aprovado.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-18-01",
+      "category": "DT-18",
+      "title": "Runtimes suportados declarados no manifesto",
+      "agent": "08",
+      "module": "Runtime",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "lineStart": 7,
+          "lineEnd": 7,
+          "detail": "Versão mínima explícita."
+        }
+      ],
+      "approvalCriterion": "Manifest declara runtime; compatibilidade efetiva verificada por CI separadamente.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-18-02",
+      "category": "DT-18",
+      "title": "Config PWA nega fallback HTML para API/webhook",
+      "agent": "09",
+      "module": "PWA",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 77,
+          "lineEnd": 77,
+          "detail": "Denylist API e webhook presente."
+        }
+      ],
+      "approvalCriterion": "Navegação de API/webhook não recebe fallback HTML do SW.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-18-03",
+      "category": "DT-18",
+      "title": "OCR apresenta fallback quando câmera não é permitida",
+      "agent": "05",
+      "module": "OCR",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/prospecting/components/prospecting-hub/OcrCapturePanel.tsx",
+          "lineStart": 116,
+          "lineEnd": 116,
+          "detail": "Catch oferece envio de foto em vez de sucesso fictício."
+        }
+      ],
+      "approvalCriterion": "Falha camera gera instrução acionável e entrada de arquivo disponível.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-18-04",
+      "category": "DT-18",
+      "title": "Build Android e APIs WebView suportadas em dispositivo",
+      "agent": "09",
+      "module": "Android",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "android/app/src/main/java/br/com/birthhub360/prospector/MainActivity.java",
+          "lineStart": 47,
+          "lineEnd": 47,
+          "detail": "Implementação existe; SDK/emulador não executados."
+        }
+      ],
+      "approvalCriterion": "Artefato Android inicia/login/camera e fluxo CRM real em dispositivo.",
+      "automatable": true,
+      "limitation": "Sem JDK/SDK/dispositivo; nenhum build nativo ou gesto executado.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-18-05",
+      "category": "DT-18",
+      "title": "Nomes do diagnóstico coincidem entre web e deep link",
+      "agent": "09",
+      "module": "Android / navegação",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "android/app/src/main/java/br/com/birthhub360/prospector/MainActivity.java",
+          "lineStart": 61,
+          "lineEnd": 61,
+          "detail": "Comparação automática dos sets aponta nome distinto."
+        }
+      ],
+      "approvalCriterion": "Catálogo nativo e rota web possuem destino canônico idêntico.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": "DEBT-UX-005",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-23-01",
+      "category": "DT-23",
+      "title": "Paginação de empresas limita linhas renderizadas",
+      "agent": "04",
+      "module": "Empresas",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/companies/components/CompanyList.tsx",
+          "lineStart": 76,
+          "lineEnd": 76,
+          "detail": "Página20 por padrão e componente Pagination."
+        }
+      ],
+      "approvalCriterion": "Lista usa limite/paginação explícito; sem certificar custo das relações incluídas.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-23-02",
+      "category": "DT-23",
+      "title": "Paginação de contatos limita linhas renderizadas",
+      "agent": "04",
+      "module": "Contatos",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/contacts/components/ContactList.tsx",
+          "lineStart": 57,
+          "lineEnd": 57,
+          "detail": "Página20 por padrão."
+        }
+      ],
+      "approvalCriterion": "Listagem não requisita todos contatos sem limite.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-23-03",
+      "category": "DT-23",
+      "title": "Vendor ECharts possui chunk dedicado",
+      "agent": "23",
+      "module": "Build frontend",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 159,
+          "lineEnd": 159,
+          "detail": "Chunk de charts separado."
+        }
+      ],
+      "approvalCriterion": "Pacote pesado de charts é separado no bundler; tamanho real exige build.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-23-04",
+      "category": "DT-23",
+      "title": "Tour não inicia import 3D para usuário que já o viu",
+      "agent": "02",
+      "module": "Onboarding",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/App.tsx",
+          "lineStart": 344,
+          "lineEnd": 344,
+          "detail": "Montagem condicionada ao localStorage antes do lazy import."
+        }
+      ],
+      "approvalCriterion": "Tour ausente não dispara import do respectivo componente.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-23-05",
+      "category": "DT-23",
+      "title": "Latência e memória com carga isolada de CRM",
+      "agent": "23",
+      "module": "CRM",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 73,
+          "lineEnd": 73,
+          "detail": "Relações completas incluídas, custo não medido."
+        }
+      ],
+      "approvalCriterion": "P95/CPU/memória e query plan medidos com volume representativo autorizado.",
+      "automatable": true,
+      "limitation": "Sem banco/dataset isolado; nenhum teste de carga autorizado/executado.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-31-01",
+      "category": "DT-31",
+      "title": "Agregações excluem soft-delete e filtram tenant",
+      "agent": "04",
+      "module": "Analytics",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/infra/PrismaAnalyticsRepository.ts",
+          "lineStart": 13,
+          "lineEnd": 13,
+          "detail": "Filtros explícitos em countCompanies/countContacts."
+        }
+      ],
+      "approvalCriterion": "Contratos lidos usam organização e soft-delete; teste cruzado separado.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-31-02",
+      "category": "DT-31",
+      "title": "Falhas de agregação devem ser observáveis",
+      "agent": "04",
+      "module": "Analytics",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório. Reprodução isolada Node do corpo atual com remoção somente de tipos e mocks; exit0.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 56,
+          "lineEnd": 56,
+          "detail": "Catch devolve HTTP200 e zeros."
+        }
+      ],
+      "approvalCriterion": "Falha retorna estado error observável; vazio apenas após consulta válida.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": "DEBT-UX-003",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-31-03",
+      "category": "DT-31",
+      "title": "CSV de cohort usa mesmas linhas da agregação",
+      "agent": "04",
+      "module": "Analytics / export",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/application/AnalyticsUseCases.ts",
+          "lineStart": 50,
+          "lineEnd": 50,
+          "detail": "CSV recebe CohortRow[] sem recalcular fórmula."
+        }
+      ],
+      "approvalCriterion": "Export preserva valores da mesma agregação; teste HTTP separado.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-31-04",
+      "category": "DT-31",
+      "title": "SSE comercial restringe evento à organização",
+      "agent": "04",
+      "module": "Eventos",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/routes/events.routes.ts",
+          "lineStart": 25,
+          "lineEnd": 25,
+          "detail": "Listener compara tenant antes de write."
+        }
+      ],
+      "approvalCriterion": "Eventos fora do tenant não são escritos pelo listener.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-31-05",
+      "category": "DT-31",
+      "title": "Consentimento/base legal e minimização da telemetria de produto",
+      "agent": "21",
+      "module": "PostHog",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/lib/analytics/posthog-client.ts",
+          "lineStart": 5,
+          "lineEnd": 5,
+          "detail": "Inicializa quando VITE_POSTHOG_KEY existe; desativa apenas DEV neste arquivo."
+        }
+      ],
+      "approvalCriterion": "Mapear base legal, payload real, retenção e mecanismo de preferência.",
+      "automatable": true,
+      "limitation": "Não foram capturados eventos nem configuração externa; ausência de gate neste arquivo não prova violação legal.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-32-01",
+      "category": "DT-32",
+      "title": "Documento raiz define idioma pt-BR",
+      "agent": "02",
+      "module": "Shell",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "index.html",
+          "lineStart": 2,
+          "lineEnd": 2,
+          "detail": "Idioma explícito."
+        }
+      ],
+      "approvalCriterion": "Leitor e browser recebem lang da página.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-32-02",
+      "category": "DT-32",
+      "title": "Moeda comercial possui formato pt-BR e BRL por padrão",
+      "agent": "04",
+      "module": "Métricas",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/commercial-intelligence/presentation/formatMetrics.ts",
+          "lineStart": 1,
+          "lineEnd": 1,
+          "detail": "Formatter usa locale pt-BR e currency."
+        }
+      ],
+      "approvalCriterion": "Valores reais formatam BRL e null retorna Não disponível.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-32-03",
+      "category": "DT-32",
+      "title": "Mês financeiro da API respeita Brasília",
+      "agent": "04",
+      "module": "Analytics",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/application/AnalyticsUseCases.ts",
+          "lineStart": 23,
+          "lineEnd": 23,
+          "detail": "Implementação ativa usa limite UTC em vez do contrato Brasil."
+        }
+      ],
+      "approvalCriterion": "API/export/métricas agrupam mesmo instante pelo mês comercial.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": "DEBT-UX-004",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-32-04",
+      "category": "DT-32",
+      "title": "Tabela temporal canônica define calendário comercial",
+      "agent": "18",
+      "module": "Time utilities",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/shared/time/brazilCalendar.ts",
+          "lineStart": 2,
+          "lineEnd": 2,
+          "detail": "Contrato explícito e helper monthRange."
+        }
+      ],
+      "approvalCriterion": "Contrato declara timezone e intervalo start/end; uso efetivo avaliado à parte.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-32-05",
+      "category": "DT-32",
+      "title": "Calendário renderiza datas em fusos de browser diferentes",
+      "agent": "04",
+      "module": "Agenda",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/calendar/components/Calendar.tsx",
+          "lineStart": 299,
+          "lineEnd": 299,
+          "detail": "Render usa locale; timezone/browser não exercitado."
+        }
+      ],
+      "approvalCriterion": "Mesmo agendamento conserva data/hora comercial UTC e SãoPaulo.",
+      "automatable": true,
+      "limitation": "Sem navegador/dataset sintético; comparação visual/runtime não executada.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-33-01",
+      "category": "DT-33",
+      "title": "Página pública principal fornece title e description estáticos",
+      "agent": "11",
+      "module": "Landing",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "index.html",
+          "lineStart": 14,
+          "lineEnd": 14,
+          "detail": "Título e meta description presentes."
+        }
+      ],
+      "approvalCriterion": "HTML inicial público tem metadados básicos legíveis sem JS.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-33-02",
+      "category": "DT-33",
+      "title": "Landing independente fornece idioma e description",
+      "agent": "11",
+      "module": "Landing separada",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "landing/index.html",
+          "lineStart": 8,
+          "lineEnd": 8,
+          "detail": "Meta e lang presentes."
+        }
+      ],
+      "approvalCriterion": "Documento de landing tem title/description/idioma.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-33-03",
+      "category": "DT-33",
+      "title": "Conteúdo público é indexável após renderização e sem vazamento autenticado",
+      "agent": "11",
+      "module": "SEO / landing",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/App.tsx",
+          "lineStart": 595,
+          "lineEnd": 595,
+          "detail": "Root usa Landing360; render crawler não executado."
+        }
+      ],
+      "approvalCriterion": "Crawler recebe conteúdo público e não recebe PII de rotas protegidas.",
+      "automatable": true,
+      "limitation": "Sem build/browser/crawler isolado; não presumir indexação ou conteúdo server-rendered.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-33-04",
+      "category": "DT-33",
+      "title": "URLs canônicas/sitemap/robots atendem domínio real",
+      "agent": "11",
+      "module": "SEO",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "index.html",
+          "lineStart": 4,
+          "lineEnd": 4,
+          "detail": "Busca no shell/src/landing/server não encontrou configuração canônica consultada."
+        }
+      ],
+      "approvalCriterion": "Validar sitemap/robots/canonical no host autorizado e domínio canônico.",
+      "automatable": true,
+      "limitation": "Configuração de proxy/hosting fora da árvore pode fornecer metadados; nenhum domínio consultado.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-33-05",
+      "category": "DT-33",
+      "title": "Metadados de compartilhamento refletem página pública",
+      "agent": "11",
+      "module": "SEO / social",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "landing/index.html",
+          "lineStart": 3,
+          "lineEnd": 3,
+          "detail": "HTML possui metadados básicos, sem prova do resultado em servidor."
+        }
+      ],
+      "approvalCriterion": "Fetch de crawler social retorna og:title/description/image válidos e sem conteúdo autenticado.",
+      "automatable": true,
+      "limitation": "Nenhum crawler/rede/produção consultado; oportunidade só após confirmação de requisito.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-34-01",
+      "category": "DT-34",
+      "title": "Manifest referencia ícones presentes no inventário",
+      "agent": "09",
+      "module": "PWA",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 30,
+          "lineEnd": 30,
+          "detail": "Teste filesystem confirma ausência192/512."
+        }
+      ],
+      "approvalCriterion": "URLs192/512 e atalhos existem no artefato.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": "DEBT-UX-006",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-34-02",
+      "category": "DT-34",
+      "title": "Cache offline não atravessa identidade autenticada",
+      "agent": "09",
+      "module": "PWA / CRM",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 61,
+          "lineEnd": 61,
+          "detail": "Cache único e logout sem invalidação."
+        }
+      ],
+      "approvalCriterion": "Cache autenticado isolado por usuário/tenant e limpo na troca.",
+      "automatable": true,
+      "limitation": "Deficiência de configuração confirmada; exploração entre sessões NÃO TESTADA.",
+      "findingId": "DEBT-UX-001",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-34-03",
+      "category": "DT-34",
+      "title": "Release Android evita cleartext na configuração manifest principal",
+      "agent": "09",
+      "module": "Android",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "android/app/src/main/AndroidManifest.xml",
+          "lineStart": 10,
+          "lineEnd": 10,
+          "detail": "Manifest release não declara usesCleartextTraffic=true; debug separado."
+        }
+      ],
+      "approvalCriterion": "Release não habilita tráfego HTTP indiscriminado; manifest merged verificado no build à parte.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-34-04",
+      "category": "DT-34",
+      "title": "Interface modal limita altura dinâmica no mobile",
+      "agent": "03",
+      "module": "UI / Dialog",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/components/ui/Dialog.tsx",
+          "lineStart": 23,
+          "lineEnd": 23,
+          "detail": "CSS limita largura/altura e overflow."
+        }
+      ],
+      "approvalCriterion": "Superfície usa viewport dinâmica e scroll interno; screenshot separado.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-34-05",
+      "category": "DT-34",
+      "title": "Responsividade real360/390/768/1440 e offline",
+      "agent": "09",
+      "module": "Web / PWA",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "tests/e2e/mobile-sweep.spec.ts",
+          "lineStart": 1,
+          "lineEnd": 1,
+          "detail": "Spec existe, execução não feita."
+        }
+      ],
+      "approvalCriterion": "Sem overflow/perda de ação em breakpoints; offline explícito em telas críticas.",
+      "automatable": true,
+      "limitation": "Dependências/browser não presentes no snapshot; nenhum screenshot nem instalação PWA.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-36-01",
+      "category": "DT-36",
+      "title": "Meilisearch injeta filtro de tenant em empresas",
+      "agent": "04",
+      "module": "Busca empresas",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/lib/search/index.ts",
+          "lineStart": 86,
+          "lineEnd": 86,
+          "detail": "Filtro e retorno limitado a IDs."
+        }
+      ],
+      "approvalCriterion": "Consulta gerada contém organização fornecida pelo backend.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-36-02",
+      "category": "DT-36",
+      "title": "Falha Meili retorna sentinel distinto de zero resultados",
+      "agent": "04",
+      "module": "Busca empresas",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/lib/search/index.ts",
+          "lineStart": 94,
+          "lineEnd": 94,
+          "detail": "Falha retorna null e repositório ativa fallback; [] preservado."
+        }
+      ],
+      "approvalCriterion": "Falha usa Postgres e resposta vazia legítima não é sobrescrita.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-36-03",
+      "category": "DT-36",
+      "title": "Paginação e total são preservados no motor full-text",
+      "agent": "04",
+      "module": "Busca empresas",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório. Reprodução isolada Node do corpo atual com remoção somente de tipos e mocks; exit0.",
+      "evidence": [
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 44,
+          "lineEnd": 44,
+          "detail": "Falta offset/total do motor antes do skip."
+        }
+      ],
+      "approvalCriterion": "Páginas1..N cobrem todos hits ordenados com total correto.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": "DEBT-UX-002",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-36-04",
+      "category": "DT-36",
+      "title": "Busca textual indisponível não produz falso sem resultados",
+      "agent": "07",
+      "module": "Conhecimento",
+      "result": "Não conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/search.service.ts",
+          "lineStart": 178,
+          "lineEnd": 178,
+          "detail": "Após duas falhas retorna array vazio."
+        }
+      ],
+      "approvalCriterion": "Erro distingue indisponibilidade total de ausência de documento.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": "DEBT-UX-007",
+      "correctionState": "aberto",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-36-05",
+      "category": "DT-36",
+      "title": "Relevância e recuperação cross-tenant de busca híbrida",
+      "agent": "07",
+      "module": "Conhecimento",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/search.service.ts",
+          "lineStart": 43,
+          "lineEnd": 43,
+          "detail": "RRF e filtro tenant lidos; qualidade/negativo real não executados."
+        }
+      ],
+      "approvalCriterion": "Golden dataset sintético mede relevância e garante nenhum hit de outro tenant.",
+      "automatable": true,
+      "limitation": "Sem DB/embeddings/dataset isolado; nenhum provider acionado.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-37-01",
+      "category": "DT-37",
+      "title": "Upload de conhecimento tem schema e papéis de escrita",
+      "agent": "07",
+      "module": "Arquivos conhecimento",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/knowledge.routes.ts",
+          "lineStart": 293,
+          "lineEnd": 293,
+          "detail": "writeRoles e validateRequest antes do handler."
+        }
+      ],
+      "approvalCriterion": "Título/nome/payload e papéis validados; autorização raiz sob responsabilidade01.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-37-02",
+      "category": "DT-37",
+      "title": "Extração PDF limita páginas e conteúdo resultante",
+      "agent": "07",
+      "module": "Arquivos conhecimento",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/knowledge.routes.ts",
+          "lineStart": 63,
+          "lineEnd": 63,
+          "detail": "max parser500 e texto400000 limitados."
+        }
+      ],
+      "approvalCriterion": "Parsing limita páginas/texto; carga/ZIP bomb exige teste separado.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-37-03",
+      "category": "DT-37",
+      "title": "Erro de formato de upload retorna400 e interrompe ingestão",
+      "agent": "07",
+      "module": "Arquivos conhecimento",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/knowledge.routes.ts",
+          "lineStart": 305,
+          "lineEnd": 305,
+          "detail": "Catch extraction responde400 e return."
+        }
+      ],
+      "approvalCriterion": "Formato não suportado/extrator inválido não é apresentado como sucesso.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-37-04",
+      "category": "DT-37",
+      "title": "Exclusão de documento usa organização e cascade esperado",
+      "agent": "07",
+      "module": "Arquivos conhecimento",
+      "result": "Parcialmente conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/ingestion.service.ts",
+          "lineStart": 324,
+          "lineEnd": 324,
+          "detail": "deleteMany aplica organizationId; cascade físico/índice precisaDB."
+        }
+      ],
+      "approvalCriterion": "Só tenant dono exclui documento e seus chunks desaparecem.",
+      "automatable": true,
+      "limitation": "Filtro lido, exclusão/retentiva/cascade não executados.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-37-05",
+      "category": "DT-37",
+      "title": "URLs de objeto aplicam acesso e expiração no fluxo real",
+      "agent": "01",
+      "module": "Object storage",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/lib/storage/index.ts",
+          "lineStart": 49,
+          "lineEnd": 49,
+          "detail": "Helper assina por1h; autorização deve ser comprovada nos chamadores."
+        }
+      ],
+      "approvalCriterion": "URL inacessível para tenant alheio, expira e respeita exclusão/retentiva.",
+      "automatable": true,
+      "limitation": "Storage externo e fluxos assinados não acionados; helper sozinho não comprova autorização.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-39-01",
+      "category": "DT-39",
+      "title": "Rotas de configurações de pilar anunciam ausência de persistência",
+      "agent": "02",
+      "module": "Configurações pilar",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/settings/components/PillarSettingsPlaceholder.tsx",
+          "lineStart": 792,
+          "lineEnd": 792,
+          "detail": "Aviso explícito de valores ilustrativos e API não existente."
+        }
+      ],
+      "approvalCriterion": "Prévia não afirma que salvou; não contada como recurso entregue.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-39-02",
+      "category": "DT-39",
+      "title": "Administração equipe exige papel na rota frontend",
+      "agent": "02",
+      "module": "Equipe",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/App.tsx",
+          "lineStart": 478,
+          "lineEnd": 478,
+          "detail": "RequireRole ADMIN na composição."
+        }
+      ],
+      "approvalCriterion": "URL direta encontra gate visual de papel; autorização backend testada separadamente.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-39-03",
+      "category": "DT-39",
+      "title": "Configuração inicial exige ADMIN na composição",
+      "agent": "02",
+      "module": "Setup",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/App.tsx",
+          "lineStart": 636,
+          "lineEnd": 636,
+          "detail": "ProtectedRoute + RequireRole ADMIN."
+        }
+      ],
+      "approvalCriterion": "Sessão nãoADMIN recebe bloqueio; validação real separada.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-39-04",
+      "category": "DT-39",
+      "title": "Destino desconhecido gera fallback de navegação determinado",
+      "agent": "02",
+      "module": "Navegação",
+      "result": "Conforme",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/App.tsx",
+          "lineStart": 534,
+          "lineEnd": 534,
+          "detail": "Catchall evita superfície sem componente."
+        }
+      ],
+      "approvalCriterion": "Rota desconhecida termina em destino existente sem tela branca; experiência erro dedicada não exigida.",
+      "automatable": true,
+      "limitation": "Leitura estática dirigida; não certifica jornada em runtime.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    },
+    {
+      "id": "DT-39-05",
+      "category": "DT-39",
+      "title": "Salvar CRM persiste e sobrevive reload com erro/retry",
+      "agent": "22",
+      "module": "CRM",
+      "result": "Não verificado",
+      "method": "Inspeção estática contextual de fonte; comandos de leitura/rg e comparação declarados no relatório.",
+      "evidence": [
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 93,
+          "lineEnd": 93,
+          "detail": "Implementação Prisma existe, sem exercícioUI->API->DB."
+        }
+      ],
+      "approvalCriterion": "Entrada sintética salva/recarrega; inválida não salva; falha gera erro; tenant alheio negado.",
+      "automatable": true,
+      "limitation": "Nenhum DB/browser real usado; leitura não prova persistência.",
+      "findingId": null,
+      "correctionState": "não aplicável",
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78"
+    }
+  ],
+  "findings": [
+    {
+      "id": "DEBT-UX-001",
+      "title": "Cache PWA de CRM não é particionado por identidade autenticada",
+      "category": "DT-34",
+      "relatedCategories": [
+        "DT-24",
+        "DT-06",
+        "DT-30"
+      ],
+      "module": "PWA / autenticação",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 61,
+          "lineEnd": 66,
+          "detail": "Cache fixo para GET CRM, por URL, sem identidade do usuário."
+        },
+        {
+          "file": "src/contexts/AuthContext.tsx",
+          "lineStart": 118,
+          "lineEnd": 128,
+          "detail": "Logout encerra sessão e redireciona; não limpa CacheStorage."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Configuração StaleWhileRevalidate guarda respostas CRM por origem/URL no mesmo cache; logout não remove o conteúdo.",
+      "rootCause": "Cache de respostas autenticadas tratado como cache público de assets.",
+      "impact": "Em navegador compartilhado, resposta antiga pode ser servida antes da resposta da nova sessão; risco de confidencialidade e de mostrar informação obsoleta.",
+      "priority": "P1",
+      "priorityReason": "Em navegador compartilhado, resposta antiga pode ser servida antes da resposta da nova sessão; risco de confidencialidade e de mostrar informação obsoleta. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "09",
+      "participants": [
+        "02",
+        "09"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Evitar cache SW de dados autenticados ou particionar e invalidar explicitamente por sessão/tenant.",
+      "approvalCriterion": "Usuário B não recebe dados de A ao trocar sessão online/offline; estado stale é explícito.",
+      "regressionTests": [
+        "Duas contas e organizações sintéticas; mesma URL; logout/login; offline; verificar CacheStorage e corpo retornado."
+      ],
+      "state": "aberto",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Configuração e ausência de limpeza no caminho de logout confirmadas; acesso cruzado real NÃO DEMONSTRADO, requer build e navegador isolado.",
+      "type": "Risco operacional",
+      "wave": "01",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    },
+    {
+      "id": "DEBT-UX-002",
+      "title": "Paginação full-text de empresas restringe resultados ao primeiro lote",
+      "category": "DT-36",
+      "relatedCategories": [
+        "DT-04",
+        "DT-39"
+      ],
+      "module": "Empresas / busca",
+      "evidence": [
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 44,
+          "lineEnd": 50,
+          "detail": "Busca só limit IDs, sem page/offset."
+        },
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 66,
+          "lineEnd": 81,
+          "detail": "Aplica offset do PostgreSQL ao mesmo conjunto limitado; total também fica limitado."
+        },
+        {
+          "file": "src/lib/search/index.ts",
+          "lineStart": 85,
+          "lineEnd": 90,
+          "detail": "Meili recebe limit sem offset."
+        },
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 44,
+          "lineEnd": 50,
+          "detail": "Reprodução Node isolada exit0: 45hits, limite20:page1=20,page2=0,total=20 esperado45."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Com ENABLE_SEARCH=true, o repositório pede os mesmos primeiros limit IDs em todas as páginas e só depois aplica skip no banco. Também conta só os IDs recuperados.",
+      "rootCause": "Paginação aplicada duas vezes em contratos incompatíveis; total de busca perdido.",
+      "impact": "Resultados além do primeiro lote tornam-se inalcançáveis; página 2 fica vazia quando Meili retorna no máximo limit IDs.",
+      "priority": "P2",
+      "priorityReason": "Resultados além do primeiro lote tornam-se inalcançáveis; página 2 fica vazia quando Meili retorna no máximo limit IDs. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "04",
+      "participants": [
+        "02",
+        "04"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Propagar paginação/total ao motor e preservar ordenação de relevância ou obter conjunto adequado sem aplicar segundo offset.",
+      "approvalCriterion": "Busca com 45 resultados e limite20 retorna páginas20/20/5, total45, sem duplicatas.",
+      "regressionTests": [
+        "Meili mock45 hits; páginas1,2,3; fallback indisponível; zero resultados; tenant distinto."
+      ],
+      "state": "aberto",
+      "confidence": "alta; reprodução isolada com corpos atuais de função e dependências sintéticas",
+      "limitations": "Corpo atual executado após remover somente tipos TypeScript; mocks de serviços. HTTP,DB real e navegador NÃO EXECUTADOS.",
+      "type": "Defeito funcional",
+      "wave": "03",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    },
+    {
+      "id": "DEBT-UX-003",
+      "title": "Analytics devolve sucesso e zeros após erro de agregação",
+      "category": "DT-31",
+      "relatedCategories": [
+        "DT-04",
+        "DT-19",
+        "DT-39"
+      ],
+      "module": "Analytics",
+      "evidence": [
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 24,
+          "lineEnd": 54,
+          "detail": "Catch substitui falha por success:true/HTTP200."
+        },
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 56,
+          "lineEnd": 96,
+          "detail": "Catch gera zeros e nulls sem propagar/logar erro."
+        },
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 87,
+          "lineEnd": 147,
+          "detail": "Catch gera isEmpty:true em caso de indisponibilidade."
+        },
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 24,
+          "lineEnd": 54,
+          "detail": "Reprodução Node isolada exit0: Repository.overview rejeita:status=200,success=true,totalCompanies=0."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Endpoints metrics/overview/dashboard capturam qualquer exceção e devolvem dados vazios ou zerados com success:true.",
+      "rootCause": "Confusão entre banco vazio e falha de banco/consulta.",
+      "impact": "Usuário e monitoramento interpretam indisponibilidade como métricas reais zeradas; erro não observável nesses handlers.",
+      "priority": "P1",
+      "priorityReason": "Usuário e monitoramento interpretam indisponibilidade como métricas reais zeradas; erro não observável nesses handlers. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "04",
+      "participants": [
+        "02",
+        "04"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Propagar erro ao middleware e manter vazio apenas quando consulta bem-sucedida devolve vazio.",
+      "approvalCriterion": "Falha do repository retorna erro observável; banco vazio continua 200 com estado empty verdadeiro.",
+      "regressionTests": [
+        "Repository rejeita overview/dashboard/getMetrics; confirmar status não2xx/log e UI error/retry; repository vazio não gera erro."
+      ],
+      "state": "aberto",
+      "confidence": "alta; reprodução isolada com corpos atuais de função e dependências sintéticas",
+      "limitations": "Corpo atual executado após remover somente tipos TypeScript; mocks de serviços. HTTP,DB real e navegador NÃO EXECUTADOS.",
+      "type": "Defeito funcional",
+      "wave": "03",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    },
+    {
+      "id": "DEBT-UX-004",
+      "title": "Analytics ativo usa calendário UTC apesar do contrato comercial Brasília",
+      "category": "DT-32",
+      "relatedCategories": [
+        "DT-31",
+        "DT-02"
+      ],
+      "module": "Analytics / calendário",
+      "evidence": [
+        {
+          "file": "src/features/analytics/application/AnalyticsUseCases.ts",
+          "lineStart": 22,
+          "lineEnd": 30,
+          "detail": "Mês inicia em UTC00:00."
+        },
+        {
+          "file": "src/features/analytics/analytics.service.ts",
+          "lineStart": 86,
+          "lineEnd": 98,
+          "detail": "Serviço paralelo usa calendário Brasil."
+        },
+        {
+          "file": "src/shared/di/setup.ts",
+          "lineStart": 178,
+          "lineEnd": 178,
+          "detail": "DI instancia implementação UTC."
+        },
+        {
+          "file": "src/shared/time/brazilCalendar.ts",
+          "lineStart": 1,
+          "lineEnd": 1,
+          "detail": "Contrato de calendário America/Sao_Paulo."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Rotas analytics usam Controller/UseCases via DI; UseCases calcula monthStart/monthKey em UTC enquanto serviço legado usa helper canônico Brasília.",
+      "rootCause": "Migração para camada hexagonal não preservou calendário comercial.",
+      "impact": "Receita/contagem/cohort no início do mês divergem por três horas e pelo mês durante a virada; indicadores deixam de ser comparáveis.",
+      "priority": "P2",
+      "priorityReason": "Receita/contagem/cohort no início do mês divergem por três horas e pelo mês durante a virada; indicadores deixam de ser comparáveis. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "04",
+      "participants": [
+        "02",
+        "04"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Reutilizar calendário canônico na implementação realmente registrada e eliminar divergência contratual.",
+      "approvalCriterion": "Instante2026-10-01T01:00Z pertence a setembro comercial em todos os endpoints.",
+      "regressionTests": [
+        "Virada mensal00:00Z/03:00Z; dezembro/janeiro; host TZ UTC e SãoPaulo; API e export CSV coincidem."
+      ],
+      "state": "aberto",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Reprodução HTTP/browser não executada; confirmação estática do fluxo.",
+      "type": "Defeito funcional",
+      "wave": "03",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    },
+    {
+      "id": "DEBT-UX-005",
+      "title": "Deep links nativos Android divergem do catálogo de rotas web",
+      "category": "DT-34",
+      "relatedCategories": [
+        "DT-18",
+        "DT-39"
+      ],
+      "module": "Android / navegação",
+      "evidence": [
+        {
+          "file": "android/app/src/main/java/br/com/birthhub360/prospector/MainActivity.java",
+          "lineStart": 55,
+          "lineEnd": 65,
+          "detail": "Lista manual nativa inclui sdr-diagnostic-joao e omite destinos web."
+        },
+        {
+          "file": "src/App.tsx",
+          "lineStart": 460,
+          "lineEnd": 460,
+          "detail": "Rota real é sdr-diagnostic."
+        },
+        {
+          "file": "src/lib/navigationBus.ts",
+          "lineStart": 67,
+          "lineEnd": 67,
+          "detail": "Contrato web usa sdr-diagnostic."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Comparação executada de listas: nativeOnly sdr-diagnostic-joao; webOnly inclui sdr-diagnostic, forecast, metas, signals-risks e outros destinos existentes.",
+      "rootCause": "Espelho manual desatualizado sem gate de paridade.",
+      "impact": "Link válido do diagnóstico é rejeitado nativamente; link com nome antigo é aceito mas rota web redireciona ao dashboard. Outros destinos web ativos não abrem via esquema custom.",
+      "priority": "P2",
+      "priorityReason": "Link válido do diagnóstico é rejeitado nativamente; link com nome antigo é aceito mas rota web redireciona ao dashboard. Outros destinos web ativos não abrem via esquema custom. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "09",
+      "participants": [
+        "02",
+        "09"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Sincronizar catálogo nativo com os destinos suportados e criar verificação automática de paridade, explicitando módulos desabilitados.",
+      "approvalCriterion": "Deep link diagnóstico válido abre tela; inválido mostra erro; catálogo de destinos ativos coincide.",
+      "regressionTests": [
+        "Comparação de sets; dispositivo/emulador para diagnóstico/forecast; destino inválido e usuário sem permissão."
+      ],
+      "state": "aberto",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Reprodução HTTP/browser não executada; confirmação estática do fluxo.",
+      "type": "Defeito funcional",
+      "wave": "04",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    },
+    {
+      "id": "DEBT-UX-006",
+      "title": "Ícones declarados no manifest PWA não existem em public",
+      "category": "DT-34",
+      "relatedCategories": [
+        "DT-16",
+        "DT-17"
+      ],
+      "module": "PWA / assets",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 30,
+          "lineEnd": 40,
+          "detail": "Ícones192/512 e atalhos apontam a arquivos ausentes."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Inventário executado: public/icons/icon-192.png e icon-512.png ausentes; também favicon.ico/apple-touch-icon.png incluídos em includeAssets ausentes. Há ícone SVG de marca, mas não os PNG referenciados no manifest.",
+      "rootCause": "Manifest não acompanhado por assets versionados ou etapa explícita de geração no script build.",
+      "impact": "Manifest fornece URLs sem artefato correspondente; identidade/instalabilidade do PWA fica comprometida em clientes que exigem esses ícones.",
+      "priority": "P2",
+      "priorityReason": "Manifest fornece URLs sem artefato correspondente; identidade/instalabilidade do PWA fica comprometida em clientes que exigem esses ícones. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "09",
+      "participants": [
+        "02",
+        "09"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Gerar/reutilizar os ícones oficiais nos caminhos manifest e verificar existência/tamanho no gate de PWA.",
+      "approvalCriterion": "Todas URLs do manifest e atalhos resolvem arquivo real com dimensão declarada.",
+      "regressionTests": [
+        "Existência de public e dist; dimensões192/512; instalação Chromium em origemHTTPS isolada."
+      ],
+      "state": "aberto",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Ausência na árvore fonte confirmada; build e resposta HTTP não executados, geração externa não foi presumida.",
+      "type": "Dívida técnica confirmada",
+      "wave": "04",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    },
+    {
+      "id": "DEBT-UX-007",
+      "title": "Busca textual da base retorna lista vazia quando banco falha",
+      "category": "DT-36",
+      "relatedCategories": [
+        "DT-19",
+        "DT-39"
+      ],
+      "module": "Base de conhecimento / busca",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/search.service.ts",
+          "lineStart": 178,
+          "lineEnd": 180,
+          "detail": "Falha FTS e ILIKE é logada, mas resposta vira [] em vez de erro."
+        },
+        {
+          "file": "src/features/knowledge/search.service.ts",
+          "lineStart": 54,
+          "lineEnd": 64,
+          "detail": "Status relata disponibilidade semântica, não falha keyword."
+        }
+      ],
+      "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+      "description": "Se FTS falha, tenta ILIKE; se fallback falha, retorna []. Quando busca semântica também indisponível, hybridSearch retorna hits[] indistinguíveis de nenhum documento encontrado.",
+      "rootCause": "Contrato só distingue indisponibilidade semântica; não distingue erro da busca textual.",
+      "impact": "Falha de banco é apresentada como ausência de conhecimento; usuário pode concluir que documento não existe.",
+      "priority": "P2",
+      "priorityReason": "Falha de banco é apresentada como ausência de conhecimento; usuário pode concluir que documento não existe. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "07",
+      "participants": [
+        "02",
+        "07"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Propagar falha da busca textual ou declarar disponibilidade de ambas estratégias e sinalizar erro quando nenhuma executou.",
+      "approvalCriterion": "Banco indisponível não gera falso empty; semântica indisponível com textual funcional mantém fallback claro.",
+      "regressionTests": [
+        "FTS falha/ILIKE sucesso; ambos falham; embeddings falham e keywords sucesso; ambas estratégias indisponíveis."
+      ],
+      "state": "aberto",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Reprodução HTTP/browser não executada; confirmação estática do fluxo.",
+      "type": "Defeito funcional",
+      "wave": "05",
+      "probability": "condicional ao fluxo indicado",
+      "frequency": "por utilização do fluxo",
+      "effort": "M",
+      "regressionRisk": "médio"
+    }
+  ],
+  "commands": [
+    {
+      "command": "Get-Content AGENTS.md e prompts 02/03/04/05/09; governança local layout/dashboard/onboarding/settings/analytics/android",
+      "exitCode": 0,
+      "result": "Lidos. Primeiro caminho03-design-acessibilidade ausente; recuperado03-design-a11y."
+    },
+    {
+      "command": "rg --files; Get-Content package.json src/App.tsx vite.config.ts capacitor.config.ts index.html AndroidManifest.xml",
+      "exitCode": 0,
+      "result": "Inventário estático; consultas exploratórias inexistentes identificadas."
+    },
+    {
+      "command": "Get-Content skills accessibility/performance/functional-completeness e relatórios históricos agent02/03/relatorio.html",
+      "exitCode": 0,
+      "result": "Histórico tipagem PillarIcons hoje resolvido; doze achados launch excluídos por steering00."
+    },
+    {
+      "command": "rg -n dirigido em auth, analytics, search, knowledge, public, calendar, DI e navegação; Get-Content fontes relacionadas",
+      "exitCode": 0,
+      "result": "Leitura contextual. Algumas consultas deram erro de caminho/Windows glob: src/lib/auth*, src/features/landing*, AuthContext primeiro caminho, Header, teste PrismaCompanyRepository; caminhos reais recuperados. Não tomados como evidência de ausência."
+    },
+    {
+      "command": "python --version; Test-Path node_modules",
+      "exitCode": 0,
+      "result": "Python3.14.7; node_modules=False."
+    },
+    {
+      "command": "Python stdin compara sets VALID_TABS/TAB_ROUTE_SET e existência dos quatro assets PWA",
+      "exitCode": 0,
+      "result": "nativeOnly sdr-diagnostic-joao; webOnly20 destinos (inclui3 legados bloqueados, não contados como dívida); faltam192/512/favicon/apple-touch. Aviso de launcher Python impresso, script concluiu."
+    },
+    {
+      "command": "Node stdin extrai getOverview e findAllWithFilters atuais; remove somente type annotations/casts; injeta repository/Meili/Prisma sintéticos sem importar dependências",
+      "exitCode": 1,
+      "result": "Primeira tentativa: Unexpected identifier as; causa cast TypeScript não removido; nenhum dado/arquivo modificado."
+    },
+    {
+      "command": "Node stdin reprodução corrigida com remoção de casts TypeScript dos mesmos corpos de função",
+      "exitCode": 0,
+      "result": "getOverview rejeiçãoDB => status200 success:true totalCompanies0. findAllWithFilters45hits limite20 => page1 20, page2 0, total20 (esperado45). Sem DB/provider/network."
+    },
+    {
+      "command": "node verify-02.cjs .",
+      "exitCode": 0,
+      "result": "6casos isolados:4controles positivos,2defeitos reproduzidos; hashesSHA256 dasfontes emitidos. SemHTTP/DB/rede."
+    }
+  ],
+  "limitations": [
+    "Somente snapshot commit informado pelo00; não se utilizou Git ancestral.",
+    "50 verificações dirigidas em10 categorias; conformidade restrita ao critério estático explicitado.",
+    "Sem node_modules no snapshot; lint/typecheck/build/unit/E2E/axe NÃO EXECUTADOS.",
+    "Sem banco isolado, providers, navegador ou dispositivo; nenhuma PII/cobrança/envio externo.",
+    "Doze achados históricos launch deliberadamente excluídos conforme steering do usuário transmitido pelo00.",
+    "Sem correções nem código funcional alterado; somente audit-02.json/audit-02.md e verify-02.cjs autorizado pelo00.",
+    "Parecer24 e QA08 devem avaliar consolidação; este relatório não aprova release."
+  ],
+  "inventory": [
+    {
+      "module": "Frontend React/Vite",
+      "sources": [
+        "src/App.tsx",
+        "src/components/layout",
+        "src/components/ui",
+        "src/styles"
+      ]
+    },
+    {
+      "module": "Analytics/CRM",
+      "sources": [
+        "src/features/analytics/presentation/AnalyticsController.ts",
+        "src/features/analytics/application/AnalyticsUseCases.ts",
+        "src/features/companies/infra/PrismaCompanyRepository.ts",
+        "src/features/analytics/infra/PrismaAnalyticsRepository.ts"
+      ]
+    },
+    {
+      "module": "Mobile/PWA",
+      "sources": [
+        "vite.config.ts",
+        "capacitor.config.ts",
+        "android/app/src/main/java/br/com/birthhub360/prospector/MainActivity.java",
+        "android",
+        "ios"
+      ]
+    },
+    {
+      "module": "Conhecimento/arquivos/busca",
+      "sources": [
+        "src/lib/search/index.ts",
+        "src/features/knowledge/search.service.ts",
+        "src/features/knowledge/knowledge.routes.ts",
+        "src/lib/storage/index.ts"
+      ]
+    },
+    {
+      "module": "Landing independente",
+      "sources": [
+        "landing/package.json",
+        "landing/index.html"
+      ]
+    }
+  ],
+  "metadata": {
+    "agent": "02",
+    "branch": "main (snapshot isolado sem alteração Git)",
+    "commit": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+    "wave": "auditoria-forense-2026-10-14",
+    "skills": [
+      "accessibility",
+      "performance",
+      "functional-completeness"
+    ],
+    "reproductionScript": "verify-02.cjs"
+  }
+}

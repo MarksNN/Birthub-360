@@ -1,0 +1,390 @@
+{
+  "group": "produto-comercial-ia",
+  "base": "9373fb224a8aba30a39f7d10d1a2be639c35af78",
+  "branch": "agente/02-varredura-lancamento",
+  "agents": [
+    {
+      "id": "02",
+      "name": "Produto e UX",
+      "filesExamined": [
+        "src/App.tsx",
+        "src/bootstrap/routes.ts",
+        "src/features/dashboard/components/RealtimeFeed.tsx"
+      ],
+      "checks": [
+        "Rota elite-agent alcançável no registro App; destino API montado com auth+tenant. Nenhuma afirmação de navegação/browser validado."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": [
+        "PROD-04"
+      ]
+    },
+    {
+      "id": "03",
+      "name": "Design e Acessibilidade",
+      "filesExamined": [
+        "src/components/ui/Dialog.tsx",
+        "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx"
+      ],
+      "checks": [
+        "Inspeção primitivas Radix/foco; sem novo bloqueador concreto de lançamento nessa amostra. Feedback do patch role alert/status. Skills accessibility/vercel-react-best-practices lidas."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": []
+    },
+    {
+      "id": "04",
+      "name": "CRM e BI",
+      "filesExamined": [
+        "src/features/crm/application/LeadUseCases.ts",
+        "src/features/analytics/analytics.service.ts",
+        "src/features/intelligence/routes/commercial-agent.routes.ts"
+      ],
+      "checks": [
+        "Analytics já usa tenant,deletedAt e calendário Brasil; rota elite não reutiliza contrato."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": [
+        "PROD-01"
+      ]
+    },
+    {
+      "id": "05",
+      "name": "Prospecção",
+      "filesExamined": [
+        "src/features/prospecting/services/cold-email.service.ts",
+        "src/features/prospecting/routes/prospecting.routes.ts",
+        "src/features/prospecting/services/enrichment.service.ts"
+      ],
+      "checks": [
+        "Cold-email tem transporte real, opt-out e falhafalse; sem envio externo. Dependência 01/21: erasure sem OptOutRecord afeta supressão por identidade desse caminho."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": []
+    },
+    {
+      "id": "07",
+      "name": "IA e Automações",
+      "filesExamined": [
+        "src/features/intelligence/routes/ai-suite.routes.ts",
+        "src/features/intelligence/services/CentralAISuiteService.ts",
+        "src/features/intelligence/routes/commercial-agent.routes.ts",
+        "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx"
+      ],
+      "checks": [
+        "Suite tem requireRole+consent middleware. Elite possui achados concretos. Acordo07 comunicado com00 para patch16 redis.ts, não editado aqui. Skill functional-completeness lida."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": [
+        "PROD-01",
+        "PROD-02",
+        "PROD-03",
+        "PROD-04"
+      ]
+    },
+    {
+      "id": "13",
+      "name": "Enxame e Governança",
+      "filesExamined": [
+        "src/features/intelligence/agents/base.agent.ts",
+        "src/features/intelligence/agents/supervisor.agent.ts",
+        "src/features/intelligence/agents/fallback.util.ts",
+        "src/features/intelligence/agents/closer.agent.ts",
+        "src/features/intelligence/agents/triad/patriciaExecution.agent.ts",
+        "src/features/intelligence/agents/triad/giselleStrategy.agent.ts"
+      ],
+      "checks": [
+        "Base tem consent gate; Closer explicita evento verificável. Triad contém mock mas sem consumidor de execução encontrado: não elevar código morto como bloqueador. Trace exposto falso confirmado."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": [
+        "PROD-03"
+      ]
+    },
+    {
+      "id": "17",
+      "name": "Cadência e Receita",
+      "filesExamined": [
+        "src/features/cadence/cadence.routes.ts",
+        "src/features/cadence/domain/cadence.ts",
+        "src/features/cadence/application/CadenceExecutionService.ts",
+        "src/features/cadence/infra/dispatchers/CadenceDispatchers.ts",
+        "src/shared/services/optOutCheck.service.ts"
+      ],
+      "checks": [
+        "Dispatchers checam opt-out e email só retorna sent após transporte. Checagem opt-out bloqueia contato anonimizado; cold email usa outro lookup, impacto comunicado01."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": [
+        "PROD-05",
+        "PROD-02"
+      ]
+    },
+    {
+      "id": "23",
+      "name": "Custo e Limites IA",
+      "filesExamined": [
+        "src/lib/ai/budget.ts",
+        "src/features/intelligence/agents/base.agent.ts",
+        "src/features/intelligence/agents/fallback.util.ts",
+        "README.md"
+      ],
+      "checks": [
+        "Orçamento global/por organização existe; fail-open DB documentado como decisão anterior: não alterar política sem00. Fallback supervisor com dois providers requer runtime para investigar; não listado como confirmado."
+      ],
+      "limits": [
+        "Escopo amostral estático; runtime não executado."
+      ],
+      "findings": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "PROD-01",
+      "title": "Copiloto exibe receita, meta e forecast fabricados",
+      "priority": "P1",
+      "owners": [
+        "07",
+        "04",
+        "18"
+      ],
+      "files": [
+        {
+          "path": "src/features/intelligence/routes/commercial-agent.routes.ts",
+          "line": 40
+        },
+        {
+          "path": "src/App.tsx",
+          "line": 400
+        },
+        {
+          "path": "src/bootstrap/routes.ts",
+          "line": 141
+        }
+      ],
+      "evidence": "Leitura estática: meta=200000; receita=wonLeads.length*25000; pipeline=openLeads.length*30000; forecasts=60%/75%. Consulta limitada aos dez leads mais recentes, sem filtro mensal nem deletedAt; score ausente vira85. UI mostra os valores como métricas comerciais.",
+      "impact": "Decisão comercial e preparação do lançamento baseadas em valores inventados.",
+      "rootCause": "Endpoint novo não reutiliza fontes de analytics/metas; substitui valores e evidências por constantes.",
+      "reproduction": "Em homologação inserir negócio ganho com valor diferente de25000 e fora do mês atual; abrir /app/intelligence/elite-agent e comparar banco/API. Reprodução runtime NÃO EXECUTADA.",
+      "correction": "07+04+18: usar analytics/metas do tenant; valores indisponíveis devem ter contrato explícito de unavailable, nunca zero inventado. Não modificar nullability sem acordo18.",
+      "verification": "Teste integração base vazia, valores reais, >10 leads, mês Brasil, soft-delete e tenant; conferir UI. REQUER OUTRO AGENTE/contrato.",
+      "status": "confirmed"
+    },
+    {
+      "id": "PROD-02",
+      "title": "Executar e adiar NBA afirmam ação sem execução ou persistência",
+      "priority": "P1",
+      "owners": [
+        "07",
+        "13",
+        "17",
+        "18",
+        "22"
+      ],
+      "files": [
+        {
+          "path": "src/features/intelligence/routes/commercial-agent.routes.ts",
+          "line": 213
+        },
+        {
+          "path": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+          "line": 75
+        }
+      ],
+      "evidence": "Execute/feedback fazem exclusivamente res.json; não chamam dispatcher/ledger nem gravam estado. Antes do patch UI anunciava discagem até em catch; feedback ignorava res.ok. Patch cirúrgico remove falso sucesso de rede e afirma somente recebimento sem confirmar execução.",
+      "impact": "Usuário acredita ter ligado ou pausado cadência; nada foi executado ou persistido.",
+      "rootCause": "Handlers cenográficos e interpretação otimista da UI; body envia decision enquanto rota lê feedbackType.",
+      "reproduction": "POST autenticado /api/commercial-agent/nba/nba-ID/execute ou /feedback; inspecionar banco/provider e recarregar. Runtime externo NÃO EXECUTADO; ausência de operação confirmada no código.",
+      "correction": "07/13/17/18: ligar ao fluxo real existente com tenant/RBAC, idempotência/ledger e status; até lá responder indisponível e desabilitar ações. Patch UI IMPLEMENTADO isolado, backend pendente.",
+      "verification": "node .tmp/verify-elite.mjs passou handler extraído sucesso HTTP/erro HTTP/rede; tsc/lint/build/Vitest/UI NÃO EXECUTADOS (node_modules ausente).",
+      "status": "confirmed"
+    },
+    {
+      "id": "PROD-03",
+      "title": "Trace de missão e aprovação LGPD são fictícios",
+      "priority": "P1",
+      "owners": [
+        "07",
+        "13",
+        "18",
+        "22"
+      ],
+      "files": [
+        {
+          "path": "src/features/intelligence/routes/commercial-agent.routes.ts",
+          "line": 140
+        },
+        {
+          "path": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+          "line": 50
+        }
+      ],
+      "evidence": "GET trace devolve COMPLETED para qualquer ID e diz nenhum risco de consentimento detectado/aprovado sem consultar missão, consentimento ou banco. UI sempre pede mission/default/trace.",
+      "impact": "A interface apresenta governança e execução inexistentes como prova concluída.",
+      "rootCause": "Resposta hardcoded independente de identidade/missão real; ausência de fonte persistida.",
+      "reproduction": "GET autenticado /api/commercial-agent/mission/id-inexistente/trace; confirmar inexistência de missão. Runtime NÃO EXECUTADO.",
+      "correction": "07+13+18: retornar trace real por tenant; missão inexistente404; sem trace mostrar indisponível. Retirar aprovação LGPD sintética.",
+      "verification": "Integração ID inexistente e outro tenant; missão concluída/falha/pendente; UI sem trace. NÃO EXECUTADO.",
+      "status": "confirmed"
+    },
+    {
+      "id": "PROD-04",
+      "title": "Falha inicial de API deixa Copiloto em carregamento infinito",
+      "priority": "P2",
+      "owners": [
+        "07"
+      ],
+      "files": [
+        {
+          "path": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+          "line": 127
+        }
+      ],
+      "evidence": "Guard loading || !overview precedia error. Após primeira falha: loading=false,error!=null,overview=null, então spinner permanecia e botão retry era inalcançável. Patch muda guarda para loading.",
+      "impact": "Falha de autenticação/servidor impede acesso e recuperação da tela.",
+      "rootCause": "Prioridade incorreta de estado loading sobre error/ausência de dados.",
+      "reproduction": "Bloquear GET workspace ou responder500 na primeira carga; observar spinner. Runtime browser NÃO EXECUTADO.",
+      "correction": "IMPLEMENTADO patch mínimo da guarda loading; ramo error/!overview existente passa a ser acessível.",
+      "verification": "Asserção fonte Node e diff --check PASS; visual/typecheck/lint/build NÃO EXECUTADOS.",
+      "status": "confirmed"
+    },
+    {
+      "id": "PROD-05",
+      "title": "API permite cadência sem conteúdo e dispatcher envia placeholder",
+      "priority": "P2",
+      "owners": [
+        "17"
+      ],
+      "files": [
+        {
+          "path": "src/features/cadence/cadence.routes.ts",
+          "line": 60
+        },
+        {
+          "path": "src/features/cadence/infra/dispatchers/CadenceDispatchers.ts",
+          "line": 104
+        },
+        {
+          "path": "src/features/cadence/domain/cadence.ts",
+          "line": 146
+        }
+      ],
+      "evidence": "templateRef optional no Zod; validateSequence valida ordens/fallback mas não conteúdo; email/WhatsApp usam texto mensagem de cadência sem conteúdo configurado quando ausente. NewSequenceDialog já exige conteúdo, portanto descompasso API/UI.",
+      "impact": "Lead real pode receber mensagem interna de configuração em vez de comunicação comercial.",
+      "rootCause": "Validação do servidor incompleta e fallback de texto passa por transporte externo.",
+      "reproduction": "POST sequência email/whatsapp sem templateRef, iniciar run permitido e avançar em homologação SMTP/WhatsApp falso. Não disparar para titular real. Runtime NÃO EXECUTADO.",
+      "correction": "IMPLEMENTADO: validateSequence exige conteúdo email/WhatsApp (rota devolve400 pelo validador existente). Dispatchers bloqueiam legado omitido/vazio/branco antes do banco/provider; voz preservada. Sem mudança schema/contrato optional. NÃO INTEGRADO; revisão24/gates pendentes.",
+      "verification": "node .tmp/verify-cadence.mjs PASS: função de domínio real extraída válido/omitido/vazio/branco,voz preservada; guard extraído dispatcher retornafailed antes DB/provider. Integração HTTP/Vitest/typecheck/lint/build NÃO EXECUTADOS.",
+      "status": "confirmed"
+    }
+  ],
+  "commands": [
+    {
+      "command": "git branch --show-current",
+      "exitCode": 0,
+      "result": "agente/02-varredura-lancamento"
+    },
+    {
+      "command": "Test-Path node_modules",
+      "exitCode": 0,
+      "result": "False"
+    },
+    {
+      "command": "node .tmp/verify-elite.mjs",
+      "exitCode": 0,
+      "result": "PASS 3 cenários handler real extraído + asserções fonte; não prova UI real"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "rg/Get-Content dirigidos",
+      "exitCode": 0,
+      "result": "Evidência de fonte; alguns caminhos especulativos ausentes ajustados na investigação"
+    },
+    {
+      "command": "node .tmp/verify-cadence.mjs",
+      "exitCode": 0,
+      "result": "PASS função domínio extraída + guard dispatcher; não integração HTTP/transporte"
+    },
+    {
+      "command": "node .tmp/verify-elite.mjs",
+      "exitCode": 0,
+      "result": "PASS execute e feedback, cada um HTTPok/HTTPerro/rede; asserções fonte loading/aria; não UI"
+    }
+  ],
+  "changes": [
+    {
+      "path": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+      "reason": "Remover falso sucesso HTTP/rede/feedback e loading infinito; feedback acessível; confetti órfão removido",
+      "status": "IMPLEMENTADO isolado; NÃO VALIDADO runtime; NÃO INTEGRADO"
+    },
+    {
+      "path": "src/features/cadence/domain/cadence.ts",
+      "reason": "Bloquear conteúdo omitido/branco para canais textuais; guard evita disparo placeholder em sequências legadas.",
+      "status": "IMPLEMENTADO isolado; testes Node extraídos PASS; NÃO VALIDADO runtime; NÃO INTEGRADO"
+    },
+    {
+      "path": "src/features/cadence/infra/dispatchers/CadenceDispatchers.ts",
+      "reason": "Bloquear conteúdo omitido/branco para canais textuais; guard evita disparo placeholder em sequências legadas.",
+      "status": "IMPLEMENTADO isolado; testes Node extraídos PASS; NÃO VALIDADO runtime; NÃO INTEGRADO"
+    }
+  ],
+  "handoffs": [
+    {
+      "to": [
+        "07",
+        "04",
+        "18"
+      ],
+      "finding": "PROD-01",
+      "status": "aberto",
+      "action": "Contrato valores indisponíveis e origem métricas reais"
+    },
+    {
+      "to": [
+        "07",
+        "13",
+        "17",
+        "18",
+        "22"
+      ],
+      "finding": "PROD-02",
+      "status": "aberto",
+      "action": "Executar/feedback real ou indisponibilidade explícita; revisão RBAC ao conectar"
+    },
+    {
+      "to": [
+        "07",
+        "13",
+        "18",
+        "22"
+      ],
+      "finding": "PROD-03",
+      "status": "aberto",
+      "action": "Trace real tenant-scoped;404 ausente; retirar aprovação fake"
+    }
+  ],
+  "limits": [
+    "Varredura dirigida por risco; leitura estática não certifica plataforma inteira.",
+    "node_modules ausente no worktree; não rodados tsc,lint,build,Vitest,Playwright,serviços externos ou banco.",
+    "Nenhum deploy/push/commit ou integração. Parecer24 obrigatório pendente.",
+    "Papéis sequenciais no ambiente exclusivo; não são oito processos concorrentes."
+  ]
+}

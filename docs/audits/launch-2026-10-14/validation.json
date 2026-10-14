@@ -1,0 +1,54 @@
+{
+  "htmlSha256": "126cf7b2c763ea56d18279b0e0eb8a4bb23348a8cf7eb49fddbff4db51d71f5f",
+  "structuralChecks": {
+    "agentIds": 26,
+    "uniqueFindings": 12,
+    "candidateHashes": 8,
+    "allInputLabels": true,
+    "uniqueHtmlIds": true,
+    "anchorsExist": true,
+    "localSourceLinksExist": true,
+    "externalDependencies": false,
+    "deferredReviewLink": [
+      "parecer-24.md",
+      "parecer-24.md"
+    ]
+  },
+  "sanitization": {
+    "result": "PASS",
+    "scope": "Padrões locais em artefatos textuais criados; revisão humana de conteúdo e screenshots",
+    "findings": [],
+    "limits": "Não substitui gitleaks completo ou auditoria de segredos do repositório. Não lê .env nem publica valores."
+  },
+  "visual": {
+    "status": "VERIFICADO VISUALMENTE — relatório, não UI da plataforma",
+    "browser": "Chrome local via ferramenta de browser",
+    "desktopScreenshot": "evidence/report-desktop.png",
+    "mobileScreenshot": "evidence/report-mobile.png",
+    "mobileViewport": {
+      "width": 390,
+      "height": 844,
+      "documentWidth": 375
+    },
+    "filterChecks": {
+      "P1": "8 de 12",
+      "conditional": "2 de 12",
+      "noMatch": "0 de 12",
+      "keyboardReset": "12 de 12"
+    },
+    "limits": [
+      "Busca/filtros e reset por Enter testados; automação click do reset não foi conclusiva, foco moveu para outra posição, então não se alega teste mouse aprovado.",
+      "Impressão/PDF não executada; estilo print inspecionado.",
+      "App de produto, providers, DB e mobile nativo não executados.",
+      "Viewport restaurado após teste."
+    ]
+  },
+  "release": "BLOQUEADO; gates globais ausentes; correções não integradas",
+  "commands": [
+    {
+      "command": "python .tmp/lancamento-20261014/validate_report.py",
+      "exitCode": 0,
+      "result": "PASS inventário/HTML/links/hashes/sanitização local"
+    }
+  ]
+}
