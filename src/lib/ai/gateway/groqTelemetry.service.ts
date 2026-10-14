@@ -266,3 +266,6 @@ class GroqTelemetryService {
 }
 
 export const groqTelemetryService = new GroqTelemetryService();
+
+export const getGroqTelemetrySnapshot = (organizationId?: string) =>
+  groqTelemetryService.getSnapshot(organizationId);
