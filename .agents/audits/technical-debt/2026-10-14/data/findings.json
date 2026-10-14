@@ -1,0 +1,2457 @@
+{
+  "schemaVersion": 1,
+  "inventoryId": "technical-debt-2026-10-14",
+  "auditedCommit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+  "count": 40,
+  "note": "Projeção normalizada do pacote forense. IDs, evidências e correctionState originais foram preservados. Os campos remediationStatus, validationStatus, auditStatus e releaseStatus separam estados que o texto original misturava.",
+  "findings": [
+    {
+      "id": "DEBT-GATE-001",
+      "legacyRef": "OPS-001",
+      "title": "Gate local de lançamento (scripts/release-gate.js) emite STATUS: GO mesmo com typecheck e lint falhando",
+      "category": "DT-08",
+      "relatedCategories": [
+        "DT-13",
+        "DT-17"
+      ],
+      "module": "QA / Release Gate",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "O script scripts/release-gate.js (invocado por npm run release:check) configura lint e typecheck como opcionais (optional: true) e não executa test:architecture, test:integration, test:e2e nem npm audit. Na reprodução controlada, quando typecheck retorna exit code 1, o script ainda imprime STATUS: GO e encerra com exit 0.",
+      "evidence": [
+        {
+          "file": "scripts/release-gate.js",
+          "lineStart": 38,
+          "lineEnd": 65,
+          "detail": "Flags optional: true em checks obrigatórios e ausência de gates de arquitetura/integração/E2E."
+        },
+        {
+          "file": "docs/release/GO-LIVE-CHECKLIST.md",
+          "lineStart": 1,
+          "lineEnd": 15,
+          "detail": "Documentação de go-live apoia decisão no comando release:check."
+        }
+      ],
+      "rootCause": "Flexibilização temporária de checks no script local nunca revertida para refletir os gates obrigatórios do AGENTS.md §28.",
+      "impact": "Falsa certificação de prontidão de release em execuções locais antes de integração ou deploy.",
+      "priority": "P1",
+      "priorityJustification": "P1 porque mascara erros de compilação e lint como aprovação formal de lançamento (STATUS: GO).",
+      "agent": "08",
+      "participants": [
+        "08",
+        "00",
+        "24"
+      ],
+      "dependencies": [
+        "Revisão independente Agente 24"
+      ],
+      "remediation": "Tornar lint e typecheck estritamente obrigatórios em scripts/release-gate.js, incluir test:architecture, test:integration, test:e2e e npm audit, e falhar se qualquer script estiver ausente em package.json.",
+      "approvalCriterion": "verify-release-gate.mjs comprova exit 1 (NO-GO) para falha individual em qualquer um dos 8 gates obrigatórios ou script ausente.",
+      "regressionTests": [
+        "Teste automatizado com 11 cenários de spawnSync simulando falha individual de cada gate e sucesso global"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta (reproduzido via verify-release-gate.mjs)",
+      "limitations": "Lógica do gate validada em VM Node; execução completa dos comandos subjacentes requer ambiente com dependências instaladas.",
+      "type": "Risco operacional",
+      "wave": "Onda 00",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-08-ops-001.md",
+      "categoryName": "Testes e QA",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-DB-001",
+      "legacyRef": "OPS-002",
+      "title": "Guia canônico LOCAL_FIRST.md orienta aplicação a conectar no PostgreSQL com superusuário de bootstrap (bypass de RLS)",
+      "category": "DT-05",
+      "relatedCategories": [
+        "DT-06",
+        "DT-11",
+        "DT-30"
+      ],
+      "module": "Banco de Dados / RLS",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "O guia docs/development/LOCAL_FIRST.md:39 instrui configurar DATABASE_URL com o usuário prospector. No entanto, docker-compose.postgres-local.yml define prospector como POSTGRES_USER (superusuário de bootstrap, que ignora Row-Level Security no PostgreSQL), enquanto scripts/db/create-app-role.sql cria especificamente o papel restrito prospector_app (NOSUPERUSER, NOBYPASSRLS) para o runtime.",
+      "evidence": [
+        {
+          "file": "docs/development/LOCAL_FIRST.md",
+          "lineStart": 35,
+          "lineEnd": 45,
+          "detail": "DATABASE_URL configurada com papel prospector no guia."
+        },
+        {
+          "file": "docker-compose.postgres-local.yml",
+          "lineStart": 20,
+          "lineEnd": 28,
+          "detail": "prospector é superuser do container Postgres."
+        },
+        {
+          "file": "scripts/db/create-app-role.sql",
+          "lineStart": 1,
+          "lineEnd": 18,
+          "detail": "Papel correto para aplicação com RLS ativo é prospector_app."
+        }
+      ],
+      "rootCause": "Documentação de setup local não foi atualizada após a introdução da segregação entre conta de migração/bootstrap e conta de runtime sujeita a RLS.",
+      "impact": "Ambientes configurados segundo o guia executam a aplicação com privilégio de superusuário, neutralizando a defesa em profundidade do PostgreSQL RLS entre tenants.",
+      "priority": "P1",
+      "priorityJustification": "P1 porque induz configuração que desativa efetivamente o isolamento RLS no banco de dados.",
+      "agent": "01",
+      "participants": [
+        "01",
+        "01A",
+        "08",
+        "18"
+      ],
+      "dependencies": [
+        "Alinhamento documental com Agente 18 e Agente 08"
+      ],
+      "remediation": "Atualizar docs/development/LOCAL_FIRST.md para especificar prospector_app em DATABASE_URL e documentar DIRECT_URL apenas para execução de migrations/bootstrap.",
+      "approvalCriterion": "Documentação consistente com scripts/db/create-app-role.sql e prisma.config.ts, sem expor credenciais reais.",
+      "regressionTests": [
+        "Verificação automatizada de contrato documental e teste de integração RLS confirmando que current_user não possui rolsuper/rolbypassrls"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta",
+      "limitations": "Confirmado nos arquivos versionados; instância PostgreSQL de produção não inspecionada.",
+      "type": "Risco operacional",
+      "wave": "Onda 01",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-01-ops-002.md",
+      "categoryName": "Banco de dados",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-DB-002",
+      "legacyRef": "NEW-MERGE-2B918E0A-DIALER-SQL",
+      "title": "Repositórios SQL nativos do discador (PgCampaignRepository/PgLeadRepository) não filtram organization_id explicitamente",
+      "category": "DT-05",
+      "relatedCategories": [
+        "DT-02",
+        "DT-06",
+        "DT-30"
+      ],
+      "module": "Cadência / Discador SQL",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Embora o merge 2b918e0a (commit 2512d2b8) tenha substituído $queryRawUnsafe por Prisma.sql parametrizado em PgCampaignRepository.ts e PgLeadRepository.ts, as queries SQL continuam selecionando e atualizando registros nas tabelas campaigns e leads (ex.: findActive, findAll, claimNextEligible) sem coluna ou filtro organization_id. Como $queryRaw opera diretamente no PrismaClient injetado, chamadas fora de withTenantContext ou sob conexão sem RLS estrito não possuem isolamento em nível de query.",
+      "evidence": [
+        {
+          "file": "src/features/cadence/dialer/infrastructure/db/repositories/PgCampaignRepository.ts",
+          "lineStart": 57,
+          "lineEnd": 71,
+          "detail": "findActive() e findAll() executam SELECT ... FROM campaigns sem cláusula WHERE organization_id."
+        },
+        {
+          "file": "src/features/cadence/dialer/infrastructure/db/repositories/PgLeadRepository.ts",
+          "lineStart": 84,
+          "lineEnd": 103,
+          "detail": "claimNextEligible() faz UPDATE leads ... RETURNING leads.* filtrando apenas campaign_id."
+        }
+      ],
+      "rootCause": "Entidades de domínio do sub-módulo dialer (Campaign e Lead) foram modeladas sem propriedade obrigatória organizationId e persistidas via SQL cru fora do interceptor de modelos do tenant-prisma.ts.",
+      "impact": "Risco de vazamento ou listagem cruzada de campanhas/leads entre organizações caso os repositórios sejam instanciados com o cliente Prisma padrão fora de uma transação RLS.",
+      "priority": "P1",
+      "priorityJustification": "P1 por violar o princípio de defesa em profundidade de multi-tenancy (AGENTS.md §26 exige filtro por organizationId além de RLS).",
+      "agent": "01",
+      "participants": [
+        "01",
+        "01A",
+        "17",
+        "22"
+      ],
+      "dependencies": [
+        "Alinhamento de schema/entidade entre Agente 01 e Agente 17"
+      ],
+      "remediation": "Incluir organizationId nas assinaturas de leitura/escrita de CampaignRepository e LeadRepository (ou migrar para modelos Prisma gerenciados por tenant-prisma.ts) e adicionar cláusula WHERE organization_id = ${organizationId} em todas as queries SQL.",
+      "approvalCriterion": "Teste de integração multi-tenant comprova que findAll/findActive/claimNextEligible de Tenant A jamais retornam ou modificam campanhas/leads de Tenant B.",
+      "regressionTests": [
+        "Teste negativo entre Tenant A e Tenant B em PgCampaignRepository e PgLeadRepository"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta (confirmado no código de PgCampaignRepository.ts e PgLeadRepository.ts)",
+      "limitations": "Confirmado estaticamente; impacto em produção mitigado apenas se o módulo dialer não estiver exposto ou se RLS bloquear na camada de sessão.",
+      "type": "Risco operacional",
+      "wave": "Onda 01",
+      "effort": "M (1–3 dias)",
+      "regressionRisk": "Médio (altera contrato das portas CampaignRepository e LeadRepository)",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-01-debt-db-002-dialer-tenancy.md",
+      "categoryName": "Banco de dados",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-LGPD-001",
+      "legacyRef": "FND-01",
+      "title": "Exclusão LGPD pode concluir sem gravar supressão multicanal (OptOutRecord)",
+      "category": "DT-06",
+      "relatedCategories": [
+        "DT-04",
+        "DT-05",
+        "DT-35"
+      ],
+      "module": "LGPD / Privacidade",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Em main, eraseDataSubject anonimiza email/telefone do Contact antes de gravar OptOutRecord e ignora exceções em blocos catch vazios. Caso a criação de OptOutRecord falhe, o retry subsequente já não possui os identificadores originais para registrar a supressão.",
+      "evidence": [
+        {
+          "file": "src/shared/services/dataSubjectErasure.service.ts",
+          "lineStart": 115,
+          "lineEnd": 135,
+          "detail": "Destruição de identificadores precede gravação de OptOutRecord com catch silencioso."
+        },
+        {
+          "file": "src/features/prospecting/services/cold-email.service.ts",
+          "lineStart": 88,
+          "lineEnd": 96,
+          "detail": "Verificação de opt-out depende de OptOutRecord persistido."
+        }
+      ],
+      "rootCause": "Persistência de supressão multicanal tratada como efeito colateral opcional após mutação destrutiva dos identificadores do titular.",
+      "impact": "Risco de violação LGPD e reabordagem comercial indevida via cold-email caso a gravação de OptOutRecord falhe durante o expurgo.",
+      "priority": "P1",
+      "priorityJustification": "P1 por risco direto à conformidade LGPD e perda de capacidade de supressão em retry; não classificado como P0 pois requer falha concorrente na escrita de OptOutRecord.",
+      "agent": "01",
+      "participants": [
+        "01",
+        "21",
+        "17",
+        "00"
+      ],
+      "dependencies": [
+        "Validação de contrato com Agente 21 (LGPD) e Agente 17 (Cadência)",
+        "Revisão independente Agente 24"
+      ],
+      "remediation": "Gravar OptOutRecord obrigatoriamente antes de anonimizar os identificadores do Contact/Lead e propagar qualquer erro de persistência (integrar candidato validado em .agents/handoffs/onda-lancamento-20261014/00-para-01-fnd-01.md).",
+      "approvalCriterion": "Teste automatizado comprova que falha em optOutRecord.create impede anonimização e propaga erro, e caminho feliz grava supressão antes de limpar PII.",
+      "regressionTests": [
+        "Cenário de falha em optOutRecord.create preserva identificadores para retry",
+        "Cenário de sucesso grava OptOutRecord e bloqueia envio em cold-email.service.ts"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta (reproduzido isoladamente via verify-lgpd-optout.mjs)",
+      "limitations": "Testado isoladamente com função extraída; fluxo HTTP/banco Postgres real não executado nesta sessão.",
+      "type": "Vulnerabilidade de segurança",
+      "wave": "Onda 01",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-01-fnd-01.md",
+      "categoryName": "Segurança e privacidade",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-LGPD-002",
+      "legacyRef": "FND-03",
+      "title": "Memória de agentes (AgentMemory) não pode ser localizada por titular para exclusão individual LGPD",
+      "category": "DT-06",
+      "relatedCategories": [
+        "DT-05",
+        "DT-10"
+      ],
+      "module": "IA / LGPD",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "O modelo AgentMemory armazena histórico conversacional em JSON (messages) escopado apenas por organizationId e sessionId, sem chave estrangeira ou índice para contactId/leadId. Embora exista retenção temporal de 90 dias (AGENT_MEMORY_RETENTION_DAYS), eraseDataSubject não consegue localizar memórias de um titular específico antes do expurgo temporal.",
+      "evidence": [
+        {
+          "file": "prisma/schema.prisma",
+          "lineStart": 1766,
+          "lineEnd": 1782,
+          "detail": "Ausência de contactId/leadId no model AgentMemory."
+        },
+        {
+          "file": "src/features/intelligence/agents/agentMemory.store.ts",
+          "lineStart": 75,
+          "lineEnd": 95,
+          "detail": "Persistência de mensagens por sessionId sem vínculo estruturado ao titular."
+        },
+        {
+          "file": "src/shared/services/dataSubjectErasure.service.ts",
+          "lineStart": 78,
+          "lineEnd": 114,
+          "detail": "Fluxo de exclusão LGPD não abrange AgentMemory."
+        }
+      ],
+      "rootCause": "Modelagem inicial de memória episódica de agentes orientada apenas a sessão, sem rastreabilidade de proveniência por titular de dados.",
+      "impact": "Se mensagens persistidas em AgentMemory contiverem dados pessoais do lead/contato, o atendimento imediato ao direito de exclusão (Art. 18 LGPD) fica incompleto até o ciclo do worker de retenção.",
+      "priority": "P1",
+      "priorityJustification": "P1 por lacuna estrutural de conformidade LGPD no atendimento imediato a requisição de exclusão de titular.",
+      "agent": "01A",
+      "participants": [
+        "01A",
+        "01",
+        "07",
+        "21",
+        "00"
+      ],
+      "dependencies": [
+        "Migration de schema pelo Agente 01/01A",
+        "Atualização dos produtores de memória pelo Agente 07",
+        "Validação LGPD pelo Agente 21"
+      ],
+      "remediation": "Adicionar vínculo opcional indexado (contactId/leadId) em AgentMemory via migration, propagar identificadores nos produtores do Agente 07 e incluir deleção/redação em eraseDataSubject.",
+      "approvalCriterion": "Ao executar eraseDataSubject para um contactId/leadId, todas as entradas associadas em AgentMemory são expurgadas ou redigidas na mesma transação.",
+      "regressionTests": [
+        "Teste de integração criando AgentMemory vinculada a contato e verificando remoção após eraseDataSubject",
+        "Preservação de memórias de outros titulares do mesmo tenant"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta (confirmado no schema.prisma e dataSubjectErasure.service.ts)",
+      "limitations": "Retenção temporal de 90 dias já existe; não foi inspecionado banco de produção para medir ocorrência real de PII em messages.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 01",
+      "effort": "M (1–3 dias)",
+      "regressionRisk": "Médio (envolve migration de banco e store de IA)",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-01A-fnd-03.md",
+      "categoryName": "Segurança e privacidade",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-SEC-001",
+      "legacyRef": "DEBT-20261014-SEC-001",
+      "title": "URLs de autenticação sensíveis são escritas em logs no fallback sem SMTP",
+      "category": "DT-06",
+      "categoryName": "Segurança e privacidade",
+      "relatedCategories": [
+        "DT-19",
+        "DT-30"
+      ],
+      "module": "auth",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Fallback MailerNotConfiguredError registra objeto email/url e interpola URL em msg; redaction do logger não cobre esses campos nem texto da mensagem.",
+      "evidence": [
+        {
+          "file": "src/lib/auth.ts",
+          "lineStart": 127,
+          "lineEnd": 132,
+          "detail": "Inspeção estática do contrato indicado; não comprova configuração aplicada nem execução ponta a ponta."
+        },
+        {
+          "file": "src/lib/logger.ts",
+          "lineStart": 36,
+          "lineEnd": 41,
+          "detail": "Lista de redaction omite url/email/msg e não modifica URL interpolada em texto."
+        },
+        {
+          "file": "src/lib/auth.ts",
+          "lineStart": 179,
+          "lineEnd": 184,
+          "detail": "Mesmo padrão no ramo SMTP ausente da verificação."
+        }
+      ],
+      "rootCause": "Logs recebem credencial transitória e PII; não há sanitização de msg/url/email no sink.",
+      "impact": "Leitor de logs com URL válida pode recuperar/verificar conta; condição SMTP ausente demonstrada por ramo estático, exposição efetiva de produção não verificada.",
+      "priority": "P1",
+      "priorityJustification": "P1 por credencial transitória de autenticação em sink de logs sob falha SMTP; não P0 pois exposição/log access efetivos não medidos.",
+      "agent": "15",
+      "participants": [
+        "01"
+      ],
+      "dependencies": [
+        "15",
+        "21",
+        "12"
+      ],
+      "remediation": "Remover URL e e-mail dos logs, emitir apenas userId/código de configuração ausente, falhar de modo observável.",
+      "approvalCriterion": "SMTP ausente não emite URL/token nem e-mail, inclusive msg serializada",
+      "regressionTests": [
+        "SMTP ausente para reset e verificação não escreve token/URL/email; capturar objeto e msg",
+        "SMTP disponível mantém envio válido"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta",
+      "limitations": "Não medidos dados/configuração real de produção nem serviços externos; conclusão limitada à evidência citada.",
+      "type": "Vulnerabilidade de segurança",
+      "wave": "Onda 01",
+      "effort": "Baixo",
+      "regressionRisk": "Médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-15-debt-20261014-sec-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-001",
+      "legacyRef": "DEBT-20261014-UX-001",
+      "title": "Cache PWA de CRM não é particionado por identidade autenticada",
+      "category": "DT-34",
+      "categoryName": "Mobile e PWA",
+      "relatedCategories": [
+        "DT-24",
+        "DT-06",
+        "DT-30"
+      ],
+      "module": "PWA / autenticação",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Configuração StaleWhileRevalidate guarda respostas CRM por origem/URL no mesmo cache; logout não remove o conteúdo.",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 61,
+          "lineEnd": 66,
+          "detail": "Cache fixo para GET CRM, por URL, sem identidade do usuário."
+        },
+        {
+          "file": "src/contexts/AuthContext.tsx",
+          "lineStart": 118,
+          "lineEnd": 128,
+          "detail": "Logout encerra sessão e redireciona; não limpa CacheStorage."
+        }
+      ],
+      "rootCause": "Cache de respostas autenticadas tratado como cache público de assets.",
+      "impact": "Em navegador compartilhado, resposta antiga pode ser servida antes da resposta da nova sessão; risco de confidencialidade e de mostrar informação obsoleta.",
+      "priority": "P1",
+      "priorityJustification": "Em navegador compartilhado, resposta antiga pode ser servida antes da resposta da nova sessão; risco de confidencialidade e de mostrar informação obsoleta. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "09",
+      "participants": [
+        "02",
+        "09"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Evitar cache SW de dados autenticados ou particionar e invalidar explicitamente por sessão/tenant.",
+      "approvalCriterion": "Usuário B não recebe dados de A ao trocar sessão online/offline; estado stale é explícito.",
+      "regressionTests": [
+        "Duas contas e organizações sintéticas; mesma URL; logout/login; offline; verificar CacheStorage e corpo retornado."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Configuração e ausência de limpeza no caminho de logout confirmadas; acesso cruzado real NÃO DEMONSTRADO, requer build e navegador isolado.",
+      "type": "Risco operacional",
+      "wave": "Onda 01",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-09-debt-20261014-ux-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-OPS-004",
+      "legacyRef": "DEBT-20261014-OPS-004",
+      "title": "Aceite do restore drill ignora status Prisma e limite RTO",
+      "category": "DT-22",
+      "categoryName": "Recuperação",
+      "relatedCategories": [
+        "DT-08",
+        "DT-19",
+        "DT-38"
+      ],
+      "module": "recuperação",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Predicate pass omite status de migration e limiteRTO900;RPO é string fixa e contagem de tabelas pode omitir falhas por catch.",
+      "evidence": [
+        {
+          "file": "scripts/backup/run-backup-restore-drill.ts",
+          "lineStart": 298,
+          "lineEnd": 302,
+          "detail": "Predicate pass omite status de migration e limiteRTO900;RPO é string fixa e contagem de tabelas pode omitir falhas por catch."
+        }
+      ],
+      "rootCause": "Predicate pass omite status de migration e limiteRTO900;RPO é string fixa e contagem de tabelas pode omitir falhas por catch.",
+      "impact": "Ferramenta pode reportar PASS apesar de migration status em erro ou restauração acima SLA; não foi executado restore real.",
+      "priority": "P1",
+      "priorityJustification": "P1: Ferramenta pode reportar PASS apesar de migration status em erro ou restauração acima SLA; não foi executado restore real. Escopo comprovado estático; ocorrência de produção não medida.",
+      "agent": "10",
+      "participants": [
+        "00"
+      ],
+      "dependencies": [
+        "Autorização específica para remediação",
+        "Ambiente descartável do14",
+        "Revisão independente24"
+      ],
+      "remediation": "Bloquear erro de schema/tabelas e extrapolaçãoRTO; medirRPO por backup real; separar referencial de provaRLS.",
+      "approvalCriterion": "Mocks migrationFAIL/restore901s/tabela ausente=>FAIL;cenário completo900s=>PASS; banco descartável prova RLS A/B.",
+      "regressionTests": [
+        "Mocks migrationFAIL/restore901s/tabela ausente=>FAIL;cenário completo900s=>PASS; banco descartável prova RLS A/B."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta para contrato estático",
+      "limitations": "Produto e infraestrutura não executados; Nenhuma correção aplicada",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 02",
+      "effort": "M (1–3 dias de engenharia com ambiente disponível)",
+      "regressionRisk": "moderado",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-10-debt-20261014-ops-004.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-API-001",
+      "legacyRef": "NEW-MERGE-2B918E0A-OPENAPI",
+      "title": "Merge de stash antigo (2b918e0a) removeu 124 linhas de /organization-modules do docs/openapi.yaml",
+      "category": "DT-02",
+      "relatedCategories": [
+        "DT-11",
+        "DT-14",
+        "DT-18"
+      ],
+      "module": "Contratos / OpenAPI",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Em 2026-10-14T13:41:59Z, o commit 2b918e0aefab924d9594b06ad7ce7a46451992ae fez merge da branch origin/backup-stash/20261013-4-pg-repositories (2512d2b86e6112460803d59abaeb6e8bdca126e0, criada antes do PR #724). Esse merge reverteu acidentalmente 124 linhas em docs/openapi.yaml, apagando a documentação dos endpoints /organization-modules, /organization-modules/onboarding/complete e /organization-modules/{moduleKey}.",
+      "evidence": [
+        {
+          "file": "docs/openapi.yaml",
+          "lineStart": 10225,
+          "lineEnd": 10235,
+          "detail": "Remoção das 124 linhas dos paths /organization-modules* no diff do commit 2512d2b8 / 2b918e0a."
+        },
+        {
+          "file": "src/bootstrap/routes.ts",
+          "lineStart": 193,
+          "lineEnd": 198,
+          "detail": "Rotas /api/organization-modules permanecem montadas em runtime, gerando deriva OpenAPI."
+        }
+      ],
+      "rootCause": "Merge direto de branch de backup-stash defasada (2026-10-11) sobre main sem resolução seletiva do arquivo docs/openapi.yaml nem execução prévia do gate verify:openapi-drift.",
+      "impact": "Quebra a paridade contratual OpenAPI e faz o gate de CI verify:openapi-drift falhar na branch main.",
+      "priority": "P1",
+      "priorityJustification": "P1 porque introduz regressão direta em main que quebra o gate de contrato OpenAPI do CI (resolvido anteriormente no PR #724).",
+      "agent": "18",
+      "participants": [
+        "18",
+        "01",
+        "08",
+        "08A"
+      ],
+      "dependencies": [
+        "Coordenação com Agente 08 para validação do gate verify:openapi-drift"
+      ],
+      "remediation": "Restaurar as 124 linhas dos endpoints /organization-modules em docs/openapi.yaml (conforme PR #724 / commit c357daa9) e validar com npm run verify:openapi-drift.",
+      "approvalCriterion": "npm run verify:openapi-drift retorna exit 0 com 0 endpoints não documentados.",
+      "regressionTests": [
+        "Execução de npm run verify:openapi-drift no gate de CI antes de qualquer merge em main"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (regressão ativa em main @ c7e33a91)",
+      "confidence": "Alta (comprovado pelo diff exato do commit 2512d2b8 / 2b918e0a)",
+      "limitations": "Nenhuma limitação; diff confirmado no histórico Git de main.",
+      "type": "Defeito funcional",
+      "wave": "Onda 03",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo (restauração de especificação OpenAPI)",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-18-debt-api-001-openapi-drift.md",
+      "categoryName": "Arquitetura",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-OPS-006",
+      "legacyRef": "DEBT-20261014-OPS-006",
+      "title": "Guard classifica falhas de qualquer origem como Redis",
+      "category": "DT-19",
+      "categoryName": "Observabilidade",
+      "relatedCategories": [
+        "DT-21"
+      ],
+      "module": "Runtime",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "matchesKnownPattern && (looksLikeIoredis || matchesKnownPattern) reduz a matchesKnownPattern; ECONNRESET de serviço não Redis segue processo.",
+      "evidence": [
+        {
+          "file": "src/lib/process-guards.ts",
+          "lineStart": 48,
+          "lineEnd": 52,
+          "detail": "Fonte direta no snapshot auditado; escopo do controle limitado ao título."
+        },
+        {
+          "file": "src/lib/process-guards.ts",
+          "lineStart": 48,
+          "lineEnd": 52,
+          "detail": "Evidência complementar da causa/contrato."
+        }
+      ],
+      "rootCause": "Predicado origem tornado tautológico por repetição do termo.",
+      "impact": "Bugs não tratados de outros clientes seguem execução em estado possivelmente inconsistente;log continua existindo.",
+      "priority": "P1",
+      "priorityJustification": "Afeta confiabilidade operacional de processo/encerramento por caminho demonstrado;sem prova de risco imediato para classificarP0.",
+      "agent": "16",
+      "participants": [
+        "06",
+        "00"
+      ],
+      "dependencies": [
+        "Ambiente isolado homologação",
+        "Revisão24",
+        "Autorização específica correção"
+      ],
+      "remediation": "Exigir proveniência Redis com mensagem compatível;caso desconhecido fatal.",
+      "approvalCriterion": "Erro application ECONNRESET termina fatal;erro Redis conhecido segue log.error.",
+      "regressionTests": [
+        "Erro application ECONNRESET termina fatal;erro Redis conhecido segue log.error."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (fonte direta;runtime limitado aos mocks especificados)",
+      "limitations": "Reprodução da função pura; não mede incidente ou ambiente real.",
+      "type": "Risco operacional",
+      "wave": "Onda 03",
+      "effort": "P",
+      "regressionRisk": "Médio: fluxo de execução/falha",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-16-debt-20261014-ops-006.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-OPS-007",
+      "legacyRef": "DEBT-20261014-OPS-007",
+      "title": "Shutdown HTTP espera fechar conexão SSE antes de encerrá-la",
+      "category": "DT-21",
+      "categoryName": "Disponibilidade",
+      "relatedCategories": [
+        "DT-19"
+      ],
+      "module": "Runtime HTTP",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Await httpServer.close callback precede sseService.closeAll;SSE mantém callback pendente e código não tem deadline.",
+      "evidence": [
+        {
+          "file": "src/bootstrap/shutdown.ts",
+          "lineStart": 69,
+          "lineEnd": 73,
+          "detail": "Fonte direta no snapshot auditado; escopo do controle limitado ao título."
+        },
+        {
+          "file": "src/features/notifications/sse.service.ts",
+          "lineStart": 55,
+          "lineEnd": 59,
+          "detail": "Evidência complementar da causa/contrato."
+        }
+      ],
+      "rootCause": "Ordem de dreno com ciclo e falta de limite/best-effort prometido em comentário.",
+      "impact": "Deploy pode exigir kill e perder encerramento ordenado;falha em closeAll/worker também impede cleanup posterior.",
+      "priority": "P1",
+      "priorityJustification": "Afeta confiabilidade operacional de processo/encerramento por caminho demonstrado;sem prova de risco imediato para classificarP0.",
+      "agent": "16",
+      "participants": [
+        "06",
+        "00"
+      ],
+      "dependencies": [
+        "Ambiente isolado homologação",
+        "Revisão24",
+        "Autorização específica correção"
+      ],
+      "remediation": "Iniciar fechamento HTTP,fechar SSE,drenar com deadline e cleanup best-effort.",
+      "approvalCriterion": "SIGTERM com SSE ativo fecha SSE e HTTP dentro deadline;uma etapa falha não impede restantes.",
+      "regressionTests": [
+        "SIGTERM com SSE ativo fecha SSE e HTTP dentro deadline;uma etapa falha não impede restantes."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (fonte direta;runtime limitado aos mocks especificados)",
+      "limitations": "Fake dependências reproduz espera; não usa socket real nem simula deployment.",
+      "type": "Risco operacional",
+      "wave": "Onda 03",
+      "effort": "P",
+      "regressionRisk": "Médio: fluxo de execução/falha",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-16-debt-20261014-ops-007.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-003",
+      "legacyRef": "DEBT-20261014-UX-003",
+      "title": "Analytics devolve sucesso e zeros após erro de agregação",
+      "category": "DT-31",
+      "categoryName": "Analytics",
+      "relatedCategories": [
+        "DT-04",
+        "DT-19",
+        "DT-39"
+      ],
+      "module": "Analytics",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Endpoints metrics/overview/dashboard capturam qualquer exceção e devolvem dados vazios ou zerados com success:true.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 24,
+          "lineEnd": 54,
+          "detail": "Catch substitui falha por success:true/HTTP200."
+        },
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 56,
+          "lineEnd": 96,
+          "detail": "Catch gera zeros e nulls sem propagar/logar erro."
+        },
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 87,
+          "lineEnd": 147,
+          "detail": "Catch gera isEmpty:true em caso de indisponibilidade."
+        },
+        {
+          "file": "src/features/analytics/presentation/AnalyticsController.ts",
+          "lineStart": 24,
+          "lineEnd": 54,
+          "detail": "Reprodução Node isolada exit0: Repository.overview rejeita:status=200,success=true,totalCompanies=0."
+        }
+      ],
+      "rootCause": "Confusão entre banco vazio e falha de banco/consulta.",
+      "impact": "Usuário e monitoramento interpretam indisponibilidade como métricas reais zeradas; erro não observável nesses handlers.",
+      "priority": "P1",
+      "priorityJustification": "Usuário e monitoramento interpretam indisponibilidade como métricas reais zeradas; erro não observável nesses handlers. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "04",
+      "participants": [
+        "02",
+        "04"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Propagar erro ao middleware e manter vazio apenas quando consulta bem-sucedida devolve vazio.",
+      "approvalCriterion": "Falha do repository retorna erro observável; banco vazio continua 200 com estado empty verdadeiro.",
+      "regressionTests": [
+        "Repository rejeita overview/dashboard/getMetrics; confirmar status não2xx/log e UI error/retry; repository vazio não gera erro."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta; reprodução isolada com corpos atuais de função e dependências sintéticas",
+      "limitations": "Corpo atual executado após remover somente tipos TypeScript; mocks de serviços. HTTP,DB real e navegador NÃO EXECUTADOS.",
+      "type": "Defeito funcional",
+      "wave": "Onda 03",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-04-debt-20261014-ux-003.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-QUEUE-001",
+      "legacyRef": "FND-02",
+      "title": "Worker é classificado como processo web e pode reenfileirar mensagens WhatsApp sem enviar",
+      "category": "DT-25",
+      "relatedCategories": [
+        "DT-09",
+        "DT-21"
+      ],
+      "module": "Filas / WhatsApp",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Em src/lib/queue/redis.ts:10, a expressão regular que detecta se o processo atual é um worker possui escape incorreto e avalia como false para worker.cjs e worker.ts. Quando a sessão WhatsApp não está ativa, o próprio whatsappCommand.worker.ts chama sendWhatsAppMessage, que julga estar no processo web, enfileira um novo job na fila BullMQ e retorna true.",
+      "evidence": [
+        {
+          "file": "src/lib/queue/redis.ts",
+          "lineStart": 8,
+          "lineEnd": 14,
+          "detail": "Regex baseline retorna false para /app/dist/worker.cjs e C:/app/worker.ts."
+        },
+        {
+          "file": "src/features/integrations/whatsapp/whatsapp.service.ts",
+          "lineStart": 408,
+          "lineEnd": 420,
+          "detail": "Enfileiramento condicional baseado na classificação de processo."
+        },
+        {
+          "file": "src/lib/queue/whatsappCommand.worker.ts",
+          "lineStart": 22,
+          "lineEnd": 30,
+          "detail": "Consumer invoca sendWhatsAppMessage diretamente."
+        }
+      ],
+      "rootCause": "Escape duplo acidental na literal RegExp de detecção de entrypoint do worker combinada com reutilização do método de serviço entre web e worker.",
+      "impact": "Reenfileiramento em loop e falso positivo de job concluído quando sessão WhatsApp do tenant está desconectada.",
+      "priority": "P1",
+      "priorityJustification": "P1 por causar loop silencioso de jobs em fila e reportar falso sucesso operacional em canal crítico de comunicação.",
+      "agent": "16",
+      "participants": [
+        "16",
+        "06",
+        "07",
+        "00"
+      ],
+      "dependencies": [
+        "Coordenação slot de filas entre Agentes 16 e 06",
+        "Revisão independente Agente 24"
+      ],
+      "remediation": "Corrigir a expressão regular de detecção de worker em src/lib/queue/redis.ts:10 (patch de 1 linha já validado em verify-worker-detector.mjs) e garantir que o worker falhe explicitamente quando a sessão estiver indisponível.",
+      "approvalCriterion": "verify-worker-detector.mjs passa 6/6 cenários (Unix/Windows, .ts/.cjs/.js) e job do worker sem sessão ativa falha sem criar novo job recursivo.",
+      "regressionTests": [
+        "Matriz de 6 caminhos de entrypoint (Unix/Windows, worker vs server)",
+        "Teste unitário de whatsappCommand.worker com sessão ausente"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta (reproduzido isoladamente em Node)",
+      "limitations": "Reprodução isolada confirmada; broker Redis/BullMQ em runtime não executado.",
+      "type": "Defeito funcional",
+      "wave": "Onda 05",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-16-fnd-02.md",
+      "categoryName": "Filas e eventos",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-AI-002",
+      "legacyRef": "PROD-01",
+      "title": "Copiloto Executivo exibe receita, meta, pipeline e forecast fabricados por constantes",
+      "category": "DT-10",
+      "relatedCategories": [
+        "DT-04",
+        "DT-31",
+        "DT-39"
+      ],
+      "module": "Inteligência Comercial / Copiloto",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "A rota GET /api/commercial-agent/workspace (em src/features/intelligence/routes/commercial-agent.routes.ts:40) busca apenas os 10 leads mais recentes sem filtrar por deletedAt ou mês comercial, e calcula métricas financeiras multiplicando contagens por valores fixos (wonLeads.length * 25000, openLeads.length * 30000, meta fixa 200000, forecasts 60%/75% e score default 85).",
+      "evidence": [
+        {
+          "file": "src/features/intelligence/routes/commercial-agent.routes.ts",
+          "lineStart": 35,
+          "lineEnd": 85,
+          "detail": "Cálculo sintético de receita, meta e forecast sobre take: 10 leads."
+        },
+        {
+          "file": "src/bootstrap/routes.ts",
+          "lineStart": 138,
+          "lineEnd": 145,
+          "detail": "Rota montada ativamente em /api/commercial-agent."
+        },
+        {
+          "file": "src/App.tsx",
+          "lineStart": 398,
+          "lineEnd": 405,
+          "detail": "Tela EliteCommercialAgentWorkspace registrada na navegação da aplicação."
+        }
+      ],
+      "rootCause": "Implementação de rota do Copiloto Executivo com fórmulas demonstrativas hardcoded em vez de consumir o serviço canônico de Analytics e Metas (Bloqueador B-06 do AGENTS.md).",
+      "impact": "Apresenta indicadores financeiros fictícios como se fossem dados reais da organização, induzindo decisões comerciais incorretas.",
+      "priority": "P1",
+      "priorityJustification": "P1 por violação direta do bloqueador prioritário B-06 (dados fictícios misturados a dados reais em tela produtiva).",
+      "agent": "07",
+      "participants": [
+        "07",
+        "04",
+        "18",
+        "22"
+      ],
+      "dependencies": [
+        "Contrato de métricas com Agente 04 (CRM/BI) e Agente 18 (OpenAPI)",
+        "Verificação de realidade pelo Agente 22"
+      ],
+      "remediation": "Substituir os cálculos fixos em commercial-agent.routes.ts pelo consumo das agregações reais do tenant (respeitando deletedAt: null e calendário Brasília) e retornar contrato explícito de unavailable quando metas não estiverem configuradas.",
+      "approvalCriterion": "Valores exibidos no Copiloto coincidem exatamente com os negócios reais do banco para o tenant, com >10 leads, respeitando soft-delete e mês comercial.",
+      "regressionTests": [
+        "Teste de integração com base vazia, negócios reais de valores variados, >10 leads e leads soft-deleted"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda contrato 07+04+18 e autorização)",
+      "confidence": "Alta (leitura direta da rota ativa)",
+      "limitations": "Confirmado no código-fonte; navegador não executado.",
+      "type": "Defeito funcional",
+      "wave": "Onda 06",
+      "effort": "M (1–3 dias)",
+      "regressionRisk": "Médio (altera payload consumido pelo frontend do Copiloto)",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-07-prod-01.md",
+      "categoryName": "Inteligência artificial",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-AI-003",
+      "legacyRef": "PROD-02",
+      "title": "Botões de executar e adiar Next Best Action (NBA) afirmam ação concluída sem execução ou persistência",
+      "category": "DT-10",
+      "relatedCategories": [
+        "DT-03",
+        "DT-04",
+        "DT-39"
+      ],
+      "module": "Inteligência Comercial / Copiloto",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Os endpoints POST /api/commercial-agent/nba/:actionId/execute e /feedback retornam apenas JSON de sucesso sem acionar nenhum dispatcher de voz/cadência nem gravar estado no banco. No código de main, o componente EliteCommercialAgentWorkspace.tsx ainda exibia mensagem 'Discando para...' até mesmo no bloco catch de erro de rede e ignorava res.ok no feedback.",
+      "evidence": [
+        {
+          "file": "src/features/intelligence/routes/commercial-agent.routes.ts",
+          "lineStart": 210,
+          "lineEnd": 245,
+          "detail": "Handlers retornam res.json sem persistência ou chamada de serviço."
+        },
+        {
+          "file": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+          "lineStart": 70,
+          "lineEnd": 115,
+          "detail": "Falso sucesso na UI e divergência de propriedade decision vs feedbackType."
+        }
+      ],
+      "rootCause": "Endpoints stubbed e tratamento otimista incondicional na interface do Copiloto.",
+      "impact": "O operador acredita que disparou uma ligação ou adiou uma tarefa comercial, mas nenhuma ação é executada nem salva após recarregar a página.",
+      "priority": "P1",
+      "priorityJustification": "P1 por violar a diretriz de honestidade de produto (falso sucesso sem persistência real).",
+      "agent": "07",
+      "participants": [
+        "07",
+        "13",
+        "17",
+        "18",
+        "22"
+      ],
+      "dependencies": [
+        "Integração com ledger/dispatcher dos Agentes 13 e 17",
+        "Contrato OpenAPI Agente 18",
+        "Verificação Agente 22"
+      ],
+      "remediation": "Integrar os endpoints /execute e /feedback ao dispatcher/ledger real com escopo de tenant e idempotência, alinhar o contrato de payload (decision/feedbackType) e aplicar o tratamento de erro honesto na UI.",
+      "approvalCriterion": "Ação executada/adiada persiste após reload da página e respeita isolamento de tenant; erro HTTP/rede exibe alerta de erro real.",
+      "regressionTests": [
+        "verify-elite.mjs (sucesso HTTP, erro HTTP e falha de rede)",
+        "Teste de integração validando persistência no banco após POST"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch parcial UI candidato isolado; backend pendente",
+      "confidence": "Alta",
+      "limitations": "Confirmado no código-fonte e via verify-elite.mjs.",
+      "type": "Defeito funcional",
+      "wave": "Onda 06",
+      "effort": "M (1–3 dias)",
+      "regressionRisk": "Médio",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-07-prod-02.md",
+      "categoryName": "Inteligência artificial",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-AI-004",
+      "legacyRef": "PROD-03",
+      "title": "Trace de missão do Copiloto e aprovação de consentimento LGPD são retornados de forma sintética/fictícia",
+      "category": "DT-10",
+      "relatedCategories": [
+        "DT-06",
+        "DT-19",
+        "DT-39"
+      ],
+      "module": "Inteligência Comercial / Enxame",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "O endpoint GET /api/commercial-agent/mission/:missionId/trace retorna um objeto JSON estático com status COMPLETED e passos como 'Nenhum risco de consentimento detectado — Aprovado' para qualquer missionId informado, sem realizar consulta ao banco de dados, ao estado do enxame ou à tabela de consentimento LGPD.",
+      "evidence": [
+        {
+          "file": "src/features/intelligence/routes/commercial-agent.routes.ts",
+          "lineStart": 140,
+          "lineEnd": 208,
+          "detail": "Payload de trace e validação LGPD 100% hardcoded no handler HTTP."
+        },
+        {
+          "file": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+          "lineStart": 48,
+          "lineEnd": 56,
+          "detail": "Chamada fixa para mission/default/trace."
+        }
+      ],
+      "rootCause": "Simulação de observabilidade de missão e compliance LGPD deixada em rota de produção.",
+      "impact": "Exibe falsa comprovação de auditoria LGPD e de execução de agentes autônomos para o usuário.",
+      "priority": "P1",
+      "priorityJustification": "P1 porque fabrica evidência de conformidade LGPD e de execução de missão na interface.",
+      "agent": "07",
+      "participants": [
+        "07",
+        "13",
+        "18",
+        "21",
+        "22"
+      ],
+      "dependencies": [
+        "Integração com estado real de missão do Agente 13",
+        "Contrato OpenAPI Agente 18"
+      ],
+      "remediation": "Consultar execuções reais de missão por organizationId, retornar 404 quando missionId não existir (ou estado vazio honesto quando nenhuma missão tiver rodado) e remover afirmações sintéticas de aprovação LGPD.",
+      "approvalCriterion": "ID inexistente ou de outro tenant retorna 404; tela sem missão ativa exibe estado vazio honesto sem forjar aprovação LGPD.",
+      "regressionTests": [
+        "Teste de integração para missionId inexistente, missionId de outro tenant e missão real persistida"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta",
+      "limitations": "Confirmado estaticamente no handler da rota.",
+      "type": "Defeito funcional",
+      "wave": "Onda 06",
+      "effort": "M (1–3 dias)",
+      "regressionRisk": "Médio",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-07-prod-03.md",
+      "categoryName": "Inteligência artificial",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-OPS-001",
+      "legacyRef": "DEBT-20261014-OPS-001",
+      "title": "62 testes co-localizados ficam fora da descoberta unitária",
+      "category": "DT-08",
+      "categoryName": "Testes e QA",
+      "relatedCategories": [
+        "DT-15"
+      ],
+      "module": "testes",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Três globs incluem tests/unit e src/**/__tests__/**/*.test.ts;62 arquivos src de teste co-localizados fora __tests__ não correspondem.",
+      "evidence": [
+        {
+          "file": "vitest.unit.config.ts",
+          "lineStart": 35,
+          "lineEnd": 39,
+          "detail": "Três globs incluem tests/unit e src/**/__tests__/**/*.test.ts;62 arquivos src de teste co-localizados fora __tests__ não correspondem."
+        }
+      ],
+      "rootCause": "Três globs incluem tests/unit e src/**/__tests__/**/*.test.ts;62 arquivos src de teste co-localizados fora __tests__ não correspondem.",
+      "impact": "Regressões nesses arquivos não são exercitadas pelo gate test:unit atual.",
+      "priority": "P1",
+      "priorityJustification": "P1: Regressões nesses arquivos não são exercitadas pelo gate test:unit atual. Escopo comprovado estático; ocorrência de produção não medida.",
+      "agent": "14",
+      "participants": [
+        "00"
+      ],
+      "dependencies": [
+        "Autorização específica para remediação",
+        "Ambiente descartável do14",
+        "Revisão independente24"
+      ],
+      "remediation": "Inventariar suites e incluir testes de produto no runner adequado,sem mascarar falhas novas.",
+      "approvalCriterion": "Descoberta lista todos testes previstos; sentinela em co-localizado falha runner; happy path passa.",
+      "regressionTests": [
+        "Descoberta lista todos testes previstos; sentinela em co-localizado falha runner; happy path passa."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta para contrato estático",
+      "limitations": "Produto e infraestrutura não executados; Nenhuma correção aplicada",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 08",
+      "effort": "M (1–3 dias de engenharia com ambiente disponível)",
+      "regressionRisk": "moderado",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-14-debt-20261014-ops-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-GOV-004",
+      "legacyRef": "PR-741-FALSE-POSITIVES",
+      "title": "PR #741 aberto (tech-debt-audit) contém 176 falsos positivos por grep textual cego e altera formatação de código",
+      "category": "DT-14",
+      "relatedCategories": [
+        "DT-13",
+        "DT-15"
+      ],
+      "module": "Git / Governança de PRs",
+      "commit": "f0f7bc14fdacfab8658cc7bf157d596590f67a8a (PR #741 sobre main c7e33a91)",
+      "description": "O PR #741 (branch tech-debt-audit-1898280509423632042) adicionou scripts/run-tech-debt-audit.ts que executa 'git grep -n -m 5 -i' para termos genéricos ('any', 'px', 'main', 'HEAD', 'build', 'meta', 'feature', 'user'), classificando 176 ocorrências textuais normais como dívidas P1/P2 atribuídas apenas ao Agente 01, além de rodar 'npm run format' no commit 0d10c785 modificando arquivos do repositório.",
+      "evidence": [
+        {
+          "file": "scripts/run-tech-debt-audit.ts",
+          "lineStart": 10,
+          "lineEnd": 102,
+          "detail": "No commit abbe7a0e (PR #741), busca textual sem análise de contexto nem mapeamento real de agentes."
+        },
+        {
+          "file": ".agents/reviews/birthub360-auditoria-dividas.json",
+          "lineStart": 1,
+          "lineEnd": 50,
+          "detail": "No PR #741, 176 achados artificiais gerados sem causa raiz nem evidência de defeito."
+        }
+      ],
+      "rootCause": "Execução automatizada superficial que violou as regras 'Não presuma que uma ocorrência textual é uma dívida' e 'Não altere código de produção'.",
+      "impact": "Se integrado em main, poluiria .agents/reviews/ com 176 falsos positivos e sobrescreveria o diagnóstico forense real.",
+      "priority": "P2",
+      "priorityJustification": "P2 porque o PR #741 está aberto contra main e introduziria ruído severo na governança técnica caso sofresse merge.",
+      "agent": "08A",
+      "participants": [
+        "08A",
+        "00",
+        "08",
+        "24"
+      ],
+      "dependencies": [
+        "Autorização humana para encerramento do PR #741"
+      ],
+      "remediation": "Não realizar merge do PR #741; encerrar o PR #741 e utilizar exclusivamente os artefatos forenses consolidados e auditados pelos Agentes 08 e 24.",
+      "approvalCriterion": "PR #741 encerrado sem merge e .agents/reviews/ populado apenas com verificações contextuais auditadas.",
+      "regressionTests": [
+        "Validação do Agente 24 exigindo causa raiz e confirmação contextual para 100% dos achados"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Bloqueado para merge pelo Agente 24",
+      "confidence": "Alta (inspeção direta dos commits abbe7a0e, 0d10c785 e f0f7bc14 no PR #741)",
+      "limitations": "Nenhuma limitação.",
+      "type": "Risco operacional",
+      "wave": "Onda 00",
+      "effort": "P (< 1 hora)",
+      "regressionRisk": "Nenhum",
+      "handoffPath": "https://github.com/MaarkssN/Birthub-360/pull/741",
+      "categoryName": "Git e versionamento",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "BLOCKED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-OPS-002",
+      "legacyRef": "DEBT-20261014-OPS-002",
+      "title": "Reinstalação Prisma na imagem permite resolver versão fora lock",
+      "category": "DT-17",
+      "categoryName": "Build",
+      "relatedCategories": [
+        "DT-07",
+        "DT-20"
+      ],
+      "module": "build",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "npm prune remove CLI e npm install --no-save utiliza range do manifesto(^7.10.0),sem versão exata do lock.",
+      "evidence": [
+        {
+          "file": "Dockerfile",
+          "lineStart": 43,
+          "lineEnd": 47,
+          "detail": "npm prune remove CLI e npm install --no-save utiliza range do manifesto(^7.10.0),sem versão exata do lock."
+        }
+      ],
+      "rootCause": "npm prune remove CLI e npm install --no-save utiliza range do manifesto(^7.10.0),sem versão exata do lock.",
+      "impact": "Imagem pode variar entre builds do mesmo commit e divergir CLI/client.",
+      "priority": "P2",
+      "priorityJustification": "P2: Imagem pode variar entre builds do mesmo commit e divergir CLI/client. Escopo comprovado estático; ocorrência de produção não medida.",
+      "agent": "08",
+      "participants": [
+        "00"
+      ],
+      "dependencies": [
+        "Autorização específica para remediação",
+        "Ambiente descartável do14",
+        "Revisão independente24"
+      ],
+      "remediation": "Preservar CLI necessária ou instalar versão exata e árvore determinada pelo lock.",
+      "approvalCriterion": "Build isolado sem resolução semver adicional; CLI/client iguais ao lock; migrate falha bloqueia boot.",
+      "regressionTests": [
+        "Build isolado sem resolução semver adicional; CLI/client iguais ao lock; migrate falha bloqueia boot."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta para contrato estático",
+      "limitations": "Produto e infraestrutura não executados; Nenhuma correção aplicada",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 00",
+      "effort": "M (1–3 dias de engenharia com ambiente disponível)",
+      "regressionRisk": "moderado",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-08-debt-20261014-ops-002.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-OPS-003",
+      "legacyRef": "DEBT-20261014-OPS-003",
+      "title": "Contexto Docker não exclui cópias e artefatos temporários locais",
+      "category": "DT-07",
+      "categoryName": "Infraestrutura e DevOps",
+      "relatedCategories": [
+        "DT-17",
+        "DT-23"
+      ],
+      "module": "container",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Exclusões não cobrem .worktrees/ e .tmp/ e builder usa COPY . .; checkout local possui esses diretórios.",
+      "evidence": [
+        {
+          "file": ".dockerignore",
+          "lineStart": 1,
+          "lineEnd": 5,
+          "detail": "Exclusões não cobrem .worktrees/ e .tmp/ e builder usa COPY . .; checkout local possui esses diretórios."
+        }
+      ],
+      "rootCause": "Exclusões não cobrem .worktrees/ e .tmp/ e builder usa COPY . .; checkout local possui esses diretórios.",
+      "impact": "Build pode transferir cópias de repo e artefatos não necessários,aumentando contexto e prejudicando reprodutibilidade. Segredos nesses diretórios não foram examinados nem alegados.",
+      "priority": "P2",
+      "priorityJustification": "P2: Build pode transferir cópias de repo e artefatos não necessários,aumentando contexto e prejudicando reprodutibilidade. Segredos nesses diretórios não foram examinados nem alegados. Escopo comprovado estático; ocorrência de produção não medida.",
+      "agent": "08",
+      "participants": [
+        "00"
+      ],
+      "dependencies": [
+        "Autorização específica para remediação",
+        "Ambiente descartável do14",
+        "Revisão independente24"
+      ],
+      "remediation": "Excluir diretórios efêmeros do contexto e verificar manifest de arquivos de build.",
+      "approvalCriterion": "Fixture .tmp/.worktrees desaparece do contexto enquanto migrations e fontes necessárias permanecem.",
+      "regressionTests": [
+        "Fixture .tmp/.worktrees desaparece do contexto enquanto migrations e fontes necessárias permanecem."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta para contrato estático",
+      "limitations": "Produto e infraestrutura não executados; Nenhuma correção aplicada",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 00",
+      "effort": "M (1–3 dias de engenharia com ambiente disponível)",
+      "regressionRisk": "moderado",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-08-debt-20261014-ops-003.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-CAD-001",
+      "legacyRef": "PROD-05",
+      "title": "API permite criar cadência sem conteúdo e dispatcher envia texto placeholder para leads reais",
+      "category": "DT-04",
+      "relatedCategories": [
+        "DT-35",
+        "DT-39"
+      ],
+      "module": "Cadência Comercial",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Enquanto o modal do frontend (NewSequenceDialog) exige preenchimento de conteúdo, a rota POST de criação de sequência permite templateRef vazio/omitido e validateSequence não rejeita passos de email ou WhatsApp sem texto. Ao executar o touch, CadenceDispatchers.ts utiliza o fallback 'Mensagem de cadência sem conteúdo configurado' e dispara a mensagem para o contato.",
+      "evidence": [
+        {
+          "file": "src/features/cadence/cadence.routes.ts",
+          "lineStart": 55,
+          "lineEnd": 68,
+          "detail": "templateRef opcional na validação de entrada da API."
+        },
+        {
+          "file": "src/features/cadence/domain/cadence.ts",
+          "lineStart": 144,
+          "lineEnd": 165,
+          "detail": "Ausência de regra exigindo templateRef não vazio para email e whatsapp."
+        },
+        {
+          "file": "src/features/cadence/infra/dispatchers/CadenceDispatchers.ts",
+          "lineStart": 100,
+          "lineEnd": 135,
+          "detail": "Envio de placeholder interno para transporte externo."
+        }
+      ],
+      "rootCause": "Assimetria de validação entre formulário React e domínio backend combinada com fallback inseguro no dispatcher.",
+      "impact": "Risco de enviar mensagem placeholder interna para clientes/leads reais em sequências criadas via API ou legadas.",
+      "priority": "P2",
+      "priorityJustification": "P2 por risco de dano à reputação comercial caso sequência sem template seja disparada via API.",
+      "agent": "17",
+      "participants": [
+        "17",
+        "00"
+      ],
+      "dependencies": [
+        "Revisão independente Agente 24"
+      ],
+      "remediation": "Exigir templateRef não vazio para canais email e whatsapp em validateSequence (mantendo opcional para voice) e bloquear envio nos dispatchers antes de consultar banco ou provedor.",
+      "approvalCriterion": "verify-cadence.mjs passa para entradas válidas, omitidas, vazias e espaços em branco, preservando canal de voz.",
+      "regressionTests": [
+        "verify-cadence.mjs cobrindo validateSequence e guardas de whatsAppCadenceDispatcher/emailCadenceDispatcher"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta (reproduzido em verify-cadence.mjs)",
+      "limitations": "Validado em nível de função de domínio e guarda de dispatcher.",
+      "type": "Defeito funcional",
+      "wave": "Onda 03",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-17-prod-05.md",
+      "categoryName": "Backend e APIs",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-ONB-001",
+      "legacyRef": "DEBT-20261014-ONB-001",
+      "title": "Mutações concorrentes de módulos podem sobrescrever seleção anterior",
+      "category": "DT-29",
+      "categoryName": "Onboarding",
+      "relatedCategories": [
+        "DT-04",
+        "DT-39"
+      ],
+      "module": "onboarding",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "mutate faz load->fn->save->get; repository.save usa upsertSetting integral sem versão/CAS no contrato. Reprodução isolada do corpo mutate original com repository in-memory e barrier: enable(optional-a)/enable(optional-b) ambos completam, resultado guarda optional-b e perde optional-a.",
+      "evidence": [
+        {
+          "file": "src/features/organization-modules/services/organizationModules.service.ts",
+          "lineStart": 69,
+          "lineEnd": 74,
+          "detail": "Inspeção estática do contrato indicado; não comprova configuração aplicada nem execução ponta a ponta."
+        },
+        {
+          "file": "src/features/organization-modules/infra/SettingOrganizationModulesRepository.ts",
+          "lineStart": 33,
+          "lineEnd": 37,
+          "detail": "save substitui JSON completo, sem versão no contrato do repositório."
+        },
+        {
+          "file": "src/lib/voice-hub/repositories/settingRepository.ts",
+          "lineStart": 19,
+          "lineEnd": 23,
+          "detail": "Atualização substitui JSON inteiro sem compare-and-swap. Repositório importado pelo onboarding atual apesar de pasta legacy."
+        }
+      ],
+      "rootCause": "Read-modify-write separado sem controle de versão ou trava por organização.",
+      "impact": "enable(A) e enable(B) simultâneos podem ambos ler S e última gravação perder A ou B; somente mesmo tenant, sem prova de acesso cruzado.",
+      "priority": "P2",
+      "priorityJustification": "P2 por falha/custo recorrente de domínio sem comprovação de perda de dados, cobrança real ou violação multi-tenant.",
+      "agent": "01",
+      "participants": [
+        "01"
+      ],
+      "dependencies": [
+        "02",
+        "01",
+        "18"
+      ],
+      "remediation": "Executar transformação dentro de transação com lock por Setting ou CAS com retry limitado.",
+      "approvalCriterion": "Teste simultâneo de enable(A)/enable(B) preserva ambas via CAS/lock/transação",
+      "regressionTests": [
+        "Barrier test dois enables independentes preserva ambos",
+        "Enable concorrente com completeOnboarding preserva timestamp e seleção"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta",
+      "limitations": "Reprodução usa corpo original extraído e repositório em memória; banco/HTTP reais não executados. Teste prova algoritmo read-modify-write, não quantifica ocorrência em produção.",
+      "type": "Defeito funcional",
+      "wave": "Onda 03",
+      "effort": "Médio",
+      "regressionRisk": "Médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-01-debt-20261014-onb-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-002",
+      "legacyRef": "DEBT-20261014-UX-002",
+      "title": "Paginação full-text de empresas restringe resultados ao primeiro lote",
+      "category": "DT-36",
+      "categoryName": "Busca",
+      "relatedCategories": [
+        "DT-04",
+        "DT-39"
+      ],
+      "module": "Empresas / busca",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Com ENABLE_SEARCH=true, o repositório pede os mesmos primeiros limit IDs em todas as páginas e só depois aplica skip no banco. Também conta só os IDs recuperados.",
+      "evidence": [
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 44,
+          "lineEnd": 50,
+          "detail": "Busca só limit IDs, sem page/offset."
+        },
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 66,
+          "lineEnd": 81,
+          "detail": "Aplica offset do PostgreSQL ao mesmo conjunto limitado; total também fica limitado."
+        },
+        {
+          "file": "src/lib/search/index.ts",
+          "lineStart": 85,
+          "lineEnd": 90,
+          "detail": "Meili recebe limit sem offset."
+        },
+        {
+          "file": "src/features/companies/infra/PrismaCompanyRepository.ts",
+          "lineStart": 44,
+          "lineEnd": 50,
+          "detail": "Reprodução Node isolada exit0: 45hits, limite20:page1=20,page2=0,total=20 esperado45."
+        }
+      ],
+      "rootCause": "Paginação aplicada duas vezes em contratos incompatíveis; total de busca perdido.",
+      "impact": "Resultados além do primeiro lote tornam-se inalcançáveis; página 2 fica vazia quando Meili retorna no máximo limit IDs.",
+      "priority": "P2",
+      "priorityJustification": "Resultados além do primeiro lote tornam-se inalcançáveis; página 2 fica vazia quando Meili retorna no máximo limit IDs. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "04",
+      "participants": [
+        "02",
+        "04"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Propagar paginação/total ao motor e preservar ordenação de relevância ou obter conjunto adequado sem aplicar segundo offset.",
+      "approvalCriterion": "Busca com 45 resultados e limite20 retorna páginas20/20/5, total45, sem duplicatas.",
+      "regressionTests": [
+        "Meili mock45 hits; páginas1,2,3; fallback indisponível; zero resultados; tenant distinto."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta; reprodução isolada com corpos atuais de função e dependências sintéticas",
+      "limitations": "Corpo atual executado após remover somente tipos TypeScript; mocks de serviços. HTTP,DB real e navegador NÃO EXECUTADOS.",
+      "type": "Defeito funcional",
+      "wave": "Onda 03",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-04-debt-20261014-ux-002.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-004",
+      "legacyRef": "DEBT-20261014-UX-004",
+      "title": "Analytics ativo usa calendário UTC apesar do contrato comercial Brasília",
+      "category": "DT-32",
+      "categoryName": "Internacionalização",
+      "relatedCategories": [
+        "DT-31",
+        "DT-02"
+      ],
+      "module": "Analytics / calendário",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Rotas analytics usam Controller/UseCases via DI; UseCases calcula monthStart/monthKey em UTC enquanto serviço legado usa helper canônico Brasília.",
+      "evidence": [
+        {
+          "file": "src/features/analytics/application/AnalyticsUseCases.ts",
+          "lineStart": 22,
+          "lineEnd": 30,
+          "detail": "Mês inicia em UTC00:00."
+        },
+        {
+          "file": "src/features/analytics/analytics.service.ts",
+          "lineStart": 86,
+          "lineEnd": 98,
+          "detail": "Serviço paralelo usa calendário Brasil."
+        },
+        {
+          "file": "src/shared/di/setup.ts",
+          "lineStart": 178,
+          "lineEnd": 178,
+          "detail": "DI instancia implementação UTC."
+        },
+        {
+          "file": "src/shared/time/brazilCalendar.ts",
+          "lineStart": 1,
+          "lineEnd": 1,
+          "detail": "Contrato de calendário America/Sao_Paulo."
+        }
+      ],
+      "rootCause": "Migração para camada hexagonal não preservou calendário comercial.",
+      "impact": "Receita/contagem/cohort no início do mês divergem por três horas e pelo mês durante a virada; indicadores deixam de ser comparáveis.",
+      "priority": "P2",
+      "priorityJustification": "Receita/contagem/cohort no início do mês divergem por três horas e pelo mês durante a virada; indicadores deixam de ser comparáveis. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "04",
+      "participants": [
+        "02",
+        "04"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Reutilizar calendário canônico na implementação realmente registrada e eliminar divergência contratual.",
+      "approvalCriterion": "Instante2026-10-01T01:00Z pertence a setembro comercial em todos os endpoints.",
+      "regressionTests": [
+        "Virada mensal00:00Z/03:00Z; dezembro/janeiro; host TZ UTC e SãoPaulo; API e export CSV coincidem."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Reprodução HTTP/browser não executada; confirmação estática do fluxo.",
+      "type": "Defeito funcional",
+      "wave": "Onda 03",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-04-debt-20261014-ux-004.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-MOB-001",
+      "legacyRef": "OPS-004",
+      "title": "Build mobile padrão embute URL fallback do Render documentado como desativado",
+      "category": "DT-16",
+      "relatedCategories": [
+        "DT-07",
+        "DT-34"
+      ],
+      "module": "Mobile / Configuração",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Em capacitor.config.ts:41, a constante PRODUCTION_URL utiliza como fallback o endereço antigo do Render, que o próprio comentário e docs/deploy/README.md:16 declaram desativado. Os workflows android-build.yml e ios-build.yml executam 'npx cap sync' sem injetar CAPACITOR_SERVER_URL.",
+      "evidence": [
+        {
+          "file": "capacitor.config.ts",
+          "lineStart": 38,
+          "lineEnd": 46,
+          "detail": "Fallback para endpoint Render desativado."
+        },
+        {
+          "file": ".github/workflows/android-build.yml",
+          "lineStart": 65,
+          "lineEnd": 75,
+          "detail": "Ausência de CAPACITOR_SERVER_URL no workflow Android."
+        },
+        {
+          "file": ".github/workflows/ios-build.yml",
+          "lineStart": 58,
+          "lineEnd": 66,
+          "detail": "Ausência de CAPACITOR_SERVER_URL no workflow iOS."
+        }
+      ],
+      "rootCause": "Transição para arquitetura Local-First sem atualização do fallback mobile e das variáveis de CI Android/iOS.",
+      "impact": "Artefatos APK/IPA gerados pelos workflows padrão tentarão conectar a um backend desativado caso distribuídos.",
+      "priority": "P2",
+      "priorityJustification": "P2 porque afeta exclusivamente a distribuição mobile (condicional à inclusão do app nativo no release).",
+      "agent": "09",
+      "participants": [
+        "09",
+        "08",
+        "10",
+        "00"
+      ],
+      "dependencies": [
+        "Definição do endpoint HTTPS definitivo pelo Agente 00 e Agente 10"
+      ],
+      "remediation": "Exigir CAPACITOR_SERVER_URL explícita nos workflows de build mobile (falhando fast se ausente em release) e atualizar capacitor.config.ts após decisão de endpoint.",
+      "approvalCriterion": "Workflow mobile falha se CAPACITOR_SERVER_URL não for fornecida ou sincroniza com o endpoint HTTPS ativo validado.",
+      "regressionTests": [
+        "Validação estática da configuração gerada pelo cap sync com variável de ambiente controlada"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda decisão de endpoint mobile)",
+      "confidence": "Alta",
+      "limitations": "Avaliação estática; SDK Android/iOS não executados.",
+      "type": "Configuração inconsistente",
+      "wave": "Onda 04",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-09-ops-004.md",
+      "categoryName": "Configuração",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-NOT-001",
+      "legacyRef": "DEBT-20261014-NOT-001",
+      "title": "Leitura broadcast silencia unread para colegas",
+      "category": "DT-35",
+      "categoryName": "Notificações",
+      "relatedCategories": [
+        "DT-39"
+      ],
+      "module": "Notificações",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Notification tem readAt único;markRead de broadcast altera mesmo registro para toda organização.",
+      "evidence": [
+        {
+          "file": "src/features/notifications/notification.service.ts",
+          "lineStart": 94,
+          "lineEnd": 98,
+          "detail": "Fonte direta no snapshot auditado; escopo do controle limitado ao título."
+        },
+        {
+          "file": "prisma/schema.prisma",
+          "lineStart": 2048,
+          "lineEnd": 2052,
+          "detail": "Evidência complementar da causa/contrato."
+        }
+      ],
+      "rootCause": "Modelo mistura notificação e estado por destinatário.",
+      "impact": "Colegas deixam de receber indicação não lida de alerta que não abriram.",
+      "priority": "P2",
+      "priorityJustification": "Degrada controle/feedback localizado;sem evidência de perda de dados ou incidente ativo.",
+      "agent": "02",
+      "participants": [
+        "06",
+        "00",
+        "01",
+        "18"
+      ],
+      "dependencies": [
+        "Agente01 schema leitura por usuário",
+        "Agente18 contrato API"
+      ],
+      "remediation": "Manter leitura por usuário com modelo01 e contrato18,sem alterar conteúdo broadcast.",
+      "approvalCriterion": "UsuárioA lê broadcast;B continua unread até lê-lo;estado não compartilhado.",
+      "regressionTests": [
+        "UsuárioA lê broadcast;B continua unread até lê-lo;estado não compartilhado."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (fonte direta;runtime limitado aos mocks especificados)",
+      "limitations": "Função exata com mock persistência; não certifica DB/RLS real.",
+      "type": "Defeito funcional",
+      "wave": "Onda 04",
+      "effort": "M",
+      "regressionRisk": "Médio: schema/contrato/UI",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-02-debt-20261014-not-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-005",
+      "legacyRef": "DEBT-20261014-UX-005",
+      "title": "Deep links nativos Android divergem do catálogo de rotas web",
+      "category": "DT-34",
+      "categoryName": "Mobile e PWA",
+      "relatedCategories": [
+        "DT-18",
+        "DT-39"
+      ],
+      "module": "Android / navegação",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Comparação executada de listas: nativeOnly sdr-diagnostic-joao; webOnly inclui sdr-diagnostic, forecast, metas, signals-risks e outros destinos existentes.",
+      "evidence": [
+        {
+          "file": "android/app/src/main/java/br/com/birthhub360/prospector/MainActivity.java",
+          "lineStart": 55,
+          "lineEnd": 65,
+          "detail": "Lista manual nativa inclui sdr-diagnostic-joao e omite destinos web."
+        },
+        {
+          "file": "src/App.tsx",
+          "lineStart": 460,
+          "lineEnd": 460,
+          "detail": "Rota real é sdr-diagnostic."
+        },
+        {
+          "file": "src/lib/navigationBus.ts",
+          "lineStart": 67,
+          "lineEnd": 67,
+          "detail": "Contrato web usa sdr-diagnostic."
+        }
+      ],
+      "rootCause": "Espelho manual desatualizado sem gate de paridade.",
+      "impact": "Link válido do diagnóstico é rejeitado nativamente; link com nome antigo é aceito mas rota web redireciona ao dashboard. Outros destinos web ativos não abrem via esquema custom.",
+      "priority": "P2",
+      "priorityJustification": "Link válido do diagnóstico é rejeitado nativamente; link com nome antigo é aceito mas rota web redireciona ao dashboard. Outros destinos web ativos não abrem via esquema custom. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "09",
+      "participants": [
+        "02",
+        "09"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Sincronizar catálogo nativo com os destinos suportados e criar verificação automática de paridade, explicitando módulos desabilitados.",
+      "approvalCriterion": "Deep link diagnóstico válido abre tela; inválido mostra erro; catálogo de destinos ativos coincide.",
+      "regressionTests": [
+        "Comparação de sets; dispositivo/emulador para diagnóstico/forecast; destino inválido e usuário sem permissão."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Reprodução HTTP/browser não executada; confirmação estática do fluxo.",
+      "type": "Defeito funcional",
+      "wave": "Onda 04",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-09-debt-20261014-ux-005.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-006",
+      "legacyRef": "DEBT-20261014-UX-006",
+      "title": "Ícones declarados no manifest PWA não existem em public",
+      "category": "DT-34",
+      "categoryName": "Mobile e PWA",
+      "relatedCategories": [
+        "DT-16",
+        "DT-17"
+      ],
+      "module": "PWA / assets",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Inventário executado: public/icons/icon-192.png e icon-512.png ausentes; também favicon.ico/apple-touch-icon.png incluídos em includeAssets ausentes. Há ícone SVG de marca, mas não os PNG referenciados no manifest.",
+      "evidence": [
+        {
+          "file": "vite.config.ts",
+          "lineStart": 30,
+          "lineEnd": 40,
+          "detail": "Ícones192/512 e atalhos apontam a arquivos ausentes."
+        }
+      ],
+      "rootCause": "Manifest não acompanhado por assets versionados ou etapa explícita de geração no script build.",
+      "impact": "Manifest fornece URLs sem artefato correspondente; identidade/instalabilidade do PWA fica comprometida em clientes que exigem esses ícones.",
+      "priority": "P2",
+      "priorityJustification": "Manifest fornece URLs sem artefato correspondente; identidade/instalabilidade do PWA fica comprometida em clientes que exigem esses ícones. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "09",
+      "participants": [
+        "02",
+        "09"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Gerar/reutilizar os ícones oficiais nos caminhos manifest e verificar existência/tamanho no gate de PWA.",
+      "approvalCriterion": "Todas URLs do manifest e atalhos resolvem arquivo real com dimensão declarada.",
+      "regressionTests": [
+        "Existência de public e dist; dimensões192/512; instalação Chromium em origemHTTPS isolada."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Ausência na árvore fonte confirmada; build e resposta HTTP não executados, geração externa não foi presumida.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 04",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-09-debt-20261014-ux-006.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-008",
+      "legacyRef": "PROD-04",
+      "title": "Falha inicial da API prende o Copiloto Executivo em estado de carregamento infinito (spinner permanente)",
+      "category": "DT-03",
+      "relatedCategories": [
+        "DT-10",
+        "DT-39"
+      ],
+      "module": "Frontend / Copiloto",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Em EliteCommercialAgentWorkspace.tsx:127, a guarda de carregamento 'if (loading || !overview)' é avaliada antes do bloco 'if (error)'. Quando a carga inicial da API falha, loading passa para false, error recebe a mensagem de falha e overview permanece null — fazendo o componente renderizar o spinner eternamente e tornando o bloco de erro/retry inalcançável.",
+      "evidence": [
+        {
+          "file": "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+          "lineStart": 124,
+          "lineEnd": 145,
+          "detail": "Ordem de guardas if (loading || !overview) bloqueia o ramo if (error || !overview)."
+        }
+      ],
+      "rootCause": "Condição booleana disjuntiva (!overview) colocada no guard de loading em vez de ficar após o tratamento de erro.",
+      "impact": "Qualquer erro transitório de rede ou HTTP 500 na abertura da tela trava a interface em loading infinito sem opção de retry.",
+      "priority": "P2",
+      "priorityJustification": "P2 por degradar a resiliência de UX na tela do Copiloto sob falha de rede/API.",
+      "agent": "07",
+      "participants": [
+        "07",
+        "02"
+      ],
+      "dependencies": [
+        "Revisão independente Agente 24"
+      ],
+      "remediation": "Alterar a primeira guarda na linha 127 para 'if (loading)' para que o bloco seguinte 'if (error || !overview)' seja alcançado e exiba o botão de retry.",
+      "approvalCriterion": "Simulação de erro 500 na carga inicial renderiza a mensagem de erro e permite acionar retry com sucesso.",
+      "regressionTests": [
+        "Asserção em verify-elite.mjs e teste de componente React com falha inicial da API"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta",
+      "limitations": "Confirmado estaticamente no código-fonte.",
+      "type": "Defeito funcional",
+      "wave": "Onda 04",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-07-prod-04.md",
+      "categoryName": "Frontend e UX",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-INT-001",
+      "legacyRef": "DEBT-20261014-INT-001",
+      "title": "Timeout Bitrix encerra antes leitura do corpo",
+      "category": "DT-09",
+      "categoryName": "Integrações externas",
+      "relatedCategories": [
+        "DT-21"
+      ],
+      "module": "Bitrix",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "O timer é cancelado após headers antes response.json; corpo lento pode manter operação sem teto.",
+      "evidence": [
+        {
+          "file": "src/features/integrations/bitrix/service/client.ts",
+          "lineStart": 159,
+          "lineEnd": 216,
+          "detail": "Timer removido na linha190 antes response.json214;reprodução exata com fake response e timeout encurtado5ms permanece pendente30ms."
+        },
+        {
+          "file": "src/features/integrations/bitrix/service/client.ts",
+          "lineStart": 92,
+          "lineEnd": 96,
+          "detail": "Evidência complementar da causa/contrato."
+        }
+      ],
+      "rootCause": "Cancelamento antecipado do AbortController.",
+      "impact": "Job/requisição pode aguardar corpo indefinidamente apesar contrato15s.",
+      "priority": "P2",
+      "priorityJustification": "Degrada controle/feedback localizado;sem evidência de perda de dados ou incidente ativo.",
+      "agent": "06",
+      "participants": [
+        "06",
+        "00"
+      ],
+      "dependencies": [
+        "Ambiente isolado homologação",
+        "Revisão24",
+        "Autorização específica correção"
+      ],
+      "remediation": "Preservar timer até consumir body em finally; aplicar também testWebhook.",
+      "approvalCriterion": "Mock entrega headers e bloqueia corpo; operação deve abortar em15s.",
+      "regressionTests": [
+        "Mock entrega headers e bloqueia corpo; operação deve abortar em15s."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (fonte direta;runtime limitado aos mocks especificados)",
+      "limitations": "Função exata isolada com safeFetch fake;timer5ms;nenhum servidor/provedor real.",
+      "type": "Risco operacional",
+      "wave": "Onda 05",
+      "effort": "P",
+      "regressionRisk": "Médio: fluxo de execução/falha",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-06-debt-20261014-int-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-UX-007",
+      "legacyRef": "DEBT-20261014-UX-007",
+      "title": "Busca textual da base retorna lista vazia quando banco falha",
+      "category": "DT-36",
+      "categoryName": "Busca",
+      "relatedCategories": [
+        "DT-19",
+        "DT-39"
+      ],
+      "module": "Base de conhecimento / busca",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Se FTS falha, tenta ILIKE; se fallback falha, retorna []. Quando busca semântica também indisponível, hybridSearch retorna hits[] indistinguíveis de nenhum documento encontrado.",
+      "evidence": [
+        {
+          "file": "src/features/knowledge/search.service.ts",
+          "lineStart": 178,
+          "lineEnd": 180,
+          "detail": "Falha FTS e ILIKE é logada, mas resposta vira [] em vez de erro."
+        },
+        {
+          "file": "src/features/knowledge/search.service.ts",
+          "lineStart": 54,
+          "lineEnd": 64,
+          "detail": "Status relata disponibilidade semântica, não falha keyword."
+        }
+      ],
+      "rootCause": "Contrato só distingue indisponibilidade semântica; não distingue erro da busca textual.",
+      "impact": "Falha de banco é apresentada como ausência de conhecimento; usuário pode concluir que documento não existe.",
+      "priority": "P2",
+      "priorityJustification": "Falha de banco é apresentada como ausência de conhecimento; usuário pode concluir que documento não existe. Evidência do caminho atual, sem inferir exploração em produção.",
+      "agent": "07",
+      "participants": [
+        "02",
+        "07"
+      ],
+      "dependencies": [
+        "08: regressão isolada",
+        "00: autorização específica de saneamento"
+      ],
+      "remediation": "Propagar falha da busca textual ou declarar disponibilidade de ambas estratégias e sinalizar erro quando nenhuma executou.",
+      "approvalCriterion": "Banco indisponível não gera falso empty; semântica indisponível com textual funcional mantém fallback claro.",
+      "regressionTests": [
+        "FTS falha/ILIKE sucesso; ambos falham; embeddings falham e keywords sucesso; ambas estratégias indisponíveis."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (código); comportamento operacional não medido",
+      "limitations": "Reprodução HTTP/browser não executada; confirmação estática do fluxo.",
+      "type": "Defeito funcional",
+      "wave": "Onda 05",
+      "effort": "M",
+      "regressionRisk": "médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-07-debt-20261014-ux-007.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-AI-001",
+      "legacyRef": "DEBT-20261014-AI-001",
+      "title": "Streaming não aplica quota por tier",
+      "category": "DT-10",
+      "categoryName": "Inteligência artificial",
+      "relatedCategories": [
+        "DT-27"
+      ],
+      "module": "IA streaming",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "streamChatCompletion chama orçamento monetário mas não enforceTokenQuota;invoke aplica o controle.",
+      "evidence": [
+        {
+          "file": "src/lib/ai/gateway/streaming.ts",
+          "lineStart": 32,
+          "lineEnd": 36,
+          "detail": "Fonte direta no snapshot auditado; escopo do controle limitado ao título."
+        },
+        {
+          "file": "src/lib/ai/gateway/chat-model.ts",
+          "lineStart": 144,
+          "lineEnd": 148,
+          "detail": "Evidência complementar da causa/contrato."
+        }
+      ],
+      "rootCause": "Dois caminhos saída com controles distintos.",
+      "impact": "Quota de tokens premium por tier não cobre streaming; teto monetário continua existindo.",
+      "priority": "P2",
+      "priorityJustification": "Degrada controle/feedback localizado;sem evidência de perda de dados ou incidente ativo.",
+      "agent": "23",
+      "participants": [
+        "06",
+        "00"
+      ],
+      "dependencies": [
+        "Ambiente isolado homologação",
+        "Revisão24",
+        "Autorização específica correção"
+      ],
+      "remediation": "Aplicar decisão quota antes streaming e registrar consumo por mesma fonte.",
+      "approvalCriterion": "Quota excedida impede streaming premium antes fetch e usa mesma política do invoke.",
+      "regressionTests": [
+        "Quota excedida impede streaming premium antes fetch e usa mesma política do invoke."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (fonte direta;runtime limitado aos mocks especificados)",
+      "limitations": "Não prova consumo real/exploração nem ausência de limites monetários.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 06",
+      "effort": "P",
+      "regressionRisk": "Médio: fluxo de execução/falha",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-23-debt-20261014-ai-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-PERF-001",
+      "legacyRef": "DEBT-20261014-PERF-001",
+      "title": "Resumo de consumo carrega todas as linhas AILog do período",
+      "category": "DT-04",
+      "categoryName": "Backend e APIs",
+      "relatedCategories": [
+        "DT-23",
+        "DT-27"
+      ],
+      "module": "usage",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "findLogsSince usa findMany sem take e UsageUseCases.summary soma/agrupa logs em JavaScript.",
+      "evidence": [
+        {
+          "file": "src/features/billing/infra/PrismaUsageRepository.ts",
+          "lineStart": 11,
+          "lineEnd": 16,
+          "detail": "Inspeção estática do contrato indicado; não comprova configuração aplicada nem execução ponta a ponta."
+        },
+        {
+          "file": "src/features/billing/application/UsageUseCases.ts",
+          "lineStart": 50,
+          "lineEnd": 55,
+          "detail": "Acumula toda lista obtida por findMany em memória."
+        }
+      ],
+      "rootCause": "Agregação diária realizada em app em vez de SQL; consulta sem limite por período.",
+      "impact": "Memória e transferência O(n) por consulta conforme chamadas de IA crescem; latência absoluta e volume real não medidos.",
+      "priority": "P2",
+      "priorityJustification": "P2 por falha/custo recorrente de domínio sem comprovação de perda de dados, cobrança real ou violação multi-tenant.",
+      "agent": "01",
+      "participants": [
+        "01"
+      ],
+      "dependencies": [
+        "23",
+        "07"
+      ],
+      "remediation": "Agregação groupBy de dia com SQL ou paginação bounded preservando totais por modelo/prompt.",
+      "approvalCriterion": "Agregação diária SQL ou paginação bounded mantém resultados sem crescimento memória linear",
+      "regressionTests": [
+        "Comparar totals/daily contra fixtures de dias e fusos",
+        "Orçamento memória/latência com dataset sintético volumoso"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta",
+      "limitations": "Não medidos dados/configuração real de produção nem serviços externos; conclusão limitada à evidência citada.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 07",
+      "effort": "Médio",
+      "regressionRisk": "Médio",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-01-debt-20261014-perf-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-FIN-001",
+      "legacyRef": "DEBT-20261014-FIN-001",
+      "title": "Alerta orçamento IA usa vetores incompatíveis",
+      "category": "DT-27",
+      "categoryName": "FinOps",
+      "relatedCategories": [
+        "DT-19"
+      ],
+      "module": "Observabilidade IA",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Counter labels provider,tenant;budget Gauge sem esses labels.Divisão padrão não encontra correspondência,dados numerador não chegam resultado.",
+      "evidence": [
+        {
+          "file": "infrastructure/observability/alert.rules.yml",
+          "lineStart": 260,
+          "lineEnd": 264,
+          "detail": "Fonte direta no snapshot auditado; escopo do controle limitado ao título."
+        },
+        {
+          "file": "src/lib/ai/metrics.ts",
+          "lineStart": 19,
+          "lineEnd": 23,
+          "detail": "Evidência complementar da causa/contrato."
+        }
+      ],
+      "rootCause": "Expressão PromQL sem agregação/explicit matching;contador lifetime também difere orçamento mensal.",
+      "impact": "AIBudgetOverrun pode permanecer vazio mesmo com custo emitido;não prova estado atual cloud.",
+      "priority": "P2",
+      "priorityJustification": "Degrada controle/feedback localizado;sem evidência de perda de dados ou incidente ativo.",
+      "agent": "10",
+      "participants": [
+        "06",
+        "00",
+        "07",
+        "23"
+      ],
+      "dependencies": [
+        "Ambiente isolado homologação",
+        "Revisão24",
+        "Autorização específica correção"
+      ],
+      "remediation": "Construir métrica custo mensal alinhada budget global e expressão agregada;teste promtool positive/negative/mês.",
+      "approvalCriterion": "promtool rule test com custos provider/tenant e gauge global deve disparar quando soma mensal>teto.",
+      "regressionTests": [
+        "promtool rule test com custos provider/tenant e gauge global deve disparar quando soma mensal>teto."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta (fonte direta;runtime limitado aos mocks especificados)",
+      "limitations": "Regra inspecionada; promtool não instalado/executado.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 08",
+      "effort": "P",
+      "regressionRisk": "Médio: fluxo de execução/falha",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-10-debt-20261014-fin-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-DOC-001",
+      "legacyRef": "OPS-003",
+      "title": "Instrução de subir stack em LOCAL_FIRST.md e GO-LIVE-CHECKLIST.md omite overlay do PostgreSQL obrigatório para migrations",
+      "category": "DT-11",
+      "relatedCategories": [
+        "DT-07",
+        "DT-16"
+      ],
+      "module": "Documentação / DevOps",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "O guia docs/development/LOCAL_FIRST.md:68 e o checklist docs/release/GO-LIVE-CHECKLIST.md:10 mandam executar 'docker compose up -d' seguido de 'npx prisma migrate deploy'. Contudo, o serviço postgres foi movido para o overlay docker-compose.postgres-local.yml, fazendo com que a porta 5434 não suba com o comando padrão.",
+      "evidence": [
+        {
+          "file": "docs/development/LOCAL_FIRST.md",
+          "lineStart": 65,
+          "lineEnd": 74,
+          "detail": "Comando omite -f docker-compose.postgres-local.yml."
+        },
+        {
+          "file": "docs/release/GO-LIVE-CHECKLIST.md",
+          "lineStart": 8,
+          "lineEnd": 14,
+          "detail": "Checklist repete comando incompleto."
+        }
+      ],
+      "rootCause": "Extração do container PostgreSQL para arquivo compose de overlay sem atualização correspondente nos guias operacionais.",
+      "impact": "Falha imediata de conexão na etapa de migração ao provisionar ambiente novo seguindo a documentação oficial.",
+      "priority": "P2",
+      "priorityJustification": "P2 por causar atrito de onboarding técnico e falha reproduzível no procedimento documentado de inicialização.",
+      "agent": "08",
+      "participants": [
+        "08",
+        "10",
+        "18"
+      ],
+      "dependencies": [
+        "Revisão independente Agente 24"
+      ],
+      "remediation": "Atualizar LOCAL_FIRST.md e GO-LIVE-CHECKLIST.md para incluir '-f docker-compose.yml -f docker-compose.postgres-local.yml' e explicitar que o compose sobe apenas a infraestrutura.",
+      "approvalCriterion": "Asserção automatizada confirma presença do comando composto nos dois documentos.",
+      "regressionTests": [
+        "Asserção em verify-release-gate.mjs validando o comando documental exato"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Patch candidato isolado (não integrado em main)",
+      "confidence": "Alta",
+      "limitations": "Verificação estática documental.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 09",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-08-ops-003.md",
+      "categoryName": "Documentação",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "PATCH_PROPOSED",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-GOV-002",
+      "legacyRef": "DEBT-20261014-GOV-002",
+      "title": "Política local-first conflita com publicação automática GHCR",
+      "category": "DT-13",
+      "categoryName": "Governança",
+      "relatedCategories": [
+        "DT-11",
+        "DT-40"
+      ],
+      "module": "CI/documentação",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "GuiaLOCAL_FIRST afirma suspensão dos pipelines cloud; workflow de publicação tem gatilho workflow_run main ativo apósCI. Publicação de imagem não prova deploy.",
+      "evidence": [
+        {
+          "file": ".github/workflows/docker-publish.yml",
+          "lineStart": 11,
+          "lineEnd": 15,
+          "detail": "GuiaLOCAL_FIRST afirma suspensão dos pipelines cloud; workflow de publicação tem gatilho workflow_run main ativo apósCI. Publicação de imagem não prova deploy."
+        }
+      ],
+      "rootCause": "GuiaLOCAL_FIRST afirma suspensão dos pipelines cloud; workflow de publicação tem gatilho workflow_run main ativo apósCI. Publicação de imagem não prova deploy.",
+      "impact": "Operação externa de publicação pode ocorrer quando documentação afirma pipelines suspensos; política de distribuição torna-se ambígua.",
+      "priority": "P2",
+      "priorityJustification": "P2: Operação externa de publicação pode ocorrer quando documentação afirma pipelines suspensos; política de distribuição torna-se ambígua. Escopo comprovado estático; ocorrência de produção não medida.",
+      "agent": "00",
+      "participants": [
+        "00"
+      ],
+      "dependencies": [
+        "Autorização específica para remediação",
+        "Ambiente descartável do14",
+        "Revisão independente24"
+      ],
+      "remediation": "Decidir explicitamente se publicaçãoGHCR é permitida durante freeze e alinhar política/gatilho via08.",
+      "approvalCriterion": "Fixture eventoCI main comprova publish habilitado/desabilitado conforme decisão;nenhum deploy real necessário.",
+      "regressionTests": [
+        "Fixture eventoCI main comprova publish habilitado/desabilitado conforme decisão;nenhum deploy real necessário."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta para contrato estático",
+      "limitations": "Produto e infraestrutura não executados; Nenhuma correção aplicada",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 09",
+      "effort": "M (1–3 dias de engenharia com ambiente disponível)",
+      "regressionRisk": "moderado",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-00-debt-20261014-gov-002.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-GOV-003",
+      "legacyRef": "HANDOFFS-20261009-13-REPROVADOS",
+      "title": "13 handoffs históricos marcam 'Status: resolvido' no cabeçalho em contradição com o corpo (Postponed / Deploy Simulado)",
+      "category": "DT-13",
+      "relatedCategories": [
+        "DT-11",
+        "DT-12",
+        "DT-15"
+      ],
+      "module": "Governança / Handoffs",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4",
+      "description": "Conforme parecer independente em .agents/reviews/handoffs-2026-10-09-24.md, 13 handoffs em .agents/handoffs/** permanecem com cabeçalho 'Status: resolvido' enquanto suas seções de resolução declaram trabalho adiado (Postponed pós-Sprint 13, ex. downloads blob e voice command no app mobile, refatoração de legacy services), deploy apenas simulado no Render (onda-6 worker) ou decisão pendente (OPA middleware).",
+      "evidence": [
+        {
+          "file": ".agents/reviews/handoffs-2026-10-09-24.md",
+          "lineStart": 28,
+          "lineEnd": 55,
+          "detail": "Tabela nominal dos 13 documentos reprovados documentalmente pelo Agente 24."
+        },
+        {
+          "file": ".agents/handoffs/onda-6/16-para-08-deploy-worker-service.md",
+          "lineStart": 1,
+          "lineEnd": 25,
+          "detail": "Cabeçalho resolvido (Deploy Simulado no Render) contradiz ausência de deploy real."
+        },
+        {
+          "file": ".agents/handoffs/onda-1/00-para-01-legacy-services-repo-migration.md",
+          "lineStart": 1,
+          "lineEnd": 30,
+          "detail": "Cabeçalho resolvido enquanto resolução declara Postponed."
+        }
+      ],
+      "rootCause": "Fechamento administrativo de ondas anteriores usando o marcador 'resolvido' para representar adiamento de escopo ou simulação documental.",
+      "impact": "Induz agentes e gestores a assumirem como implementadas funcionalidades que foram apenas adiadas ou simuladas.",
+      "priority": "P2",
+      "priorityJustification": "P2 por comprometer a confiabilidade da memória operacional do repositório (AGENTS.md §8 e §40).",
+      "agent": "00",
+      "participants": [
+        "00",
+        "08",
+        "10",
+        "15",
+        "21",
+        "24"
+      ],
+      "dependencies": [
+        "Revisão independente Agente 24 após reconciliação dos cabeçalhos"
+      ],
+      "remediation": "Reconciliar os cabeçalhos dos 13 handoffs contraditórios (separando status 'adiado/bloqueado-freeze' ou 'parcial' de 'resolvido') e regenerar .agents/reviews/checklist-handoffs.html via node scripts/generate-handoffs-checklist.cjs.",
+      "approvalCriterion": "Script de auditoria de handoffs reporta 0 contradições entre Status do cabeçalho e texto da seção Resolução.",
+      "regressionTests": [
+        "Execução de node scripts/generate-handoffs-checklist.cjs e validação pelo Agente 24"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Parcialmente saneado (2 de 13 reconciliados em e13b53dc; 11 permanecem abertos)",
+      "confidence": "Alta",
+      "limitations": "Escopo estritamente documental.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 09",
+      "effort": "P (< 1 dia)",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/reviews/handoffs-2026-10-09-24.md",
+      "categoryName": "Governança",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-BILL-003",
+      "legacyRef": "DEBT-20261014-BILL-003",
+      "title": "Função legada de renovação normaliza mês inválido e salta mês previsto",
+      "category": "DT-28",
+      "categoryName": "Billing",
+      "relatedCategories": [
+        "DT-39"
+      ],
+      "module": "billing",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Execução da função pura computePeriodEnd extraída do fonte: 2026-01-31 mensal =>2026-03-03; 2026-03-31 mensal =>2026-05-01; 2024-02-29 anual =>2025-03-01.",
+      "evidence": [
+        {
+          "file": "src/lib/voice-hub/services/billingService.ts",
+          "lineStart": 149,
+          "lineEnd": 154,
+          "detail": "Inspeção estática do contrato indicado; não comprova configuração aplicada nem execução ponta a ponta."
+        },
+        {
+          "file": "src/bootstrap/routes.ts",
+          "lineStart": 200,
+          "lineEnd": 204,
+          "detail": "Bootstrap expõe módulo legado como indisponível; serviços de billing voce-hub não possuem caminho HTTP ativo demonstrado."
+        }
+      ],
+      "rootCause": "Date.setMonth/setFullYear normaliza dias inválidos para mês seguinte sem clamp.",
+      "impact": "Reutilizar serviço legado para faturamento carregaria cálculo incorreto de currentPeriodEnd. Bootstrap atual marca voice-hub indisponível; não há prova de efeito financeiro corrente.",
+      "priority": "P3",
+      "priorityJustification": "P3 por função defeituosa localizada em módulo legado desativado; sem exposição financeira atual comprovada.",
+      "agent": "12",
+      "participants": [
+        "01"
+      ],
+      "dependencies": [
+        "12",
+        "18"
+      ],
+      "remediation": "Antes de reativar/reutilizar billing legado, fixar política de calendário e clamp de dia; não ampliar escopo nem reativar produto nesta auditoria.",
+      "approvalCriterion": "31 janeiro mensal resulta fim fevereiro; leap-day anual segue regra publicada",
+      "regressionTests": [
+        "31jan mensal encerra fevereiro",
+        "31mar mensal encerra abril",
+        "29fev anual segue regra explícita",
+        "Dias normais preservam dia e hora"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta",
+      "limitations": "Função pura reproduzida; módulo indisponível em rota atual. Nenhum pagamento ou sessão real executado.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 03",
+      "effort": "Baixo",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-12-debt-20261014-bill-003.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-CODE-001",
+      "legacyRef": "DEBT-20261014-CODE-001",
+      "title": "Signup executa user.count redundante para decidir ADMIN idêntico nos dois ramos",
+      "category": "DT-01",
+      "categoryName": "Código-fonte",
+      "relatedCategories": [
+        "DT-23"
+      ],
+      "module": "auth",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "userCount é usado só por isFirstUser e ternário ADMIN/ADMIN.",
+      "evidence": [
+        {
+          "file": "src/lib/auth.ts",
+          "lineStart": 345,
+          "lineEnd": 350,
+          "detail": "Inspeção estática do contrato indicado; não comprova configuração aplicada nem execução ponta a ponta."
+        },
+        {
+          "file": "src/lib/auth.ts",
+          "lineStart": 361,
+          "lineEnd": 366,
+          "detail": "Ambos os ramos geram ADMIN; contagem é observacionalmente redundante."
+        }
+      ],
+      "rootCause": "Lógica de primeiro usuário permaneceu após regra fundador sempre ADMIN.",
+      "impact": "Uma consulta ao banco dispensável em cada cadastro; aumenta manutenção e duração de seção bootstrap.",
+      "priority": "P3",
+      "priorityJustification": "P3 por custo localizado sem mudança funcional.",
+      "agent": "01",
+      "participants": [
+        "01"
+      ],
+      "dependencies": [
+        "01"
+      ],
+      "remediation": "Eliminar contagem e ternário redundante preservando regra aprovada de fundador.",
+      "approvalCriterion": "Signup mantém ADMIN fundador sem consulta global redundante",
+      "regressionTests": [
+        "Cadastro primeiro/segundo fundador gera mesmo papel e org própria sem user.count"
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "Alta",
+      "limitations": "Não medidos dados/configuração real de produção nem serviços externos; conclusão limitada à evidência citada.",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 03",
+      "effort": "Baixo",
+      "regressionRisk": "Baixo",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-01-debt-20261014-code-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    },
+    {
+      "id": "DEBT-GOV-001",
+      "legacyRef": "DEBT-20261014-GOV-001",
+      "title": "Leitura obrigatória referencia plano de ondas ausente",
+      "category": "DT-11",
+      "categoryName": "Documentação",
+      "relatedCategories": [
+        "DT-12",
+        "DT-13"
+      ],
+      "module": "governança",
+      "commit": "c7e33a911b734ddb3131a3ad08d421efbc823fd4 (base 9373fb224a8aba30a39f7d10d1a2be639c35af78)",
+      "description": "Prompt00 e README apontam EXECUCAO-ONDAS.md inexistente no snapshot/checkout; decisões de prompt são humanas.",
+      "evidence": [
+        {
+          "file": ".agents/prompts/00-coordenador.md",
+          "lineStart": 13,
+          "lineEnd": 17,
+          "detail": "Prompt00 e README apontam EXECUCAO-ONDAS.md inexistente no snapshot/checkout; decisões de prompt são humanas."
+        }
+      ],
+      "rootCause": "Prompt00 e README apontam EXECUCAO-ONDAS.md inexistente no snapshot/checkout; decisões de prompt são humanas.",
+      "impact": "Novo coordenador não consegue cumprir a sequência de reconhecimento obrigatória através da referência atual.",
+      "priority": "P3",
+      "priorityJustification": "P3: Novo coordenador não consegue cumprir a sequência de reconhecimento obrigatória através da referência atual. Escopo comprovado estático; ocorrência de produção não medida.",
+      "agent": "00",
+      "participants": [
+        "00"
+      ],
+      "dependencies": [
+        "Autorização específica para remediação",
+        "Ambiente descartável do14",
+        "Revisão independente24"
+      ],
+      "remediation": "Preparar decisão humana de governança para referência canônica;não editar prompt sem autorização.",
+      "approvalCriterion": "Verificador de links obrigatórios resolve fonte versionada e revisão humana aprovada.",
+      "regressionTests": [
+        "Verificador de links obrigatórios resolve fonte versionada e revisão humana aprovada."
+      ],
+      "state": "Confirmado / Aberto",
+      "correctionState": "Não iniciada (aguarda autorização)",
+      "confidence": "alta para contrato estático",
+      "limitations": "Produto e infraestrutura não executados; Nenhuma correção aplicada",
+      "type": "Dívida técnica confirmada",
+      "wave": "Onda 09",
+      "effort": "M (1–3 dias de engenharia com ambiente disponível)",
+      "regressionRisk": "moderado",
+      "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-00-debt-20261014-gov-001.md",
+      "auditStatus": "CONFIRMED",
+      "remediationStatus": "OPEN",
+      "validationStatus": "NOT_VALIDATED",
+      "releaseStatus": "BLOCKED"
+    }
+  ]
+}
