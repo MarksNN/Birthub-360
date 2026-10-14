@@ -23,3 +23,9 @@
 - Teste isolado do gate: exit 0, 11 cenarios. Contexto Docker simulado: exit 0.
 - Build de imagem Docker: NAO EXECUTADO.
 - Nenhum achado foi marcado RESOLVED ou VERIFIED.
+
+## 2026-10-14T19:10:00-03:00 — DEBT-GOV-004
+
+- PR #741 fechado sem merge.
+- Branch `tech-debt-audit-1898280509423632042` e worktrees `pr-741-*` preservadas.
+- Status vivo: IN_REVIEW, nao RESOLVED. Falta parecer do Agente 24.

@@ -516,22 +516,29 @@
         "08",
         "24"
       ],
-      "remediationStatus": "BLOCKED",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "IN_REVIEW",
+      "validationStatus": "CHECKED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "BLOCKED",
       "originalCorrectionState": "Bloqueado para merge pelo Agente 24",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-14T19:10:00-03:00",
       "updatedBy": "00",
-      "branch": null,
-      "pullRequest": null,
+      "branch": "tech-debt-audit-1898280509423632042",
+      "pullRequest": "https://github.com/MaarkssN/Birthub-360/pull/741",
       "fixCommit": null,
       "testsExecuted": [],
       "validationResult": null,
-      "closureEvidence": null,
+      "closureEvidence": "PR #741 fechado sem merge em 2026-10-14. Branch tech-debt-audit-1898280509423632042 preservada no commit 6ecfcc4f. Worktrees pr-741-* preservadas. Inventario canonico integrado na main por b2fb5a6f (PR #742).",
       "handoffPath": "https://github.com/MaarkssN/Birthub-360/pull/741",
-      "notes": "Estado original bloqueia merge do artefato associado. A dívida permanece sem resolução."
+      "notes": "Nao e RESOLVED: o parecer 24 desta acao ainda nao existe. Commits de formato e teste do PR permanecem na branch para reavaliacao achado a achado.",
+      "statusHistory": [
+        {
+          "at": "2026-10-14T13:02:12-03:00",
+          "remediationStatus": "BLOCKED",
+          "note": "estado anterior preservado"
+        }
+      ]
     },
     {
       "id": "DEBT-OPS-002",
