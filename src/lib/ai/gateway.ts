@@ -41,6 +41,7 @@ export { generateEmbedding } from './gateway/embeddings.js';
 export { LOCAL_MODEL } from './gateway/model-routing.js';
 export { cleanAndParseJson, toChatCompletionMessages } from './gateway/parsing.js';
 export { estimateCostUsd } from './gateway/pricing.js';
+export { getGroqTelemetrySnapshot } from './gateway/groqTelemetry.service.js';
 export {
   UNTRUSTED_CONTENT_GUARD_INSTRUCTION,
   wrapUntrustedContent,
