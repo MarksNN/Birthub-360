@@ -13,16 +13,17 @@ import {
 import { useCallback, useState } from 'react';
 import { Button } from '../../../components/ui/Button.js';
 import { Card } from '../../../components/ui/Card.js';
-import type {
-  HealthScoreResult,
-  ExecutiveAlert,
-} from '../../commercial-intelligence/commercialIntelligence.api.js';
 import type { NotificationItem } from '../../notifications/notifications.api.js';
-import { type DealRiskScanResult, signalsRisksApi } from '../signalsRisks.api.js';
+import {
+  type DealRiskScanResult,
+  type SignalRiskExecutiveAlert,
+  type SignalRiskHealthScore,
+  signalsRisksApi,
+} from '../signalsRisks.api.js';
 
 interface DealRisksTabProps {
-  healthScore: HealthScoreResult | null;
-  overviewAlerts: ExecutiveAlert[];
+  healthScore: SignalRiskHealthScore | null;
+  overviewAlerts: SignalRiskExecutiveAlert[];
   notifications: NotificationItem[];
   onRefresh: () => void;
 }
