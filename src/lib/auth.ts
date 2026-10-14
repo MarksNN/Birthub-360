@@ -124,8 +124,8 @@ export const auth = betterAuth({
       } catch (error: any) {
         if (error instanceof MailerNotConfiguredError) {
           logger.warn(
-            { email: user.email, url },
-            `Reset de senha solicitado, mas SMTP não está configurado. O link é: ${url}`,
+            { userId: user.id, reason: 'MAILER_NOT_CONFIGURED' },
+            'Reset de senha solicitado, mas SMTP não está configurado.',
           );
           throw new APIError('INTERNAL_SERVER_ERROR', {
             message:
@@ -133,7 +133,7 @@ export const auth = betterAuth({
           });
         }
         logger.error(
-          { err: error, email: user.email },
+          { userId: user.id, reason: 'RESET_EMAIL_FAILED' },
           'Falha ao enviar e-mail de redefinição de senha.',
         );
         throw new APIError('INTERNAL_SERVER_ERROR', {
@@ -175,13 +175,13 @@ export const auth = betterAuth({
         // depois, e `sendOnSignIn` acima tenta de novo na primeira tentativa de login.
         if (error instanceof MailerNotConfiguredError) {
           logger.warn(
-            { email: user.email, url },
-            `Verificação de e-mail solicitada, mas SMTP não está configurado. O link é: ${url}`,
+            { userId: user.id, reason: 'MAILER_NOT_CONFIGURED' },
+            'Verificação de e-mail solicitada, mas SMTP não está configurado.',
           );
           return;
         }
         logger.error(
-          { err: error, email: user.email },
+          { userId: user.id, reason: 'VERIFICATION_EMAIL_FAILED' },
           'Falha ao enviar e-mail de verificação de cadastro.',
         );
       }

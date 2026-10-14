@@ -14,6 +14,7 @@ const copilotoInsightUpdateManyMock = vi.fn();
 const copilotoCrmFieldSuggestionUpdateManyMock = vi.fn();
 const copilotoCoachingEvaluationUpdateManyMock = vi.fn();
 const deleteObjectMock = vi.fn();
+const optOutCreateMock = vi.fn();
 
 vi.mock('@/lib/storage', () => ({
   deleteObject: (...args: unknown[]) => deleteObjectMock(...args),
@@ -30,6 +31,9 @@ vi.mock('@/lib/prisma', () => ({
     },
     lead: {
       findMany: (...args: unknown[]) => leadFindManyMock(...args),
+    },
+    optOutRecord: {
+      create: (...args: unknown[]) => optOutCreateMock(...args),
     },
     conversationSignal: {
       updateMany: (...args: unknown[]) => conversationSignalUpdateManyMock(...args),
@@ -73,6 +77,7 @@ beforeEach(() => {
   deleteObjectMock.mockResolvedValue(true);
   updateManyMock.mockResolvedValue({ count: 3 });
   leadFindManyMock.mockResolvedValue([{ id: 'lead-1' }, { id: 'lead-2' }]);
+  optOutCreateMock.mockResolvedValue({ id: 'opt-1' });
   conversationSignalUpdateManyMock.mockResolvedValue({ count: 2 });
   timelineEventUpdateManyMock.mockResolvedValue({ count: 4 });
   voiceCallLogUpdateManyMock.mockResolvedValue({ count: 5 });
@@ -98,6 +103,7 @@ describe('eraseDataSubject — mecanismo técnico de exclusão/anonimização LG
       where: { id: CONTACT_ID, organizationId: ORG_ID },
     });
     expect(updateMock).not.toHaveBeenCalled();
+    expect(optOutCreateMock).not.toHaveBeenCalled();
   });
 
   it('anonimiza todos os campos identificadores do contato e mascara o WhatsApp ligado a ele', async () => {
@@ -109,6 +115,10 @@ describe('eraseDataSubject — mecanismo técnico de exclusão/anonimização LG
 
     const result = await eraseDataSubject({ organizationId: ORG_ID, contactId: CONTACT_ID });
 
+    expect(optOutCreateMock).toHaveBeenCalled();
+    expect(optOutCreateMock.mock.invocationCallOrder[0]).toBeLessThan(
+      updateMock.mock.invocationCallOrder[0],
+    );
     expect(updateMock).toHaveBeenCalledWith({
       where: { id: CONTACT_ID },
       data: {

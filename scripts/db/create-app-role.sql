@@ -17,12 +17,15 @@
 -- com :'app_password' dentro de um DO $$ ... $$, o texto chega literal no servidor e vira erro de
 -- sintaxe. \gexec mantem a interpolacao num SELECT de nivel superior, onde ela funciona de verdade.
 SELECT format(
-    'CREATE ROLE prospector_app WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD %L',
+    'CREATE ROLE prospector_app WITH LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD %L',
     :'app_password'
 )
 WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'prospector_app')
 UNION ALL
-SELECT format('ALTER ROLE prospector_app WITH PASSWORD %L', :'app_password')
+SELECT format(
+    'ALTER ROLE prospector_app WITH LOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD %L',
+    :'app_password'
+)
 WHERE EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'prospector_app')
 \gexec
 
