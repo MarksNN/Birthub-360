@@ -1,9 +1,26 @@
 import { api } from '../../lib/api.js';
-import type {
-  HealthScoreResult,
-  ExecutiveAlert,
-} from '../commercial-intelligence/commercialIntelligence.api.js';
 import type { NotificationItem } from '../notifications/notifications.api.js';
+
+export interface SignalRiskHealthScore {
+  overallScore: number | null;
+  pillars: Array<{
+    pillar:
+      | 'pipeline'
+      | 'conversao'
+      | 'produtividade'
+      | 'qualidadeCrm'
+      | 'followUp'
+      | 'confiabilidadeForecast';
+    label: string;
+    score: number | null;
+  }>;
+}
+
+export interface SignalRiskExecutiveAlert {
+  id: string;
+  title: string;
+  description: string;
+}
 
 export interface DataQualityReportData {
   available: boolean;
@@ -47,9 +64,9 @@ export const signalsRisksApi = {
     }
   },
 
-  getHealthScore: async (): Promise<HealthScoreResult | null> => {
+  getHealthScore: async (): Promise<SignalRiskHealthScore | null> => {
     try {
-      const response = await api.get<{ success: boolean; data: HealthScoreResult }>(
+      const response = await api.get<{ success: boolean; data: SignalRiskHealthScore }>(
         '/api/commercial-intelligence/health-score',
       );
       return response.data ?? null;
@@ -58,9 +75,11 @@ export const signalsRisksApi = {
     }
   },
 
-  getExecutiveAlerts: async (): Promise<ExecutiveAlert[]> => {
+  getExecutiveAlerts: async (): Promise<SignalRiskExecutiveAlert[]> => {
     try {
-      const response = await api.get<ExecutiveAlert[]>('/api/commercial-intelligence/alerts');
+      const response = await api.get<SignalRiskExecutiveAlert[]>(
+        '/api/commercial-intelligence/alerts',
+      );
       return Array.isArray(response) ? response : [];
     } catch {
       return [];
