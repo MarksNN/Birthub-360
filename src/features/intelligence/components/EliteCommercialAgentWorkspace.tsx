@@ -1,6 +1,5 @@
 import type React from 'react';
 import { useState, useEffect, useCallback } from 'react';
-import canvasConfetti from 'canvas-confetti';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -32,6 +31,7 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
   const [showScoreEvidence, setShowScoreEvidence] = useState(false);
   const [executingAction, setExecutingAction] = useState(false);
   const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
+  const [actionErrorMessage, setActionErrorMessage] = useState<string | null>(null);
 
   const fetchWorkspaceData = useCallback(async () => {
     try {
@@ -76,6 +76,8 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
     if (!overview?.nextBestAction) return;
     SoundFX.play('click');
     setExecutingAction(true);
+    setActionSuccessMessage(null);
+    setActionErrorMessage(null);
     try {
       const res = await fetch(
         `/api/commercial-agent/nba/${overview.nextBestAction.actionId}/execute`,
@@ -86,30 +88,15 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
         },
       );
       const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Não foi possível solicitar a ação comercial.');
+      }
       setActionSuccessMessage(
-        json.success
-          ? `Disparo efetuado com sucesso via Adaptive Cadence. Discando para ${overview.nextBestAction.contactName}...`
-          : 'Ação registrada no fluxo comercial.',
+        'Solicitação recebida pelo servidor. A execução do contato ainda não foi confirmada.',
       );
-    } catch {
-      setActionSuccessMessage(
-        `Disparo efetuado com sucesso via Adaptive Cadence. Discando para ${overview.nextBestAction.contactName}...`,
-      );
+    } catch (err) {
+      setActionErrorMessage(err instanceof Error ? err.message : 'Falha ao solicitar a ação comercial.');
     } finally {
-      SoundFX.play('success');
-      canvasConfetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: [
-          '--color-brand-primary',
-          '--color-brand-secondary',
-          '--color-brand-accent',
-          '--color-success',
-          '--color-info',
-        ].map((token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim()),
-        disableForReducedMotion: true,
-      });
       setExecutingAction(false);
       setTimeout(() => setActionSuccessMessage(null), 5000);
     }
@@ -118,8 +105,10 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
   const handleFeedbackAction = async (decision: 'POSTPONED' | 'REJECTED') => {
     if (!overview?.nextBestAction) return;
     SoundFX.play('click');
+    setActionSuccessMessage(null);
+    setActionErrorMessage(null);
     try {
-      await fetch(`/api/commercial-agent/nba/${overview.nextBestAction.actionId}/feedback`, {
+      const res = await fetch(`/api/commercial-agent/nba/${overview.nextBestAction.actionId}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -128,16 +117,20 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
           reason: decision === 'POSTPONED' ? 'Adiamento manual' : 'Substituição manual',
         }),
       });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Não foi possível solicitar a alteração da ação.');
+      }
       setActionSuccessMessage(
-        decision === 'POSTPONED'
-          ? 'Cadência pausada e recalculada.'
-          : 'Ação rejeitada. Nova estratégia solicitada à Giselle.',
+        'Solicitação recebida pelo servidor. A alteração da cadência ainda não foi confirmada.',
       );
       setTimeout(() => setActionSuccessMessage(null), 5000);
-    } catch {}
+    } catch (err) {
+      setActionErrorMessage(err instanceof Error ? err.message : 'Falha ao solicitar alteração da ação.');
+    }
   };
 
-  if (loading || !overview) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
@@ -329,9 +322,11 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
       </div>
 
       {/* FEEDBACK DE AÇÃO */}
+      {actionErrorMessage && <p role="alert">{actionErrorMessage}</p>}
       <AnimatePresence>
         {actionSuccessMessage && (
           <motion.div
+            role="status"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

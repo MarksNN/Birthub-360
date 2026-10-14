@@ -63,6 +63,9 @@ async function resolveLeadContactId(
 /** Rotas para WhatsApp real. Opt-out é verificado pelo interceptor checkOptOutStatus antes do envio para assegurar bloqueio instantâneo e ausência de vazamento multi-tenant (B-13 e §27). */
 export const whatsAppCadenceDispatcher: Pick<CadenceDispatcher, 'dispatch'> = {
   async dispatch(touch: CadenceTouch, run: CadenceRunState) {
+    if (!touch.templateRef?.trim()) {
+      return { result: 'failed' as const, error: 'Conteúdo da mensagem de cadência não configurado.' };
+    }
     const contactId = await resolveLeadContactId(run.organizationId, run.leadId);
     if (contactId) {
       const optOutCheck = await checkOptOutStatus(contactId, 'whatsapp', run.organizationId);
@@ -130,6 +133,9 @@ function splitSubjectAndBody(
 /** Rotas para e-mail real via SMTP (`sendEmail`). Interceptor checkOptOutStatus valida opt-out e consentimento antes do disparo (B-13 e §27). */
 export const emailCadenceDispatcher: Pick<CadenceDispatcher, 'dispatch'> = {
   async dispatch(touch: CadenceTouch, run: CadenceRunState) {
+    if (!touch.templateRef?.trim()) {
+      return { result: 'failed' as const, error: 'Conteúdo da mensagem de cadência não configurado.' };
+    }
     const contactId = await resolveLeadContactId(run.organizationId, run.leadId);
     if (contactId) {
       const optOutCheck = await checkOptOutStatus(contactId, 'email', run.organizationId);
