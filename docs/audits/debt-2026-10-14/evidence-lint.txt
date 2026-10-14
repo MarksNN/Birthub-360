@@ -1,0 +1,7 @@
+
+> react-example@0.0.1 lint
+> biome lint src
+
+
+'biome' não é reconhecido como um comando interno
+ou externo, um programa operável ou um arquivo em lotes.

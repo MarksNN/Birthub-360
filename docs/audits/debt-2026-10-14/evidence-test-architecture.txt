@@ -1,0 +1,11 @@
+
+> react-example@0.0.1 test:architecture
+> npm run lint:architecture && npm run verify:architecture-coverage && npm run check:hotspots
+
+
+> react-example@0.0.1 lint:architecture
+> depcruise --config .dependency-cruiser.cjs --ignore-known .dependency-cruiser-known-violations.json --output-type err src server.ts worker.ts
+
+
+'depcruise' não é reconhecido como um comando interno
+ou externo, um programa operável ou um arquivo em lotes.
