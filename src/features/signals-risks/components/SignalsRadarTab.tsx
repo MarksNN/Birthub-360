@@ -30,7 +30,8 @@ const CATALOG_SIGNALS: MarketSignalItem[] = [
     source: 'Receita Federal do Brasil (via BrasilAPI)',
     detectedAt: new Date().toISOString(),
     segment: 'Logística & Transporte',
-    suggestedAction: 'Oferecer solução estruturante de onboarding e conformidade operacional imediata.',
+    suggestedAction:
+      'Oferecer solução estruturante de onboarding e conformidade operacional imediata.',
   },
   {
     id: 'sig-02',
@@ -42,7 +43,8 @@ const CATALOG_SIGNALS: MarketSignalItem[] = [
     source: 'Receita Federal / Cadastro de Filiais',
     detectedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
     segment: 'Operador Logístico',
-    suggestedAction: 'Abordar com oferta de cobertura de risco e gestão em múltiplos polos operacionais.',
+    suggestedAction:
+      'Abordar com oferta de cobertura de risco e gestão em múltiplos polos operacionais.',
   },
   {
     id: 'sig-03',
@@ -54,7 +56,8 @@ const CATALOG_SIGNALS: MarketSignalItem[] = [
     source: 'Web Scraper & Rastreador Corporativo',
     detectedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
     segment: 'Embarcador / Indústria',
-    suggestedAction: 'Destacar APIs abertas e facilidade de integração técnica nativa da plataforma.',
+    suggestedAction:
+      'Destacar APIs abertas e facilidade de integração técnica nativa da plataforma.',
   },
   {
     id: 'sig-04',
@@ -66,7 +69,8 @@ const CATALOG_SIGNALS: MarketSignalItem[] = [
     source: 'Vagas & Redes Profissionais Públicas',
     detectedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
     segment: 'Transportadora B2B',
-    suggestedAction: 'Mapear novos tomadores de decisão e conectar proposta de eficiência operacional.',
+    suggestedAction:
+      'Mapear novos tomadores de decisão e conectar proposta de eficiência operacional.',
   },
 ];
 
@@ -106,11 +110,9 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             <Radio className="w-4 h-4 text-brand animate-pulse" />
           </div>
           <div className="text-2xl font-black text-ink">
-            {loading ? '...' : coverage?.totalSignals ?? CATALOG_SIGNALS.length}
+            {loading ? '...' : (coverage?.totalSignals ?? CATALOG_SIGNALS.length)}
           </div>
-          <p className="text-[11px] text-ink-2 mt-1">
-            Gatilhos de momento de compra monitorados
-          </p>
+          <p className="text-[11px] text-ink-2 mt-1">Gatilhos de momento de compra monitorados</p>
         </Card>
 
         <Card padding="default" className="border-info/20 bg-info/[0.03]">
@@ -121,11 +123,9 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             <Building2 className="w-4 h-4 text-info-active dark:text-info" />
           </div>
           <div className="text-2xl font-black text-ink">
-            {loading ? '...' : coverage?.accountsWithSignals ?? 12}
+            {loading ? '...' : (coverage?.accountsWithSignals ?? 12)}
           </div>
-          <p className="text-[11px] text-ink-2 mt-1">
-            Contas-alvo com gatilhos detectados
-          </p>
+          <p className="text-[11px] text-ink-2 mt-1">Contas-alvo com gatilhos detectados</p>
         </Card>
 
         <Card padding="default" className="border-success/20 bg-success/[0.03]">
@@ -149,9 +149,7 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             <Sparkles className="w-4 h-4 text-accent-violet" />
           </div>
           <div className="text-2xl font-black text-ink">Alta Confiança</div>
-          <p className="text-[11px] text-ink-2 mt-1">
-            Classificação algorítmica por timing e fit
-          </p>
+          <p className="text-[11px] text-ink-2 mt-1">Classificação algorítmica por timing e fit</p>
         </Card>
       </div>
 
@@ -190,7 +188,11 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
       {/* ── Grade de Sinais de Intenção ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredSignals.map((signal) => (
-          <Card key={signal.id} padding="default" className="space-y-4 hover:border-brand/40 transition-all">
+          <Card
+            key={signal.id}
+            padding="default"
+            className="space-y-4 hover:border-brand/40 transition-all"
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="p-2 rounded-lg bg-brand/10 text-brand">
@@ -214,18 +216,14 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
               </span>
             </div>
 
-            <p className="text-xs text-ink-2 leading-relaxed">
-              {signal.description}
-            </p>
+            <p className="text-xs text-ink-2 leading-relaxed">{signal.description}</p>
 
             <div className="rounded-lg border border-brand/15 bg-brand/[0.03] p-3 text-xs space-y-1">
               <div className="flex items-center gap-1.5 text-brand font-semibold">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Recomendação de Abordagem Comercial</span>
               </div>
-              <p className="text-ink-2 text-[11px]">
-                {signal.suggestedAction}
-              </p>
+              <p className="text-ink-2 text-[11px]">{signal.suggestedAction}</p>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-line text-[11px] text-ink-2">
@@ -245,7 +243,9 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
       {filteredSignals.length === 0 && (
         <Card padding="lg" className="text-center py-12">
           <Info className="w-8 h-8 text-ink-3 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-ink">Nenhum sinal encontrado para o filtro atual.</p>
+          <p className="text-sm font-semibold text-ink">
+            Nenhum sinal encontrado para o filtro atual.
+          </p>
           <p className="text-xs text-ink-2 mt-1">Tente ajustar a busca ou categoria selecionada.</p>
         </Card>
       )}
@@ -256,7 +256,9 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
         <div className="space-y-1">
           <p className="font-semibold text-ink">Princípio de Integridade: Sinais Auditáveis</p>
           <p>
-            Em conformidade com a governança da plataforma (Wave 13), sinais de mercado nunca são fabricados ou simulados como verdade. Cada evento possui comprovação em registros públicos oficiais (CNPJ, Receita Federal) ou rastreamento web verificado.
+            Em conformidade com a governança da plataforma (Wave 13), sinais de mercado nunca são
+            fabricados ou simulados como verdade. Cada evento possui comprovação em registros
+            públicos oficiais (CNPJ, Receita Federal) ou rastreamento web verificado.
           </p>
         </div>
       </div>

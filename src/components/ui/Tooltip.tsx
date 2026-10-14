@@ -52,11 +52,7 @@ export function Tooltip({
     onOpenChange: setIsOpen,
     placement,
     whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(8),
-      flip({ fallbackAxisSideDirection: 'start' }),
-      shift({ padding: 8 }),
-    ],
+    middleware: [offset(8), flip({ fallbackAxisSideDirection: 'start' }), shift({ padding: 8 })],
   });
 
   const hover = useHover(context, {
@@ -69,12 +65,7 @@ export function Tooltip({
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'tooltip' });
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    focus,
-    dismiss,
-    role,
-  ]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover, focus, dismiss, role]);
 
   if (!isValidElement(children)) {
     return <>{children}</>;

@@ -1,10 +1,4 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Loader2,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -64,18 +58,13 @@ export function Pagination({
     }
   };
 
-  const formattedTotal =
-    typeof totalItems === 'number'
-      ? totalItems.toLocaleString('pt-BR')
-      : null;
+  const formattedTotal = typeof totalItems === 'number' ? totalItems.toLocaleString('pt-BR') : null;
 
   return (
     <div className="p-4 border-t border-line bg-surface-2/50 flex flex-wrap items-center justify-between gap-4">
       {/* Informações da página e total */}
       <div className="flex items-center gap-3">
-        {loading && (
-          <Loader2 className="w-3.5 h-3.5 animate-spin text-brand shrink-0" />
-        )}
+        {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-brand shrink-0" />}
         <span className="text-xs text-ink-2 font-semibold">
           Página {page} de {Math.max(1, totalPages)}
           {typeof totalItems === 'number' && itemLabel ? ` · ${formattedTotal} ${itemLabel}` : ''}
@@ -159,8 +148,7 @@ export function Pagination({
           onClick={() => onPageChange(Math.max(1, page - 1))}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface/70 backdrop-blur-md border border-line text-ink-2 hover:bg-surface-elevated hover:shadow-sm active:scale-95 disabled:hover:scale-100 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer text-xs font-semibold"
         >
-          <ChevronLeft className="w-4 h-4" />{' '}
-          <span className="hidden sm:inline">Anterior</span>
+          <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Anterior</span>
         </button>
 
         {/* Botão Próxima */}
@@ -170,8 +158,7 @@ export function Pagination({
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface/70 backdrop-blur-md border border-line text-ink-2 hover:bg-surface-elevated hover:shadow-sm active:scale-95 disabled:hover:scale-100 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer text-xs font-semibold"
         >
-          <span className="hidden sm:inline">Próxima</span>{' '}
-          <ChevronRight className="w-4 h-4" />
+          <span className="hidden sm:inline">Próxima</span> <ChevronRight className="w-4 h-4" />
         </button>
 
         {/* Botão Última Página */}

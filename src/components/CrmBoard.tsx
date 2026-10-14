@@ -919,7 +919,10 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
           {/* Mover Etapa em Massa */}
           <Tooltip content="Transfere todos os leads selecionados para a nova etapa de funil indicada.">
             <div className="flex items-center gap-1.5 cursor-pointer">
-              <label htmlFor="crm-board-batch-stage" className="text-[11px] font-semibold text-ink-2 cursor-pointer">
+              <label
+                htmlFor="crm-board-batch-stage"
+                className="text-[11px] font-semibold text-ink-2 cursor-pointer"
+              >
                 Etapa:
               </label>
               <select
@@ -946,7 +949,10 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
           {/* Reatribuir Vendedor */}
           <Tooltip content="Reatribui a responsabilidade dos leads selecionados para outro membro da equipe.">
             <div className="flex items-center gap-1.5 cursor-pointer">
-              <label htmlFor="crm-board-batch-owner" className="text-[11px] font-semibold text-ink-2 cursor-pointer">
+              <label
+                htmlFor="crm-board-batch-owner"
+                className="text-[11px] font-semibold text-ink-2 cursor-pointer"
+              >
                 Dono:
               </label>
               <select
