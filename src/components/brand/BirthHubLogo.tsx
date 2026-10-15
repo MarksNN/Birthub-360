@@ -10,7 +10,12 @@ interface BirthHubLogoProps {
   animated?: boolean;
 }
 
-export function BirthHubLogo({ variant = 'mark', className, title, animated = true }: BirthHubLogoProps) {
+export function BirthHubLogo({
+  variant = 'mark',
+  className,
+  title,
+  animated = true,
+}: BirthHubLogoProps) {
   const src =
     variant === 'horizontal'
       ? horizontal
