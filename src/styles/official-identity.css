@@ -61,10 +61,42 @@ html.dark,
 }
 
 html.light,
-[data-theme="light"] {
+:root.light,
+[data-theme="light"],
+:root[data-theme="light"] {
   --brand: #0369a1;
+  --color-brand: #0369a1;
   --color-brand-primary: #0369a1;
   --color-interactive-primary: #0369a1;
+  --color-interactive-hover: #0284c7;
+  --color-heading-gold: #b45309;
+  --color-heading-cyan: #0369a1;
+  --color-text-secondary: #475569;
+  --palette-muted: #475569;
+  --ink-2: #475569;
+}
+
+[data-theme="light"] .text-brand,
+html.light .text-brand {
+  color: #0369a1;
+}
+
+[data-theme="light"] .text-ink-2,
+html.light .text-ink-2 {
+  color: #475569;
+}
+
+[data-theme="light"] .vancouver-gradient-text,
+html.light .vancouver-gradient-text,
+[data-theme="light"] .gradient-text,
+html.light .gradient-text {
+  color: #b45309;
+}
+
+[data-theme="light"] .vancouver-btn-outline,
+html.light .vancouver-btn-outline {
+  color: #0369a1;
+  border-color: #0369a1;
 }
 
 /* Utility compatibility without changing the official focus shorthand. */
