@@ -1,113 +1,205 @@
+/* ==========================================================================
+   BIRTH HUB 360° — LANDING STYLES (OFICIAL NEON IDENTITY)
+   Governança: Zero fundo branco em botões, Títulos Centralizados, 
+   Dourado Radiante (Sem tom marrom), Multi-CRM & SVG Badges
+   ========================================================================== */
+
+.landing-neon-root {
+  --color-gold-real: #F59E0B;
+  --color-gold-glow: #FBBF24;
+  --color-gold-deep: #D97706;
+  --color-gold-light: #FDE68A;
+  --grad-gold-real: linear-gradient(135deg, #FDE68A 0%, #F59E0B 50%, #D97706 100%);
+  --grad-gold-shine: linear-gradient(135deg, #FFFBEB 0%, #FBBF24 50%, #B45309 100%);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   1. CORES DE TÍTULOS & GRADIENTES (DOURADO RADIANTE, NUNCA MARROM)
+   ========================================================================== */
+
 .landing-neon-root .neon-title-blue,
 .landing-neon-root h1.neon-title-blue,
 .landing-neon-root h2.neon-title-blue,
 .landing-neon-root h3.neon-title-blue,
 .landing-neon-root h4.neon-title-blue {
-  color: var(--color-heading-cyan) !important;
+  color: var(--color-heading-cyan, #00D4FF) !important;
   text-shadow: none;
 }
+
 .landing-neon-root .neon-title-pink,
 .landing-neon-root h1.neon-title-pink,
 .landing-neon-root h2.neon-title-pink,
 .landing-neon-root h3.neon-title-pink,
 .landing-neon-root h4.neon-title-pink {
-  color: var(--color-heading-pink) !important;
+  color: var(--color-heading-pink, #FF2D9B) !important;
   text-shadow: none;
 }
+
+/* Dourado real e luminoso, corrigindo qualquer derivação marrom escura */
 .landing-neon-root .neon-title-gold,
+.landing-neon-root .text-gold,
 .landing-neon-root h1.neon-title-gold,
 .landing-neon-root h2.neon-title-gold,
 .landing-neon-root h3.neon-title-gold,
 .landing-neon-root h4.neon-title-gold {
-  color: var(--color-heading-gold) !important;
-  text-shadow: none;
+  color: #F59E0B !important;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
 }
+
 .landing-neon-root .neon-gradient-title {
-  color: var(--color-heading-gold);
-  background: none;
-  -webkit-text-fill-color: currentColor;
+  background-image: linear-gradient(135deg, #FDE68A 0%, #F59E0B 50%, #D97706 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
   display: inline-block;
 }
+
+.landing-neon-root .grad-text-gold {
+  background-image: linear-gradient(135deg, #FDE68A 0%, #F59E0B 50%, #D97706 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
+}
+
 .landing-neon-root .grad-text-blue {
-  color: var(--color-heading-cyan) !important;
-  text-shadow: none;
+  background-image: linear-gradient(135deg, #38BDF8 0%, #0284C7 50%, #2563EB 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
 }
+
 .landing-neon-root .grad-text-purple {
-  color: var(--color-heading-iris) !important;
-  text-shadow: none;
+  background-image: linear-gradient(135deg, #C084FC 0%, #A855F7 50%, #7C3AED 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
 }
+
 .landing-neon-root .grad-text-cyan {
-  color: var(--color-heading-gold) !important;
-  text-shadow: none;
+  background-image: linear-gradient(135deg, #22D3EE 0%, #06B6D4 50%, #0284C7 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
 }
-.landing-neon-root .vancouver-btn-gradient,
-.landing-neon-root .btn-cta-light {
+
+/* ==========================================================================
+   2. BOTÕES: ZERO FUNDO BRANCO (REGRA EXPLÍCITA DO USUÁRIO)
+   ========================================================================== */
+
+/* Todos os botões primários e CTA recebem gradiente de alta energia, texto branco */
+.landing-neon-root .btn-cta-light,
+.landing-neon-root .btn-primary-gradient,
+.landing-neon-root .vancouver-btn-gradient {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
   padding: 0.85rem 2rem;
-  border-radius: var(--radius-card);
-  font-family: var(--font-interface);
+  border-radius: var(--radius-card, 16px);
+  font-family: var(--font-interface, 'Inter', sans-serif);
   font-weight: 800;
   font-size: 0.95rem;
-  color: var(--color-heading-cyan) !important;
-  background: var(--color-surface) !important;
-  border: 2px solid var(--color-heading-cyan) !important;
-  box-shadow: var(--shadow-card);
+  letter-spacing: 0.04em;
+  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #7C3AED 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.42), 0 4px 12px rgba(124, 58, 237, 0.3) !important;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
-.landing-neon-root .vancouver-btn-gradient:hover,
-.landing-neon-root .btn-cta-light:hover {
+
+.landing-neon-root .btn-cta-light:hover,
+.landing-neon-root .btn-primary-gradient:hover,
+.landing-neon-root .vancouver-btn-gradient:hover {
   transform: translateY(-2px) scale(1.02);
-  color: var(--color-heading-pink) !important;
-  border-color: var(--color-heading-pink) !important;
-  box-shadow: var(--shadow-card);
+  background: linear-gradient(135deg, #0EA5E9 0%, #3B82F6 50%, #8B5CF6 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 14px 32px -4px rgba(2, 132, 199, 0.55), 0 6px 18px rgba(124, 58, 237, 0.4) !important;
   filter: brightness(1.1);
 }
-.landing-neon-root .vancouver-btn-gradient:active,
-.landing-neon-root .btn-cta-light:active {
+
+.landing-neon-root .btn-cta-light:active,
+.landing-neon-root .btn-primary-gradient:active,
+.landing-neon-root .vancouver-btn-gradient:active {
   transform: translateY(0);
 }
+
+/* Botões secundários: base grafite/azul escuro de alta tecnologia — NUNCA BRANCO */
+.landing-neon-root .btn-secondary-dark,
 .landing-neon-root .vancouver-btn-outline {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.75rem;
-  border-radius: var(--radius-card);
-  font-family: var(--font-interface);
+  padding: 0.85rem 1.85rem;
+  border-radius: var(--radius-card, 16px);
+  font-family: var(--font-interface, 'Inter', sans-serif);
   font-weight: 700;
   font-size: 0.925rem;
-  color: var(--color-heading-cyan) !important;
-  background: var(--color-border-subtle) !important;
-  border: 1.5px solid var(--color-heading-cyan) !important;
-  box-shadow: var(--shadow-card);
+  color: #38BDF8 !important;
+  background: #0F172A !important; /* Grafite profundo — zero branco */
+  border: 1.5px solid #0284C7 !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25) !important;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
+
+.landing-neon-root .btn-secondary-dark:hover,
 .landing-neon-root .vancouver-btn-outline:hover {
-  background: var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
+  background: #1E293B !important;
+  color: #FFFFFF !important;
+  border-color: #38BDF8 !important;
+  box-shadow: 0 8px 22px rgba(2, 132, 199, 0.4) !important;
   transform: translateY(-2px);
 }
-.landing-neon-root .vancouver-navbar,
+
+/* Botões de autenticação social / SSO: Fundo grafite elegante, sem fundo branco */
+.landing-neon-root .btn-social-dark {
+  background: #0F172A !important;
+  color: #F8FAFC !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s ease;
+}
+
+.landing-neon-root .btn-social-dark:hover {
+  background: #1E293B !important;
+  border-color: #0284C7 !important;
+  color: #38BDF8 !important;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   3. NAVBAR & SURFACES
+   ========================================================================== */
+
 .landing-neon-root .navbar-sticky {
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
-  background: var(--color-border-subtle) !important;
+  background: rgba(15, 23, 42, 0.88) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--color-border-subtle) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.18) !important;
   transition: all 0.3s ease;
 }
+
 .landing-neon-root .vancouver-hero-bg {
   position: absolute;
   top: -150px;
@@ -115,138 +207,70 @@
   transform: translateX(-50%);
   width: 1000px;
   height: 600px;
-  background: var(--grad-glow);
+  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.18), transparent 70%);
   filter: blur(90px);
   pointer-events: none;
   z-index: 0;
 }
+
 .landing-neon-root .section-card {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card);
+  background: #0F172A !important;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: var(--radius-card, 16px);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: var(--shadow-card);
-}
-.landing-neon-root .section-card:hover {
-  border-color: var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
-  transform: translateY(-3px);
-}
-.landing-neon-root .pillar-card {
-  background: var(--color-surface) !important;
-  border-radius: var(--radius-card);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.landing-neon-root .pillar-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card);
-}
-.landing-neon-root .flow-step-card {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card);
-  transition: all 0.3s ease;
-}
-.landing-neon-root .flow-step-card:hover {
-  border-color: var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
-  transform: translateY(-2px);
-}
-.landing-neon-root .card-glow-light {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
-}
-.landing-neon-root .neon-badge-blue {
-  background: var(--color-border-subtle) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-heading-cyan) !important;
-}
-.landing-neon-root .neon-badge-pink {
-  background: var(--color-border-subtle) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-heading-pink) !important;
-}
-.landing-neon-root .neon-badge-gold {
-  background: var(--color-border-subtle) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-heading-gold) !important;
-}
-.landing-neon-root .logo-glow-light {
-  filter: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
-.landing-neon-root {
-  background: var(--color-background);
-  color: var(--color-text-primary);
+.landing-neon-root .section-card:hover {
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  transform: translateY(-3px);
 }
-.landing-neon-root p {
-  color: var(--color-text-secondary);
-  line-height: 1.75;
+
+.landing-neon-root .pillar-card {
+  background: #0F172A !important;
+  border-radius: var(--radius-card, 16px);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.landing-neon-root :where(.section-card, .pillar-card, .flow-step-card) p {
-  font-size: 15px;
+
+.landing-neon-root .pillar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
-.landing-neon-root :where(.section-card, .pillar-card, .flow-step-card) {
-  border: 1px solid var(--color-brand-primary);
-  border-radius: var(--radius-card);
+
+.landing-neon-root .flow-step-card {
+  background: #0F172A !important;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: var(--radius-card, 16px);
+  transition: all 0.3s ease;
 }
-.landing-neon-root .neon-gradient-title {
-  background: none;
-  -webkit-text-fill-color: currentColor;
-  color: var(--color-heading-gold);
-}
-.landing-neon-root :where(.vancouver-btn-gradient, .btn-cta-light) {
-  border-radius: var(--radius-control);
-  background: var(--color-interactive-primary) !important;
-  color: var(--on-brand) !important;
-}
-.landing-neon-root :where(.vancouver-btn-gradient, .btn-cta-light):hover {
-  background: var(--color-interactive-hover) !important;
-}
-.landing-neon-root .vancouver-btn-outline {
-  border-radius: var(--radius-control);
-  background: var(--color-surface) !important;
-}
-.landing-neon-root :where(.vancouver-navbar, .navbar-sticky) {
-  background: var(--color-background) !important;
-}
-.landing-neon-root input {
-  background: var(--color-surface-elevated);
-  color: var(--color-text-primary);
-  border-radius: var(--radius-control);
-}
-.landing-neon-root input:-webkit-autofill {
-  -webkit-text-fill-color: var(--color-text-primary);
-  box-shadow: 0 0 0 1000px var(--color-surface-elevated) inset;
-}
-.landing-neon-root :focus-visible {
-  outline: var(--color-focus-ring);
-  outline-offset: 3px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .landing-neon-root * {
-    animation: none !important;
-    transition: none !important;
-  }
+
+.landing-neon-root .flow-step-card:hover {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
 }
 
 .landing-neon-root .capability-card {
   padding: 24px 20px;
   text-align: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-brand-primary);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  background: #0F172A !important;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: var(--radius-card, 16px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   animation: capability-enter 360ms ease-out both;
   transition:
     transform 160ms ease,
-    background-color 160ms ease;
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
+
 .landing-neon-root .capability-card:hover {
   transform: translateY(-3px);
-  background: var(--color-surface-hover);
+  background: #1E293B !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
 }
+
 @keyframes capability-enter {
   from {
     opacity: 0;
@@ -257,7 +281,12 @@
     transform: translateY(0);
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
+  .landing-neon-root * {
+    animation: none !important;
+    transition: none !important;
+  }
   .landing-neon-root .capability-card {
     animation: none;
     transition: none;
@@ -265,4 +294,15 @@
   .landing-neon-root .capability-card:hover {
     transform: none;
   }
+}
+
+/* ==========================================================================
+   4. SVG BADGES PERSONALIZADOS PARA TÍTULOS
+   ========================================================================== */
+
+.title-badge-svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.45));
 }
