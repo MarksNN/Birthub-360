@@ -160,20 +160,13 @@ export const KanbanCard = React.memo(function KanbanCard({
         ...style,
         background: isSelected ? 'rgba(22,119,255,0.06)' : 'rgba(255,255,255,0.03)',
       }}
-      role="button"
-      tabIndex={0}
       onPointerMove={handlePointerMove}
       onMouseEnter={() => {
         setIsHovered(true);
         SoundFX.play('hover');
       }}
       onMouseLeave={() => setIsHovered(false)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-        }
-      }}
-      className={`backdrop-blur-[8px] rounded-xl border transition-all duration-200 group relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+      className={`backdrop-blur-[8px] rounded-xl border transition-all duration-200 group relative overflow-hidden ${
         isSelected
           ? 'border-brand ring-1 ring-brand/60 shadow-glow-brand'
           : isHighPriority
@@ -238,7 +231,7 @@ export const KanbanCard = React.memo(function KanbanCard({
           SoundFX.play('click');
           onClick(lead);
         }}
-        className={`p-4 pb-0 cursor-grab active:cursor-grabbing ${selectionMode || isSelected ? 'pl-9' : ''}`}
+        className={`p-4 pb-0 cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg ${selectionMode || isSelected ? 'pl-9' : ''}`}
       >
         {/* Cabeçalho do Card: Empresa, Temperatura e Score */}
         <div className="flex justify-between items-start gap-2 mb-2">

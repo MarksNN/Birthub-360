@@ -515,26 +515,26 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <div className="p-4 rounded-xl bg-surface border border-line">
                   <p className="text-xs text-ink-2 font-semibold uppercase">Oportunidades Ativas</p>
                   <p className="text-2xl font-bold text-brand mt-1">1.240</p>
-                  <span className="text-[10px] text-emerald-600 font-bold">
+                  <span className="text-[10px] text-emerald-700 font-bold">
                     ↑ 14% vs mês anterior
                   </span>
                 </div>
                 <div className="p-4 rounded-xl bg-surface border border-line">
                   <p className="text-xs text-ink-2 font-semibold uppercase">Pipeline Ponderado</p>
                   <p className="text-2xl font-bold text-brand mt-1">R$ 8.940.000</p>
-                  <span className="text-[10px] text-sky-600 font-bold">Probabilidade 82%</span>
+                  <span className="text-[10px] text-sky-700 font-bold">Probabilidade 82%</span>
                 </div>
                 <div className="p-4 rounded-xl bg-surface border border-line">
                   <p className="text-xs text-ink-2 font-semibold uppercase">Sinais de Compra</p>
                   <p className="text-2xl font-bold text-brand mt-1">348</p>
-                  <span className="text-[10px] text-purple-600 font-bold">
+                  <span className="text-[10px] text-purple-700 font-bold">
                     14 prioritários hoje
                   </span>
                 </div>
                 <div className="p-4 rounded-xl bg-surface border border-line">
                   <p className="text-xs text-ink-2 font-semibold uppercase">Eficiência SDR</p>
-                  <p className="text-2xl font-bold text-emerald-600 mt-1">94.2%</p>
-                  <span className="text-[10px] text-emerald-600 font-bold">Sem vazamentos</span>
+                  <p className="text-2xl font-bold text-emerald-700 mt-1">94.2%</p>
+                  <span className="text-[10px] text-emerald-700 font-bold">Sem vazamentos</span>
                 </div>
               </div>
 
@@ -1179,25 +1179,25 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <span className="font-bold text-xs text-brand">B24</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="WhatsApp API">
-              <span className="font-bold text-xs text-emerald-600">WPP</span>
+              <span className="font-bold text-xs text-emerald-700">WPP</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="PostgreSQL 16">
               <span className="font-bold text-xs text-blue-700">PG</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="Google Workspace">
-              <span className="font-bold text-xs text-amber-600">G-W</span>
+              <span className="font-bold text-xs text-amber-700">G-W</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="Redis Cache">
-              <span className="font-bold text-xs text-rose-600">RDS</span>
+              <span className="font-bold text-xs text-rose-700">RDS</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="Qdrant IA">
-              <span className="font-bold text-xs text-purple-600">QDR</span>
+              <span className="font-bold text-xs text-purple-700">QDR</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="OpenAI API">
-              <span className="font-bold text-xs text-sky-600">AI</span>
+              <span className="font-bold text-xs text-sky-700">AI</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="MinIO Storage">
-              <span className="font-bold text-xs text-red-600">MIO</span>
+              <span className="font-bold text-xs text-red-700">MIO</span>
             </div>
           </div>
         </div>
