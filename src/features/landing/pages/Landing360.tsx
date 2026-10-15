@@ -922,7 +922,7 @@ export function Landing360({
         {/* 6. FLUXO OPERACIONAL */}
         <section
           id="fluxo"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0B1120] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1033,20 +1033,20 @@ export function Landing360({
             </div>
 
             {/* Demonstração Real do Motor de Prospecção */}
-            <div className="mt-12 rounded-2xl border border-slate-800 bg-[#0F172A] p-4 sm:p-6 shadow-2xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
+            <div className="mt-12 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] p-4 sm:p-6 shadow-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#00D4FF] animate-pulse" />
                   <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF]">
                     Radar Discovery em Operação Real · Fontes Abertas
                   </span>
                 </div>
-                <span className="font-mono text-[11px] text-slate-400">
+                <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
                   Captura de tela real do produto · Desktop &amp; Mobile
                 </span>
               </div>
 
-              <div className="relative overflow-hidden rounded-xl border border-slate-800 bg-[#0B1120]">
+              <div className="relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-[#0B1120]">
                 {reduceMotion ? (
                   <img
                     src="/landing/prospeccao/poster-prospect-radar.png"
@@ -1083,7 +1083,7 @@ export function Landing360({
         {/* 7. IA (INTELIGÊNCIA ARTIFICIAL CONTEXTUAL) */}
         <section
           id="ia"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0F172A] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1128,7 +1128,7 @@ export function Landing360({
 
             <div className="flex flex-col lg:flex-row items-center gap-10">
               <div className="lg:w-1/2 space-y-4">
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0B1120] border border-slate-800">
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
                   <div className="w-6 h-6 rounded-full bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-4 h-4" />
                   </div>
@@ -1141,7 +1141,7 @@ export function Landing360({
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0B1120] border border-slate-800">
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
                   <div className="w-6 h-6 rounded-full bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-4 h-4" />
                   </div>
@@ -1154,7 +1154,7 @@ export function Landing360({
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0B1120] border border-slate-800">
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
                   <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-4 h-4" />
                   </div>
@@ -1169,24 +1169,24 @@ export function Landing360({
               </div>
 
               <div className="lg:w-1/2 w-full">
-                <div className="section-card p-6 border-2 border-[#FF2D9B]/30 bg-[#0B1120] shadow-2xl">
-                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                <div className="section-card p-6 border-2 border-[#FF2D9B]/30 bg-white dark:bg-[#0B1120] shadow-2xl">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <span className="w-3 h-3 rounded-full bg-[#FF2D9B] animate-pulse" />
                       <span className="font-mono text-xs font-bold text-[#FF2D9B]">
                         COPILOTO COMERCIAL ATIVO
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-400">
+                    <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
                       Contexto: Deal #4892 · Multi-CRM
                     </span>
                   </div>
                   <div className="space-y-3 font-mono text-xs">
-                    <div className="p-3.5 rounded-xl bg-[#0F172A] border border-[#FF2D9B]/25 text-slate-200">
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#FF2D9B]/25 text-slate-700 dark:text-slate-200">
                       <span className="text-[#FF2D9B] font-bold">Diagnóstico:</span> Negociação de
                       R$ 140k sem retorno há 4 dias após envio de proposta.
                     </div>
-                    <div className="p-3.5 rounded-xl bg-[#0F172A] border border-[#00D4FF]/25 text-slate-200">
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#00D4FF]/25 text-slate-700 dark:text-slate-200">
                       <span className="text-[#00D4FF] font-bold">Ação Sugerida:</span> Disparar
                       cadência de validação de decisor financeiro abordando ROI estimado em 90 dias.
                     </div>
@@ -1200,7 +1200,7 @@ export function Landing360({
         {/* 8. AUTOMAÇÃO & CONECTIVIDADE MULTI-CRM */}
         <section
           id="automacao"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0B1120] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1306,7 +1306,7 @@ export function Landing360({
         {/* 9. PERFORMANCE COMERCIAL */}
         <section
           id="performance"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0F172A] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1395,7 +1395,7 @@ export function Landing360({
         {/* 10. PREVISIBILIDADE COMERCIAL */}
         <section
           id="previsibilidade"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0B1120] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1483,7 +1483,7 @@ export function Landing360({
         {/* 11. ECOSSISTEMA TECNOLÓGICO */}
         <section
           id="ecossistema"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0F172A] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1550,48 +1550,48 @@ export function Landing360({
 
             {/* Grid Multi-CRM Completo */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#00D4FF]">Bitrix24</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Conexão via API &amp; Webhooks
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#FF2D9B]">HubSpot</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Conexão Bidirecional</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Conexão Bidirecional</div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#F59E0B]">Salesforce</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Enterprise Connector</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Enterprise Connector</div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#22C55E]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#22C55E]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#22C55E]">Pipedrive</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Pipeline Sync</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Pipeline Sync</div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#38BDF8]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#38BDF8]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#38BDF8]">WhatsApp API</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Comunicação Direta</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Comunicação Direta</div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#F59E0B]">Telefonia em Nuvem</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Gravação &amp; Métricas</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Gravação &amp; Métricas</div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#00D4FF]">
                   Webhooks &amp; APIs
                 </div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Conexão Flexível</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Conexão Flexível</div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#FF2D9B]">E-mail Corporativo</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Rastreabilidade Total</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Rastreabilidade Total</div>
               </div>
             </div>
           </div>
@@ -1600,7 +1600,7 @@ export function Landing360({
         {/* 12. COMMAND CENTER (COCKPIT) */}
         <section
           id="command-center"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0B1120] border-b border-slate-800"
+          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
         >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
@@ -1638,17 +1638,17 @@ export function Landing360({
             <div className="flex flex-col lg:flex-row items-center gap-10">
               <div className="lg:w-1/2 w-full space-y-4">
                 <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-                  <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-800 text-slate-200 text-center">
+                  <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
                     <span className="font-bold text-[#00D4FF] block mb-1">SDRs &amp; BDRs</span>
                     Fila organizada e dados enriquecidos na tela.
                   </div>
-                  <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-800 text-slate-200 text-center">
+                  <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
                     <span className="font-bold text-[#F59E0B] block mb-1">Closers</span>
                     Histórico 360°, objeções e apoio do copiloto.
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-800 text-slate-200 text-center">
+                <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
                   <span className="font-bold text-[#FF2D9B] block mb-1">
                     Diretoria &amp; Head de Vendas
                   </span>
@@ -1657,8 +1657,8 @@ export function Landing360({
               </div>
 
               <div className="lg:w-1/2 w-full">
-                <div className="section-card p-6 bg-[#0F172A] border border-[#00D4FF]/30 shadow-2xl">
-                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                <div className="section-card p-6 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-[#00D4FF]/30 shadow-2xl">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                     <span className="font-mono text-xs font-bold text-[#00D4FF]">
                       BIRTH HUB 360° · COCKPIT
                     </span>
@@ -1667,16 +1667,16 @@ export function Landing360({
                     </span>
                   </div>
                   <div className="space-y-3 font-mono text-xs">
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#0B1120] border border-slate-800">
-                      <span className="text-slate-300">Leads Ativos na Fila</span>
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-300">Leads Ativos na Fila</span>
                       <span className="font-bold text-[#00D4FF]">184 contatos</span>
                     </div>
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#0B1120] border border-slate-800">
-                      <span className="text-slate-300">Deals com Risco Identificado</span>
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-300">Deals com Risco Identificado</span>
                       <span className="font-bold text-[#F59E0B]">3 oportunidades</span>
                     </div>
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#0B1120] border border-slate-800">
-                      <span className="text-slate-300">Cadências em Execução</span>
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-300">Cadências em Execução</span>
                       <span className="font-bold text-[#FF2D9B]">12 ativas</span>
                     </div>
                   </div>
@@ -1689,7 +1689,7 @@ export function Landing360({
         {/* 13. CTA FINAL */}
         <section
           id="cta"
-          className="px-5 py-20 sm:px-8 lg:px-14 bg-[#0F172A] text-center border-b border-slate-800"
+          className="px-5 py-20 sm:px-8 lg:px-14 landing-section-alt text-center"
         >
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             {/* SVG 12: Starburst Beacon */}
@@ -1738,7 +1738,7 @@ export function Landing360({
         </section>
 
         {/* 14. FOOTER */}
-        <footer className="px-5 py-10 sm:px-8 lg:px-14 bg-[#0B1120]">
+        <footer className="px-5 py-10 sm:px-8 lg:px-14 landing-section-footer">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-800 pb-8 mb-6">
             <div className="flex items-center gap-3">
               <BH360LogoMark size={42} />
@@ -1823,7 +1823,7 @@ export function Landing360({
               SoundFX.play('click');
               setActiveScreen('intro');
             }}
-            className="text-slate-300 hover:text-[#00D4FF] transition-colors flex items-center gap-2 font-mono text-xs sm:text-sm font-bold uppercase tracking-widest cursor-pointer px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700"
+            className="text-slate-700 dark:text-slate-300 hover:text-[#00D4FF] dark:hover:text-[#00D4FF] transition-colors flex items-center gap-2 font-mono text-xs sm:text-sm font-bold uppercase tracking-widest cursor-pointer px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Voltar ao Início</span>
@@ -1849,7 +1849,7 @@ export function Landing360({
                 SoundFX.play('confirm');
                 navigate('/login');
               }}
-              className="text-slate-400 hover:text-[#00D4FF] transition-colors font-mono text-xs cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F172A] border border-slate-800"
+              className="text-slate-600 dark:text-slate-400 hover:text-[#00D4FF] transition-colors font-mono text-xs cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800"
             >
               <span>Tela Cheia</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1862,7 +1862,7 @@ export function Landing360({
           <BH360LogoMark size={56} />
           <div className="mt-3 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-ping" />
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-slate-300">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
               Birth Hub · <span className="text-[#00D4FF]">v4.2 Enterprise</span>
             </span>
           </div>
@@ -1919,11 +1919,11 @@ export function Landing360({
             </p>
           </div>
 
-          <div className="bg-[#0F172A] border border-slate-800 shadow-2xl rounded-2xl p-6 sm:p-8 relative">
-            {/* Abas E-mail vs SSO — SEM FUNDO BRANCO */}
+          <div className="bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-6 sm:p-8 relative">
+            {/* Abas E-mail vs SSO */}
             {authMode === 'signin' && (
               <div
-                className="grid grid-cols-2 gap-1.5 mb-6 p-1 bg-[#0B1120] border border-slate-800 rounded-xl"
+                className="grid grid-cols-2 gap-1.5 mb-6 p-1 bg-slate-100 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 rounded-xl"
                 role="tablist"
               >
                 <button
@@ -1932,7 +1932,7 @@ export function Landing360({
                   className={`py-2.5 px-4 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'email'
                       ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#00D4FF] shadow-lg'
-                      : 'text-slate-400 hover:text-white bg-[#0F172A]'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-[#0F172A]'
                   }`}
                 >
                   <Mail className="w-4 h-4" />
@@ -1944,7 +1944,7 @@ export function Landing360({
                   className={`py-2.5 px-4 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'sso'
                       ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#00D4FF] shadow-lg'
-                      : 'text-slate-400 hover:text-white bg-[#0F172A]'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-[#0F172A]'
                   }`}
                 >
                   <Lock className="w-4 h-4" />
@@ -1980,7 +1980,7 @@ export function Landing360({
                 <div className="space-y-1.5">
                   <label
                     htmlFor="login-name"
-                    className="block font-mono text-xs font-bold text-slate-300 uppercase tracking-wider"
+                    className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
                   >
                     Nome Completo
                   </label>
@@ -1989,7 +1989,7 @@ export function Landing360({
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-[#0B1120] text-white border border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder:text-slate-500"
+                    className="w-full bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     placeholder="Ex: Carlos Mendes"
                     autoComplete="name"
                   />
@@ -2000,7 +2000,7 @@ export function Landing360({
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="login-email"
-                    className="block font-mono text-xs font-bold text-slate-300 uppercase tracking-wider"
+                    className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
                   >
                     {authMethod === 'sso' ? 'E-mail ou Domínio SSO' : 'E-mail Corporativo'}
                   </label>
@@ -2013,7 +2013,7 @@ export function Landing360({
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#0B1120] text-white border border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder:text-slate-500"
+                  className="w-full bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder={authMethod === 'sso' ? 'empresa.com.br' : 'seu.nome@empresa.com.br'}
                   required
                   autoComplete="email"
@@ -2025,7 +2025,7 @@ export function Landing360({
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="login-password"
-                      className="block font-mono text-xs font-bold text-slate-300 uppercase tracking-wider"
+                      className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
                     >
                       Senha de Acesso
                     </label>
@@ -2036,7 +2036,7 @@ export function Landing360({
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-[#0B1120] text-white border border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all pr-11 placeholder:text-slate-500"
+                      className="w-full bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all pr-11 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       placeholder="••••••••••••"
                       required
                       autoComplete={authMode === 'signin' ? 'current-password' : 'new-password'}
@@ -2044,7 +2044,7 @@ export function Landing360({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#00D4FF] transition-colors p-1"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-[#00D4FF] transition-colors p-1"
                       aria-label="Mostrar ou ocultar senha"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -2055,12 +2055,12 @@ export function Landing360({
 
               {authMode === 'signin' && (
                 <div className="flex items-center justify-between pt-1 font-sans text-xs">
-                  <label className="flex items-center gap-2 cursor-pointer text-slate-300 hover:text-white select-none">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white select-none">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-700 bg-[#0B1120] text-[#00D4FF] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#0B1120] text-[#00D4FF] focus:ring-0 focus:ring-offset-0 cursor-pointer"
                     />
                     <span>Manter conectado</span>
                   </label>
@@ -2111,7 +2111,7 @@ export function Landing360({
                     setErrorMessage('');
                     setSuccessMessage('');
                   }}
-                  className="font-sans text-xs text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
+                  className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Não possui credenciais corporativas?{' '}
                   <span className="font-bold text-[#00D4FF] hover:underline">Solicitar acesso</span>
@@ -2126,7 +2126,7 @@ export function Landing360({
                     setErrorMessage('');
                     setSuccessMessage('');
                   }}
-                  className="font-sans text-xs text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
+                  className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Já possui credenciais corporativas?{' '}
                   <span className="font-bold text-[#00D4FF] hover:underline">Fazer login</span>
@@ -2141,7 +2141,7 @@ export function Landing360({
                     setErrorMessage('');
                     setSuccessMessage('');
                   }}
-                  className="font-sans text-xs text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
+                  className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Voltar para{' '}
                   <span className="font-bold text-[#00D4FF] hover:underline">
@@ -2151,12 +2151,12 @@ export function Landing360({
               )}
             </div>
 
-            {/* SSO — BOTÕES SEM FUNDO BRANCO */}
+            {/* SSO — BOTÕES ADAPTATIVOS */}
             {authMode === 'signin' && (
               <div className="mt-6">
                 <div className="relative flex items-center justify-center mb-4">
-                  <div className="w-full border-t border-slate-800" />
-                  <span className="absolute bg-[#0F172A] px-3 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                  <span className="absolute bg-white dark:bg-[#0F172A] px-3 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     ou acesse com
                   </span>
                 </div>
@@ -2220,40 +2220,48 @@ export function Landing360({
 
           {/* Badges de Confiança */}
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
+            <div className="bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] shrink-0" />
               <div className="min-w-0">
                 <div className="font-mono text-[10px] font-bold text-[#00D4FF] truncate">
                   AES-256
                 </div>
-                <div className="font-sans text-[9px] text-slate-400 truncate">Criptografado</div>
+                <div className="font-sans text-[9px] text-slate-500 dark:text-slate-400 truncate">
+                  Criptografado
+                </div>
               </div>
             </div>
-            <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
+            <div className="bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#FF2D9B] shadow-[0_0_8px_#FF2D9B] shrink-0" />
               <div className="min-w-0">
                 <div className="font-mono text-[10px] font-bold text-[#FF2D9B] truncate">
                   SSO &amp; MFA
                 </div>
-                <div className="font-sans text-[9px] text-slate-400 truncate">Autenticação</div>
+                <div className="font-sans text-[9px] text-slate-500 dark:text-slate-400 truncate">
+                  Autenticação
+                </div>
               </div>
             </div>
-            <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
+            <div className="bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#F59E0B] shadow-[0_0_8px_#F59E0B] shrink-0" />
               <div className="min-w-0">
                 <div className="font-mono text-[10px] font-bold text-[#F59E0B] truncate">
                   LGPD/GDPR
                 </div>
-                <div className="font-sans text-[9px] text-slate-400 truncate">Conformidade</div>
+                <div className="font-sans text-[9px] text-slate-500 dark:text-slate-400 truncate">
+                  Conformidade
+                </div>
               </div>
             </div>
-            <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
+            <div className="bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] shrink-0" />
               <div className="min-w-0">
                 <div className="font-mono text-[10px] font-bold text-[#00D4FF] truncate">
                   99.99%
                 </div>
-                <div className="font-sans text-[9px] text-slate-400 truncate">Uptime SLA</div>
+                <div className="font-sans text-[9px] text-slate-500 dark:text-slate-400 truncate">
+                  Uptime SLA
+                </div>
               </div>
             </div>
           </div>
