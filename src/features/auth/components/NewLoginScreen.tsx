@@ -2,42 +2,24 @@ import {
   AlertCircle,
   ArrowRight,
   BarChart3,
-  Bot,
   BrainCircuit,
   Building2,
-  Calendar,
   Check,
   CheckCircle2,
   ChevronRight,
-  Clock,
-  Compass,
-  Cpu,
   Database,
   Eye,
   EyeOff,
-  Globe,
-  Layers,
-  LineChart,
   Lock,
   Mail,
-  MessageSquare,
   Moon,
-  Network,
-  PhoneCall,
-  Radio,
   Search,
-  Server,
-  Shield,
-  ShieldAlert,
   ShieldCheck,
   Sparkles,
   Sun,
-  Target,
   TrendingUp,
-  Users,
   Workflow,
   X,
-  Zap,
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -48,7 +30,6 @@ import { authClient } from '../../../lib/auth-client.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
 import {
-  AiSectionIcon,
   AuthModalSectionIcon,
   AutomationSectionIcon,
   CockpitSectionIcon,
@@ -59,7 +40,7 @@ import {
   PerfSectionIcon,
   PillarsSectionIcon,
   PlatformSectionIcon,
-} from '../../landing/components/LandingTitleIcons.js';
+} from '../../../components/brand/LandingTitleIcons.js';
 import './NewLoginScreen.css';
 
 // 8 PILARES OFICIAIS DO BIRTH HUB 360°
@@ -141,7 +122,12 @@ const OFFICIAL_PILLARS = [
 function BH360LogoMark({ size = 44 }: { size?: number }) {
   return (
     <span style={{ width: size, height: size }} className="inline-block">
-      <BirthHubLogo variant="icon" title="Birth Hub 360º" className="h-full w-full" animated={true} />
+      <BirthHubLogo
+        variant="icon"
+        title="Birth Hub 360º"
+        className="h-full w-full"
+        animated={true}
+      />
     </span>
   );
 }
@@ -545,7 +531,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     <h3 className="font-display text-sm font-bold text-[#0284C7] dark:text-[#00D4FF]">
                       Fluxo de Negociação Unificado (CRM)
                     </h3>
-                    <span className="text-xs text-[#0284C7] dark:text-[#00D4FF] font-bold">Tempo Real</span>
+                    <span className="text-xs text-[#0284C7] dark:text-[#00D4FF] font-bold">
+                      Tempo Real
+                    </span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-surface p-3 rounded-xl border border-line space-y-2">
@@ -593,7 +581,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <div className="p-5 rounded-2xl border border-purple-200 bg-purple-50/50 space-y-3">
                   <div className="flex items-center gap-2 text-purple-700">
                     <BrainCircuit className="w-4 h-4" />
-                    <h3 className="font-display text-sm font-bold text-[#A855F7] dark:text-[#FF2D9B]">Motor IA &amp; Diagnóstico</h3>
+                    <h3 className="font-display text-sm font-bold text-[#A855F7] dark:text-[#FF2D9B]">
+                      Motor IA &amp; Diagnóstico
+                    </h3>
                   </div>
                   <p className="text-xs text-ink-2 leading-relaxed">
                     Sinal preditivo detectou aumento de 3.2x no engajamento de decisores em 12
@@ -640,7 +630,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-3">
               <PlatformSectionIcon size={32} />
-              <span>Ajudamos você a gerenciar de ponta a ponta, todas as camadas da sua receita.</span>
+              <span>
+                Ajudamos você a gerenciar de ponta a ponta, todas as camadas da sua receita.
+              </span>
             </h2>
             <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Da inteligência de mercado à orquestração de cadências e previsão probabilística de
@@ -842,7 +834,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                       </span>
                     </div>
 
-                    <p className="text-xs text-[#475569] dark:text-[#70D6FF] leading-relaxed">{p.desc}</p>
+                    <p className="text-xs text-[#475569] dark:text-[#70D6FF] leading-relaxed">
+                      {p.desc}
+                    </p>
                   </div>
 
                   <div
@@ -870,7 +864,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-3">
               <CockpitSectionIcon size={32} />
-              <span>Tudo em uma única plataforma: do mobile ao desktop tudo o que você precisa está aqui</span>
+              <span>
+                Tudo em uma única plataforma: do mobile ao desktop tudo o que você precisa está aqui
+              </span>
             </h2>
             <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Alternância perfeita entre interfaces ricas para gestores e execução ágil na ponta
@@ -1218,7 +1214,9 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-[#0284C7] dark:text-[#00D4FF]">Ajuda</h3>
+                <h3 className="font-display text-xl font-bold text-[#0284C7] dark:text-[#00D4FF]">
+                  Ajuda
+                </h3>
                 <p className="text-xs text-ink-2 mt-2">
                   Documentação técnica, manuais de uso e suporte aos pilares.
                 </p>
@@ -1255,9 +1253,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {/* Card 3: Newsletter / Novidades */}
             <div className="vancouver-quick-card">
               <div>
-                <h3 className="font-display text-xl font-bold text-[#F59E0B]">
-                  Novidades
-                </h3>
+                <h3 className="font-display text-xl font-bold text-[#F59E0B]">Novidades</h3>
                 <p className="text-xs text-ink-2 mt-2">
                   Receba insights semanais sobre IA aplicada a vendas B2B.
                 </p>
@@ -1280,9 +1276,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-[#10B981]">
-                  Segurança
-                </h3>
+                <h3 className="font-display text-xl font-bold text-[#10B981]">Segurança</h3>
                 <p className="text-xs text-ink-2 mt-2">
                   Auditorias de segurança, RLS multi-tenant e conformidade LGPD.
                 </p>
@@ -1398,7 +1392,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <div className="flex justify-center mb-1">
                 <BH360LogoMark size={40} />
               </div>
-              <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-2.5">
+              <h2
+                id="auth-modal-title"
+                className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-2.5"
+              >
                 <AuthModalSectionIcon size={24} />
                 <span>
                   {authMode === 'signin' && 'Acessar o Hub'}
