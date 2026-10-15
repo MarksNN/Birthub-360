@@ -129,7 +129,7 @@ export function SinglePageDashboard() {
                 <Radar className="w-3.5 h-3.5 animate-spin-slow" />
                 Command Center 360°
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
                 SISTEMA OPERACIONAL
               </span>
