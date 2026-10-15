@@ -1,6 +1,6 @@
 # Relatório — Onda 00
 
-Estado: BLOQUEADA. Não integrada. A imagem de DEBT-OPS-002 foi construída e a CLI do Prisma respondeu sem rede. Os gates de produto continuam vermelhos.
+Estado: BLOQUEADA. Não integrada. O build de `8b4b3c84` terminou e a CLI do Prisma respondeu sem rede. Unitário, arquitetura, audit e integração não estão verdes. A Onda 01 não começa.
 
 ## Resumo
 
@@ -8,7 +8,7 @@ Estado: BLOQUEADA. Não integrada. A imagem de DEBT-OPS-002 foi construída e a 
 - Objetivo: impedir STATUS: GO com gate obrigatório falhando, fixar a CLI do Prisma na imagem e excluir contexto Docker efêmero.
 - IDs nesta branch: DEBT-GATE-001, DEBT-OPS-002, DEBT-OPS-003, DEBT-DOC-001 (comando de compose exigido pelo verificador).
 - DEBT-GOV-004: ainda BLOCKED nesta revisão; o encerramento do PR #741 é operação GitHub separada. A branch `tech-debt-audit-1898280509423632042` e as worktrees `pr-741-*` não devem ser apagadas.
-- Responsáveis: 08 (gate, Docker), 08A (PR #741), 00 (orquestração), 24 (parecer ainda pendente).
+- Responsáveis: 08 (gate, Docker), 08A (PR #741), 00 (orquestração), 24 (parecer BLOQUEADO em `onda-00-reval2-20261015-24.md`).
 - Base: `b2fb5a6f`.
 - Branch: `fix/debt-wave-00-release-gates`.
 
@@ -67,3 +67,19 @@ Integrado por merge commit `b2fb5a6f`. Proteção clássica da `main` sem requir
 
 - A imagem de auditoria foi construída e a CLI respondeu sem rede. O release gate de produto não está verde: unitário, arquitetura e `npm audit` falharam por itens fora do diff desta onda. Integração não rodou de propósito, para não escrever no Postgres operacional.
 - Sem gates de produto verdes e sem parecer novo do Agente 24 sobre `aa591642`, a Onda 00 não libera a Onda 01 e o PR #748 não deve ser integrado.
+
+## Revalidação de 2026-10-15 18:20 -03
+
+HEAD `8b4b3c84bae19b8d3c661e8078d8d209db5e8b00`.
+
+- SSH e Engine remotos disponíveis. O build da imagem ficou no Docker local do Windows 1 porque o Windows 2 tinha 808 MB livres e 19 containers dentro de uma VM de 3,33 GiB.
+- `docker buildx build` exit 0. Tag `birthhub360-audit-wave00:8b4b3c84`. Digest `sha256:77859747ed461550aaf6d8cdb915c044f53a99641f40a6081d2adf182433d85b`. 7217047330 bytes.
+- Prisma na imagem, sem rede: 7.10.0, igual ao client e ao lock. Schema engine de 23510888 bytes. 139 diretórios de migration. Imagem removida depois do registro.
+- `npm run lint` exit 0. `npm run typecheck` exit 0. `npm run build` exit 0.
+- `npm run test:unit` exit 1. Três falhas fora do diff: prefixo OpenAPI `roleplay`, `aria-pressed` do modo escuro, adapter Groq com body já lido.
+- `npm run test:architecture` exit 4. Quatro violações de dependency-cruiser fora do diff.
+- `npm audit` exit 1. Três moderate em `sprintf-js` / `mammoth`.
+- Integração isolada exit 1. 30 arquivos falharam, 55 passaram. 46 testes falharam, 378 passaram, 203 skipped. Postgres e Redis descartáveis no Windows 2. `birthhub_postgres` não foi usado. `prisma migrate deploy` exit 0.
+- `npm run test:e2e` não executado. `npm run release:check` não executado como comando único; seria NO-GO.
+- PR #741 continua CLOSED sem merge.
+- Pareceres: `.agents/reviews/onda-00-reval2-20261015-08-qa.md` e `.agents/reviews/onda-00-reval2-20261015-24.md`. Veredito: BLOQUEADO. Sem merge. Sem deploy. Sem Onda 01.
