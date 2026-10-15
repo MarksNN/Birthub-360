@@ -96,6 +96,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     ref,
   ) => {
     const [isHovered, setIsHovered] = React.useState(false);
+    const isInteractive = Boolean(onClick);
+    const isHoverAware = spotlight || soundHover || Boolean(onMouseEnter || onMouseLeave || onPointerMove);
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
       onPointerMove?.(e);
@@ -139,17 +141,21 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           cardVariants({ variant, padding, className }),
           (isLoading || borderBeam || spotlight) && 'overflow-hidden isolate',
         )}
-        onPointerMove={handlePointerMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        {...(onClick
+        {...(isHoverAware
+          ? {
+              onPointerMove: handlePointerMove,
+              onMouseEnter: handleMouseEnter,
+              onMouseLeave: handleMouseLeave,
+            }
+          : {})}
+        {...(isInteractive
           ? {
               role: 'button',
               tabIndex: 0,
               onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+                  e.currentTarget.click();
                 }
               },
               onClick: handleClick,
