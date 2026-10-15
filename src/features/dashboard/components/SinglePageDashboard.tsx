@@ -145,22 +145,22 @@ export function SinglePageDashboard() {
           <motion.div className="flex flex-wrap items-center gap-3" variants={staggerItem}>
             <Button
               type="button"
-              variant="secondary"
+              variant="vancouver"
               onClick={() => navigate('/app/prospect')}
-              className="gap-2"
+              className="gap-2 rounded-full"
             >
-              <Search className="w-4 h-4 text-brand" />
+              <Search className="w-4 h-4 text-[#00D4FF]" />
               <span>Buscar Mercado</span>
             </Button>
 
             <Button
               type="button"
-              variant="default"
+              variant="brand"
               onClick={() => navigate('/app/crm')}
-              className="gap-2 font-bold shadow-md"
+              className="gap-2 rounded-full"
             >
               <Activity className="w-4 h-4" />
-              <span>Abrir Cockpit CRM</span>
+              <span>Abrir Cockpit CRM 360°</span>
             </Button>
           </motion.div>
         </motion.header>

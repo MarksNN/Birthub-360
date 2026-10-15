@@ -120,14 +120,14 @@ export function Sidebar({
           }`}
         >
           <div className="flex min-w-0 items-center gap-2.5">
-            <BirthHubLogo variant="mark" animated={false} className="h-7 w-7 shrink-0" />
+            <BirthHubLogo variant="mark" animated={false} className="h-7 w-7 shrink-0 drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]" />
             {!isCollapsed && (
               <div className="min-w-0 leading-tight">
-                <div className="font-display text-sm font-semibold tracking-tight text-ink">
-                  BirthHub 360°
+                <div className="font-display text-sm font-extrabold tracking-tight text-ink">
+                  BIRTH HUB <span className="text-gradient-brand">360°</span>
                 </div>
-                <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-ink-2">
-                  Operate
+                <div className="text-[9px] font-mono font-bold uppercase tracking-[0.12em] text-[#00D4FF]">
+                  Revenue Intelligence
                 </div>
               </div>
             )}

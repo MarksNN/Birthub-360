@@ -110,7 +110,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         <BirthHubLogo
           variant="mark"
           animated
-          className="h-8 w-8 shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.35)]"
+          className="h-8 w-8 shrink-0 drop-shadow-[0_0_12px_rgba(0,212,255,0.45)]"
         />
         <div
           className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--color-border-strong)]"

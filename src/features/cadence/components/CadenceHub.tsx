@@ -70,10 +70,10 @@ export function CadenceHub() {
               <Button
                 type="button"
                 size="sm"
-                variant="cosmic"
-                shine
+                variant="brand"
                 soundClick
                 onClick={() => setStartRunOpen(true)}
+                className="rounded-full font-display font-bold"
               >
                 <Play className="w-3.5 h-3.5 mr-1" aria-hidden="true" /> Iniciar cadência
               </Button>
