@@ -6,7 +6,6 @@ import {
   Check,
   CheckCircle2,
   Compass,
-  Cpu,
   Eye,
   EyeOff,
   Loader2,
@@ -14,7 +13,6 @@ import {
   Mail,
   Menu,
   Moon,
-  Server,
   Sun,
   Target,
   Workflow,
@@ -63,7 +61,7 @@ import {
   ProblemSectionIcon,
   ReactiveCardIcon,
   SilosCardIcon,
-} from '../components/LandingTitleIcons.js';
+} from '../../../components/brand/LandingTitleIcons.js';
 import './Landing360.css';
 
 // 8 PILARES OFICIAIS COMPLETOS DO BIRTH HUB 360° (PALETA NEON OFICIAL - DOURADO RADIANTE)
@@ -197,7 +195,12 @@ const FEATURE_TAGS = [
 function BH360LogoMark({ size = 52 }: { size?: number }) {
   return (
     <span style={{ width: size, height: size }} className="inline-block relative">
-      <BirthHubLogo variant="icon" title="Birth Hub 360º" className="w-full h-full" animated={true} />
+      <BirthHubLogo
+        variant="icon"
+        title="Birth Hub 360º"
+        className="w-full h-full"
+        animated={true}
+      />
     </span>
   );
 }
@@ -481,7 +484,9 @@ export function Landing360({
                     type="button"
                     onClick={toggleTheme}
                     className="landing-theme-toggle-btn"
-                    aria-label={theme === 'dark' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
+                    aria-label={
+                      theme === 'dark' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'
+                    }
                   >
                     {theme === 'dark' ? (
                       <span className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
@@ -596,7 +601,9 @@ export function Landing360({
                     >
                       {tag.label}
                     </h4>
-                    <p className="landing-subtitle text-xs leading-relaxed text-center">{tag.desc}</p>
+                    <p className="landing-subtitle text-xs leading-relaxed text-center">
+                      {tag.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -713,9 +720,9 @@ export function Landing360({
                   <span>Dados &amp; Conectividade Multi-CRM</span>
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
-                  Conexão via API REST e webhooks bidirecionais com Bitrix24, HubSpot, Salesforce, Pipedrive,
-                  e-mails corporativos, canais de mensageria e dados enriquecidos B2B em uma única
-                  fonte da verdade.
+                  Conexão via API REST e webhooks bidirecionais com Bitrix24, HubSpot, Salesforce,
+                  Pipedrive, e-mails corporativos, canais de mensageria e dados enriquecidos B2B em
+                  uma única fonte da verdade.
                 </p>
               </div>
 
@@ -786,7 +793,10 @@ export function Landing360({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {OFFICIAL_PILLARS.map((p) => {
                 const isActive = selectedPillar === p.id;
-                const pillarIcons: Record<string, React.ComponentType<{ size?: number; color?: string; className?: string }>> = {
+                const pillarIcons: Record<
+                  string,
+                  React.ComponentType<{ size?: number; color?: string; className?: string }>
+                > = {
                   '01': Pillar1HubIcon,
                   '02': Pillar2IntelIcon,
                   '03': Pillar3OrchIcon,
@@ -1542,7 +1552,9 @@ export function Landing360({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center">
                 <div className="font-mono text-sm font-bold text-[#00D4FF]">Bitrix24</div>
-                <div className="font-sans text-xs text-slate-400 mt-1">Conexão via API &amp; Webhooks</div>
+                <div className="font-sans text-xs text-slate-400 mt-1">
+                  Conexão via API &amp; Webhooks
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center">
@@ -1648,7 +1660,7 @@ export function Landing360({
                 <div className="section-card p-6 bg-[#0F172A] border border-[#00D4FF]/30 shadow-2xl">
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
                     <span className="font-mono text-xs font-bold text-[#00D4FF]">
-                       BIRTH HUB 360° · COCKPIT
+                      BIRTH HUB 360° · COCKPIT
                     </span>
                     <span className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#00D4FF]/20 text-[#00D4FF] font-bold">
                       100% OPERACIONAL
@@ -1704,7 +1716,9 @@ export function Landing360({
 
             <h2 className="font-display text-3xl sm:text-5xl font-extrabold landing-title-gradient tracking-tight leading-tight text-center mx-auto flex items-center justify-center gap-3">
               <CtaSectionIcon size={40} />
-              <span>Pronto para transformar sua operação comercial em um centro de comando inteligente?</span>
+              <span>
+                Pronto para transformar sua operação comercial em um centro de comando inteligente?
+              </span>
             </h2>
             <p className="landing-subtitle mt-4 text-base sm:text-lg max-w-2xl mx-auto text-center">
               Acesse a plataforma corporativa do Birth Hub 360° e conecte dados, equipe e execução
