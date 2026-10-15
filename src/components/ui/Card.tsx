@@ -97,7 +97,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ) => {
     const [isHovered, setIsHovered] = React.useState(false);
     const isInteractive = Boolean(onClick);
-    const isHoverAware = spotlight || soundHover || Boolean(onMouseEnter || onMouseLeave || onPointerMove);
+    const isHoverAware =
+      spotlight || soundHover || Boolean(onMouseEnter || onMouseLeave || onPointerMove);
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
       onPointerMove?.(e);

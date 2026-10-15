@@ -64,7 +64,10 @@ async function resolveLeadContactId(
 export const whatsAppCadenceDispatcher: Pick<CadenceDispatcher, 'dispatch'> = {
   async dispatch(touch: CadenceTouch, run: CadenceRunState) {
     if (!touch.templateRef?.trim()) {
-      return { result: 'failed' as const, error: 'Conteúdo da mensagem de cadência não configurado.' };
+      return {
+        result: 'failed' as const,
+        error: 'Conteúdo da mensagem de cadência não configurado.',
+      };
     }
     const contactId = await resolveLeadContactId(run.organizationId, run.leadId);
     if (contactId) {
@@ -134,7 +137,10 @@ function splitSubjectAndBody(
 export const emailCadenceDispatcher: Pick<CadenceDispatcher, 'dispatch'> = {
   async dispatch(touch: CadenceTouch, run: CadenceRunState) {
     if (!touch.templateRef?.trim()) {
-      return { result: 'failed' as const, error: 'Conteúdo da mensagem de cadência não configurado.' };
+      return {
+        result: 'failed' as const,
+        error: 'Conteúdo da mensagem de cadência não configurado.',
+      };
     }
     const contactId = await resolveLeadContactId(run.organizationId, run.leadId);
     if (contactId) {
