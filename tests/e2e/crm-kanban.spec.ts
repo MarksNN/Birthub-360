@@ -305,7 +305,7 @@ test.describe('Kanban do CRM — coluna vazia', () => {
     const column = page
       .locator('h3', { hasText: 'Qualificação (SDR)' })
       .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
-    await expect(column.getByText('📥 Solte cards aqui')).toBeVisible();
+    await expect(column.getByText(/Solte cards aqui/i)).toBeVisible();
     await expect(column.getByText('0', { exact: true })).toBeVisible();
   });
 

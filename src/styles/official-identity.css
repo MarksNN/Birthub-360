@@ -60,6 +60,13 @@ html.dark,
   --on-brand: var(--palette-neon-black);
 }
 
+html.light,
+[data-theme="light"] {
+  --brand: #0369a1;
+  --color-brand-primary: #0369a1;
+  --color-interactive-primary: #0369a1;
+}
+
 /* Utility compatibility without changing the official focus shorthand. */
 .text-brand-ink {
   color: var(--color-heading-cyan);
