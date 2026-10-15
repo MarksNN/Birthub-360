@@ -4,13 +4,26 @@ import fs from 'node:fs';
 const ignore = fs.readFileSync('.dockerignore', 'utf8');
 const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
 
-for (const pattern of ['.worktrees', '.tmp', 'tmp', 'temp', '**/*.tmp', '!prisma/migrations/', '!prisma/migrations/**']) {
+for (const pattern of [
+  '.worktrees',
+  '.tmp',
+  'tmp',
+  'temp',
+  '**/*.tmp',
+  '!prisma/migrations/',
+  '!prisma/migrations/**',
+  'identidade-visual/**',
+  '!identidade-visual/birthhub360/tokens/**',
+  '!identidade-visual/birthhub360/logos/**',
+]) {
   assert(ignore.includes(pattern), pattern);
 }
 
 assert(!dockerfile.includes('devDependencies.prisma'), 'Dockerfile ainda resolve o range semver de devDependencies');
 assert(dockerfile.includes("require('./node_modules/prisma/package.json').version"), 'versão da CLI deve vir da instalação do lockfile');
 assert(dockerfile.includes("packages['node_modules/prisma'].version"), 'build deve comparar a CLI com o lock');
+assert(dockerfile.includes('node node_modules/@prisma/engines/scripts/postinstall.js'), 'o build precisa baixar o schema-engine');
+assert(dockerfile.includes("name.startsWith('schema-engine-')"), 'o build precisa falhar se o schema-engine não existir');
 
 function excluded(rel) {
   const normalized = rel.replace(/\\/g, '/').replace(/^\.\//, '');

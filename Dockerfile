@@ -24,6 +24,9 @@ RUN npm ci --ignore-scripts
 
 COPY . .
 RUN npx prisma generate
+# Node deriva o heap do cgroup. No builder limitado, o padrão mata o Vite
+# por volta de 800 MB (exit 134). O runner não herda esta variável.
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm run build
 RUN npm run build:worker
 
@@ -48,6 +51,8 @@ RUN npm prune --omit=dev
 # O build falha se a CLI instalada divergir do lock ou do client.
 RUN prisma_version="$(tr -d '\r\n' < /tmp/prisma-cli-version)" \
  && npm install --no-save --ignore-scripts "prisma@${prisma_version}" \
+ && node node_modules/@prisma/engines/scripts/postinstall.js \
+ && node -e "const fs=require('fs'); const path=require('path'); const dir='node_modules/@prisma/engines'; const hit=fs.readdirSync(dir).find((name)=>name.startsWith('schema-engine-') && fs.statSync(path.join(dir,name)).size>1000000); if(!hit){ console.error('schema-engine ausente depois do postinstall'); process.exit(1);} console.log('schema-engine', hit);" \
  && node -e "const lock=require('./package-lock.json').packages['node_modules/prisma'].version; const cli=require('prisma/package.json').version; const client=require('@prisma/client/package.json').version; if (cli!==lock || cli!==client) { console.error('Prisma CLI/client/lock divergentes', {cli, client, lock}); process.exit(1);} console.log('prisma CLI/client/lock', cli);"
 
 # Stage 2: Production
