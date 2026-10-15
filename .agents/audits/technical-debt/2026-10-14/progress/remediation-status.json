@@ -555,20 +555,21 @@
         "00"
       ],
       "remediationStatus": "IN_REVIEW",
-      "validationStatus": "NOT_VALIDATED",
+      "validationStatus": "TESTED_OFFLINE",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "BLOCKED",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-15T00:45:00-03:00",
+      "lastUpdate": "2026-10-15T02:40:00-03:00",
       "updatedBy": "00",
       "branch": "fix/debt-wave-00-release-gates",
       "pullRequest": "https://github.com/MaarkssN/Birthub-360/pull/748",
-      "fixCommit": "508a052711161dad3bedbb1f94ec61f498f675aa",
+      "fixCommit": "aa5916423e8c9360410d2ef29d3f9b42e0c976f9",
       "testsExecuted": [
-        "docker build --resource memory=1024m -t birthhub360-audit-wave00:8f4b8be6"
+        "docker buildx build --resource memory=2560m --resource memory-swap=2560m -t birthhub360-audit-wave00:b68bdd92",
+        "docker run --network none --entrypoint sh npx prisma --version"
       ],
-      "validationResult": "Build real iniciado no Docker remoto e NAO concluido. Contexto 43,28 MB, node:22-slim baixado, apt-get dos dois estagios concluido, npm ci sem linha final. API do daemon deixou de responder. Cliente encerrado. prisma --version na imagem NÃO EXECUTADO. Lock continua 7.10.0 para prisma e @prisma/client. Nao e RESOLVED.",
+      "validationResult": "Build exit 0. Imagem sha256:093b2766dc5e73c87daff69dea3b10a28c668bd0decae6797b5d0f7e620331ad, 7217122613 bytes. Builder: schema-engine-debian-openssl-3.0.x e prisma CLI/client/lock 7.10.0. Na imagem, sem rede: npx prisma --version exit 0, prisma 7.10.0, @prisma/client 7.10.0, schema-engine-debian-openssl-3.0.x com 23510888 bytes, 139 diretorios de migration. Nao e RESOLVED: unitario, arquitetura, audit e release:check continuam vermelhos ou nao executados.",
       "closureEvidence": null,
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-08-debt-20261014-ops-002.md",
       "notes": "2026-10-14 OPEN. Causa: npm install prisma@range de devDependencies. Correcao proposta no Dockerfile. Imagem nao foi construida aqui.",

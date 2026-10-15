@@ -1,6 +1,6 @@
 # Relatório — Onda 00
 
-Estado: BLOQUEADA. Não integrada. Revalidação de 2026-10-15 não fechou DEBT-OPS-002 e não deixou os gates de produto verdes.
+Estado: BLOQUEADA. Não integrada. A imagem de DEBT-OPS-002 foi construída e a CLI do Prisma respondeu sem rede. Os gates de produto continuam vermelhos.
 
 ## Resumo
 
@@ -15,8 +15,8 @@ Estado: BLOQUEADA. Não integrada. Revalidação de 2026-10-15 não fechou DEBT-
 ## Alterações
 
 - `scripts/release-gate.js`: lint, typecheck, arquitetura, unitário, integração, e2e, build e `npm audit` são bloqueantes. Script ausente no `package.json` não é executado e produz NO-GO. Falha de spawn (`status` nulo ou erro) também produz NO-GO.
-- `Dockerfile`: a CLI do Prisma reinstalada depois do `npm prune` usa a versão já resolvida em `node_modules/prisma`, e o build quebra se CLI, client e lock divergirem.
-- `.dockerignore`: exclui `.worktrees`, `.tmp`, `tmp`, `temp` e `**/*.tmp`, mantendo `prisma/migrations`.
+- `Dockerfile`: a CLI do Prisma reinstalada depois do `npm prune` usa a versão já resolvida em `node_modules/prisma`, o postinstall de `@prisma/engines` baixa o `schema-engine`, e o build quebra se CLI, client e lock divergirem ou se o binário não existir. O builder usa `NODE_OPTIONS=--max-old-space-size=2048` só nesse estágio.
+- `.dockerignore`: exclui `.worktrees`, `.tmp`, `tmp`, `temp` e `**/*.tmp`, mantendo `prisma/migrations`. Reabre só `identidade-visual/birthhub360/tokens` e `logos`, que o Vite importa.
 - `docs/development/LOCAL_FIRST.md` e `docs/release/GO-LIVE-CHECKLIST.md`: comando composto dos dois arquivos compose, explícito como infraestrutura apenas.
 - `docs/audits/launch-2026-10-14/evidence/verify-release-gate.mjs`: baseline pinado em `b2fb5a6f`, porque depois do fix o `HEAD` deixa de reproduzir o defeito.
 
@@ -49,12 +49,21 @@ Suíte npm no worktree `C:\Github\Birthub-360\.worktrees\debt-wave-00`, Node v24
 - Resultado do build: NÃO CONCLUÍDO. Exit code final da imagem: ausente. `npx prisma --version` dentro da imagem: NÃO EXECUTADO. DEBT-OPS-002 permanece sem a prova exigida.
 - Snapshot anterior dos containers foi gravado em `%TEMP%\wave00-containers-before.txt`. O snapshot posterior não pôde ser lido porque a API do daemon não respondeu. `birthhub_temporal` já estava `Restarting` antes do build.
 
+## Imagem concluída — 2026-10-15
+
+- Commit dos arquivos de build: `aa5916423e8c9360410d2ef29d3f9b42e0c976f9`. A tag usada no build ainda diz `b68bdd92` porque esse era o HEAD quando o `docker build` começou. O digest identifica a imagem.
+- Comando: `docker buildx build --progress=plain --resource memory=2560m --resource memory-swap=2560m -t birthhub360-audit-wave00:b68bdd92`. Exit 0.
+- Imagem: `sha256:093b2766dc5e73c87daff69dea3b10a28c668bd0decae6797b5d0f7e620331ad`, 7217122613 bytes, criada `2026-10-15T05:37:47Z`.
+- O builder imprimiu `schema-engine schema-engine-debian-openssl-3.0.x` e `prisma CLI/client/lock 7.10.0`.
+- Prova na imagem final, com `--network none`, `--memory=512m` e sem `DATABASE_URL` operacional: `npx prisma --version` exit 0. Prisma 7.10.0, `@prisma/client` 7.10.0, Schema Engine `0edf323efd1d98336f3f0a68684b56f689b900d3` em `node_modules/@prisma/engines/schema-engine-debian-openssl-3.0.x` (23510888 bytes), 139 diretórios em `prisma/migrations`.
+- Depois do reinício do Docker, Postgres, Redis, MinIO, Meilisearch e Ollama estavam Up. Langfuse, Grafana, Prometheus, Loki, Tempo, ClickHouse e o coletor ficaram Exited (255). `birthhub_temporal` continuou Restarting. Nenhum container operacional foi parado por este trabalho.
+- DEBT-OPS-002 tem a prova da imagem. O achado não passa a RESOLVED. O release da Onda 00 continua BLOCKED.
+
 ## CI do PR #742
 
 Integrado por merge commit `b2fb5a6f`. Proteção clássica da `main` sem required checks e sem required reviews. Application gate, build e SonarQube falharam no PR e também na `main` `3afbae33` (formatador e Sonar preexistentes). O build do workflow falhou porque o application gate falhou. O diff do #742 era só inventário, validador e parecer.
 
 ## Riscos
 
-- A imagem Docker não foi concluída. O host do daemon ficou sem resposta na API durante o `npm ci` limitado a 1024 MB. A reinstalação da CLI continua sem prova de execução.
-- O release gate de produto não está verde: unitário, arquitetura e `npm audit` falharam por itens fora do diff desta onda. Integração não rodou de propósito, para não escrever no Postgres operacional.
-- Sem build concluído e sem gates de produto verdes, a Onda 00 não libera a Onda 01 e o PR #748 não deve ser integrado.
+- A imagem de auditoria foi construída e a CLI respondeu sem rede. O release gate de produto não está verde: unitário, arquitetura e `npm audit` falharam por itens fora do diff desta onda. Integração não rodou de propósito, para não escrever no Postgres operacional.
+- Sem gates de produto verdes e sem parecer novo do Agente 24 sobre `aa591642`, a Onda 00 não libera a Onda 01 e o PR #748 não deve ser integrado.

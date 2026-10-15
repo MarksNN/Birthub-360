@@ -38,3 +38,11 @@
 - No worktree local: `npm ci` exit 0; `npm run lint` exit 0 (375 warnings); `npm run typecheck` exit 0; `npm run build` exit 0; `npm run test:unit` exit 1 (3 falhas, 4122 passaram, 1 skipped); `npm run test:architecture` exit 1 (4 violações); `npm audit` exit 1 (3 moderate).
 - `npm run test:integration` não foi executado: o pretest usaria o container operacional `birthhub_postgres`. `npm run release:check` não foi reexecutado como comando único; os constituintes bloqueantes já falharam.
 - PR #741 reconfirmado CLOSED, `mergedAt` null.
+
+## 2026-10-15T02:40:00-03:00 — imagem da Onda 00
+
+- Autor do registro: Agente 00. Nenhum achado passou a RESOLVED ou VERIFIED.
+- Commit do Dockerfile testado: `aa5916423e8c9360410d2ef29d3f9b42e0c976f9`.
+- `docker buildx build` exit 0. Imagem `sha256:093b2766dc5e73c87daff69dea3b10a28c668bd0decae6797b5d0f7e620331ad`, tag `birthhub360-audit-wave00:b68bdd92`, 7217122613 bytes.
+- Na imagem, `docker run --network none`: `npx prisma --version` exit 0. Prisma 7.10.0, client 7.10.0, `schema-engine-debian-openssl-3.0.x` com 23510888 bytes, 139 diretórios de migration.
+- A Onda 00 continua BLOCKED. Unitário, arquitetura e `npm audit` seguem vermelhos. Integração e `release:check` não foram executados.
