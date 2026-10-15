@@ -176,12 +176,11 @@ services:
     image: temporalio/auto-setup:1.24.2
     container_name: birthhub_temporal
     environment:
-      DB: postgresql
+      DB: postgres12
       DB_PORT: 5432
       POSTGRES_USER: ${POSTGRES_USER:-prospector}
       POSTGRES_PWD: ${POSTGRES_PASSWORD:-prospector_pass}
       POSTGRES_SEEDS: postgres
-      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
       ENABLE_ES: 'false'
       TEMPORAL_CORS_ORIGINS: 'http://localhost:3000,http://localhost:8233,http://localhost:8088'
     ports:
@@ -199,7 +198,7 @@ services:
       retries: 20
 
   temporal-admin-tools:
-    image: temporalio/admin-tools:1.24.2
+    image: temporalio/admin-tools:1.24.2-tctl-1.18.1-cli-1.0.0
     container_name: birthhub_temporal_admin_tools
     environment:
       TEMPORAL_ADDRESS: temporal:7233
