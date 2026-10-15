@@ -29,3 +29,12 @@
 - PR #741 fechado sem merge.
 - Branch `tech-debt-audit-1898280509423632042` e worktrees `pr-741-*` preservadas.
 - Status vivo: IN_REVIEW, nao RESOLVED. Falta parecer do Agente 24.
+
+## 2026-10-15T00:45:00-03:00 — revalidação da Onda 00
+
+- Autor do registro: Agente 00. Nenhum achado passou a RESOLVED ou VERIFIED.
+- HEAD revalidado: `8f4b8be6d74eee12ed3c338bee8830a44b7aff4e`.
+- Docker remoto (Windows 2, `docker-remoto`, Engine 29.8.0) respondeu no início. O build da imagem `birthhub360-audit-wave00:8f4b8be6` com `--resource memory=1024m` transferiu 43,28 MB de contexto, puxou `node:22-slim` e entrou em `npm ci`. O log parou nesse passo. A API do daemon deixou de responder (`docker ps` / `docker info` sem retorno). O cliente do build foi encerrado para aliviar o host. A imagem não ficou pronta. DEBT-OPS-002 continua sem build concluído.
+- No worktree local: `npm ci` exit 0; `npm run lint` exit 0 (375 warnings); `npm run typecheck` exit 0; `npm run build` exit 0; `npm run test:unit` exit 1 (3 falhas, 4122 passaram, 1 skipped); `npm run test:architecture` exit 1 (4 violações); `npm audit` exit 1 (3 moderate).
+- `npm run test:integration` não foi executado: o pretest usaria o container operacional `birthhub_postgres`. `npm run release:check` não foi reexecutado como comando único; os constituintes bloqueantes já falharam.
+- PR #741 reconfirmado CLOSED, `mergedAt` null.
