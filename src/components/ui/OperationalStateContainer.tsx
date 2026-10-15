@@ -65,9 +65,7 @@ export function OperationalStateContainer({
   // 1. Loading State
   if (state === 'loading') {
     return (
-      <div className={cn('w-full', className)}>
-        {loadingSkeleton ?? <DefaultLoadingSkeleton />}
-      </div>
+      <div className={cn('w-full', className)}>{loadingSkeleton ?? <DefaultLoadingSkeleton />}</div>
     );
   }
 
@@ -155,9 +153,7 @@ export function OperationalStateContainer({
               disabled={stale.isRefreshing}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-warn/40 hover:bg-warn/20 transition-colors font-bold text-[11px] cursor-pointer"
             >
-              <RefreshCw
-                className={cn('w-3 h-3', stale.isRefreshing && 'animate-spin')}
-              />
+              <RefreshCw className={cn('w-3 h-3', stale.isRefreshing && 'animate-spin')} />
               Reconectar
             </button>
           )}

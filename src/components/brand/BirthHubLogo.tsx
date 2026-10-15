@@ -82,11 +82,25 @@ export function BirthHubOfficialLogoHorizontal({
           <stop offset="0" stopColor="#00D4FF" />
           <stop offset="1" stopColor="#FF2D9B" />
         </linearGradient>
-        <linearGradient id="bh-o1" gradientUnits="userSpaceOnUse" x1="198" y1="86" x2="198" y2="170">
+        <linearGradient
+          id="bh-o1"
+          gradientUnits="userSpaceOnUse"
+          x1="198"
+          y1="86"
+          x2="198"
+          y2="170"
+        >
           <stop offset="0" stopColor="#FF2D9B" />
           <stop offset="1" stopColor="#FFC107" />
         </linearGradient>
-        <linearGradient id="bh-o2" gradientUnits="userSpaceOnUse" x1="199" y1="168" x2="127" y2="210">
+        <linearGradient
+          id="bh-o2"
+          gradientUnits="userSpaceOnUse"
+          x1="199"
+          y1="168"
+          x2="127"
+          y2="210"
+        >
           <stop offset="0" stopColor="#FFC107" />
           <stop offset="1" stopColor="#00D4FF" />
         </linearGradient>
@@ -102,7 +116,16 @@ export function BirthHubOfficialLogoHorizontal({
         </linearGradient>
       </defs>
       <g id="bh-emblem">
-        <circle cx="128" cy="128" r="118" fill="none" stroke="#FFC107" strokeWidth="11" opacity="0.6" strokeDasharray="1.5 10" />
+        <circle
+          cx="128"
+          cy="128"
+          r="118"
+          fill="none"
+          stroke="#FFC107"
+          strokeWidth="11"
+          opacity="0.6"
+          strokeDasharray="1.5 10"
+        />
         <g fill="none" strokeWidth="16">
           <path stroke="url(#bh-o0)" d="M127 46 A82 82 0 0 1 199 87" />
           <path stroke="url(#bh-o1)" d="M198 86 A82 82 0 0 1 198 170" />
@@ -159,7 +182,15 @@ export function BirthHubOfficialEmblem({
           <stop offset="100%" stopColor="#FFC107" />
         </linearGradient>
       </defs>
-      <circle cx="128" cy="128" r="118" fill="none" stroke="url(#emblem-arc-core)" strokeWidth="12" strokeDasharray="6 14" />
+      <circle
+        cx="128"
+        cy="128"
+        r="118"
+        fill="none"
+        stroke="url(#emblem-arc-core)"
+        strokeWidth="12"
+        strokeDasharray="6 14"
+      />
       <circle cx="128" cy="128" r="82" fill="#0D0D0D" />
       <circle cx="128" cy="128" r="66" fill="none" stroke="#FFC107" strokeWidth="3" opacity="0.6" />
       <line x1="62" y1="128" x2="194" y2="128" stroke="#FFC107" strokeWidth="2" opacity="0.4" />
@@ -171,4 +202,3 @@ export function BirthHubOfficialEmblem({
     </svg>
   );
 }
-

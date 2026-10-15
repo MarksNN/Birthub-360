@@ -353,7 +353,7 @@ html.dark,
 /* Botões do Catálogo Oficial (#5 e #6) */
 .btn-neon-cta {
   background: var(--grad-cta);
-  color: #0D0D0D;
+  color: #0d0d0d;
   font-family: var(--font-display);
   font-weight: 800;
   border-radius: var(--radius-pill);
@@ -377,4 +377,3 @@ html.dark,
   box-shadow: 0 0 16px rgba(0, 212, 255, 0.25);
   transform: translateY(-1px);
 }
-

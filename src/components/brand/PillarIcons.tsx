@@ -261,4 +261,3 @@ export const PILLAR_ICONS: Record<string, React.FC<PillarIconProps>> = {
 };
 
 export { AIIcon as AiIcon };
-

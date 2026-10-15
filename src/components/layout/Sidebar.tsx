@@ -120,7 +120,11 @@ export function Sidebar({
           }`}
         >
           <div className="flex min-w-0 items-center gap-2.5">
-            <BirthHubLogo variant="mark" animated={false} className="h-7 w-7 shrink-0 drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]" />
+            <BirthHubLogo
+              variant="mark"
+              animated={false}
+              className="h-7 w-7 shrink-0 drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"
+            />
             {!isCollapsed && (
               <div className="min-w-0 leading-tight">
                 <div className="font-display text-sm font-extrabold tracking-tight text-ink">

@@ -58,9 +58,7 @@ export function ButtonGroup<T extends string = string>({
             className={cn(
               'relative rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring flex items-center gap-1.5 z-10 select-none',
               sizeClasses[size],
-              isSelected
-                ? 'text-ink font-bold'
-                : 'text-ink-2 hover:text-ink',
+              isSelected ? 'text-ink font-bold' : 'text-ink-2 hover:text-ink',
               item.disabled && 'opacity-40 cursor-not-allowed',
             )}
             aria-pressed={isSelected}

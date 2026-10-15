@@ -43,16 +43,7 @@ export interface IconButtonProps
 
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   (
-    {
-      className,
-      variant,
-      size,
-      magnetic = true,
-      soundClick = false,
-      onClick,
-      children,
-      ...props
-    },
+    { className, variant, size, magnetic = true, soundClick = false, onClick, children, ...props },
     ref,
   ) => {
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {

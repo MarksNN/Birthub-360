@@ -12,19 +12,7 @@ export interface FabProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 }
 
 export const Fab = React.forwardRef<HTMLButtonElement, FabProps>(
-  (
-    {
-      className,
-      icon,
-      label,
-      glow = true,
-      magnetic = true,
-      onClick,
-      children,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ className, icon, label, glow = true, magnetic = true, onClick, children, ...props }, ref) => {
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       SoundFX.play('click');
       onClick?.(e);
@@ -39,7 +27,8 @@ export const Fab = React.forwardRef<HTMLButtonElement, FabProps>(
           'inline-flex items-center justify-center gap-2 rounded-full font-display font-bold transition-all duration-300 ease-out active:scale-95 cursor-pointer select-none',
           'bg-gradient-to-r from-[#FF2D9B] to-[#00D4FF] text-[#0D0D0D]',
           label ? 'px-5 py-3 h-12 shadow-lg' : 'h-14 w-14 p-0 shadow-xl',
-          glow && 'shadow-[0_0_24px_rgba(0,212,255,0.45)] hover:shadow-[0_0_32px_rgba(0,212,255,0.65)] hover:scale-105',
+          glow &&
+            'shadow-[0_0_24px_rgba(0,212,255,0.45)] hover:shadow-[0_0_32px_rgba(0,212,255,0.65)] hover:scale-105',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00D4FF]',
           className,
         )}

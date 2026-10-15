@@ -8,14 +8,10 @@ const alertVariants = cva(
   {
     variants: {
       severity: {
-        success:
-          'bg-ok/10 text-ok-active border-ok/30 dark:border-ok/40',
-        warning:
-          'bg-warn/10 text-warn-active border-warn/30 dark:border-warn/40',
-        error:
-          'bg-critical/10 text-critical-active border-critical/30 dark:border-critical/40',
-        info:
-          'bg-info/10 text-info-active border-info/30 dark:border-info/40',
+        success: 'bg-ok/10 text-ok-active border-ok/30 dark:border-ok/40',
+        warning: 'bg-warn/10 text-warn-active border-warn/30 dark:border-warn/40',
+        error: 'bg-critical/10 text-critical-active border-critical/30 dark:border-critical/40',
+        info: 'bg-info/10 text-info-active border-info/30 dark:border-info/40',
         brand:
           'bg-brand/10 text-brand-ink dark:text-brand border-brand/30 shadow-[0_0_15px_rgba(0,212,255,0.15)]',
       },
@@ -47,15 +43,8 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     const IconComponent = severityIcons[severity ?? 'info'];
 
     return (
-      <div
-        ref={ref}
-        role="alert"
-        className={cn(alertVariants({ severity }), className)}
-        {...props}
-      >
-        <div className="shrink-0 mt-0.5">
-          {icon ?? <IconComponent className="w-5 h-5" />}
-        </div>
+      <div ref={ref} role="alert" className={cn(alertVariants({ severity }), className)} {...props}>
+        <div className="shrink-0 mt-0.5">{icon ?? <IconComponent className="w-5 h-5" />}</div>
         <div className="flex-1 min-w-0">
           {title && <h5 className="font-semibold leading-none tracking-tight mb-1">{title}</h5>}
           <div className="text-xs leading-relaxed opacity-95">{children}</div>
