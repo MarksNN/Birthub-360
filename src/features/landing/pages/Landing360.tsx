@@ -920,10 +920,7 @@ export function Landing360({
         </section>
 
         {/* 6. FLUXO OPERACIONAL */}
-        <section
-          id="fluxo"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
-        >
+        <section id="fluxo" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1081,10 +1078,7 @@ export function Landing360({
         </section>
 
         {/* 7. IA (INTELIGÊNCIA ARTIFICIAL CONTEXTUAL) */}
-        <section
-          id="ia"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt"
-        >
+        <section id="ia" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1198,10 +1192,7 @@ export function Landing360({
         </section>
 
         {/* 8. AUTOMAÇÃO & CONECTIVIDADE MULTI-CRM */}
-        <section
-          id="automacao"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
-        >
+        <section id="automacao" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1304,10 +1295,7 @@ export function Landing360({
         </section>
 
         {/* 9. PERFORMANCE COMERCIAL */}
-        <section
-          id="performance"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt"
-        >
+        <section id="performance" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1393,10 +1381,7 @@ export function Landing360({
         </section>
 
         {/* 10. PREVISIBILIDADE COMERCIAL */}
-        <section
-          id="previsibilidade"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
-        >
+        <section id="previsibilidade" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1481,10 +1466,7 @@ export function Landing360({
         </section>
 
         {/* 11. ECOSSISTEMA TECNOLÓGICO */}
-        <section
-          id="ecossistema"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt"
-        >
+        <section id="ecossistema" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1559,49 +1541,60 @@ export function Landing360({
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#FF2D9B]">HubSpot</div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Conexão Bidirecional</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Conexão Bidirecional
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#F59E0B]">Salesforce</div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Enterprise Connector</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Enterprise Connector
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#22C55E]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#22C55E]">Pipedrive</div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Pipeline Sync</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Pipeline Sync
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#38BDF8]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#38BDF8]">WhatsApp API</div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Comunicação Direta</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Comunicação Direta
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#F59E0B]">Telefonia em Nuvem</div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Gravação &amp; Métricas</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Gravação &amp; Métricas
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#00D4FF]">
                   Webhooks &amp; APIs
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Conexão Flexível</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Conexão Flexível
+                </div>
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
                 <div className="font-mono text-sm font-bold text-[#FF2D9B]">E-mail Corporativo</div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">Rastreabilidade Total</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Rastreabilidade Total
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         {/* 12. COMMAND CENTER (COCKPIT) */}
-        <section
-          id="command-center"
-          className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base"
-        >
+        <section id="command-center" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
@@ -1668,15 +1661,21 @@ export function Landing360({
                   </div>
                   <div className="space-y-3 font-mono text-xs">
                     <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-300">Leads Ativos na Fila</span>
+                      <span className="text-slate-600 dark:text-slate-300">
+                        Leads Ativos na Fila
+                      </span>
                       <span className="font-bold text-[#00D4FF]">184 contatos</span>
                     </div>
                     <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-300">Deals com Risco Identificado</span>
+                      <span className="text-slate-600 dark:text-slate-300">
+                        Deals com Risco Identificado
+                      </span>
                       <span className="font-bold text-[#F59E0B]">3 oportunidades</span>
                     </div>
                     <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-300">Cadências em Execução</span>
+                      <span className="text-slate-600 dark:text-slate-300">
+                        Cadências em Execução
+                      </span>
                       <span className="font-bold text-[#FF2D9B]">12 ativas</span>
                     </div>
                   </div>
@@ -1687,10 +1686,7 @@ export function Landing360({
         </section>
 
         {/* 13. CTA FINAL */}
-        <section
-          id="cta"
-          className="px-5 py-20 sm:px-8 lg:px-14 landing-section-alt text-center"
-        >
+        <section id="cta" className="px-5 py-20 sm:px-8 lg:px-14 landing-section-alt text-center">
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             {/* SVG 12: Starburst Beacon */}
             <svg
