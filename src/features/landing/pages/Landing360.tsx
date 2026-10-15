@@ -12,14 +12,16 @@ import {
   Loader2,
   Lock,
   Mail,
+  Menu,
   Server,
   Target,
   Workflow,
+  X,
   Zap,
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import { authClient } from '../../../lib/auth-client.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
@@ -112,14 +114,46 @@ const OFFICIAL_PILLARS = [
 
 // TAGS DE CAPACIDADES DA PLATAFORMA (PALETA NEON OFICIAL COM CONECTIVIDADE MULTI-CRM)
 const FEATURE_TAGS = [
-  { label: 'Pipeline Centralizado', color: '#00D4FF', desc: 'Reúna oportunidades, etapas e histórico comercial em uma visão organizada.' },
-  { label: 'Inteligência B2B', color: '#FF2D9B', desc: 'Contextualize empresas e contatos com dados para apoiar a qualificação.' },
-  { label: 'Cadências Automatizadas', color: '#00D4FF', desc: 'Organize sequências de contato e próximos passos ao longo da negociação.' },
-  { label: 'Velocidade de Ciclo', color: '#F59E0B', desc: 'Acompanhe o tempo entre etapas e identifique pontos de estagnação.' },
-  { label: 'Cenários Ponderados', color: '#F59E0B', desc: 'Compare projeções considerando etapas, probabilidades e histórico do pipeline.' },
-  { label: 'Copiloto Comercial IA', color: '#FF2D9B', desc: 'Apoie diagnósticos e próximas ações com o contexto das negociações.' },
-  { label: 'Conectividade Multi-CRM', color: '#00D4FF', desc: 'Conecte registros e fluxos comerciais com Bitrix24, Salesforce, HubSpot e Pipedrive.' },
-  { label: 'Telefonia & Voz Ativa', color: '#FF2D9B', desc: 'Integre interações de voz ao acompanhamento das oportunidades comerciais.' },
+  {
+    label: 'Pipeline Centralizado',
+    color: '#00D4FF',
+    desc: 'Reúna oportunidades, etapas e histórico comercial em uma visão organizada.',
+  },
+  {
+    label: 'Inteligência B2B',
+    color: '#FF2D9B',
+    desc: 'Contextualize empresas e contatos com dados para apoiar a qualificação.',
+  },
+  {
+    label: 'Cadências Automatizadas',
+    color: '#00D4FF',
+    desc: 'Organize sequências de contato e próximos passos ao longo da negociação.',
+  },
+  {
+    label: 'Velocidade de Ciclo',
+    color: '#F59E0B',
+    desc: 'Acompanhe o tempo entre etapas e identifique pontos de estagnação.',
+  },
+  {
+    label: 'Cenários Ponderados',
+    color: '#F59E0B',
+    desc: 'Compare projeções considerando etapas, probabilidades e histórico do pipeline.',
+  },
+  {
+    label: 'Copiloto Comercial IA',
+    color: '#FF2D9B',
+    desc: 'Apoie diagnósticos e próximas ações com o contexto das negociações.',
+  },
+  {
+    label: 'Conectividade Multi-CRM',
+    color: '#00D4FF',
+    desc: 'Conecte registros e fluxos comerciais com Bitrix24, Salesforce, HubSpot e Pipedrive.',
+  },
+  {
+    label: 'Telefonia & Voz Ativa',
+    color: '#FF2D9B',
+    desc: 'Integre interações de voz ao acompanhamento das oportunidades comerciais.',
+  },
 ];
 
 function BH360LogoMark({ size = 52 }: { size?: number }) {
@@ -152,6 +186,11 @@ export function Landing360({
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedPillar, setSelectedPillar] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Birth Hub 360° · Sistema Operacional Comercial Multi-CRM';
+  }, []);
 
   // Redirecionamento se já autenticado
   useEffect(() => {
@@ -167,7 +206,7 @@ export function Landing360({
 
   const handleGoToLogin = () => {
     SoundFX.play('confirm');
-    navigate('/login');
+    setActiveScreen('login');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -315,16 +354,81 @@ export function Landing360({
               </a>
             </nav>
 
-            {/* Botão de Login no Topo - Sem fundo branco */}
-            <button
-              type="button"
-              onClick={handleGoToLogin}
-              className="btn-cta-light hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
-            >
-              <span>Acessar Plataforma</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Botão de Login no Topo - Sem fundo branco */}
+              <button
+                type="button"
+                onClick={handleGoToLogin}
+                className="btn-cta-light hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+              >
+                <span>Acessar Plataforma</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              {/* Botão Hambúrguer Mobile (< xl) */}
+              <button
+                type="button"
+                onClick={() => {
+                  SoundFX.play('click');
+                  setMobileMenuOpen(!mobileMenuOpen);
+                }}
+                aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+                aria-expanded={mobileMenuOpen}
+                className="xl:hidden inline-flex items-center justify-center p-2 rounded-xl bg-[#0F172A] border border-slate-700 text-slate-200 hover:text-[#00D4FF] hover:border-[#00D4FF] transition-all cursor-pointer shadow-md"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 text-[#FF2D9B]" />
+                ) : (
+                  <Menu className="w-5 h-5 text-[#00D4FF]" />
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* Gaveta de Navegação Mobile */}
+          {mobileMenuOpen && (
+            <div className="xl:hidden max-w-7xl mx-auto mt-3 pt-3 border-t border-slate-800 bg-[#0F172A]/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-slate-800/80 animate-in fade-in slide-in-from-top-2 duration-200">
+              <nav className="flex flex-col gap-1.5 font-mono text-xs font-semibold text-slate-300">
+                {[
+                  { href: '#problema', label: 'Problema' },
+                  { href: '#plataforma', label: 'Plataforma' },
+                  { href: '#pilares', label: '8 Pilares' },
+                  { href: '#fluxo', label: 'Fluxo Operacional' },
+                  { href: '#ia', label: 'Inteligência Artificial' },
+                  { href: '#automacao', label: 'Automação' },
+                  { href: '#performance', label: 'Performance' },
+                  { href: '#previsibilidade', label: 'Previsibilidade' },
+                  { href: '#ecossistema', label: 'Ecossistema Multi-CRM' },
+                ].map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => {
+                      SoundFX.play('click');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-[#00D4FF] transition-colors flex items-center justify-between"
+                  >
+                    <span>{item.label}</span>
+                    <span className="text-slate-500 font-mono text-[10px]">→</span>
+                  </a>
+                ))}
+                <div className="pt-2 mt-1 border-t border-slate-800 sm:hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleGoToLogin();
+                    }}
+                    className="btn-cta-light w-full py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                  >
+                    <span>Acessar Plataforma</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </nav>
+            </div>
+          )}
         </header>
 
         {/* 2. HERO SECTION */}
@@ -340,19 +444,36 @@ export function Landing360({
             {/* Badge de Categoria com SVG Customizado e Centralizado */}
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-[#0F172A] border border-[#00D4FF]/40 text-[#00D4FF] shadow-lg shadow-[#00D4FF]/10 mb-6 mx-auto">
               {/* SVG 1: Hero Orbit Badge */}
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="url(#hero-badge-grad)" strokeWidth="1.5" strokeDasharray="3 3"/>
-                <circle cx="12" cy="12" r="4.5" fill="url(#hero-badge-core)"/>
-                <path d="M12 2V5M12 19V22M2 12H5M19 12H22" stroke="#00D4FF" strokeWidth="1.5" strokeLinecap="round"/>
+              <svg
+                className="w-4 h-4 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="url(#hero-badge-grad)"
+                  strokeWidth="1.5"
+                  strokeDasharray="3 3"
+                />
+                <circle cx="12" cy="12" r="4.5" fill="url(#hero-badge-core)" />
+                <path
+                  d="M12 2V5M12 19V22M2 12H5M19 12H22"
+                  stroke="#00D4FF"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
                 <defs>
                   <linearGradient id="hero-badge-grad" x1="2" y1="2" x2="22" y2="22">
-                    <stop stopColor="#00D4FF"/>
-                    <stop offset="0.5" stopColor="#FF2D9B"/>
-                    <stop offset="1" stopColor="#F59E0B"/>
+                    <stop stopColor="#00D4FF" />
+                    <stop offset="0.5" stopColor="#FF2D9B" />
+                    <stop offset="1" stopColor="#F59E0B" />
                   </linearGradient>
                   <radialGradient id="hero-badge-core" cx="50%" cy="50%" r="50%">
-                    <stop stopColor="#00D4FF"/>
-                    <stop offset="1" stopColor="#0284C7"/>
+                    <stop stopColor="#00D4FF" />
+                    <stop offset="1" stopColor="#0284C7" />
                   </radialGradient>
                 </defs>
               </svg>
@@ -437,9 +558,25 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#EF4444]/10 border border-[#EF4444]/40 text-[#EF4444] mb-3.5 mx-auto">
                 {/* SVG 2: Problema Shield */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L3 7V12C3 17.5 6.8 21.7 12 23C17.2 21.7 21 17.5 21 12V7L12 2Z" stroke="#EF4444" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12 8V12M12 16H12.01" stroke="#EF4444" strokeWidth="2" strokeLinecap="round"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2L3 7V12C3 17.5 6.8 21.7 12 23C17.2 21.7 21 17.5 21 12V7L12 2Z"
+                    stroke="#EF4444"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 8V12M12 16H12.01"
+                    stroke="#EF4444"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
                 </svg>
                 <span>O Gargalo Estrutural das Empresas</span>
               </div>
@@ -509,10 +646,33 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
                 {/* SVG 3: Plataforma One OS 3D Blocks */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="#00D4FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="#FF2D9B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2L2 7L12 12L22 7L12 2Z"
+                    stroke="#F59E0B"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M2 12L12 17L22 12"
+                    stroke="#00D4FF"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M2 17L12 22L22 17"
+                    stroke="#FF2D9B"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
                 <span>Arquitetura One OS</span>
               </div>
@@ -532,13 +692,16 @@ export function Landing360({
                     <Server className="w-6 h-6" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase text-[#00D4FF] mb-1">Camada 1</span>
+                <span className="font-mono text-xs font-bold uppercase text-[#00D4FF] mb-1">
+                  Camada 1
+                </span>
                 <h3 className="font-display text-base font-bold text-white mb-2 text-center">
                   Dados &amp; Conectividade Multi-CRM
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed text-center">
-                  Conexão nativa e bidirecional com Bitrix24, HubSpot, Salesforce, Pipedrive, e-mails
-                  corporativos, canais de mensageria e dados enriquecidos B2B em uma única fonte da verdade.
+                  Conexão nativa e bidirecional com Bitrix24, HubSpot, Salesforce, Pipedrive,
+                  e-mails corporativos, canais de mensageria e dados enriquecidos B2B em uma única
+                  fonte da verdade.
                 </p>
               </div>
 
@@ -548,7 +711,9 @@ export function Landing360({
                     <Cpu className="w-6 h-6" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase text-[#FF2D9B] mb-1">Camada 2</span>
+                <span className="font-mono text-xs font-bold uppercase text-[#FF2D9B] mb-1">
+                  Camada 2
+                </span>
                 <h3 className="font-display text-base font-bold text-white mb-2 text-center">
                   Motor de Diagnóstico &amp; IA
                 </h3>
@@ -564,7 +729,9 @@ export function Landing360({
                     <Zap className="w-6 h-6" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase text-[#F59E0B] mb-1">Camada 3</span>
+                <span className="font-mono text-xs font-bold uppercase text-[#F59E0B] mb-1">
+                  Camada 3
+                </span>
                 <h3 className="font-display text-base font-bold text-white mb-2 text-center">
                   Execução &amp; Orquestração
                 </h3>
@@ -587,22 +754,27 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
                 {/* SVG 4: 8-Spoke Command Wheel */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="9" stroke="url(#pilares-ring)" strokeWidth="1.8"/>
-                  <circle cx="12" cy="3" r="1.5" fill="#00D4FF"/>
-                  <circle cx="18.36" cy="5.64" r="1.5" fill="#FF2D9B"/>
-                  <circle cx="21" cy="12" r="1.5" fill="#F59E0B"/>
-                  <circle cx="18.36" cy="18.36" r="1.5" fill="#22C55E"/>
-                  <circle cx="12" cy="21" r="1.5" fill="#38BDF8"/>
-                  <circle cx="5.64" cy="18.36" r="1.5" fill="#8B7DFF"/>
-                  <circle cx="3" cy="12" r="1.5" fill="#00D4FF"/>
-                  <circle cx="5.64" cy="5.64" r="1.5" fill="#FF2D9B"/>
-                  <circle cx="12" cy="12" r="3" fill="#F59E0B"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="9" stroke="url(#pilares-ring)" strokeWidth="1.8" />
+                  <circle cx="12" cy="3" r="1.5" fill="#00D4FF" />
+                  <circle cx="18.36" cy="5.64" r="1.5" fill="#FF2D9B" />
+                  <circle cx="21" cy="12" r="1.5" fill="#F59E0B" />
+                  <circle cx="18.36" cy="18.36" r="1.5" fill="#22C55E" />
+                  <circle cx="12" cy="21" r="1.5" fill="#38BDF8" />
+                  <circle cx="5.64" cy="18.36" r="1.5" fill="#8B7DFF" />
+                  <circle cx="3" cy="12" r="1.5" fill="#00D4FF" />
+                  <circle cx="5.64" cy="5.64" r="1.5" fill="#FF2D9B" />
+                  <circle cx="12" cy="12" r="3" fill="#F59E0B" />
                   <defs>
                     <linearGradient id="pilares-ring" x1="3" y1="3" x2="21" y2="21">
-                      <stop stopColor="#F59E0B"/>
-                      <stop offset="0.5" stopColor="#FF2D9B"/>
-                      <stop offset="1" stopColor="#00D4FF"/>
+                      <stop stopColor="#F59E0B" />
+                      <stop offset="0.5" stopColor="#FF2D9B" />
+                      <stop offset="1" stopColor="#00D4FF" />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -634,7 +806,9 @@ export function Landing360({
                       }
                     }}
                     className={`pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border transition-all duration-300 relative ${
-                      isActive ? 'pillar-card-active ring-2 ring-offset-2 ring-offset-[#0B1120]' : ''
+                      isActive
+                        ? 'pillar-card-active ring-2 ring-offset-2 ring-offset-[#0B1120]'
+                        : ''
                     }`}
                     style={{
                       backgroundColor: '#0F172A',
@@ -693,7 +867,9 @@ export function Landing360({
                       >
                         {p.name}
                       </h3>
-                      <p className="font-sans text-xs text-slate-300 leading-relaxed mb-3 text-center">{p.desc}</p>
+                      <p className="font-sans text-xs text-slate-300 leading-relaxed mb-3 text-center">
+                        {p.desc}
+                      </p>
                       <div className="text-center">
                         <span className="inline-block px-2.5 py-1 rounded text-[10px] font-mono font-semibold bg-[#1E293B] text-slate-200 border border-slate-700">
                           Foco: {p.focus}
@@ -730,21 +906,35 @@ export function Landing360({
         </section>
 
         {/* 6. FLUXO OPERACIONAL */}
-        <section id="fluxo" className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0B1120] border-b border-slate-800">
+        <section
+          id="fluxo"
+          className="px-5 py-16 sm:px-8 lg:px-14 bg-[#0B1120] border-b border-slate-800"
+        >
           <div className="max-w-6xl mx-auto">
             {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
                 {/* SVG 5: Fluxo Pulse Wave */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 12H7L10 5L14 19L17 12H21" stroke="url(#fluxo-pulse-svg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="10" cy="5" r="2" fill="#00D4FF"/>
-                  <circle cx="14" cy="19" r="2" fill="#FF2D9B"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 12H7L10 5L14 19L17 12H21"
+                    stroke="url(#fluxo-pulse-svg)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="10" cy="5" r="2" fill="#00D4FF" />
+                  <circle cx="14" cy="19" r="2" fill="#FF2D9B" />
                   <defs>
                     <linearGradient id="fluxo-pulse-svg" x1="3" y1="12" x2="21" y2="12">
-                      <stop stopColor="#00D4FF"/>
-                      <stop offset="0.5" stopColor="#FF2D9B"/>
-                      <stop offset="1" stopColor="#F59E0B"/>
+                      <stop stopColor="#00D4FF" />
+                      <stop offset="0.5" stopColor="#FF2D9B" />
+                      <stop offset="1" stopColor="#F59E0B" />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -766,7 +956,8 @@ export function Landing360({
                   Entrada &amp; Captura
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed text-center">
-                  Leads e contas são integrados via CRMs (Bitrix24, HubSpot, Salesforce, Pipedrive), campanhas ou prospecção ativa.
+                  Leads e contas são integrados via CRMs (Bitrix24, HubSpot, Salesforce, Pipedrive),
+                  campanhas ou prospecção ativa.
                 </p>
               </div>
 
@@ -792,7 +983,9 @@ export function Landing360({
 
               <div className="flow-step-card p-5 text-center flex flex-col items-center">
                 <div className="font-mono text-xs font-bold text-[#FF2D9B] mb-2">ETAPA 04</div>
-                <h4 className="font-display text-sm font-bold text-white mb-2 text-center">Apoio com IA</h4>
+                <h4 className="font-display text-sm font-bold text-white mb-2 text-center">
+                  Apoio com IA
+                </h4>
                 <p className="text-xs text-slate-300 leading-relaxed text-center">
                   Copiloto analisa objeções, histórico e recomenda a abordagem ideal.
                 </p>
@@ -849,7 +1042,9 @@ export function Landing360({
 
               <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-300 font-mono">
                 <span>✦ ICP Filtrado por Segmento, Região e Personas B2B</span>
-                <span className="text-[#00D4FF]">Integração nativa com Bitrix24, HubSpot, Salesforce e principais CRMs</span>
+                <span className="text-[#00D4FF]">
+                  Integração nativa com Bitrix24, HubSpot, Salesforce e principais CRMs
+                </span>
               </div>
             </div>
           </div>
@@ -865,10 +1060,28 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FF2D9B]/10 border border-[#FF2D9B]/40 text-[#FF2D9B] mb-3.5 mx-auto">
                 {/* SVG 6: Quantum Neural Spark */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12" stroke="#FF2D9B" strokeWidth="1.8" strokeLinecap="round"/>
-                  <path d="M12 6V12L16 14" stroke="#FF2D9B" strokeWidth="1.8" strokeLinecap="round"/>
-                  <path d="M18 2L19.5 5.5L23 7L19.5 8.5L18 12L16.5 8.5L13 7L16.5 5.5L18 2Z" fill="#FF2D9B"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12"
+                    stroke="#FF2D9B"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M12 6V12L16 14"
+                    stroke="#FF2D9B"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M18 2L19.5 5.5L23 7L19.5 8.5L18 12L16.5 8.5L13 7L16.5 5.5L18 2Z"
+                    fill="#FF2D9B"
+                  />
                 </svg>
                 <span>IA COM CONTEXTO OPERACIONAL REAL</span>
               </div>
@@ -890,7 +1103,10 @@ export function Landing360({
                   </div>
                   <div>
                     <h4 className="font-bold text-[#00D4FF] text-sm">Diagnóstico de Entraves</h4>
-                    <p className="text-xs sm:text-sm text-slate-300 mt-1">Alerta deals estagnados com sugestões claras de destravamento baseadas no histórico da conta.</p>
+                    <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                      Alerta deals estagnados com sugestões claras de destravamento baseadas no
+                      histórico da conta.
+                    </p>
                   </div>
                 </div>
 
@@ -900,7 +1116,10 @@ export function Landing360({
                   </div>
                   <div>
                     <h4 className="font-bold text-[#FF2D9B] text-sm">Próxima Melhor Ação</h4>
-                    <p className="text-xs sm:text-sm text-slate-300 mt-1">Recomendações acionáveis para o vendedor avançar o contato e contornar objeções críticas.</p>
+                    <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                      Recomendações acionáveis para o vendedor avançar o contato e contornar
+                      objeções críticas.
+                    </p>
                   </div>
                 </div>
 
@@ -910,7 +1129,10 @@ export function Landing360({
                   </div>
                   <div>
                     <h4 className="font-bold text-[#F59E0B] text-sm">Isolamento &amp; Segurança</h4>
-                    <p className="text-xs sm:text-sm text-slate-300 mt-1">Seus dados comerciais jamais são utilizados para treinar modelos públicos. Conformidade LGPD total.</p>
+                    <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                      Seus dados comerciais jamais são utilizados para treinar modelos públicos.
+                      Conformidade LGPD total.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -924,16 +1146,18 @@ export function Landing360({
                         COPILOTO COMERCIAL ATIVO
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-400">Contexto: Deal #4892 · Multi-CRM</span>
+                    <span className="font-mono text-[10px] text-slate-400">
+                      Contexto: Deal #4892 · Multi-CRM
+                    </span>
                   </div>
                   <div className="space-y-3 font-mono text-xs">
                     <div className="p-3.5 rounded-xl bg-[#0F172A] border border-[#FF2D9B]/25 text-slate-200">
-                      <span className="text-[#FF2D9B] font-bold">Diagnóstico:</span> Negociação de R$ 140k
-                      sem retorno há 4 dias após envio de proposta.
+                      <span className="text-[#FF2D9B] font-bold">Diagnóstico:</span> Negociação de
+                      R$ 140k sem retorno há 4 dias após envio de proposta.
                     </div>
                     <div className="p-3.5 rounded-xl bg-[#0F172A] border border-[#00D4FF]/25 text-slate-200">
-                      <span className="text-[#00D4FF] font-bold">Ação Sugerida:</span> Disparar cadência
-                      de validação de decisor financeiro abordando ROI estimado em 90 dias.
+                      <span className="text-[#00D4FF] font-bold">Ação Sugerida:</span> Disparar
+                      cadência de validação de decisor financeiro abordando ROI estimado em 90 dias.
                     </div>
                   </div>
                 </div>
@@ -952,12 +1176,46 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3.5 mx-auto">
                 {/* SVG 7: Multi-Cloud Sync Loop */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 4V9H9" stroke="#00D4FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20 20V15H15" stroke="#00D4FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20 9A8 8 0 0 0 6.34 6.34L4 9" stroke="#00D4FF" strokeWidth="1.8" strokeLinecap="round"/>
-                  <path d="M4 15A8 8 0 0 0 17.66 17.66L20 15" stroke="#00D4FF" strokeWidth="1.8" strokeLinecap="round"/>
-                  <circle cx="12" cy="12" r="3" stroke="#F59E0B" strokeWidth="1.8" fill="rgba(245, 158, 11, 0.2)"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4 4V9H9"
+                    stroke="#00D4FF"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M20 20V15H15"
+                    stroke="#00D4FF"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M20 9A8 8 0 0 0 6.34 6.34L4 9"
+                    stroke="#00D4FF"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M4 15A8 8 0 0 0 17.66 17.66L20 15"
+                    stroke="#00D4FF"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                    stroke="#F59E0B"
+                    strokeWidth="1.8"
+                    fill="rgba(245, 158, 11, 0.2)"
+                  />
                 </svg>
                 <span>CONECTIVIDADE MULTI-CRM</span>
               </div>
@@ -965,7 +1223,8 @@ export function Landing360({
                 Automação Inteligente &amp; Conectividade Multi-CRM
               </h2>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed text-center mx-auto">
-                Remova tarefas braçais repetitivas e integre seus fluxos com Bitrix24, HubSpot, Salesforce, Pipedrive e mensageria sem atrito.
+                Remova tarefas braçais repetitivas e integre seus fluxos com Bitrix24, HubSpot,
+                Salesforce, Pipedrive e mensageria sem atrito.
               </p>
             </div>
 
@@ -978,7 +1237,8 @@ export function Landing360({
                   Sincronização Multi-CRM
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed text-center">
-                  Atualizações automáticas de campos, estágios de oportunidade e tarefas em Bitrix24, HubSpot, Salesforce e Pipedrive sem digitação dupla.
+                  Atualizações automáticas de campos, estágios de oportunidade e tarefas em
+                  Bitrix24, HubSpot, Salesforce e Pipedrive sem digitação dupla.
                 </p>
               </div>
 
@@ -1021,10 +1281,20 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
                 {/* SVG 8: Performance Telemetry Gauge */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="12" cy="12" r="4" fill="#F59E0B"/>
-                  <path d="M12 12L15 9" stroke="#0F172A" strokeWidth="2" strokeLinecap="round"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93"
+                    stroke="#F59E0B"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="12" cy="12" r="4" fill="#F59E0B" />
+                  <path d="M12 12L15 9" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <span>TELEMETRIA DE RESULTADOS</span>
               </div>
@@ -1039,7 +1309,9 @@ export function Landing360({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="section-card p-5 border-t-4 border-t-[#00D4FF] text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#00D4FF] uppercase font-bold">Taxa de Conversão</div>
+                <div className="font-mono text-xs text-[#00D4FF] uppercase font-bold">
+                  Taxa de Conversão
+                </div>
                 <div className="font-display text-2xl font-extrabold text-white my-1 text-center">
                   Funil 360°
                 </div>
@@ -1049,7 +1321,9 @@ export function Landing360({
               </div>
 
               <div className="section-card p-5 border-t-4 border-t-[#FF2D9B] text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#FF2D9B] uppercase font-bold">Velocidade de Vendas</div>
+                <div className="font-mono text-xs text-[#FF2D9B] uppercase font-bold">
+                  Velocidade de Vendas
+                </div>
                 <div className="font-display text-2xl font-extrabold text-white my-1 text-center">
                   Ciclo Médio
                 </div>
@@ -1059,7 +1333,9 @@ export function Landing360({
               </div>
 
               <div className="section-card p-5 border-t-4 border-t-[#F59E0B] text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#F59E0B] uppercase font-bold">Gestão de Metas</div>
+                <div className="font-mono text-xs text-[#F59E0B] uppercase font-bold">
+                  Gestão de Metas
+                </div>
                 <div className="font-display text-2xl font-extrabold text-white my-1 text-center">
                   Ritmo &amp; Pace
                 </div>
@@ -1069,7 +1345,9 @@ export function Landing360({
               </div>
 
               <div className="section-card p-5 border-t-4 border-t-[#00D4FF] text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#00D4FF] uppercase font-bold">Motivos de Perda</div>
+                <div className="font-mono text-xs text-[#00D4FF] uppercase font-bold">
+                  Motivos de Perda
+                </div>
                 <div className="font-display text-2xl font-extrabold text-white my-1 text-center">
                   Win / Loss
                 </div>
@@ -1091,11 +1369,28 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
                 {/* SVG 9: Predictive Forecast Trend Radar */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 3V21H21" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M7 16L12 10L16 14L21 6" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="10" r="2.5" fill="#00D4FF"/>
-                  <circle cx="21" cy="6" r="2.5" fill="#FF2D9B"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 3V21H21"
+                    stroke="#F59E0B"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7 16L12 10L16 14L21 6"
+                    stroke="#F59E0B"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="12" cy="10" r="2.5" fill="#00D4FF" />
+                  <circle cx="21" cy="6" r="2.5" fill="#FF2D9B" />
                 </svg>
                 <span>RIGOR ANALÍTICO</span>
               </div>
@@ -1161,13 +1456,51 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3.5 mx-auto">
                 {/* SVG 10: Constellation Network Hub */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="3.5" fill="#00D4FF"/>
-                  <circle cx="4" cy="6" r="2.5" stroke="#FF2D9B" strokeWidth="1.5" fill="rgba(255,45,155,0.2)"/>
-                  <circle cx="20" cy="6" r="2.5" stroke="#F59E0B" strokeWidth="1.5" fill="rgba(245,158,11,0.2)"/>
-                  <circle cx="4" cy="18" r="2.5" stroke="#22C55E" strokeWidth="1.5" fill="rgba(34,197,94,0.2)"/>
-                  <circle cx="20" cy="18" r="2.5" stroke="#38BDF8" strokeWidth="1.5" fill="rgba(56,189,248,0.2)"/>
-                  <path d="M6.5 7.5L9.5 10.5M17.5 7.5L14.5 10.5M6.5 16.5L9.5 13.5M17.5 16.5L14.5 13.5" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="3.5" fill="#00D4FF" />
+                  <circle
+                    cx="4"
+                    cy="6"
+                    r="2.5"
+                    stroke="#FF2D9B"
+                    strokeWidth="1.5"
+                    fill="rgba(255,45,155,0.2)"
+                  />
+                  <circle
+                    cx="20"
+                    cy="6"
+                    r="2.5"
+                    stroke="#F59E0B"
+                    strokeWidth="1.5"
+                    fill="rgba(245,158,11,0.2)"
+                  />
+                  <circle
+                    cx="4"
+                    cy="18"
+                    r="2.5"
+                    stroke="#22C55E"
+                    strokeWidth="1.5"
+                    fill="rgba(34,197,94,0.2)"
+                  />
+                  <circle
+                    cx="20"
+                    cy="18"
+                    r="2.5"
+                    stroke="#38BDF8"
+                    strokeWidth="1.5"
+                    fill="rgba(56,189,248,0.2)"
+                  />
+                  <path
+                    d="M6.5 7.5L9.5 10.5M17.5 7.5L14.5 10.5M6.5 16.5L9.5 13.5M17.5 16.5L14.5 13.5"
+                    stroke="#94A3B8"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
                 </svg>
                 <span>CONECTIVIDADE ENTERPRISE</span>
               </div>
@@ -1175,7 +1508,8 @@ export function Landing360({
                 Integrado ao ecossistema tecnológico da sua empresa
               </h2>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed text-center mx-auto">
-                Construído para operar com múltiplos CRMs e todas as ferramentas comerciais corporativas.
+                Construído para operar com múltiplos CRMs e todas as ferramentas comerciais
+                corporativas.
               </p>
             </div>
 
@@ -1212,7 +1546,9 @@ export function Landing360({
               </div>
 
               <div className="p-5 rounded-2xl bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center">
-                <div className="font-mono text-sm font-bold text-[#00D4FF]">Webhooks &amp; APIs</div>
+                <div className="font-mono text-sm font-bold text-[#00D4FF]">
+                  Webhooks &amp; APIs
+                </div>
                 <div className="font-sans text-xs text-slate-400 mt-1">Conexão Flexível</div>
               </div>
 
@@ -1234,10 +1570,20 @@ export function Landing360({
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FF2D9B]/10 border border-[#FF2D9B]/40 text-[#FF2D9B] mb-3.5 mx-auto">
                 {/* SVG 11: Cockpit Radar */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="9" stroke="#FF2D9B" strokeWidth="1.8"/>
-                  <path d="M12 3V12L18.5 15.5" stroke="#00D4FF" strokeWidth="1.8" strokeLinecap="round"/>
-                  <circle cx="12" cy="12" r="2" fill="#F59E0B"/>
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="12" cy="12" r="9" stroke="#FF2D9B" strokeWidth="1.8" />
+                  <path
+                    d="M12 3V12L18.5 15.5"
+                    stroke="#00D4FF"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="12" cy="12" r="2" fill="#F59E0B" />
                 </svg>
                 <span>COCKPIT OPERACIONAL</span>
               </div>
@@ -1265,7 +1611,9 @@ export function Landing360({
                 </div>
 
                 <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-800 text-slate-200 text-center">
-                  <span className="font-bold text-[#FF2D9B] block mb-1">Diretoria &amp; Head de Vendas</span>
+                  <span className="font-bold text-[#FF2D9B] block mb-1">
+                    Diretoria &amp; Head de Vendas
+                  </span>
                   Previsibilidade acionável, pace diário e controle total de pipeline.
                 </div>
               </div>
@@ -1307,13 +1655,23 @@ export function Landing360({
         >
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             {/* SVG 12: Starburst Beacon */}
-            <svg className="w-8 h-8 mb-4 mx-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="url(#cta-star-svg)" stroke="#F59E0B" strokeWidth="1"/>
+            <svg
+              className="w-8 h-8 mb-4 mx-auto"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                fill="url(#cta-star-svg)"
+                stroke="#F59E0B"
+                strokeWidth="1"
+              />
               <defs>
                 <linearGradient id="cta-star-svg" x1="2" y1="2" x2="22" y2="22">
-                  <stop stopColor="#F59E0B"/>
-                  <stop offset="0.5" stopColor="#FF2D9B"/>
-                  <stop offset="1" stopColor="#00D4FF"/>
+                  <stop stopColor="#F59E0B" />
+                  <stop offset="0.5" stopColor="#FF2D9B" />
+                  <stop offset="1" stopColor="#00D4FF" />
                 </linearGradient>
               </defs>
             </svg>
@@ -1380,7 +1738,21 @@ export function Landing360({
 
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-slate-400 text-center">
             <p>© {new Date().getFullYear()} Birth Hub 360°. Todos os direitos reservados.</p>
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              <Link
+                to="/terms"
+                className="hover:text-[#00D4FF] transition-colors underline-offset-4 hover:underline"
+              >
+                Termos de Uso
+              </Link>
+              <span>·</span>
+              <Link
+                to="/privacy"
+                className="hover:text-[#00D4FF] transition-colors underline-offset-4 hover:underline"
+              >
+                Política de Privacidade
+              </Link>
+              <span>·</span>
               <span>Isolamento Multi-Tenant</span>
               <span>·</span>
               <span>Conformidade LGPD/GDPR</span>
@@ -1401,19 +1773,33 @@ export function Landing360({
             : 'opacity-0 pointer-events-none'
         }`}
       >
-        {/* Botão Voltar para a Landing — SEM FUNDO BRANCO */}
-        <button
-          id="btn-back"
-          type="button"
-          onClick={() => {
-            SoundFX.play('click');
-            setActiveScreen('intro');
-          }}
-          className="self-start mb-6 text-slate-300 hover:text-[#00D4FF] transition-colors flex items-center gap-2 font-mono text-xs sm:text-sm font-bold uppercase tracking-widest cursor-pointer px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Voltar ao Início</span>
-        </button>
+        {/* Topo do Modal com navegação — SEM FUNDO BRANCO */}
+        <div className="w-full max-w-[480px] flex items-center justify-between mb-6">
+          <button
+            id="btn-back"
+            type="button"
+            onClick={() => {
+              SoundFX.play('click');
+              setActiveScreen('intro');
+            }}
+            className="text-slate-300 hover:text-[#00D4FF] transition-colors flex items-center gap-2 font-mono text-xs sm:text-sm font-bold uppercase tracking-widest cursor-pointer px-4 py-2 rounded-xl bg-[#0F172A] border border-slate-700"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Voltar ao Início</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              SoundFX.play('confirm');
+              navigate('/login');
+            }}
+            className="text-slate-400 hover:text-[#00D4FF] transition-colors font-mono text-xs cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F172A] border border-slate-800"
+          >
+            <span>Tela Cheia</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
         {/* Header Centralizado do Modal */}
         <div className="flex flex-col items-center mb-6 text-center">
@@ -1431,10 +1817,29 @@ export function Landing360({
           <div className="mb-6 text-center">
             {/* SVG 13: Zero Trust Lock Shield */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest mb-3.5 bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] shadow-lg shadow-[#F59E0B]/10 mx-auto">
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="5" y="11" width="14" height="10" rx="3" stroke="#F59E0B" strokeWidth="1.8" fill="rgba(245, 158, 11, 0.15)"/>
-                <path d="M8 11V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V11" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round"/>
-                <circle cx="12" cy="16" r="1.5" fill="#F59E0B"/>
+              <svg
+                className="w-4 h-4 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="5"
+                  y="11"
+                  width="14"
+                  height="10"
+                  rx="3"
+                  stroke="#F59E0B"
+                  strokeWidth="1.8"
+                  fill="rgba(245, 158, 11, 0.15)"
+                />
+                <path
+                  d="M8 11V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V11"
+                  stroke="#F59E0B"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+                <circle cx="12" cy="16" r="1.5" fill="#F59E0B" />
               </svg>
               <span>Acesso Seguro · Zero Trust Architecture</span>
             </div>
@@ -1540,7 +1945,9 @@ export function Landing360({
                   >
                     {authMethod === 'sso' ? 'E-mail ou Domínio SSO' : 'E-mail Corporativo'}
                   </label>
-                  <span className="font-mono text-[10px] text-[#00D4FF]/80">Domínio empresarial</span>
+                  <span className="font-mono text-[10px] text-[#00D4FF]/80">
+                    Domínio empresarial
+                  </span>
                 </div>
                 <input
                   id="login-email"
@@ -1678,7 +2085,9 @@ export function Landing360({
                   className="font-sans text-xs text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Voltar para{' '}
-                  <span className="font-bold text-[#00D4FF] hover:underline">Login Corporativo</span>
+                  <span className="font-bold text-[#00D4FF] hover:underline">
+                    Login Corporativo
+                  </span>
                 </button>
               )}
             </div>
@@ -1755,7 +2164,9 @@ export function Landing360({
             <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] shrink-0" />
               <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-[#00D4FF] truncate">AES-256</div>
+                <div className="font-mono text-[10px] font-bold text-[#00D4FF] truncate">
+                  AES-256
+                </div>
                 <div className="font-sans text-[9px] text-slate-400 truncate">Criptografado</div>
               </div>
             </div>
@@ -1771,14 +2182,18 @@ export function Landing360({
             <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#F59E0B] shadow-[0_0_8px_#F59E0B] shrink-0" />
               <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-[#F59E0B] truncate">LGPD/GDPR</div>
+                <div className="font-mono text-[10px] font-bold text-[#F59E0B] truncate">
+                  LGPD/GDPR
+                </div>
                 <div className="font-sans text-[9px] text-slate-400 truncate">Conformidade</div>
               </div>
             </div>
             <div className="bg-[#0F172A] border border-slate-800 flex items-center gap-2 p-2.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-[#00D4FF] shadow-[0_0_8px_#00D4FF] shrink-0" />
               <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-[#00D4FF] truncate">99.99%</div>
+                <div className="font-mono text-[10px] font-bold text-[#00D4FF] truncate">
+                  99.99%
+                </div>
                 <div className="font-sans text-[9px] text-slate-400 truncate">Uptime SLA</div>
               </div>
             </div>

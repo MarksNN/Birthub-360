@@ -4,6 +4,16 @@
    Dourado Radiante (Sem tom marrom), Multi-CRM & SVG Badges
    ========================================================================== */
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 .landing-neon-root {
   --color-gold-real: #F59E0B;
   --color-gold-glow: #FBBF24;
