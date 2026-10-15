@@ -95,7 +95,9 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
         'Solicitação recebida pelo servidor. A execução do contato ainda não foi confirmada.',
       );
     } catch (err) {
-      setActionErrorMessage(err instanceof Error ? err.message : 'Falha ao solicitar a ação comercial.');
+      setActionErrorMessage(
+        err instanceof Error ? err.message : 'Falha ao solicitar a ação comercial.',
+      );
     } finally {
       setExecutingAction(false);
       setTimeout(() => setActionSuccessMessage(null), 5000);
@@ -108,15 +110,18 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
     setActionSuccessMessage(null);
     setActionErrorMessage(null);
     try {
-      const res = await fetch(`/api/commercial-agent/nba/${overview.nextBestAction.actionId}/feedback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          missionId: 'm-acme',
-          decision,
-          reason: decision === 'POSTPONED' ? 'Adiamento manual' : 'Substituição manual',
-        }),
-      });
+      const res = await fetch(
+        `/api/commercial-agent/nba/${overview.nextBestAction.actionId}/feedback`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            missionId: 'm-acme',
+            decision,
+            reason: decision === 'POSTPONED' ? 'Adiamento manual' : 'Substituição manual',
+          }),
+        },
+      );
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.error || 'Não foi possível solicitar a alteração da ação.');
@@ -126,7 +131,9 @@ export const EliteCommercialAgentWorkspace: React.FC = () => {
       );
       setTimeout(() => setActionSuccessMessage(null), 5000);
     } catch (err) {
-      setActionErrorMessage(err instanceof Error ? err.message : 'Falha ao solicitar alteração da ação.');
+      setActionErrorMessage(
+        err instanceof Error ? err.message : 'Falha ao solicitar alteração da ação.',
+      );
     }
   };
 
