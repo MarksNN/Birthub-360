@@ -28,7 +28,7 @@ const COMPARISON_DATA: ComparisonRow[] = [
     fragmentedAi: false,
   },
   {
-    feature: 'Sincronização Nativa com Bitrix24 & CRMs',
+    feature: 'Sincronização via API & Webhooks com Bitrix24 & CRMs',
     birthHub: 'Bidirecional em tempo real com fila segura',
     traditionalCrm: 'Webhooks limitados',
     fragmentedAi: 'Zapiers lentos e instáveis',

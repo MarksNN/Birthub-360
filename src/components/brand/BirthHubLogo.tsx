@@ -10,23 +10,35 @@ interface BirthHubLogoProps {
   animated?: boolean;
 }
 
-export function BirthHubLogo({ variant = 'mark', className, title }: BirthHubLogoProps) {
+export function BirthHubLogo({ variant = 'mark', className, title, animated = true }: BirthHubLogoProps) {
   const src =
     variant === 'horizontal'
       ? horizontal
       : variant === 'core' || variant === 'symbol'
         ? symbol
         : icon;
-  return (
+
+  const imageElement = (
     <img
       src={src}
-      className={className}
+      className={`birthhub-logo-img ${animated ? 'birthhub-logo-animated' : ''} ${className ?? ''}`}
       alt={title ?? ''}
       aria-hidden={title ? undefined : true}
       draggable={false}
       style={{ objectFit: 'contain' }}
     />
   );
+
+  if (animated) {
+    return (
+      <span className="birthhub-logo-animated-wrapper inline-flex items-center justify-center relative group">
+        <span className="birthhub-logo-glow-aura pointer-events-none absolute -inset-1 rounded-full opacity-60 blur-md group-hover:opacity-100 transition-opacity" />
+        {imageElement}
+      </span>
+    );
+  }
+
+  return imageElement;
 }
 
 export function BirthHubSignature({ className }: { className?: string }) {

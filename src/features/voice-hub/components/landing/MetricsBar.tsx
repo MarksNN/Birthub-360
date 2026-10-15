@@ -7,7 +7,7 @@ interface MetricItem {
 }
 
 const METRICS: MetricItem[] = [
-  { value: '50+', label: 'Integrações Nativas', detail: 'Bitrix24, CRMs e Mensageria' },
+  { value: '50+', label: 'Conectores & APIs', detail: 'Bitrix24 via REST/Webhooks e CRMs' },
   { value: '360°', label: 'Visão do Cliente', detail: 'Da prospecção ao fechamento' },
   { value: '10x', label: 'Velocidade de Decisão', detail: 'Diagnósticos e IA assistida' },
   { value: '99.9%', label: 'Disponibilidade', detail: 'Arquitetura resiliente e segura' },

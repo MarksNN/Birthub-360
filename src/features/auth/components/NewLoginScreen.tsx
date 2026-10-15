@@ -21,6 +21,7 @@ import {
   Lock,
   Mail,
   MessageSquare,
+  Moon,
   Network,
   PhoneCall,
   Radio,
@@ -30,6 +31,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Sparkles,
+  Sun,
   Target,
   TrendingUp,
   Users,
@@ -41,9 +43,23 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext.js';
+import { useTheme } from '../../../contexts/ThemeContext.js';
 import { authClient } from '../../../lib/auth-client.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
+import {
+  AiSectionIcon,
+  AuthModalSectionIcon,
+  AutomationSectionIcon,
+  CockpitSectionIcon,
+  CtaSectionIcon,
+  EcosystemSectionIcon,
+  FlowSectionIcon,
+  HeroTitleIcon,
+  PerfSectionIcon,
+  PillarsSectionIcon,
+  PlatformSectionIcon,
+} from '../../landing/components/LandingTitleIcons.js';
 import './NewLoginScreen.css';
 
 // 8 PILARES OFICIAIS DO BIRTH HUB 360°
@@ -125,13 +141,14 @@ const OFFICIAL_PILLARS = [
 function BH360LogoMark({ size = 44 }: { size?: number }) {
   return (
     <span style={{ width: size, height: size }} className="inline-block">
-      <BirthHubLogo variant="icon" title="Birth Hub 360º" className="h-full w-full" />
+      <BirthHubLogo variant="icon" title="Birth Hub 360º" className="h-full w-full" animated={true} />
     </span>
   );
 }
 
 export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {}) {
   const { currentUser } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   // Se já autenticado, vai para o dashboard
@@ -346,6 +363,19 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={toggleTheme}
+              className="landing-theme-toggle-btn"
+              aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              title={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-[#F59E0B]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#00D4FF]" />
+              )}
+            </button>
+            <button
+              type="button"
               onClick={() => {
                 SoundFX.play('click');
                 setAuthMode('signin');
@@ -385,13 +415,16 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           </div>
 
           {/* Título Principal Vancouver Plus com Texto em Gradiente */}
-          <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-brand leading-[1.12]">
-            <span className="vancouver-gradient-text">Personalizado</span> para Gerenciar Toda sua
-            Operação Comercial
+          <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0284C7] dark:text-[#00D4FF] leading-[1.12] flex items-center justify-center gap-4">
+            <HeroTitleIcon size={44} />
+            <span>
+              <span className="vancouver-gradient-text">Personalizado</span> para Gerenciar Toda sua
+              Operação Comercial
+            </span>
           </h1>
 
           {/* Subtítulo */}
-          <p className="max-w-3xl mx-auto text-base sm:text-lg text-brand leading-relaxed font-sans">
+          <p className="max-w-3xl mx-auto text-base sm:text-lg text-[#475569] dark:text-[#70D6FF] leading-relaxed font-sans">
             Opere com previsibilidade, segurança e inteligência artificial em um dashboard intuitivo
             e integrado de ponta a ponta. Projetado para transformar dados brutos em decisões que
             fecham negócios.
@@ -509,10 +542,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 p-5 rounded-2xl border border-line bg-surface space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display text-sm font-bold text-brand">
+                    <h3 className="font-display text-sm font-bold text-[#0284C7] dark:text-[#00D4FF]">
                       Fluxo de Negociação Unificado (CRM)
                     </h3>
-                    <span className="text-xs text-brand font-bold">Tempo Real</span>
+                    <span className="text-xs text-[#0284C7] dark:text-[#00D4FF] font-bold">Tempo Real</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-surface p-3 rounded-xl border border-line space-y-2">
@@ -560,7 +593,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <div className="p-5 rounded-2xl border border-purple-200 bg-purple-50/50 space-y-3">
                   <div className="flex items-center gap-2 text-purple-700">
                     <BrainCircuit className="w-4 h-4" />
-                    <h3 className="font-display text-sm font-bold">Motor IA & Diagnóstico</h3>
+                    <h3 className="font-display text-sm font-bold text-[#A855F7] dark:text-[#FF2D9B]">Motor IA &amp; Diagnóstico</h3>
                   </div>
                   <p className="text-xs text-ink-2 leading-relaxed">
                     Sinal preditivo detectou aumento de 3.2x no engajamento de decisores em 12
@@ -579,8 +612,8 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
           {/* Logo Grid das Tecnologias Integradas */}
           <div className="mt-16 text-center space-y-4">
-            <p className="text-xs font-mono uppercase tracking-widest text-brand">
-              Conectado e integrado nativamente com os principais ecossistemas corporativos
+            <p className="text-xs font-mono uppercase tracking-widest text-[#0284C7] dark:text-[#00D4FF]">
+              Conectado via APIs e webhooks com os principais ecossistemas corporativos
             </p>
             <div className="vancouver-logo-grid">
               <div className="vancouver-logo-pill">Bitrix24 CRM</div>
@@ -605,10 +638,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       >
         <div className="max-w-6xl mx-auto space-y-20">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
-              Ajudamos você a gerenciar de ponta a ponta, todas as camadas da sua receita.
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-3">
+              <PlatformSectionIcon size={32} />
+              <span>Ajudamos você a gerenciar de ponta a ponta, todas as camadas da sua receita.</span>
             </h2>
-            <p className="text-base text-brand">
+            <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Da inteligência de mercado à orquestração de cadências e previsão probabilística de
               fechamento.
             </p>
@@ -617,10 +651,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           {/* Bloco 1: Gestão Holística */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h3 className="font-display text-2xl font-bold text-brand">
-                Gestão Estratégica para Visão Holística da Receita
+              <h3 className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF] flex items-center gap-2.5">
+                <FlowSectionIcon size={24} />
+                <span>Gestão Estratégica para Visão Holística da Receita</span>
               </h3>
-              <p className="text-sm text-brand leading-relaxed">
+              <p className="text-sm text-[#475569] dark:text-[#70D6FF] leading-relaxed">
                 Centralize o pipeline e acompanhe em tempo real onde estão as melhores
                 oportunidades, eliminando planilhas fragmentadas e dados desatualizados.
               </p>
@@ -716,10 +751,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             </div>
 
             <div className="order-1 lg:order-2 space-y-6">
-              <h3 className="font-display text-2xl font-bold text-brand">
-                Microgestão de Cada Dado Sem Gargalos Operacionais
+              <h3 className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF] flex items-center gap-2.5">
+                <AutomationSectionIcon size={24} />
+                <span>Microgestão de Cada Dado Sem Gargalos Operacionais</span>
               </h3>
-              <p className="text-sm text-brand leading-relaxed">
+              <p className="text-sm text-[#475569] dark:text-[#70D6FF] leading-relaxed">
                 Elimine o trabalho manual e o atrito na passagem de bastão entre pré-vendas (SDR),
                 vendas e pós-vendas com automações precisas e inteligência contextual.
               </p>
@@ -757,10 +793,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-brand text-xs font-bold font-mono">
               METODOLOGIA OFICIAL
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
-              Os 8 Pilares Oficiais do Birth Hub 360°
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#F59E0B] flex items-center justify-center gap-3">
+              <PillarsSectionIcon size={32} />
+              <span>Os 8 Pilares Oficiais do Birth Hub 360°</span>
             </h2>
-            <p className="text-base text-brand">
+            <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Uma arquitetura modular robusta desenvolvida para governança, velocidade e
               previsibilidade na receita B2B.
             </p>
@@ -805,7 +842,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                       </span>
                     </div>
 
-                    <p className="text-xs text-brand leading-relaxed">{p.desc}</p>
+                    <p className="text-xs text-[#475569] dark:text-[#70D6FF] leading-relaxed">{p.desc}</p>
                   </div>
 
                   <div
@@ -831,10 +868,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       >
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
-              Tudo em uma única plataforma: do mobile ao desktop tudo o que você precisa está aqui
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-3">
+              <CockpitSectionIcon size={32} />
+              <span>Tudo em uma única plataforma: do mobile ao desktop tudo o que você precisa está aqui</span>
             </h2>
-            <p className="text-base text-brand">
+            <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Alternância perfeita entre interfaces ricas para gestores e execução ágil na ponta
               para vendedores.
             </p>
@@ -870,10 +908,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {platformTab === 'crm' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  <h3 className="font-display text-2xl font-bold text-brand">
+                  <h3 className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF]">
                     Painel Central com Visão 360° do Negócio
                   </h3>
-                  <p className="text-sm text-brand leading-relaxed">
+                  <p className="text-sm text-[#475569] dark:text-[#70D6FF] leading-relaxed">
                     Acompanhe cada conta, contato e estágio de negociação com telemetria unificada.
                     O Kanban interativo reage em tempo real com regras de validação que impedem
                     perdas no funil.
@@ -917,10 +955,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {platformTab === 'intel' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  <h3 className="font-display text-2xl font-bold text-brand">
+                  <h3 className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF]">
                     Enriquecimento de Decisores & Sinais B2B
                   </h3>
-                  <p className="text-sm text-brand leading-relaxed">
+                  <p className="text-sm text-[#475569] dark:text-[#70D6FF] leading-relaxed">
                     Identifique decisores reais (C-Level, Diretores e Gerentes), e-mails
                     corporativos válidos e telefones diretos antes de iniciar o contato comercial.
                   </p>
@@ -963,10 +1001,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {platformTab === 'voice' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div className="space-y-4">
-                  <h3 className="font-display text-2xl font-bold text-brand">
+                  <h3 className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF]">
                     Copiloto de Voz & Transcrição Inteligente
                   </h3>
-                  <p className="text-sm text-brand leading-relaxed">
+                  <p className="text-sm text-[#475569] dark:text-[#70D6FF] leading-relaxed">
                     Grave e transcreva chamadas comerciais com separação de interlocutores, extração
                     imediata de pontos de dor, objeções e preenchimento automático no Bitrix24.
                   </p>
@@ -1007,10 +1045,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       <section id="precos" className="py-24 px-6 sm:px-12 bg-surface">
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
-              Nossos planos são transparentes e fáceis de entender
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#F59E0B] flex items-center justify-center gap-3">
+              <PerfSectionIcon size={32} />
+              <span>Nossos planos são transparentes e fáceis de entender</span>
             </h2>
-            <p className="text-base text-brand">
+            <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Comece agora sem taxa de implantação oculta. Evolua conforme a sua operação expande.
             </p>
 
@@ -1125,10 +1164,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
       >
         <div className="max-w-5xl mx-auto text-center space-y-12">
           <div className="space-y-4">
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-brand">
-              Conecte-se ao que sua operação realmente precisa
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-3">
+              <EcosystemSectionIcon size={32} />
+              <span>Conecte-se ao que sua operação realmente precisa</span>
             </h2>
-            <p className="text-base text-brand">
+            <p className="text-base text-[#475569] dark:text-[#70D6FF]">
               Conectores robustos para o seu stack de vendas, mensageria e dados corporativos.
             </p>
           </div>
@@ -1178,7 +1218,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">Ajuda</h3>
+                <h3 className="font-display text-xl font-bold text-[#0284C7] dark:text-[#00D4FF]">Ajuda</h3>
                 <p className="text-xs text-ink-2 mt-2">
                   Documentação técnica, manuais de uso e suporte aos pilares.
                 </p>
@@ -1199,7 +1239,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">Contato</h3>
+                <h3 className="font-display text-xl font-bold text-[#FF2D9B]">Contato</h3>
                 <p className="text-xs text-ink-2 mt-2">comercial@birthhub360.com</p>
                 <p className="text-xs text-ink-2 mt-1">
                   Fale diretamente com nossa diretoria comercial.
@@ -1215,7 +1255,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
             {/* Card 3: Newsletter / Novidades */}
             <div className="vancouver-quick-card">
               <div>
-                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">
+                <h3 className="font-display text-xl font-bold text-[#F59E0B]">
                   Novidades
                 </h3>
                 <p className="text-xs text-ink-2 mt-2">
@@ -1240,7 +1280,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               className="vancouver-quick-card"
             >
               <div>
-                <h3 className="font-display text-xl font-bold text-ink dark:text-brand">
+                <h3 className="font-display text-xl font-bold text-[#10B981]">
                   Segurança
                 </h3>
                 <p className="text-xs text-ink-2 mt-2">
@@ -1264,10 +1304,11 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center pb-12 border-b border-line">
             <div className="space-y-3">
-              <h3 className="font-display text-2xl font-bold text-ink dark:text-brand">
-                Pronto para estruturar sua operação comercial com rigor e inteligência?
+              <h3 className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF] flex items-center gap-3">
+                <CtaSectionIcon size={28} />
+                <span>Pronto para estruturar sua operação comercial com rigor e inteligência?</span>
               </h3>
-              <p className="text-sm text-ink-2">
+              <p className="text-sm text-[#475569] dark:text-[#70D6FF]">
                 Conheça a única plataforma desenhada especificamente para conectar dados a
                 fechamentos reais.
               </p>
@@ -1327,27 +1368,45 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
         >
           <div className="vancouver-card w-full max-w-md p-8 bg-surface shadow-2xl relative">
-            {/* Botão Fechar */}
-            <button
-              type="button"
-              onClick={() => setShowAuthModal(false)}
-              aria-label="Fechar janela de autenticação"
-              className="absolute top-5 right-5 p-1 rounded-full text-ink-2 hover:text-ink-2 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Topo do Modal: Theme Toggle + Botão Fechar */}
+            <div className="absolute top-5 right-5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="landing-theme-toggle-btn"
+                aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+                title={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-[#F59E0B]" />
+                ) : (
+                  <Moon className="w-4 h-4 text-[#00D4FF]" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAuthModal(false)}
+                aria-label="Fechar janela de autenticação"
+                className="p-1 rounded-full text-ink-2 hover:text-ink-2 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
             {/* Cabeçalho do Modal */}
             <div className="text-center space-y-2 mb-6">
               <div className="flex justify-center mb-1">
                 <BH360LogoMark size={40} />
               </div>
-              <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-brand">
-                {authMode === 'signin' && 'Acessar o Hub'}
-                {authMode === 'signup' && 'Criar Nova Conta'}
-                {authMode === 'forgot' && 'Recuperar Senha'}
+              <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#0284C7] dark:text-[#00D4FF] flex items-center justify-center gap-2.5">
+                <AuthModalSectionIcon size={24} />
+                <span>
+                  {authMode === 'signin' && 'Acessar o Hub'}
+                  {authMode === 'signup' && 'Criar Nova Conta'}
+                  {authMode === 'forgot' && 'Recuperar Senha'}
+                </span>
               </h2>
-              <p className="text-xs text-ink-2">
+              <p className="text-xs text-[#475569] dark:text-[#70D6FF]">
                 {authMode === 'signin' && 'Informe suas credenciais corporativas para entrar.'}
                 {authMode === 'signup' && 'Solicite provisionamento para sua equipe comercial.'}
                 {authMode === 'forgot' && 'Enviaremos um link de recuperação para seu e-mail.'}

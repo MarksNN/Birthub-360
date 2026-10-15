@@ -458,3 +458,36 @@
     gap: 0.75rem;
   }
 }
+
+.landing-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid #cbd5e1;
+  color: #0284c7;
+}
+
+.landing-theme-toggle-btn:hover {
+  background: #e2e8f0;
+  color: #0369a1;
+  transform: scale(1.05);
+}
+
+:root.dark .landing-theme-toggle-btn,
+.dark .landing-theme-toggle-btn {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #38bdf8;
+}
+
+:root.dark .landing-theme-toggle-btn:hover,
+.dark .landing-theme-toggle-btn:hover {
+  background: #1e293b;
+  color: #00d4ff;
+  border-color: #00d4ff;
+}

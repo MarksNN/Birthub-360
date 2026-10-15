@@ -117,7 +117,7 @@ export function ProductModulesSection(): React.ReactElement {
             title="Automação & Integrações"
             subtitle="Pilar 07 — Conectividade"
             features={[
-              'Conector nativo bidirecional para Bitrix24',
+              'Conector via API REST e webhooks para Bitrix24',
               'Webhooks de alta vazão com fila assíncrona (BullMQ)',
               'Disparo automatizado de mensagens no WhatsApp',
               'Exportação estruturada de relatórios operacionais',
