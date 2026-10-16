@@ -225,4 +225,91 @@ describe('bootstrap/shutdown', () => {
       expect(workers[name]?.close, `${name}.close() não foi chamado`).toHaveBeenCalledTimes(1);
     }
   });
+
+  it('encerra clientes SSE antes do callback de httpServer.close terminar, evitando deadlock com stream ativo (DEBT-OPS-007)', async () => {
+    let pendingHttpCloseCallback: ((err?: Error) => void) | undefined;
+
+    const deps = buildDeps(calls, {
+      httpServer: {
+        close: vi.fn((cb?: (err?: Error) => void) => {
+          calls.push('httpServer.close');
+          pendingHttpCloseCallback = cb;
+        }),
+      } as unknown as Server,
+      sseService: {
+        closeAll: vi.fn(async () => {
+          calls.push('sseService.closeAll');
+          // Simula o comportamento real do Node http.Server: o callback de server.close()
+          // só dispara depois que conexões SSE long-lived são encerradas por closeAll().
+          pendingHttpCloseCallback?.(undefined);
+        }),
+      },
+    });
+
+    const shutdown = createGracefulShutdown(deps);
+    await shutdown('SIGTERM');
+
+    expect(calls.indexOf('httpServer.close')).toBe(0);
+    expect(calls.indexOf('sseService.closeAll')).toBe(1);
+    expect(calls).toContain('exit(0)');
+  });
+
+  it('respeita o deadline httpCloseTimeoutMs quando uma conexão HTTP fica presa e continua o cleanup', async () => {
+    const deps = buildDeps(calls, {
+      httpCloseTimeoutMs: 15,
+      httpServer: {
+        close: vi.fn(() => {
+          calls.push('httpServer.close');
+          // Nunca invoca o callback
+        }),
+      } as unknown as Server,
+    });
+
+    const shutdown = createGracefulShutdown(deps);
+    await shutdown('SIGTERM');
+
+    expect(deps.logger.error).toHaveBeenCalled();
+    expect(calls).toContain('sseService.closeAll');
+    expect(calls).toContain('worker:leads');
+    expect(calls).toContain('prisma.$disconnect');
+    expect(calls).toContain('exit(0)');
+  });
+
+  it('isola falhas em sseService.closeAll, workers, Langfuse e Prisma sem interromper as etapas seguintes', async () => {
+    const deps = buildDeps(calls, {
+      sseService: {
+        closeAll: vi.fn(async () => {
+          calls.push('sseService.closeAll:throw');
+          throw new Error('sse close failed');
+        }),
+      },
+      shutdownLangfuse: vi.fn(async () => {
+        calls.push('shutdownLangfuse:throw');
+        throw new Error('langfuse failed');
+      }),
+      prisma: {
+        $disconnect: vi.fn(async () => {
+          calls.push('prisma.$disconnect:throw');
+          throw new Error('prisma disconnect failed');
+        }),
+      },
+    });
+    deps.workers.leadsWorker = {
+      close: vi.fn(async () => {
+        calls.push('worker:leads:throw');
+        throw new Error('worker close failed');
+      }),
+    } as unknown as NonNullable<EmbeddedWorkersHandle['leadsWorker']>;
+
+    const shutdown = createGracefulShutdown(deps);
+    await shutdown('SIGTERM');
+
+    expect(calls).toContain('sseService.closeAll:throw');
+    expect(calls).toContain('worker:leads:throw');
+    expect(calls).toContain('worker:agent');
+    expect(calls).toContain('shutdownLangfuse:throw');
+    expect(calls).toContain('prisma.$disconnect:throw');
+    expect(calls).toContain('connection.quit');
+    expect(calls).toContain('exit(0)');
+  });
 });

@@ -205,16 +205,16 @@ describe('AnalyticsUseCases.cohortAnalysis — nunca fabricado', () => {
   it('conta um lead ganho em até 30 dias em won30d e won60d; um ganho em 45 dias só em won60d', async () => {
     const rows: CohortLeadRow[] = [
       {
-        createdAt: new Date('2026-07-01T00:00:00Z'),
-        closedAt: new Date('2026-07-20T00:00:00Z'),
+        createdAt: new Date('2026-07-01T03:00:00Z'),
+        closedAt: new Date('2026-07-20T03:00:00Z'),
         status: 'Negocios_Ganhos',
       },
       {
-        createdAt: new Date('2026-07-01T00:00:00Z'),
-        closedAt: new Date('2026-08-15T00:00:00Z'),
+        createdAt: new Date('2026-07-01T03:00:00Z'),
+        closedAt: new Date('2026-08-15T03:00:00Z'),
         status: 'Negocios_Ganhos',
       },
-      { createdAt: new Date('2026-07-01T00:00:00Z'), closedAt: null, status: 'Negocios_Perdidos' },
+      { createdAt: new Date('2026-07-01T03:00:00Z'), closedAt: null, status: 'Negocios_Perdidos' },
     ];
     const repo = buildFakeRepository({ findLeadsForCohort: vi.fn().mockResolvedValue(rows) });
     const useCases = new AnalyticsUseCases(repo);
@@ -234,14 +234,44 @@ describe('AnalyticsUseCases.cohortAnalysis — nunca fabricado', () => {
     expect(cohorts).toEqual([]);
   });
 
-  it('busca só desde o início da janela de meses pedida', async () => {
+  it('busca só desde o início da janela de meses pedida (00:00 America/Sao_Paulo = 03:00Z)', async () => {
     const findLeadsForCohort = vi.fn().mockResolvedValue([]);
     const repo = buildFakeRepository({ findLeadsForCohort });
     const useCases = new AnalyticsUseCases(repo);
 
     await useCases.cohortAnalysis(ORG, 3, NOW);
 
-    expect(findLeadsForCohort).toHaveBeenCalledWith(ORG, new Date('2026-06-01T00:00:00Z'));
+    expect(findLeadsForCohort).toHaveBeenCalledWith(ORG, new Date('2026-06-01T03:00:00Z'));
+  });
+
+  it('classifica o instante 2026-10-01T01:00:00Z (22h de 30/09 em Brasília) no mês comercial 2026-09 em overview, monthly e cohortAnalysis (DEBT-UX-004)', async () => {
+    const borderInstant = new Date('2026-10-01T01:00:00Z');
+    const countLeadsByStatusSince = vi.fn().mockResolvedValue(1);
+    const repo = buildFakeRepository({
+      countLeadsByStatusSince,
+      findLeadsCreatedSince: vi.fn().mockResolvedValue([{ createdAt: borderInstant }]),
+      findLeadsClosedSince: vi
+        .fn()
+        .mockResolvedValue([{ closedAt: borderInstant, status: 'Negocios_Ganhos' }]),
+      findLeadsForCohort: vi.fn().mockResolvedValue([
+        { createdAt: borderInstant, closedAt: borderInstant, status: 'Negocios_Ganhos' },
+      ]),
+    });
+    const useCases = new AnalyticsUseCases(repo);
+
+    await useCases.overview(ORG, borderInstant);
+    expect(countLeadsByStatusSince).toHaveBeenCalledWith(
+      ORG,
+      'Negocios_Ganhos',
+      new Date('2026-09-01T03:00:00Z'),
+    );
+
+    const monthly = await useCases.monthly(ORG, 2, borderInstant);
+    const sepMonthly = monthly.find((m) => m.month === '2026-09');
+    expect(sepMonthly).toEqual({ month: '2026-09', created: 1, won: 1, lost: 0 });
+
+    const cohorts = await useCases.cohortAnalysis(ORG, 2, borderInstant);
+    expect(cohorts).toEqual([{ month: '2026-09', total: 1, won30d: 1, won60d: 1 }]);
   });
 });
 
