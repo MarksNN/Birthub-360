@@ -15,9 +15,9 @@ import { Card } from '../../../components/ui/Card.js';
 import { GamificationWidget } from '../../../components/ui/GamificationWidget.js';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import { cn } from '../../../lib/utils.js';
-import { SellerCoachingCard } from '../../dashboard/components/SellerCoachingCard.js';
 import { gamificationApi } from '../api/gamification.api.js';
 import type { LeaderboardPeriod, LeaderboardRanking, SellerScore } from '../domain/Gamification.js';
+import { SellerCoachingCard } from './SellerCoachingCard.js';
 
 export function GamificationView() {
   const { currentUser } = useAuth();
