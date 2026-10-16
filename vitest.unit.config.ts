@@ -35,8 +35,9 @@ export default defineConfig({
     include: [
       'tests/unit/**/*.test.ts',
       'tests/unit/**/*.test.tsx',
-      'src/**/*.test.ts',
-      'src/**/*.test.tsx',
+      'src/**/__tests__/**/*.test.ts',
+      'src/**/__tests__/**/*.test.tsx',
+      'src/lib/voice-runtime/**/*.test.ts',
     ],
     coverage: {
       provider: 'v8',

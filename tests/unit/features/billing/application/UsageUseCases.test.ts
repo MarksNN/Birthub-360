@@ -128,7 +128,7 @@ describe('UsageUseCases.summary', () => {
   it('escopa todas as consultas na organização pedida', async () => {
     await useCases.summary(ORG, 30);
 
-    expect(repo.findLogsSince).toHaveBeenCalledWith(ORG, expect.any(Date));
+    expect(repo.findLogsSince).toHaveBeenCalledWith(ORG, expect.any(Date), 5_000);
     expect(repo.groupByModel).toHaveBeenCalledWith(ORG, expect.any(Date));
     expect(repo.groupByPrompt).toHaveBeenCalledWith(ORG, expect.any(Date));
     expect(repo.sumCostSince).toHaveBeenCalledWith(ORG, expect.any(Date));
