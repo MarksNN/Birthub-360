@@ -303,6 +303,21 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
           },
         });
         voiceCallLogsRedacted = voiceCallLogsCount;
+
+        // DEBT-LGPD-002: Localiza e anonimiza memórias conversacionais de agentes (AgentMemory)
+        // atreladas aos leads deste titular antes do expurgo temporal ordinário de 90 dias
+        for (const leadId of leadIds) {
+          await prisma.agentMemory.updateMany({
+            where: {
+              organizationId: target.organizationId,
+              sessionId: { contains: `lead_${leadId}` },
+            },
+            data: {
+              messages: [],
+              status: 'ANONYMIZED_LGPD',
+            },
+          });
+        }
       }
 
       logger.info(

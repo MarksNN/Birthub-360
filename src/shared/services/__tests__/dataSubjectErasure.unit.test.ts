@@ -37,6 +37,9 @@ vi.mock('@/lib/prisma', () => ({
     optOutRecord: {
       create: (...args: unknown[]) => optOutCreateMock(...args),
     },
+    agentMemory: {
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+    },
     conversationSignal: {
       updateMany: (...args: unknown[]) => conversationSignalUpdateManyMock(...args),
     },

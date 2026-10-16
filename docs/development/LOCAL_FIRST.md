@@ -4,6 +4,8 @@
 > Todos os caminhos de produção em nuvem (Render, Neon, Cloudflare, Kubernetes/ArgoCD, OCI) estão
 > **desativados por enquanto**. O repositório e os serviços locais (`docker-compose.yml`) são a
 > única fonte de execução ativa da plataforma, sem qualquer dependência ou deploy para provedores cloud.
+> A publicação de imagens no GitHub Container Registry (GHCR via `docker-publish.yml`) serve exclusivamente
+> para empacotamento auditado de artefatos após CI verde, não constituindo deploy nem execução em nuvem.
 > Ver `docs/deploy/README.md`.
 
 
