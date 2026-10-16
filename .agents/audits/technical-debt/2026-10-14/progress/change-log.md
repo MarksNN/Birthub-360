@@ -59,3 +59,13 @@
 - `npm run test:e2e` e `npm run release:check` como comando único: NÃO EXECUTADOS. O pretest chamaria o container `birthhub_postgres`. O gate único seria NO-GO pelos exits já obtidos.
 - PR #741 reconfirmado CLOSED, `mergedAt` null.
 - Containers temporários e o volume anônimo criado por eles foram removidos. `birthhub_postgres` permaneceu healthy.
+
+## 2026-10-16T12:45:00-03:00 — integração verde e e2e vermelho
+
+- Autor do registro: Agente 00. Nenhum achado passou a RESOLVED ou VERIFIED. `releaseStatus` continua BLOCKED.
+- HEAD testado: `06d81153c309ad8662d5d55c12b4972a1b8db139`. Sem mudança de Dockerfile, `.dockerignore` ou `scripts/release-gate.js`.
+- Integração isolada no Docker local do Windows 1, sem `npm run test:integration` e sem `birthhub_postgres`. Containers `birthhub360-audit-wave00-pg` (`127.0.0.1:55434`), `birthhub360-audit-wave00-redis` (`127.0.0.1:56379`) e `birthhub360-audit-wave00-meili` (`127.0.0.1:57700`). `prisma migrate deploy` exit 0, 139 migrations. Vitest exit 0: 85 arquivos, 625 testes passaram, 2 skipped, 839,64 s.
+- E2E sem `npm run test:e2e`. No cwd do worktree, `/login` fica 404 porque `send` recusa o segmento `.worktrees`. Pelo junction sem segmento oculto, `/login` respondeu 200 e `npx playwright test` exit 1: 73 falharam, 85 passaram, 1 skipped, 33,8 min. Trinta e quatro falhas são contraste do axe. O restante é timeout, locator ausente ou botão duplicado no Kanban, fora do diff desta onda.
+- `npm run release:check` como comando único: NÃO EXECUTADO. Seria NO-GO.
+- Os três containers de auditoria e o volume `birthhub360-audit-wave00-pgdata` foram removidos. `birthhub_postgres`, `birthhub_redis` e `birthhub_meilisearch` seguiram healthy.
+- PR vivo deste origin: https://github.com/MarksNN/Birthub-360/pull/3. `gh pr view 741` não resolve neste origin. Sem merge. Sem deploy. Sem Onda 01.

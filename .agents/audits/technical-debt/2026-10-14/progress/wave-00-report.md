@@ -1,6 +1,6 @@
 # Relatório — Onda 00
 
-Estado: BLOQUEADA. Não integrada. O build de `8b4b3c84` terminou e a CLI do Prisma respondeu sem rede. Unitário, arquitetura, audit e integração não estão verdes. A Onda 01 não começa.
+Estado: BLOQUEADA. Não integrada. A integração isolada de 2026-10-16 passou (85 arquivos, 625 testes, 2 skipped). O e2e rodou e terminou exit 1 (73 falharam, 85 passaram, 1 skipped). Unitário, arquitetura e audit continuam vermelhos. A Onda 01 não começa.
 
 ## Resumo
 
@@ -83,3 +83,13 @@ HEAD `8b4b3c84bae19b8d3c661e8078d8d209db5e8b00`.
 - `npm run test:e2e` não executado. `npm run release:check` não executado como comando único; seria NO-GO.
 - PR #741 continua CLOSED sem merge.
 - Pareceres: `.agents/reviews/onda-00-reval2-20261015-08-qa.md` e `.agents/reviews/onda-00-reval2-20261015-24.md`. Veredito: BLOQUEADO. Sem merge. Sem deploy. Sem Onda 01.
+
+## Revalidação de 2026-10-16 12:45 -03
+
+HEAD ainda `06d81153c309ad8662d5d55c12b4972a1b8db139`. Nenhum achado passou a RESOLVED ou VERIFIED. `releaseStatus` continua BLOCKED.
+
+- Integração, sem `npm run test:integration` (o pretest escreveria em `birthhub_postgres`): `npx dotenv-cli -e .env.test -- npx prisma migrate deploy` exit 0, 139 migrations, banco `prospectordb_test` em `127.0.0.1:55434`. Depois `npx dotenv-cli -e .env.test -- npx vitest run -c vitest.integration.config.ts --no-file-parallelism` exit 0. 85 arquivos passaram. 625 testes passaram, 2 skipped. Duração 839,64 s. Redis respondeu antes da suíte. Containers só desta rodada: `birthhub360-audit-wave00-pg`, `birthhub360-audit-wave00-redis`, `birthhub360-audit-wave00-meili`, volume `birthhub360-audit-wave00-pgdata`, todos em `127.0.0.1`. Foram removidos depois do registro. `birthhub_postgres`, `birthhub_redis` e `birthhub_meilisearch` seguiram Up (healthy).
+- E2E, sem `npm run test:e2e`: a primeira chamada `npx dotenv-cli -e .env.test -- npx playwright test` no worktree exit 1 em 68,5 s, `Timed out waiting 60000ms from config.webServer`. Com o servidor já no ar, `GET /login` respondia 404. `send` trata o segmento `.worktrees` do caminho absoluto como arquivo oculto e o `res.sendFile` do fallback SPA devolve 404. O mesmo código, com cwd num junction sem segmento oculto (`C:\Users\Marks\AppData\Local\Temp\wave00-e2e-cwd`), fez `GET /login` responder 200. Playwright reusou esse servidor (`reuseExistingServer`, `PLAYWRIGHT_CHROMIUM_EXECUTABLE` no Chrome instalado, ffmpeg do Playwright em cache local). Exit 1. 73 falharam, 85 passaram, 1 skipped, 33,8 min. 34 falhas são contraste do axe em `accessibility.spec.ts`. As outras são timeout de clique, locator ausente ou dois botões com o mesmo nome no Kanban. Fora do diff da Onda 00. Não corrigidas aqui.
+- `npm run release:check` não foi executado como comando único. Unitário, arquitetura, audit e e2e já reprovam, então o gate seria NO-GO.
+- PR aberto deste origin: https://github.com/MarksNN/Birthub-360/pull/3 (`fix/debt-wave-00-release-gates`). `gh pr view 741` neste origin não resolve o número. A ref `origin/pr/741` está gone. O registro de 2026-10-15 sobre o PR #741 permanece histórico. DEBT-GOV-004 não vira RESOLVED.
+- A prova de imagem de `8b4b3c84` não foi refeita. DEBT-OPS-002 continua IN_REVIEW / TESTED_OFFLINE.
