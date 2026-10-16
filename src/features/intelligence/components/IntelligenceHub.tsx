@@ -16,6 +16,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Users,
   Wand2,
   Workflow,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ import { type KnowledgeDocumentSummary, knowledgeApi } from '../../knowledge/kno
 import { AgentQualityPanel } from './AgentQualityPanel.js';
 import { AIPendingActions } from './AIPendingActions.js';
 import { AISuiteHub } from './AISuiteHub.js';
+import { EliteCommercialAgentWorkspace } from './EliteCommercialAgentWorkspace.js';
 import { GroqTelemetryPanel } from './GroqTelemetryPanel.js';
 import { CopilotoIaHub } from '../../copiloto-ia/components/CopilotoIaHub.js';
 import { AutomationGuide } from './AutomationGuide.js';
@@ -55,7 +57,8 @@ export type IntelligenceTab =
   | 'tools'
   | 'rag'
   | 'quality'
-  | 'copiloto';
+  | 'copiloto'
+  | 'commercial_cell';
 
 interface IntelligenceHubProps {
   initialTab?: IntelligenceTab;
@@ -67,9 +70,16 @@ interface IntelligenceHubProps {
 const TOOL_TABS: {
   id: IntelligenceTab;
   label: string;
-  icon: typeof Bot | typeof Cpu | typeof Gauge;
+  icon: typeof Bot | typeof Cpu | typeof Gauge | typeof Users;
   description: string;
 }[] = [
+  {
+    id: 'commercial_cell',
+    label: 'Célula Comercial de Agentes',
+    icon: Users,
+    description:
+      'Workspace executivo dos 12 agentes comerciais da Tríade e Swarm — Next Best Action, traces de governança e orquestração.',
+  },
   {
     id: 'telemetry',
     label: 'Telemetria Groq Cloud',
@@ -315,6 +325,7 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
       </button>
 
       <motion.div key={activeTab} initial="hidden" animate="show" variants={fadeInUp}>
+        {activeTab === 'commercial_cell' && <EliteCommercialAgentWorkspace />}
         {activeTab === 'telemetry' && <GroqTelemetryPanel />}
         {activeTab === 'ai_suite' && <AISuiteHub />}
         {activeTab === 'swarm' && <SwarmDashboard />}

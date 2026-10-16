@@ -1,7 +1,7 @@
 import {
   autoUpdate,
-  flip,
   FloatingPortal,
+  flip,
   offset,
   type Placement,
   shift,
@@ -96,7 +96,7 @@ export function Tooltip({
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
               className={cn(
-                'z-[9999] max-w-xs rounded-xl border border-line bg-surface-elevated/95 px-3 py-1.5 text-xs font-medium text-ink shadow-xl backdrop-blur-md pointer-events-none select-none',
+                'z-[9999] max-w-xs rounded-card border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink shadow-card pointer-events-none select-none',
                 className,
               )}
               {...getFloatingProps()}

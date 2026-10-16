@@ -314,8 +314,6 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
             },
             data: {
               messages: [],
-              status: 'Failed',
-              errorMessage: 'ANONYMIZED_LGPD',
             },
           });
         }

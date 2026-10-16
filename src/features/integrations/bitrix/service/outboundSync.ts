@@ -499,3 +499,104 @@ export async function exportLeadToBitrixNow(
   });
   return { exportedCount, skippedCount };
 }
+
+export interface SyncActivityToBitrixParams {
+  type: 'call' | 'whatsapp' | 'email' | 'meeting';
+  subject: string;
+  description?: string;
+  completed?: boolean;
+  direction?: 'inbound' | 'outbound';
+  durationSeconds?: number;
+}
+
+/**
+ * Espelha atividades de contato (ligações de voz, WhatsApp, e-mail) do Lead no CRM do Bitrix24
+ * via `crm.activity.add`. Fire-and-forget: nunca quebra fluxos principais se o Bitrix estiver
+ * fora do ar ou o lead ainda não estiver vinculado.
+ */
+export async function syncActivityToBitrix(
+  organizationId: string,
+  leadId: string,
+  params: SyncActivityToBitrixParams,
+): Promise<{ bitrixActivityId?: number } | null> {
+  try {
+    const connection = await prisma.bitrixConnection.findFirst({
+      where: { organizationId },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (!connection) return null;
+
+    const lead = await prisma.lead.findFirst({
+      where: { id: leadId, organizationId },
+      select: {
+        id: true,
+        bitrixLeadId: true,
+        bitrixDealId: true,
+        contact: { select: { phone: true, whatsapp: true, email: true } },
+      },
+    });
+    if (!lead) return null;
+
+    let ownerTypeId: number | null = null;
+    let ownerId: string | null = null;
+
+    if (lead.bitrixLeadId) {
+      ownerTypeId = 1; // 1 = Lead
+      ownerId = lead.bitrixLeadId;
+    } else if (lead.bitrixDealId) {
+      ownerTypeId = 2; // 2 = Deal
+      ownerId = lead.bitrixDealId;
+    } else {
+      logger.info(
+        { organizationId, leadId },
+        '[bitrix] Lead sem vínculo com ID no Bitrix24 — syncActivityToBitrix ignorado.',
+      );
+      return null;
+    }
+
+    const webhookUrl = await getConnectionWebhookUrl(organizationId, connection.id);
+
+    // Mapeamento Bitrix TYPE_ID: 1 = Meeting, 2 = Call, 4 = Email
+    const typeId = params.type === 'meeting' ? 1 : params.type === 'email' ? 4 : 2;
+
+    const phoneOrEmail =
+      params.type === 'email' ? lead.contact?.email : lead.contact?.whatsapp || lead.contact?.phone;
+
+    const fields: Record<string, unknown> = {
+      OWNER_TYPE_ID: ownerTypeId,
+      OWNER_ID: ownerId,
+      TYPE_ID: typeId,
+      SUBJECT: params.subject,
+      DESCRIPTION: params.description || '',
+      COMPLETED: params.completed === false ? 'N' : 'Y',
+      DIRECTION: params.direction === 'inbound' ? 1 : 2,
+      START_TIME: new Date().toISOString(),
+    };
+
+    if (phoneOrEmail) {
+      fields.COMMUNICATIONS = [
+        {
+          VALUE: phoneOrEmail,
+          TYPE: params.type === 'email' ? 'EMAIL' : 'PHONE',
+        },
+      ];
+    }
+
+    const response = await callBitrix<{ result: number }>(webhookUrl, 'crm.activity.add', {
+      fields,
+    });
+
+    logger.info(
+      { organizationId, leadId, bitrixActivityId: response?.result },
+      '[bitrix] Atividade CRM sincronizada com sucesso no Bitrix24.',
+    );
+
+    return { bitrixActivityId: response?.result };
+  } catch (err: any) {
+    logger.warn(
+      { err, organizationId, leadId, params },
+      '[bitrix] Falha ao sincronizar atividade CRM no Bitrix24 (efeito secundário não-bloqueante).',
+    );
+    return null;
+  }
+}

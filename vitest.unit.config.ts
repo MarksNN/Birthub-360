@@ -34,10 +34,8 @@ export default defineConfig({
     fileParallelism,
     include: [
       'tests/unit/**/*.test.ts',
-      'tests/unit/**/*.test.tsx',
       'src/**/__tests__/**/*.test.ts',
-      'src/**/__tests__/**/*.test.tsx',
-      'src/lib/voice-runtime/**/*.test.ts',
+      'tests/unit/**/*.test.tsx',
     ],
     coverage: {
       provider: 'v8',

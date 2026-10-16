@@ -22,9 +22,9 @@ test.describe('Onboarding de Módulos da Organização', () => {
     await prospectCard.click(); // ativa Prospecção
 
     // 4. Continua o fluxo
-    await page.getByRole('button', { name: /Continuar/ }).click();
-    await expect(page.locator('text=Tudo pronto!')).toBeVisible();
-    await page.getByRole('button', { name: /Ir para o Dashboard/ }).click();
+    await page.getByRole('button', { name: /Continuar/i }).click();
+    await expect(page.locator('text=Confirmar configuração')).toBeVisible();
+    await page.getByRole('button', { name: /(Salvar e )?ir para o Dashboard/i }).click();
 
     // 5. Após setup, deve ir para /app
     await page.waitForURL('**/app');

@@ -89,7 +89,24 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
   async run(inputData: string, sessionId?: string) {
     const { marketResearchTool } = await import('../tools/marketResearchTool.js');
-    const result = await this.runWithTools(inputData, [marketResearchTool], sessionId);
+    const { getLeadContextTool } = await import('../tools/crmTools.js');
+    const { searchPlaybookTool } = await import('../tools/playbookTool.js');
+    const { getObjectionBattlecardTool } = await import('../tools/battlecardTool.js');
+    const { checkDealHealthTool } = await import('../tools/dealHealthTool.js');
+    const { inspectContractReadinessTool } = await import('../tools/contractInspectionTool.js');
+
+    const result = await this.runWithTools(
+      inputData,
+      [
+        marketResearchTool,
+        getLeadContextTool,
+        searchPlaybookTool,
+        getObjectionBattlecardTool,
+        checkDealHealthTool,
+        inspectContractReadinessTool,
+      ],
+      sessionId,
+    );
 
     return {
       closePlan: result.output as string | undefined,

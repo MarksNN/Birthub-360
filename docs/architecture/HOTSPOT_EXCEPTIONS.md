@@ -205,10 +205,19 @@ propósito por estar fora de "## Exceções ativas"):
 
 ### `src/components/CrmBoard.tsx`
 
+- **Limite excepcional:** 1200 linhas
+- **Dono:** Agente 02 — Produto e UX
+- **Motivo:** Cruzou o limite de 1000 linhas (1003 linhas) após a modernização visual dos módulos operacionais (PR #729 / Onda F), aplicando tokens semânticos e estados de foco acessíveis WCAG AA. Ampliado para 1200 linhas devido a controles de filtros (enriquecimento/temperatura) e ação em lote de enriquecimento com IA. Exceção registrada para manter o pipeline liberado enquanto se planeja a extração de subcomponentes do pipeline e toolbar.
+- **Registrado em:** 2026-10-11
+- **Atualizado em:** 2026-10-16
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/crm/components/LeadDetailDrawer.tsx`
+
 - **Limite excepcional:** 1100 linhas
 - **Dono:** Agente 02 — Produto e UX
-- **Motivo:** Cruzou o limite de 1000 linhas (1003 linhas) após a modernização visual dos módulos operacionais (PR #729 / Onda F), aplicando tokens semânticos e estados de foco acessíveis WCAG AA. Exceção registrada para manter o pipeline liberado enquanto se planeja a extração de subcomponentes do pipeline e toolbar.
-- **Registrado em:** 2026-10-11
+- **Motivo:** O drawer de detalhes do lead reúne abas de informações da empresa, contatos, atividades, histórico e enriquecimento em um único componente coeso. Ultrapassou ligeiramente 1000 linhas (1008 linhas) ao exibir metadados avançados de enriquecimento. A exceção desbloqueia o gate enquanto os sub-painéis são extraídos para componentes filhos.
+- **Registrado em:** 2026-10-16
 - **Reavaliar até:** 2026-11-30
 
 ## Débito conhecido, abaixo do limite de falha (sem exceção necessária)

@@ -95,4 +95,26 @@ describe('LeadUseCases.enqueueBatchEnrichment', () => {
     expect(addBulk).not.toHaveBeenCalled();
     expect(companyUpdateMany).not.toHaveBeenCalled();
   });
+
+  it('quando leadIds é especificado: filtra pelos leads informados no where', async () => {
+    leadFindMany.mockResolvedValue([pendingLeads[0]]);
+
+    const result = await useCases.enqueueBatchEnrichment(ORG, ['lead-1']);
+
+    expect(leadFindMany).toHaveBeenCalledWith({
+      where: {
+        organizationId: ORG,
+        companyId: { not: null },
+        deletedAt: null,
+        id: { in: ['lead-1'] },
+      },
+      select: { id: true, companyId: true, company: { select: { cnpj: true, segment: true } } },
+    });
+    expect(result).toEqual({ enqueued: 1, enfileirado: true });
+    expect(addBulk).toHaveBeenCalledTimes(1);
+    expect(companyUpdateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['company-1'] } },
+      data: { enrichmentStatus: 'Enriquecendo' },
+    });
+  });
 });

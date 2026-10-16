@@ -1,6 +1,6 @@
-import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import * as React from 'react';
 
 import { cn } from '../../lib/utils.js';
 
@@ -49,7 +49,7 @@ const DrawerContent = React.forwardRef<
         ref={ref}
         aria-modal="true"
         className={cn(
-          'fixed z-50 gap-4 overflow-y-auto overscroll-contain border-line bg-surface-elevated p-6 text-ink shadow-xl transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
+          'fixed z-50 gap-4 overflow-y-auto overscroll-contain border-line bg-surface p-6 text-ink shadow-card motion-safe:transition-transform motion-safe:ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
           sideVariants[side],
           className,
         )}
@@ -58,9 +58,9 @@ const DrawerContent = React.forwardRef<
         {children}
         <DialogPrimitive.Close
           aria-label="Fechar gaveta"
-          className="absolute right-4 top-4 rounded-sm text-ink-2 opacity-80 transition-opacity hover:opacity-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none"
+          className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:pointer-events-none"
         >
-          <X className="h-4 w-4" aria-hidden="true" />
+          <X className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DrawerPortal>
@@ -87,7 +87,7 @@ const DrawerTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-display font-semibold text-ink', className)}
+    className={cn('font-display text-lg font-semibold tracking-[-0.02em] text-ink', className)}
     {...props}
   />
 ));
@@ -161,13 +161,13 @@ function Drawer({
 
 export {
   Drawer,
-  DrawerPortal,
-  DrawerOverlay,
-  DrawerTrigger,
   DrawerClose,
   DrawerContent,
-  DrawerHeader,
-  DrawerFooter,
-  DrawerTitle,
   DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
+  DrawerTitle,
+  DrawerTrigger,
 };

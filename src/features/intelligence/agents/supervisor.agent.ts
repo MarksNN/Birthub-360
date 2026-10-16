@@ -59,30 +59,30 @@ const AGENT_INFO: Record<
   sdr: {
     label: 'SDR Autônomo',
     description:
-      'Qualifica um lead JÁ CADASTRADO no CRM (fit com o ICP, porte/faturamento, situação cadastral) e atualiza o status de qualificação.',
+      'Qualifica um lead no CRM (fit com o ICP, pesquisa de mercado, busca de leads, playbook e battlecards de objeção) e atualiza o status de qualificação.',
     chooseWhen:
-      'A missão pede para qualificar/analisar um lead específico que já existe no CRM. Exige um Lead ID real — nunca escolha sem um.',
+      'A missão pede para qualificar/analisar um lead específico que já existe no CRM ou localizar por nome da empresa.',
   },
   bdr: {
     label: 'BDR (Outbound)',
     description:
-      'Avalia o fit outbound de um lead/empresa a partir de um resumo em texto (não precisa de cadastro no CRM) e sugere a linha de abordagem para o primeiro contato frio.',
+      'Avalia o fit outbound de um lead/empresa (pesquisa multi-engine, playbook, consulta ao CRM, firmografia enriquecida e battlecards táticos) e sugere a linha de abordagem para o primeiro contato frio e priorização de contas.',
     chooseWhen:
-      'A missão é sobre um lead/empresa NOVO, ainda sem contato feito, ou pede uma sugestão de abertura/primeira mensagem de prospecção.',
+      'A missão é sobre prospecção fria, identificação de contas no CRM, priorização por aderência ao ICP ou sugestão de abertura de contato.',
   },
   closer: {
     label: 'Closer Autônomo',
     description:
-      'Conduz estratégia de negociação para oportunidades qualificadas: objeções, prova de valor, compromisso de decisão e proteção de margem.',
+      'Conduz estratégia de negociação para oportunidades qualificadas: contexto real do lead, matriz de objeções/battlecards, diagnóstico de saúde do deal, prontidão contratual e proteção de margem. Jamais fecha negócios autonomamente.',
     chooseWhen:
-      'A missão envolve oportunidade qualificada, proposta enviada, reunião comercial, piloto, negociação, objeção, decisão ou fechamento. Não use para primeiro contato frio.',
+      'A missão envolve oportunidade qualificada, proposta enviada, reunião comercial, piloto, negociação, objeção, decisão ou prontidão contratual. Não use para primeiro contato frio.',
   },
   crm: {
     label: 'Gestor de CRM',
     description:
-      'Resume o risco de perda de negócios/deals JÁ EM ANDAMENTO e recomenda a próxima ação concreta de tratativa.',
+      'Diagnostica o risco de estagnação, aging, tempo sem interação, ICP Fit, oportunidades que precisam de enriquecimento e saúde de deals em andamento, recomendando a próxima ação concreta de tratativa.',
     chooseWhen:
-      'A missão é sobre uma negociação/deal que já está em andamento (não um lead novo) — risco de estagnação ou perda, próximos passos comerciais.',
+      'A missão é sobre uma negociação/deal que já está em andamento (não um lead novo) — risco de estagnação, tempo sem interação, pipeline parado ou reenriquecimento.',
   },
   ops: {
     label: 'Agente de Operações',

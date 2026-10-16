@@ -1,19 +1,18 @@
-import * as React from 'react';
-import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { AlertCircle, AlertTriangle, CheckCircle2, Info, X } from 'lucide-react';
+import * as React from 'react';
 import { cn } from '../../lib/utils.js';
 
 const alertVariants = cva(
-  'relative w-full rounded-xl p-4 text-sm flex items-start gap-3 border transition-all duration-200',
+  'relative w-full rounded-card border border-line bg-surface px-4 py-3 text-sm text-ink flex items-start gap-3',
   {
     variants: {
       severity: {
-        success: 'bg-ok/10 text-ok-active border-ok/30 dark:border-ok/40',
-        warning: 'bg-warn/10 text-warn-active border-warn/30 dark:border-warn/40',
-        error: 'bg-critical/10 text-critical-active border-critical/30 dark:border-critical/40',
-        info: 'bg-info/10 text-info-active border-info/30 dark:border-info/40',
-        brand:
-          'bg-brand/10 text-brand-ink dark:text-brand border-brand/30 shadow-[0_0_15px_rgba(0,212,255,0.15)]',
+        success: 'bg-[color:color-mix(in_srgb,var(--ok)_9%,var(--surface))]',
+        warning: 'bg-[color:color-mix(in_srgb,var(--warn)_10%,var(--surface))]',
+        error: 'bg-[color:color-mix(in_srgb,var(--critical)_9%,var(--surface))]',
+        info: 'bg-[color:color-mix(in_srgb,var(--info)_9%,var(--surface))]',
+        brand: 'bg-[color:color-mix(in_srgb,var(--brand)_8%,var(--surface))]',
       },
     },
     defaultVariants: {
@@ -21,6 +20,22 @@ const alertVariants = cva(
     },
   },
 );
+
+const iconWellVariants = cva('grid h-8 w-8 shrink-0 place-items-center rounded-full', {
+  variants: {
+    severity: {
+      success: 'bg-[color:color-mix(in_srgb,var(--ok)_16%,var(--surface))] text-ok',
+      warning: 'bg-[color:color-mix(in_srgb,var(--warn)_18%,var(--surface))] text-gold',
+      error: 'bg-[color:color-mix(in_srgb,var(--critical)_14%,var(--surface))] text-critical',
+      info: 'bg-[color:color-mix(in_srgb,var(--info)_14%,var(--surface))] text-primary',
+      brand:
+        'bg-[color:color-mix(in_srgb,var(--iris)_16%,var(--surface))] text-[color:var(--iris)]',
+    },
+  },
+  defaultVariants: {
+    severity: 'info',
+  },
+});
 
 const severityIcons = {
   success: CheckCircle2,
@@ -44,19 +59,25 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 
     return (
       <div ref={ref} role="alert" className={cn(alertVariants({ severity }), className)} {...props}>
-        <div className="shrink-0 mt-0.5">{icon ?? <IconComponent className="w-5 h-5" />}</div>
-        <div className="flex-1 min-w-0">
-          {title && <h5 className="font-semibold leading-none tracking-tight mb-1">{title}</h5>}
-          <div className="text-xs leading-relaxed opacity-95">{children}</div>
+        <div className={iconWellVariants({ severity })}>
+          {icon ?? <IconComponent className="h-4 w-4" strokeWidth={1.5} />}
+        </div>
+        <div className="min-w-0 flex-1 pt-1">
+          {title && (
+            <h5 className="mb-1 font-display text-sm font-semibold leading-none tracking-[-0.02em] text-ink">
+              {title}
+            </h5>
+          )}
+          <div className="text-[13px] leading-relaxed text-ink-2">{children}</div>
         </div>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 p-1 -mr-1 -mt-1 rounded-lg opacity-70 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 transition-opacity"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             aria-label="Fechar alerta"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" strokeWidth={1.5} />
           </button>
         )}
       </div>

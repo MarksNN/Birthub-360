@@ -100,7 +100,21 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
   async run(inputData: string, sessionId?: string) {
     const { marketResearchTool } = await import('../tools/marketResearchTool.js');
-    const result = await this.runWithTools(inputData, [marketResearchTool], sessionId);
+    const { searchPlaybookTool } = await import('../tools/playbookTool.js');
+    const { searchLeadsTool, getLeadContextTool } = await import('../tools/crmTools.js');
+    const { getObjectionBattlecardTool } = await import('../tools/battlecardTool.js');
+
+    const result = await this.runWithTools(
+      inputData,
+      [
+        marketResearchTool,
+        searchPlaybookTool,
+        searchLeadsTool,
+        getLeadContextTool,
+        getObjectionBattlecardTool,
+      ],
+      sessionId,
+    );
 
     return {
       qualification: result.output as string | undefined,

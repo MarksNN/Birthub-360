@@ -15,6 +15,8 @@ import {
 } from '../birth-voice/birthVoice.helpers.js';
 import { isSuppressed } from '../birth-voice/callSuppression.service.js';
 import { threeCXExtensionResolutionFailuresTotal } from './threecx.metrics.js';
+import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
+import { syncActivityToBitrix } from '../bitrix/service/outboundSync.js';
 
 export interface ThreeCXConnectionInput {
   label?: string;
@@ -836,6 +838,61 @@ export async function process3CXWebhook(
         date: new Date(),
         observations,
       },
+    });
+
+    if (callId) {
+      // Registra no VoiceCallLog para visibilidade unificada de chamadas e encerramento de cadência por hasLeadReplied
+      await prisma.voiceCallLog
+        .upsert({
+          where: {
+            organizationId_providerCallId: {
+              organizationId,
+              providerCallId: callId,
+            },
+          },
+          update: {
+            outcome,
+            durationSeconds: typeof durationSeconds === 'number' ? Math.round(durationSeconds) : 0,
+            summary: observations,
+          },
+          create: {
+            organizationId,
+            leadId: lead.id,
+            providerCallId: callId,
+            outcome,
+            durationSeconds: typeof durationSeconds === 'number' ? Math.round(durationSeconds) : 0,
+            summary: observations,
+          },
+        })
+        .catch((err) => {
+          logger.warn({ err, callId, leadId: lead.id }, '[3cx] Falha ao registrar VoiceCallLog.');
+        });
+
+      // Desbloqueia toques pendentes de voz na cadência multicanal
+      await resolveCadencePendingVoiceTouch(organizationId, lead.id, callId, {
+        result: hadConversation ? 'sent' : 'failed',
+        error: !hadConversation ? outcome : null,
+      }).catch((err) => {
+        logger.warn(
+          { err, callId, leadId: lead.id },
+          '[3cx] Falha ao resolver toque pendente de cadência.',
+        );
+      });
+    }
+
+    // Espelha a chamada no Bitrix24 (crm.activity.add)
+    syncActivityToBitrix(organizationId, lead.id, {
+      type: 'call',
+      subject: `Ligação PABX 3CX (ramal ${extension}): ${hadConversation ? 'Conversa' : 'Sem atendimento'}`,
+      description: observations,
+      completed: hadConversation,
+      direction: 'outbound',
+      durationSeconds: typeof durationSeconds === 'number' ? Math.round(durationSeconds) : 0,
+    }).catch((err) => {
+      logger.warn(
+        { err, callId, leadId: lead.id },
+        '[3cx] Falha ao espelhar chamada de voz no Bitrix24.',
+      );
     });
 
     // Nunca loga o telefone completo — só ids, mesmo padrão de voiceResult.webhook.ts:118.
