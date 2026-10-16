@@ -12,26 +12,27 @@ import { afterEach, beforeAll, afterAll, describe, expect, it, vi } from 'vitest
  * guardrails, ledger de decisão) rodam com o código real, contra o Postgres real.
  */
 
-const mockEnv: Record<string, unknown> = {
-  SWARM_SCHEDULER_ENABLED: true,
-  SWARM_SCHEDULER_ORGANIZATIONS: '*',
-  SWARM_SCHEDULER_MAX_LEADS_PER_RUN: 5,
-  SWARM_AUTONOMY_MODE: 'supervised',
-  SWARM_AUTONOMOUS_MIN_SCORE: 80,
-  SWARM_NEW_LEAD_GRACE_MINUTES: 30,
-  SWARM_STALE_PIPELINE_HOURS: 72,
-  SWARM_STALE_PROPOSAL_HOURS: 48,
-  SWARM_RECOMMENDATION_COOLDOWN_HOURS: 24,
-  SDR_CALL_WINDOW_START: 9,
-  SDR_CALL_WINDOW_END: 18,
-  SDR_CALL_TIMEZONE: 'America/Sao_Paulo',
-  AI_PII_EXTERNAL_CONSENT_ORGANIZATIONS: '*',
-};
+const { mockEnv, STUBBED_RECOMMENDATION } = vi.hoisted(() => ({
+  mockEnv: {
+    SWARM_SCHEDULER_ENABLED: true,
+    SWARM_SCHEDULER_ORGANIZATIONS: '*',
+    SWARM_SCHEDULER_MAX_LEADS_PER_RUN: 5,
+    SWARM_AUTONOMY_MODE: 'supervised',
+    SWARM_AUTONOMOUS_MIN_SCORE: 80,
+    SWARM_NEW_LEAD_GRACE_MINUTES: 30,
+    SWARM_STALE_PIPELINE_HOURS: 72,
+    SWARM_STALE_PROPOSAL_HOURS: 48,
+    SWARM_RECOMMENDATION_COOLDOWN_HOURS: 24,
+    SDR_CALL_WINDOW_START: 9,
+    SDR_CALL_WINDOW_END: 18,
+    SDR_CALL_TIMEZONE: 'America/Sao_Paulo',
+    AI_PII_EXTERNAL_CONSENT_ORGANIZATIONS: '*',
+  },
+  STUBBED_RECOMMENDATION:
+    'Diagnóstico: follow-up vencido há 3 dias, decisor ainda não confirmou o piloto. ' +
+    'Ação recomendada: ligar hoje e reforçar o caso de ROI antes que o lead esfrie.',
+}));
 vi.mock('@/config/env', () => ({ env: mockEnv }));
-
-const STUBBED_RECOMMENDATION =
-  'Diagnóstico: follow-up vencido há 3 dias, decisor ainda não confirmou o piloto. ' +
-  'Ação recomendada: ligar hoje e reforçar o caso de ROI antes que o lead esfrie.';
 
 // Única fronteira controlada desta reprodução: sem GROQ_API_KEY/OPENAI_API_KEY
 // neste ambiente, uma chamada real ao provedor sempre falharia por credencial, não por
@@ -53,30 +54,36 @@ vi.mock('@/lib/ai/gateway', async () => {
   };
 });
 
-vi.mock('@/features/intelligence/agents/fallback.util', () => ({
-  buildModelWithFallback: () => {
-    const stubModel: any = {
-      invoke: async () => ({
-        content: STUBBED_RECOMMENDATION,
-        _getType: () => 'ai',
-      }),
-      bindTools: () => stubModel,
-      withFallbacks: () => stubModel,
-    };
-    return stubModel;
-  },
-  buildModelWithFallbackAndTools: () => {
-    const stubModel: any = {
-      invoke: async () => ({
-        content: STUBBED_RECOMMENDATION,
-        _getType: () => 'ai',
-      }),
-      bindTools: () => stubModel,
-      withFallbacks: () => stubModel,
-    };
-    return stubModel;
-  },
-}));
+vi.mock('@/features/intelligence/agents/base.agent', async () => {
+  const actual = await vi.importActual<typeof import('@/features/intelligence/agents/base.agent')>(
+    '@/features/intelligence/agents/base.agent',
+  );
+  class MockBaseAgent extends actual.BaseAgent {
+    protected override async runWithTools(
+      inputData: string,
+      _tools: any,
+      sessionId?: string,
+    ): Promise<any> {
+      const sid = sessionId || `session-${this.agentType.toLowerCase()}-${Date.now()}`;
+      await (this as any).updateMemory(sid, [
+        { role: 'human', content: inputData },
+        { role: 'ai', content: STUBBED_RECOMMENDATION },
+      ]);
+      const { logAiUsage } = await import('@/lib/ai/gateway');
+      await logAiUsage({
+        model: 'stub-model-e2e',
+        usage: { totalTokens: 420, promptTokens: 300, completionTokens: 120 },
+        latencyMs: 50,
+        agentRole: this.agentType,
+      });
+      return { output: STUBBED_RECOMMENDATION, sessionId: sid };
+    }
+  }
+  return {
+    ...actual,
+    BaseAgent: MockBaseAgent,
+  };
+});
 
 const { prisma } = await import('@/lib/prisma');
 const { requestContext } = await import('@/lib/async-context');
