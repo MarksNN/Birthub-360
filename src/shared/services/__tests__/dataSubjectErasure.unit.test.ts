@@ -13,6 +13,7 @@ const copilotoTranscriptSegmentUpdateManyMock = vi.fn();
 const copilotoInsightUpdateManyMock = vi.fn();
 const copilotoCrmFieldSuggestionUpdateManyMock = vi.fn();
 const copilotoCoachingEvaluationUpdateManyMock = vi.fn();
+const optOutRecordCreateMock = vi.fn();
 const deleteObjectMock = vi.fn();
 const optOutCreateMock = vi.fn();
 
@@ -26,6 +27,7 @@ vi.mock('@/lib/prisma', () => ({
       findFirst: (...args: unknown[]) => findFirstMock(...args),
       update: (...args: unknown[]) => updateMock(...args),
     },
+
     whatsAppMessage: {
       updateMany: (...args: unknown[]) => updateManyMock(...args),
     },
