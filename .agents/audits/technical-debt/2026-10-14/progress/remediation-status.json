@@ -89,7 +89,7 @@
         "17",
         "22"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -99,7 +99,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/features/cadence/dialer/PgDialerRepositories.test.ts"
       ],
@@ -178,7 +178,7 @@
       "participants": [
         "01"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -188,7 +188,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -207,7 +207,7 @@
         "02",
         "09"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -217,7 +217,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -235,7 +235,7 @@
       "participants": [
         "00"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -245,7 +245,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -380,7 +380,7 @@
         "07",
         "00"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -390,7 +390,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -411,7 +411,7 @@
         "18",
         "22"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -421,7 +421,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -443,7 +443,7 @@
         "18",
         "22"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -453,7 +453,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -475,7 +475,7 @@
         "21",
         "22"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -485,7 +485,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -558,7 +558,7 @@
       "participants": [
         "00"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -568,7 +568,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -586,7 +586,7 @@
       "participants": [
         "00"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -596,7 +596,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -641,7 +641,7 @@
       "participants": [
         "01"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -651,7 +651,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -670,7 +670,7 @@
         "02",
         "04"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -680,7 +680,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -730,7 +730,7 @@
         "10",
         "00"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -740,7 +740,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -761,7 +761,7 @@
         "01",
         "18"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -771,7 +771,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/features/notification-service.test.ts"
       ],
@@ -790,7 +790,7 @@
         "02",
         "09"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -800,7 +800,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -819,7 +819,7 @@
         "02",
         "09"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -829,7 +829,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -904,7 +904,7 @@
         "02",
         "07"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -914,7 +914,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -961,7 +961,7 @@
       "participants": [
         "01"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -971,7 +971,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -992,7 +992,7 @@
         "07",
         "23"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -1002,7 +1002,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -1105,7 +1105,7 @@
       "participants": [
         "01"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -1115,7 +1115,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
@@ -1133,7 +1133,7 @@
       "participants": [
         "01"
       ],
-      "remediationStatus": "TESTING",
+      "remediationStatus": "VERIFIED",
       "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
       "releaseStatus": "READY",
@@ -1143,7 +1143,7 @@
       "updatedBy": "00",
       "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
+      "fixCommit": "5709caaa9e6ca3a093086eb2ce3602157cb76100",
       "testsExecuted": [
         "npx vitest run tests/unit/audit/wave2-out-of-scope-remediations.test.ts"
       ],
