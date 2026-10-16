@@ -82,6 +82,24 @@ const SIGNAL_TYPES = [
   { id: 'VAGAS', label: 'Vagas & Headcount' },
 ];
 
+function getSignalCountForType(
+  byType: Record<string, number> | null | undefined,
+  typeId: string,
+): number {
+  if (!byType) return 0;
+  const direct = byType[typeId] ?? 0;
+  if (direct > 0) return direct;
+  // Mapeamento semântico com a taxonomia de AccountSignal do banco (ACCOUNT_SIGNAL_TYPES)
+  const aliases: Record<string, string[]> = {
+    EXPANSAO: ['geographic_expansion', 'expansao'],
+    VAGAS: ['mass_hiring', 'vagas'],
+    NOVA_OPERACAO: ['funding_round', 'mna', 'nova_operacao'],
+    TECNOLOGIA: ['stack', 'tecnologia'],
+  };
+  const matchedAliases = aliases[typeId] ?? [];
+  return matchedAliases.reduce((sum, key) => sum + (byType[key] ?? 0), 0);
+}
+
 export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
   const [selectedFilter, setSelectedFilter] = useState('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
@@ -110,9 +128,13 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             <Radio className="w-4 h-4 text-brand animate-pulse" />
           </div>
           <div className="text-2xl font-black text-ink">
-            {loading ? '...' : (coverage?.totalSignals ?? CATALOG_SIGNALS.length)}
+            {loading ? '...' : coverage?.available ? (coverage.totalSignals ?? 0) : 0}
           </div>
-          <p className="text-[11px] text-ink-2 mt-1">Gatilhos de momento de compra monitorados</p>
+          <p className="text-[11px] text-ink-2 mt-1">
+            {coverage?.available
+              ? 'Gatilhos de momento de compra monitorados no tenant'
+              : (coverage?.reason ?? 'Nenhum sinal ativo registrado no tenant')}
+          </p>
         </Card>
 
         <Card padding="default" className="border-info/20 bg-info/[0.03]">
@@ -123,9 +145,13 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             <Building2 className="w-4 h-4 text-info-active dark:text-info" />
           </div>
           <div className="text-2xl font-black text-ink">
-            {loading ? '...' : (coverage?.accountsWithSignals ?? 12)}
+            {loading ? '...' : coverage?.available ? (coverage.accountsWithSignals ?? 0) : 0}
           </div>
-          <p className="text-[11px] text-ink-2 mt-1">Contas-alvo com gatilhos detectados</p>
+          <p className="text-[11px] text-ink-2 mt-1">
+            {coverage?.available
+              ? 'Contas-alvo com gatilhos detectados'
+              : 'Aguardando enriquecimento de contas'}
+          </p>
         </Card>
 
         <Card padding="default" className="border-success/20 bg-success/[0.03]">
@@ -135,7 +161,9 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             </span>
             <ShieldCheck className="w-4 h-4 text-success-active dark:text-success" />
           </div>
-          <div className="text-2xl font-black text-ink">100%</div>
+          <div className="text-2xl font-black text-ink">
+            {loading ? '...' : coverage?.available ? '100%' : 'N/D'}
+          </div>
           <p className="text-[11px] text-ink-2 mt-1">
             Dados públicos e Receita Federal (zero suposição)
           </p>
@@ -148,7 +176,13 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             </span>
             <Sparkles className="w-4 h-4 text-accent-violet" />
           </div>
-          <div className="text-2xl font-black text-ink">Alta Confiança</div>
+          <div className="text-2xl font-black text-ink">
+            {loading
+              ? '...'
+              : coverage?.available
+                ? `${coverage.totalSignals} Sinais`
+                : 'Aguardando Dados'}
+          </div>
           <p className="text-[11px] text-ink-2 mt-1">Classificação algorítmica por timing e fit</p>
         </Card>
       </div>
@@ -157,20 +191,39 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl border border-line bg-surface">
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <Filter className="w-4 h-4 text-ink-2 shrink-0 mr-1" />
-          {SIGNAL_TYPES.map((type) => (
-            <button
-              key={type.id}
-              type="button"
-              onClick={() => setSelectedFilter(type.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedFilter === type.id
-                  ? 'bg-brand text-slate-950 shadow-sm'
-                  : 'bg-surface-2 text-ink-2 hover:text-ink hover:bg-surface-hover'
-              }`}
-            >
-              {type.label}
-            </button>
-          ))}
+          {SIGNAL_TYPES.map((type) => {
+            const count =
+              type.id === 'TODOS'
+                ? coverage?.available
+                  ? (coverage.totalSignals ?? 0)
+                  : 0
+                : getSignalCountForType(coverage?.byType, type.id);
+            return (
+              <button
+                key={type.id}
+                type="button"
+                onClick={() => setSelectedFilter(type.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  selectedFilter === type.id
+                    ? 'bg-brand text-slate-950 shadow-sm'
+                    : 'bg-surface-2 text-ink-2 hover:text-ink hover:bg-surface-hover'
+                }`}
+              >
+                <span>{type.label}</span>
+                {coverage?.available && (
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                      selectedFilter === type.id
+                        ? 'bg-slate-950/20 text-slate-950'
+                        : 'bg-surface text-ink-2'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <div className="relative w-full sm:w-64">
@@ -187,57 +240,69 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
 
       {/* ── Grade de Sinais de Intenção ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredSignals.map((signal) => (
-          <Card
-            key={signal.id}
-            padding="default"
-            className="space-y-4 hover:border-brand/40 transition-all"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="p-2 rounded-lg bg-brand/10 text-brand">
-                  <TrendingUp className="w-4 h-4" />
-                </span>
-                <div>
-                  <h3 className="text-sm font-bold text-ink">{signal.title}</h3>
-                  <span className="text-[11px] text-ink-2 font-mono">
-                    Segmento: {signal.segment}
+        {filteredSignals.map((signal) => {
+          const occurrences = getSignalCountForType(coverage?.byType, signal.type);
+          return (
+            <Card
+              key={signal.id}
+              padding="default"
+              className="space-y-4 hover:border-brand/40 transition-all"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-2 rounded-lg bg-brand/10 text-brand">
+                    <TrendingUp className="w-4 h-4" />
                   </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-ink">{signal.title}</h3>
+                    <span className="text-[11px] text-ink-2 font-mono">
+                      Segmento: {signal.segment}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${
+                      signal.confidence === 'ALTA'
+                        ? 'bg-success/10 text-success-active dark:text-success border border-success/30'
+                        : 'bg-warning/10 text-warning-active dark:text-warning border border-warning/30'
+                    }`}
+                  >
+                    CONFIANÇA {signal.confidence}
+                  </span>
+                  {coverage?.available && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-brand/10 text-brand border border-brand/20">
+                      {occurrences} no tenant
+                    </span>
+                  )}
                 </div>
               </div>
-              <span
-                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${
-                  signal.confidence === 'ALTA'
-                    ? 'bg-success/10 text-success-active dark:text-success border border-success/30'
-                    : 'bg-warning/10 text-warning-active dark:text-warning border border-warning/30'
-                }`}
-              >
-                CONFIANÇA {signal.confidence}
-              </span>
-            </div>
 
-            <p className="text-xs text-ink-2 leading-relaxed">{signal.description}</p>
+              <p className="text-xs text-ink-2 leading-relaxed">{signal.description}</p>
 
-            <div className="rounded-lg border border-brand/15 bg-brand/[0.03] p-3 text-xs space-y-1">
-              <div className="flex items-center gap-1.5 text-brand font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Recomendação de Abordagem Comercial</span>
+              <div className="rounded-lg border border-brand/15 bg-brand/[0.03] p-3 text-xs space-y-1">
+                <div className="flex items-center gap-1.5 text-brand font-semibold">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Recomendação de Abordagem Comercial</span>
+                </div>
+                <p className="text-ink-2 text-[11px]">{signal.suggestedAction}</p>
               </div>
-              <p className="text-ink-2 text-[11px]">{signal.suggestedAction}</p>
-            </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-line text-[11px] text-ink-2">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-ink-2" />
-                Fonte: {signal.source}
-              </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
-                Detectado recentemente
-              </span>
-            </div>
-          </Card>
-        ))}
+              <div className="flex items-center justify-between pt-2 border-t border-line text-[11px] text-ink-2">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-ink-2" />
+                  Fonte: {signal.source}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {coverage?.available && occurrences > 0
+                    ? `${occurrences} ocorrência(s) detectada(s)`
+                    : 'Catálogo de referência'}
+                </span>
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       {filteredSignals.length === 0 && (
