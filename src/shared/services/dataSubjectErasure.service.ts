@@ -128,28 +128,11 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
 
       if (leadIds.length > 0) {
         for (const leadId of leadIds) {
-          await prisma.optOutRecord
-            .create({
-              data: {
-                organizationId: target.organizationId,
-                scope: 'Global',
-                leadId,
-                email: emailNormalized,
-                phoneE164,
-                originChannel: 'manual',
-                reason: 'LGPD Art. 18 - Direito de exclusão exercido pelo titular',
-                evidence: 'Exercício de direito do titular sob LGPD',
-                requestedBy: target.actorUserId ?? null,
-              },
-            });
-        }
-      } else if (emailNormalized || phoneE164) {
-        await prisma.optOutRecord
-          .create({
+          await prisma.optOutRecord.create({
             data: {
               organizationId: target.organizationId,
               scope: 'Global',
-              leadId: null,
+              leadId,
               email: emailNormalized,
               phoneE164,
               originChannel: 'manual',
@@ -158,6 +141,21 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
               requestedBy: target.actorUserId ?? null,
             },
           });
+        }
+      } else if (emailNormalized || phoneE164) {
+        await prisma.optOutRecord.create({
+          data: {
+            organizationId: target.organizationId,
+            scope: 'Global',
+            leadId: null,
+            email: emailNormalized,
+            phoneE164,
+            originChannel: 'manual',
+            reason: 'LGPD Art. 18 - Direito de exclusão exercido pelo titular',
+            evidence: 'Exercício de direito do titular sob LGPD',
+            requestedBy: target.actorUserId ?? null,
+          },
+        });
       }
 
       if (!alreadyAnonymized) {
