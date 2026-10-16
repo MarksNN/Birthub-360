@@ -50,3 +50,20 @@
 ## 4. Conclusão
 
 Entrega validada e aprovada para liberação de commit e merge pelo Coordenador (Agente 00) / Operações Git (Agente 08A).
+
+---
+
+## 5. Adendo — Ajustes Visuais de Refinamento (Feedback do Usuário)
+
+| Item Solicitado | Implementação | Evidência / Status |
+| :--- | :--- | :--- |
+| **1. Links em Botões Pill** | Todos os 9 links da navbar encapsulados em `.nav-pill-btn` (borda 1px, pill radius, hover cyan). | Aprovado |
+| **2. Correção de Sobreposição** | Resolvida colisão entre "Ecossistema" e toggle de tema via `shrink-0` nos extremos e `max-w-[1440px]`. | Verificado em 1280px e 1440px |
+| **3. Remoção Badge Hero** | Removido badge `SISTEMA OPERACIONAL COMERCIAL` e ícone acima do H1. | Verificado |
+| **4. Animação Piscar/Pulsar** | Implementada `@keyframes cta-pulse-blink` e classe `.btn-cta-pulse` nos CTAs de Acesso. | Verificado |
+| **5. Remoção Título Capacidades** | Removido título `Capacidades Operacionais Integradas` acima dos 4 cards. | Verificado |
+
+- **Typecheck:** EXIT CODE 0
+- **Build:** EXIT CODE 0
+- **Evidências Visuais:** `landing-adjustments-1440.png`, `landing-adjustments-1280.png`, `landing-adjustments-dark.png`.
+

@@ -331,9 +331,9 @@ export function Landing360({
       ════════════════════════════════════════════════════════════════════ */}
       <div className={activeScreen === 'intro' ? 'block' : 'hidden'}>
         {/* 1. NAVBAR FIXA — PRESENÇA INSTITUCIONAL & ENTERPRISE */}
-        <header className="navbar-sticky w-full px-6 py-4 sm:px-10 lg:px-16">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <a href="#hero" className="flex items-center gap-3.5 group">
+        <header className="navbar-sticky w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-3.5">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
+            <a href="#hero" className="flex items-center gap-3.5 group shrink-0">
               <BH360LogoMark size={48} />
               <div className="flex flex-col">
                 <span className="font-display text-xl font-bold leading-tight tracking-tight">
@@ -346,38 +346,38 @@ export function Landing360({
               </div>
             </a>
 
-            {/* Links de navegação desktop — Tipografia Inter, maior área clicável */}
-            <nav className="hidden xl:flex items-center gap-1.5 font-sans text-[13px] font-semibold text-slate-700 dark:text-slate-300">
-              <a href="#problema" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+            {/* Links de navegação desktop — Cada item como um botão pill, sem sobreposição */}
+            <nav className="hidden xl:flex items-center justify-center gap-1.5 2xl:gap-2 flex-1 mx-2">
+              <a href="#problema" className="nav-pill-btn">
                 Problema
               </a>
-              <a href="#plataforma" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#plataforma" className="nav-pill-btn">
                 Plataforma
               </a>
-              <a href="#pilares" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#pilares" className="nav-pill-btn">
                 8 Pilares
               </a>
-              <a href="#fluxo" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#fluxo" className="nav-pill-btn">
                 Fluxo
               </a>
-              <a href="#ia" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#ia" className="nav-pill-btn">
                 IA
               </a>
-              <a href="#automacao" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#automacao" className="nav-pill-btn">
                 Automação
               </a>
-              <a href="#performance" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#performance" className="nav-pill-btn">
                 Performance
               </a>
-              <a href="#previsibilidade" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#previsibilidade" className="nav-pill-btn">
                 Previsibilidade
               </a>
-              <a href="#ecossistema" className="px-2.5 py-1.5 rounded-lg hover:text-[#00D4FF] hover:bg-slate-500/10 transition-colors">
+              <a href="#ecossistema" className="nav-pill-btn">
                 Ecossistema
               </a>
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               {/* Botão de Alternância de Tema (Light / Dark) */}
               <button
                 type="button"
@@ -393,11 +393,11 @@ export function Landing360({
                 )}
               </button>
 
-              {/* Botão de Login no Topo - Sem fundo branco */}
+              {/* Botão de Login no Topo com animação de piscar/pulsar */}
               <button
                 type="button"
                 onClick={handleGoToLogin}
-                className="btn-cta-light hidden sm:inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider cursor-pointer shadow-md"
+                className="btn-cta-light btn-cta-pulse hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider cursor-pointer shadow-md"
               >
                 <span>Acessar Plataforma</span>
                 <ArrowRight className="w-4 h-4" />
@@ -500,11 +500,6 @@ export function Landing360({
           <div className="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full blur-[140px] bg-[#FF2D9B]/10" />
 
           <div className="relative z-10 max-w-6xl mx-auto flex flex-col items-center text-center">
-            {/* Badge de Categoria */}
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest section-card border border-[#00D4FF]/40 text-[#00D4FF] shadow-lg shadow-[#00D4FF]/10 mb-6 mx-auto">
-              <span>SISTEMA OPERACIONAL COMERCIAL</span>
-            </div>
-
             {/* Headline Centralizada com Gradientes Oficiais e Dourado Radiante - SEM BRANCO OU PRETO */}
             <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.18] max-w-4xl text-center mx-auto mb-6">
               <span>
@@ -525,12 +520,12 @@ export function Landing360({
               para planejar, monitorar, prever e acelerar suas operações comerciais.
             </p>
 
-            {/* CTAs do Hero — ZERO FUNDO BRANCO */}
+            {/* CTAs do Hero com animação pulsante — ZERO FUNDO BRANCO */}
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 type="button"
                 onClick={handleGoToLogin}
-                className="btn-cta-light inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider cursor-pointer shadow-lg"
+                className="btn-cta-light btn-cta-pulse inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider cursor-pointer shadow-lg"
               >
                 <span>Acessar Plataforma</span>
                 <ArrowRight className="w-5 h-5" />
@@ -544,13 +539,8 @@ export function Landing360({
               </a>
             </div>
 
-            {/* Capacidades reais: Título Centralizado com Multi-CRM — Respiro +36px e bordas semânticas */}
-            <div className="mt-24 pt-10 border-t border-slate-200/80 dark:border-slate-800 w-full max-w-5xl">
-              <div className="mb-6 text-center">
-                <h3 className="font-mono text-xs font-bold uppercase tracking-widest landing-title-cyan">
-                  Capacidades Operacionais Integradas
-                </h3>
-              </div>
+            {/* Capacidades reais: Multi-CRM — Respiro +36px e bordas semânticas */}
+            <div className="mt-20 pt-8 border-t border-slate-200/80 dark:border-slate-800 w-full max-w-5xl">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {FEATURE_TAGS.map((tag, index) => (
                   <div

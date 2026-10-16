@@ -326,6 +326,30 @@ html {
   transform: translateY(0);
 }
 
+/* Animação de Piscar / Pulsar do CTA de Acesso */
+@keyframes cta-pulse-blink {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7), 0 10px 25px -4px rgba(2, 132, 199, 0.42);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 22px 6px rgba(0, 212, 255, 0.75), 0 14px 34px -4px rgba(2, 132, 199, 0.65);
+    filter: brightness(1.18);
+  }
+}
+
+.btn-cta-pulse {
+  animation: cta-pulse-blink 2.2s infinite ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-cta-pulse {
+    animation: none !important;
+  }
+}
+
 /* Botões secundários: Adaptativos para Light e Dark */
 .landing-neon-root .btn-secondary-dark,
 .landing-neon-root .vancouver-btn-outline {
@@ -390,6 +414,55 @@ html {
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--landing-navbar-border) !important;
   transition: all 0.3s ease;
+}
+
+/* Botões de navegação pill (Header Desktop) */
+.nav-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 9999px;
+  white-space: nowrap;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background-color: rgba(255, 255, 255, 0.75);
+  color: #334155;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+:root.dark .nav-pill-btn,
+.dark .nav-pill-btn {
+  border-color: rgba(100, 116, 139, 0.35);
+  background-color: rgba(15, 23, 42, 0.7);
+  color: #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.nav-pill-btn:hover {
+  border-color: rgba(0, 212, 255, 0.75);
+  color: #0284c7;
+  background-color: rgba(0, 212, 255, 0.08);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+:root.dark .nav-pill-btn:hover,
+.dark .nav-pill-btn:hover {
+  border-color: rgba(0, 212, 255, 0.85);
+  color: #00d4ff;
+  background-color: rgba(0, 212, 255, 0.14);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.nav-pill-btn:active {
+  transform: translateY(0);
 }
 
 .landing-neon-root .vancouver-hero-bg {
