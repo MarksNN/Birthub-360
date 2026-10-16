@@ -121,6 +121,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       console.error('Erro ao encerrar sessão:', err);
     } finally {
+      try {
+        if (typeof window !== 'undefined' && 'caches' in window && window.caches) {
+          const keys = await window.caches.keys();
+          await Promise.all(keys.map((key) => window.caches.delete(key)));
+        }
+      } catch {
+        // Ignora erro de CacheStorage indisponível (contexto inseguro / navegador restrito)
+      }
       window.location.href = '/login';
     }
   };

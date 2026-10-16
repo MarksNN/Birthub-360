@@ -28,7 +28,7 @@ backups
 !prisma/migrations/
 !prisma/migrations/**
 
-# Agentes, memória operacional, IDEs
+# Agentes, memória operacional, IDEs e diretórios efêmeros/worktrees locais
 .agents
 .claude
 .devin
@@ -37,6 +37,9 @@ backups
 .vscode
 .idea
 .storybook
+.worktrees
+.tmp
+tmp
 agente-codigo-local
 
 # Projetos nativos mobile / desktop

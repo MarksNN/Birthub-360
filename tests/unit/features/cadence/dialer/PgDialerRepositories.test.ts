@@ -154,34 +154,45 @@ describe('PgDncRepository', () => {
 });
 
 describe('PgCampaignRepository', () => {
-  const repo = new PgCampaignRepository(prisma);
+  const orgId = 'org-tenant-a';
+  const repo = new PgCampaignRepository(prisma, orgId);
   const campaignProps = {
     id: '44444444-4444-4444-8444-444444444444',
+    organizationId: orgId,
     name: 'Campanha Teste',
     status: 'active' as const,
     createdAt: new Date('2026-10-10T10:00:00Z'),
     updatedAt: new Date('2026-10-10T10:00:00Z'),
   };
 
-  it('save faz upsert parametrizado em campaigns', async () => {
+  it('rejeita operação sem organizationId configurado ou no contexto', async () => {
+    const unscopedRepo = new PgCampaignRepository(prisma);
+    await expect(unscopedRepo.findAll()).rejects.toThrow(/requires organizationId/);
+  });
+
+  it('save faz upsert parametrizado em campaigns com organization_id', async () => {
     executeRaw.mockResolvedValue(1);
     await repo.save(Campaign.restore(campaignProps));
     const sql = sqlArg(executeRaw);
     expect(sql.sql).toContain('INSERT INTO campaigns');
     expect(sql.sql).toContain('ON CONFLICT (id) DO UPDATE');
+    expect(sql.sql).toContain('WHERE campaigns.organization_id =');
     expect(sql.values).toEqual([
       campaignProps.id,
+      orgId,
       campaignProps.name,
       campaignProps.status,
       campaignProps.createdAt,
       campaignProps.updatedAt,
+      orgId,
     ]);
   });
 
-  it('findById retorna campanha ou null', async () => {
+  it('findById retorna campanha ou null escopado por organization_id', async () => {
     queryRaw.mockResolvedValueOnce([
       {
         id: campaignProps.id,
+        organization_id: orgId,
         name: campaignProps.name,
         status: campaignProps.status,
         created_at: campaignProps.createdAt,
@@ -191,16 +202,18 @@ describe('PgCampaignRepository', () => {
 
     const found = await repo.findById(campaignProps.id);
     expect(found?.toProps()).toEqual(campaignProps);
-    expect(sqlArg(queryRaw).values).toEqual([campaignProps.id]);
+    expect(sqlArg(queryRaw).values).toEqual([campaignProps.id, orgId]);
 
-    const notFound = await repo.findById(campaignProps.id);
+    const notFound = await repo.findById(campaignProps.id, 'org-tenant-b');
     expect(notFound).toBeNull();
+    expect(sqlArg(queryRaw, 1).values).toEqual([campaignProps.id, 'org-tenant-b']);
   });
 
-  it('findActive busca apenas status active', async () => {
+  it('findActive busca apenas status active do tenant informado', async () => {
     queryRaw.mockResolvedValue([
       {
         id: campaignProps.id,
+        organization_id: orgId,
         name: campaignProps.name,
         status: 'active',
         created_at: campaignProps.createdAt,
@@ -212,21 +225,27 @@ describe('PgCampaignRepository', () => {
     expect(list[0]?.toProps().status).toBe('active');
     const sql = sqlArg(queryRaw);
     expect(sql.sql).toContain("status = 'active'");
+    expect(sql.sql).toContain('organization_id =');
+    expect(sql.values).toEqual([orgId]);
   });
 
-  it('findAll retorna todas as campanhas ordenadas', async () => {
+  it('findAll retorna todas as campanhas do tenant ordenadas', async () => {
     queryRaw.mockResolvedValue([]);
     await repo.findAll();
     const sql = sqlArg(queryRaw);
     expect(sql.sql).toContain('FROM campaigns');
+    expect(sql.sql).toContain('WHERE organization_id =');
     expect(sql.sql).toContain('ORDER BY created_at DESC');
+    expect(sql.values).toEqual([orgId]);
   });
 });
 
 describe('PgLeadRepository', () => {
-  const repo = new PgLeadRepository(prisma);
+  const orgId = 'org-tenant-a';
+  const repo = new PgLeadRepository(prisma, orgId);
   const leadProps = {
     id: '55555555-5555-4555-8555-555555555555',
+    organizationId: orgId,
     campaignId: '44444444-4444-4444-8444-444444444444',
     name: 'Lead Teste',
     phone: PhoneNumber.create('+5511988887777'),
@@ -237,14 +256,21 @@ describe('PgLeadRepository', () => {
     updatedAt: new Date('2026-10-10T10:00:00Z'),
   };
 
-  it('save faz upsert parametrizado em lote de 1 lead', async () => {
+  it('rejeita operação sem organizationId configurado ou no contexto', async () => {
+    const unscopedRepo = new PgLeadRepository(prisma);
+    await expect(unscopedRepo.findById(leadProps.id)).rejects.toThrow(/requires organizationId/);
+  });
+
+  it('save faz upsert parametrizado em lote de 1 lead com organization_id', async () => {
     executeRaw.mockResolvedValue(1);
     await repo.save(Lead.restore(leadProps));
     const sql = sqlArg(executeRaw);
     expect(sql.sql).toContain('INSERT INTO leads');
     expect(sql.sql).toContain('ON CONFLICT (id) DO UPDATE');
+    expect(sql.sql).toContain('WHERE leads.organization_id =');
     expect(sql.values).toEqual([
       leadProps.id,
+      orgId,
       leadProps.campaignId,
       leadProps.name,
       leadProps.phone.toE164(),
@@ -253,13 +279,15 @@ describe('PgLeadRepository', () => {
       leadProps.nextAttemptAt,
       leadProps.createdAt,
       leadProps.updatedAt,
+      orgId,
     ]);
   });
 
-  it('findById retorna lead restaurado ou null', async () => {
+  it('findById retorna lead restaurado ou null escopado por organization_id', async () => {
     queryRaw.mockResolvedValueOnce([
       {
         id: leadProps.id,
+        organization_id: orgId,
         campaign_id: leadProps.campaignId,
         name: leadProps.name,
         phone: leadProps.phone.toE164(),
@@ -273,17 +301,19 @@ describe('PgLeadRepository', () => {
 
     const found = await repo.findById(leadProps.id);
     expect(found?.toProps().id).toEqual(leadProps.id);
-    expect(sqlArg(queryRaw).values).toEqual([leadProps.id]);
+    expect(sqlArg(queryRaw).values).toEqual([leadProps.id, orgId]);
 
-    const notFound = await repo.findById(leadProps.id);
+    const notFound = await repo.findById(leadProps.id, 'org-tenant-b');
     expect(notFound).toBeNull();
+    expect(sqlArg(queryRaw, 1).values).toEqual([leadProps.id, 'org-tenant-b']);
   });
 
-  it('claimNextEligible executa CTE com FOR UPDATE SKIP LOCKED parametrizado', async () => {
+  it('claimNextEligible executa CTE com FOR UPDATE SKIP LOCKED e organization_id parametrizado', async () => {
     const now = new Date('2026-10-10T12:00:00Z');
     queryRaw.mockResolvedValue([
       {
         id: leadProps.id,
+        organization_id: orgId,
         campaign_id: leadProps.campaignId,
         name: leadProps.name,
         phone: leadProps.phone.toE164(),
@@ -300,18 +330,19 @@ describe('PgLeadRepository', () => {
     expect(claimed[0]?.toProps().status).toBe('in_progress');
     const sql = sqlArg(queryRaw);
     expect(sql.sql).toContain('FOR UPDATE SKIP LOCKED');
-    expect(sql.values).toEqual([leadProps.campaignId, now, 5, now]);
+    expect(sql.sql).toContain('organization_id =');
+    expect(sql.values).toEqual([orgId, leadProps.campaignId, now, 5, now, orgId]);
   });
 
-  it('existsByCampaignAndPhone retorna booleano parametrizado', async () => {
+  it('existsByCampaignAndPhone retorna booleano parametrizado por organization_id', async () => {
     queryRaw.mockResolvedValueOnce([{ exists: 1 }]).mockResolvedValueOnce([]);
     expect(await repo.existsByCampaignAndPhone(leadProps.campaignId, '+5511988887777')).toBe(true);
     const sql = sqlArg(queryRaw);
-    expect(sql.values).toEqual([leadProps.campaignId, '+5511988887777']);
+    expect(sql.values).toEqual([orgId, leadProps.campaignId, '+5511988887777']);
     expect(await repo.existsByCampaignAndPhone(leadProps.campaignId, '+5511900000000')).toBe(false);
   });
 
-  it('getCampaignStats computa agregação parametrizada', async () => {
+  it('getCampaignStats computa agregação parametrizada por organization_id', async () => {
     queryRaw.mockResolvedValue([
       {
         total_leads: '10',
@@ -329,6 +360,6 @@ describe('PgLeadRepository', () => {
     expect(stats.contacted).toBe(3);
     expect(stats.contactRatePercent).toBe(30);
     const sql = sqlArg(queryRaw);
-    expect(sql.values).toEqual([leadProps.campaignId]);
+    expect(sql.values).toEqual([orgId, leadProps.campaignId]);
   });
 });

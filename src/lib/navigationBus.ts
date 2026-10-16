@@ -28,7 +28,7 @@ function isKnownTab(tab: string): tab is TabType {
   return Object.hasOwn(TAB_ROUTE_SET, tab);
 }
 
-const TAB_ROUTE_SET: Record<TabType, true> = {
+export const TAB_ROUTE_SET: Record<TabType, true> = {
   dashboard: true,
   workspace: true,
   companies: true,
@@ -85,3 +85,11 @@ const TAB_ROUTE_SET: Record<TabType, true> = {
   settings_automation: true,
   settings_engagement: true,
 };
+
+/**
+ * Conjunto canônico de destinos navegáveis ativos (exclui módulos ocultos em `NAV_HIDDEN_TABS`).
+ * Deve permanecer em paridade estrita com `VALID_TABS` em `MainActivity.java` (Android).
+ */
+export const ACTIVE_NAV_TABS: ReadonlySet<TabType> = new Set(
+  (Object.keys(TAB_ROUTE_SET) as TabType[]).filter((tab) => !NAV_HIDDEN_TABS.has(tab)),
+);

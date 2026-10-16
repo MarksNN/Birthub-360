@@ -69,7 +69,8 @@ export interface UsageByPromptRow {
  * específica, não um CRUD genérico).
  */
 export interface UsageRepository {
-  findLogsSince(organizationId: string, since: Date): Promise<UsageLogRow[]>;
+  findLogsSince(organizationId: string, since: Date, limit?: number): Promise<UsageLogRow[]>;
+  groupByDay?(organizationId: string, since: Date): Promise<UsagePoint[]>;
   groupByModel(organizationId: string, since: Date): Promise<UsageByModelRow[]>;
   groupByPrompt(organizationId: string, since: Date): Promise<UsageByPromptRow[]>;
   sumCostSince(organizationId: string, since: Date): Promise<number>;

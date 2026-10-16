@@ -48,18 +48,19 @@ public class MainActivity extends BridgeActivity {
 
     private static final String TAG = "BirthHub360DeepLink";
 
-    // Espelha TAB_ROUTE_SET de src/lib/navigationBus.ts. Mantenha sincronizado manualmente sempre
-    // que o Agente 02 alterar o contrato de navegação — ver
-    // .agents/handoffs/onda-8/09-para-02-navigationbus-rotas-ausentes.md para o bug que acontece
-    // quando as duas listas divergem (deep link "abre e não faz nada").
+    // Espelha ACTIVE_NAV_TABS de src/lib/navigationBus.ts (TAB_ROUTE_SET menos NAV_HIDDEN_TABS:
+    // voice-hub, outbound, dialer). Mantenha sincronizado sempre que o Agente 02 alterar o
+    // contrato de navegação (validado por teste automatizado de paridade).
     private static final Set<String> VALID_TABS = new HashSet<>(Arrays.asList(
         "dashboard", "workspace", "companies", "contacts", "crm", "crm360", "mesa-tratamento",
-        "activities", "cadence", "prospect", "intelligence", "market-intelligence", "propostas",
-        "chatbook", "roleplay", "qualification_matrix", "objections_matrix", "topic_training",
-        "bitrix", "reports", "integrations", "knowledge", "analytics", "winloss", "calendar",
-        "notifications", "automations", "usage", "editor", "team", "settings",
-        "commercial_intelligence", "copiloto_ia", "daily-plan", "sdr-diagnostic-joao",
-        "module-access"
+        "activities", "cadence", "prospect", "signals-risks", "intelligence", "market-intelligence",
+        "propostas", "chatbook", "roleplay", "qualification_matrix", "objections_matrix",
+        "topic_training", "bitrix", "reports", "integrations", "knowledge", "analytics", "winloss",
+        "calendar", "notifications", "automations", "usage", "editor", "team", "settings",
+        "commercial_intelligence", "copiloto_ia", "daily-plan", "sdr-diagnostic", "module-access",
+        "forecast", "metas", "pipeline_ponderado", "playbooks", "jornadas", "processos", "roteiros",
+        "settings_hub", "settings_market", "settings_sales", "settings_performance",
+        "settings_predictability", "settings_ai", "settings_automation", "settings_engagement"
     ));
 
     @Override

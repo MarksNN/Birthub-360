@@ -38,9 +38,11 @@ RUN npm prune --omit=dev
 # (Render, render.yaml) não usa este Dockerfile e não é afetado, mas o caminho
 # k8s/Helm/ArgoCD (charts/prospector-atlas/templates/migration-job.yaml,
 # k8s/migration-job.yaml — aspiracional) precisa da CLI presente na imagem final.
-# Reinstala só a CLI, na mesma versão fixada em devDependencies, sem tocar em
-# package.json/lockfile (--no-save) e sem reintroduzir o restante das devDependencies.
-RUN npm install --no-save prisma@$(node -p "require('./package.json').devDependencies.prisma")
+# Reinstala só a CLI, na versão EXATA resolvida em package-lock.json (não o range semver do
+# package.json), sem tocar em package.json/lockfile (--no-save --package-lock=false) e sem
+# reintroduzir o restante das devDependencies.
+RUN PRISMA_EXACT_VERSION=$(node -p "const lock = require('./package-lock.json'); (lock.packages && lock.packages['node_modules/prisma'] && lock.packages['node_modules/prisma'].version) || require('./package.json').devDependencies.prisma.replace(/^[^0-9]*/, '')") \
+    && npm install --no-save --package-lock=false --exact "prisma@${PRISMA_EXACT_VERSION}"
 
 # Stage 2: Production
 FROM node:22-slim AS runner

@@ -391,6 +391,7 @@ export interface SendWhatsAppMessageContext {
   leadId?: string | null;
   email?: string | null;
   skipOptOutCheck?: boolean;
+  fromWorker?: boolean;
 }
 
 export async function sendWhatsAppMessage(
@@ -409,7 +410,13 @@ export async function sendWhatsAppMessage(
   // WASocket" (o cenário exato que o broker existe para resolver). O sinal correto é
   // `isDedicatedWorkerProcess`: só o worker dedicado é dono do WASocket de verdade — qualquer
   // outro processo (web, em qualquer ambiente) sem sessão local deve enfileirar via broker.
-  if (!isDedicatedWorkerProcess && (!session?.sock || session.status !== 'connected')) {
+  // `context?.fromWorker` garante defesa em profundidade: o próprio consumer da fila nunca
+  // reenfileira recursivamente um job `send` quando a sessão estiver desconectada.
+  if (
+    !isDedicatedWorkerProcess &&
+    !context?.fromWorker &&
+    (!session?.sock || session.status !== 'connected')
+  ) {
     await enqueueWhatsAppCommand({
       type: 'send',
       organizationId,

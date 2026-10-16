@@ -31,5 +31,7 @@ export interface SearchResponse {
   hits: SearchHit[];
   /** `false` quando o provedor de embeddings falhou e caímos só em palavra-chave. */
   semanticAvailable: boolean;
+  /** `false` quando tanto o FTS quanto o fallback ILIKE falharam no banco. */
+  keywordAvailable?: boolean;
   query: string;
 }

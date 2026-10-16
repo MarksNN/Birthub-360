@@ -142,18 +142,30 @@ function mapPlan(plan: Plan): PlanOption {
 
 // One period out from `from`, based on the plan's billing interval. Returns null for an
 // unrecognized interval rather than guessing — an explicit null "no renewal date known" beats a
-// fabricated one (AGENTS.md §14).
-function computePeriodEnd(billingInterval: string, from: Date = new Date()): Date | null {
-  const end = new Date(from);
-  if (billingInterval === 'monthly') {
-    end.setMonth(end.getMonth() + 1);
-    return end;
+// fabricated one (AGENTS.md §14). Clamps end-of-month and leap-day dates to the last valid day of
+// the target month in UTC so Jan 31 + 1 month -> Feb 28/29 and Feb 29 + 1 year -> Feb 28.
+export function computePeriodEnd(billingInterval: string, from: Date = new Date()): Date | null {
+  if (billingInterval !== 'monthly' && billingInterval !== 'yearly') {
+    return null;
   }
-  if (billingInterval === 'yearly') {
-    end.setFullYear(end.getFullYear() + 1);
-    return end;
-  }
-  return null;
+  const year = from.getUTCFullYear() + (billingInterval === 'yearly' ? 1 : 0);
+  const monthIndex = from.getUTCMonth() + (billingInterval === 'monthly' ? 1 : 0);
+  const targetYear = year + Math.floor(monthIndex / 12);
+  const targetMonth = ((monthIndex % 12) + 12) % 12;
+  const maxDayInTargetMonth = new Date(Date.UTC(targetYear, targetMonth + 1, 0)).getUTCDate();
+  const clampedDay = Math.min(from.getUTCDate(), maxDayInTargetMonth);
+
+  return new Date(
+    Date.UTC(
+      targetYear,
+      targetMonth,
+      clampedDay,
+      from.getUTCHours(),
+      from.getUTCMinutes(),
+      from.getUTCSeconds(),
+      from.getUTCMilliseconds(),
+    ),
+  );
 }
 
 // Reads the tenant's current wallet balance + active plan for the "Saldo em Carteira"/"Plano

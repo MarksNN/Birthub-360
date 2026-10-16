@@ -152,16 +152,21 @@ async function run() {
   const drillDbUrl = `postgresql://${pgUser}:${pgPass}@${pgHost}:${pgPort}/${drillDbName}?schema=public`;
   console.log(`   - Verificando 'prisma migrate status' no banco restaurado...`);
   let migrateStatusOutput = '';
+  let migrateStatusExitOk = false;
   try {
     migrateStatusOutput = execSync(`npx prisma migrate status`, {
       env: { ...process.env, DATABASE_URL: drillDbUrl },
       encoding: 'utf-8',
     });
+    migrateStatusExitOk = true;
   } catch (e: unknown) {
     const err = e as { stdout?: string; stderr?: string };
     migrateStatusOutput = err.stdout || err.stderr || String(e);
+    migrateStatusExitOk = false;
   }
-  console.log(`     Status Prisma: ${migrateStatusOutput.includes('Database schema is up to date') ? 'Database schema is up to date! ✅' : migrateStatusOutput.trim()}`);
+  console.log(
+    `     Status Prisma: ${migrateStatusExitOk && migrateStatusOutput.includes('Database schema is up to date') ? 'Database schema is up to date! ✅' : migrateStatusOutput.trim()}`,
+  );
 
   // 5.2 Compara contagens entre banco canônico e banco restaurado
   const origClient = new Client({
@@ -200,7 +205,8 @@ async function run() {
     '_prisma_migrations',
   ];
 
-  const tableCounts: Array<{ table: string; original: number; restored: number; match: boolean }> = [];
+  const tableCounts: Array<{ table: string; original: number; restored: number; match: boolean }> =
+    [];
   console.log(`   - Comparando contagens de registros entre original e restaurado:`);
 
   for (const table of tablesToVerify) {
@@ -211,9 +217,13 @@ async function run() {
       const drillCount = drillRes.rows[0].c;
       const match = origCount === drillCount;
       tableCounts.push({ table, original: origCount, restored: drillCount, match });
-      console.log(`     * ${table}: original=${origCount}, restaurado=${drillCount} -> ${match ? 'OK ✅' : 'DIVERGÊNCIA ❌'}`);
+      console.log(
+        `     * ${table}: original=${origCount}, restaurado=${drillCount} -> ${match ? 'OK ✅' : 'DIVERGÊNCIA ❌'}`,
+      );
     } catch {
-      // Tabela pode não existir em esquemas reduzidos
+      // Falha ao consultar tabela obrigatória deve invalidar o drill (nunca ser ignorada silenciosamente)
+      tableCounts.push({ table, original: -1, restored: -1, match: false });
+      console.log(`     * ${table}: AUSENTE OU ERRO NA CONSULTA ❌`);
     }
   }
 
@@ -252,7 +262,7 @@ async function run() {
 
   // 6. Simulação de Falhas e Detecção de Alerta
   console.log(`\n[6/6] Simulando falhas de restore para validação de observabilidade...`);
-  
+
   // Teste de arquivo inexistente
   let missingFileDetected = false;
   try {
@@ -269,14 +279,17 @@ async function run() {
   console.log(`   - Testando detecção de payload SQL inválido/corrompido...`);
   const corruptTestDb = `corrupt_test_${Date.now()}`;
   await rootClient.query(`CREATE DATABASE "${corruptTestDb}" OWNER ${pgUser};`);
-  
-  const corruptSql = 'BEGIN; CREATE TABLE test_corrupt (id int); MALFORMED SQL SYNTAX ERROR HERE; COMMIT;';
+
+  const corruptSql =
+    'BEGIN; CREATE TABLE test_corrupt (id int); MALFORMED SQL SYNTAX ERROR HERE; COMMIT;';
   const corruptProcess = spawnSync(
     `docker exec -i birthhub_postgres psql -v ON_ERROR_STOP=1 -U ${pgUser} -d ${corruptTestDb}`,
-    { shell: true, input: corruptSql }
+    { shell: true, input: corruptSql },
   );
   const corruptSqlDetected = corruptProcess.status !== 0;
-  console.log(`     Detecção de erro estrito (exit code ${corruptProcess.status}): ${corruptSqlDetected ? 'Detectado e interrompido com sucesso ✅' : 'Falha ao interromper ❌'}`);
+  console.log(
+    `     Detecção de erro estrito (exit code ${corruptProcess.status}): ${corruptSqlDetected ? 'Detectado e interrompido com sucesso ✅' : 'Falha ao interromper ❌'}`,
+  );
   await rootClient.query(`DROP DATABASE IF EXISTS "${corruptTestDb}";`);
 
   // Limpeza do banco de drill
@@ -293,15 +306,23 @@ async function run() {
   console.log(`✅ Banco temporário limpo.`);
 
   // Compilação do resultado
+  const rtoTargetSec = 900; // 15 minutos
   const rtoMeasuredSec = Math.round((restoreDurationMs / 1000) * 100) / 100;
-  const allTablesMatch = tableCounts.every((t) => t.match);
-  const pass =
-    allTablesMatch &&
-    invalidIndexes === 0 &&
-    orphanContacts === 0 &&
-    orphanLeads === 0 &&
-    corruptSqlDetected &&
-    missingFileDetected;
+  const rpoMeasuredSec = Math.max(0, Math.round((Date.now() - stat.mtimeMs) / 1000));
+  const acceptance = evaluateRestoreDrillAcceptance({
+    migrateStatusExitOk,
+    migrateStatusOutput,
+    expectedTableCount: tablesToVerify.length,
+    tableCounts,
+    invalidIndexes,
+    orphanContacts,
+    orphanLeads,
+    corruptSqlDetected,
+    missingFileDetected,
+    rtoMeasuredSec,
+    rtoTargetSec,
+  });
+  const { allTablesMatch, pass } = acceptance;
 
   const result: DrillResult = {
     timestamp: new Date().toISOString(),
@@ -335,9 +356,9 @@ async function run() {
       corruptSqlDetected,
     },
     sla: {
-      rpoAchieved: '<= 24 horas (rotina de backup diário snapshot) / <= 1h incremental',
+      rpoAchieved: `${rpoMeasuredSec}s (idade real do snapshot restaurado)`,
       rtoMeasuredSec,
-      rtoTargetSec: 900, // 15 minutos
+      rtoTargetSec,
       pass,
     },
   };
@@ -345,14 +366,16 @@ async function run() {
   console.log('\n================================================================');
   console.log(`  RESULTADO DO DRILL: ${pass ? 'PASS ✅' : 'FAIL ❌'}`);
   console.log(`  - Duração Backup: ${(backupDurationMs / 1000).toFixed(2)}s`);
-  console.log(`  - Duração Restore: ${rtoMeasuredSec}s (Target RTO <= 900s)`);
+  console.log(`  - Duração Restore: ${rtoMeasuredSec}s (Target RTO <= ${rtoTargetSec}s)`);
   console.log(`  - Tamanho Dump: ${sizeKb} KB`);
-  console.log(`  - Integridade Tabelas: ${allTablesMatch ? '100% idênticas' : 'Divergência detectada'}`);
+  console.log(
+    `  - Integridade Tabelas: ${allTablesMatch ? '100% idênticas' : 'Divergência detectada'}`,
+  );
   console.log('================================================================\n');
 
   fs.writeFileSync(
     path.join(rootDir, 'BACKUP-RESTORE-DRILL-RESULT.json'),
-    JSON.stringify(result, null, 2)
+    JSON.stringify(result, null, 2),
   );
 
   if (!pass) {
@@ -360,7 +383,66 @@ async function run() {
   }
 }
 
-run().catch((err) => {
-  console.error('ERRO FATAL NO DRILL DE BACKUP/RESTORE:', err);
-  process.exit(1);
-});
+export interface RestoreDrillAcceptanceInput {
+  migrateStatusExitOk: boolean;
+  migrateStatusOutput: string;
+  expectedTableCount: number;
+  tableCounts: Array<{ table: string; original: number; restored: number; match: boolean }>;
+  invalidIndexes: number;
+  orphanContacts: number;
+  orphanLeads: number;
+  corruptSqlDetected: boolean;
+  missingFileDetected: boolean;
+  rtoMeasuredSec: number;
+  rtoTargetSec?: number;
+}
+
+export function evaluateRestoreDrillAcceptance(input: RestoreDrillAcceptanceInput): {
+  migrationsUpToDate: boolean;
+  allTablesMatch: boolean;
+  rtoWithinTarget: boolean;
+  pass: boolean;
+} {
+  const rtoTargetSec = input.rtoTargetSec ?? 900;
+  const migrationsUpToDate =
+    input.migrateStatusExitOk &&
+    /Database schema is up to date/i.test(input.migrateStatusOutput);
+  const allTablesMatch =
+    input.expectedTableCount > 0 &&
+    input.tableCounts.length === input.expectedTableCount &&
+    input.tableCounts.every((t) => t.match && t.original >= 0 && t.restored >= 0);
+  const rtoWithinTarget =
+    Number.isFinite(input.rtoMeasuredSec) &&
+    input.rtoMeasuredSec >= 0 &&
+    input.rtoMeasuredSec <= rtoTargetSec;
+
+  const pass =
+    migrationsUpToDate &&
+    allTablesMatch &&
+    rtoWithinTarget &&
+    input.invalidIndexes === 0 &&
+    input.orphanContacts === 0 &&
+    input.orphanLeads === 0 &&
+    input.corruptSqlDetected &&
+    input.missingFileDetected;
+
+  return {
+    migrationsUpToDate,
+    allTablesMatch,
+    rtoWithinTarget,
+    pass,
+  };
+}
+
+const isMainModule =
+  typeof process !== 'undefined' &&
+  Array.isArray(process.argv) &&
+  Boolean(process.argv[1]) &&
+  path.resolve(process.argv[1]).endsWith('run-backup-restore-drill.ts');
+
+if (isMainModule) {
+  run().catch((err) => {
+    console.error('ERRO FATAL NO DRILL DE BACKUP/RESTORE:', err);
+    process.exit(1);
+  });
+}

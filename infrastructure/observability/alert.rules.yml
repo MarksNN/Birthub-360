@@ -257,7 +257,7 @@ groups:
       # não são substitutas uma da outra (AILog tem o detalhe por chamada; esta métrica é o
       # agregado para alertar).
       - alert: AIBudgetOverrun
-        expr: ai_usage_cost_usd_total / ai_usage_budget_usd_total > 1
+        expr: sum(ai_usage_cost_usd_total) / max(ai_usage_budget_usd_total) > 1
         for: 5m
         labels:
           severity: critical

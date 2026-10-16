@@ -10,6 +10,7 @@ export type LeadStatus =
 
 export interface LeadProps {
   id: string;
+  organizationId?: string;
   campaignId: string;
   name: string;
   phone: PhoneNumber;
@@ -29,11 +30,13 @@ export class Lead {
     campaignId: string;
     name: string;
     phone: PhoneNumber;
+    organizationId?: string;
     now?: Date;
   }): Lead {
     const now = input.now ?? new Date();
     return new Lead({
       id: input.id,
+      ...(input.organizationId ? { organizationId: input.organizationId } : {}),
       campaignId: input.campaignId,
       name: input.name,
       phone: input.phone,
@@ -51,6 +54,10 @@ export class Lead {
 
   get id(): string {
     return this.props.id;
+  }
+
+  get organizationId(): string | undefined {
+    return this.props.organizationId;
   }
 
   get campaignId(): string {

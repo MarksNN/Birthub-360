@@ -28,13 +28,19 @@ export class UsageUseCases {
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
 
-    const [logs, byModelRows, byPromptRows, costThisMonth, unattributedCalls] = await Promise.all([
-      this.usageRepository.findLogsSince(organizationId, since),
-      this.usageRepository.groupByModel(organizationId, since),
-      this.usageRepository.groupByPrompt(organizationId, since),
-      this.usageRepository.sumCostSince(organizationId, monthStart),
-      this.usageRepository.countUnattributed(since),
-    ]);
+    const hasSqlGroupByDay = typeof this.usageRepository.groupByDay === 'function';
+
+    const [dailyRows, logs, byModelRows, byPromptRows, costThisMonth, unattributedCalls] =
+      await Promise.all([
+        hasSqlGroupByDay ? this.usageRepository.groupByDay!(organizationId, since) : Promise.resolve(null),
+        hasSqlGroupByDay
+          ? Promise.resolve([])
+          : this.usageRepository.findLogsSince(organizationId, since, 5_000),
+        this.usageRepository.groupByModel(organizationId, since),
+        this.usageRepository.groupByPrompt(organizationId, since),
+        this.usageRepository.sumCostSince(organizationId, monthStart),
+        this.usageRepository.countUnattributed(since),
+      ]);
 
     // Pré-popula os dias para o gráfico não ter buracos onde não houve chamada.
     const buckets = new Map<string, UsagePoint>();
@@ -45,18 +51,37 @@ export class UsageUseCases {
 
     let totalTokens = 0;
     let totalCost = 0;
-    let latencySum = 0;
+    let totalCalls = 0;
+    let weightedLatencySum = 0;
 
-    for (const log of logs) {
-      totalTokens += log.tokens;
-      totalCost += log.cost;
-      latencySum += log.latencyMs;
+    if (dailyRows !== null) {
+      for (const point of dailyRows) {
+        const bucket = buckets.get(point.day);
+        if (bucket) {
+          bucket.tokens += point.tokens;
+          bucket.cost += point.cost;
+          bucket.calls += point.calls;
+        }
+      }
+      for (const row of byModelRows) {
+        totalTokens += row.tokens;
+        totalCost += row.cost;
+        totalCalls += row.calls;
+        weightedLatencySum += row.avgLatencyMs * row.calls;
+      }
+    } else {
+      for (const log of logs) {
+        totalTokens += log.tokens;
+        totalCost += log.cost;
+        totalCalls += 1;
+        weightedLatencySum += log.latencyMs;
 
-      const bucket = buckets.get(dayKey(log.createdAt));
-      if (bucket) {
-        bucket.tokens += log.tokens;
-        bucket.cost += log.cost;
-        bucket.calls += 1;
+        const bucket = buckets.get(dayKey(log.createdAt));
+        if (bucket) {
+          bucket.tokens += log.tokens;
+          bucket.cost += log.cost;
+          bucket.calls += 1;
+        }
       }
     }
 
@@ -76,14 +101,14 @@ export class UsageUseCases {
     return {
       totalTokens,
       totalCost,
-      totalCalls: logs.length,
-      avgLatencyMs: logs.length > 0 ? Math.round(latencySum / logs.length) : 0,
+      totalCalls,
+      avgLatencyMs: totalCalls > 0 ? Math.round(weightedLatencySum / totalCalls) : 0,
       costThisMonth,
       byModel,
       byPrompt,
       daily: [...buckets.values()],
       unattributedCalls,
-      isEmpty: logs.length === 0,
+      isEmpty: totalCalls === 0,
     };
   }
 }

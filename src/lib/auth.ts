@@ -124,8 +124,8 @@ export const auth = betterAuth({
       } catch (error: any) {
         if (error instanceof MailerNotConfiguredError) {
           logger.warn(
-            { email: user.email, url },
-            `Reset de senha solicitado, mas SMTP não está configurado. O link é: ${url}`,
+            { userId: user.id, code: 'SMTP_NOT_CONFIGURED' },
+            'Reset de senha solicitado, mas SMTP não está configurado.',
           );
           throw new APIError('INTERNAL_SERVER_ERROR', {
             message:
@@ -133,7 +133,7 @@ export const auth = betterAuth({
           });
         }
         logger.error(
-          { err: error, email: user.email },
+          { err: error, userId: user.id },
           'Falha ao enviar e-mail de redefinição de senha.',
         );
         throw new APIError('INTERNAL_SERVER_ERROR', {
@@ -175,13 +175,13 @@ export const auth = betterAuth({
         // depois, e `sendOnSignIn` acima tenta de novo na primeira tentativa de login.
         if (error instanceof MailerNotConfiguredError) {
           logger.warn(
-            { email: user.email, url },
-            `Verificação de e-mail solicitada, mas SMTP não está configurado. O link é: ${url}`,
+            { userId: user.id, code: 'SMTP_NOT_CONFIGURED' },
+            'Verificação de e-mail solicitada, mas SMTP não está configurado.',
           );
           return;
         }
         logger.error(
-          { err: error, email: user.email },
+          { err: error, userId: user.id },
           'Falha ao enviar e-mail de verificação de cadastro.',
         );
       }
@@ -355,10 +355,6 @@ export const auth = betterAuth({
               },
             });
 
-            // Verificar se é o primeiro usuário do sistema - se sim, recebe ADMIN automaticamente
-            const userCount = await prisma.user.count();
-            const isFirstUser = userCount === 0;
-
             // Quem cria uma organização NOVA vira ADMIN dela — sem isso, `role` cai no
             // default do schema (VISUALIZADOR, somente-leitura, ver additionalFields
             // abaixo) e essa pessoa fica travada para sempre: é a ÚNICA usuária da
@@ -372,7 +368,7 @@ export const auth = betterAuth({
               data: {
                 ...user,
                 organizationId: org.id,
-                role: isFirstUser ? 'ADMIN' : 'ADMIN', // Primeiro usuário ou fundador de org sempre é ADMIN
+                role: 'ADMIN', // Fundador de org sempre é ADMIN
               },
             };
           }

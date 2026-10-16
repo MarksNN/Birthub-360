@@ -35,6 +35,8 @@ function normalize(keys: Iterable<string>): string[] {
  * de ModuleAccessService) para teste sem banco.
  */
 export class OrganizationModulesService {
+  private readonly mutationLocks = new Map<string, Promise<unknown>>();
+
   constructor(
     private readonly repository: OrganizationModulesRepository = settingOrganizationModulesRepository,
   ) {}
@@ -66,21 +68,34 @@ export class OrganizationModulesService {
     userId: string,
     fn: (current: OrganizationModulesStoredState) => OrganizationModulesStoredState,
   ): Promise<OrganizationModulesView> {
-    const current = (await this.repository.load(organizationId)) ?? {
-      // Primeira gravação parte só dos obrigatórios (o /setup escolhe o resto explicitamente).
-      enabledModules: [...ALWAYS_ACTIVE_KEYS],
-      onboardingCompletedAt: null,
-      updatedByUserId: null,
+    const previous = this.mutationLocks.get(organizationId) ?? Promise.resolve();
+    const runMutation = async (): Promise<OrganizationModulesView> => {
+      const current = (await this.repository.load(organizationId)) ?? {
+        // Primeira gravação parte só dos obrigatórios (o /setup escolhe o resto explicitamente).
+        enabledModules: [...ALWAYS_ACTIVE_KEYS],
+        onboardingCompletedAt: null,
+        updatedByUserId: null,
+      };
+      const next = fn(current);
+      const saved: OrganizationModulesStoredState = {
+        ...next,
+        enabledModules: normalize(next.enabledModules),
+        updatedByUserId: userId,
+      };
+      await this.repository.save(organizationId, saved);
+      // Relê do repositório: a resposta reflete o que de fato foi persistido, não o que pedimos.
+      return this.get(organizationId);
     };
-    const next = fn(current);
-    const saved: OrganizationModulesStoredState = {
-      ...next,
-      enabledModules: normalize(next.enabledModules),
-      updatedByUserId: userId,
-    };
-    await this.repository.save(organizationId, saved);
-    // Relê do repositório: a resposta reflete o que de fato foi persistido, não o que pedimos.
-    return this.get(organizationId);
+
+    const nextPromise = previous.catch(() => undefined).then(runMutation);
+    this.mutationLocks.set(organizationId, nextPromise);
+    try {
+      return await nextPromise;
+    } finally {
+      if (this.mutationLocks.get(organizationId) === nextPromise) {
+        this.mutationLocks.delete(organizationId);
+      }
+    }
   }
 
   async enable(organizationId: string, userId: string, moduleKey: string) {
