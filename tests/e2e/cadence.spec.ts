@@ -25,7 +25,7 @@ test.describe('Cadência — UI de escrita (criar sequência, iniciar/pausar/ret
     expect(leadRes.status()).toBe(201);
     const leadId = (await leadRes.json()).data.id as string;
 
-    await page.getByRole('button', { name: 'Cadência', exact: true }).click();
+    await page.getByRole('button', { name: /^Cadência/ }).click();
     await expect(page).toHaveURL(/\/app\/cadence$/);
     await waitForAppReady(page);
 
@@ -77,7 +77,7 @@ test.describe('Cadência — UI de escrita (criar sequência, iniciar/pausar/ret
     });
     const leadId = (await leadRes.json()).data.id as string;
 
-    await page.getByRole('button', { name: 'Cadência', exact: true }).click();
+    await page.getByRole('button', { name: /^Cadência/ }).click();
     await waitForAppReady(page);
 
     await page.getByRole('button', { name: 'Nova sequência' }).click();

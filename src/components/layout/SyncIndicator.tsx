@@ -216,10 +216,10 @@ export function SyncIndicator({ className = '' }: { className?: string }) {
         }
         className={`group relative flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 border cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
           status === 'online'
-            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15'
+            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/15'
             : status === 'syncing'
               ? 'border-brand/30 bg-brand/10 text-brand-ink dark:text-brand hover:bg-brand/15'
-              : 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/15 animate-pulse'
+              : 'border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300 hover:bg-amber-500/15 animate-pulse'
         }`}
       >
         {status === 'online' && (

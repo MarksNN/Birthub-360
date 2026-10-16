@@ -40,7 +40,7 @@ export const KanbanColumn = React.memo(function KanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`relative flex flex-col rounded-xl min-w-[320px] max-w-[320px] max-h-full shrink-0 border bg-surface transition-all duration-300 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-brand/20 before:to-transparent before:z-20 ${
+      className={`relative flex flex-col rounded-2xl min-w-[320px] max-w-[320px] max-h-full shrink-0 border bg-surface transition-all duration-300 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-brand/20 before:to-transparent before:z-20 ${
         isOver
           ? 'border-brand/50 shadow-[0_0_30px_rgba(0,229,255,0.15)] scale-[1.01]'
           : 'border-line/40 hover:border-line/70'

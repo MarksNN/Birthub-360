@@ -7,6 +7,8 @@ import { DataFlowLines } from '../ui/DataFlowLines.js';
 import { VoiceCommandWidget } from '../ui/VoiceCommandWidget.js';
 import { useNavigationState } from './hooks/useNavigationState.js';
 import { MobileNavDrawer } from './MobileNavDrawer.js';
+import { CommandPalette } from '../ui/CommandPalette.js';
+import { Toaster } from '../ui/Toaster.js';
 import type { TabType } from './tabMeta.js';
 
 interface MainLayoutProps {
@@ -66,6 +68,8 @@ export function MainLayout({ children, activeTab: activeTabProp }: MainLayoutPro
       </div>
 
       <VoiceCommandWidget />
+      <CommandPalette />
+      <Toaster />
     </div>
   );
 }

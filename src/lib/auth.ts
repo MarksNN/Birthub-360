@@ -341,6 +341,20 @@ export const auth = betterAuth({
               data: { id: orgId, name: `${user.name || 'Novo Usuário'} - Operações` },
             });
 
+            // Inicializa módulos da organização no onboarding pendente (/setup)
+            await prisma.setting.create({
+              data: {
+                organizationId: org.id,
+                userId: null,
+                key: 'organization.modules',
+                value: {
+                  enabledModules: ['hub'],
+                  onboardingCompletedAt: null,
+                  updatedByUserId: null,
+                },
+              },
+            });
+
             // Verificar se é o primeiro usuário do sistema - se sim, recebe ADMIN automaticamente
             const userCount = await prisma.user.count();
             const isFirstUser = userCount === 0;
