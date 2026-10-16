@@ -118,6 +118,23 @@ export class LeadUseCases extends BaseUseCases<Lead, LeadRepository> {
       }
     }
 
+    // Automação de enriquecimento: se o lead foi criado vinculado a uma empresa,
+    // agenda o enriquecimento cadastral/firmográfico automático em segundo plano.
+    if (validated.companyId) {
+      try {
+        const { queueCompanyEnrichment } = await import('../../../lib/queue/enrichment.queue.js');
+        void queueCompanyEnrichment({
+          companyId: validated.companyId,
+          organizationId,
+        });
+      } catch (err: any) {
+        logger.warn(
+          { err, leadId: lead.id, companyId: validated.companyId },
+          'Falha ao agendar auto-enriquecimento do lead recém-criado',
+        );
+      }
+    }
+
     return lead;
   }
 
@@ -152,12 +169,33 @@ export class LeadUseCases extends BaseUseCases<Lead, LeadRepository> {
     ) {
       broadcastEvent({ type: 'DEAL_LOST', organizationId, payload: { leadId: id } });
     }
-    if (data.status)
+    if (data.status) {
       this.syncStatusChangeToCrms(organizationId, id, updated.bitrixLeadId || null, {
         name: 'Lead Atualizado',
         amount: updated.amount ?? undefined,
         stageLabel: updated.status,
       });
+
+      const qualifyingStages = [
+        'Qualificação (SDR)',
+        'Reunião Agendada',
+        'Convertido em Oportunidade',
+        'Nova Oportunidade',
+      ];
+      const companyId = updated.companyId;
+      if (qualifyingStages.includes(data.status) && companyId && updated.score == null) {
+        import('../../../lib/queue/enrichment.queue.js')
+          .then(({ queueCompanyEnrichment }) =>
+            queueCompanyEnrichment({ companyId, organizationId }),
+          )
+          .catch((err) => {
+            logger.warn(
+              { err, leadId: id },
+              'Falha ao enfileirar auto-enriquecimento na mudança de etapa',
+            );
+          });
+      }
+    }
     return updated;
   }
 
@@ -191,6 +229,25 @@ export class LeadUseCases extends BaseUseCases<Lead, LeadRepository> {
       amount: updated.amount ?? undefined,
       stageLabel: updated.status,
     });
+
+    const qualifyingStages = [
+      'Qualificação (SDR)',
+      'Reunião Agendada',
+      'Convertido em Oportunidade',
+      'Nova Oportunidade',
+    ];
+    const companyId = updated.companyId;
+    if (qualifyingStages.includes(newStatus) && companyId && updated.score == null) {
+      import('../../../lib/queue/enrichment.queue.js')
+        .then(({ queueCompanyEnrichment }) => queueCompanyEnrichment({ companyId, organizationId }))
+        .catch((err) => {
+          logger.warn(
+            { err, leadId: id },
+            'Falha ao enfileirar auto-enriquecimento na mudança de status',
+          );
+        });
+    }
+
     return updated;
   }
 
@@ -533,20 +590,25 @@ export class LeadUseCases extends BaseUseCases<Lead, LeadRepository> {
    * como "Enriquecendo" e o retorno expõe `enfileirado: false` + `motivo` para o cliente da API
    * distinguir "nada pendente" de "havia leads pendentes, mas a fila está fora do ar".
    */
-  async enqueueBatchEnrichment(organizationId: string) {
+  async enqueueBatchEnrichment(organizationId: string, leadIds?: string[]) {
     const { prisma } = await import('../../../lib/prisma.js');
     const { enrichmentQueue } = await import('../../../lib/queue/enrichment.queue.js');
     const { queuesEnabled } = await import('../../../lib/queue/redis.js');
 
+    const where: any = {
+      organizationId,
+      companyId: { not: null },
+      deletedAt: null,
+    };
+
+    if (leadIds && leadIds.length > 0) {
+      where.id = { in: leadIds };
+    } else {
+      where.company = { enrichmentStatus: 'Pendente' };
+    }
+
     const leadsToEnrich = await prisma.lead.findMany({
-      where: {
-        organizationId,
-        companyId: { not: null },
-        company: { enrichmentStatus: 'Pendente' },
-        // Garantir que não pegamos leads deletados se houver soft delete, mas o prisma de Company não tem deletedAt?
-        // O schema diz que Company tem deletedAt.
-        deletedAt: null,
-      },
+      where,
       select: { id: true, companyId: true, company: { select: { cnpj: true, segment: true } } },
     });
 

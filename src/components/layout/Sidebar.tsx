@@ -235,7 +235,8 @@ export function Sidebar({
                       onClick={(e) => {
                         if (hasSubItems && !isCollapsed) {
                           toggleGroupExpand(group.id, e);
-                        } else if (group.primaryTab) {
+                        }
+                        if (group.primaryTab) {
                           selectTab(group.primaryTab, e);
                         }
                       }}

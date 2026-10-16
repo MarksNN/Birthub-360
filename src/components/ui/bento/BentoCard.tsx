@@ -54,13 +54,11 @@ export function BentoCard({
   }[rowSpan];
 
   const variantClasses = {
-    surface:
-      'bg-surface-elevated/85 backdrop-blur-xl border border-line/80 shadow-card hover:border-brand/35',
-    glass: 'bh-glass hover:border-brand/40 shadow-card',
-    accent: 'bg-surface-elevated/90 border border-brand/40 shadow-glow-brand',
-    cosmic: 'bg-surface-elevated/90 border border-brand/50 shadow-card',
-    specular:
-      'bg-surface/75 backdrop-blur-2xl border border-line/60 shadow-card hover:border-brand/35',
+    surface: 'border border-line bg-surface shadow-card',
+    glass: 'border border-line bg-surface shadow-card',
+    accent: 'border border-line bg-surface shadow-card',
+    cosmic: 'border border-line bg-surface shadow-card',
+    specular: 'border border-line bg-surface shadow-card',
   }[variant];
 
   const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {

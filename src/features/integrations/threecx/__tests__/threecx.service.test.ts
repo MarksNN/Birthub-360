@@ -26,6 +26,9 @@ const prismaMock = {
     create: vi.fn(),
     findFirst: vi.fn(),
   },
+  voiceCallLog: {
+    upsert: vi.fn().mockResolvedValue({ id: 'vcl-1' }),
+  },
 };
 vi.mock('@/lib/prisma', () => ({ prisma: prismaMock }));
 

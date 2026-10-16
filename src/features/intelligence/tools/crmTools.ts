@@ -6,15 +6,36 @@ import { fromPrismaLeadStatus, toPrismaLeadStatus } from '../../../lib/enumMap.j
 import { prisma } from '../../../lib/prisma.js';
 import { LEAD_STATUS, type LeadStatus } from '../../../lib/zod.js';
 import { minimizePii } from '../services/guardrails.service.js';
+import {
+  buildCanonicalEnrichmentContext,
+  formatCanonicalEnrichmentForAgent,
+  toPrismaTemperature,
+  toCanonicalTemperature,
+} from '../domain/canonicalEnrichment.js';
 
 /**
  * Ferramenta para o agente ENCONTRAR o(s) Lead(s) certo(s) quando a instrução menciona uma
  * empresa/contato pelo nome (ou só um status/filtro) em vez de já trazer um ID pronto — sem isto,
  * qualquer instrução que não viesse com um leadId explícito batia num beco sem saída ("me passe o
  * ID do lead"), mesmo quando o dado já existe no CRM e só precisava ser localizado por nome.
+ * ONDA 11: Suporta filtros de temperatura (HOT/WARM/COLD), minScore de ICP Fit e flag needsEnrichment.
  */
 export const searchLeadsTool = tool(
-  async ({ query, status, limit }: { query?: string; status?: string; limit?: number }) => {
+  async ({
+    query,
+    status,
+    temperature,
+    minScore,
+    needsEnrichment,
+    limit,
+  }: {
+    query?: string;
+    status?: string;
+    temperature?: 'HOT' | 'WARM' | 'COLD';
+    minScore?: number;
+    needsEnrichment?: boolean;
+    limit?: number;
+  }) => {
     const organizationId = getTenantId();
     if (!organizationId) {
       return 'Erro: contexto de organização ausente — não é possível buscar leads com segurança.';
@@ -22,11 +43,20 @@ export const searchLeadsTool = tool(
 
     const take = Math.min(Math.max(limit ?? 10, 1), 20);
     const trimmedQuery = query?.trim();
+    const prismaTemp = toPrismaTemperature(temperature);
 
-    const leads = await prisma.lead.findMany({
+    const leads = (await prisma.lead.findMany({
       where: {
         organizationId,
+        deletedAt: null,
         ...(status ? { status: toPrismaLeadStatus(status as LeadStatus) as never } : {}),
+        ...(prismaTemp ? { temperature: prismaTemp as any } : {}),
+        ...(minScore !== undefined ? { score: { gte: minScore } } : {}),
+        ...(needsEnrichment
+          ? {
+              OR: [{ score: null }, { company: { is: { enrichmentStatus: 'Pendente' } } }],
+            }
+          : {}),
         ...(trimmedQuery
           ? {
               OR: [
@@ -38,9 +68,9 @@ export const searchLeadsTool = tool(
           : {}),
       },
       include: { company: true, contact: true },
-      orderBy: { lastInteraction: 'desc' },
+      orderBy: [{ score: 'desc' }, { lastInteraction: 'desc' }],
       take,
-    });
+    })) as any[];
 
     if (leads.length === 0) {
       return 'Nenhum lead encontrado com esses critérios. Confirme o nome da empresa/contato ou peça o ID diretamente.';
@@ -48,7 +78,7 @@ export const searchLeadsTool = tool(
 
     const lines = leads.map(
       (l) =>
-        `- ID: ${l.id} | Empresa: ${l.company?.tradeName ?? 'Desconhecida'} | Contato: ${l.contact?.name ?? '—'} | Status: ${fromPrismaLeadStatus(l.status)}`,
+        `- ID: ${l.id} | Empresa: ${l.company?.tradeName ?? l.company?.legalName ?? 'Desconhecida'} | Contato: ${l.contact?.name ?? '—'} | Status: ${fromPrismaLeadStatus(l.status)} | Temp: ${toCanonicalTemperature(l.temperature)} | ICP Fit: ${l.score !== null && l.score !== undefined ? `${l.score}/100` : 'PENDING'}`,
     );
     const disambiguationHint =
       leads.length > 1
@@ -71,7 +101,7 @@ export const searchLeadsTool = tool(
   {
     name: 'search_leads',
     description:
-      'Busca leads existentes no CRM por nome de empresa (razão social ou fantasia), nome do contato e/ou status — use SEMPRE que a instrução mencionar uma empresa/pessoa/lead pelo nome em vez de trazer um ID pronto. Retorna o ID real de cada lead encontrado para usar em seguida com get_lead_context ou as demais ferramentas. Nunca invente um leadId: se a busca não retornar nada, informe isso ao usuário em vez de inventar um ID.',
+      'Busca leads existentes no CRM por nome de empresa (razão social ou fantasia), contato, status, temperatura (HOT/WARM/COLD), nota mínima de ICP Fit e pendência de enriquecimento. Retorna o ID real de cada lead encontrado para usar em seguida com get_lead_context ou as demais ferramentas. Nunca invente um leadId: se a busca não retornar nada, informe isso ao usuário em vez de inventar um ID.',
     schema: z.object({
       query: z
         .string()
@@ -80,13 +110,29 @@ export const searchLeadsTool = tool(
           'Texto livre para buscar por nome da empresa (razão social/fantasia) ou nome do contato',
         ),
       status: z.enum(LEAD_STATUS).optional().describe('Filtrar por status atual do lead'),
+      temperature: z
+        .enum(['HOT', 'WARM', 'COLD'])
+        .optional()
+        .describe('Filtrar por temperatura do lead (HOT, WARM ou COLD)'),
+      minScore: z
+        .number()
+        .min(0)
+        .max(100)
+        .optional()
+        .describe('Pontuação mínima de ICP Fit (0 a 100)'),
+      needsEnrichment: z
+        .boolean()
+        .optional()
+        .describe(
+          'Se true, filtra apenas oportunidades que precisam de enriquecimento cadastral/firmográfico',
+        ),
       limit: z.number().min(1).max(20).optional().describe('Máximo de resultados (padrão 10)'),
     }),
   },
 );
 
 /**
- * Ferramenta para o agente buscar o contexto completo de um Lead (empresa, contato, interações)
+ * Ferramenta para o agente buscar o contexto canônico completo de um Lead (empresa enriquecida, ICP Fit, temperatura, estagnação, contato e histórico).
  */
 export const getLeadContextTool = tool(
   async ({ leadId }: { leadId: string }) => {
@@ -99,40 +145,23 @@ export const getLeadContextTool = tool(
     }
 
     const lead = await prisma.lead.findFirst({
-      where: { id: leadId, organizationId },
-      include: { company: true, contact: true },
+      where: { id: leadId, organizationId, deletedAt: null },
+      include: {
+        company: true,
+        contact: true,
+        activities: { take: 10, orderBy: { date: 'desc' } },
+      },
     });
 
     if (!lead) {
       return 'Erro: Lead não encontrado no CRM.';
     }
 
-    const c = lead.company;
+    const canonicalCtx = buildCanonicalEnrichmentContext(lead);
+    let context = formatCanonicalEnrichmentForAgent(canonicalCtx);
+
     const p = lead.contact;
-
-    let context = `Lead ID: ${lead.id}\nStatus atual: ${lead.status}\n`;
-
-    if (c) {
-      context += `Empresa: ${c.tradeName}\n`;
-      context += `Segmento: ${c.segment || 'Desconhecido'}\n`;
-      context += `Porte: ${c.size || 'Desconhecido'}\n`;
-      context += `Situação Cadastral: ${c.situacaoCadastral || 'Desconhecido'}\n`;
-      context += `Tecnologias: ${c.technologies?.join(', ') || 'Nenhuma identificada'}\n`;
-      context += `Resumo Enriquecimento: ${c.observations || 'Nenhum'}\n`;
-    }
-
-    if (p) {
-      context += `\nContato: ${p.name} (${p.role || 'Cargo desconhecido'})\n`;
-    }
-
-    // SEC-013b: este texto vira uma ToolMessage devolvida ao LLM externo (Groq/OpenAI)
-    // dentro do loop de tool-calling do agente — sem isto, o nome real do contato ia direto pro
-    // provedor. Diferente de ai.service.ts/sdrOutboundDraft.agent.ts (chamada única, resposta reidratada no
-    // fim), aqui o texto reentra num agente multi-turn: reidratar de volta exigiria rastrear o
-    // token pelo estado do grafo até onde a saída final chega no humano — não coberto ainda,
-    // então o pior caso hoje é "[NOME_DO_CONTATO]" aparecer cru se a IA ecoar o token de volta
-    // no resumo de qualificação, nunca o nome real vazando pro provedor externo.
-    if (p) {
+    if (p?.name) {
       context = minimizePii(context, [{ token: '[NOME_DO_CONTATO]', value: p.name }]).text;
     }
 
@@ -141,7 +170,7 @@ export const getLeadContextTool = tool(
   {
     name: 'get_lead_context',
     description:
-      'Obtém as informações detalhadas e dados enriquecidos de uma empresa e contato a partir do ID do Lead.',
+      'Obtém as informações detalhadas e dados enriquecidos canônicos de uma empresa e contato a partir do ID do Lead (inclui ICP Fit, temperatura, histórico de estagnação, firmografia e completude).',
     schema: z.object({
       leadId: z.string().describe('O ID do Lead (ex: cm0v...)'),
     }),

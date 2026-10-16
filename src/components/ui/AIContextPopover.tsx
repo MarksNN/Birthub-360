@@ -123,7 +123,7 @@ export function AIContextPopover({
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
-            className="z-[200] w-72 rounded-2xl border border-brand/40 bg-surface/95 shadow-glow-brand backdrop-blur-xl"
+            className="z-[200] w-72 overflow-hidden rounded-card border border-line bg-surface shadow-card"
             role="dialog"
             aria-label={`Insight de IA — ${ENTITY_LABELS[entityType]} ${entityName}`}
           >
@@ -131,15 +131,17 @@ export function AIContextPopover({
 
             {/* Header */}
             <div className="flex items-center justify-between border-b border-line px-4 py-3">
-              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-ink dark:text-brand">
-                <Sparkles className="h-3.5 w-3.5" />
-                IA — {ENTITY_LABELS[entityType]}
+              <span className="flex items-center gap-2 text-[13px] font-semibold tracking-[-0.011em] text-ink">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-[color:color-mix(in_srgb,var(--iris)_16%,var(--surface))] text-[color:var(--iris)]">
+                  <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} />
+                </span>
+                {ENTITY_LABELS[entityType]}
               </span>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Fechar insight"
-                className="rounded-lg p-1 text-ink-2 hover:bg-surface-2 hover:text-ink transition-colors"
+                className="grid h-8 w-8 place-items-center rounded-full text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -157,21 +159,23 @@ export function AIContextPopover({
               )}
 
               {error && (
-                <p className="rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</p>
+                <p className="rounded-card border border-line bg-[color:color-mix(in_srgb,var(--critical)_9%,var(--surface))] px-3 py-2 text-xs text-ink">
+                  {error}
+                </p>
               )}
 
               {insight && !loading && (
                 <div className="space-y-2.5">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-ink-2 mb-1">
+                    <p className="mb-1 text-[11px] font-medium tracking-[0.08em] text-ink-2">
                       Resumo
                     </p>
                     <p className="text-sm text-ink leading-relaxed">{insight.summary}</p>
                   </div>
 
                   {insight.nextAction && (
-                    <div className="rounded-xl bg-brand/10 px-3 py-2">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-brand-ink dark:text-brand mb-0.5">
+                    <div className="rounded-card bg-[color:color-mix(in_srgb,var(--brand)_8%,var(--surface))] px-3 py-2">
+                      <p className="mb-0.5 text-[11px] font-medium tracking-[0.08em] text-ink-2">
                         Próxima Ação Recomendada
                       </p>
                       <p className="text-xs text-ink">{insight.nextAction}</p>
@@ -179,8 +183,8 @@ export function AIContextPopover({
                   )}
 
                   {insight.risk && (
-                    <div className="rounded-xl bg-amber-500/10 px-3 py-2">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-0.5">
+                    <div className="rounded-card bg-[color:color-mix(in_srgb,var(--warn)_12%,var(--surface))] px-3 py-2">
+                      <p className="mb-0.5 text-[11px] font-medium tracking-[0.08em] text-ink-2">
                         Risco
                       </p>
                       <p className="text-xs text-ink">{insight.risk}</p>

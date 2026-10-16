@@ -2,6 +2,7 @@ import { MailerNotConfiguredError, sendEmail } from '../../../../lib/email/maile
 import { logger } from '../../../../lib/logger.js';
 import { prisma } from '../../../../lib/prisma.js';
 import { sendWhatsAppMessage } from '../../../integrations/whatsapp/whatsapp.service.js';
+import { syncActivityToBitrix } from '../../../integrations/bitrix/service/outboundSync.js';
 import type { CadenceDispatcher } from '../../application/cadenceService.js';
 import type { CadenceRunState, CadenceTouch } from '../../domain/cadence.js';
 import { checkOptOutStatus } from '../../../../shared/services/optOutCheck.service.js';
@@ -104,8 +105,55 @@ export const whatsAppCadenceDispatcher: Pick<CadenceDispatcher, 'dispatch'> = {
         undefined,
         { leadId: run.leadId },
       );
-      // sendWhatsAppMessage não devolve o id da mensagem do provedor (Baileys) hoje — ver
-      // limitação documentada em docs/CADENCE-CYCLE-AUDIT.md.
+
+      // Registra Activity e TimelineEvent de saída para visualização no CRM
+      await prisma.activity
+        .create({
+          data: {
+            organizationId: run.organizationId,
+            leadId: run.leadId,
+            type: 'WhatsApp' as never,
+            status: 'Concluida' as never,
+            owner: 'Cadência Multicanal',
+            date: new Date(),
+            observations: `Toque de cadência WhatsApp enviado (ordem ${touch.order}):\n${touch.templateRef}`,
+          },
+        })
+        .catch((err) =>
+          logger.warn(
+            { err, leadId: run.leadId },
+            'Falha ao registrar Activity de WhatsApp da cadência',
+          ),
+        );
+
+      await prisma.timelineEvent
+        .create({
+          data: {
+            type: 'whatsapp',
+            description: `Disparo de cadência via WhatsApp: "${(touch.templateRef || '').slice(0, 150)}"`,
+            leadId: run.leadId,
+          },
+        })
+        .catch((err) =>
+          logger.warn(
+            { err, leadId: run.leadId },
+            'Falha ao registrar TimelineEvent de WhatsApp da cadência',
+          ),
+        );
+
+      syncActivityToBitrix(run.organizationId, run.leadId, {
+        type: 'whatsapp',
+        subject: `Cadência: WhatsApp toque #${touch.order}`,
+        description: touch.templateRef ?? undefined,
+        completed: true,
+        direction: 'outbound',
+      }).catch((err) =>
+        logger.warn(
+          { err, leadId: run.leadId },
+          'Falha ao espelhar atividade de WhatsApp da cadência no Bitrix24',
+        ),
+      );
+
       return { result: 'sent' as const, providerMessageId: null };
     } catch (err: any) {
       const message = err instanceof Error ? err.message : String(err);
@@ -169,6 +217,55 @@ export const emailCadenceDispatcher: Pick<CadenceDispatcher, 'dispatch'> = {
     const { subject, body } = splitSubjectAndBody(touch.templateRef, run.sequenceId);
     try {
       const { messageId } = await sendEmail({ to: email, subject, text: body });
+
+      // Registra Activity e TimelineEvent de saída para visualização no CRM
+      await prisma.activity
+        .create({
+          data: {
+            organizationId: run.organizationId,
+            leadId: run.leadId,
+            type: 'Email' as never,
+            status: 'Concluida' as never,
+            owner: 'Cadência Multicanal',
+            date: new Date(),
+            observations: `Toque de cadência E-mail enviado (ordem ${touch.order}):\nAssunto: ${subject}\n\n${body}`,
+          },
+        })
+        .catch((err) =>
+          logger.warn(
+            { err, leadId: run.leadId },
+            'Falha ao registrar Activity de E-mail da cadência',
+          ),
+        );
+
+      await prisma.timelineEvent
+        .create({
+          data: {
+            type: 'email',
+            description: `Disparo de cadência via E-mail: "${subject}"`,
+            leadId: run.leadId,
+          },
+        })
+        .catch((err) =>
+          logger.warn(
+            { err, leadId: run.leadId },
+            'Falha ao registrar TimelineEvent de E-mail da cadência',
+          ),
+        );
+
+      syncActivityToBitrix(run.organizationId, run.leadId, {
+        type: 'email',
+        subject: `Cadência: E-mail - ${subject}`,
+        description: body,
+        completed: true,
+        direction: 'outbound',
+      }).catch((err) =>
+        logger.warn(
+          { err, leadId: run.leadId },
+          'Falha ao espelhar atividade de E-mail da cadência no Bitrix24',
+        ),
+      );
+
       return { result: 'sent' as const, providerMessageId: messageId };
     } catch (err: any) {
       const message =

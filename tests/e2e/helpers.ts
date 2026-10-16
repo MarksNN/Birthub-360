@@ -58,6 +58,33 @@ export async function signUp(
     await prisma.user.update({ where: { email }, data: { emailVerified: true } });
   }
 
+  if (completeOnboarding) {
+    requestContext.enterWith({ bypassRls: true });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { organizationId: true },
+    });
+    if (user?.organizationId) {
+      await prisma.setting.updateMany({
+        where: { organizationId: user.organizationId, key: 'organization.modules' },
+        data: {
+          value: {
+            enabledModules: [
+              'crm-comercial',
+              'prospect-inteligente',
+              'inteligencia-mercado',
+              'hub',
+              'automacoes',
+              'performance',
+            ],
+            onboardingCompletedAt: new Date().toISOString(),
+            updatedByUserId: null,
+          },
+        },
+      });
+    }
+  }
+
   // Remove eventual sessão criada pelo cadastro para provar um login novo com a senha.
   await page.context().clearCookies();
   await page.goto('/login');
@@ -78,8 +105,8 @@ export async function signUp(
 
   await page.waitForURL(/\/(app|setup)(?:[/?#]|$)/, { timeout: 45_000 });
   if (completeOnboarding && new URL(page.url()).pathname === '/setup') {
-    await page.getByRole('button', { name: /Continuar/ }).click();
-    await page.getByRole('button', { name: /Ir para o Dashboard/ }).click();
+    await page.getByRole('button', { name: /Continuar/i }).click();
+    await page.getByRole('button', { name: /(Salvar e )?ir para o Dashboard/i }).click();
   }
   await expect(page).toHaveURL(completeOnboarding ? /\/app(?:[/?#]|$)/ : /\/setup(?:[/?#]|$)/, { timeout: 15_000 });
 

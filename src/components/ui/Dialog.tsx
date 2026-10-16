@@ -23,7 +23,7 @@ const DIALOG_SURFACE =
   'fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[var(--radius-modal)] border border-line bg-surface-elevated p-6 text-ink duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95';
 
 const DIALOG_CLOSE_CLASS =
-  'absolute right-4 top-4 rounded-sm text-ink-2 opacity-80 transition-opacity hover:opacity-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none';
+  'absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:pointer-events-none';
 
 const DialogPortal = DialogPrimitive.Portal;
 
@@ -55,14 +55,14 @@ const DialogContent = React.forwardRef<
       aria-modal="true"
       className={cn(
         DIALOG_SURFACE,
-        'max-w-lg shadow-[var(--shadow-elevated)] data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+        'max-w-lg bg-surface shadow-card data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
         className,
       )}
       {...props}
     >
       {children}
       <DialogPrimitive.Close aria-label="Fechar modal" className={DIALOG_CLOSE_CLASS}>
-        <X className="h-4 w-4" aria-hidden="true" />
+        <X className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
@@ -89,7 +89,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      'text-lg font-display font-semibold leading-tight tracking-tight text-ink',
+      'font-display text-lg font-semibold leading-tight tracking-[-0.02em] text-ink',
       className,
     )}
     {...props}
@@ -176,7 +176,7 @@ function Dialog({
           {footer && <DialogFooter>{footer}</DialogFooter>}
           {!preventClose && (
             <DialogPrimitive.Close aria-label="Fechar modal" className={DIALOG_CLOSE_CLASS}>
-              <X className="h-4 w-4" aria-hidden="true" />
+              <X className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
             </DialogPrimitive.Close>
           )}
         </DialogPrimitive.Content>

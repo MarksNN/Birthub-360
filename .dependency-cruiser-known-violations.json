@@ -141,6 +141,15 @@
       "name": "no-cross-feature-imports",
       "severity": "error"
     },
+    "to": "src/features/integrations/bitrix/service/outboundSync.ts"
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/cadence/infra/dispatchers/CadenceDispatchers.ts",
+    "rule": {
+      "name": "no-cross-feature-imports",
+      "severity": "error"
+    },
     "to": "src/features/integrations/whatsapp/whatsapp.service.ts"
   },
   {
@@ -406,6 +415,15 @@
   },
   {
     "type": "dependency",
+    "from": "src/features/integrations/birth-voice/voiceResult.webhook.ts",
+    "rule": {
+      "name": "no-cross-feature-imports",
+      "severity": "error"
+    },
+    "to": "src/features/cadence/infra/cadenceWebhookResolver.ts"
+  },
+  {
+    "type": "dependency",
     "from": "src/features/integrations/email/emailReply.webhook.ts",
     "rule": {
       "name": "no-cross-feature-imports",
@@ -439,6 +457,15 @@
       "severity": "error"
     },
     "to": "src/features/cadence/infra/PrismaSignatureRequestRepository.ts"
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/integrations/threecx/threecx.service.ts",
+    "rule": {
+      "name": "no-cross-feature-imports",
+      "severity": "error"
+    },
+    "to": "src/features/cadence/infra/cadenceWebhookResolver.ts"
   },
   {
     "type": "dependency",
@@ -546,15 +573,6 @@
       "severity": "error"
     },
     "to": "src/features/integrations/bitrix/bitrix.service.ts"
-  },
-  {
-    "type": "dependency",
-    "from": "src/features/prospecting/components/prospecting-hub/CandidateCard.tsx",
-    "rule": {
-      "name": "no-cross-feature-imports",
-      "severity": "error"
-    },
-    "to": "src/features/integrations/whatsapp/components/WhatsAppChatPanel.tsx"
   },
   {
     "type": "dependency",

@@ -16,53 +16,53 @@ const ACCENTS: Record<
   { bar: string; chip: string; title: string; eyebrow: string; card: string }
 > = {
   brand: {
-    bar: 'bg-brand',
-    chip: 'bg-brand/10 border-brand/25 text-brand-ink dark:text-brand',
-    title: 'text-brand-ink dark:text-brand',
-    eyebrow: 'text-brand-ink dark:text-brand',
-    card: 'border-brand/25 bg-brand/[0.04]',
+    bar: 'bg-[color:var(--brand-text)]',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
   pink: {
     bar: 'bg-[color:var(--color-heading-pink)]',
-    chip: 'bg-[color:var(--color-heading-pink)]/10 border-[color:var(--color-heading-pink)]/25 text-[color:var(--color-heading-pink)] dark:text-[color:var(--color-heading-pink)]',
-    title: 'text-[color:var(--color-heading-pink)] dark:text-[color:var(--color-heading-pink)]',
-    eyebrow: 'text-[color:var(--color-heading-pink)] dark:text-[color:var(--color-heading-pink)]',
-    card: 'border-[color:var(--color-heading-pink)]/25 bg-[color:var(--color-heading-pink)]/[0.04]',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
   gold: {
     bar: 'bg-[color:var(--color-heading-gold)]',
-    chip: 'bg-[color:var(--color-heading-gold)]/10 border-[color:var(--color-heading-gold)]/30 text-[color:var(--color-heading-gold)] dark:text-[color:var(--color-heading-gold)]',
-    title: 'text-[color:var(--color-heading-gold)] dark:text-[color:var(--color-heading-gold)]',
-    eyebrow: 'text-[color:var(--color-heading-gold)] dark:text-[color:var(--color-heading-gold)]',
-    card: 'border-[color:var(--color-heading-gold)]/25 bg-[color:var(--color-heading-gold)]/[0.04]',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
   iris: {
-    bar: 'bg-iris',
-    chip: 'bg-iris/10 border-iris/25 text-accent-violet',
-    title: 'text-accent-violet',
-    eyebrow: 'text-accent-violet',
-    card: 'border-iris/25 bg-iris/[0.04]',
+    bar: 'bg-[color:var(--iris)]',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
   success: {
-    bar: 'bg-success',
-    chip: 'bg-success/10 border-success/25 text-success-active dark:text-success',
-    title: 'text-success-active dark:text-success',
-    eyebrow: 'text-success-active dark:text-success',
-    card: 'border-success/25 bg-success/[0.04]',
+    bar: 'bg-[color:var(--ok)]',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
   warning: {
-    bar: 'bg-warning',
-    chip: 'bg-warning/10 border-warning/25 text-warning-active dark:text-warning',
-    title: 'text-warning-active dark:text-warning',
-    eyebrow: 'text-warning-active dark:text-warning',
-    card: 'border-warning/25 bg-warning/[0.04]',
+    bar: 'bg-[color:var(--gold)]',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
   neutral: {
     bar: 'bg-line-strong',
-    chip: 'bg-surface-2 border-line text-[color:var(--color-heading-blue)]',
-    title: 'text-[color:var(--color-heading-blue)]',
-    eyebrow: 'text-[color:var(--color-heading-blue)]',
-    card: 'border-line bg-surface',
+    chip: 'border-line bg-[color:color-mix(in_srgb,var(--ink)_4%,var(--surface))] text-ink',
+    title: 'text-ink',
+    eyebrow: 'text-ink-2',
+    card: '',
   },
 };
 
@@ -112,7 +112,7 @@ export function PageTitleCard({
         {iconNode && (
           <span
             className={cn(
-              'grid h-11 w-11 shrink-0 place-items-center rounded-control border',
+              'grid h-10 w-10 shrink-0 place-items-center rounded-full border',
               accent
                 ? a.chip
                 : 'text-[color:var(--card-accent)] border-[color:var(--card-accent)] bg-surface-elevated',
@@ -123,14 +123,16 @@ export function PageTitleCard({
         )}
         <div className="min-w-0">
           {eyebrow && (
-            <p className={cn('bh-label mb-0.5 font-bold uppercase tracking-[0.18em]', a.eyebrow)}>
+            <p
+              className={cn('mb-1 text-[11px] font-medium uppercase tracking-[0.08em]', a.eyebrow)}
+            >
               {eyebrow}
             </p>
           )}
           <div className="flex flex-wrap items-center gap-2.5">
             <Heading
               className={cn(
-                'font-display text-xl font-bold leading-tight tracking-tight sm:text-2xl',
+                'font-display text-xl font-semibold leading-tight tracking-[-0.02em] sm:text-2xl',
                 a.title,
               )}
             >

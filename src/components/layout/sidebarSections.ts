@@ -69,7 +69,7 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
         {
           id: 'revenue_tree',
           label: 'Pipeline CRM',
-          ariaLabel: 'Pipeline & CRM',
+          ariaLabel: 'Pipeline CRM',
           icon: TAB_META.crm.icon,
           primaryTab: 'crm',
           subItems: [
@@ -212,7 +212,7 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
         {
           id: 'performance',
           label: TAB_META.analytics.label,
-          ariaLabel: 'Performance Comercial Analytics',
+          ariaLabel: TAB_META.analytics.label,
           icon: TAB_META.analytics.icon,
           primaryTab: 'analytics',
         },

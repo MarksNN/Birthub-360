@@ -34,9 +34,8 @@ export default defineConfig({
     fileParallelism,
     include: [
       'tests/unit/**/*.test.ts',
+      'src/**/__tests__/**/*.test.ts',
       'tests/unit/**/*.test.tsx',
-      'src/**/*.test.ts',
-      'src/**/*.test.tsx',
     ],
     coverage: {
       provider: 'v8',

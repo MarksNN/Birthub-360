@@ -5,11 +5,14 @@ import { RdStationProvider } from '@/features/integrations/rdstation/RdStationPr
 
 // Global fetch mock
 const fetchMock = vi.fn();
-global.fetch = fetchMock;
 
 describe('External CRM Providers (HubSpot, RD Station)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('fetch', fetchMock);
+    if (typeof window !== 'undefined') {
+      window.fetch = fetchMock;
+    }
     registerCrmProvider(HubSpotProvider);
     registerCrmProvider(RdStationProvider);
   });
