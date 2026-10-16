@@ -44,6 +44,13 @@ export class OptOutSuppressedError extends Error {
   }
 }
 
+function requireOptOutReason(result: OptOutCheckResult): string {
+  if (typeof result.reason !== 'string' || result.reason.length === 0) {
+    throw new Error('Blocked opt-out result is missing a reason.');
+  }
+  return result.reason;
+}
+
 /**
  * Palavras-chave padronizadas de opt-out multicanal.
  * Cobre termos em português e inglês ("SAIR", "STOP", "CANCELAR", "DESCADASTRO", etc.),
@@ -116,7 +123,11 @@ export async function checkOptOutStatus(
       matchedBy: 'missing_params',
     };
     if (options?.throwOnBlocked) {
-      throw new OptOutSuppressedError(contactId || 'unknown', channel || 'unknown', result.reason!);
+      throw new OptOutSuppressedError(
+        contactId || 'unknown',
+        channel || 'unknown',
+        requireOptOutReason(result),
+      );
     }
     return result;
   }
@@ -150,7 +161,7 @@ export async function checkOptOutStatus(
       matchedBy: 'tenant_mismatch',
     };
     if (options?.throwOnBlocked) {
-      throw new OptOutSuppressedError(contactId, channel, result.reason!);
+      throw new OptOutSuppressedError(contactId, channel, requireOptOutReason(result));
     }
     return result;
   }
@@ -166,7 +177,7 @@ export async function checkOptOutStatus(
       matchedBy: 'anonymized',
     };
     if (options?.throwOnBlocked) {
-      throw new OptOutSuppressedError(contactId, channel, result.reason!);
+      throw new OptOutSuppressedError(contactId, channel, requireOptOutReason(result));
     }
     return result;
   }
@@ -191,7 +202,7 @@ export async function checkOptOutStatus(
       matchedBy: 'contact_flag',
     };
     if (options?.throwOnBlocked) {
-      throw new OptOutSuppressedError(contactId, channel, result.reason!);
+      throw new OptOutSuppressedError(contactId, channel, requireOptOutReason(result));
     }
     return result;
   }
@@ -215,7 +226,7 @@ export async function checkOptOutStatus(
           matchedBy: 'lead_flag',
         };
         if (options?.throwOnBlocked) {
-          throw new OptOutSuppressedError(contactId, channel, result.reason!);
+          throw new OptOutSuppressedError(contactId, channel, requireOptOutReason(result));
         }
         return result;
       }
@@ -269,7 +280,7 @@ export async function checkOptOutStatus(
           matchedBy: 'opt_out_record',
         };
         if (options?.throwOnBlocked) {
-          throw new OptOutSuppressedError(contactId, channel, result.reason!);
+          throw new OptOutSuppressedError(contactId, channel, requireOptOutReason(result));
         }
         return result;
       }

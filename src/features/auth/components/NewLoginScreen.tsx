@@ -444,7 +444,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
           {/* Widget Flutuante 1 (Direita Superior) */}
           <div className="vancouver-floating-card-1 hidden md:block">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center border border-emerald-100">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
@@ -452,7 +452,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                   Pipeline Previsto
                 </p>
                 <p className="text-base font-bold text-brand">
-                  R$ 4.280.000 <span className="text-xs text-emerald-600 font-bold">+28.4%</span>
+                  R$ 4.280.000 <span className="text-xs text-emerald-800 font-bold">+28.4%</span>
                 </p>
               </div>
             </div>
@@ -1181,7 +1181,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <span className="font-bold text-xs text-blue-700">PG</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="Google Workspace">
-              <span className="font-bold text-xs text-amber-700">G-W</span>
+              <span className="font-bold text-xs text-amber-800">G-W</span>
             </div>
             <div className="vancouver-ecosystem-circle" title="Redis Cache">
               <span className="font-bold text-xs text-rose-700">RDS</span>
