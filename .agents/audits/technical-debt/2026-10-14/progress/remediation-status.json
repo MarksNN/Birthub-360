@@ -57,22 +57,25 @@
         "08",
         "18"
       ],
-      "remediationStatus": "PATCH_PROPOSED",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Patch candidato isolado (não integrado em main)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "node scripts/verify-technical-debt-inventory.cjs",
+        "npx tsc --noEmit"
+      ],
+      "validationResult": "PASSED: scripts/db/create-app-role.sql e docs/development/LOCAL_FIRST.md incluem NOBYPASSRLS explicitamente em CREATE ROLE e ALTER ROLE para prospector_app.",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-01-ops-002.md",
-      "notes": "Patch candidato identificado na auditoria e não integrado. Não é correção concluída nem validada."
+      "notes": "PASSED: scripts/db/create-app-role.sql e docs/development/LOCAL_FIRST.md incluem NOBYPASSRLS explicitamente em CREATE ROLE e ALTER ROLE para prospector_app."
     },
     {
       "id": "DEBT-DB-002",
@@ -115,22 +118,24 @@
         "17",
         "00"
       ],
-      "remediationStatus": "PATCH_PROPOSED",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Patch candidato isolado (não integrado em main)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "npx vitest run -c vitest.unit.config.ts src/shared/services/__tests__/dataSubjectErasure.unit.test.ts"
+      ],
+      "validationResult": "PASSED (7/7 tests): eraseDataSubject grava OptOutRecord antes de anonimizar identificadores do Contact e propaga falha sem destruir email/telefone.",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-lancamento-20261014/00-para-01-fnd-01.md",
-      "notes": "Patch candidato identificado na auditoria e não integrado. Não é correção concluída nem validada."
+      "notes": "PASSED (7/7 tests): eraseDataSubject grava OptOutRecord antes de anonimizar identificadores do Contact e propaga falha sem destruir email/telefone."
     },
     {
       "id": "DEBT-LGPD-002",
@@ -280,22 +285,24 @@
         "06",
         "00"
       ],
-      "remediationStatus": "OPEN",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "npx vitest run -c vitest.unit.config.ts tests/unit/lib/process-guards.test.ts"
+      ],
+      "validationResult": "PASSED (3/3 tests): isKnownRedisUnavailableRejection exige matchesKnownPattern && looksLikeIoredis; ECONNRESET fora de Redis encerra com logger.fatal + process.exit(1).",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-16-debt-20261014-ops-006.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "PASSED (3/3 tests): isKnownRedisUnavailableRejection exige matchesKnownPattern && looksLikeIoredis; ECONNRESET fora de Redis encerra com logger.fatal + process.exit(1)."
     },
     {
       "id": "DEBT-OPS-007",
@@ -307,22 +314,24 @@
         "06",
         "00"
       ],
-      "remediationStatus": "OPEN",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "npx vitest run -c vitest.unit.config.ts tests/unit/bootstrap/shutdown.test.ts"
+      ],
+      "validationResult": "PASSED (8/8 tests): shutdown inicia httpServer.close, fecha streams SSE via sseService.closeAll() antes de aguardar o dreno HTTP com deadline, e isola etapas em try/catch best-effort.",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-16-debt-20261014-ops-007.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "PASSED (8/8 tests): shutdown inicia httpServer.close, fecha streams SSE via sseService.closeAll() antes de aguardar o dreno HTTP com deadline, e isola etapas em try/catch best-effort."
     },
     {
       "id": "DEBT-UX-003",
@@ -666,22 +675,24 @@
         "02",
         "04"
       ],
-      "remediationStatus": "OPEN",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "npx vitest run -c vitest.unit.config.ts tests/unit/features/analytics/AnalyticsUseCases.dashboard.test.ts"
+      ],
+      "validationResult": "PASSED (19/19 tests): AnalyticsUseCases utiliza brazilMonthKey/brazilMonthRange/shiftBrazilMonth (America/Sao_Paulo); 2026-10-01T01:00:00Z contabilizado em 2026-09.",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-04-debt-20261014-ux-004.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "PASSED (19/19 tests): AnalyticsUseCases utiliza brazilMonthKey/brazilMonthRange/shiftBrazilMonth (America/Sao_Paulo); 2026-10-01T01:00:00Z contabilizado em 2026-09."
     },
     {
       "id": "DEBT-MOB-001",
@@ -832,22 +843,24 @@
         "06",
         "00"
       ],
-      "remediationStatus": "OPEN",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "npx vitest run -c vitest.unit.config.ts tests/unit/features/integrations/bitrix/client.timeout.test.ts"
+      ],
+      "validationResult": "PASSED (2/2 tests): testWebhook e callBitrix preservam timer do AbortController até concluir leitura do body JSON via readJsonWithSignal, abortando com 504 em 15s.",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-06-debt-20261014-int-001.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "PASSED (2/2 tests): testWebhook e callBitrix preservam timer do AbortController até concluir leitura do body JSON via readJsonWithSignal, abortando com 504 em 15s."
     },
     {
       "id": "DEBT-UX-007",
@@ -886,22 +899,24 @@
         "06",
         "00"
       ],
-      "remediationStatus": "OPEN",
-      "validationStatus": "NOT_VALIDATED",
+      "remediationStatus": "VERIFIED",
+      "validationStatus": "VALIDATED",
       "auditStatus": "CONFIRMED",
-      "releaseStatus": "BLOCKED",
+      "releaseStatus": "READY",
       "originalCorrectionState": "Não iniciada (aguarda autorização)",
       "originalState": "Confirmado / Aberto",
-      "lastUpdate": "2026-10-14T13:02:12-03:00",
+      "lastUpdate": "2026-10-15T22:56:00-03:00",
       "updatedBy": "00",
-      "branch": null,
+      "branch": "integracao/onda-saneamento-20261015",
       "pullRequest": null,
-      "fixCommit": null,
-      "testsExecuted": [],
-      "validationResult": null,
-      "closureEvidence": null,
+      "fixCommit": "19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63",
+      "testsExecuted": [
+        "npx vitest run -c vitest.unit.config.ts tests/unit/lib/ai/streaming-quota.test.ts"
+      ],
+      "validationResult": "PASSED (2/2 tests): streamChatCompletion aplica tokenQuotaService.enforceTokenQuota antes do fetch e registra uso pós-stream via tokenQuotaService.recordUsage.",
+      "closureEvidence": "Commit 19bab04a2c0cd6ff61c556a44f99d1fc4f70ff63 + Revisão Independente APROVADA (.agents/reviews/onda-saneamento-20261015-24-revisao-independente.md)",
       "handoffPath": ".agents/handoffs/onda-dividas-20261014/00-para-23-debt-20261014-ai-001.md",
-      "notes": "Auditoria confirmou o achado. Correção não iniciada neste registro."
+      "notes": "PASSED (2/2 tests): streamChatCompletion aplica tokenQuotaService.enforceTokenQuota antes do fetch e registra uso pós-stream via tokenQuotaService.recordUsage."
     },
     {
       "id": "DEBT-PERF-001",
