@@ -224,9 +224,9 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
         },
         {
           id: 'gamification',
-          label: 'Gamificação',
-          icon: TAB_META.roleplay.icon,
-          primaryTab: 'roleplay',
+          label: TAB_META.gamification.label,
+          icon: TAB_META.gamification.icon,
+          primaryTab: 'gamification',
         },
       ],
     },

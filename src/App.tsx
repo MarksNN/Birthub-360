@@ -263,6 +263,11 @@ const DocumentEditor = lazy(() =>
 const Team = lazy(() =>
   import('./features/team/components/Team.js').then((m) => ({ default: m.Team })),
 );
+const GamificationView = lazy(() =>
+  import('./features/gamification/components/GamificationView.js').then((m) => ({
+    default: m.GamificationView,
+  })),
+);
 const ModuleAccessAdmin = lazy(() =>
   import('./features/module-access/components/ModuleAccessAdmin.js').then((m) => ({
     default: m.ModuleAccessAdmin,
@@ -443,6 +448,7 @@ function AppLayout() {
             <Route path="integrations" element={<Integrations />} />
             <Route path="knowledge" element={<KnowledgeBase />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="gamification" element={<GamificationView />} />
             <Route path="winloss" element={<WinLossAnalysis />} />
             <Route path="market-intelligence" element={<Ldr />} />
             <Route path="market-intelligence/hub" element={<InteligenciaMercadoHub />} />

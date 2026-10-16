@@ -38,6 +38,7 @@ import {
   ShieldCheck,
   Stethoscope,
   Target,
+  Trophy,
   UserCog,
   Users,
   Wallet,
@@ -115,6 +116,7 @@ export type TabType =
   | 'forecast'
   | 'metas'
   | 'pipeline_ponderado'
+  | 'gamification'
   | 'playbooks'
   | 'jornadas'
   | 'processos'
@@ -184,6 +186,7 @@ export const TAB_META: Record<TabType, { label: string; icon: any; accent: NavAc
   // PILAR 04 — PERFORMANCE COMERCIAL
   dashboard: { label: 'Command Center', icon: PerformanceIcon as any, accent: 'gold' },
   analytics: { label: 'Analytics', icon: BarChart3, accent: 'blue' },
+  gamification: { label: 'Gamificação', icon: Trophy, accent: 'gold' },
   winloss: { label: 'Win/Loss', icon: Target, accent: 'red' },
   reports: { label: 'Relatórios Avançados', icon: FileBarChart, accent: 'slate' },
   settings_performance: { label: 'Ajustes de Performance', icon: SettingsIcon, accent: 'slate' },
