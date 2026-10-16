@@ -53,6 +53,31 @@ vi.mock('@/lib/ai/gateway', async () => {
   };
 });
 
+vi.mock('@/features/intelligence/agents/fallback.util', () => ({
+  buildModelWithFallback: () => {
+    const stubModel: any = {
+      invoke: async () => ({
+        content: STUBBED_RECOMMENDATION,
+        _getType: () => 'ai',
+      }),
+      bindTools: () => stubModel,
+      withFallbacks: () => stubModel,
+    };
+    return stubModel;
+  },
+  buildModelWithFallbackAndTools: () => {
+    const stubModel: any = {
+      invoke: async () => ({
+        content: STUBBED_RECOMMENDATION,
+        _getType: () => 'ai',
+      }),
+      bindTools: () => stubModel,
+      withFallbacks: () => stubModel,
+    };
+    return stubModel;
+  },
+}));
+
 const { prisma } = await import('@/lib/prisma');
 const { requestContext } = await import('@/lib/async-context');
 const { runSwarmScheduler, getSwarmSloSnapshot } =
