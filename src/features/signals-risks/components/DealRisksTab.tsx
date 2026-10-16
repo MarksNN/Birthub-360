@@ -118,6 +118,11 @@ export function DealRisksTab({
             <span className="text-ink-3">
               Em cooldown (já alertados): {scanResult.skippedCooldown}
             </span>
+            {scanResult.errors > 0 && (
+              <span className="text-critical font-bold">
+                Falhas de processamento: {scanResult.errors}
+              </span>
+            )}
           </div>
         )}
 
