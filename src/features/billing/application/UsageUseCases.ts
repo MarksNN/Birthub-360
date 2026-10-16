@@ -32,7 +32,9 @@ export class UsageUseCases {
 
     const [dailyRows, logs, byModelRows, byPromptRows, costThisMonth, unattributedCalls] =
       await Promise.all([
-        hasSqlGroupByDay ? this.usageRepository.groupByDay!(organizationId, since) : Promise.resolve(null),
+        hasSqlGroupByDay
+          ? this.usageRepository.groupByDay!(organizationId, since)
+          : Promise.resolve(null),
         hasSqlGroupByDay
           ? Promise.resolve([])
           : this.usageRepository.findLogsSince(organizationId, since, 5_000),

@@ -114,7 +114,8 @@ export const signalsRisksApi = {
   getRiskNotifications: async (): Promise<NotificationItem[]> => {
     try {
       const response = await api.get<
-        { items: NotificationItem[]; unread: number } | { data?: { items: NotificationItem[]; unread: number } }
+        | { items: NotificationItem[]; unread: number }
+        | { data?: { items: NotificationItem[]; unread: number } }
       >('/api/notifications?unread=1');
       const items = (response as any)?.items ?? (response as any)?.data?.items ?? [];
       // Filtra notificações com teor de risco, sinal ou atenção comercial

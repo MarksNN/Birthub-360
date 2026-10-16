@@ -61,7 +61,8 @@ router.get('/workspace', async (req: Request, res: Response, next: NextFunction)
     const influencablePipeline = openLeads.reduce((sum, l) => sum + Number(l.amount ?? 0), 0);
     const commitForecast = Math.round(
       openLeads.reduce(
-        (sum, l) => sum + Number(l.amount ?? 0) * (Math.min(100, Math.max(0, l.probability ?? 0)) / 100),
+        (sum, l) =>
+          sum + Number(l.amount ?? 0) * (Math.min(100, Math.max(0, l.probability ?? 0)) / 100),
         0,
       ),
     );
@@ -69,8 +70,7 @@ router.get('/workspace', async (req: Request, res: Response, next: NextFunction)
       openLeads.reduce(
         (sum, l) =>
           sum +
-          Number(l.amount ?? 0) *
-            (Math.min(100, Math.max(0, l.score ?? l.probability ?? 0)) / 100),
+          Number(l.amount ?? 0) * (Math.min(100, Math.max(0, l.score ?? l.probability ?? 0)) / 100),
         0,
       ),
     );
@@ -251,11 +251,7 @@ router.get(
         missionId: `mission-${lead.id}`,
         title: `Orquestração Tríade: ${accountName}`,
         accountName,
-        status: hasOptOut
-          ? 'WAITING_HUMAN_ACTION'
-          : latestActivity
-            ? 'COMPLETED'
-            : 'IN_PROGRESS',
+        status: hasOptOut ? 'WAITING_HUMAN_ACTION' : latestActivity ? 'COMPLETED' : 'IN_PROGRESS',
         root: 'Tagarela (Supervisor Geral)',
         directors: {
           giselle: {
@@ -439,9 +435,7 @@ router.post(
       const resolvedDecision = decision || feedbackType || 'POSTPONED';
       const now = new Date();
       const nextActionDate =
-        resolvedDecision === 'POSTPONED'
-          ? new Date(now.getTime() + 24 * 60 * 60 * 1000)
-          : null;
+        resolvedDecision === 'POSTPONED' ? new Date(now.getTime() + 24 * 60 * 60 * 1000) : null;
 
       const [activity] = await Promise.all([
         prisma.activity.create({

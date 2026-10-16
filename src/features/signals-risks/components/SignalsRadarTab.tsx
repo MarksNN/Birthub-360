@@ -133,7 +133,7 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
           <p className="text-[11px] text-ink-2 mt-1">
             {coverage?.available
               ? 'Gatilhos de momento de compra monitorados no tenant'
-              : coverage?.reason ?? 'Nenhum sinal ativo registrado no tenant'}
+              : (coverage?.reason ?? 'Nenhum sinal ativo registrado no tenant')}
           </p>
         </Card>
 
@@ -177,7 +177,11 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
             <Sparkles className="w-4 h-4 text-accent-violet" />
           </div>
           <div className="text-2xl font-black text-ink">
-            {loading ? '...' : coverage?.available ? `${coverage.totalSignals} Sinais` : 'Aguardando Dados'}
+            {loading
+              ? '...'
+              : coverage?.available
+                ? `${coverage.totalSignals} Sinais`
+                : 'Aguardando Dados'}
           </div>
           <p className="text-[11px] text-ink-2 mt-1">Classificação algorítmica por timing e fit</p>
         </Card>
@@ -190,7 +194,9 @@ export function SignalsRadarTab({ coverage, loading }: SignalsRadarTabProps) {
           {SIGNAL_TYPES.map((type) => {
             const count =
               type.id === 'TODOS'
-                ? (coverage?.available ? (coverage.totalSignals ?? 0) : 0)
+                ? coverage?.available
+                  ? (coverage.totalSignals ?? 0)
+                  : 0
                 : getSignalCountForType(coverage?.byType, type.id);
             return (
               <button
