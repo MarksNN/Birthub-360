@@ -1,0 +1,594 @@
+{
+  "schemaVersion": 1,
+  "inventoryId": "technical-debt-2026-10-14",
+  "count": 40,
+  "categories": [
+    {
+      "id": "DT-01",
+      "name": "Código-fonte",
+      "focus": "Duplicações, código morto, complexidade, tipagem e tratamento de erros",
+      "leadAgent": "01",
+      "totalChecks": 5,
+      "conforme": 1,
+      "naoConforme": 1,
+      "parcialmenteConforme": 2,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-CODE-001"
+      ]
+    },
+    {
+      "id": "DT-02",
+      "name": "Arquitetura",
+      "focus": "Acoplamento, coesão, modularidade, contratos e escalabilidade",
+      "leadAgent": "01",
+      "totalChecks": 6,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-API-001"
+      ]
+    },
+    {
+      "id": "DT-03",
+      "name": "Frontend e UX",
+      "focus": "React, componentes, CSS, design system, responsividade e acessibilidade",
+      "leadAgent": "02",
+      "totalChecks": 6,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-UX-008"
+      ]
+    },
+    {
+      "id": "DT-04",
+      "name": "Backend e APIs",
+      "focus": "Validação, regras de negócio, transações, idempotência e resiliência",
+      "leadAgent": "01",
+      "totalChecks": 6,
+      "conforme": 3,
+      "naoConforme": 2,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 2,
+      "findingIds": [
+        "DEBT-CAD-001",
+        "DEBT-PERF-001"
+      ]
+    },
+    {
+      "id": "DT-05",
+      "name": "Banco de dados",
+      "focus": "Schema, índices, queries, migrations, integridade e retenção",
+      "leadAgent": "01A",
+      "totalChecks": 7,
+      "conforme": 3,
+      "naoConforme": 2,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 2,
+      "findingsCount": 2,
+      "findingIds": [
+        "DEBT-DB-001",
+        "DEBT-DB-002"
+      ]
+    },
+    {
+      "id": "DT-06",
+      "name": "Segurança e privacidade",
+      "focus": "Auth, autorização, segredos, vulnerabilidades, LGPD e isolamento",
+      "leadAgent": "15",
+      "totalChecks": 7,
+      "conforme": 3,
+      "naoConforme": 3,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 3,
+      "findingIds": [
+        "DEBT-LGPD-001",
+        "DEBT-LGPD-002",
+        "DEBT-SEC-001"
+      ]
+    },
+    {
+      "id": "DT-07",
+      "name": "Infraestrutura e DevOps",
+      "focus": "Ambientes, containers, deploy, rollback, IaC e resiliência",
+      "leadAgent": "10",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 0,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-OPS-003"
+      ]
+    },
+    {
+      "id": "DT-08",
+      "name": "Testes e QA",
+      "focus": "Cobertura, regressões, testes frágeis, integração e E2E",
+      "leadAgent": "08",
+      "totalChecks": 6,
+      "conforme": 3,
+      "naoConforme": 2,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 2,
+      "findingIds": [
+        "DEBT-GATE-001",
+        "DEBT-OPS-001"
+      ]
+    },
+    {
+      "id": "DT-09",
+      "name": "Integrações externas",
+      "focus": "APIs, webhooks, OAuth, limites, sincronização e reconciliação",
+      "leadAgent": "06",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 0,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-INT-001"
+      ]
+    },
+    {
+      "id": "DT-10",
+      "name": "Inteligência artificial",
+      "focus": "Modelos, prompts, agentes, RAG, guardrails e avaliações",
+      "leadAgent": "07",
+      "totalChecks": 8,
+      "conforme": 3,
+      "naoConforme": 4,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 4,
+      "findingIds": [
+        "DEBT-AI-002",
+        "DEBT-AI-003",
+        "DEBT-AI-004",
+        "DEBT-AI-001"
+      ]
+    },
+    {
+      "id": "DT-11",
+      "name": "Documentação",
+      "focus": "Conteúdo ausente, incorreto, obsoleto ou conflitante",
+      "leadAgent": "18",
+      "totalChecks": 6,
+      "conforme": 2,
+      "naoConforme": 3,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 2,
+      "findingIds": [
+        "DEBT-DOC-001",
+        "DEBT-GOV-001"
+      ]
+    },
+    {
+      "id": "DT-12",
+      "name": "Conhecimento técnico",
+      "focus": "Dependência de conhecimento implícito e fluxos não documentados",
+      "leadAgent": "00",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-13",
+      "name": "Governança",
+      "focus": "Responsabilidades, decisões, padrões, políticas e aprovações",
+      "leadAgent": "00",
+      "totalChecks": 6,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 2,
+      "findingIds": [
+        "DEBT-GOV-002",
+        "DEBT-GOV-003"
+      ]
+    },
+    {
+      "id": "DT-14",
+      "name": "Git e versionamento",
+      "focus": "Branches, histórico, conflitos, divergências e proteção",
+      "leadAgent": "08A",
+      "totalChecks": 6,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-GOV-004"
+      ]
+    },
+    {
+      "id": "DT-15",
+      "name": "Revisão de código",
+      "focus": "Revisões insuficientes, ownership e critérios de aprovação",
+      "leadAgent": "24",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 2,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-16",
+      "name": "Configuração",
+      "focus": "Variáveis de ambiente, flags, defaults e inconsistências",
+      "leadAgent": "10",
+      "totalChecks": 6,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-MOB-001"
+      ]
+    },
+    {
+      "id": "DT-17",
+      "name": "Build",
+      "focus": "Reprodutibilidade, tempo de compilação e dependências do build",
+      "leadAgent": "08",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-OPS-002"
+      ]
+    },
+    {
+      "id": "DT-18",
+      "name": "Compatibilidade",
+      "focus": "Runtimes, navegadores, APIs e bibliotecas incompatíveis",
+      "leadAgent": "02",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-19",
+      "name": "Observabilidade",
+      "focus": "Logs, métricas, tracing, correlação e alertas",
+      "leadAgent": "10",
+      "totalChecks": 5,
+      "conforme": 2,
+      "naoConforme": 2,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-OPS-006"
+      ]
+    },
+    {
+      "id": "DT-20",
+      "name": "Manutenção",
+      "focus": "Atualizações adiadas, dependências obsoletas e workarounds",
+      "leadAgent": "14",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-21",
+      "name": "Disponibilidade",
+      "focus": "Pontos únicos de falha, health checks e tolerância a falhas",
+      "leadAgent": "16",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 0,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-OPS-007"
+      ]
+    },
+    {
+      "id": "DT-22",
+      "name": "Recuperação",
+      "focus": "Backups, restauração, RTO, RPO e desastres",
+      "leadAgent": "10",
+      "totalChecks": 5,
+      "conforme": 1,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 3,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-OPS-004"
+      ]
+    },
+    {
+      "id": "DT-23",
+      "name": "Desempenho",
+      "focus": "Latência, CPU, memória, queries, renderização e throughput",
+      "leadAgent": "23",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-24",
+      "name": "Cache",
+      "focus": "Políticas de expiração, invalidação, consistência e isolamento",
+      "leadAgent": "01",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-25",
+      "name": "Filas e eventos",
+      "focus": "Duplicação, ordenação, retentativas, DLQ e confiabilidade",
+      "leadAgent": "16",
+      "totalChecks": 6,
+      "conforme": 4,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-QUEUE-001"
+      ]
+    },
+    {
+      "id": "DT-26",
+      "name": "Custos cloud",
+      "focus": "Recursos ociosos, desperdícios e dimensionamento",
+      "leadAgent": "10",
+      "totalChecks": 5,
+      "conforme": 2,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 3,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-27",
+      "name": "FinOps",
+      "focus": "Atribuição de custos, métricas, alertas e orçamento",
+      "leadAgent": "23",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-FIN-001"
+      ]
+    },
+    {
+      "id": "DT-28",
+      "name": "Billing",
+      "focus": "Assinaturas, planos, pagamentos, limites e consistência",
+      "leadAgent": "01",
+      "totalChecks": 5,
+      "conforme": 2,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 2,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-BILL-003"
+      ]
+    },
+    {
+      "id": "DT-29",
+      "name": "Onboarding",
+      "focus": "Provisionamento, configuração, ativação e desativação de tenants",
+      "leadAgent": "01",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-ONB-001"
+      ]
+    },
+    {
+      "id": "DT-30",
+      "name": "Identidade e permissões",
+      "focus": "RBAC, ABAC, privilégios, sessões e segregação",
+      "leadAgent": "01",
+      "totalChecks": 5,
+      "conforme": 5,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 0,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-31",
+      "name": "Analytics",
+      "focus": "Eventos, métricas, consistência e qualidade dos dados",
+      "leadAgent": "04",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-UX-003"
+      ]
+    },
+    {
+      "id": "DT-32",
+      "name": "Internacionalização",
+      "focus": "Idiomas, moedas, formatos, datas e fusos horários",
+      "leadAgent": "04",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-UX-004"
+      ]
+    },
+    {
+      "id": "DT-33",
+      "name": "SEO",
+      "focus": "Metadados, indexação, sitemap, semântica e renderização",
+      "leadAgent": "02",
+      "totalChecks": 5,
+      "conforme": 2,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 3,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-34",
+      "name": "Mobile e PWA",
+      "focus": "Layout, dispositivos, cache offline e sincronização",
+      "leadAgent": "09",
+      "totalChecks": 5,
+      "conforme": 2,
+      "naoConforme": 2,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 3,
+      "findingIds": [
+        "DEBT-UX-001",
+        "DEBT-UX-005",
+        "DEBT-UX-006"
+      ]
+    },
+    {
+      "id": "DT-35",
+      "name": "Notificações",
+      "focus": "E-mail, entregabilidade, filas, templates e preferências",
+      "leadAgent": "06",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 1,
+      "parcialmenteConforme": 1,
+      "naoVerificado": 0,
+      "findingsCount": 1,
+      "findingIds": [
+        "DEBT-NOT-001"
+      ]
+    },
+    {
+      "id": "DT-36",
+      "name": "Busca",
+      "focus": "Indexação, relevância, filtros, paginação e performance",
+      "leadAgent": "04",
+      "totalChecks": 5,
+      "conforme": 2,
+      "naoConforme": 2,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 2,
+      "findingIds": [
+        "DEBT-UX-002",
+        "DEBT-UX-007"
+      ]
+    },
+    {
+      "id": "DT-37",
+      "name": "Arquivos",
+      "focus": "Uploads, permissões, armazenamento, validação e retenção",
+      "leadAgent": "01",
+      "totalChecks": 5,
+      "conforme": 3,
+      "naoConforme": 0,
+      "parcialmenteConforme": 1,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-38",
+      "name": "Migrações",
+      "focus": "Migrações incompletas, compatibilidade e consistência",
+      "leadAgent": "01A",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-39",
+      "name": "Produto",
+      "focus": "Fluxos incompletos, workarounds, fricções e inconsistências",
+      "leadAgent": "02",
+      "totalChecks": 5,
+      "conforme": 4,
+      "naoConforme": 0,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 1,
+      "findingsCount": 0,
+      "findingIds": []
+    },
+    {
+      "id": "DT-40",
+      "name": "Continuidade operacional",
+      "focus": "Dependências externas, processos manuais e contingência",
+      "leadAgent": "00",
+      "totalChecks": 5,
+      "conforme": 1,
+      "naoConforme": 1,
+      "parcialmenteConforme": 0,
+      "naoVerificado": 3,
+      "findingsCount": 0,
+      "findingIds": []
+    }
+  ]
+}

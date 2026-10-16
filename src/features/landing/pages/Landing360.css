@@ -1,113 +1,397 @@
-.landing-neon-root .neon-title-blue,
-.landing-neon-root h1.neon-title-blue,
-.landing-neon-root h2.neon-title-blue,
-.landing-neon-root h3.neon-title-blue,
-.landing-neon-root h4.neon-title-blue {
-  color: var(--color-heading-cyan) !important;
-  text-shadow: none;
+/* ==========================================================================
+   BIRTH HUB 360° — LANDING STYLES (OFICIAL NEON & LIGHT/DARK SYSTEM)
+   Governança:
+   1. Nenhum título ou subtítulo branco ou preto
+   2. Todos os títulos com SVG customizado e não repetido
+   3. Bitrix não é conexão nativa (API/Webhooks/Multi-CRM)
+   4. Modo Light e Modo Dark completos
+   5. Modo Light como padrão
+   6. Efeito animado no logo
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
 }
-.landing-neon-root .neon-title-pink,
-.landing-neon-root h1.neon-title-pink,
-.landing-neon-root h2.neon-title-pink,
-.landing-neon-root h3.neon-title-pink,
-.landing-neon-root h4.neon-title-pink {
-  color: var(--color-heading-pink) !important;
-  text-shadow: none;
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
-.landing-neon-root .neon-title-gold,
-.landing-neon-root h1.neon-title-gold,
-.landing-neon-root h2.neon-title-gold,
-.landing-neon-root h3.neon-title-gold,
-.landing-neon-root h4.neon-title-gold {
-  color: var(--color-heading-gold) !important;
-  text-shadow: none;
+
+/* ==========================================================================
+   1. ANIMAÇÕES E EFEITOS DO LOGO OFICIAL
+   ========================================================================== */
+
+@keyframes birthhub-logo-float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3.5px) rotate(0.8deg);
+  }
 }
-.landing-neon-root .neon-gradient-title {
-  color: var(--color-heading-gold);
-  background: none;
-  -webkit-text-fill-color: currentColor;
+
+@keyframes birthhub-logo-glow {
+  0%,
+  100% {
+    background: radial-gradient(
+      circle,
+      rgba(0, 212, 255, 0.4) 0%,
+      rgba(255, 45, 155, 0.22) 50%,
+      transparent 70%
+    );
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    background: radial-gradient(
+      circle,
+      rgba(255, 45, 155, 0.5) 0%,
+      rgba(245, 158, 11, 0.35) 50%,
+      transparent 70%
+    );
+    transform: scale(1.18);
+    opacity: 1;
+  }
+}
+
+.birthhub-logo-animated-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.birthhub-logo-glow-aura {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  animation: birthhub-logo-glow 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(10px);
+}
+
+.birthhub-logo-animated {
+  position: relative;
+  z-index: 1;
+  animation: birthhub-logo-float 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.45));
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.35s ease;
+}
+
+.birthhub-logo-animated-wrapper:hover .birthhub-logo-animated {
+  transform: scale(1.1) translateY(-2px);
+  filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.75))
+    drop-shadow(0 0 30px rgba(255, 45, 155, 0.5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .birthhub-logo-animated,
+  .birthhub-logo-glow-aura {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   2. ROOT & SISTEMA DE TEMAS (LIGHT PADRÃO + DARK)
+   ========================================================================== */
+
+.landing-neon-root {
+  --color-gold-real: #f59e0b;
+  --color-gold-glow: #fbbf24;
+  --color-gold-deep: #d97706;
+  --color-gold-light: #fde68a;
+  --grad-gold-real: linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #d97706 100%);
+  --grad-gold-shine: linear-gradient(135deg, #fffbeb 0%, #fbbf24 50%, #b45309 100%);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* TEMA LIGHT (PADRÃO) */
+.landing-neon-root {
+  background: #f8fafc;
+  color: #334155;
+  --landing-bg-primary: #f8fafc;
+  --landing-bg-secondary: #ffffff;
+  --landing-bg-card: #ffffff;
+  --landing-card-border: rgba(203, 213, 225, 0.7);
+  --landing-card-hover-border: rgba(2, 132, 199, 0.45);
+  --landing-card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+  --landing-card-hover-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.14);
+  --landing-navbar-bg: rgba(255, 255, 255, 0.92);
+  --landing-navbar-border: rgba(226, 232, 240, 0.85);
+  --landing-section-border: rgba(226, 232, 240, 0.8);
+  --landing-hero-glow: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.12), transparent 70%);
+}
+
+/* TEMA DARK */
+:root.dark .landing-neon-root,
+.dark .landing-neon-root {
+  background: #0b1120;
+  color: #94a3b8;
+  --landing-bg-primary: #0b1120;
+  --landing-bg-secondary: #0f172a;
+  --landing-bg-card: #0f172a;
+  --landing-card-border: rgba(56, 189, 248, 0.18);
+  --landing-card-hover-border: rgba(56, 189, 248, 0.45);
+  --landing-card-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --landing-card-hover-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  --landing-navbar-bg: rgba(15, 23, 42, 0.92);
+  --landing-navbar-border: rgba(56, 189, 248, 0.18);
+  --landing-section-border: rgba(51, 65, 85, 0.6);
+  --landing-hero-glow: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.22), transparent 70%);
+}
+
+/* ==========================================================================
+   3. REGRA ESTRITA: NENHUM TÍTULO OU SUBTÍTULO BRANCO OU PRETO
+   ========================================================================== */
+
+/* Subtítulos: Jamais brancos ou pretos */
+.landing-neon-root .landing-subtitle,
+.landing-neon-root p.landing-subtitle {
+  color: #475569 !important; /* Slate-600 em Light Mode (legível, não preto) */
+}
+
+:root.dark .landing-neon-root .landing-subtitle,
+.dark .landing-neon-root .landing-subtitle,
+:root.dark .landing-neon-root p.landing-subtitle,
+.dark .landing-neon-root p.landing-subtitle {
+  color: #70d6ff !important; /* Azul Leitura Neon em Dark Mode (legível, não branco) */
+}
+
+/* Títulos: Cores de marca vibrantes, gradientes ou matizes neon */
+.landing-neon-root .landing-title-cyan {
+  color: #0284c7 !important; /* Light: Sky profundo */
+}
+:root.dark .landing-neon-root .landing-title-cyan,
+.dark .landing-neon-root .landing-title-cyan {
+  color: #00d4ff !important; /* Dark: Azul Neon */
+}
+
+.landing-neon-root .landing-title-pink {
+  color: #db2777 !important; /* Light: Rosa vibrante */
+}
+:root.dark .landing-neon-root .landing-title-pink,
+.dark .landing-neon-root .landing-title-pink {
+  color: #ff2d9b !important; /* Dark: Rosa Neon */
+}
+
+.landing-neon-root .landing-title-gold {
+  color: #d97706 !important; /* Light: Âmbar Ouro */
+}
+:root.dark .landing-neon-root .landing-title-gold,
+.dark .landing-neon-root .landing-title-gold {
+  color: #f59e0b !important; /* Dark: Dourado Radiante */
+}
+
+.landing-neon-root .landing-title-purple {
+  color: #7c3aed !important; /* Light: Violeta profundo */
+}
+:root.dark .landing-neon-root .landing-title-purple,
+.dark .landing-neon-root .landing-title-purple {
+  color: #8b7dff !important; /* Dark: Íris / Roxo Neon */
+}
+
+.landing-neon-root .landing-title-gradient {
+  background-image: linear-gradient(135deg, #0284c7 0%, #7c3aed 50%, #d97706 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
   display: inline-block;
 }
+
+:root.dark .landing-neon-root .landing-title-gradient,
+.dark .landing-neon-root .landing-title-gradient {
+  background-image: linear-gradient(135deg, #00d4ff 0%, #ff2d9b 50%, #f59e0b 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
+}
+
+.landing-neon-root .grad-text-gold {
+  background-image: linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #d97706 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
+}
+
 .landing-neon-root .grad-text-blue {
-  color: var(--color-heading-cyan) !important;
-  text-shadow: none;
+  background-image: linear-gradient(135deg, #38bdf8 0%, #0284c7 50%, #2563eb 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
 }
+
 .landing-neon-root .grad-text-purple {
-  color: var(--color-heading-iris) !important;
-  text-shadow: none;
+  background-image: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7c3aed 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
 }
+
 .landing-neon-root .grad-text-cyan {
-  color: var(--color-heading-gold) !important;
-  text-shadow: none;
+  background-image: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0284c7 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
 }
-.landing-neon-root .vancouver-btn-gradient,
-.landing-neon-root .btn-cta-light {
+
+/* Fallback de segurança: Qualquer h1-h6 nunca deve renderizar branco ou preto */
+.landing-neon-root h1,
+.landing-neon-root h2,
+.landing-neon-root h3,
+.landing-neon-root h4,
+.landing-neon-root h5,
+.landing-neon-root h6 {
+  color: #0284c7;
+}
+
+:root.dark .landing-neon-root h1,
+:root.dark .landing-neon-root h2,
+:root.dark .landing-neon-root h3,
+:root.dark .landing-neon-root h4,
+:root.dark .landing-neon-root h5,
+:root.dark .landing-neon-root h6,
+.dark .landing-neon-root h1,
+.dark .landing-neon-root h2,
+.dark .landing-neon-root h3,
+.dark .landing-neon-root h4,
+.dark .landing-neon-root h5,
+.dark .landing-neon-root h6 {
+  color: #00d4ff;
+}
+
+/* ==========================================================================
+   4. BOTÕES & INTERAÇÕES
+   ========================================================================== */
+
+/* Botões primários com gradiente de alta energia */
+.landing-neon-root .btn-cta-light,
+.landing-neon-root .btn-primary-gradient,
+.landing-neon-root .vancouver-btn-gradient {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
   padding: 0.85rem 2rem;
-  border-radius: var(--radius-card);
-  font-family: var(--font-interface);
+  border-radius: var(--radius-card, 16px);
+  font-family: var(--font-interface, "Inter", sans-serif);
   font-weight: 800;
   font-size: 0.95rem;
-  color: var(--color-heading-cyan) !important;
-  background: var(--color-surface) !important;
-  border: 2px solid var(--color-heading-cyan) !important;
-  box-shadow: var(--shadow-card);
+  letter-spacing: 0.04em;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #7c3aed 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow:
+    0 10px 25px -4px rgba(2, 132, 199, 0.42),
+    0 4px 12px rgba(124, 58, 237, 0.3) !important;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
-.landing-neon-root .vancouver-btn-gradient:hover,
-.landing-neon-root .btn-cta-light:hover {
+
+.landing-neon-root .btn-cta-light:hover,
+.landing-neon-root .btn-primary-gradient:hover,
+.landing-neon-root .vancouver-btn-gradient:hover {
   transform: translateY(-2px) scale(1.02);
-  color: var(--color-heading-pink) !important;
-  border-color: var(--color-heading-pink) !important;
-  box-shadow: var(--shadow-card);
+  background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #8b5cf6 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 14px 32px -4px rgba(2, 132, 199, 0.55),
+    0 6px 18px rgba(124, 58, 237, 0.4) !important;
   filter: brightness(1.1);
 }
-.landing-neon-root .vancouver-btn-gradient:active,
-.landing-neon-root .btn-cta-light:active {
+
+.landing-neon-root .btn-cta-light:active,
+.landing-neon-root .btn-primary-gradient:active,
+.landing-neon-root .vancouver-btn-gradient:active {
   transform: translateY(0);
 }
+
+/* Botões secundários: Adaptativos para Light e Dark */
+.landing-neon-root .btn-secondary-dark,
 .landing-neon-root .vancouver-btn-outline {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.75rem;
-  border-radius: var(--radius-card);
-  font-family: var(--font-interface);
+  padding: 0.85rem 1.85rem;
+  border-radius: var(--radius-card, 16px);
+  font-family: var(--font-interface, "Inter", sans-serif);
   font-weight: 700;
   font-size: 0.925rem;
-  color: var(--color-heading-cyan) !important;
-  background: var(--color-border-subtle) !important;
-  border: 1.5px solid var(--color-heading-cyan) !important;
-  box-shadow: var(--shadow-card);
+  color: #0284c7 !important;
+  background: #f1f5f9 !important;
+  border: 1.5px solid #0284c7 !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15) !important;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
 }
+
+:root.dark .landing-neon-root .btn-secondary-dark,
+.dark .landing-neon-root .btn-secondary-dark,
+:root.dark .landing-neon-root .vancouver-btn-outline,
+.dark .landing-neon-root .vancouver-btn-outline {
+  color: #38bdf8 !important;
+  background: #0f172a !important;
+  border: 1.5px solid #0284c7 !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25) !important;
+}
+
+.landing-neon-root .btn-secondary-dark:hover,
 .landing-neon-root .vancouver-btn-outline:hover {
-  background: var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
+  background: #e2e8f0 !important;
+  color: #0369a1 !important;
+  border-color: #0369a1 !important;
   transform: translateY(-2px);
 }
-.landing-neon-root .vancouver-navbar,
+
+:root.dark .landing-neon-root .btn-secondary-dark:hover,
+.dark .landing-neon-root .btn-secondary-dark:hover,
+:root.dark .landing-neon-root .vancouver-btn-outline:hover,
+.dark .landing-neon-root .vancouver-btn-outline:hover {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 8px 22px rgba(2, 132, 199, 0.4) !important;
+}
+
+/* ==========================================================================
+   5. NAVBAR & SUPERFÍCIES
+   ========================================================================== */
+
 .landing-neon-root .navbar-sticky {
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
-  background: var(--color-border-subtle) !important;
+  background: var(--landing-navbar-bg) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--color-border-subtle) !important;
+  border-bottom: 1px solid var(--landing-navbar-border) !important;
   transition: all 0.3s ease;
 }
+
 .landing-neon-root .vancouver-hero-bg {
   position: absolute;
   top: -150px;
@@ -115,138 +399,72 @@
   transform: translateX(-50%);
   width: 1000px;
   height: 600px;
-  background: var(--grad-glow);
+  background: var(--landing-hero-glow);
   filter: blur(90px);
   pointer-events: none;
   z-index: 0;
 }
+
 .landing-neon-root .section-card {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card);
+  background: var(--landing-bg-card) !important;
+  border: 1px solid var(--landing-card-border);
+  border-radius: var(--radius-card, 16px);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: var(--shadow-card);
-}
-.landing-neon-root .section-card:hover {
-  border-color: var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
-  transform: translateY(-3px);
-}
-.landing-neon-root .pillar-card {
-  background: var(--color-surface) !important;
-  border-radius: var(--radius-card);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.landing-neon-root .pillar-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card);
-}
-.landing-neon-root .flow-step-card {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card);
-  transition: all 0.3s ease;
-}
-.landing-neon-root .flow-step-card:hover {
-  border-color: var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
-  transform: translateY(-2px);
-}
-.landing-neon-root .card-glow-light {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  box-shadow: var(--shadow-card);
-}
-.landing-neon-root .neon-badge-blue {
-  background: var(--color-border-subtle) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-heading-cyan) !important;
-}
-.landing-neon-root .neon-badge-pink {
-  background: var(--color-border-subtle) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-heading-pink) !important;
-}
-.landing-neon-root .neon-badge-gold {
-  background: var(--color-border-subtle) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  color: var(--color-heading-gold) !important;
-}
-.landing-neon-root .logo-glow-light {
-  filter: none;
+  box-shadow: var(--landing-card-shadow);
 }
 
-.landing-neon-root {
-  background: var(--color-background);
-  color: var(--color-text-primary);
+.landing-neon-root .section-card:hover {
+  border-color: var(--landing-card-hover-border) !important;
+  box-shadow: var(--landing-card-hover-shadow);
+  transform: translateY(-3px);
 }
-.landing-neon-root p {
-  color: var(--color-text-secondary);
-  line-height: 1.75;
+
+.landing-neon-root .pillar-card {
+  background: var(--landing-bg-card) !important;
+  border-radius: var(--radius-card, 16px);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--landing-card-shadow);
 }
-.landing-neon-root :where(.section-card, .pillar-card, .flow-step-card) p {
-  font-size: 15px;
+
+.landing-neon-root .pillar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--landing-card-hover-shadow);
 }
-.landing-neon-root :where(.section-card, .pillar-card, .flow-step-card) {
-  border: 1px solid var(--color-brand-primary);
-  border-radius: var(--radius-card);
+
+.landing-neon-root .flow-step-card {
+  background: var(--landing-bg-card) !important;
+  border: 1px solid var(--landing-card-border);
+  border-radius: var(--radius-card, 16px);
+  transition: all 0.3s ease;
+  box-shadow: var(--landing-card-shadow);
 }
-.landing-neon-root .neon-gradient-title {
-  background: none;
-  -webkit-text-fill-color: currentColor;
-  color: var(--color-heading-gold);
-}
-.landing-neon-root :where(.vancouver-btn-gradient, .btn-cta-light) {
-  border-radius: var(--radius-control);
-  background: var(--color-interactive-primary) !important;
-  color: var(--on-brand) !important;
-}
-.landing-neon-root :where(.vancouver-btn-gradient, .btn-cta-light):hover {
-  background: var(--color-interactive-hover) !important;
-}
-.landing-neon-root .vancouver-btn-outline {
-  border-radius: var(--radius-control);
-  background: var(--color-surface) !important;
-}
-.landing-neon-root :where(.vancouver-navbar, .navbar-sticky) {
-  background: var(--color-background) !important;
-}
-.landing-neon-root input {
-  background: var(--color-surface-elevated);
-  color: var(--color-text-primary);
-  border-radius: var(--radius-control);
-}
-.landing-neon-root input:-webkit-autofill {
-  -webkit-text-fill-color: var(--color-text-primary);
-  box-shadow: 0 0 0 1000px var(--color-surface-elevated) inset;
-}
-.landing-neon-root :focus-visible {
-  outline: var(--color-focus-ring);
-  outline-offset: 3px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .landing-neon-root * {
-    animation: none !important;
-    transition: none !important;
-  }
+
+.landing-neon-root .flow-step-card:hover {
+  border-color: var(--landing-card-hover-border) !important;
+  box-shadow: var(--landing-card-hover-shadow);
+  transform: translateY(-2px);
 }
 
 .landing-neon-root .capability-card {
   padding: 24px 20px;
   text-align: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-brand-primary);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  background: var(--landing-bg-card) !important;
+  border: 1px solid var(--landing-card-border);
+  border-radius: var(--radius-card, 16px);
+  box-shadow: var(--landing-card-shadow);
   animation: capability-enter 360ms ease-out both;
   transition:
     transform 160ms ease,
-    background-color 160ms ease;
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
+
 .landing-neon-root .capability-card:hover {
   transform: translateY(-3px);
-  background: var(--color-surface-hover);
+  border-color: var(--landing-card-hover-border) !important;
+  box-shadow: var(--landing-card-hover-shadow);
 }
+
 @keyframes capability-enter {
   from {
     opacity: 0;
@@ -257,12 +475,114 @@
     transform: translateY(0);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .landing-neon-root .capability-card {
-    animation: none;
-    transition: none;
-  }
-  .landing-neon-root .capability-card:hover {
-    transform: none;
-  }
+
+/* ==========================================================================
+   6. SVG BADGES PERSONALIZADOS PARA TÍTULOS
+   ========================================================================== */
+
+.title-badge-svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.35));
+  transition: transform 0.25s ease;
+}
+
+.title-badge-svg:hover {
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   7. THEME TOGGLE BUTTON NA NAVBAR
+   ========================================================================== */
+
+.landing-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  color: #0284c7;
+}
+
+.landing-theme-toggle-btn:hover {
+  background: #e2e8f0;
+  color: #0369a1;
+  transform: scale(1.05);
+}
+
+:root.dark .landing-theme-toggle-btn,
+.dark .landing-theme-toggle-btn {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #38bdf8;
+}
+
+:root.dark .landing-theme-toggle-btn:hover,
+.dark .landing-theme-toggle-btn:hover {
+  background: #1e293b;
+  color: #00d4ff;
+  border-color: #00d4ff;
+}
+
+/* ==========================================================================
+   8. SEÇÕES SEMÂNTICAS ADAPTATIVAS (LIGHT / DARK)
+   ========================================================================== */
+
+.landing-section-base {
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+:root.dark .landing-section-base,
+.dark .landing-section-base {
+  background-color: #0b1120;
+  border-bottom-color: #1e293b;
+}
+
+.landing-section-alt {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+:root.dark .landing-section-alt,
+.dark .landing-section-alt {
+  background-color: #0f172a;
+  border-bottom-color: #1e293b;
+}
+
+.landing-section-footer {
+  background-color: #0b1120;
+  border-top: 1px solid #1e293b;
+}
+:root.dark .landing-section-footer,
+.dark .landing-section-footer {
+  background-color: #070d17;
+  border-top-color: #1e293b;
+}
+
+.btn-social-dark {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  transition: all 0.2s ease;
+}
+.btn-social-dark:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #0284c7;
+}
+:root.dark .btn-social-dark,
+.dark .btn-social-dark {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+}
+:root.dark .btn-social-dark:hover,
+.dark .btn-social-dark:hover {
+  background: #1e293b;
+  color: #ffffff;
+  border-color: #00d4ff;
 }

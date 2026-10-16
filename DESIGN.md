@@ -1,57 +1,70 @@
-# DESIGN.md — Birth Hub 360° (App Operate)
+# DESIGN.md — Birth Hub 360° (Sistema Operacional de Revenue Intelligence)
 
 <!-- impeccable:design-schema 1 -->
 
 Escopo: produto web autenticado (`/app/*`) — modo **Operate**.  
-O DESIGN do playbook editorial vive em `docs/strategy/DESIGN-playbook.md`.
+Autoridade normativa: Manual Oficial de Identidade Visual 2026 e Manual de Identidade do Produto (Nova pasta).  
+Regra expressa de governança: Landing Page e Tela de Login permanecem intocadas.
 
 ## Mundo visual
 
-Central de comando SaaS premium: densidade executiva, hierarquia clara, cards e tipografia moderna. Inspiração estrutural: [Vancouver+](https://vancouverplus-template.modulify.website/) (dashboard limpo) — **não** copiar só dark; light e dark são cidadãos de primeira classe.
+Central de comando 360° de Revenue Intelligence: alta densidade executiva, interfaces hiper-responsivas, tipografia com toque arredondado, cards com acabamento impecável e contraste WCAG 2.2 AA inegociável. Operação fluida tanto no tema claro quanto no tema escuro.
 
-Princípios: premium, executivo, preciso, alta densidade sem poluição, próxima ação óbvia. Evitar landing marketing, hero centralizada e template genérico.
+## Paleta Oficial Neon & Superfícies
 
-## Paleta (tokens semânticos)
+Fonte normativa: `src/styles/official-identity.css` e `src/styles/globals.css`.
 
-Fonte normativa: `src/styles/globals.css` + overrides de canvas em `src/styles/elegance.css` (`--el-*`).
+| Papel | Dark Oficial | Light Oficial | Descrição |
+|---|---|---|---|
+| Fundo Canvas `--bg` | Preto Neon `#0D0D0D` | Canvas Claro `#F8FAFC` | Fundo principal da aplicação |
+| Fundo Cards `--surface` | Fundo Cards `#14141A` | Branco Puro `#FFFFFF` | Superfície de cartões e modais |
+| Superfície 2 `--surface2` | `#1C1C24` | `#F1F5F9` | Elementos aninhados, tabelas e pílulas |
+| Texto Principal `--ink` | Branco Neon `#F8F9FF` | Azul Escuro `#0B132B` | Leitura de alto contraste |
+| Texto Secundário `--muted` | `#A1A1B5` / `#9EADC8` | `#475569` | Metadados contextuais e descrições |
+| Azul Neon (Brand) | `#00D4FF` | `#0284C7` (adaptado AA) | Inovação, confiança, halos da órbita |
+| Rosa Neon (Brand 2) | `#FF2D9B` | `#D91B7C` | Energia, conversão e ações CTA |
+| Dourado Neon (Warn/Meta) | `#FFC107` | `#D97706` | Prosperidade, ARR, métricas e alertas |
+| Sucesso / Ok | `#22C55E` | `#16A34A` | Metas batidas e sincronização ativa |
+| Crítico / Risco | `#EF4444` | `#DC2626` | Perdas de negócio e desconexão de API |
+| Informativo / Info | `#3B82F6` | `#2563EB` | Avisos de andamento e dicas contextuais |
+| Íris / Inteligência IA | `#8B7DFF` | `#7C3AED` | Copiloto IA e agentes autônomos |
 
-| Papel | Light (efetivo) | Dark (efetivo) |
-|---|---|---|
-| Canvas `--bg` | Pearl `#FBF8F3` | Ink deep `#0E0C12` |
-| Surface | `#FFFFFF` / pearl-2 | pearl-2 / cream |
-| Ink | `#141218` | `#F8F4EA` |
-| Brand | Antique/Champagne gold `#C9A24C` | mesmo ouro (texto over → `--on-brand` escuro) |
-| Accent | pink / soft sky / sage (`--el-*`) | idem calibrado |
+## Gradientes Oficiais de Assinatura
 
-Marca canônica Antique Gold `#D4AF37` permanece no brandbook; o canvas Operate usa ouro champagne como assinatura de UI sem inventar hex soltos nos componentes (`bg-brand`, `text-ink`, `border-line` / `border-input`).
+- **Gradiente de Títulos (Brand):** `linear-gradient(135deg, #00D4FF 0%, #FF2D9B 50%, #FFC107 100%)`
+- **Gradiente de Ação (CTA Neon):** `linear-gradient(135deg, #FF2D9B 0%, #00D4FF 100%)`
+- **Anel de Órbita Cônico 360°:** `conic-gradient(from 0deg, #FFC107, #FF2D9B, #00D4FF, #FFC107)`
+- **Glows Oficiais:** `0 0 24px rgba(0, 212, 255, 0.45)` (Azul), `0 0 24px rgba(255, 45, 155, 0.45)` (Rosa)
 
-## Tipografia
+## Trinca Tipográfica Exclusiva
 
-- **Sora** (`--font-brand-display`) — títulos, labels importantes, `font-display`
-- **Inter** (`--font-brand-sans`) — corpo, UI, tabelas, dados
-- Self-hosted em `public/fonts/` — **sem Google Fonts** no caminho crítico do app
-- Fraunces / Instrument Sans **não** são tipografia do produto Operate
+1. **Sora** (`--font-display`): Títulos (H1–H6), Heros de impacto, botões de ação e números de destaque comercial. Pesos: 400, 600, 700, 800. Tracking: `-0.02em`.
+2. **Inter** (`--font-interface`): Interface de alta densidade (menus, tabelas, modais, formulários). Configurada obrigatoriamente com `font-feature-settings: "cv05", "cv11", "ss01"` (toque arredondado) e tracking `-0.012em`.
+3. **IBM Plex Mono** (`--font-mono`): Dados tabulares, contadores de receita (R$ 1.482.000), logs de IA e badges técnicos.
 
-## Componentes
+## Geometria e Raios de Borda
 
-Primitivos em `src/components/ui/**`: Button, Input, Select, Textarea, Dialog, Drawer, Card, Table, Badge, EmptyState, Skeleton — tokens semânticos (PR #692).  
-Shell (Sidebar/App) é propriedade do Agente 02 — redesign visual não altera navegação sem handoff.
+- Controles e Inputs: `12px` (`--radius-control` / `--r-control`)
+- Cards e Superfícies: `16px` (`--radius-card` / `--r-card`)
+- Modais e Diálogos: `20px` (`--radius-modal` / `--r-modal`)
+- Botões e Pílulas Segmentadas: `9999px` (`--radius-pill` / `--r-pill`)
 
-## Temas
+## Os 4 Estados Obrigatórios de Todo Módulo (Capítulo 5)
 
-- Default: light (ThemeContext / `atlas_theme`)
-- Dark: profundidade, contraste AA, glow só em foco/hover
-- Focus: `--focus-ring` ≥ 3:1; inputs: `--border-input` ≥ 3:1
-- Motion: respeitar `prefers-reduced-motion`
+Todo painel, dashboard ou lista deve implementar de forma explícita e testada:
+1. **Loading State:** Skeletons pulsantes no formato exato dos cards (`<Skeleton>`).
+2. **Empty State:** Visual zero-state com Call-to-Action claro (`<EmptyState>`).
+3. **Error State:** Causa raiz transparente e ação de retentativa rápida sem deslogar o operador.
+4. **Stale State:** Informar timestamp da última sincronização mantendo dados prévios visíveis em cache.
+Padronizado no componente global: `<OperationalStateContainer>`.
 
-## Anti-referências
+## Catálogo de Componentes Oficiais (30 componentes)
 
-- Hex escuros fixos em primitivos UI (regressão 08–09/10)
-- Google Fonts + `!important` em headings
-- Landing Vancouver+ como UI do app; copiar só o dark
-
-## Direção desta onda (`agente/03-impeccable-vancouver`)
-
-1. Documentar sistema Operate (este arquivo + PRODUCT.md)
-2. Alinhar `elegance.css` à Constituição (Sora/Inter self-hosted) mantendo canvas pearl/gold
-3. Gaps vs Vancouver+ rastreados no run `.agents/runs/03-impeccable-vancouver-20261010.md`
+1. Marca & Logos: `BirthHubOfficialLogoHorizontal`, `BirthHubOfficialEmblem`, `BirthHubLogo`
+2. Ícones: `PillarIcons` (8 ícones dos pilares), `BrandIcons` (24x24 traço redondo)
+3. Ações: `Button` (variantes brand CTA neon e vancouver outline), `IconButton`, `ButtonGroup`, `ToggleButtonGroup`, `Fab`
+4. Formulários: `CyberInput`, `Input`, `Textarea`, `Select`, `Switch`, `Slider`, `DatePicker`
+5. Navegação: `Sidebar`, `Tabs`, `Stepper`, `Breadcrumbs`
+6. Dados & Métricas: `BentoMetric`, `Badge` (Coolors), `Table`, Gráficos Neon
+7. Feedback & Alertas: `Alert`, `Dialog`, `CommandPalette` (⌘K)
+8. Efeitos: `bh-glass`, `border-glow-brand`, `OrbitRing` (anel cônico 360°)

@@ -135,11 +135,7 @@ export async function* streamChatCompletion(
   const ttftMs = firstTokenAt ? firstTokenAt - startedAt : Date.now() - startedAt;
   const latencyMs = Date.now() - startedAt;
 
-  recordAiUsageCost(
-    'groq',
-    requestContext.getStore()?.tenantId,
-    estimatedCost,
-  );
+  recordAiUsageCost('groq', requestContext.getStore()?.tenantId, estimatedCost);
 
   groqTelemetryService.recordGroqCall({
     model: modelUsed,

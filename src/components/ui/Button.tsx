@@ -33,14 +33,19 @@ const buttonVariants = cva(
         link: 'text-brand-ink dark:text-brand underline-offset-4 hover:underline',
         cosmic:
           'bg-brand text-on-brand hover:bg-brand-active hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] shadow-sm',
+        brand:
+          'bg-gradient-to-r from-[#FF2D9B] to-[#00D4FF] text-[#0D0D0D] font-display font-extrabold shadow-[0_4px_18px_rgba(0,212,255,0.4)] hover:brightness-110 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
+        vancouver:
+          'border border-[#00D4FF] bg-transparent text-[#00D4FF] hover:bg-[#00D4FF]/10 hover:border-[#00D4FF] hover:shadow-[0_0_16px_rgba(0,212,255,0.25)] hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
       },
       size: {
         default: 'h-9 px-4 py-2',
         sm: 'h-8 px-3 text-xs',
         lg: 'h-10 px-8',
-        icon: 'h-9 w-9 p-0',
-        'icon-sm': 'h-8 w-8 p-0',
-        'icon-lg': 'h-10 w-10 p-0',
+        pill: 'h-10 px-6 rounded-full font-display font-bold',
+        icon: 'h-9 w-9 p-0 rounded-full',
+        'icon-sm': 'h-8 w-8 p-0 rounded-full',
+        'icon-lg': 'h-10 w-10 p-0 rounded-full',
       },
     },
     defaultVariants: {

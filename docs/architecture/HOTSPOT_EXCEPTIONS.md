@@ -56,10 +56,11 @@ propósito por estar fora de "## Exceções ativas"):
 
 ### `src/features/landing/pages/Landing360.tsx`
 
-- **Limite excepcional:** 1900 linhas
+- **Limite excepcional:** 2300 linhas
 - **Dono:** Marks-Mah
-- **Motivo:** Nova landing page 360 integrada ao portal comercial e vitrine visual; pendente de modularização de seções.
+- **Motivo:** Nova landing page 360 integrada ao portal comercial e vitrine visual (adicionados gaveta de navegação mobile, links de conformidade e modal de acesso); pendente de modularização de seções.
 - **Registrado em:** 2026-10-07
+- **Atualizado em:** 2026-10-15
 - **Reavaliar até:** 2026-11-30
 
 ### `src/features/integrations/bitrix/service/extraction.ts`
@@ -72,7 +73,7 @@ propósito por estar fora de "## Exceções ativas"):
 
 ### `src/features/crm360/infra/PrismaCrm360Repository.ts`
 
-- **Limite excepcional:** 1200 linhas
+- **Limite excepcional:** 1210 linhas
 - **Dono:** Agente 17 — Cadência Multicanal e Ciclo de Receita
 - **Motivo:** achado ACH-17-08 (auditoria multiagente) — `updateDocumentStatus` marcava uma
   proposta como "Pago" sem passar pelo `dealClosureGate`, deixando o fechamento de negócio
@@ -85,9 +86,11 @@ propósito por estar fora de "## Exceções ativas"):
   `StripeChargePort` via construtor (fix de `no-cross-feature-imports`) soma mais algumas linhas
   de infraestrutura. Modularizar (extrair os métodos de propostas/documentos para um repositório
   próprio, separado do resto de `PrismaCrm360Repository`) fica para um item de dívida técnica
-  dedicado.
+  dedicado. A contagem atual chegou a 1203 linhas, 3 acima do teto anterior; o aumento do teto é
+  temporário e não substitui a modularização.
 - **Registrado em:** 2026-09-12
 - **Atualizado em:** 2026-09-13 (Onda 5, BILLING-003)
+- **Atualizado em:** 2026-10-14 (exceção temporária para a contagem atual)
 - **Reavaliar até:** 2026-11-30 (mesmo checkpoint dos demais itens desta lista)
 
 ### `src/features/integrations/components/BitrixImportPanel.tsx`
@@ -108,6 +111,17 @@ propósito por estar fora de "## Exceções ativas"):
 - **Motivo:** Exceção criada para liberar o build, arquivo passou das 1000 linhas (1081).
 - **Registrado em:** 2026-09-23
 - **Reavaliar até:** 2026-11-30 (mesmo checkpoint dos demais itens desta lista)
+
+### `src/features/integrations/components/ExternalCrmPanel.tsx`
+
+- **Limite excepcional:** 1100 linhas
+- **Dono:** Agente 06 — Integrações e Bitrix
+- **Motivo:** arquivo preexistente com 1077 linhas, acima do limite geral. A extração de
+  subcomponentes é uma refatoração de UX/integração independente desta correção de CI e deve ser
+  planejada pelo dono do domínio. Exceção temporária para manter o gate executável sem alterar o
+  limite geral do repositório.
+- **Registrado em:** 2026-10-14
+- **Reavaliar até:** 2026-11-30
 
 ### `src/features/commercial-intelligence/domain/CommercialIntelligence.ts`
 
@@ -160,6 +174,16 @@ propósito por estar fora de "## Exceções ativas"):
 - **Dono:** Agente 07 — IA e Automações
 - **Motivo:** O arquivo superou o limite de 1000 linhas devido à adição contínua de rotas e integrações de IA, precisará ser fatiado em sub-rotas por domínio (agents, swarms, automations).
 - **Registrado em:** 2026-10-03
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/market-intelligence/server/marketIntelligenceCompany.service.ts`
+
+- **Limite excepcional:** 1020 linhas
+- **Dono:** Agente 13 — Enxame Autônomo e Governança de Agentes de Runtime (LDR/Market Intelligence, Onda 43)
+- **Motivo:** a formatação de linhas longas no PR #741 elevou a contagem de 994 para 1016 linhas,
+  sem mudança funcional. A exceção mantém a formatação verificada e registra a modularização do
+  serviço como trabalho posterior do dono do domínio.
+- **Registrado em:** 2026-10-14
 - **Reavaliar até:** 2026-11-30
 
 ### `src/features/voice-hub/store/useStudioStore.ts`

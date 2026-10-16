@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 1,
+  "inventoryId": "technical-debt-2026-10-14",
+  "count": 10,
+  "note": "Dez ondas, 00 a 09. status NOT_STARTED porque esta missão não executou saneamento.",
+  "waves": [
+    {
+      "id": "Onda 00",
+      "name": "Onda 00 — Preparação, Baseline Isolado e Higiene de Gates",
+      "objective": "Estabelecer baseline reprodutível em ambiente isolado (Agente 14), blindar o gate local de lançamento contra falsos positivos (scripts/release-gate.js), fixar versão determinística do Prisma CLI na imagem Docker, higienizar .dockerignore e bloquear o merge do PR #741.",
+      "findings": [
+        "DEBT-GATE-001",
+        "DEBT-OPS-002",
+        "DEBT-OPS-003",
+        "DEBT-GOV-004"
+      ],
+      "leadAgents": [
+        "08",
+        "14",
+        "08A",
+        "00"
+      ],
+      "affectedFiles": [
+        "scripts/release-gate.js",
+        "docs/release/GO-LIVE-CHECKLIST.md",
+        "Dockerfile",
+        ".dockerignore",
+        "PR #741 (branch tech-debt-audit-1898280509423632042)"
+      ],
+      "prerequisites": [
+        "Autorização humana explícita para iniciar saneamento e encerrar PR #741",
+        "Preservação integral da branch main (c7e33a911b734ddb3131a3ad08d421efbc823fd4) e criação de worktrees isolados por agente"
+      ],
+      "risks": [
+        "Falha de build Docker caso a versão do Prisma CLI no runner divirja do @prisma/client gerado no builder",
+        "Bloqueio legítimo de pipelines locais que antes passavam por falso positivo em scripts/release-gate.js"
+      ],
+      "executionOrder": "1º Preparar ambiente isolado (Agente 14) -> 2º Descartar/fechar PR #741 (Agente 08A) -> 3º Corrigir scripts/release-gate.js, Dockerfile e .dockerignore (Agente 08) -> 4º Revisão independente (Agente 24).",
+      "entryCriteria": "Diagnóstico forense aprovado pelo Agente 24 e autorização humana para abertura da Onda 00.",
+      "exitCriteria": "verify-release-gate.mjs passando 11/11 cenários; build de imagem Docker resolvendo Prisma CLI idêntico ao lockfile; .dockerignore excluindo .worktrees/ e .tmp/; parecer APROVADO do Agente 24.",
+      "mandatoryTests": [
+        "node docs/audits/launch-2026-10-14/evidence/verify-release-gate.mjs",
+        "Inspeção de contexto Docker com diretórios sintéticos .worktrees/ e .tmp/",
+        "Verificação de versão exata npx prisma --version dentro do estágio runner"
+      ],
+      "requiredEvidence": [
+        "Diff mínimo assinado por SHA-256",
+        "Logs de saída (exit 0/1) dos 11 cenários do release-gate",
+        "Parecer formal do Agente 24 em .agents/reviews/"
+      ],
+      "rollbackStrategy": "Reverter commit da branch agente/08-onda-00-gates antes da integração em main; nenhuma alteração de banco de dados envolvida.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 01",
+      "name": "Onda 01 — Segurança Crítica, Privacidade LGPD e Isolamento Multi-Tenant",
+      "objective": "Eliminar exposição de URLs/tokens de autenticação em logs quando SMTP está ausente, garantir gravação de OptOutRecord antes de anonimização LGPD, vincular AgentMemory ao titular para expurgo individual, blindar queries SQL do discador por organization_id, corrigir orientação de role NOSUPERUSER (prospector_app) e isolar cache PWA de CRM por sessão/identidade.",
+      "findings": [
+        "DEBT-SEC-001",
+        "DEBT-LGPD-001",
+        "DEBT-LGPD-002",
+        "DEBT-DB-001",
+        "DEBT-DB-002",
+        "DEBT-UX-001"
+      ],
+      "leadAgents": [
+        "15",
+        "01",
+        "01A",
+        "09",
+        "21"
+      ],
+      "affectedFiles": [
+        "src/lib/auth.ts",
+        "src/lib/logger.ts",
+        "src/shared/services/dataSubjectErasure.service.ts",
+        "src/features/prospecting/services/cold-email.service.ts",
+        "prisma/schema.prisma",
+        "src/features/intelligence/agents/agentMemory.store.ts",
+        "src/features/cadence/dialer/infrastructure/db/repositories/PgCampaignRepository.ts",
+        "src/features/cadence/dialer/infrastructure/db/repositories/PgLeadRepository.ts",
+        "docs/development/LOCAL_FIRST.md",
+        "vite.config.ts",
+        "src/contexts/AuthContext.tsx"
+      ],
+      "prerequisites": [
+        "Conclusão da Onda 00 (ambiente isolado do Agente 14 operacional)",
+        "Slot exclusivo respeitado entre Agente 01 e Agente 01A para prisma/schema.prisma",
+        "Coordenação 09 -> 08 (vite.config.ts) -> 02 (AuthContext.tsx) para política de cache PWA"
+      ],
+      "risks": [
+        "Alteração de schema em AgentMemory exige migration compatível com registros legados sem contactId/leadId",
+        "Limpeza de CacheStorage no logout não deve remover assets estáticos públicos necessários offline"
+      ],
+      "executionOrder": "1º Sanitizar logs de auth e corrigir ordem de OptOutRecord em eraseDataSubject (Agente 01/15) -> 2º Adicionar filtro organization_id nos repositórios SQL do dialer e migrar AgentMemory (Agente 01/01A + 07) -> 3º Particionar/limpar cache PWA no logout (Agente 09/08/02) -> 4º Validar isolamento A/B (Agente 22) e Revisão (Agente 24).",
+      "entryCriteria": "Onda 00 concluída e matriz de propriedade exclusiva publicada pelo Agente 00.",
+      "exitCriteria": "Zero URLs/tokens de reset/verificação em logs sob falha SMTP; falha de OptOutRecord aborta anonimização; eraseDataSubject remove AgentMemory do titular; testes negativos cross-tenant A/B aprovados no dialer e no cache PWA; parecer APROVADO do Agente 24.",
+      "mandatoryTests": [
+        "Teste unitário/integração de fallback MailerNotConfiguredError verificando ausência de url/email no sink do pino logger",
+        "node docs/audits/launch-2026-10-14/evidence/verify-lgpd-optout.mjs + teste de integração PostgreSQL de eraseDataSubject com AgentMemory",
+        "Teste negativo multi-tenant (Tenant A vs Tenant B) em PgCampaignRepository, PgLeadRepository e troca de sessão no navegador (CacheStorage)"
+      ],
+      "requiredEvidence": [
+        "Saída de testes unitários e de integração multi-tenant com exit 0",
+        "Comprovação pelo Agente 22 de não vazamento entre sessões A/B após logout",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Reversão atômica de commits por domínio; para a migration aditiva de colunas opcionais em AgentMemory, manter colunas nullable compatíveis com versão anterior do app.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 02",
+      "name": "Onda 02 — Integridade de Dados, Migrações e Confiabilidade de Recuperação (DR)",
+      "objective": "Endurecer o critério de aprovação do drill automatizado de backup e restauração (run-backup-restore-drill.ts) para falhar obrigatoriamente quando o status de migração Prisma estiver inválido, quando tabelas falharem na contagem ou quando o tempo de restauração exceder a meta RTO de 900 segundos.",
+      "findings": [
+        "DEBT-OPS-004"
+      ],
+      "leadAgents": [
+        "10",
+        "01A"
+      ],
+      "affectedFiles": [
+        "scripts/backup/run-backup-restore-drill.ts"
+      ],
+      "prerequisites": [
+        "Onda 01 concluída",
+        "Banco PostgreSQL descartável de homologação/teste disponível para ensaio de restore"
+      ],
+      "risks": [
+        "Execução acidental do drill apontando para banco não descartável caso variáveis de ambiente não sejam isoladas"
+      ],
+      "executionOrder": "1º Atualizar predicado pass e medição real de RPO/RTO em run-backup-restore-drill.ts (Agente 10) -> 2º Validar cenários de falha (migration failed, RTO 901s, tabela órfã) e sucesso (Agente 08/01A) -> 3º Revisão (Agente 24).",
+      "entryCriteria": "Ambiente de banco descartável validado pelo Agente 14.",
+      "exitCriteria": "Predicado retorna false para migrateStatusOutput com erro, rtoMeasuredSec > 900 ou tableCounts vazio; drill real em banco descartável passa com exit 0 e comprova RLS pós-restore.",
+      "mandatoryTests": [
+        "Ensaio de predicado isolado com entradas inválidas (migrateStatusOutput='migration failed', rtoMeasuredSec=901, tableCounts=[])",
+        "Execução de npm run backup:drill contra container PostgreSQL descartável"
+      ],
+      "requiredEvidence": [
+        "Artefato JSON do drill com RTO/RPO medidos e status PASS/FAIL",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Reverter alteração em scripts/backup/run-backup-restore-drill.ts; backups existentes permanecem intactos.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 03",
+      "name": "Onda 03 — Arquitetura, Backend, Contratos OpenAPI e Resiliência de Runtime",
+      "objective": "Restaurar o contrato OpenAPI de /organization-modules removido no merge 2b918e0a, eliminar perda de atualização concorrente (read-modify-write) em módulos da organização, propagar erros reais no AnalyticsController em vez de retornar HTTP 200 com zeros, unificar calendário comercial Brasília no AnalyticsUseCases, corrigir paginação full-text de empresas com Meilisearch, exigir conteúdo válido em sequências de cadência, corrigir predicado tautológico em process-guards.ts, eliminar deadlock SSE no shutdown HTTP e limpar código legado/redundante em auth e billing.",
+      "findings": [
+        "DEBT-API-001",
+        "DEBT-UX-003",
+        "DEBT-OPS-006",
+        "DEBT-OPS-007",
+        "DEBT-ONB-001",
+        "DEBT-UX-002",
+        "DEBT-UX-004",
+        "DEBT-CAD-001",
+        "DEBT-CODE-001",
+        "DEBT-BILL-003"
+      ],
+      "leadAgents": [
+        "18",
+        "04",
+        "16",
+        "01",
+        "17",
+        "12"
+      ],
+      "affectedFiles": [
+        "docs/openapi.yaml",
+        "src/features/analytics/presentation/AnalyticsController.ts",
+        "src/features/analytics/application/AnalyticsUseCases.ts",
+        "src/features/companies/infra/PrismaCompanyRepository.ts",
+        "src/lib/search/index.ts",
+        "src/features/organization-modules/services/organizationModules.service.ts",
+        "src/features/organization-modules/infra/SettingOrganizationModulesRepository.ts",
+        "src/features/cadence/domain/cadence.ts",
+        "src/features/cadence/infra/dispatchers/CadenceDispatchers.ts",
+        "src/lib/process-guards.ts",
+        "src/bootstrap/shutdown.ts",
+        "src/lib/auth.ts",
+        "src/lib/voice-hub/services/billingService.ts"
+      ],
+      "prerequisites": [
+        "Ondas 00 e 01 concluídas",
+        "Acordo de contrato de erro e paginação com Agente 18 antes de alterar respostas HTTP de Analytics e Busca"
+      ],
+      "risks": [
+        "Frontend de Analytics deve tratar status HTTP 5xx exibindo estado de erro/retry em vez de quebrar ao deixar de receber 200 com zeros",
+        "Alteração da ordem de fechamento SSE/HTTP no shutdown exige teste de não regressão para requisições HTTP em voo"
+      ],
+      "executionOrder": "1º Restaurar docs/openapi.yaml (Agente 18) -> 2º Corrigir process-guards.ts e shutdown.ts (Agente 16) -> 3º Corrigir AnalyticsController, AnalyticsUseCases e paginação em PrismaCompanyRepository (Agente 04) -> 4º Aplicar transação/CAS em organizationModules.service.ts, remover user.count redundante em auth.ts e corrigir clamp de data em billingService.ts (Agente 01/12) -> 5º Integrar validação de conteúdo de cadência (Agente 17) -> 6º Revisão (Agente 24).",
+      "entryCriteria": "Contratos de erro HTTP e paginação validados pelo Agente 18.",
+      "exitCriteria": "verify:openapi-drift passa com exit 0; verify-02.cjs, verify-06.cjs, verify-onboarding.mjs, verify-billing.mjs e verify-cadence.mjs passam 100% nos cenários corrigidos; parecer APROVADO do Agente 24.",
+      "mandatoryTests": [
+        "npm run verify:openapi-drift",
+        "Reproduções de regressão para AnalyticsController (erro 500 vs banco vazio 200), Meilisearch (45 hits paginados 20/20/5), barrier test de enable(A)+enable(B) simultâneos, process-guards ECONNRESET não-Redis e SIGTERM com cliente SSE ativo"
+      ],
+      "requiredEvidence": [
+        "Saídas de execução de todos os scripts de verificação com exit 0",
+        "Teste de fuso horário America/Sao_Paulo na virada de mês (2026-10-01T01:00Z pertencente a setembro)",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Reverter commits individuais por subdomínio (OpenAPI, Runtime, Analytics/Busca, Onboarding/Auth, Cadência) preservando independência entre os PRs.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 04",
+      "name": "Onda 04 — Frontend, Design System, Resiliência de UI, Mobile e PWA",
+      "objective": "Corrigir guarda de loading no Copiloto Executivo para exibir erro/retry na falha inicial, individualizar estado de leitura de notificações broadcast por usuário, sincronizar deep links nativos Android com o catálogo de rotas web, fornecer os ícones PNG oficiais declarados no manifest PWA e validar endpoint mobile Capacitor.",
+      "findings": [
+        "DEBT-UX-008",
+        "DEBT-NOT-001",
+        "DEBT-UX-005",
+        "DEBT-UX-006",
+        "DEBT-MOB-001"
+      ],
+      "leadAgents": [
+        "02",
+        "07",
+        "09",
+        "11",
+        "01"
+      ],
+      "affectedFiles": [
+        "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+        "prisma/schema.prisma",
+        "src/features/notifications/notification.service.ts",
+        "android/app/src/main/java/br/com/birthhub360/prospector/MainActivity.java",
+        "src/App.tsx",
+        "src/lib/navigationBus.ts",
+        "vite.config.ts",
+        "public/icons/icon-192.png",
+        "public/icons/icon-512.png",
+        "capacitor.config.ts",
+        ".github/workflows/android-build.yml",
+        ".github/workflows/ios-build.yml"
+      ],
+      "prerequisites": [
+        "Handoff de schema concluído pelo Agente 01 para tabela/relação de leitura de notificação por usuário antes da alteração no serviço pelo Agente 02",
+        "Fornecimento dos ícones PNG oficiais 192x192 e 512x512 pelo Agente 11"
+      ],
+      "risks": [
+        "Migração de leitura de notificações broadcast deve preservar notificações diretas (userId != null) sem perda de histórico",
+        "Sincronização de deep links exige manter bloqueio explícito para rotas legadas desativadas"
+      ],
+      "executionOrder": "1º Corrigir guarda loading em EliteCommercialAgentWorkspace.tsx (Agente 07) -> 2º Migrar schema de estado de leitura de notificações broadcast (Agente 01) e atualizar notification.service.ts (Agente 02) -> 3º Adicionar ícones PWA em public/ (Agente 11/09) e alinhar MainActivity.java + capacitor.config.ts (Agente 09) -> 4º Revisão (Agente 24).",
+      "entryCriteria": "Onda 03 concluída e ativos visuais de ícones disponibilizados pelo Agente 11.",
+      "exitCriteria": "Falha inicial da API exibe botão de retry no Copiloto; leitura de broadcast por Usuário A mantém unread=1 para Usuário B; paridade 100% entre VALID_TABS nativo e rotas web ativas; todos os caminhos do manifest PWA existem em public/ e dist/.",
+      "mandatoryTests": [
+        "Teste unitário/componente de EliteCommercialAgentWorkspace com erro 500 inicial",
+        "Teste multi-usuário A/B de leitura de notificação broadcast",
+        "Script de paridade de sets entre MainActivity.java e navigationBus.ts + verificação de existência e dimensões de ícones PWA"
+      ],
+      "requiredEvidence": [
+        "Screenshots desktop/mobile (1280px, 768px, 390px) dos estados de erro/retry e notificações",
+        "Saída do verificador de paridade de deep links e precache PWA (exit 0)",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Reverter commits de UI/Mobile e, se necessário, manter fallback de leitura em Notification enquanto a tabela de recibos por usuário é desativada.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 05",
+      "name": "Onda 05 — Integrações Externas, Bitrix24, Filas WhatsApp e Busca Híbrida",
+      "objective": "Estender o escopo do AbortController de timeout do cliente Bitrix24 até o término do parsing do corpo (response.json), corrigir o detector de worker do Redis/WhatsApp para impedir reenfileiramento em loop e diferenciar falha de banco de dados de resultado vazio na busca textual/híbrida da base de conhecimento.",
+      "findings": [
+        "DEBT-QUEUE-001",
+        "DEBT-INT-001",
+        "DEBT-UX-007"
+      ],
+      "leadAgents": [
+        "16",
+        "06",
+        "07"
+      ],
+      "affectedFiles": [
+        "src/lib/queue/redis.ts",
+        "src/features/integrations/whatsapp/whatsapp.service.ts",
+        "src/lib/queue/whatsappCommand.worker.ts",
+        "src/features/integrations/bitrix/service/client.ts",
+        "src/features/knowledge/search.service.ts"
+      ],
+      "prerequisites": [
+        "Respeito ao slot exclusivo de filas entre Agentes 16, 06 e 07",
+        "Onda 03 concluída"
+      ],
+      "risks": [
+        "Alteração de timeout no cliente Bitrix24 pode abortar payloads legítimos muito grandes se o limite de 15s for insuficiente para extrações pesadas (usar timeout configurável por operação)"
+      ],
+      "executionOrder": "1º Integrar correção de regex em src/lib/queue/redis.ts e guarda em whatsappCommand.worker.ts (Agente 16/06) -> 2º Mover clearTimeout(timeout) para bloco finally após response.json() em bitrix/service/client.ts (Agente 06) -> 3º Propagar status de erro de busca textual em knowledge/search.service.ts (Agente 07) -> 4º Revisão (Agente 24).",
+      "entryCriteria": "Slot de filas alocado sequencialmente pelo Agente 00.",
+      "exitCriteria": "verify-worker-detector.mjs passa 6/6; cliente Bitrix aborta em 15s quando mock entrega headers mas trava o stream do body; hybridSearch sinaliza erro explícito quando FTS e ILIKE falham simultaneamente com busca semântica indisponível.",
+      "mandatoryTests": [
+        "node docs/audits/launch-2026-10-14/evidence/verify-worker-detector.mjs",
+        "Teste unitário com fake stream Bitrix que envia cabeçalhos HTTP 200 e retém o corpo além do timeout",
+        "Teste unitário de hybridSearch com falha simultânea de PostgreSQL e Qdrant/embeddings"
+      ],
+      "requiredEvidence": [
+        "Logs de execução dos testes unitários e de integração isolada (exit 0)",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Reverter commits individuais de cliente Bitrix, fila Redis ou busca de conhecimento sem impacto em schema.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 06",
+      "name": "Onda 06 — Inteligência Artificial, Copiloto Executivo, Enxame e Quotas por Tier",
+      "objective": "Substituir métricas financeiras fabricadas por constantes no Copiloto Executivo por dados reais do tenant, conectar as ações de NBA (executar/adiar) e o trace de missão ao estado real persistido no banco com verificação LGPD verdadeira, e aplicar enforceTokenQuota antes do início de streamChatCompletion.",
+      "findings": [
+        "DEBT-AI-002",
+        "DEBT-AI-003",
+        "DEBT-AI-004",
+        "DEBT-AI-001"
+      ],
+      "leadAgents": [
+        "07",
+        "23",
+        "13",
+        "04",
+        "18"
+      ],
+      "affectedFiles": [
+        "src/features/intelligence/routes/commercial-agent.routes.ts",
+        "src/features/intelligence/components/EliteCommercialAgentWorkspace.tsx",
+        "src/lib/ai/gateway/streaming.ts",
+        "src/lib/ai/gateway/chat-model.ts"
+      ],
+      "prerequisites": [
+        "Contratos de Analytics (Onda 03) e Resiliência de UI (Onda 04) concluídos",
+        "Definição de política de contabilização de tokens em streaming pelo Agente 23"
+      ],
+      "risks": [
+        "Tenants sem negócios cadastrados ou sem metas passarão a ver estado vazio/indisponível honesto em vez de R$ 200.000 fabricados (comportamento correto exigido por B-06)",
+        "Bloqueio de streaming para tenants que já excederam a quota de tokens premium do seu tier"
+      ],
+      "executionOrder": "1º Aplicar enforceTokenQuota em src/lib/ai/gateway/streaming.ts (Agente 07/23) -> 2º Conectar commercial-agent.routes.ts às fontes reais de Analytics/Metas, ledger de NBA e trace de missão por tenant (Agente 07/04/13/18) -> 3º Validar persistência real no banco (Agente 22) e Revisão (Agente 24).",
+      "entryCriteria": "Onda 03 e Onda 05 concluídas.",
+      "exitCriteria": "Zero constantes financeiras hardcoded em commercial-agent.routes.ts; execução/adiamento de NBA gravado no banco e preservado após F5; trace de missão inexistente retorna 404; quota excedida bloqueia streaming antes do fetch ao provedor LLM.",
+      "mandatoryTests": [
+        "Suíte de integração de commercial-agent.routes.ts com banco vazio, >10 leads reais, leads deletados e múltiplos tenants",
+        "Teste unitário de streamChatCompletion com quota de tier esgotada vs disponível"
+      ],
+      "requiredEvidence": [
+        "Comprovação de paridade entre banco PostgreSQL e payload da API pelo Agente 22",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Desabilitar temporariamente os botões de ação NBA na UI com badge honesta de 'Indisponível' caso o dispatcher apresente instabilidade; reverter commit da rota.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 07",
+      "name": "Onda 07 — Performance, Escalabilidade e Eficiência de Consultas",
+      "objective": "Substituir o carregamento integral em memória de todas as linhas de AILog do período (findMany sem limite em PrismaUsageRepository.ts e agregação em JS no UsageUseCases.ts) por agregação SQL groupBy/SUM no PostgreSQL ou paginação estritamente limitada.",
+      "findings": [
+        "DEBT-PERF-001"
+      ],
+      "leadAgents": [
+        "01",
+        "23",
+        "07"
+      ],
+      "affectedFiles": [
+        "src/features/billing/infra/PrismaUsageRepository.ts",
+        "src/features/billing/application/UsageUseCases.ts"
+      ],
+      "prerequisites": [
+        "Onda 06 concluída"
+      ],
+      "risks": [
+        "Divergência de agrupamento diário caso o truncamento de data no SQL use fuso horário diferente do esperado pelo contrato de billing"
+      ],
+      "executionOrder": "1º Implementar agregação SQL / groupBy no PrismaUsageRepository.ts (Agente 01) -> 2º Adaptar UsageUseCases.ts preservando o formato exato do DTO de resposta (Agente 01/23) -> 3º Executar benchmark comparativo de memória e latência (Agente 08/23) -> 4º Revisão (Agente 24).",
+      "entryCriteria": "Especificação de fuso horário de faturamento confirmada entre Agente 01 e Agente 23.",
+      "exitCriteria": "Consumo de memória constante O(dias + modelos) independente do número total de linhas em AILog; paridade matemática exata com os totais anteriores.",
+      "mandatoryTests": [
+        "Teste de integração comparando totais por modelo, prompt e dia em dataset sintético de 50.000 registros de AILog",
+        "Verificação de isolamento RLS por organizationId na query agregada"
+      ],
+      "requiredEvidence": [
+        "Relatório de memória/latência antes e depois da agregação SQL",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Reverter para consulta paginada por cursor com take máximo caso a query SQL agregada necessite de ajuste de índice.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 08",
+      "name": "Onda 08 — QA, Descoberta Completa de Testes e Observabilidade PromQL",
+      "objective": "Incluir os 62 arquivos de teste co-localizados em src/** (atualmente ignorados por vitest.unit.config.ts) na descoberta oficial de testes unitários sem mascarar falhas, e corrigir a incompatibilidade de labels nos vetores PromQL do alerta AIBudgetOverrun.",
+      "findings": [
+        "DEBT-OPS-001",
+        "DEBT-FIN-001"
+      ],
+      "leadAgents": [
+        "14",
+        "08",
+        "10",
+        "23"
+      ],
+      "affectedFiles": [
+        "vitest.unit.config.ts",
+        "infrastructure/observability/alert.rules.yml",
+        "src/lib/ai/metrics.ts"
+      ],
+      "prerequisites": [
+        "Ondas 00 a 07 concluídas"
+      ],
+      "risks": [
+        "Alguns dos 62 testes co-localizados em src/features/voice-hub/** e src/lib/voice-hub/** podem exigir ajuste de mocks globais (ex. window.matchMedia) ao entrarem no gate unitário principal"
+      ],
+      "executionOrder": "1º Expandir test.include em vitest.unit.config.ts para cobrir src/**/*.test.{ts,tsx} e triar eventuais falhas nos 62 arquivos (Agente 14/08) -> 2º Ajustar expressão PromQL com sum() e correspondência de labels em alert.rules.yml (Agente 10/23) -> 3º Revisão (Agente 24).",
+      "entryCriteria": "Ambiente de testes completo do Agente 14 ativo.",
+      "exitCriteria": "100% dos arquivos *.test.ts e *.test.tsx sob src/ e tests/unit/ descobertos e aprovados (560+ arquivos de teste); promtool test rules aprovando o disparo de AIBudgetOverrun.",
+      "mandatoryTests": [
+        "npm run test:unit verificando a contagem de arquivos executados (>= 560 suítes)",
+        "Teste negativo introduzindo falha sintética em arquivo co-localizado fora de __tests__ para provar bloqueio do runner",
+        "Validação sintática e de regras do alert.rules.yml"
+      ],
+      "requiredEvidence": [
+        "Log completo do Vitest com todas as 62 suítes anteriormente excluídas passando",
+        "Parecer formal do Agente 24"
+      ],
+      "rollbackStrategy": "Separar suítes legadas de voice-hub em job dedicado bloqueante caso haja conflito de ambiente JSDOM vs Node, nunca voltando a ignorá-las silenciosamente.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    },
+    {
+      "id": "Onda 09",
+      "name": "Onda 09 — Governança, Documentação Operacional e Certificação de Release",
+      "objective": "Alinhar a política Local-First com o gatilho automático de publicação de imagem no GHCR (.github/workflows/docker-publish.yml), corrigir a referência ao arquivo inexistente EXECUCAO-ONDAS.md sob decisão humana, atualizar os comandos de compose em LOCAL_FIRST.md/GO-LIVE-CHECKLIST.md, reconciliar os 13 handoffs históricos contraditórios e executar o gate final completo para certificação de release.",
+      "findings": [
+        "DEBT-GOV-002",
+        "DEBT-DOC-001",
+        "DEBT-GOV-003",
+        "DEBT-GOV-001"
+      ],
+      "leadAgents": [
+        "00",
+        "08",
+        "18",
+        "24"
+      ],
+      "affectedFiles": [
+        ".github/workflows/docker-publish.yml",
+        "docs/development/LOCAL_FIRST.md",
+        "docs/release/GO-LIVE-CHECKLIST.md",
+        ".agents/prompts/00-coordenador.md",
+        ".agents/README.md",
+        ".agents/handoffs/**",
+        ".agents/reviews/checklist-handoffs.html"
+      ],
+      "prerequisites": [
+        "Decisão humana explícita sobre: (a) manter ou desabilitar workflow_run automático em docker-publish.yml durante o modo Local-First, e (b) atualizar a referência a EXECUCAO-ONDAS.md em .agents/prompts/00-coordenador.md (AGENTS.md §5)",
+        "Ondas 00 a 08 concluídas e aprovadas"
+      ],
+      "risks": [
+        "Edição de arquivos em .agents/prompts/ sem autorização humana violaria AGENTS.md §5 — executar exclusivamente após confirmação do usuário"
+      ],
+      "executionOrder": "1º Aplicar ajustes em LOCAL_FIRST.md, GO-LIVE-CHECKLIST.md e docker-publish.yml conforme decisão humana (Agente 08/18) -> 2º Reconciliar cabeçalhos dos handoffs contraditórios e regenerar checklist-handoffs.html (Agente 00) -> 3º Executar todos os gates globais no mesmo commit SHA (Agente 08/14) -> 4º Emitir certificação final independente (Agente 24).",
+      "entryCriteria": "Todas as ondas técnicas (00 a 08) aprovadas e decisões humanas de governança registradas.",
+      "exitCriteria": "Zero links obrigatórios quebrados; zero handoffs com contradição entre cabeçalho e resolução; todos os 46 checks anteriormente 'Não verificados' executados no ambiente integrado com exit 0; parecer final APROVADO do Agente 24.",
+      "mandatoryTests": [
+        "Execução completa de npm run release:check (lint, typecheck, test:architecture, test:unit, test:integration, test:e2e, build, npm audit, gitleaks)",
+        "node scripts/generate-handoffs-checklist.cjs"
+      ],
+      "requiredEvidence": [
+        "Logs completos de todos os gates verdes no HEAD candidato",
+        "Parecer final de certificação de release assinado pelo Agente 24"
+      ],
+      "rollbackStrategy": "Reverter alterações documentais/workflows via Git; nenhuma operação de deploy em produção ocorre sem acionamento explícito posterior do Agente 08A.",
+      "status": "NOT_STARTED",
+      "statusEvidence": null,
+      "statusNote": "Nenhuma execução de saneamento foi registrada. Patch candidato não conta como onda concluída."
+    }
+  ]
+}

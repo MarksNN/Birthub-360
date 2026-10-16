@@ -7,7 +7,7 @@ const redisUrl = configuredRedisUrl || 'redis://localhost:6379';
 const isProduction = process.env.NODE_ENV === 'production';
 const entrypoint = process.argv[1] || '';
 export const isDedicatedWorkerProcess =
-  /(?:^|[\\/])worker(?:-[a-zA-Z0-9_-]+)?\.(?:ts|js|cjs|mjs)$/.test(entrypoint);
+  /(?:^|[\\/])worker(?:-[a-zA-Z0-9_-]+)?\.(?:cjs|mjs|ts|js)$/.test(entrypoint);
 
 export const redisConfigured = Boolean(configuredRedisUrl);
 

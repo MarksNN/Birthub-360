@@ -1,12 +1,20 @@
 
 import { spawnSync } from 'child_process';
 import { execSync } from 'child_process';
+import { readFileSync } from 'node:fs';
+
+const scripts = JSON.parse(readFileSync('package.json', 'utf8')).scripts || {};
 
 function run(cmd, name, optional = false) {
   try {
+    const script = cmd.startsWith('npm run ') ? cmd.slice('npm run '.length) : null;
+    if (script && !Object.hasOwn(scripts, script)) {
+      console.error('Script obrigatório ausente: ' + script);
+      return { name, status: 'FAIL', critical: true };
+    }
     process.stdout.write('Executando ' + name + '... ');
     const [command, ...args] = cmd.split(' ');
-    const result = spawnSync(command, args, { stdio: 'ignore', shell: true });
+    const result = spawnSync(command, args, { stdio: 'inherit', shell: true });
     
     if (result.status === 0) {
       console.log('APROVADO');
@@ -32,10 +40,14 @@ function run(cmd, name, optional = false) {
 }
 
 const checks = [
-  run('npm run lint', 'Lint', true),
-  run('npm run typecheck', 'Typecheck', true),
+  run('npm run lint', 'Lint', false),
+  run('npm run typecheck', 'Typecheck', false),
+  run('npm run test:architecture', 'Arquitetura', false),
   run('npm run test:unit', 'Testes Unitarios', false),
+  run('npm run test:integration', 'Testes de Integracao', false),
+  run('npm run test:e2e', 'Testes E2E', false),
   run('npm run build', 'Build da Aplicacao', false),
+  run('npm audit', 'Auditoria de Dependencias', false),
   run('npm run security:dependency-inventory', 'Security Inventory', true),
 ];
 

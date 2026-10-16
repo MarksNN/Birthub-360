@@ -42,7 +42,7 @@ test.describe('Mobile Android (Pixel 5 emulado, touch real via Chromium)', () =>
     const scrollRegion = page.getByLabel('Colunas do pipeline — role o conteúdo horizontalmente');
     // Ponto de partida seguro: dentro do placeholder "Solte cards aqui" de uma coluna vazia — sem
     // nenhum card sob o dedo, então qualquer aria-pressed=true só pode vir de um bug real.
-    const emptyPlaceholder = page.getByText('📥 Solte cards aqui').first();
+    const emptyPlaceholder = page.getByText(/Solte cards aqui/i).first();
     const startBox = await emptyPlaceholder.boundingBox();
     if (!startBox) throw new Error('sem bounding box do placeholder vazio');
 

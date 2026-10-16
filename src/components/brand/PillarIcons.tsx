@@ -259,3 +259,5 @@ export const PILLAR_ICONS: Record<string, React.FC<PillarIconProps>> = {
     </svg>
   ),
 };
+
+export { AIIcon as AiIcon };

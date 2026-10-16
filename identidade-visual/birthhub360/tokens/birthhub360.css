@@ -121,7 +121,7 @@ html.light,
 :root.light {
   --color-heading-cyan: color-mix(in srgb, #0284C7 85%, #0D0D0D);
   --color-heading-blue: color-mix(in srgb, #3B82F6 80%, #0D0D0D);
-  --color-heading-gold: color-mix(in srgb, #D97706 70%, #0D0D0D);
+  --color-heading-gold: #D97706;
   --color-heading-pink: #D91B7C;
   --color-heading-iris: color-mix(in srgb, #8B7DFF 65%, #0D0D0D);
   --color-heading-success: color-mix(in srgb, #22C55E 60%, #0D0D0D);

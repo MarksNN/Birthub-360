@@ -12,7 +12,7 @@ const FAQ_DATA: FaqItem[] = [
   {
     question: 'Como funciona a integração com o Bitrix24?',
     answer:
-      'A integração com o Bitrix24 é nativa e bidirecional. Ela sincroniza automaticamente negócios (deals), contatos, empresas, tarefas e histórico de atividades sem necessidade de integrações de terceiros ou configurações complexas.',
+      'A integração com o Bitrix24 opera via API REST e webhooks em tempo real. Ela sincroniza automaticamente negócios (deals), contatos, empresas, tarefas e histórico de atividades com total integridade e observabilidade.',
   },
   {
     question: 'Qual é o modelo de cobrança para chamadas de voz e IA?',

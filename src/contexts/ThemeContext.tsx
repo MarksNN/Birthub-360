@@ -11,11 +11,27 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function getInitialTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'light';
+
+  try {
+    const savedTheme = window.localStorage.getItem('atlas_theme');
+    return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light';
+  } catch (error) {
+    console.error('Não foi possível carregar a preferência de tema salva.', error);
+    return 'light';
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<ThemeMode>('light');
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
 
   useEffect(() => {
-    localStorage.setItem('atlas_theme', theme);
+    try {
+      window.localStorage.setItem('atlas_theme', theme);
+    } catch (error) {
+      console.error('Não foi possível salvar a preferência de tema.', error);
+    }
     const root = document.documentElement;
     root.dataset.theme = theme;
     root.classList.toggle('light', theme === 'light');

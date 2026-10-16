@@ -258,7 +258,7 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                     <div
                       className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-10 rounded-[inherit]"
                       style={{
-                        background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(212,175,55,0.08), transparent 40%)`,
+                        background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0, 212, 255, 0.12), transparent 40%)`,
                       }}
                       aria-hidden="true"
                     />

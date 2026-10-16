@@ -13,16 +13,17 @@ import {
 import { useCallback, useState } from 'react';
 import { Button } from '../../../components/ui/Button.js';
 import { Card } from '../../../components/ui/Card.js';
-import type { HealthScoreResult, ExecutiveAlert } from '../../commercial-intelligence/commercialIntelligence.api.js';
 import type { NotificationItem } from '../../notifications/notifications.api.js';
 import {
   type DealRiskScanResult,
+  type SignalRiskExecutiveAlert,
+  type SignalRiskHealthScore,
   signalsRisksApi,
 } from '../signalsRisks.api.js';
 
 interface DealRisksTabProps {
-  healthScore: HealthScoreResult | null;
-  overviewAlerts: ExecutiveAlert[];
+  healthScore: SignalRiskHealthScore | null;
+  overviewAlerts: SignalRiskExecutiveAlert[];
   notifications: NotificationItem[];
   onRefresh: () => void;
 }
@@ -130,7 +131,10 @@ export function DealRisksTab({
       {/* ── Três Pilares de Risco Preventivo ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Pilar 1: Silêncio */}
-        <Card padding="default" className="border-warning/20 hover:border-warning/40 transition-all space-y-3">
+        <Card
+          padding="default"
+          className="border-warning/20 hover:border-warning/40 transition-all space-y-3"
+        >
           <div className="flex items-center justify-between">
             <span className="p-2 rounded-lg bg-warning/10 text-warning-active dark:text-warning">
               <Clock className="w-4 h-4" />
@@ -142,17 +146,23 @@ export function DealRisksTab({
           <div>
             <h3 className="text-sm font-bold text-ink">Silêncio Prolongado</h3>
             <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-              Leads em negociação aberta sem nenhuma mensagem ou retorno do tomador de decisão há mais de 5 dias úteis.
+              Leads em negociação aberta sem nenhuma mensagem ou retorno do tomador de decisão há
+              mais de 5 dias úteis.
             </p>
           </div>
           <div className="pt-2 border-t border-line text-[11px] text-ink-2 flex items-center justify-between">
             <span>Ação recomendada:</span>
-            <strong className="text-warning-active dark:text-warning">Breakup e-mail ou ligação executiva</strong>
+            <strong className="text-warning-active dark:text-warning">
+              Breakup e-mail ou ligação executiva
+            </strong>
           </div>
         </Card>
 
         {/* Pilar 2: Mudança de Tom */}
-        <Card padding="default" className="border-critical/20 hover:border-critical/40 transition-all space-y-3">
+        <Card
+          padding="default"
+          className="border-critical/20 hover:border-critical/40 transition-all space-y-3"
+        >
           <div className="flex items-center justify-between">
             <span className="p-2 rounded-lg bg-critical/10 text-critical">
               <MessageSquare className="w-4 h-4" />
@@ -164,7 +174,8 @@ export function DealRisksTab({
           <div>
             <h3 className="text-sm font-bold text-ink">Mudança de Tom & Frieza</h3>
             <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-              Detecção semântica de atrito, respostas monossilábicas ou evasivas nas mensagens trocadas via WhatsApp.
+              Detecção semântica de atrito, respostas monossilábicas ou evasivas nas mensagens
+              trocadas via WhatsApp.
             </p>
           </div>
           <div className="pt-2 border-t border-line text-[11px] text-ink-2 flex items-center justify-between">
@@ -174,7 +185,10 @@ export function DealRisksTab({
         </Card>
 
         {/* Pilar 3: Concorrentes */}
-        <Card padding="default" className="border-iris/20 hover:border-iris/40 transition-all space-y-3">
+        <Card
+          padding="default"
+          className="border-iris/20 hover:border-iris/40 transition-all space-y-3"
+        >
           <div className="flex items-center justify-between">
             <span className="p-2 rounded-lg bg-iris/10 text-accent-violet">
               <Users className="w-4 h-4" />
@@ -186,7 +200,8 @@ export function DealRisksTab({
           <div>
             <h3 className="text-sm font-bold text-ink">Concorrente Mencionado</h3>
             <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-              Identificação de citações a concorrentes diretos da logística durante conversas ou trocas de proposta.
+              Identificação de citações a concorrentes diretos da logística durante conversas ou
+              trocas de proposta.
             </p>
           </div>
           <div className="pt-2 border-t border-line text-[11px] text-ink-2 flex items-center justify-between">
@@ -225,7 +240,10 @@ export function DealRisksTab({
               O Health Score avalia a aderência do pipeline aos limiares de segurança:
             </p>
             {healthScore?.pillars?.map((p) => (
-              <div key={p.pillar} className="flex items-center justify-between text-xs py-1 border-b border-line/40">
+              <div
+                key={p.pillar}
+                className="flex items-center justify-between text-xs py-1 border-b border-line/40"
+              >
                 <span className="text-ink-2">{p.label}</span>
                 <span className="font-mono font-bold text-ink">
                   {p.score !== null ? `${p.score} pts` : 'N/D'}
@@ -300,7 +318,10 @@ export function DealRisksTab({
                 </div>
               ))
             ) : (
-              <Card padding="default" className="border-success/20 bg-success/[0.04] text-center py-8">
+              <Card
+                padding="default"
+                className="border-success/20 bg-success/[0.04] text-center py-8"
+              >
                 <CheckCircle2 className="w-7 h-7 text-success-active dark:text-success mx-auto mb-2" />
                 <p className="text-xs font-bold text-ink">Nenhum deal em risco crítico ativo</p>
                 <p className="text-[11px] text-ink-2 mt-0.5">

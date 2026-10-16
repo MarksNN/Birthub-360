@@ -34,6 +34,9 @@ const cardVariants = cva('bh-platform-card relative overflow-hidden rounded-card
         'bg-surface border border-line shadow-sm hover:border-brand/30 hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
       cosmic:
         'bg-gradient-to-br from-surface-elevated/90 to-brand/10 backdrop-blur-2xl border border-brand/50 shadow-card hover:border-brand hover:shadow-glow-brand-strong hover:-translate-y-1 transition-all duration-300',
+      glass:
+        'bh-glass border border-line shadow-lg backdrop-blur-xl hover:border-brand/50 transition-all duration-300',
+      neon: 'bg-surface border border-brand/50 shadow-[0_0_20px_rgba(0,212,255,0.25)] hover:border-brand hover:shadow-[0_0_28px_rgba(0,212,255,0.4)] transition-all duration-300 hover:-translate-y-0.5',
     },
     padding: {
       default: 'p-6',
@@ -96,6 +99,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     ref,
   ) => {
     const [isHovered, setIsHovered] = React.useState(false);
+    const isInteractive = Boolean(onClick);
+    const isHoverAware =
+      spotlight || soundHover || Boolean(onMouseEnter || onMouseLeave || onPointerMove);
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
       onPointerMove?.(e);
@@ -139,17 +145,21 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           cardVariants({ variant, padding, className }),
           (isLoading || borderBeam || spotlight) && 'overflow-hidden isolate',
         )}
-        onPointerMove={handlePointerMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        {...(onClick
+        {...(isHoverAware
+          ? {
+              onPointerMove: handlePointerMove,
+              onMouseEnter: handleMouseEnter,
+              onMouseLeave: handleMouseLeave,
+            }
+          : {})}
+        {...(isInteractive
           ? {
               role: 'button',
               tabIndex: 0,
               onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+                  e.currentTarget.click();
                 }
               },
               onClick: handleClick,

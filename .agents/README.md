@@ -27,6 +27,13 @@
 - *Especialistas de governança 21 (Privacidade e LGPD), 22 (Verificação de Realidade) e 23 (Custo, Performance e Limites de IA):* regidos diretamente pelas diretrizes de `/AGENTS.md` (§3, §26, §27) em conjunto com os prompts de domínio correlatos (`01A`, `14`, `15`, `07`).
 - `COMO-CHAMAR-OS-AGENTES.md` — prompts prontos para colar, um por agente, para abrir a sessão correspondente em qualquer ferramenta de agente de código
 
+## Inventário canônico de dívidas técnicas
+
+Antes de corrigir uma dívida já auditada, leia [`.agents/audits/technical-debt/CURRENT.md`](audits/technical-debt/CURRENT.md).
+O snapshot vigente tem 40 achados canônicos e 216 verificações.
+Não crie outro ID se o achado já possui identificador `DEBT-*`.
+A varredura de 176 itens do PR #741 não é fonte oficial.
+
 ## Pastas de execução (criadas em runtime, não versionadas com conteúdo sensível)
 - `runs/` — relatórios de onda do Coordenador (`baseline.md`, `onda-2.md`, `onda-2.5.md`, `onda-4.md`, `onda-5.md`, …). Somente o Coordenador escreve aqui. Inclui a matriz de propriedade que `/AGENTS.md` → "Regra de concorrência" exige antes de disparar uma onda com mais de 3 especialistas.
 - `PLAN-V4/` (substitui a antiga referência `completion/`) — mapa da plataforma, inventário, bloqueadores e planos estruturados das ondas de finalização.

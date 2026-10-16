@@ -394,8 +394,14 @@ function AppLayout() {
               }
             />
             <Route path="signals-risks" element={<SignalsAndRisksHub />} />
-            <Route path="signals-risks/radar" element={<SignalsAndRisksHub initialView="radar" />} />
-            <Route path="signals-risks/deal-risks" element={<SignalsAndRisksHub initialView="deal-risks" />} />
+            <Route
+              path="signals-risks/radar"
+              element={<SignalsAndRisksHub initialView="radar" />}
+            />
+            <Route
+              path="signals-risks/deal-risks"
+              element={<SignalsAndRisksHub initialView="deal-risks" />}
+            />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
             {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,

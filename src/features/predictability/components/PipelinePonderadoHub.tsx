@@ -94,14 +94,14 @@ export function PipelinePonderadoHub() {
                   {p.stages.map((s) => (
                     <tr key={s.stageName} className="border-t border-[var(--line)]">
                       <td className="py-1.5">{s.stageName}</td>
-                      <td className="py-1.5 text-right tabular-nums">{s.count}</td>
-                      <td className="py-1.5 text-right tabular-nums">
+                      <td className="py-1.5 text-right font-mono tabular-nums">{s.count}</td>
+                      <td className="py-1.5 text-right font-mono tabular-nums">
                         {formatBRL(s.grossAmount, cur)}
                       </td>
-                      <td className="py-1.5 text-right tabular-nums">
+                      <td className="py-1.5 text-right font-mono tabular-nums">
                         {formatPct(s.avgProbability)}
                       </td>
-                      <td className="py-1.5 text-right tabular-nums">
+                      <td className="py-1.5 text-right font-mono tabular-nums font-semibold text-brand">
                         {formatBRL(s.weightedAmount, cur)}
                       </td>
                     </tr>
