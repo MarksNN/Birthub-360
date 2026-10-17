@@ -117,7 +117,6 @@ export type TabType =
   | 'forecast'
   | 'metas'
   | 'pipeline_ponderado'
-  | 'gamification'
   | 'playbooks'
   | 'jornadas'
   | 'processos'
@@ -187,10 +186,9 @@ export const TAB_META: Record<TabType, { label: string; icon: any; accent: NavAc
   // PILAR 04 — PERFORMANCE COMERCIAL
   dashboard: { label: 'Command Center', icon: PerformanceIcon as any, accent: 'gold' },
   analytics: { label: 'Analytics', icon: BarChart3, accent: 'blue' },
-  gamification: { label: 'Gamificação', icon: Trophy, accent: 'gold' },
+  gamification: { label: 'Gamificação & Ranking', icon: Trophy, accent: 'gold' },
   winloss: { label: 'Win/Loss', icon: Target, accent: 'red' },
   reports: { label: 'Relatórios Avançados', icon: FileBarChart, accent: 'slate' },
-  gamification: { label: 'Gamificação & Ranking', icon: Trophy, accent: 'gold' },
   settings_performance: { label: 'Ajustes de Performance', icon: SettingsIcon, accent: 'slate' },
 
   // PILAR 05 — PREVISIBILIDADE COMERCIAL
