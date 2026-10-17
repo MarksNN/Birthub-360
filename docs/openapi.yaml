@@ -4708,6 +4708,52 @@ paths:
         '401': { description: Não autenticado }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  # ───────────────────────────── Mobile ─────────────────────────────
+  /mobile/field-meetings/sync:
+    post:
+      tags: [Mobile]
+      summary: Sincroniza e concilia reuniões de campo gravadas offline com o Copiloto IA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title: { type: string }
+                leadId: { type: string, nullable: true }
+                audioData: { type: string, nullable: true }
+                audioMimeType: { type: string }
+                audioSizeBytes: { type: integer }
+                durationMs: { type: integer }
+                recordedAt: { type: string, format: date-time }
+                meetingNotes: { type: string }
+                consentMethod: { type: string }
+                textVersion: { type: string }
+      responses:
+        '201':
+          description: Reunião de campo sincronizada e enfileirada para transcrição
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      title: { type: string }
+                      status: { type: string }
+                      consentGranted: { type: boolean }
+                      leadId: { type: string, nullable: true }
+                      audioObjectKey: { type: string }
+                      hasNotes: { type: boolean }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   # ───────────────────────────── Cadence ─────────────────────────────
   /cadence/opt-outs:
     get:
