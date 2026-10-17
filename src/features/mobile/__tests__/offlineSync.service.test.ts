@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  OfflineSyncService,
-  LocalStorageAdapter,
-  sanitizePayload,
-  generateTemporaryId,
-  extractEntityId,
-  isTransientNetworkError,
   type ApiClientAdapter,
+  extractEntityId,
+  generateTemporaryId,
+  isTransientNetworkError,
+  LocalStorageAdapter,
+  OfflineSyncService,
+  sanitizePayload,
 } from '../offlineSync.service.js';
 
 describe('OfflineSyncService (Mobile / Capacitor / PWA)', () => {

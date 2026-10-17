@@ -1,7 +1,5 @@
-import type { ObjectionMatrixItemRepository } from '../../playbook/objection-matrix/domain/ObjectionMatrixItem.js';
-import { PrismaObjectionMatrixRepository } from '../../playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.js';
-import type { QualificationMatrixItemRepository } from '../../playbook/qualification-matrix/domain/QualificationMatrixItem.js';
-import { PrismaQualificationMatrixRepository } from '../../playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
+import type { RoleplayPlaybookPort } from '../../../shared/contracts/roleplayPlaybook.contract.js';
+import { container } from '../../../shared/di/container.js';
 import type {
   RoleplayFeedback,
   RoleplayMessage,
@@ -13,12 +11,24 @@ import { prismaRoleplayRepository } from '../infra/PrismaRoleplayRepository.js';
 import { RoleplayAiService } from '../services/roleplay-ai.service.js';
 
 export class RoleplayUseCases {
+  private playbookPort?: RoleplayPlaybookPort;
+
   constructor(
     private repository: RoleplayRepository = prismaRoleplayRepository,
     private aiService: RoleplayAiService = new RoleplayAiService(),
-    private qualificationRepo: QualificationMatrixItemRepository = new PrismaQualificationMatrixRepository(),
-    private objectionRepo: ObjectionMatrixItemRepository = new PrismaObjectionMatrixRepository(),
-  ) {}
+    playbookPort?: RoleplayPlaybookPort,
+  ) {
+    this.playbookPort = playbookPort;
+  }
+
+  private getPlaybookPort(): RoleplayPlaybookPort | null {
+    if (this.playbookPort) return this.playbookPort;
+    try {
+      return container.resolve<RoleplayPlaybookPort>('RoleplayPlaybookPort');
+    } catch {
+      return null;
+    }
+  }
 
   async listPersonas(): Promise<RoleplayPersona[]> {
     return this.repository.listPersonas();
@@ -97,15 +107,18 @@ export class RoleplayUseCases {
     // Busca matrizes ativas da organização para contextualizar a simulação (DT-007)
     let qualificationCriteria: string[] = [];
     let objections: string[] = [];
-    try {
-      const [qualRes, objRes] = await Promise.all([
-        this.qualificationRepo.findAllWithFilters(organizationId, undefined, 1, 50),
-        this.objectionRepo.findAllWithFilters(organizationId, undefined, 1, 50),
-      ]);
-      qualificationCriteria = qualRes.data.map((q) => `${q.questionCategory}: ${q.questionText}`);
-      objections = objRes.data.map((o) => `${o.objectionTitle} (${o.objectionText})`);
-    } catch {
-      // Degradação graciosa em caso de falha de leitura secundária
+    const playbook = this.getPlaybookPort();
+    if (playbook) {
+      try {
+        const [qualRes, objRes] = await Promise.all([
+          playbook.findQualificationCriteria(organizationId),
+          playbook.findObjections(organizationId),
+        ]);
+        qualificationCriteria = qualRes;
+        objections = objRes;
+      } catch {
+        // Degradação graciosa em caso de falha de leitura secundária
+      }
     }
 
     // Execução real do LLM provider (DT-007: sem MOCK_DATA no caminho produtivo)
@@ -161,15 +174,18 @@ export class RoleplayUseCases {
     // Busca matrizes ativas da organização para enriquecer o parecer de avaliação pedagógica
     let qualificationCriteria: string[] = [];
     let objections: string[] = [];
-    try {
-      const [qualRes, objRes] = await Promise.all([
-        this.qualificationRepo.findAllWithFilters(organizationId, undefined, 1, 50),
-        this.objectionRepo.findAllWithFilters(organizationId, undefined, 1, 50),
-      ]);
-      qualificationCriteria = qualRes.data.map((q) => `${q.questionCategory}: ${q.questionText}`);
-      objections = objRes.data.map((o) => `${o.objectionTitle} (${o.objectionText})`);
-    } catch {
-      // Degradação graciosa
+    const playbook = this.getPlaybookPort();
+    if (playbook) {
+      try {
+        const [qualRes, objRes] = await Promise.all([
+          playbook.findQualificationCriteria(organizationId),
+          playbook.findObjections(organizationId),
+        ]);
+        qualificationCriteria = qualRes;
+        objections = objRes;
+      } catch {
+        // Degradação graciosa
+      }
     }
 
     // Avaliação real da IA (DT-007: sem fórmulas matemáticas arbitrárias falsificando avaliação de IA)
