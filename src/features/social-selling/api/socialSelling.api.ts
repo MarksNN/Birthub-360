@@ -3,7 +3,6 @@ import type {
   GenerateApproachInput,
   GeneratedApproachResult,
 } from '../domain/socialSelling.types.js';
-
 export type {
   GenerateApproachInput,
   GeneratedApproachResult,

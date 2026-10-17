@@ -11,6 +11,14 @@ coverage
 .git
 .github
 
+# Cópias efêmeras locais. Não entram no contexto de build.
+# Migrations em prisma/migrations continuam incluídas pela exceção mais abaixo.
+.worktrees
+.tmp
+tmp
+temp
+**/*.tmp
+
 # Ambientes, segredos e dumps (Segurança Bloqueador #4, #14)
 .env
 .env.*
@@ -54,10 +62,17 @@ argocd
 infrastructure
 docker
 
-# Documentação, manuais e ativos visuais pesados
+# Documentação, manuais e ativos visuais pesados.
+# O brandbook fica de fora. O Vite importa os tokens e os três SVG do logo;
+# a exceção precisa reabrir os diretórios pais, senão o arquivo não entra.
 docs
 documentacao-aplicacao
-identidade-visual
+identidade-visual/**
+!identidade-visual/birthhub360/
+!identidade-visual/birthhub360/tokens/
+!identidade-visual/birthhub360/tokens/**
+!identidade-visual/birthhub360/logos/
+!identidade-visual/birthhub360/logos/**
 assets/brand
 birthhub-360-assets
 design-system-capture

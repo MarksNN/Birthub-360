@@ -24,12 +24,20 @@ RUN npm ci --ignore-scripts
 
 COPY . .
 RUN npx prisma generate
+# Node deriva o heap do cgroup. No builder limitado, o padrão mata o Vite
+# por volta de 800 MB (exit 134). O runner não herda esta variável.
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm run build
 RUN npm run build:worker
 
 # Remove devDependencies (typescript, eslint, vitest, prisma CLI, etc.) antes de copiar
 # node_modules pro estágio final — nada disso é necessário em runtime, só incha a imagem
 # de produção (DEVOPS-005 na auditoria de dívida técnica).
+# A versão exata da CLI já resolvida pelo npm ci fica em node_modules/prisma.
+# Capturá-la antes do prune evita reinstalar o range semver de devDependencies
+# (ex.: ^7.10.0), que pode resolver uma versão diferente do package-lock.json.
+RUN node -p "require('./node_modules/prisma/package.json').version" > /tmp/prisma-cli-version
+
 RUN npm prune --omit=dev
 
 # npm prune acima remove também a CLI do prisma (devDependency), que o Job de migração
@@ -38,11 +46,14 @@ RUN npm prune --omit=dev
 # (Render, render.yaml) não usa este Dockerfile e não é afetado, mas o caminho
 # k8s/Helm/ArgoCD (charts/prospector-atlas/templates/migration-job.yaml,
 # k8s/migration-job.yaml — aspiracional) precisa da CLI presente na imagem final.
-# Reinstala só a CLI, na versão EXATA resolvida em package-lock.json (não o range semver do
-# package.json), sem tocar em package.json/lockfile (--no-save --package-lock=false) e sem
-# reintroduzir o restante das devDependencies.
-RUN PRISMA_EXACT_VERSION=$(node -p "const lock = require('./package-lock.json'); (lock.packages && lock.packages['node_modules/prisma'] && lock.packages['node_modules/prisma'].version) || require('./package.json').devDependencies.prisma.replace(/^[^0-9]*/, '')") \
-    && npm install --no-save --package-lock=false --exact "prisma@${PRISMA_EXACT_VERSION}"
+# Reinstala só a CLI, na versão exata já instalada pelo lockfile, sem tocar em
+# package.json/lockfile (--no-save) e sem reintroduzir o restante das devDependencies.
+# O build falha se a CLI instalada divergir do lock ou do client.
+RUN prisma_version="$(tr -d '\r\n' < /tmp/prisma-cli-version)" \
+ && npm install --no-save --ignore-scripts "prisma@${prisma_version}" \
+ && node node_modules/@prisma/engines/scripts/postinstall.js \
+ && node -e "const fs=require('fs'); const path=require('path'); const dir='node_modules/@prisma/engines'; const hit=fs.readdirSync(dir).find((name)=>name.startsWith('schema-engine-') && fs.statSync(path.join(dir,name)).size>1000000); if(!hit){ console.error('schema-engine ausente depois do postinstall'); process.exit(1);} console.log('schema-engine', hit);" \
+ && node -e "const lock=require('./package-lock.json').packages['node_modules/prisma'].version; const cli=require('prisma/package.json').version; const client=require('@prisma/client/package.json').version; if (cli!==lock || cli!==client) { console.error('Prisma CLI/client/lock divergentes', {cli, client, lock}); process.exit(1);} console.log('prisma CLI/client/lock', cli);"
 
 # Stage 2: Production
 FROM node:22-slim AS runner

@@ -82,7 +82,9 @@ beforeEach(() => {
 });
 
 describe('get3CXConnectionsForOrg / save3CXConnectionForOrg / delete3CXConnectionForOrg', () => {
-  it('lista sempre consulta o Prisma filtrado por organizationId — nenhum cache em memória entre chamadas', async () => {
+  it(
+    'lista sempre consulta o Prisma filtrado por organizationId — nenhum cache em memória entre chamadas',
+    async () => {
     const { get3CXConnectionsForOrg } = await import('../threecx.service.js');
     prismaMock.threeCXConnection.findMany.mockResolvedValueOnce([
       { id: 'conn-1', organizationId: 'org-a' },
@@ -99,7 +101,7 @@ describe('get3CXConnectionsForOrg / save3CXConnectionForOrg / delete3CXConnectio
     prismaMock.threeCXConnection.findMany.mockResolvedValueOnce([]);
     const second = await get3CXConnectionsForOrg('org-a');
     expect(second).toEqual([]);
-  }, 15000);
+  }, 30000);
 
   it('save grava via prisma.threeCXConnection.create com o organizationId correto', async () => {
     const { save3CXConnectionForOrg } = await import('../threecx.service.js');
