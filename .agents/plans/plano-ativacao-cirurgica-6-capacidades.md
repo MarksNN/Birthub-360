@@ -29,10 +29,10 @@
 | :--- | :--- | :---: | :--- | :---: | :---: |
 | **1. RevOps** | `src/features/signals-risks`, `src/features/commercial-intelligence`, `src/features/market-intelligence` | **Pronta para Produção** | Nenhum. Envelope HTTP corrigido, dados reais do tenant mapeados, varredura homologada e suíte de integração aprovada. | Baixa–Média | **HOMOLOGADA (Commit 79216c60 / Parecer 24 APROVADO)** |
 | **2. Gamificação** | `src/features/gamification`, `src/features/team`, `src/features/job-roles` | **Pronta para Produção** | Nenhum. Agregador conectado ao ranking, perfil enriquecido, rota desacoplada de roleplay, API client tipado e view dedicada criada. | Baixa–Média | **HOMOLOGADA (Parecer 24 APROVADO)** |
-| **3. Roleplay** | `src/features/roleplay`, `src/features/playbook`, `src/features/copiloto-ia` | **Existente** | Injeção das matrizes ativas do tenant (`Qualification`/`Objection`) nos prompts da sessão de simulação. | Média | Próxima na Fila |
-| **4. Social Selling** | `src/features/social-selling`, `src/features/market-intelligence`, `src/lib/ai` | **Existente** | Conexão do gerador de abordagens consultivas ao gateway unificado de IA com cotas de tokens. | Média | Planejada |
-| **5. VoiceHub** | `src/lib/voice-hub`, `src/features/cadence/dialer`, `src/features/voice-hub` | **Existente** | Conexão da UI `ActiveCallView` ao WebSocket de runtime de voz e validação técnica de latência WebRTC. | Alta | Planejada |
-| **6. Mobile** | `src/features/mobile`, `src/features/copiloto-ia`, Capacitor (Android/iOS) | **Existente** | Integração do plugin nativo de áudio para reuniões de campo à fila de `OfflineSyncService`. | Alta | Planejada |
+| **3. Roleplay** | `src/features/roleplay`, `src/features/playbook`, `src/features/copiloto-ia` | **Pronta para Produção** | Nenhum. RoleplayHub interativo, matriz de objeções, coaching com IA, histórico e 31 testes de regressão aprovados. | Média | **HOMOLOGADA (Parecer 24 APROVADO)** |
+| **4. Social Selling** | `src/features/social-selling`, `src/features/market-intelligence`, `src/lib/ai` | **Pronta para Produção** | Nenhum. Gerador de abordagens consultivas com IA conectado ao AI Gateway, suporte multicanal (LinkedIn/WhatsApp/Email), FinOps e 8 testes aprovados. | Média | **HOMOLOGADA (Parecer 24 APROVADO)** |
+| **5. VoiceHub & Telefonia** | `src/lib/voice-hub`, `src/features/cadence`, `src/features/integrations` | **Pronta para Produção** | Nenhum. Integração bidirecional Bitrix24, WhatsApp com opt-out, Birth Voices e 3CX conciliando VoiceCallLog e destravamento de cadência. | Alta | **HOMOLOGADA (Parecer 24 APROVADO)** |
+| **6. Mobile** | `src/features/mobile`, `src/features/copiloto-ia`, Capacitor (Android/iOS) | **Pronta para Produção** | Nenhum. Gravação nativa/web implementada, enfileiramento FIELD_MEETING_AUDIO em OfflineSyncService, consentimento LGPD auditado, conciliação com Copiloto IA e permissões Android homologadas. | Alta | **HOMOLOGADA (Parecer 24 APROVADO)** |
 
 ---
 
@@ -120,3 +120,39 @@
    - Arquivo: `.agents/reviews/capacidade-1-revops-24-revisao-independente.md`
    - Commit: `79216c606ebaf60d485d13fd82bf6fc85874e8ea`
    - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+3. **Execução e Código da Capacidade 2 (Gamificação):** **APROVADO** (em 2026-10-16)
+   - Arquivo: `.agents/reviews/capacidade-2-gamificacao-24-revisao-independente.md`
+   - Commit: `2968867e5b892e2485b2cbedd541c7888bbabd14`
+   - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+4. **Execução e Código da Capacidade 6 (Mobile):** **APROVADO** (em 2026-10-16)
+   - Arquivo: `.agents/reviews/capacidade-6-mobile-24-revisao-independente.md`
+   - Branch: `agente/00-ativacao-capacidade-6-mobile`
+   - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+
+---
+
+## 7. Auditoria Forense Detalhada e Execução — Capacidade 6 (Mobile)
+
+### 7.1. Rastreabilidade Factual dos Componentes
+- **Motor de Gravação de Áudio Nativo/Web:**
+  - `src/features/mobile/audioRecording.service.ts`: linhas 1–345 (MediaRecorder cross-platform para WebView do Capacitor no Android/iOS e PWA, gerenciamento de stream e codecs, timer de duração, conversão para Base64 e integração direta com a fila offline).
+- **Gerenciador de Sincronização Offline-First:**
+  - `src/features/mobile/offlineSync.service.ts`: linhas 1–854 (tipo `FIELD_MEETING_AUDIO`, payload `FieldMeetingAudioPayload`, método `enqueueFieldMeetingAudio`, persistência local segura, resolução de IDs temporários e conciliação automática com retry e detecção de status de rede).
+- **Serviço de Backend de Ingestão e Conciliação:**
+  - `src/features/mobile/server/mobileFieldMeeting.service.ts`: linhas 1–240 (recebe payload offline, cria conversa no Copiloto IA com `source: 'MANUAL'`, registra consentimento verbal auditável LGPD, transiciona estados de captura, armazena buffer de áudio em S3/MinIO, anexa notas de campo como transcript segments e enfileira job de transcrição Whisper).
+- **Rotas e Endpoints Mobile:**
+  - `src/features/mobile/server/mobileFieldMeeting.routes.ts`: linhas 1–44 (`POST /api/mobile/field-meetings/sync`), com autorização `requireRole([...COPILOTO_IA_ROLES])` e isolamento `requireTenant`. Montado em `src/bootstrap/routes.ts:254`.
+- **Manifest e Permissões Nativas Android:**
+  - `android/app/src/main/AndroidManifest.xml`: linhas 94–100 (permissões `RECORD_AUDIO` e `MODIFY_AUDIO_SETTINGS` declaradas com justificativa funcional estrita para o Agente 09).
+- **Interface Mobile-First de Campo:**
+  - `src/features/mobile/components/FieldMeetingRecorder.tsx`: linhas 1–487 (cockpit mobile com botões táteis para iniciar, pausar e finalizar gravação, visualizador de tempo, indicador de online/offline, gaveta de fila pendente com botão de sincronização manual, checkbox obrigatório de consentimento LGPD, campo de anotações e prévia de áudio).
+
+### 7.2. Evidências dos Gates
+1. **TypeScript Typecheck:** `npm run typecheck` (0 erros).
+2. **Biome Linter:** `npm run lint` (0 erros em arquivos inspecionados).
+3. **Vitest (Unitários e Integração):** 24/24 testes aprovados (100% PASS):
+   - `tests/unit/features/mobile/offlineSync.service.test.ts` (10 testes) — **PASSED**
+   - `tests/unit/features/mobile/audioRecording.service.test.ts` (6 testes) — **PASSED**
+   - `tests/unit/features/mobile/mobileFieldMeeting.service.test.ts` (4 testes) — **PASSED**
+   - `tests/integration/features/mobile/mobileFieldMeetingFlow.integration.test.tsx` (4 testes) — **PASSED**
+
