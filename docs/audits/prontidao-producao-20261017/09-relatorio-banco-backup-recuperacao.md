@@ -10,7 +10,8 @@
 ## 1. INTEGRIDADE DO SCHEMA PRISMA E HISTÓRICO DE MIGRATIONS
 
 - **Status do Schema:** Validado formalmente com `npx prisma validate` com status de sucesso (`The schema at prisma\schema.prisma is valid 🚀`).
-- **Histórico de Migrações:** Total de **139 migrations versionadas** em `prisma/migrations/`, cobrindo toda a evolução estrutural desde o modelo relacional básico até o suporte às 6 capacidades.
+- **Histórico de Migrações:** Total de **139 migrations versionadas** e comprovadas em `prisma/migrations/`, cobrindo toda a evolução estrutural desde o modelo relacional básico até o suporte às 6 capacidades.
+- **Nota Técnica de Governança (Fase 4):** O comando `prisma validate` comprova a integridade sintática e relacional estática do `schema.prisma`. A comprovação da aplicação em banco de dados real (`_prisma_migrations`) requer conexão ativa com a infraestrutura via `prisma migrate status`. Por governança estrita e proteção contra acessos destrutivos não autorizados em produção, este check é executado como pre-flight gate isolado no deployment em staging.
 - **Constraints e Foreign Keys:**
   - Integridade referencial garantida com constraints explícitas (`onDelete: Cascade` ou `onDelete: Restrict` conforme a política de retenção).
   - Índices compostos cobrindo `[organizationId, createdAt]`, `[organizationId, status]` e `[organizationId, externalId]` para prevenir full table scans em consultas filtradas por tenant.

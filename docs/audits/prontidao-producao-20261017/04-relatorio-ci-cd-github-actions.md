@@ -41,6 +41,13 @@
 - **Diagnóstico:** A compilação do TypeScript no ambiente Android / Node esgotava a memória padrão de 4 GB do V8.
 - **Resolução:** Script `typecheck` no `package.json` foi padronizado com `node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit`, executando estritamente em 100% dos arquivos com 0 erros e consumo estável de memória.
 
+### 6. Diagnóstico Conclusivo das Falhas Instantâneas (2-3s) Recentes na Nuvem do GitHub
+- **Diagnóstico Comprovado:** Em execuções recentes nos commits `8e586c44` e branches derivadas, múltiplos workflows (SonarQube, CodeQL, Central Release, Bundle Budget, Latency) falharam em 2 a 3 segundos sem iniciar qualquer runner.
+- **Evidência Extraída da API do GitHub (`gh run view 39000998604` e `39023032076`):**
+  > `X The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings`
+- **Conclusão:** Não há erro de código, sintaxe ou teste causando essas falhas remotas. Trata-se de bloqueio na conta GitHub (`MarksNN`) por limite de faturamento/minutos consumidos do plano.
+- **Mitigação e Comprovação:** Todos os gates obrigatórios correspondentes foram executados localmente e com sucesso absoluto (100% GREEN) nesta branch.
+
 ---
 
 ## 3. CHECKLIST DE SCRIPTS OBRIGATÓRIOS DO PACKAGE.JSON

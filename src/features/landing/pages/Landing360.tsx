@@ -607,13 +607,13 @@ export function Landing360({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-3">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-3 py-1 rounded-full mb-3">
                   Silos &amp; Fragmentação
                 </span>
                 <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center mb-4">
                   <SilosCardIcon size={24} color="#FF2D9B" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#FF2D9B] mb-2 text-center">
                   Silos e Ferramentas Desconectadas
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -624,13 +624,13 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-3">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-3 py-1 rounded-full mb-3">
                   Falta de Telemetria
                 </span>
                 <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center mb-4">
                   <ReactiveCardIcon size={24} color="#F59E0B" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#F59E0B] mb-2 text-center">
                   Gestão Reativa &amp; Decisões Tardias
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -641,13 +641,13 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-2.5 py-0.5 rounded-full mb-3">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-3 py-1 rounded-full mb-3">
                   Execução Reativa
                 </span>
                 <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center mb-4">
                   <LostDealsCardIcon size={24} color="#00D4FF" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-[#00D4FF] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#00D4FF] mb-2 text-center">
                   Perda Invisível de Oportunidades
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -687,10 +687,10 @@ export function Landing360({
                     <MultiCrmDataLayerIcon size={24} color="#00D4FF" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] mb-1">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-3 py-1 rounded-full mb-2">
                   Camada 01
                 </span>
-                <h3 className="font-display text-base font-bold landing-title-cyan mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold landing-title-cyan mb-2 text-center">
                   Dados &amp; Conectividade Multi-CRM
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -706,10 +706,10 @@ export function Landing360({
                     <AiDiagnosticLayerIcon size={24} color="#FF2D9B" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] mb-1">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-3 py-1 rounded-full mb-2">
                   Camada 02
                 </span>
-                <h3 className="font-display text-base font-bold landing-title-pink mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold landing-title-pink mb-2 text-center">
                   Motor de Diagnóstico &amp; IA
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -724,10 +724,10 @@ export function Landing360({
                     <ExecutionLayerIcon size={24} color="#F59E0B" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] mb-1">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-3 py-1 rounded-full mb-2">
                   Camada 03
                 </span>
-                <h3 className="font-display text-base font-bold landing-title-gold mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold landing-title-gold mb-2 text-center">
                   Execução &amp; Orquestração
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
