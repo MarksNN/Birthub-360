@@ -488,7 +488,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                 <Lock className="w-3 h-3 text-emerald-500" />
                 <span>birthhub360.com/app/dashboard</span>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 font-mono">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>ONLINE</span>
               </div>
@@ -528,10 +528,10 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 p-5 rounded-2xl border border-line bg-surface space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display text-sm font-bold text-[#0284C7] dark:text-[#00D4FF]">
+                    <h3 className="font-display text-sm font-bold text-[#0369A1] dark:text-[#00D4FF]">
                       Fluxo de Negociação Unificado (CRM)
                     </h3>
-                    <span className="text-xs text-[#0284C7] dark:text-[#00D4FF] font-bold">
+                    <span className="text-xs text-[#0369A1] dark:text-[#00D4FF] font-bold">
                       Tempo Real
                     </span>
                   </div>
@@ -602,7 +602,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
 
           {/* Logo Grid das Tecnologias Integradas */}
           <div className="mt-16 text-center space-y-4">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#0284C7] dark:text-[#00D4FF]">
+            <p className="text-xs font-mono uppercase tracking-widest text-[#0369A1] dark:text-[#00D4FF]">
               Conectado via APIs e webhooks com os principais ecossistemas corporativos
             </p>
             <div className="vancouver-logo-grid">
@@ -940,7 +940,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                     <span className="text-sm font-semibold text-ink">
                       Tempo Médio de Fechamento
                     </span>
-                    <span className="text-sm font-bold text-emerald-600">
+                    <span className="text-sm font-bold text-emerald-700">
                       18 dias (34% mais rápido)
                     </span>
                   </div>
