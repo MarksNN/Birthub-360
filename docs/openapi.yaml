@@ -4665,6 +4665,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
 
+  # ───────────────────────────── Social Selling ─────────────────────────────
+  /social-selling/approach/generate:
+    post:
+      tags: [Social Selling]
+      summary: Gera abordagem consultiva e personalizada de prospecção com IA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetCompany, targetRole]
+              properties:
+                targetCompany: { type: string }
+                targetRole: { type: string }
+                segment: { type: string }
+                triggerEvent: { type: string }
+                channel: { type: string, enum: [linkedin, whatsapp, email] }
+                tone: { type: string, enum: [consultative, direct, provocative, friendly] }
+      responses:
+        '200':
+          description: Abordagem de prospecção gerada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      headline: { type: string }
+                      hook: { type: string }
+                      body: { type: string }
+                      callToAction: { type: string }
+                      fullMessage: { type: string }
+                      channel: { type: string }
+                      tone: { type: string }
+                      estimatedTokens: { type: integer }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   # ───────────────────────────── Cadence ─────────────────────────────
   /cadence/opt-outs:
     get:
