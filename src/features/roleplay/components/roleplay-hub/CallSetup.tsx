@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Phone, PhoneCall } from 'lucide-react';
+import { CheckCircle2, Flame, Phone, PhoneCall } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button.js';
 import type { Persona } from './types.js';
 
@@ -49,7 +49,11 @@ export function CallSetup({
               <span className="font-black text-lg text-ink leading-tight pr-4">{p.label}</span>
               {selectedPersona === p.id && <CheckCircle2 className="w-6 h-6 shrink-0 text-brand" />}
             </div>
-            <p className="text-sm text-ink-2 leading-relaxed font-medium">{p.desc}</p>
+            <p className="text-sm text-ink-2 leading-relaxed font-medium mb-3">{p.desc}</p>
+            <div className="mt-auto pt-2 flex items-center gap-1.5 text-[11px] font-bold text-amber-500 uppercase tracking-wider">
+              <Flame className="w-3.5 h-3.5" />
+              <span>Foco em Objeção Real (RevOps)</span>
+            </div>
           </motion.button>
         ))}
       </div>

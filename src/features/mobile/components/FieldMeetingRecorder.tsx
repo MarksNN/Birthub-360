@@ -7,30 +7,27 @@
  * offline-first com fila resiliente via OfflineSyncService.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
 import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  FileText,
   Mic,
-  Square,
   Pause,
   Play,
-  CheckCircle2,
-  AlertCircle,
+  RefreshCw,
+  ShieldCheck,
+  Square,
   Wifi,
   WifiOff,
-  RefreshCw,
-  FileText,
-  Clock,
-  ShieldCheck,
 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  audioRecordingService,
   type AudioRecordingResult,
   type AudioRecordingState,
+  audioRecordingService,
 } from '../audioRecording.service.js';
-import {
-  offlineSyncService,
-  type OfflineSyncStats,
-} from '../offlineSync.service.js';
+import { type OfflineSyncStats, offlineSyncService } from '../offlineSync.service.js';
 
 export interface FieldMeetingRecorderProps {
   initialLeadId?: string;
@@ -54,9 +51,7 @@ export function FieldMeetingRecorder({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [recordingResult, setRecordingResult] = useState<AudioRecordingResult | null>(null);
 
-  const [syncStats, setSyncStats] = useState<OfflineSyncStats>(() =>
-    offlineSyncService.getStats(),
-  );
+  const [syncStats, setSyncStats] = useState<OfflineSyncStats>(() => offlineSyncService.getStats());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error' | 'info';
@@ -112,7 +107,8 @@ export function FieldMeetingRecorder({
     if (!consentGranted) {
       setFeedback({
         type: 'error',
-        message: 'O consentimento verbal do titular é obrigatório pela LGPD antes de iniciar a gravação.',
+        message:
+          'O consentimento verbal do titular é obrigatório pela LGPD antes de iniciar a gravação.',
       });
       return;
     }
@@ -289,8 +285,8 @@ export function FieldMeetingRecorder({
             feedback.type === 'success'
               ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800'
               : feedback.type === 'error'
-              ? 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800'
-              : 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800'
+                ? 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800'
+                : 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800'
           }`}
         >
           {feedback.type === 'success' ? (
@@ -305,7 +301,10 @@ export function FieldMeetingRecorder({
       {/* Metadados da Reunião */}
       <div className="flex flex-col gap-3">
         <div>
-          <label htmlFor="field-meeting-title" className="block text-xs font-medium text-ink/70 mb-1">
+          <label
+            htmlFor="field-meeting-title"
+            className="block text-xs font-medium text-ink/70 mb-1"
+          >
             Título da Reunião / Cliente
           </label>
           <input
@@ -320,7 +319,10 @@ export function FieldMeetingRecorder({
         </div>
 
         <div>
-          <label htmlFor="field-meeting-lead-id" className="block text-xs font-medium text-ink/70 mb-1">
+          <label
+            htmlFor="field-meeting-lead-id"
+            className="block text-xs font-medium text-ink/70 mb-1"
+          >
             ID do Lead ou Oportunidade (Opcional)
           </label>
           <input
@@ -349,7 +351,8 @@ export function FieldMeetingRecorder({
             />
             <span className="text-xs text-ink/80 leading-relaxed select-none">
               <strong className="text-ink font-semibold">Consentimento Verbal LGPD:</strong>{' '}
-              Confirmo que informei o cliente sobre a gravação para ata comercial e obtive sua anuência verbal antes de iniciar.
+              Confirmo que informei o cliente sobre a gravação para ata comercial e obtive sua
+              anuência verbal antes de iniciar.
             </span>
           </label>
         </div>
@@ -447,7 +450,10 @@ export function FieldMeetingRecorder({
 
       {/* Anotações Adicionais da Reunião */}
       <div>
-        <label htmlFor="field-meeting-notes" className="block text-xs font-medium text-ink/70 mb-1 flex items-center gap-1.5">
+        <label
+          htmlFor="field-meeting-notes"
+          className="block text-xs font-medium text-ink/70 mb-1 flex items-center gap-1.5"
+        >
           <FileText className="w-3.5 h-3.5" />
           Anotações & Destaques de Campo (Opcional)
         </label>

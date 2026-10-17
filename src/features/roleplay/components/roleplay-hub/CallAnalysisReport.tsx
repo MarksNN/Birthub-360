@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { AlertTriangle, CheckCircle2, Phone, RotateCcw, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Award, CheckCircle2, Phone, RotateCcw, ShieldCheck } from 'lucide-react';
 import { Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useTheme } from '../../../../contexts/ThemeContext.js';
 import { scoreTextClass, scoreTextClassOnSurface } from './scoreColor.js';
@@ -60,11 +60,35 @@ export function CallAnalysisReport({
               {analysisResult.score}
             </span>
           </div>
-          <div className="mt-4 px-4 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold uppercase tracking-widest">
-            Estimativa pedagógica
+          <div className="mt-4 px-4 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
+            <Award className="w-3.5 h-3.5 text-amber-400" />
+            <span>
+              {analysisResult.score >= 80 ? '+50 pts Gamificação' : 'Estimativa pedagógica'}
+            </span>
           </div>
         </div>
       </div>
+      {analysisResult.score >= 80 && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-brand/10 to-transparent border border-amber-500/30 p-5 rounded-[2rem] flex items-center justify-between gap-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-amber-500/20 rounded-2xl text-amber-400">
+              <Award className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="font-black text-sm text-ink uppercase tracking-wide">
+                Conquista Desbloqueada: Mestre em Objeções
+              </p>
+              <p className="text-xs text-ink-2 font-medium">
+                Desempenho de excelência no Roleplay (Score {analysisResult.score}/100) registrado
+                no ranking de gamificação do seu tenant.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 text-xs font-black uppercase tracking-widest text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20">
+            Nível Pro
+          </span>
+        </div>
+      )}
 
       {analysisResult.clarityScore != null &&
         analysisResult.objectionHandlingScore != null &&
