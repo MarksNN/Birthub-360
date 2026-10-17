@@ -107,9 +107,9 @@ export class MobileFieldMeetingService {
         ipAddress: clientIp,
         afterState: { granted: true, method: consentMethod, textVersion },
       });
-    } catch (auditErr) {
+    } catch (auditErr: any) {
       logger.warn(
-        { error: auditErr },
+        { err: auditErr },
         'Falha no log de auditoria LGPD de reunião de campo (best-effort)',
       );
     }
@@ -132,9 +132,9 @@ export class MobileFieldMeetingService {
     if (input.audioData) {
       try {
         await this.persistAudioBuffer(objectKey, input.audioData, mimeType);
-      } catch (storageErr) {
+      } catch (storageErr: any) {
         logger.warn(
-          { error: storageErr, objectKey },
+          { err: storageErr, objectKey },
           'Armazenamento em bucket S3 indisponível, prosseguindo com metadata',
         );
       }
@@ -171,9 +171,9 @@ export class MobileFieldMeetingService {
     // 7. Enfileira job de transcrição via Whisper
     try {
       await enqueueTranscribeConversationJob({ conversationId, organizationId });
-    } catch (jobErr) {
+    } catch (jobErr: any) {
       logger.warn(
-        { error: jobErr },
+        { err: jobErr },
         'Falha ao enfileirar job de transcrição (best-effort em ambiente sem worker)',
       );
     }
@@ -182,7 +182,7 @@ export class MobileFieldMeetingService {
       {
         organizationId,
         conversationId,
-        leadId: input.leadId,
+        leadId: input.leadId || null,
         durationMs,
       },
       'Reunião de campo sincronizada com sucesso no Copiloto IA',
