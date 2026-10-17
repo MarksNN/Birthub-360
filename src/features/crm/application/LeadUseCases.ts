@@ -16,6 +16,7 @@ const WON_STATUS_LABEL = 'Negócios Ganhos';
 
 /** Shape of the company relation when Lead is fetched with `include: { company: true }` */
 interface LeadCompanyRelation {
+  cnpj?: string | null;
   legalName?: string | null;
   tradeName?: string | null;
   cnae?: string | null;
@@ -311,6 +312,7 @@ export class LeadUseCases extends BaseUseCases<Lead, LeadRepository> {
 
     const company = lead.company as LeadCompanyRelation | undefined;
     const result = await enrichCompany(organizationId, lead.companyId, {
+      cnpj: company?.cnpj || undefined,
       segmentKeywords: company?.segment ? [company.segment] : undefined,
       fleetSizeHint: company?.size || undefined,
     });
@@ -324,6 +326,16 @@ export class LeadUseCases extends BaseUseCases<Lead, LeadRepository> {
       temperature: result.fit.temperature,
       // Assuming the repository handles timelines or we emit an event.
     });
+
+    try {
+      const { sseService } = await import('../../notifications/sse.service.js');
+      sseService.notifyCompanyEnriched(organizationId, lead.companyId, {
+        fit: result.fit,
+        message: `Lead "${lead.title || company?.tradeName || id}" enriquecido individualmente!`,
+      });
+    } catch {
+      // SSE é best-effort
+    }
 
     // Since we removed prisma import, we rely on the repository to fetch the updated lead.
     const finalLead = await this.repository.findById?.(organizationId, id);

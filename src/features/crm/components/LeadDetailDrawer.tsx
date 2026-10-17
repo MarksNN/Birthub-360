@@ -284,8 +284,14 @@ export function LeadDetailDrawer({ leadId, onClose, onChanged }: LeadDetailDrawe
     if (!lead) return;
     setEnriching(true);
     try {
-      const result = await api.post<{ lead: Lead }>(`/api/leads/${lead.id}/enrich`, {});
-      setLead(result.lead);
+      const result = await api.post<{ lead?: Lead; data?: { lead?: Lead } }>(
+        `/api/leads/${lead.id}/enrich`,
+        {},
+      );
+      const updatedLead = result.lead || result.data?.lead;
+      if (updatedLead) {
+        setLead(updatedLead);
+      }
       onChanged();
       SoundFX.play('success');
       toast.success('Lead enriquecido com sucesso!');
