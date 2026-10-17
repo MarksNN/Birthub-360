@@ -5,7 +5,8 @@
 **Executor:** Agente 08 (QA e Release)  
 **Auditor Independente:** Agente 24  
 **Total de Testes Unitários Executados na CI:** 4.231 testes em 524 arquivos (100% PASS)  
-**Total de Testes Específicos das 6 Capacidades:** 123 testes (79 unitários + 44 de integração, 100% PASS)  
+**Total de Testes Específicos das 6 Capacidades:** 147 testes (103 unitários + 44 de integração, 100% PASS)  
+*Nota de Reconciliação:* A anotação preliminar de 123 testes (79 unitários + 44 de integração) correspondia ao rascunho anterior à incorporação dos 24 testes da Capacidade 2 (Gamificação: 15 unitários + 9 integração). A soma exata e atual das 6 capacidades totaliza rigorosamente 147 testes (103 unitários + 44 de integração), todos com 100% de aprovação.
 
 ---
 
