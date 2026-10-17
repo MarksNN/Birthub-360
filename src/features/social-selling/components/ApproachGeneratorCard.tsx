@@ -1,25 +1,25 @@
-import { useState } from 'react';
 import {
-  Sparkles,
-  Send,
-  Copy,
-  Check,
   Building2,
-  User,
+  Check,
+  Copy,
   Layers,
-  Zap,
   Loader2,
+  Send,
   Share2,
+  Sparkles,
+  User,
+  Zap,
 } from 'lucide-react';
+import { useState } from 'react';
+import { Badge } from '../../../components/ui/Badge.js';
 import { Button } from '../../../components/ui/Button.js';
 import { Input } from '../../../components/ui/Input.js';
 import { Select } from '../../../components/ui/Select.js';
-import { Badge } from '../../../components/ui/Badge.js';
 import {
-  socialSellingApi,
-  type GeneratedApproachResult,
   type GenerateApproachInput,
+  type GeneratedApproachResult,
   type SocialSellingTone,
+  socialSellingApi,
 } from '../api/socialSelling.api.js';
 
 export function ApproachGeneratorCard() {
@@ -75,7 +75,8 @@ export function ApproachGeneratorCard() {
           </div>
           <h2 className="text-base font-bold text-ink">Gerador de Abordagens</h2>
           <p className="text-xs text-ink-2">
-            Crie copys personalizadas baseadas em gatilhos e cargos decisores para LinkedIn, WhatsApp e E-mail.
+            Crie copys personalizadas baseadas em gatilhos e cargos decisores para LinkedIn,
+            WhatsApp e E-mail.
           </p>
         </div>
 

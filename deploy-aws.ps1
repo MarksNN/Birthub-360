@@ -5,6 +5,7 @@
 $EC2_HOST = "3.143.251.44"
 $EC2_USER = "ubuntu"
 $KEY_CANDIDATES = @(
+    "$env:USERPROFILE\.ssh\Birthub360.pem",
     "C:\Users\marce\OneDrive\Documentos\CHAVE AWS BIRTHUB 360.pem",
     "$env:USERPROFILE\OneDrive\Documentos\CHAVE AWS BIRTHUB 360.pem",
     "$env:USERPROFILE\Documents\CHAVE AWS BIRTHUB 360.pem",
