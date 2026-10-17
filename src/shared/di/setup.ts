@@ -290,4 +290,15 @@ export function setupDI() {
     'CopilotoIaController',
     new CopilotoIaController(copilotoIaUseCases, copilotoBitrixWritebackUseCases),
   );
+
+  // Conexão do barramento de eventos do CRM com o motor de automações
+  subscribeToCrmStageChanges(async (event) => {
+    await automationEngine.handle({
+      organizationId: event.organizationId,
+      trigger: 'Lead mudou de status',
+      entity: 'Lead',
+      entityId: event.leadId,
+      data: event.data,
+    });
+  });
 }
