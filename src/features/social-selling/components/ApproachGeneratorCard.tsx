@@ -75,7 +75,8 @@ export function ApproachGeneratorCard() {
           </div>
           <h2 className="text-base font-bold text-ink">Gerador de Abordagens</h2>
           <p className="text-xs text-ink-2">
-            Crie copys personalizadas baseadas em gatilhos e cargos decisores para LinkedIn, WhatsApp e E-mail.
+            Crie copys personalizadas baseadas em gatilhos e cargos decisores para LinkedIn,
+            WhatsApp e E-mail.
           </p>
         </div>
 

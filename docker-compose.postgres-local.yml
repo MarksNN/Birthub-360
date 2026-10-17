@@ -15,7 +15,11 @@
 # Nunca aponte DATABASE_URL da aplicação para ele de novo sem uma decisão registrada.
 services:
   postgres:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector:pg17
+    # Para compilar imagem personalizada com PostGIS 17 + pgvector + TLS autoassinado:
+    # build:
+    #   context: .
+    #   dockerfile: docker/postgres/Dockerfile
     container_name: birthhub_postgres
     environment:
       # Superusuario de bootstrap — usado só pela inicialização do container (criar a extension
