@@ -12,6 +12,7 @@ import { AuditService } from '../../../lib/audit/audit.service.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { AppError } from '../../../shared/middlewares/errorHandler.js';
+import { ingestLiveCallInsight } from '../../commercial-intelligence/application/dealRiskDetection.service.js';
 import { enqueueTranscribeConversationJob } from '../../copiloto-ia/jobs/transcribeConversation.worker.js';
 import type { FieldMeetingAudioPayload } from '../offlineSync.service.js';
 
@@ -176,6 +177,54 @@ export class MobileFieldMeetingService {
         { err: jobErr },
         'Falha ao enfileirar job de transcrição (best-effort em ambiente sem worker)',
       );
+    }
+
+    // 8. Elevação de Inteligência (Capacidade 6 Mobile ➔ Capacidade 1 RevOps):
+    // Se o lead foi informado e há anotações de campo, avalia preventivamente riscos imediatos (concorrentes ou objeções)
+    if (input.leadId && input.meetingNotes?.trim()) {
+      try {
+        const notesLower = input.meetingNotes.toLowerCase();
+        const competitorMatches = [
+          'concorrente',
+          'proposta concorrente',
+          'outro fornecedor',
+        ].filter((c) => notesLower.includes(c));
+        const competitorMentioned =
+          competitorMatches.length > 0 ? 'Concorrente citado em campo' : null;
+
+        const isNegative =
+          notesLower.includes('insatisfeito') ||
+          notesLower.includes('caro') ||
+          notesLower.includes('rejeit');
+        const objectionCategory =
+          notesLower.includes('preço') || notesLower.includes('caro')
+            ? 'preco_ou_orcamento'
+            : competitorMentioned
+              ? 'concorrente'
+              : null;
+
+        await ingestLiveCallInsight(
+          organizationId,
+          {
+            callId: `field-meeting-${conversationId.substring(0, 8)}`,
+            dealId: input.leadId,
+            timestamp: now,
+            sentimentScore: isNegative ? -0.3 : 0.4,
+            objectionCategory,
+            competitorMentioned,
+            suggestedRebuttal: objectionCategory
+              ? 'Agendar alinhamento executivo para demonstrar ROI e diferenciais'
+              : null,
+          },
+          now,
+          { notify: true },
+        );
+      } catch (riskErr: any) {
+        logger.warn(
+          { err: riskErr, leadId: input.leadId },
+          'Detecção de risco preventivo em reunião de campo não bloqueia sincronização',
+        );
+      }
     }
 
     logger.info(

@@ -1,9 +1,5 @@
 import { api } from '../../../lib/api.js';
-import type {
-  RoleplayFeedback,
-  RoleplayPersona,
-  RoleplaySession,
-} from '../domain/Roleplay.js';
+import type { RoleplayFeedback, RoleplayPersona, RoleplaySession } from '../domain/Roleplay.js';
 
 export interface StartSessionResponse {
   session: RoleplaySession;

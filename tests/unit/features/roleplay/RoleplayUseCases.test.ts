@@ -87,4 +87,27 @@ describe('RoleplayUseCases — Simulador Comercial e Avaliação Real de IA (DT-
       useCases.sendTurn('org-1', session.id, 'Olá Roberto, como estão os negócios?'),
     ).rejects.toThrow('LLM provider unavailable: rate limit exceeded');
   });
+
+  it('consulta critérios de qualificação e objeções via RoleplayPlaybookPort', async () => {
+    const repo = new InMemoryRoleplayRepository();
+    const mockAi = createMockAiService();
+    const mockPlaybookPort = {
+      findQualificationCriteria: vi.fn().mockResolvedValue(['Orçamento: Tem verba aprovada?']),
+      findObjections: vi.fn().mockResolvedValue(['Preço alto (Muito caro)']),
+    };
+    const useCases = new RoleplayUseCases(repo, mockAi, mockPlaybookPort);
+
+    const { session } = await useCases.startSession('org-1', 'user-1', 'cfo-cético');
+    await useCases.sendTurn('org-1', session.id, 'Proposta comercial');
+
+    expect(mockPlaybookPort.findQualificationCriteria).toHaveBeenCalledWith('org-1');
+    expect(mockPlaybookPort.findObjections).toHaveBeenCalledWith('org-1');
+    expect(mockAi.simulateCustomerResponse).toHaveBeenCalledWith(
+      expect.objectContaining({
+        qualificationCriteria: ['Orçamento: Tem verba aprovada?'],
+        objections: ['Preço alto (Muito caro)'],
+      }),
+    );
+  });
 });
+
