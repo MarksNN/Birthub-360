@@ -225,3 +225,24 @@
    - `tests/unit/features/mobile/mobileFieldMeeting.service.test.ts` (4 testes) — **PASSED**
    - `tests/integration/features/mobile/mobileFieldMeetingFlow.integration.test.tsx` (4 testes) — **PASSED**
 
+---
+
+## 8. Elevação e Sinergia Cruzada dos Motores (Eixos 1, 2 e 3)
+
+### 8.1. Arquitetura de Sinergia e Desacoplamento Limpo
+Para elevar as 6 capacidades operando como um ecossistema integrado sem violar a regra `no-cross-feature-imports` do `.dependency-cruiser.cjs`:
+1. **Eixo 1 (Mobile C6 & Voice C5 ➔ RevOps C1):**
+   - Criação da porta `LiveCallRiskPort` em `src/shared/contracts/liveCallRisk.contract.ts`.
+   - Injeção em `MobileFieldMeetingService` via container DI desacoplado.
+   - Detecção preventiva de objeções e risco de deal executada de forma resiliente (não bloqueante) a partir das notas e áudio coletados em reuniões presenciais de campo.
+2. **Eixo 2 (Roleplay C3 ➔ Playbook Dinâmico C3/C1):**
+   - Criação da porta `RoleplayPlaybookPort` em `src/shared/contracts/roleplayPlaybook.contract.ts` e adaptador `PlaybookRoleplayAdapter`.
+   - Roleplay consome matrizes vivas de objeções originadas das dores reais e táticas mapeadas em RevOps e Playbook.
+   - Indicador visual e comportamental `Foco em Objeção Real (RevOps)` ativo nas personas do Roleplay.
+3. **Eixo 3 (Incentivos e Hábitos — Gamificação C2 & Roleplay C3):**
+   - Conexão do feedback pedagógico do Roleplay com o motor de pontuação da Gamificação.
+   - Score $\ge 80$ no simulador de IA concede automaticamente badge visual `+50 pts Gamificação` e aciona a conquista `"Mestre em Objeções" (Nível Pro)`.
+4. **Desacoplamento de Filas Assíncronas:**
+   - Criação da porta `CopilotoTranscriptionQueuePort` em `src/shared/contracts/copilotoTranscription.contract.ts`.
+   - `MobileFieldMeetingService` consome a porta sem importar arquivos internos de workers de outras features.
+
