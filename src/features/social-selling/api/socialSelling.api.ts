@@ -1,8 +1,15 @@
-import { api } from '../../lib/api.js';
+import { api } from '../../../lib/api.js';
 import type {
   GenerateApproachInput,
   GeneratedApproachResult,
-} from './domain/socialSelling.types.js';
+} from '../domain/socialSelling.types.js';
+
+export type {
+  GenerateApproachInput,
+  GeneratedApproachResult,
+  SocialSellingChannel,
+  SocialSellingTone,
+} from '../domain/socialSelling.types.js';
 
 export const socialSellingApi = {
   generateApproach: async (input: GenerateApproachInput): Promise<GeneratedApproachResult> => {

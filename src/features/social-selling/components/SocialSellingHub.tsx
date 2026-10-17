@@ -2,11 +2,12 @@ import { Check, Copy, ExternalLink, Layers, Search, Share2, Sparkles, Target } f
 import { useState } from 'react';
 import { ExecutiveHeader } from '../../../components/layout/ExecutiveHeader.js';
 import { BRAND } from '../../../config/brand.js';
+import { ApproachGeneratorCard } from './ApproachGeneratorCard.tsx';
 
 export function SocialSellingHub() {
-  const [activeSubTab, setActiveSubTab] = useState<'motor' | 'pipeline' | 'linkedin' | 'posts'>(
-    'motor',
-  );
+  const [activeSubTab, setActiveSubTab] = useState<
+    'approach' | 'motor' | 'pipeline' | 'linkedin' | 'posts'
+  >('approach');
   const [iframeKey, setIframeKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +25,10 @@ export function SocialSellingHub() {
   // do usuário: removidas (não redesenhadas) — ver o card de origem sem o preenchimento de imagem
   // nesse HTML, ajustado pra não sobrar buraco visual, sem inventar substituto novo.
   const subTabs = [
+    {
+      id: 'approach',
+      label: 'Gerador de Abordagens IA',
+    },
     {
       id: 'motor',
       label: 'Motor de Social Selling',
@@ -179,6 +184,8 @@ export function SocialSellingHub() {
       <div
         className={`flex-1 bg-surface rounded-xl border border-line overflow-hidden shadow-sm flex flex-col ${isFullscreen ? 'h-[calc(100vh-110px)]' : 'min-h-[520px]'}`}
       >
+        {activeSubTab === 'approach' && <ApproachGeneratorCard />}
+
         {activeSubTab === 'motor' && (
           <iframe
             key={`motor-${iframeKey}`}

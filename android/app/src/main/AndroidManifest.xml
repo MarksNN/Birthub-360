@@ -90,4 +90,11 @@
          ambiente). Ver handoff
          .agents/handoffs/audit-ach/09-para-05-ocr-camera-permission-declarada.md. -->
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- RECORD_AUDIO e MODIFY_AUDIO_SETTINGS — uso funcional real para gravação de reuniões
+         presenciais de campo (Capacidade 6 - Mobile, propriedade do Agente 09).
+         Permite ao WebView/Capacitor capturar o áudio da conversa presencial via MediaRecorder
+         com consentimento prévio do titular (LGPD) e enfileirar na fila do OfflineSyncService. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 </manifest>

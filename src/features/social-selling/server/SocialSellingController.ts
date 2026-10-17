@@ -6,17 +6,13 @@ import {
 } from './socialSellingApproach.service.js';
 
 export class SocialSellingController {
-  constructor(
-    private readonly service: SocialSellingApproachService = socialSellingApproachService,
-  ) {}
-
-  generateApproach = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  static async generateApproach(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const authReq = req as AuthRequest;
       const { organizationId, id: userId } = authReq.user;
       const { targetCompany, targetRole, segment, triggerEvent, channel, tone } = req.body || {};
 
-      const result = await this.service.generateApproach(organizationId, userId, {
+      const result = await socialSellingApproachService.generateApproach(organizationId, userId, {
         targetCompany,
         targetRole,
         segment,
@@ -32,7 +28,5 @@ export class SocialSellingController {
     } catch (error) {
       next(error);
     }
-  };
+  }
 }
-
-export const socialSellingController = new SocialSellingController();
