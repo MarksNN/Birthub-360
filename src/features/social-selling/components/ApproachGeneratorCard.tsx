@@ -158,7 +158,7 @@ export function ApproachGeneratorCard() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  tone: e.target.value as 'consultivo' | 'executivo' | 'provocativo' | 'storytelling',
+                  tone: e.target.value as SocialSellingTone,
                 })
               }
             >
