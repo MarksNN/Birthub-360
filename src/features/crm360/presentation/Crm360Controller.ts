@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { routeParam } from '../../../shared/http/routeParams.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
+import { publishCrmStageChange } from '../../../shared/services/crmEventBus.js';
 import type { Crm360UseCases } from '../application/Crm360UseCases.js';
 
 export class Crm360Controller {
@@ -100,13 +101,24 @@ export class Crm360Controller {
     try {
       const { organizationId: orgId, id: actorUserId } = (req as AuthRequest).user;
       const { stageId, expectedCloseDate } = req.body;
+      const leadId = routeParam(req.params.id, 'id');
       const data = await this.crm360UseCases.updateLeadStage(
         orgId,
-        routeParam(req.params.id, 'id'),
+        leadId,
         stageId,
         expectedCloseDate ? new Date(expectedCloseDate) : undefined,
         actorUserId,
       );
+
+      if (data) {
+        void publishCrmStageChange({
+          organizationId: orgId,
+          leadId,
+          stageId,
+          data: { ...(data as unknown as Record<string, unknown>) },
+        });
+      }
+
       res.json({ success: true, data });
     } catch (error: any) {
       next(error);
@@ -116,7 +128,18 @@ export class Crm360Controller {
   convertLead = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const orgId = (req as AuthRequest).user.organizationId;
-      const data = await this.crm360UseCases.convertLead(orgId, routeParam(req.params.id, 'id'));
+      const leadId = routeParam(req.params.id, 'id');
+      const data = await this.crm360UseCases.convertLead(orgId, leadId);
+
+      if (data) {
+        void publishCrmStageChange({
+          organizationId: orgId,
+          leadId,
+          funnel: 'Negocio',
+          data: { ...(data as unknown as Record<string, unknown>), converted: true },
+        });
+      }
+
       res.json({ success: true, data });
     } catch (error: any) {
       next(error);
