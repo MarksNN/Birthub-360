@@ -128,6 +128,75 @@
    - Arquivo: `.agents/reviews/capacidade-6-mobile-24-revisao-independente.md`
    - Branch: `agente/00-ativacao-capacidade-6-mobile`
    - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+5. **Execução e Código da Capacidade 5 (VoiceHub & Telefonia):** **APROVADO** (em 2026-10-17)
+   - Arquivo: `.agents/reviews/capacidade-5-voicehub-24-revisao-independente.md`
+   - Branch: `agente/00-ativacao-capacidade-5-voicehub`
+   - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 53 testes aprovados (100% PASS).
+
+---
+
+## 7. Auditoria Forense Detalhada e Execução — Capacidade 6 (Mobile)
+
+### 7.1. Rastreabilidade Factual dos Componentes
+- **Motor de Gravação de Áudio Nativo/Web:**
+  - `src/features/mobile/audioRecording.service.ts`: linhas 1–345 (MediaRecorder cross-platform para WebView do Capacitor no Android/iOS e PWA, gerenciamento de stream e codecs, timer de duração, conversão para Base64 e integração direta com a fila offline).
+- **Gerenciador de Sincronização Offline-First:**
+  - `src/features/mobile/offlineSync.service.ts`: linhas 1–854 (tipo `FIELD_MEETING_AUDIO`, payload `FieldMeetingAudioPayload`, método `enqueueFieldMeetingAudio`, persistência local segura, resolução de IDs temporários e conciliação automática com retry e detecção de status de rede).
+- **Serviço de Backend de Ingestão e Conciliação:**
+  - `src/features/mobile/server/mobileFieldMeeting.service.ts`: linhas 1–240 (recebe payload offline, cria conversa no Copiloto IA com `source: 'MANUAL'`, registra consentimento verbal auditável LGPD, transiciona estados de captura, armazena buffer de áudio em S3/MinIO, anexa notas de campo como transcript segments e enfileira job de transcrição Whisper).
+- **Rotas e Endpoints Mobile:**
+  - `src/features/mobile/server/mobileFieldMeeting.routes.ts`: linhas 1–44 (`POST /api/mobile/field-meetings/sync`), com autorização `requireRole([...COPILOTO_IA_ROLES])` e isolamento `requireTenant`. Montado em `src/bootstrap/routes.ts:254`.
+- **Manifest e Permissões Nativas Android:**
+  - `android/app/src/main/AndroidManifest.xml`: linhas 94–100 (permissões `RECORD_AUDIO` e `MODIFY_AUDIO_SETTINGS` declaradas com justificativa funcional estrita para o Agente 09).
+- **Interface Mobile-First de Campo:**
+  - `src/features/mobile/components/FieldMeetingRecorder.tsx`: linhas 1–487 (cockpit mobile com botões táteis para iniciar, pausar e finalizar gravação, visualizador de tempo, indicador de online/offline, gaveta de fila pendente com botão de sincronização manual, checkbox obrigatório de consentimento LGPD, campo de anotações e prévia de áudio).
+
+### 7.2. Evidências dos Gates
+1. **TypeScript Typecheck:** `npm run typecheck` (0 erros).
+2. **Biome Linter:** `npm run lint` (0 erros em arquivos inspecionados).
+3. **Vitest (Unitários e Integração):** 24/24 testes aprovados (100% PASS):
+   - `tests/unit/features/mobile/offlineSync.service.test.ts` (10 testes) — **PASSED**
+   - `tests/unit/features/mobile/audioRecording.service.test.ts` (6 testes) — **PASSED**
+   - `tests/unit/features/mobile/mobileFieldMeeting.service.test.ts` (4 testes) — **PASSED**
+   - `tests/integration/features/mobile/mobileFieldMeetingFlow.integration.test.tsx` (4 testes) — **PASSED**
+
+---
+
+## 8. Auditoria Forense Detalhada e Execução — Capacidade 5 (VoiceHub & Cockpit de Telefonia)
+
+### 8.1. Rastreabilidade Factual dos Componentes
+- **Cliente Tipado de Telefonia Operacional (`voiceHub.api.ts`):**
+  - `src/features/voice-hub/api/voiceHub.api.ts`: linhas 1–162. Conecta diretamente os serviços operacionais de telefonia em produção:
+    - `/api/integrations/birth-voice/connections`: listagem de credenciais seguras do motor de voz Birth Voices.
+    - `/api/integrations/birth-voice/cold-call/status`: janelas de discagem, limites diários e métricas agregadas de chamadas.
+    - `/api/integrations/birth-voice/call/:leadId`: disparo direto de chamada SDR/NPS/Reativação com verificação prévia de opt-out (HTTP 409).
+    - `/api/integrations/birth-voice/suppressions`: gerenciamento da lista de supressão por tenant (LGPD).
+    - `/api/integrations/3cx/connections`: listagem de ramais e gateways PABX 3CX.
+    - `/api/cadence/runs?status=Active`: identificação e monitoramento de toques pendentes de voz em cadências comerciais.
+- **Cockpit Comercial e Operacional de Telefonia (`VoiceHubView.tsx`):**
+  - `src/features/voice-hub/components/VoiceHubView.tsx`: linhas 1–549. Cockpit bento moderno com visualização clara de:
+    - Indicadores de saúde e status das conexões Birth Voices e PABX 3CX.
+    - Discador SDR Direto com tratamento observável de feedback e proteção preventiva de opt-out LGPD.
+    - Métricas operacionais consolidadas de campanhas ativas (Tentativas, Atendidas, Agendadas).
+    - Fila de toques de voz em cadências multicanais ativas.
+    - Gerenciador de lista de supressão (Opt-Out) com formulário de inclusão rápida e auditoria de motivo.
+- **Roteamento SPA Integrado (`App.tsx`):**
+  - `src/App.tsx`: linhas 103, 140–143. Lazy loading seguro e rotas `/app/voice-hub` e `/app/voice-hub/*` montadas, respeitando o isolamento do painel e mantendo intocados os contratos de navegação de `tabMeta.ts` e `navHiddenTabs.unit.test.ts`.
+
+### 8.2. Diagnóstico Arquitetural e Gate de Módulos Legados
+- **Gate Intencional 503:** Em conformidade com a decisão de arquitetura P0 (#693), `/api/voice-hub/*`, `/api/outbound/*` e `/api/dialer-3cx/*` estão preservados com `unavailableLegacyModule` (503 `MODULE_NOT_READY`), impedindo vazamento de dados de infraestruturas legadas não isoladas.
+- **Telefonia em Produção:** As chamadas ativas operam de forma segura através dos gateways auditados `/api/integrations/birth-voice` e `/api/integrations/3cx`, com garantia de multi-tenancy (`organizationId`), RBAC e consentimento do titular (LGPD).
+
+### 8.3. Evidências dos Gates
+1. **TypeScript Typecheck:** `npx tsc --noEmit` — **0 erros** (aprovado após tipagem estrita de coleções de cadência).
+2. **Biome Linter:** `npx @biomejs/biome check src/features/voice-hub src/App.tsx tests/unit/features/voice-hub tests/integration/features/voice-hub` — **0 erros / 0 advertências**.
+3. **Vitest (Unitários e Integração de Voz):** 53/53 testes aprovados (100% PASS):
+   - `tests/unit/features/voice-hub/voiceHubFlow.unit.test.tsx` (9 testes) — **PASSED**
+   - `tests/integration/features/voice-hub/voiceHubFlow.integration.test.tsx` (9 testes) — **PASSED**
+   - `tests/unit/features/voice-hub-availability-gate.test.ts` (1 teste) — **PASSED**
+   - `tests/unit/features/voice-hub-studio-persistence.test.ts` (29 testes) — **PASSED**
+   - `tests/unit/features/voice-hub-test-simulator.test.tsx` (4 testes) — **PASSED**
+   - `tests/unit/features/voice-hub-canvas-recovery.test.tsx` (5 testes) — **PASSED**
 
 ---
 
