@@ -1250,13 +1250,13 @@ export function Landing360({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
-                <div className="w-10 h-10 rounded-lg bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center font-bold mb-3 font-mono text-sm border border-[#F59E0B]/40">
+                <div className="w-11 h-11 rounded-xl bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center font-bold mb-3 font-mono text-base border border-[#F59E0B]/40">
                   01
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] mb-1">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-3 py-1 rounded-full mb-2">
                   Modelagem Probabilística
                 </span>
-                <h3 className="font-display text-base font-bold text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
                   Pipeline Ponderado
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -1266,13 +1266,13 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
-                <div className="w-10 h-10 rounded-lg bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center font-bold mb-3 font-mono text-sm border border-[#00D4FF]/40">
+                <div className="w-11 h-11 rounded-xl bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center font-bold mb-3 font-mono text-base border border-[#00D4FF]/40">
                   02
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] mb-1">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-3 py-1 rounded-full mb-2">
                   Qualidade da Base
                 </span>
-                <h3 className="font-display text-base font-bold text-[#00D4FF] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2 text-center">
                   Maturidade de Dados
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -1282,17 +1282,21 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
-                <div className="w-10 h-10 rounded-lg bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center font-bold mb-3 font-mono text-sm border border-[#FF2D9B]/40">
+                <div className="w-11 h-11 rounded-xl bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center font-bold mb-3 font-mono text-base border border-[#FF2D9B]/40">
                   03
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] mb-1">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-3 py-1 rounded-full mb-2">
                   Gestão de Risco
                 </span>
-                <h3 className="font-display text-base font-bold text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
                   Cenários Conservador &amp; Otimista
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Simulação de faixas de faturamento para que a liderança tome decisões de
+                  crescimento seguras.
+                </p>
+              </div>
+            </div>
                   contratação e investimento com segurança.
                 </p>
               </div>

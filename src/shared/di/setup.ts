@@ -18,7 +18,6 @@ import { AutomationUseCases } from '../../features/automations/application/Autom
 import { automationEngine } from '../../features/automations/automation.engine.js';
 import { PrismaAutomationRepository } from '../../features/automations/infra/PrismaAutomationRepository.js';
 import { AutomationController } from '../../features/automations/presentation/AutomationController.js';
-import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { UsageUseCases } from '../../features/billing/application/UsageUseCases.js';
 import { PrismaUsageRepository } from '../../features/billing/infra/PrismaUsageRepository.js';
 import { UsageController } from '../../features/billing/presentation/UsageController.js';
@@ -32,8 +31,10 @@ import { BugReportController } from '../../features/bug-reports/presentation/Bug
 // estrutural local (mesmo padrão de `ChurnPredictionService`/`CommercialIntelligenceAiService`).
 import { prismaSignatureRequestRepository } from '../../features/cadence/infra/PrismaSignatureRequestRepository.js';
 import { MeetingSynthesisService } from '../../features/chatbook/services/meeting-synthesis.service.js';
-import { CommercialIntelligenceUseCases } from '../../features/commercial-intelligence/application/CommercialIntelligenceUseCases.js';
-import { currentPeriod } from '../../features/commercial-intelligence/application/CommercialIntelligenceUseCases.js';
+import {
+  CommercialIntelligenceUseCases,
+  currentPeriod,
+} from '../../features/commercial-intelligence/application/CommercialIntelligenceUseCases.js';
 import { CommercialIntelligenceAiService } from '../../features/commercial-intelligence/infra/CommercialIntelligenceAiService.js';
 import { PrismaCommercialIntelligenceRepository } from '../../features/commercial-intelligence/infra/PrismaCommercialIntelligenceRepository.js';
 import { PrismaForecastSnapshotStore } from '../../features/commercial-intelligence/infra/PrismaForecastSnapshotStore.js';
@@ -62,6 +63,13 @@ import { Crm360Controller } from '../../features/crm360/presentation/Crm360Contr
 import { FeatureFlagsUseCases } from '../../features/feature-flags/application/FeatureFlagsUseCases.js';
 import { PrismaFeatureFlagRepository } from '../../features/feature-flags/infra/PrismaFeatureFlagRepository.js';
 import { FeatureFlagsController } from '../../features/feature-flags/presentation/FeatureFlagsController.js';
+// Negociador de IA em segundo plano (item 3 da IA Agêntica de Vendas, onda de 2026-09-15) — mesmo
+// motivo do comentário da Onda 43 acima: `intelligence/services/aiPendingAction.service.ts` não
+// pode importar `integrations/whatsapp/whatsapp.service.ts` diretamente
+// (no-cross-feature-imports). Registrado aqui e resolvido via
+// `container.resolve<WhatsAppSenderPort>('WhatsAppSenderPort')`, mesmo padrão de
+// `GoogleCalendarService` logo acima.
+import { callLead } from '../../features/integrations/birth-voice/birthVoice.service.js';
 import { BitrixLeadWritebackAdapter } from '../../features/integrations/bitrix/infra/BitrixLeadWritebackAdapter.js';
 import { testBitrixConnection } from '../../features/integrations/bitrix/service/connections.js';
 // Meeting Hub (Google Meet no agendamento público) — mesmo motivo do comentário da Onda 43 acima:
@@ -71,13 +79,6 @@ import { testBitrixConnection } from '../../features/integrations/bitrix/service
 // o tipo estrutural local já usado por `agent.routes.ts`.
 import { createCalendarEvent } from '../../features/integrations/google/google.service.js';
 import { StripeChargeAdapter } from '../../features/integrations/stripe/infra/StripeChargeAdapter.js';
-// Negociador de IA em segundo plano (item 3 da IA Agêntica de Vendas, onda de 2026-09-15) — mesmo
-// motivo do comentário da Onda 43 acima: `intelligence/services/aiPendingAction.service.ts` não
-// pode importar `integrations/whatsapp/whatsapp.service.ts` diretamente
-// (no-cross-feature-imports). Registrado aqui e resolvido via
-// `container.resolve<WhatsAppSenderPort>('WhatsAppSenderPort')`, mesmo padrão de
-// `GoogleCalendarService` logo acima.
-import { callLead } from '../../features/integrations/birth-voice/birthVoice.service.js';
 import { sendWhatsAppMessage } from '../../features/integrations/whatsapp/whatsapp.service.js';
 import { CloserAgent } from '../../features/intelligence/agents/closer.agent.js';
 import { SDRQualificationAgent } from '../../features/intelligence/agents/sdrQualification.agent.js';
@@ -102,6 +103,7 @@ import { NoteUseCases } from '../../features/notes/application/NoteUseCases.js';
 import { PrismaNoteRepository } from '../../features/notes/infra/PrismaNoteRepository.js';
 // Controllers
 import { NoteController } from '../../features/notes/presentation/NoteController.js';
+import { PlaybookRoleplayAdapter } from '../../features/playbook/infra/PlaybookRoleplayAdapter.js';
 import { LivingPlaybookController } from '../../features/playbook/living-playbook/presentation/LivingPlaybookController.js';
 import { ObjectionMatrixUseCases } from '../../features/playbook/objection-matrix/application/ObjectionMatrixUseCases.js';
 import { PrismaObjectionMatrixRepository } from '../../features/playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.js';
@@ -109,8 +111,8 @@ import { ObjectionMatrixController } from '../../features/playbook/objection-mat
 import { QualificationMatrixUseCases } from '../../features/playbook/qualification-matrix/application/QualificationMatrixUseCases.js';
 import { PrismaQualificationMatrixRepository } from '../../features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
 import { QualificationMatrixController } from '../../features/playbook/qualification-matrix/presentation/QualificationMatrixController.js';
-import { PlaybookRoleplayAdapter } from '../../features/playbook/infra/PlaybookRoleplayAdapter.js';
 import { InMemoryEventBus } from '../infra/events/InMemoryEventBus.js';
+import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { container } from './container.js';
 
 export function setupDI() {
@@ -292,4 +294,15 @@ export function setupDI() {
     'CopilotoIaController',
     new CopilotoIaController(copilotoIaUseCases, copilotoBitrixWritebackUseCases),
   );
+
+  // Conexão do barramento de eventos do CRM com o motor de automações
+  subscribeToCrmStageChanges(async (event) => {
+    await automationEngine.handle({
+      organizationId: event.organizationId,
+      trigger: 'Lead mudou de status',
+      entity: 'Lead',
+      entityId: event.leadId,
+      data: event.data,
+    });
+  });
 }
