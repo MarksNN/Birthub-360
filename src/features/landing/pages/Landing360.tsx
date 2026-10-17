@@ -500,17 +500,21 @@ export function Landing360({
           <div className="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full blur-[140px] bg-[#FF2D9B]/10" />
 
           <div className="relative z-10 max-w-6xl mx-auto flex flex-col items-center text-center">
-            {/* Headline Centralizada com Gradientes Oficiais e Dourado Radiante - SEM BRANCO OU PRETO */}
-            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.18] max-w-4xl text-center mx-auto mb-6">
-              <span>
-                <span className="landing-title-cyan font-extrabold">Dados que </span>
-                <span className="grad-text-blue font-extrabold">Conectam.</span>
-                <br />
-                <span className="landing-title-purple font-extrabold">Inteligência que </span>
-                <span className="grad-text-purple font-extrabold">Decide.</span>
-                <br />
-                <span className="landing-title-gold font-extrabold">Execução que </span>
-                <span className="grad-text-gold font-extrabold">Acontece.</span>
+            {/* Headline Centralizada com Animação Luminous das 3 Frases */}
+            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.2] max-w-4xl text-center mx-auto mb-6">
+              <span className="block space-y-1 sm:space-y-2">
+                <span className="hero-phrase-line hero-phrase-1 block">
+                  <span className="landing-title-cyan font-extrabold">Dados que </span>
+                  <span className="grad-text-blue font-extrabold">Conectam.</span>
+                </span>
+                <span className="hero-phrase-line hero-phrase-2 block">
+                  <span className="landing-title-purple font-extrabold">Inteligência que </span>
+                  <span className="grad-text-purple font-extrabold">Decide.</span>
+                </span>
+                <span className="hero-phrase-line hero-phrase-3 block">
+                  <span className="landing-title-gold font-extrabold">Execução que </span>
+                  <span className="grad-text-gold font-extrabold">Acontece.</span>
+                </span>
               </span>
             </h1>
 
@@ -545,31 +549,32 @@ export function Landing360({
                 {FEATURE_TAGS.map((tag, index) => (
                   <div
                     key={tag.label}
-                    className="capability-card flex flex-col items-center justify-center text-center p-5 rounded-2xl transition-all"
+                    className="capability-card flex flex-col items-center justify-center text-center p-6 rounded-2xl transition-all"
                     style={{
-                      borderColor: `${tag.color}45`,
-                      borderWidth: '1px',
+                      borderColor: `${tag.color}60`,
+                      borderWidth: '2.5px',
                       borderStyle: 'solid',
+                      boxShadow: `0 8px 24px -2px ${tag.color}25, 0 0 14px 1px ${tag.color}15`,
                       animationDelay: `${index * 45}ms`,
                     }}
                   >
                     <span
-                      className="font-mono text-[10px] font-bold uppercase tracking-wider mb-2.5 px-2.5 py-0.5 rounded-full"
+                      className="font-mono text-xs font-bold uppercase tracking-wider mb-2.5 px-3 py-1 rounded-full"
                       style={{
                         color: tag.color,
-                        backgroundColor: `${tag.color}15`,
-                        border: `1px solid ${tag.color}30`,
+                        backgroundColor: `${tag.color}18`,
+                        border: `1px solid ${tag.color}40`,
                       }}
                     >
                       {tag.kicker}
                     </span>
                     <h4
-                      className="font-display font-bold text-[15px] leading-snug text-center mb-2"
+                      className="font-display font-bold text-base sm:text-lg leading-snug text-center mb-2"
                       style={{ color: tag.color }}
                     >
                       {tag.label}
                     </h4>
-                    <p className="landing-subtitle text-xs leading-relaxed text-center">
+                    <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                       {tag.desc}
                     </p>
                   </div>
