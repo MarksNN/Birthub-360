@@ -1,12 +1,4 @@
 import {
-  HubIcon,
-  IntelligenceIcon,
-  OrchestrationIcon,
-  PerformanceIcon,
-  AIIcon,
-  AutomationIcon,
-} from '../brand/PillarIcons.js';
-import {
   Activity,
   BarChart3,
   Bell,
@@ -38,11 +30,20 @@ import {
   ShieldCheck,
   Stethoscope,
   Target,
+  Trophy,
   UserCog,
   Users,
   Wallet,
   Zap,
 } from 'lucide-react';
+import {
+  AIIcon,
+  AutomationIcon,
+  HubIcon,
+  IntelligenceIcon,
+  OrchestrationIcon,
+  PerformanceIcon,
+} from '../brand/PillarIcons.js';
 
 /**
  * Identificador de cada módulo navegável — fonte única usada pela Sidebar, Topbar e Command
@@ -88,6 +89,7 @@ export type TabType =
   | 'propostas'
   | 'chatbook'
   | 'roleplay'
+  | 'gamification'
   | 'qualification_matrix'
   | 'objections_matrix'
   | 'topic_training'
@@ -186,6 +188,7 @@ export const TAB_META: Record<TabType, { label: string; icon: any; accent: NavAc
   analytics: { label: 'Analytics', icon: BarChart3, accent: 'blue' },
   winloss: { label: 'Win/Loss', icon: Target, accent: 'red' },
   reports: { label: 'Relatórios Avançados', icon: FileBarChart, accent: 'slate' },
+  gamification: { label: 'Gamificação & Ranking', icon: Trophy, accent: 'gold' },
   settings_performance: { label: 'Ajustes de Performance', icon: SettingsIcon, accent: 'slate' },
 
   // PILAR 05 — PREVISIBILIDADE COMERCIAL

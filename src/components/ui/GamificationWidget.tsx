@@ -1,7 +1,7 @@
 import confetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Award, Check, ChevronRight, Sparkles, Trophy, Volume2, VolumeX, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
 import { Button } from './Button.js';
@@ -20,6 +20,7 @@ export interface GamificationWidgetProps {
   level?: number;
   streakDays?: number;
   show3DCore?: boolean;
+  profile?: import('../../features/gamification/domain/Gamification.js').SellerScore | null;
 }
 
 export function GamificationWidget({
@@ -28,13 +29,22 @@ export function GamificationWidget({
   level = 1,
   streakDays = 0,
   show3DCore = true,
+  profile = null,
 }: GamificationWidgetProps) {
   const [activeTab, setActiveTab] = useState<'missions' | 'achievements'>('missions');
   const [showPanel, setShowPanel] = useState(false);
-  const [currentLevel, setCurrentLevel] = useState(level);
-  const [xp, setXp] = useState(initialXp);
-  const [streak, setStreak] = useState(streakDays);
+  const [currentLevel, setCurrentLevel] = useState(() => profile?.level ?? level);
+  const [xp, setXp] = useState(() => profile?.totalPoints ?? initialXp);
+  const [streak, setStreak] = useState(() => profile?.streakDays ?? streakDays);
   const [soundActive, setSoundActive] = useState(() => SoundFX.isEnabled());
+
+  useEffect(() => {
+    if (profile) {
+      setCurrentLevel(profile.level);
+      setXp(profile.totalPoints);
+      setStreak(profile.streakDays);
+    }
+  }, [profile]);
 
   const [missions, setMissions] = useState([
     { id: 1, title: 'Completar perfil do SDR e ICP', xp: 250, done: false },

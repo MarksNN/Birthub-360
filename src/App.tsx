@@ -263,6 +263,11 @@ const DocumentEditor = lazy(() =>
 const Team = lazy(() =>
   import('./features/team/components/Team.js').then((m) => ({ default: m.Team })),
 );
+const GamificationView = lazy(() =>
+  import('./features/gamification/components/GamificationView.js').then((m) => ({
+    default: m.GamificationView,
+  })),
+);
 const ModuleAccessAdmin = lazy(() =>
   import('./features/module-access/components/ModuleAccessAdmin.js').then((m) => ({
     default: m.ModuleAccessAdmin,
@@ -435,6 +440,7 @@ function AppLayout() {
             <Route path="roteiros" element={<RoteirosHub />} />
             <Route path="chatbook" element={<ChatbookHub />} />
             <Route path="roleplay" element={<RoleplayHub />} />
+            <Route path="gamification" element={<GamificationView />} />
             <Route path="qualification_matrix" element={<QualificationMatrixPage />} />
             <Route path="objections_matrix" element={<ObjectionsMatrixPage />} />
             <Route path="topic_training" element={<TopicTrainingAcademy />} />

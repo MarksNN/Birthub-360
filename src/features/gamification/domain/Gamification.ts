@@ -27,6 +27,7 @@ export interface SellerScore {
   wonRevenue: number;
   badges: Badge[];
   streakDays: number;
+  performance?: import('./SellerPerformance.js').AggregatedSellerPerformance;
 }
 
 export type LeaderboardPeriod = 'all' | 'month' | 'week';
