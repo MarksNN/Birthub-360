@@ -47,7 +47,7 @@ const checks = [
   run('npm run test:integration', 'Testes de Integracao', false),
   run('npm run test:e2e', 'Testes E2E', false),
   run('npm run build', 'Build da Aplicacao', false),
-  run('npm audit', 'Auditoria de Dependencias', false),
+  run('npm run security:audit-waivers', 'Auditoria de Dependencias', false),
   run('npm run security:dependency-inventory', 'Security Inventory', true),
 ];
 
