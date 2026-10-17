@@ -59,7 +59,7 @@ export class MobileFieldMeetingService {
     userId?: string,
     clientIp?: string,
   ): Promise<MobileFieldMeetingSyncResult> {
-    if (!input.title || !input.title.trim()) {
+    if (!input.title?.trim()) {
       throw new AppError('Título da reunião de campo é obrigatório.', 400);
     }
 
@@ -177,7 +177,7 @@ export class MobileFieldMeetingService {
 
     // 6. Se houver anotações da reunião tomadas em campo, persiste como segmento de transcrição inicial
     let hasNotes = false;
-    if (input.meetingNotes && input.meetingNotes.trim()) {
+    if (input.meetingNotes?.trim()) {
       hasNotes = true;
       await prisma.copilotoTranscriptSegment.create({
         data: {
@@ -252,6 +252,7 @@ export class MobileFieldMeetingService {
         logger.warn(
           { err: riskErr, leadId: input.leadId },
           'Detecção de risco preventivo em reunião de campo não bloqueia sincronização',
+        );
       }
     }
 

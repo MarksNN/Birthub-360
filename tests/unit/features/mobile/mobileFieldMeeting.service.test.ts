@@ -4,15 +4,21 @@ import { AuditService } from '../../../../src/lib/audit/audit.service.js';
 import { MobileFieldMeetingService } from '../../../../src/features/mobile/server/mobileFieldMeeting.service.js';
 import * as transcribeJob from '../../../../src/features/copiloto-ia/jobs/transcribeConversation.worker.js';
 
+import { container } from '../../../../src/shared/di/container.js';
+
 describe('MobileFieldMeetingService (Backend de Reuniões de Campo)', () => {
   let service: MobileFieldMeetingService;
 
   beforeEach(() => {
-    service = new MobileFieldMeetingService();
     vi.clearAllMocks();
 
     vi.spyOn(AuditService, 'log').mockResolvedValue({} as any);
     vi.spyOn(transcribeJob, 'enqueueTranscribeConversationJob').mockResolvedValue(undefined as any);
+
+    container.register('CopilotoTranscriptionQueuePort', {
+      enqueueTranscribeConversationJob: transcribeJob.enqueueTranscribeConversationJob,
+    });
+    service = new MobileFieldMeetingService();
   });
 
   afterEach(() => {
