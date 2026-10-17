@@ -200,4 +200,52 @@ describe('make3CXCall — honestidade sobre chamada real (nunca finge sucesso)',
     expect(assertSafeExternalUrlMock).toHaveBeenCalledWith('https://pbx.example.com');
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('envia headers de autenticação e negocia Call Control API quando endpoint v1 retorna 404', async () => {
+    const connWithAuth = await connect3CX(ORG_ID, {
+      pbxUrl: 'https://pbx-modern.example.com',
+      extension: '202',
+      apiKey: 'api-user',
+      apiSecret: 'secret123',
+    });
+
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/api/v1/calls')) {
+        return Promise.resolve({ ok: false, status: 404 });
+      }
+      if (url.includes('/callcontrol/202/makecall')) {
+        return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ result: { callid: 999 } }) });
+      }
+      return Promise.resolve({ ok: false, status: 500 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await make3CXCall(ORG_ID, connWithAuth.id, '11987654321', 'lead-auth');
+    expect(result.success).toBe(true);
+
+    // Verificou tentativa v1 com headers de auth
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://pbx-modern.example.com/api/v1/calls',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: expect.stringMatching(/^Basic /),
+          'X-API-KEY': 'api-user',
+        }),
+      }),
+    );
+
+    // E fallback transparente para Call Control API
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://pbx-modern.example.com/callcontrol/202/makecall',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: expect.stringMatching(/^Basic /),
+          'X-API-KEY': 'api-user',
+        }),
+        body: expect.stringContaining('"destination":"11987654321"'),
+      }),
+    );
+  });
 });
+

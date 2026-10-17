@@ -8,15 +8,15 @@ import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { AppError } from '../../../shared/middlewares/errorHandler.js';
 import { assertSafeExternalUrl, safeFetch } from '../../../shared/security/urlGuard.js';
+import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
 import {
   callMarker,
   callResultedInConversation,
   classifyCallOutcome,
 } from '../birth-voice/birthVoice.helpers.js';
 import { isSuppressed } from '../birth-voice/callSuppression.service.js';
-import { threeCXExtensionResolutionFailuresTotal } from './threecx.metrics.js';
-import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
 import { syncActivityToBitrix } from '../bitrix/service/outboundSync.js';
+import { threeCXExtensionResolutionFailuresTotal } from './threecx.metrics.js';
 
 export interface ThreeCXConnectionInput {
   label?: string;
@@ -177,11 +177,33 @@ export async function test3CXConnection(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8_000);
   try {
+    const headers: Record<string, string> = {};
+    if (conn.apiKey && conn.apiSecret) {
+      headers.Authorization = `Basic ${Buffer.from(`${conn.apiKey}:${conn.apiSecret}`).toString('base64')}`;
+      headers['X-API-KEY'] = conn.apiKey;
+    } else if (conn.apiKey) {
+      headers.Authorization = `Bearer ${conn.apiKey}`;
+      headers['X-API-KEY'] = conn.apiKey;
+    }
+
     // Teste de ping na API do 3CX (MakeCall API / REST Call Control)
-    const res = await safeFetch(`${conn.pbxUrl}/api/v1/healthcheck`, {
+    let res = await safeFetch(`${conn.pbxUrl}/api/v1/healthcheck`, {
       method: 'GET',
+      headers,
       signal: controller.signal,
     });
+
+    // Se o endpoint legado /api/v1/healthcheck não existir (404), testa a Call Control API oficial
+    if (res.status === 404) {
+      res = await safeFetch(
+        `${conn.pbxUrl}/callcontrol/${encodeURIComponent(conn.extension)}/participants`,
+        {
+          method: 'GET',
+          headers,
+          signal: controller.signal,
+        },
+      );
+    }
 
     logger.info(
       { organizationId, connectionId, ok: res.ok },
@@ -312,12 +334,39 @@ export async function make3CXCall(
   let dialSucceeded: boolean;
   let failureReason = '';
   try {
-    const res = await safeFetch(`${conn.pbxUrl}/api/v1/calls`, {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (conn.apiKey && conn.apiSecret) {
+      headers.Authorization = `Basic ${Buffer.from(`${conn.apiKey}:${conn.apiSecret}`).toString('base64')}`;
+      headers['X-API-KEY'] = conn.apiKey;
+    } else if (conn.apiKey) {
+      headers.Authorization = `Bearer ${conn.apiKey}`;
+      headers['X-API-KEY'] = conn.apiKey;
+    }
+
+    let res = await safeFetch(`${conn.pbxUrl}/api/v1/calls`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ from: conn.extension, to: cleanNumber }),
       signal: controller.signal,
     });
+
+    // Se o endpoint legado /api/v1/calls não existir (404/405), negocia via Call Control API oficial
+    if (res.status === 404 || res.status === 405) {
+      res = await safeFetch(
+        `${conn.pbxUrl}/callcontrol/${encodeURIComponent(conn.extension)}/makecall`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            destination: cleanNumber,
+            timeout: 30,
+            attacheddata: { discadorAttemptId: callId },
+          }),
+          signal: controller.signal,
+        },
+      );
+    }
+
     dialSucceeded = res.ok;
     if (!res.ok) failureReason = `PABX respondeu HTTP ${res.status}`;
   } catch (err: any) {

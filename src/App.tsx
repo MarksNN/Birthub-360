@@ -612,7 +612,7 @@ export default function App() {
                         }
                       />
                       <Route path="/" element={<Landing360 />} />
-                      <Route path="/welcome" element={<WelcomeScreen />} />
+                      <Route path="/welcome" element={<Landing360 initialScreen="intro" />} />
                       <Route path="/landing-new" element={<LandingInnovative />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfUse />} />
@@ -620,7 +620,7 @@ export default function App() {
                         única a tela deixou de existir; a rota permanece como redirecionamento
                         para não quebrar link salvo, atalho de app instalado ou bookmark. */}
                       <Route path="/select-brand" element={<Navigate to="/welcome" replace />} />
-                      <Route path="/login" element={<LoginScreen />} />
+                      <Route path="/login" element={<Landing360 initialScreen="login" />} />
                       <Route path="/reset-password" element={<ResetPasswordScreen />} />
                       <Route path="/book/:slug" element={<PublicBookingPage />} />
                       {/* Hub Executivo ("os círculos") — tela de destinos pós-login: Central

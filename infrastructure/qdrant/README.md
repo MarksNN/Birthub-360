@@ -23,17 +23,20 @@ Qdrant é um vector database open source para embeddings. Este deploy configura 
 ### Comandos
 
 ```bash
-# Subir serviço
-docker-compose -f docker-compose.qdrant.yml up -d
+# Subir serviço isoladamente via compose de serviços canônico (recomendado)
+docker compose -f docker-compose.services.yml up -d qdrant
+
+# Ou via overlay dedicado
+docker compose -f docker-compose.qdrant.yml up -d
 
 # Ver logs
-docker-compose -f docker-compose.qdrant.yml logs -f qdrant
+docker compose -f docker-compose.services.yml logs -f qdrant
 
 # Parar serviço
-docker-compose -f docker-compose.qdrant.yml down
+docker compose -f docker-compose.services.yml stop qdrant
 
 # Reiniciar
-docker-compose -f docker-compose.qdrant.yml restart qdrant
+docker compose -f docker-compose.services.yml restart qdrant
 ```
 
 ## Configuração
@@ -62,14 +65,14 @@ const collectionName = `tenant_${tenantId}_documents`
 
 ```bash
 # Backup do volume
-docker run --rm -v birthhub-qdrant_data:/data -v $(pwd):/backup alpine tar czf /backup/qdrant-backup-$(date +%Y%m%d).tar.gz /data
+docker run --rm -v birthhub_qdrant_data:/data -v $(pwd):/backup alpine tar czf /backup/qdrant-backup-$(date +%Y%m%d).tar.gz /data
 ```
 
 ### Restore
 
 ```bash
 # Restore do volume
-docker run --rm -v birthhub-qdrant_data:/data -v $(pwd):/backup alpine tar xzf /backup/qdrant-backup-YYYYMMDD.tar.gz -C /
+docker run --rm -v birthhub_qdrant_data:/data -v $(pwd):/backup alpine tar xzf /backup/qdrant-backup-YYYYMMDD.tar.gz -C /
 ```
 
 ## Segurança
@@ -129,10 +132,10 @@ Editar `docker-compose.qdrant.yml` e alterar as portas mapeadas.
 
 ### Volume não persiste
 
-Verificar se o volume `qdrant_data` existe:
+Verificar se o volume `birthhub_qdrant_data` existe:
 
 ```bash
-docker volume ls
+docker volume ls | grep birthhub_qdrant_data
 ```
 
 ## Integração com Aplicação
@@ -140,3 +143,4 @@ docker volume ls
 O cliente Qdrant já está implementado em `src/lib/ai/embeddings/qdrant.ts`.
 
 Ver handoff: `.agents/handoffs/onda-ia-1/07-para-10-qdrant-config.md`
+
