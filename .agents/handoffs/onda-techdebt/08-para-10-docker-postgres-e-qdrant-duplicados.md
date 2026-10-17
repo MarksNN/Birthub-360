@@ -46,4 +46,9 @@ Handoff atendido e resolvido pelo Agente 10:
    - Removida a chave obsoleta `version: '3.8'` do Compose v2, eliminando avisos de depreciação.
    - `container_name` alinhado para `birthhub_qdrant` (convenção canônica da stack).
    - Healthcheck alinhado para `http://127.0.0.1:6333/healthz`, consistente com `docker-compose.services.yml` e `infrastructure/qdrant/README.md`.
+   - Volume de persistência consolidado e unificado para `birthhub_qdrant_data` (eliminando divergência com `docker-compose.services.yml`).
+   - `docker-compose.postgres-local.yml` alinhado para `pgvector/pgvector:pg17` com suporte a compilação do `docker/postgres/Dockerfile` (PostGIS 3 + TLS).
+
+## Status Final
+CONCLUÍDO E HOMOLOGADO.
 
