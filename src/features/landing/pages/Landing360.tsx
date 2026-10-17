@@ -782,30 +782,31 @@ export function Landing360({
                         : ''
                     }`}
                     style={{
-                      borderColor: isActive ? p.color : `${p.color}66`,
-                      borderWidth: '1px',
+                      borderColor: isActive ? p.color : `${p.color}90`,
+                      borderWidth: '2.5px',
+                      borderStyle: 'solid',
                       boxShadow: isActive
-                        ? `0 0 0 2px ${p.color}, 0 12px 28px -4px ${p.color}33`
-                        : `0 4px 20px -2px ${p.color}18`,
+                        ? `0 0 0 3px ${p.color}, 0 16px 40px -4px ${p.color}55, 0 0 24px 2px ${p.color}40`
+                        : `0 10px 30px -2px ${p.color}28, 0 0 18px 2px ${p.color}18`,
                     }}
                   >
                     {/* Topo do Card */}
                     <div className="flex items-center justify-between mb-3 pt-1">
                       <div className="flex items-center gap-2">
                         <span
-                          className="font-mono text-xs font-bold px-2 py-0.5 rounded-md"
+                          className="font-mono text-xs font-bold px-2.5 py-1 rounded-full"
                           style={{
-                            backgroundColor: `${p.color}18`,
+                            backgroundColor: `${p.color}22`,
                             color: p.color,
-                            border: `1px solid ${p.color}44`,
+                            border: `1.5px solid ${p.color}55`,
                           }}
                         >
                           {p.id}
                         </span>
                         <span
-                          className="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+                          className="font-mono text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                           style={{
-                            backgroundColor: `${p.color}18`,
+                            backgroundColor: `${p.color}22`,
                             color: p.color,
                           }}
                         >
@@ -814,11 +815,11 @@ export function Landing360({
                       </div>
 
                       <div
-                        className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base transition-transform duration-300 group-hover:scale-110"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg transition-transform duration-300 group-hover:scale-110"
                         style={{
-                          backgroundColor: `${p.color}18`,
+                          backgroundColor: `${p.color}22`,
                           color: p.color,
-                          border: `1px solid ${p.color}44`,
+                          border: `1.5px solid ${p.color}55`,
                         }}
                       >
                         {p.symbol}
@@ -828,16 +829,16 @@ export function Landing360({
                     {/* Conteúdo do Card com Nome Oficial */}
                     <div className="flex-1 my-1">
                       <h3
-                        className="font-display text-sm sm:text-base font-bold leading-tight mb-2 text-center"
+                        className="font-display text-base sm:text-lg font-bold leading-tight mb-2 text-center"
                         style={{ color: p.color }}
                       >
                         {p.name}
                       </h3>
-                      <p className="landing-subtitle font-sans text-xs leading-relaxed mb-3 text-center">
+                      <p className="landing-subtitle font-sans text-sm font-medium leading-relaxed mb-3 text-center">
                         {p.desc}
                       </p>
                       <div className="text-center">
-                        <span className="inline-block px-2.5 py-1 rounded text-[10px] font-mono font-semibold section-card landing-subtitle border border-slate-700/60">
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-mono font-semibold section-card landing-subtitle border border-slate-700/60">
                           Foco: {p.focus}
                         </span>
                       </div>
@@ -890,70 +891,80 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="flow-step-card card-semantic-cyan p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs font-bold text-[#00D4FF] mb-2 text-center">
-                  <span>ETAPA 01</span>
+              <div className="flow-step-card card-semantic-cyan p-5 sm:p-6 text-center flex flex-col items-center">
+                <div className="mb-3 text-center">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#00D4FF]/15 text-[#0284c7] dark:text-[#00D4FF] border border-[#00D4FF]/35">
+                    ETAPA 01
+                  </span>
                 </div>
-                <h4 className="font-display text-sm font-bold text-[#00D4FF] mb-2 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2.5 text-center">
                   Entrada &amp; Captura
                 </h4>
-                <p className="landing-subtitle text-xs leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Leads e contas são integrados via CRMs (Bitrix24, HubSpot, Salesforce, Pipedrive),
                   campanhas ou prospecção ativa.
                 </p>
               </div>
 
-              <div className="flow-step-card card-semantic-pink p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs font-bold text-[#FF2D9B] mb-2 text-center">
-                  <span>ETAPA 02</span>
+              <div className="flow-step-card card-semantic-pink p-5 sm:p-6 text-center flex flex-col items-center">
+                <div className="mb-3 text-center">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#FF2D9B]/15 text-[#db2777] dark:text-[#FF2D9B] border border-[#FF2D9B]/35">
+                    ETAPA 02
+                  </span>
                 </div>
-                <h4 className="font-display text-sm font-bold text-[#FF2D9B] mb-2 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2.5 text-center">
                   Enriquecimento B2B
                 </h4>
-                <p className="landing-subtitle text-xs leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Dados de receita, decisores e porte validam o fit do cliente ideal (ICP).
                 </p>
               </div>
 
-              <div className="flow-step-card card-semantic-gold p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs font-bold text-[#F59E0B] mb-2 text-center">
-                  <span>ETAPA 03</span>
+              <div className="flow-step-card card-semantic-gold p-5 sm:p-6 text-center flex flex-col items-center">
+                <div className="mb-3 text-center">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#F59E0B]/15 text-[#d97706] dark:text-[#F59E0B] border border-[#F59E0B]/35">
+                    ETAPA 03
+                  </span>
                 </div>
-                <h4 className="font-display text-sm font-bold text-[#F59E0B] mb-2 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#d97706] dark:text-[#F59E0B] mb-2.5 text-center">
                   Cadência &amp; SLA
                 </h4>
-                <p className="landing-subtitle text-xs leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Distribuição instantânea ao SDR com réguas de contato automáticas.
                 </p>
               </div>
 
-              <div className="flow-step-card card-semantic-iris p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs font-bold text-[#8B7DFF] mb-2 text-center">
-                  <span>ETAPA 04</span>
+              <div className="flow-step-card card-semantic-iris p-5 sm:p-6 text-center flex flex-col items-center">
+                <div className="mb-3 text-center">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#8B7DFF]/15 text-[#7c3aed] dark:text-[#8B7DFF] border border-[#8B7DFF]/35">
+                    ETAPA 04
+                  </span>
                 </div>
-                <h4 className="font-display text-sm font-bold text-[#8B7DFF] mb-2 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#7c3aed] dark:text-[#8B7DFF] mb-2.5 text-center">
                   Apoio com IA
                 </h4>
-                <p className="landing-subtitle text-xs leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Copiloto analisa objeções, histórico e recomenda a abordagem ideal.
                 </p>
               </div>
 
-              <div className="flow-step-card card-semantic-green p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs font-bold text-[#10B981] mb-2 text-center">
-                  <span>ETAPA 05</span>
+              <div className="flow-step-card card-semantic-green p-5 sm:p-6 text-center flex flex-col items-center">
+                <div className="mb-3 text-center">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#10B981]/15 text-[#059669] dark:text-[#10B981] border border-[#10B981]/35">
+                    ETAPA 05
+                  </span>
                 </div>
-                <h4 className="font-display text-sm font-bold text-[#10B981] mb-2 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#059669] dark:text-[#10B981] mb-2.5 text-center">
                   Fechamento &amp; Dados
                 </h4>
-                <p className="landing-subtitle text-xs leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Contrato fechado e aprendizados de win/loss retroalimentam o sistema.
                 </p>
               </div>
             </div>
 
             {/* Demonstração Real do Motor de Prospecção — Prova de Capacidade Enterprise */}
-            <div className="mt-14 rounded-2xl border border-[#00D4FF]/30 dark:border-[#00D4FF]/40 bg-white dark:bg-[#0F172A] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,212,255,0.08)]">
+            <div className="mt-14 rounded-2xl border-[2.5px] border-[#00D4FF]/60 dark:border-[#00D4FF]/80 bg-gradient-to-b from-white to-sky-50/60 dark:from-[#0F172A] dark:to-[#081C30] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,212,255,0.15)]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
@@ -1033,39 +1044,39 @@ export function Landing360({
 
             <div className="flex flex-col lg:flex-row items-center gap-10">
               <div className="lg:w-1/2 space-y-4">
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="section-card card-semantic-cyan flex items-start gap-3.5 p-5 rounded-2xl shadow-md">
+                  <div className="w-8 h-8 rounded-full bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center shrink-0 mt-0.5 border border-[#00D4FF]/35">
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-[#00D4FF] text-sm">Diagnóstico de Entraves</h4>
-                    <p className="landing-subtitle text-xs sm:text-sm mt-1">
+                    <h4 className="font-display font-bold text-base text-[#0284c7] dark:text-[#00D4FF]">Diagnóstico de Entraves</h4>
+                    <p className="landing-subtitle text-sm font-medium mt-1">
                       Alerta deals estagnados com sugestões claras de destravamento baseadas no
                       histórico da conta.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="section-card card-semantic-pink flex items-start gap-3.5 p-5 rounded-2xl shadow-md">
+                  <div className="w-8 h-8 rounded-full bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center shrink-0 mt-0.5 border border-[#FF2D9B]/35">
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-[#FF2D9B] text-sm">Próxima Melhor Ação</h4>
-                    <p className="landing-subtitle text-xs sm:text-sm mt-1">
+                    <h4 className="font-display font-bold text-base text-[#db2777] dark:text-[#FF2D9B]">Próxima Melhor Ação</h4>
+                    <p className="landing-subtitle text-sm font-medium mt-1">
                       Recomendações acionáveis para o vendedor avançar o contato e contornar
                       objeções críticas.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="section-card card-semantic-gold flex items-start gap-3.5 p-5 rounded-2xl shadow-md">
+                  <div className="w-8 h-8 rounded-full bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center shrink-0 mt-0.5 border border-[#F59E0B]/35">
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-[#F59E0B] text-sm">Isolamento &amp; Segurança</h4>
-                    <p className="landing-subtitle text-xs sm:text-sm mt-1">
+                    <h4 className="font-display font-bold text-base text-[#d97706] dark:text-[#F59E0B]">Isolamento &amp; Segurança</h4>
+                    <p className="landing-subtitle text-sm font-medium mt-1">
                       Seus dados comerciais jamais são utilizados para treinar modelos públicos.
                       Conformidade LGPD total.
                     </p>
@@ -1074,7 +1085,7 @@ export function Landing360({
               </div>
 
               <div className="lg:w-1/2 w-full">
-                <div className="section-card p-6 border-2 border-[#FF2D9B]/30 bg-white dark:bg-[#0B1120] shadow-2xl">
+                <div className="section-card card-semantic-pink p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <span className="w-3 h-3 rounded-full bg-[#FF2D9B] animate-pulse" />
@@ -1087,11 +1098,11 @@ export function Landing360({
                     </span>
                   </div>
                   <div className="space-y-3 font-mono text-xs">
-                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#FF2D9B]/25 text-slate-700 dark:text-slate-200">
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#FF2D9B]/40 text-slate-700 dark:text-slate-200 shadow-sm">
                       <span className="text-[#FF2D9B] font-bold">Diagnóstico:</span> Negociação de
                       R$ 140k sem retorno há 4 dias após envio de proposta.
                     </div>
-                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#00D4FF]/25 text-slate-700 dark:text-slate-200">
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#00D4FF]/40 text-slate-700 dark:text-slate-200 shadow-sm">
                       <span className="text-[#00D4FF] font-bold">Ação Sugerida:</span> Disparar
                       cadência de validação de decisor financeiro abordando ROI estimado em 90 dias.
                     </div>
@@ -1319,50 +1330,50 @@ export function Landing360({
 
             {/* Grid Multi-CRM Completo */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#00D4FF]">Bitrix24</div>
+              <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#00D4FF]">Bitrix24</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Conexão via API &amp; Webhooks
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#FF2D9B]">HubSpot</div>
+              <div className="section-card card-semantic-pink p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">HubSpot</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Conexão Bidirecional
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#F59E0B]">Salesforce</div>
+              <div className="section-card card-semantic-gold p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">Salesforce</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Enterprise Connector
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#22C55E]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#22C55E]">Pipedrive</div>
+              <div className="section-card card-semantic-green p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#059669] dark:text-[#22C55E]">Pipedrive</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Pipeline Sync
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#38BDF8]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#38BDF8]">WhatsApp API</div>
+              <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#38BDF8]">WhatsApp API</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Comunicação Direta
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#F59E0B]">Telefonia em Nuvem</div>
+              <div className="section-card card-semantic-gold p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">Telefonia em Nuvem</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Gravação &amp; Métricas
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#00D4FF]">
+              <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#00D4FF]">
                   Webhooks &amp; APIs
                 </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -1370,8 +1381,8 @@ export function Landing360({
                 </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#FF2D9B]">E-mail Corporativo</div>
+              <div className="section-card card-semantic-pink p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">E-mail Corporativo</div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Rastreabilidade Total
                 </div>
@@ -1400,19 +1411,19 @@ export function Landing360({
 
             <div className="flex flex-col lg:flex-row items-center gap-10">
               <div className="lg:w-1/2 w-full space-y-4">
-                <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-                  <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
-                    <span className="font-bold text-[#00D4FF] block mb-1">SDRs &amp; BDRs</span>
+                <div className="grid grid-cols-2 gap-3.5 font-mono text-xs">
+                  <div className="section-card card-semantic-cyan p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
+                    <span className="font-bold text-[#0284c7] dark:text-[#00D4FF] block mb-1.5 text-sm">SDRs &amp; BDRs</span>
                     Fila organizada e dados enriquecidos na tela.
                   </div>
-                  <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
-                    <span className="font-bold text-[#F59E0B] block mb-1">Closers</span>
+                  <div className="section-card card-semantic-gold p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
+                    <span className="font-bold text-[#d97706] dark:text-[#F59E0B] block mb-1.5 text-sm">Closers</span>
                     Histórico 360°, objeções e apoio do copiloto.
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
-                  <span className="font-bold text-[#FF2D9B] block mb-1">
+                <div className="section-card card-semantic-pink p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
+                  <span className="font-bold text-[#db2777] dark:text-[#FF2D9B] block mb-1.5 text-sm">
                     Diretoria &amp; Head de Vendas
                   </span>
                   Previsibilidade acionável, pace diário e controle total de pipeline.
@@ -1420,33 +1431,33 @@ export function Landing360({
               </div>
 
               <div className="lg:w-1/2 w-full">
-                <div className="section-card p-6 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-[#00D4FF]/30 shadow-2xl">
+                <div className="section-card card-semantic-cyan p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
-                    <span className="font-mono text-xs font-bold text-[#00D4FF]">
+                    <span className="font-mono text-xs font-bold text-[#0284c7] dark:text-[#00D4FF]">
                       BIRTH HUB 360° · COCKPIT
                     </span>
-                    <span className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#00D4FF]/20 text-[#00D4FF] font-bold">
+                    <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-[#00D4FF]/20 text-[#0284c7] dark:text-[#00D4FF] font-bold border border-[#00D4FF]/30">
                       100% OPERACIONAL
                     </span>
                   </div>
                   <div className="space-y-3 font-mono text-xs">
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-300">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/30 shadow-sm">
+                      <span className="text-slate-600 dark:text-slate-300 font-medium">
                         Leads Ativos na Fila
                       </span>
-                      <span className="font-bold text-[#00D4FF]">184 contatos</span>
+                      <span className="font-bold text-[#0284c7] dark:text-[#00D4FF]">184 contatos</span>
                     </div>
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-300">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/30 shadow-sm">
+                      <span className="text-slate-600 dark:text-slate-300 font-medium">
                         Deals com Risco Identificado
                       </span>
-                      <span className="font-bold text-[#F59E0B]">3 oportunidades</span>
+                      <span className="font-bold text-[#d97706] dark:text-[#F59E0B]">3 oportunidades</span>
                     </div>
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
-                      <span className="text-slate-600 dark:text-slate-300">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/30 shadow-sm">
+                      <span className="text-slate-600 dark:text-slate-300 font-medium">
                         Cadências em Execução
                       </span>
-                      <span className="font-bold text-[#FF2D9B]">12 ativas</span>
+                      <span className="font-bold text-[#db2777] dark:text-[#FF2D9B]">12 ativas</span>
                     </div>
                   </div>
                 </div>
@@ -1746,7 +1757,7 @@ export function Landing360({
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full h-11 bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                      placeholder="Ex: Carlos Mendes"
+                      placeholder="Seu nome"
                       autoComplete="name"
                     />
                   </div>
@@ -1770,7 +1781,7 @@ export function Landing360({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full h-11 bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                    placeholder="seu.nome@empresa.com.br"
+                    placeholder="nome@empresa.com.br"
                     required
                     autoComplete="email"
                   />
@@ -1793,7 +1804,7 @@ export function Landing360({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full h-11 bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none transition-all pr-11 placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                        placeholder="••••••••••••"
+                        placeholder="••••••••"
                         required
                         autoComplete={authMode === 'signin' ? 'current-password' : 'new-password'}
                       />
@@ -1850,10 +1861,10 @@ export function Landing360({
                     <>
                       <span>
                         {authMode === 'signup'
-                          ? 'Solicitar Provisionamento'
+                          ? 'Solicitar Acesso'
                           : authMode === 'forgot'
                             ? 'Enviar Link de Redefinição'
-                            : 'Entrar no Birth Hub'}
+                            : 'Entrar na Plataforma'}
                       </span>
                       <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 text-white" />
                     </>
@@ -1867,6 +1878,7 @@ export function Landing360({
               {authMode === 'signin' && (
                 <button
                   type="button"
+                  aria-label="Criar conta"
                   onClick={() => {
                     setAuthMode('signup');
                     setErrorMessage('');
@@ -1875,7 +1887,7 @@ export function Landing360({
                   className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Não possui credenciais corporativas?{' '}
-                  <span className="font-bold text-[#00D4FF] hover:underline">Solicitar acesso</span>
+                  <span className="font-bold text-[#00D4FF] hover:underline">Criar conta</span>
                 </button>
               )}
 
