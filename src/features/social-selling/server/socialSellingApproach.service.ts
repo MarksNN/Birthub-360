@@ -12,7 +12,7 @@ import type {
 export class SocialSellingApproachService {
   async generateApproach(
     organizationId: string,
-    userId: string,
+    _userId: string,
     input: GenerateApproachInput,
   ): Promise<GeneratedApproachResult> {
     const channel: SocialSellingChannel = input.channel || 'linkedin';
