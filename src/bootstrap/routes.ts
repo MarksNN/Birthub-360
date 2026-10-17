@@ -53,6 +53,7 @@ import { lgpdRouter } from '../features/lgpd/lgpd.routes.js';
 import { accountIntelligenceRoutes } from '../features/market-intelligence/server/accountIntelligence.routes.js';
 import { marketIntelligenceCompanyRoutes } from '../features/market-intelligence/server/marketIntelligenceCompany.routes.js';
 import { mesaTratamentoRoutes } from '../features/mesa-tratamento/routes/mesaTratamento.routes.js';
+import { mobileFieldMeetingRoutes } from '../features/mobile/server/mobileFieldMeeting.routes.js';
 import { moduleAccessRoutes } from '../features/module-access/routes/moduleAccess.routes.js';
 import { noteRoutes } from '../features/notes/routes/note.routes.js';
 import { notificationRoutes } from '../features/notifications/notification.routes.js';
@@ -250,6 +251,7 @@ export function mountFeatureRoutes(app: Express): void {
   app.use('/api/market-intelligence', authenticateToken, requireTenant, accountIntelligenceRoutes);
   app.use('/api/sales-orchestration', authenticateToken, requireTenant, salesOrchestrationRoutes);
   app.use('/api/social-selling', authenticateToken, requireTenant, socialSellingRoutes);
+  app.use('/api/mobile', authenticateToken, requireTenant, mobileFieldMeetingRoutes);
 
   // Qualquer /api/* que não bateu em nenhuma rota acima deve 404 aqui, e nunca
   // cair no fallback do Vite/SPA (mountFrontend, em frontend.ts): em dev, `vite.middlewares`

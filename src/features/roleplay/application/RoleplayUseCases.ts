@@ -1,3 +1,5 @@
+import type { RoleplayPlaybookPort } from '../../../shared/contracts/roleplayPlaybook.contract.js';
+import { container } from '../../../shared/di/container.js';
 import type {
   RoleplayFeedback,
   RoleplayMessage,
@@ -9,10 +11,24 @@ import { prismaRoleplayRepository } from '../infra/PrismaRoleplayRepository.js';
 import { RoleplayAiService } from '../services/roleplay-ai.service.js';
 
 export class RoleplayUseCases {
+  private playbookPort?: RoleplayPlaybookPort;
+
   constructor(
     private repository: RoleplayRepository = prismaRoleplayRepository,
     private aiService: RoleplayAiService = new RoleplayAiService(),
-  ) {}
+    playbookPort?: RoleplayPlaybookPort,
+  ) {
+    this.playbookPort = playbookPort;
+  }
+
+  private getPlaybookPort(): RoleplayPlaybookPort | null {
+    if (this.playbookPort) return this.playbookPort;
+    try {
+      return container.resolve<RoleplayPlaybookPort>('RoleplayPlaybookPort');
+    } catch {
+      return null;
+    }
+  }
 
   async listPersonas(): Promise<RoleplayPersona[]> {
     return this.repository.listPersonas();
@@ -88,11 +104,30 @@ export class RoleplayUseCases {
       text: m.content,
     }));
 
+    // Busca matrizes ativas da organização para contextualizar a simulação (DT-007)
+    let qualificationCriteria: string[] = [];
+    let objections: string[] = [];
+    const playbook = this.getPlaybookPort();
+    if (playbook) {
+      try {
+        const [qualRes, objRes] = await Promise.all([
+          playbook.findQualificationCriteria(organizationId),
+          playbook.findObjections(organizationId),
+        ]);
+        qualificationCriteria = qualRes;
+        objections = objRes;
+      } catch {
+        // Degradação graciosa em caso de falha de leitura secundária
+      }
+    }
+
     // Execução real do LLM provider (DT-007: sem MOCK_DATA no caminho produtivo)
     const aiResponse = await this.aiService.simulateCustomerResponse({
       persona: personaInput,
       history,
       userMessage: userText,
+      qualificationCriteria,
+      objections,
     });
 
     const replyText = aiResponse.personaReply;
@@ -136,8 +171,28 @@ export class RoleplayUseCases {
       text: m.content,
     }));
 
+    // Busca matrizes ativas da organização para enriquecer o parecer de avaliação pedagógica
+    let qualificationCriteria: string[] = [];
+    let objections: string[] = [];
+    const playbook = this.getPlaybookPort();
+    if (playbook) {
+      try {
+        const [qualRes, objRes] = await Promise.all([
+          playbook.findQualificationCriteria(organizationId),
+          playbook.findObjections(organizationId),
+        ]);
+        qualificationCriteria = qualRes;
+        objections = objRes;
+      } catch {
+        // Degradação graciosa
+      }
+    }
+
     // Avaliação real da IA (DT-007: sem fórmulas matemáticas arbitrárias falsificando avaliação de IA)
-    const aiEvaluation = await this.aiService.evaluateSession(personaInput, history);
+    const aiEvaluation = await this.aiService.evaluateSession(personaInput, history, {
+      qualificationCriteria,
+      objections,
+    });
 
     const feedback: RoleplayFeedback = {
       overallScore: aiEvaluation.overallScore,

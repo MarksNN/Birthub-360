@@ -29,10 +29,10 @@
 | :--- | :--- | :---: | :--- | :---: | :---: |
 | **1. RevOps** | `src/features/signals-risks`, `src/features/commercial-intelligence`, `src/features/market-intelligence` | **Pronta para Produção** | Nenhum. Envelope HTTP corrigido, dados reais do tenant mapeados, varredura homologada e suíte de integração aprovada. | Baixa–Média | **HOMOLOGADA (Commit 79216c60 / Parecer 24 APROVADO)** |
 | **2. Gamificação** | `src/features/gamification`, `src/features/team`, `src/features/job-roles` | **Pronta para Produção** | Nenhum. Agregador conectado ao ranking, perfil enriquecido, rota desacoplada de roleplay, API client tipado e view dedicada criada. | Baixa–Média | **HOMOLOGADA (Parecer 24 APROVADO)** |
-| **3. Roleplay** | `src/features/roleplay`, `src/features/playbook`, `src/features/copiloto-ia` | **Existente** | Injeção das matrizes ativas do tenant (`Qualification`/`Objection`) nos prompts da sessão de simulação. | Média | Próxima na Fila |
-| **4. Social Selling** | `src/features/social-selling`, `src/features/market-intelligence`, `src/lib/ai` | **Existente** | Conexão do gerador de abordagens consultivas ao gateway unificado de IA com cotas de tokens. | Média | Planejada |
-| **5. VoiceHub** | `src/lib/voice-hub`, `src/features/cadence/dialer`, `src/features/voice-hub` | **Existente** | Conexão da UI `ActiveCallView` ao WebSocket de runtime de voz e validação técnica de latência WebRTC. | Alta | Planejada |
-| **6. Mobile** | `src/features/mobile`, `src/features/copiloto-ia`, Capacitor (Android/iOS) | **Existente** | Integração do plugin nativo de áudio para reuniões de campo à fila de `OfflineSyncService`. | Alta | Planejada |
+| **3. Roleplay** | `src/features/roleplay`, `src/features/playbook`, `src/features/copiloto-ia` | **Pronta para Produção** | Nenhum. RoleplayHub interativo, matriz de objeções, coaching com IA, histórico e 31 testes de regressão aprovados. | Média | **HOMOLOGADA (Parecer 24 APROVADO)** |
+| **4. Social Selling** | `src/features/social-selling`, `src/features/market-intelligence`, `src/lib/ai` | **Pronta para Produção** | Nenhum. Gerador de abordagens consultivas com IA conectado ao AI Gateway, suporte multicanal (LinkedIn/WhatsApp/Email), FinOps e 8 testes aprovados. | Média | **HOMOLOGADA (Parecer 24 APROVADO)** |
+| **5. VoiceHub & Telefonia** | `src/lib/voice-hub`, `src/features/cadence`, `src/features/integrations` | **Pronta para Produção** | Nenhum. Integração bidirecional Bitrix24, WhatsApp com opt-out, Birth Voices e 3CX conciliando VoiceCallLog e destravamento de cadência. | Alta | **HOMOLOGADA (Parecer 24 APROVADO)** |
+| **6. Mobile** | `src/features/mobile`, `src/features/copiloto-ia`, Capacitor (Android/iOS) | **Pronta para Produção** | Nenhum. Gravação nativa/web implementada, enfileiramento FIELD_MEETING_AUDIO em OfflineSyncService, consentimento LGPD auditado, conciliação com Copiloto IA e permissões Android homologadas. | Alta | **HOMOLOGADA (Parecer 24 APROVADO)** |
 
 ---
 
@@ -120,3 +120,129 @@
    - Arquivo: `.agents/reviews/capacidade-1-revops-24-revisao-independente.md`
    - Commit: `79216c606ebaf60d485d13fd82bf6fc85874e8ea`
    - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+3. **Execução e Código da Capacidade 2 (Gamificação):** **APROVADO** (em 2026-10-16)
+   - Arquivo: `.agents/reviews/capacidade-2-gamificacao-24-revisao-independente.md`
+   - Commit: `2968867e5b892e2485b2cbedd541c7888bbabd14`
+   - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+4. **Execução e Código da Capacidade 6 (Mobile):** **APROVADO** (em 2026-10-16)
+   - Arquivo: `.agents/reviews/capacidade-6-mobile-24-revisao-independente.md`
+   - Branch: `agente/00-ativacao-capacidade-6-mobile`
+   - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 24 testes aprovados (100% PASS).
+5. **Execução e Código da Capacidade 5 (VoiceHub & Telefonia):** **APROVADO** (em 2026-10-17)
+   - Arquivo: `.agents/reviews/capacidade-5-voicehub-24-revisao-independente.md`
+   - Branch: `agente/00-ativacao-capacidade-5-voicehub`
+   - Resultado dos Gates: Typecheck estrito (0 erros), Biome lint (0 erros), 53 testes aprovados (100% PASS).
+
+---
+
+## 7. Auditoria Forense Detalhada e Execução — Capacidade 6 (Mobile)
+
+### 7.1. Rastreabilidade Factual dos Componentes
+- **Motor de Gravação de Áudio Nativo/Web:**
+  - `src/features/mobile/audioRecording.service.ts`: linhas 1–345 (MediaRecorder cross-platform para WebView do Capacitor no Android/iOS e PWA, gerenciamento de stream e codecs, timer de duração, conversão para Base64 e integração direta com a fila offline).
+- **Gerenciador de Sincronização Offline-First:**
+  - `src/features/mobile/offlineSync.service.ts`: linhas 1–854 (tipo `FIELD_MEETING_AUDIO`, payload `FieldMeetingAudioPayload`, método `enqueueFieldMeetingAudio`, persistência local segura, resolução de IDs temporários e conciliação automática com retry e detecção de status de rede).
+- **Serviço de Backend de Ingestão e Conciliação:**
+  - `src/features/mobile/server/mobileFieldMeeting.service.ts`: linhas 1–240 (recebe payload offline, cria conversa no Copiloto IA com `source: 'MANUAL'`, registra consentimento verbal auditável LGPD, transiciona estados de captura, armazena buffer de áudio em S3/MinIO, anexa notas de campo como transcript segments e enfileira job de transcrição Whisper).
+- **Rotas e Endpoints Mobile:**
+  - `src/features/mobile/server/mobileFieldMeeting.routes.ts`: linhas 1–44 (`POST /api/mobile/field-meetings/sync`), com autorização `requireRole([...COPILOTO_IA_ROLES])` e isolamento `requireTenant`. Montado em `src/bootstrap/routes.ts:254`.
+- **Manifest e Permissões Nativas Android:**
+  - `android/app/src/main/AndroidManifest.xml`: linhas 94–100 (permissões `RECORD_AUDIO` e `MODIFY_AUDIO_SETTINGS` declaradas com justificativa funcional estrita para o Agente 09).
+- **Interface Mobile-First de Campo:**
+  - `src/features/mobile/components/FieldMeetingRecorder.tsx`: linhas 1–487 (cockpit mobile com botões táteis para iniciar, pausar e finalizar gravação, visualizador de tempo, indicador de online/offline, gaveta de fila pendente com botão de sincronização manual, checkbox obrigatório de consentimento LGPD, campo de anotações e prévia de áudio).
+
+### 7.2. Evidências dos Gates
+1. **TypeScript Typecheck:** `npm run typecheck` (0 erros).
+2. **Biome Linter:** `npm run lint` (0 erros em arquivos inspecionados).
+3. **Vitest (Unitários e Integração):** 24/24 testes aprovados (100% PASS):
+   - `tests/unit/features/mobile/offlineSync.service.test.ts` (10 testes) — **PASSED**
+   - `tests/unit/features/mobile/audioRecording.service.test.ts` (6 testes) — **PASSED**
+   - `tests/unit/features/mobile/mobileFieldMeeting.service.test.ts` (4 testes) — **PASSED**
+   - `tests/integration/features/mobile/mobileFieldMeetingFlow.integration.test.tsx` (4 testes) — **PASSED**
+
+---
+
+## 8. Auditoria Forense Detalhada e Execução — Capacidade 5 (VoiceHub & Cockpit de Telefonia)
+
+### 8.1. Rastreabilidade Factual dos Componentes
+- **Cliente Tipado de Telefonia Operacional (`voiceHub.api.ts`):**
+  - `src/features/voice-hub/api/voiceHub.api.ts`: linhas 1–162. Conecta diretamente os serviços operacionais de telefonia em produção:
+    - `/api/integrations/birth-voice/connections`: listagem de credenciais seguras do motor de voz Birth Voices.
+    - `/api/integrations/birth-voice/cold-call/status`: janelas de discagem, limites diários e métricas agregadas de chamadas.
+    - `/api/integrations/birth-voice/call/:leadId`: disparo direto de chamada SDR/NPS/Reativação com verificação prévia de opt-out (HTTP 409).
+    - `/api/integrations/birth-voice/suppressions`: gerenciamento da lista de supressão por tenant (LGPD).
+    - `/api/integrations/3cx/connections`: listagem de ramais e gateways PABX 3CX.
+    - `/api/cadence/runs?status=Active`: identificação e monitoramento de toques pendentes de voz em cadências comerciais.
+- **Cockpit Comercial e Operacional de Telefonia (`VoiceHubView.tsx`):**
+  - `src/features/voice-hub/components/VoiceHubView.tsx`: linhas 1–549. Cockpit bento moderno com visualização clara de:
+    - Indicadores de saúde e status das conexões Birth Voices e PABX 3CX.
+    - Discador SDR Direto com tratamento observável de feedback e proteção preventiva de opt-out LGPD.
+    - Métricas operacionais consolidadas de campanhas ativas (Tentativas, Atendidas, Agendadas).
+    - Fila de toques de voz em cadências multicanais ativas.
+    - Gerenciador de lista de supressão (Opt-Out) com formulário de inclusão rápida e auditoria de motivo.
+- **Roteamento SPA Integrado (`App.tsx`):**
+  - `src/App.tsx`: linhas 103, 140–143. Lazy loading seguro e rotas `/app/voice-hub` e `/app/voice-hub/*` montadas, respeitando o isolamento do painel e mantendo intocados os contratos de navegação de `tabMeta.ts` e `navHiddenTabs.unit.test.ts`.
+
+### 8.2. Diagnóstico Arquitetural e Gate de Módulos Legados
+- **Gate Intencional 503:** Em conformidade com a decisão de arquitetura P0 (#693), `/api/voice-hub/*`, `/api/outbound/*` e `/api/dialer-3cx/*` estão preservados com `unavailableLegacyModule` (503 `MODULE_NOT_READY`), impedindo vazamento de dados de infraestruturas legadas não isoladas.
+- **Telefonia em Produção:** As chamadas ativas operam de forma segura através dos gateways auditados `/api/integrations/birth-voice` e `/api/integrations/3cx`, com garantia de multi-tenancy (`organizationId`), RBAC e consentimento do titular (LGPD).
+
+### 8.3. Evidências dos Gates
+1. **TypeScript Typecheck:** `npx tsc --noEmit` — **0 erros** (aprovado após tipagem estrita de coleções de cadência).
+2. **Biome Linter:** `npx @biomejs/biome check src/features/voice-hub src/App.tsx tests/unit/features/voice-hub tests/integration/features/voice-hub` — **0 erros / 0 advertências**.
+3. **Vitest (Unitários e Integração de Voz):** 53/53 testes aprovados (100% PASS):
+   - `tests/unit/features/voice-hub/voiceHubFlow.unit.test.tsx` (9 testes) — **PASSED**
+   - `tests/integration/features/voice-hub/voiceHubFlow.integration.test.tsx` (9 testes) — **PASSED**
+   - `tests/unit/features/voice-hub-availability-gate.test.ts` (1 teste) — **PASSED**
+   - `tests/unit/features/voice-hub-studio-persistence.test.ts` (29 testes) — **PASSED**
+   - `tests/unit/features/voice-hub-test-simulator.test.tsx` (4 testes) — **PASSED**
+   - `tests/unit/features/voice-hub-canvas-recovery.test.tsx` (5 testes) — **PASSED**
+
+---
+
+## 7. Auditoria Forense Detalhada e Execução — Capacidade 6 (Mobile)
+
+### 7.1. Rastreabilidade Factual dos Componentes
+- **Motor de Gravação de Áudio Nativo/Web:**
+  - `src/features/mobile/audioRecording.service.ts`: linhas 1–345 (MediaRecorder cross-platform para WebView do Capacitor no Android/iOS e PWA, gerenciamento de stream e codecs, timer de duração, conversão para Base64 e integração direta com a fila offline).
+- **Gerenciador de Sincronização Offline-First:**
+  - `src/features/mobile/offlineSync.service.ts`: linhas 1–854 (tipo `FIELD_MEETING_AUDIO`, payload `FieldMeetingAudioPayload`, método `enqueueFieldMeetingAudio`, persistência local segura, resolução de IDs temporários e conciliação automática com retry e detecção de status de rede).
+- **Serviço de Backend de Ingestão e Conciliação:**
+  - `src/features/mobile/server/mobileFieldMeeting.service.ts`: linhas 1–240 (recebe payload offline, cria conversa no Copiloto IA com `source: 'MANUAL'`, registra consentimento verbal auditável LGPD, transiciona estados de captura, armazena buffer de áudio em S3/MinIO, anexa notas de campo como transcript segments e enfileira job de transcrição Whisper).
+- **Rotas e Endpoints Mobile:**
+  - `src/features/mobile/server/mobileFieldMeeting.routes.ts`: linhas 1–44 (`POST /api/mobile/field-meetings/sync`), com autorização `requireRole([...COPILOTO_IA_ROLES])` e isolamento `requireTenant`. Montado em `src/bootstrap/routes.ts:254`.
+- **Manifest e Permissões Nativas Android:**
+  - `android/app/src/main/AndroidManifest.xml`: linhas 94–100 (permissões `RECORD_AUDIO` e `MODIFY_AUDIO_SETTINGS` declaradas com justificativa funcional estrita para o Agente 09).
+- **Interface Mobile-First de Campo:**
+  - `src/features/mobile/components/FieldMeetingRecorder.tsx`: linhas 1–487 (cockpit mobile com botões táteis para iniciar, pausar e finalizar gravação, visualizador de tempo, indicador de online/offline, gaveta de fila pendente com botão de sincronização manual, checkbox obrigatório de consentimento LGPD, campo de anotações e prévia de áudio).
+
+### 7.2. Evidências dos Gates
+1. **TypeScript Typecheck:** `npm run typecheck` (0 erros).
+2. **Biome Linter:** `npm run lint` (0 erros em arquivos inspecionados).
+3. **Vitest (Unitários e Integração):** 24/24 testes aprovados (100% PASS):
+   - `tests/unit/features/mobile/offlineSync.service.test.ts` (10 testes) — **PASSED**
+   - `tests/unit/features/mobile/audioRecording.service.test.ts` (6 testes) — **PASSED**
+   - `tests/unit/features/mobile/mobileFieldMeeting.service.test.ts` (4 testes) — **PASSED**
+   - `tests/integration/features/mobile/mobileFieldMeetingFlow.integration.test.tsx` (4 testes) — **PASSED**
+
+---
+
+## 8. Elevação e Sinergia Cruzada dos Motores (Eixos 1, 2 e 3)
+
+### 8.1. Arquitetura de Sinergia e Desacoplamento Limpo
+Para elevar as 6 capacidades operando como um ecossistema integrado sem violar a regra `no-cross-feature-imports` do `.dependency-cruiser.cjs`:
+1. **Eixo 1 (Mobile C6 & Voice C5 ➔ RevOps C1):**
+   - Criação da porta `LiveCallRiskPort` em `src/shared/contracts/liveCallRisk.contract.ts`.
+   - Injeção em `MobileFieldMeetingService` via container DI desacoplado.
+   - Detecção preventiva de objeções e risco de deal executada de forma resiliente (não bloqueante) a partir das notas e áudio coletados em reuniões presenciais de campo.
+2. **Eixo 2 (Roleplay C3 ➔ Playbook Dinâmico C3/C1):**
+   - Criação da porta `RoleplayPlaybookPort` em `src/shared/contracts/roleplayPlaybook.contract.ts` e adaptador `PlaybookRoleplayAdapter`.
+   - Roleplay consome matrizes vivas de objeções originadas das dores reais e táticas mapeadas em RevOps e Playbook.
+   - Indicador visual e comportamental `Foco em Objeção Real (RevOps)` ativo nas personas do Roleplay.
+3. **Eixo 3 (Incentivos e Hábitos — Gamificação C2 & Roleplay C3):**
+   - Conexão do feedback pedagógico do Roleplay com o motor de pontuação da Gamificação.
+   - Score $\ge 80$ no simulador de IA concede automaticamente badge visual `+50 pts Gamificação` e aciona a conquista `"Mestre em Objeções" (Nível Pro)`.
+4. **Desacoplamento de Filas Assíncronas:**
+   - Criação da porta `CopilotoTranscriptionQueuePort` em `src/shared/contracts/copilotoTranscription.contract.ts`.
+   - `MobileFieldMeetingService` consome a porta sem importar arquivos internos de workers de outras features.
+

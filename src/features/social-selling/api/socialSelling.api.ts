@@ -3,6 +3,12 @@ import type {
   GenerateApproachInput,
   GeneratedApproachResult,
 } from '../domain/socialSelling.types.js';
+export type {
+  GenerateApproachInput,
+  GeneratedApproachResult,
+  SocialSellingChannel,
+  SocialSellingTone,
+} from '../domain/socialSelling.types.js';
 
 export const socialSellingApi = {
   generateApproach: async (input: GenerateApproachInput): Promise<GeneratedApproachResult> => {

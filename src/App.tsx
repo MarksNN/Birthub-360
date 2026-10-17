@@ -292,6 +292,11 @@ const WelcomeScreen = lazy(() =>
 const LandingInnovative = lazy(() =>
   import('./features/voice-hub/pages/LandingInnovative.js').then((m) => ({ default: m.default })),
 );
+const VoiceHubView = lazy(() =>
+  import('./features/voice-hub/components/VoiceHubView.js').then((m) => ({
+    default: m.VoiceHubView,
+  })),
+);
 const Ldr = lazy(() => import('./pages/Ldr.js').then((m) => ({ default: m.Ldr })));
 const Account360 = lazy(() =>
   import('./features/market-intelligence/components/Account360.js').then((m) => ({
@@ -430,7 +435,8 @@ function AppLayout() {
               503 (caíam em erro genérico/404), então deep-link volta pro dashboard até o 12
               reabrir o gate; os módulos saem da navegação via NAV_HIDDEN_TABS (tabMeta.ts). */}
             <Route path="dialer" element={<Navigate to="/app/cadence" replace />} />
-            <Route path="voice-hub/*" element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="voice-hub" element={<VoiceHubView />} />
+            <Route path="voice-hub/*" element={<VoiceHubView />} />
             <Route path="outbound/*" element={<Navigate to="/app/dashboard" replace />} />
 
             <Route path="cadence" element={<CadenceHub />} />

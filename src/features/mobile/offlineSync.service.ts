@@ -13,7 +13,22 @@ export type OfflineOperationType =
   | 'CREATE_LEAD'
   | 'UPDATE_LEAD'
   | 'CREATE_NOTE'
+  | 'FIELD_MEETING_AUDIO'
   | 'GENERIC_MUTATION';
+
+export interface FieldMeetingAudioPayload {
+  title: string;
+  leadId?: string;
+  audioData: string; // Base64 do áudio gravado em campo
+  audioMimeType: string;
+  audioSizeBytes: number;
+  durationMs?: number;
+  recordedAt?: string;
+  consentGranted: boolean;
+  consentMethod?: string;
+  textVersion?: string;
+  meetingNotes?: string;
+}
 
 export type OfflineOperationStatus = 'pending' | 'syncing' | 'synced' | 'failed';
 
@@ -540,6 +555,31 @@ export class OfflineSyncService {
       payload: noteData,
       dependsOnTempId: isTemp ? leadId : undefined,
       meta: { entity: 'note', leadId },
+    });
+  }
+
+  /**
+   * Enfileira gravação nativa de áudio de reunião presencial de campo (Capacidade 6 - Mobile).
+   */
+  public async enqueueFieldMeetingAudio(
+    payload: FieldMeetingAudioPayload,
+    tempId?: string,
+  ): Promise<OfflineQueueItem<FieldMeetingAudioPayload>> {
+    const isTemp =
+      payload.leadId &&
+      (payload.leadId.startsWith('temp_') ||
+        this.queue.some((q) => q.temporaryId === payload.leadId));
+
+    const assignedTempId = tempId || generateTemporaryId('temp_meeting_audio');
+
+    return this.enqueue<FieldMeetingAudioPayload>({
+      type: 'FIELD_MEETING_AUDIO',
+      endpoint: '/api/mobile/field-meetings/sync',
+      method: 'POST',
+      payload,
+      temporaryId: assignedTempId,
+      dependsOnTempId: isTemp ? payload.leadId : undefined,
+      meta: { entity: 'field_meeting_audio', leadId: payload.leadId },
     });
   }
 
