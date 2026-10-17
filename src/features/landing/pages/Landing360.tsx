@@ -1293,11 +1293,7 @@ export function Landing360({
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Simulação de faixas de faturamento para que a liderança tome decisões de
-                  crescimento seguras.
-                </p>
-              </div>
-            </div>
-                  contratação e investimento com segurança.
+                  crescimento, contratação e investimento com segurança.
                 </p>
               </div>
             </div>

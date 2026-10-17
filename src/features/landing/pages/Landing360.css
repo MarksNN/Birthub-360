@@ -271,27 +271,57 @@ html {
 }
 
 /* Fallback de segurança: apenas para títulos neutros que não possuem classe de cor explícita */
-.landing-neon-root h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.landing-neon-root h2:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.landing-neon-root h3:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.landing-neon-root h4:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.landing-neon-root h5:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.landing-neon-root h6:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]) {
+.landing-neon-root
+h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.landing-neon-root
+  h2:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.landing-neon-root
+  h3:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.landing-neon-root
+  h4:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.landing-neon-root
+  h5:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.landing-neon-root
+  h6:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]) {
   color: #0284c7;
 }
 
-:root.dark .landing-neon-root h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-:root.dark .landing-neon-root h2:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-:root.dark .landing-neon-root h3:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-:root.dark .landing-neon-root h4:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-:root.dark .landing-neon-root h5:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-:root.dark .landing-neon-root h6:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.dark .landing-neon-root h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.dark .landing-neon-root h2:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.dark .landing-neon-root h3:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.dark .landing-neon-root h4:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.dark .landing-neon-root h5:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
-.dark .landing-neon-root h6:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]) {
+:root.dark
+  .landing-neon-root
+  h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+:root.dark
+  .landing-neon-root
+  h2:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+:root.dark
+  .landing-neon-root
+  h3:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+:root.dark
+  .landing-neon-root
+  h4:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+:root.dark
+  .landing-neon-root
+  h5:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+:root.dark
+  .landing-neon-root
+  h6:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.dark
+  .landing-neon-root
+  h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.dark
+  .landing-neon-root
+  h2:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.dark
+  .landing-neon-root
+  h3:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.dark
+  .landing-neon-root
+  h4:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.dark
+  .landing-neon-root
+  h5:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]),
+.dark
+  .landing-neon-root
+  h6:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"]) {
   color: #00d4ff;
 }
 
@@ -786,85 +816,115 @@ html {
 .landing-neon-root .card-semantic-cyan {
   background: linear-gradient(180deg, #ffffff 0%, rgba(240, 249, 255, 0.92) 100%) !important;
   border: 2.5px solid rgba(0, 212, 255, 0.65) !important;
-  box-shadow: 0 8px 28px -2px rgba(0, 212, 255, 0.22), 0 0 16px 1px rgba(0, 212, 255, 0.14);
+  box-shadow:
+    0 8px 28px -2px rgba(0, 212, 255, 0.22),
+    0 0 16px 1px rgba(0, 212, 255, 0.14);
 }
 :root.dark .landing-neon-root .card-semantic-cyan,
 .dark .landing-neon-root .card-semantic-cyan {
   background: linear-gradient(180deg, #0f172a 0%, rgba(8, 28, 48, 0.96) 100%) !important;
   border-color: rgba(0, 212, 255, 0.8) !important;
-  box-shadow: 0 10px 36px -4px rgba(0, 212, 255, 0.38), 0 0 24px 2px rgba(0, 212, 255, 0.25);
+  box-shadow:
+    0 10px 36px -4px rgba(0, 212, 255, 0.38),
+    0 0 24px 2px rgba(0, 212, 255, 0.25);
 }
 .landing-neon-root .card-semantic-cyan:hover {
   border-color: rgba(0, 212, 255, 1) !important;
-  box-shadow: 0 14px 44px -4px rgba(0, 212, 255, 0.45), 0 0 30px 4px rgba(0, 212, 255, 0.35);
+  box-shadow:
+    0 14px 44px -4px rgba(0, 212, 255, 0.45),
+    0 0 30px 4px rgba(0, 212, 255, 0.35);
   transform: translateY(-3px);
 }
 
 .landing-neon-root .card-semantic-pink {
   background: linear-gradient(180deg, #ffffff 0%, rgba(255, 241, 248, 0.92) 100%) !important;
   border: 2.5px solid rgba(255, 45, 155, 0.65) !important;
-  box-shadow: 0 8px 28px -2px rgba(255, 45, 155, 0.22), 0 0 16px 1px rgba(255, 45, 155, 0.14);
+  box-shadow:
+    0 8px 28px -2px rgba(255, 45, 155, 0.22),
+    0 0 16px 1px rgba(255, 45, 155, 0.14);
 }
 :root.dark .landing-neon-root .card-semantic-pink,
 .dark .landing-neon-root .card-semantic-pink {
   background: linear-gradient(180deg, #0f172a 0%, rgba(48, 10, 32, 0.96) 100%) !important;
   border-color: rgba(255, 45, 155, 0.8) !important;
-  box-shadow: 0 10px 36px -4px rgba(255, 45, 155, 0.38), 0 0 24px 2px rgba(255, 45, 155, 0.25);
+  box-shadow:
+    0 10px 36px -4px rgba(255, 45, 155, 0.38),
+    0 0 24px 2px rgba(255, 45, 155, 0.25);
 }
 .landing-neon-root .card-semantic-pink:hover {
   border-color: rgba(255, 45, 155, 1) !important;
-  box-shadow: 0 14px 44px -4px rgba(255, 45, 155, 0.45), 0 0 30px 4px rgba(255, 45, 155, 0.35);
+  box-shadow:
+    0 14px 44px -4px rgba(255, 45, 155, 0.45),
+    0 0 30px 4px rgba(255, 45, 155, 0.35);
   transform: translateY(-3px);
 }
 
 .landing-neon-root .card-semantic-gold {
   background: linear-gradient(180deg, #ffffff 0%, rgba(254, 252, 232, 0.92) 100%) !important;
   border: 2.5px solid rgba(245, 158, 11, 0.65) !important;
-  box-shadow: 0 8px 28px -2px rgba(245, 158, 11, 0.22), 0 0 16px 1px rgba(245, 158, 11, 0.14);
+  box-shadow:
+    0 8px 28px -2px rgba(245, 158, 11, 0.22),
+    0 0 16px 1px rgba(245, 158, 11, 0.14);
 }
 :root.dark .landing-neon-root .card-semantic-gold,
 .dark .landing-neon-root .card-semantic-gold {
   background: linear-gradient(180deg, #0f172a 0%, rgba(48, 32, 8, 0.96) 100%) !important;
   border-color: rgba(245, 158, 11, 0.8) !important;
-  box-shadow: 0 10px 36px -4px rgba(245, 158, 11, 0.38), 0 0 24px 2px rgba(245, 158, 11, 0.25);
+  box-shadow:
+    0 10px 36px -4px rgba(245, 158, 11, 0.38),
+    0 0 24px 2px rgba(245, 158, 11, 0.25);
 }
 .landing-neon-root .card-semantic-gold:hover {
   border-color: rgba(245, 158, 11, 1) !important;
-  box-shadow: 0 14px 44px -4px rgba(245, 158, 11, 0.45), 0 0 30px 4px rgba(245, 158, 11, 0.35);
+  box-shadow:
+    0 14px 44px -4px rgba(245, 158, 11, 0.45),
+    0 0 30px 4px rgba(245, 158, 11, 0.35);
   transform: translateY(-3px);
 }
 
 .landing-neon-root .card-semantic-iris {
   background: linear-gradient(180deg, #ffffff 0%, rgba(245, 243, 255, 0.92) 100%) !important;
   border: 2.5px solid rgba(139, 125, 255, 0.65) !important;
-  box-shadow: 0 8px 28px -2px rgba(139, 125, 255, 0.22), 0 0 16px 1px rgba(139, 125, 255, 0.14);
+  box-shadow:
+    0 8px 28px -2px rgba(139, 125, 255, 0.22),
+    0 0 16px 1px rgba(139, 125, 255, 0.14);
 }
 :root.dark .landing-neon-root .card-semantic-iris,
 .dark .landing-neon-root .card-semantic-iris {
   background: linear-gradient(180deg, #0f172a 0%, rgba(28, 16, 52, 0.96) 100%) !important;
   border-color: rgba(139, 125, 255, 0.8) !important;
-  box-shadow: 0 10px 36px -4px rgba(139, 125, 255, 0.38), 0 0 24px 2px rgba(139, 125, 255, 0.25);
+  box-shadow:
+    0 10px 36px -4px rgba(139, 125, 255, 0.38),
+    0 0 24px 2px rgba(139, 125, 255, 0.25);
 }
 .landing-neon-root .card-semantic-iris:hover {
   border-color: rgba(139, 125, 255, 1) !important;
-  box-shadow: 0 14px 44px -4px rgba(139, 125, 255, 0.45), 0 0 30px 4px rgba(139, 125, 255, 0.35);
+  box-shadow:
+    0 14px 44px -4px rgba(139, 125, 255, 0.45),
+    0 0 30px 4px rgba(139, 125, 255, 0.35);
   transform: translateY(-3px);
 }
 
 .landing-neon-root .card-semantic-green {
   background: linear-gradient(180deg, #ffffff 0%, rgba(236, 253, 245, 0.92) 100%) !important;
   border: 2.5px solid rgba(16, 185, 129, 0.65) !important;
-  box-shadow: 0 8px 28px -2px rgba(16, 185, 129, 0.22), 0 0 16px 1px rgba(16, 185, 129, 0.14);
+  box-shadow:
+    0 8px 28px -2px rgba(16, 185, 129, 0.22),
+    0 0 16px 1px rgba(16, 185, 129, 0.14);
 }
 :root.dark .landing-neon-root .card-semantic-green,
 .dark .landing-neon-root .card-semantic-green {
   background: linear-gradient(180deg, #0f172a 0%, rgba(8, 44, 28, 0.96) 100%) !important;
   border-color: rgba(16, 185, 129, 0.8) !important;
-  box-shadow: 0 10px 36px -4px rgba(16, 185, 129, 0.38), 0 0 24px 2px rgba(16, 185, 129, 0.25);
+  box-shadow:
+    0 10px 36px -4px rgba(16, 185, 129, 0.38),
+    0 0 24px 2px rgba(16, 185, 129, 0.25);
 }
 .landing-neon-root .card-semantic-green:hover {
   border-color: rgba(16, 185, 129, 1) !important;
-  box-shadow: 0 14px 44px -4px rgba(16, 185, 129, 0.45), 0 0 30px 4px rgba(16, 185, 129, 0.35);
+  box-shadow:
+    0 14px 44px -4px rgba(16, 185, 129, 0.45),
+    0 0 30px 4px rgba(16, 185, 129, 0.35);
   transform: translateY(-3px);
 }
 
@@ -876,7 +936,8 @@ html {
    ========================================================================== */
 
 @keyframes hero-glow-cyan {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.3));
     transform: translateY(0);
   }
@@ -887,7 +948,8 @@ html {
 }
 
 @keyframes hero-glow-purple {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 8px rgba(255, 45, 155, 0.3));
     transform: translateY(0);
   }
@@ -898,7 +960,8 @@ html {
 }
 
 @keyframes hero-glow-gold {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.3));
     transform: translateY(0);
   }
@@ -910,7 +973,9 @@ html {
 
 .hero-phrase-line {
   display: inline-block;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.35s ease;
   will-change: transform, filter;
 }
 
