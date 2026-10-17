@@ -113,7 +113,6 @@ import { QualificationMatrixUseCases } from '../../features/playbook/qualificati
 import { PrismaQualificationMatrixRepository } from '../../features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
 import { QualificationMatrixController } from '../../features/playbook/qualification-matrix/presentation/QualificationMatrixController.js';
 import { InMemoryEventBus } from '../infra/events/InMemoryEventBus.js';
-import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { container } from './container.js';
 
 export function setupDI() {
