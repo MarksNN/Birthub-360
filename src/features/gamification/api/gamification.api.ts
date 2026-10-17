@@ -1,71 +1,98 @@
-import { api } from '../../lib/api.js';
-import type { LeaderboardPeriod, LeaderboardRanking, SellerScore } from './domain/Gamification.js';
-import type { AggregatedSellerPerformance } from './domain/SellerPerformance.js';
+import { api } from '../../../lib/api.js';
+import type { LeaderboardPeriod, LeaderboardRanking, SellerScore } from '../domain/Gamification.js';
 
-export interface CoachingWeeklyReport {
-  report: {
-    motivationalHeadline: string;
-    overallGrade: 'A+' | 'A' | 'B' | 'C' | 'D';
-    celebrationPoint: string;
-    criticalGaps: string[];
-    actionableMicroHabits: string[];
-    suggestedTrainingTopic: string;
-    nextWeekTargetFocus: string;
-  };
-  performance: AggregatedSellerPerformance;
-  period: string;
+export interface WeeklyCoachingReport {
+  motivationalHeadline: string;
+  overallGrade: 'A+' | 'A' | 'B' | 'C' | 'D';
+  celebrationPoint: string;
+  criticalGaps: string[];
+  actionableMicroHabits: string[];
+  suggestedTrainingTopic: string;
+  nextWeekTargetFocus: string;
+}
+
+export interface SellerPerformanceSummary {
+  callsMade: number;
+  meetingsScheduled: number;
+  dealsClosed: number;
+  conversionRatePercent: number;
+  avgTicket: number;
+  topLossReason: string;
+}
+
+export interface CoachingData {
+  metrics?: SellerPerformanceSummary;
+  coaching?: string;
+  report?: WeeklyCoachingReport;
+  performance?: SellerPerformanceSummary;
+  period?: string;
 }
 
 export const gamificationApi = {
-  getLeaderboard: async (period: LeaderboardPeriod = 'month'): Promise<LeaderboardRanking> => {
-    const response = await api.get<
-      { data?: LeaderboardRanking; success?: boolean } & LeaderboardRanking
-    >(`/api/gamification/leaderboard?period=${period}`);
-    if ('rankings' in response && Array.isArray(response.rankings)) {
-      return response;
+  /**
+   * Obtém ranking da organização por período ('all' | 'month' | 'week').
+   * O endpoint /api/gamification/leaderboard retorna { success: true, data: LeaderboardRanking }.
+   * O cliente api desempacota o payload data automaticamente.
+   */
+  async getLeaderboard(period: LeaderboardPeriod = 'month'): Promise<LeaderboardRanking> {
+    try {
+      const response = await api.get<any>(`/gamification/leaderboard?period=${period}`);
+      const data = response?.rankings ? response : (response?.data ?? response);
+      return {
+        period: data?.period ?? period,
+        rankings: Array.isArray(data?.rankings) ? data.rankings : [],
+      };
+    } catch (error) {
+      console.warn('[GamificationApi] Falha ao obter leaderboard:', error);
+      return { period, rankings: [] };
     }
-    if (response?.data?.rankings) {
-      return response.data;
-    }
-    return { period, rankings: [] };
   },
 
-  getSellerProfile: async (sellerName?: string): Promise<SellerScore> => {
-    const query = sellerName ? `?seller=${encodeURIComponent(sellerName)}` : '';
-    const response = await api.get<{ data?: SellerScore; success?: boolean } & SellerScore>(
-      `/api/gamification/profile${query}`,
-    );
-    if ('totalPoints' in response && typeof response.totalPoints === 'number') {
-      return response;
+  /**
+   * Obtém perfil gamificado do consultor (nível, pontos, métricas, badges).
+   * O endpoint /api/gamification/profile?seller=... retorna { success: true, data: SellerScore | null }.
+   */
+  async getSellerProfile(seller?: string): Promise<SellerScore | null> {
+    try {
+      const query = seller ? `?seller=${encodeURIComponent(seller)}` : '';
+      const response = await api.get<any>(`/gamification/profile${query}`);
+      const data = response?.sellerName ? response : (response?.data ?? response);
+      if (!data || typeof data !== 'object' || !data.sellerName) {
+        return null;
+      }
+      return data as SellerScore;
+    } catch (error) {
+      console.warn('[GamificationApi] Falha ao obter perfil do vendedor:', error);
+      return null;
     }
-    if (response?.data?.totalPoints !== undefined) {
-      return response.data;
-    }
-    return {
-      sellerName: sellerName || 'Consultor',
-      totalPoints: 0,
-      level: 1,
-      levelTitle: 'Consultor Trainee',
-      callsCount: 0,
-      meetingsCount: 0,
-      qualifiedCount: 0,
-      dealsClosed: 0,
-      wonRevenue: 0,
-      badges: [],
-      streakDays: 0,
-    };
   },
 
-  getWeeklyCoaching: async (role?: string): Promise<CoachingWeeklyReport> => {
-    const response = await api.post<
-      { data?: CoachingWeeklyReport; success?: boolean } & CoachingWeeklyReport
-    >('/api/gamification/coaching/weekly', { role: role || undefined });
-    if ('report' in response && response.report) {
-      return response;
+  /**
+   * Obtém coaching executivo e métricas do vendedor via IA.
+   */
+  async getCoaching(seller?: string): Promise<CoachingData | null> {
+    try {
+      const query = seller ? `?seller=${encodeURIComponent(seller)}` : '';
+      const response = await api.get<any>(`/gamification/coaching${query}`);
+      const data = response?.data ?? response;
+      return data as CoachingData;
+    } catch (error) {
+      console.warn('[GamificationApi] Falha ao obter coaching:', error);
+      return null;
     }
-    if (response?.data?.report) {
-      return response.data;
+  },
+
+  /**
+   * Dispara geração de relatório estruturado de coaching semanal com IA.
+   */
+  async getWeeklyCoaching(role?: string): Promise<CoachingData | null> {
+    try {
+      const response = await api.post<any>('/gamification/coaching/weekly', { role });
+      const data = response?.data ?? response;
+      return data as CoachingData;
+    } catch (error) {
+      console.warn('[GamificationApi] Falha ao gerar coaching semanal:', error);
+      return null;
     }
-    throw new Error('Formato inválido retornado pelo serviço de coaching');
   },
 };

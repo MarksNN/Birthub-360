@@ -50,6 +50,7 @@ export const TAB_ROUTE_SET: Record<TabType, true> = {
   integrations: true,
   knowledge: true,
   analytics: true,
+  gamification: true,
   winloss: true,
   calendar: true,
   notifications: true,

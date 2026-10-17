@@ -555,7 +555,11 @@ export function Landing360({
                   >
                     <span
                       className="font-mono text-[10px] font-bold uppercase tracking-wider mb-2.5 px-2.5 py-0.5 rounded-full"
-                      style={{ color: tag.color, backgroundColor: `${tag.color}15`, border: `1px solid ${tag.color}30` }}
+                      style={{
+                        color: tag.color,
+                        backgroundColor: `${tag.color}15`,
+                        border: `1px solid ${tag.color}30`,
+                      }}
                     >
                       {tag.kicker}
                     </span>
@@ -780,7 +784,6 @@ export function Landing360({
                         : `0 4px 20px -2px ${p.color}18`,
                     }}
                   >
-
                     {/* Topo do Card */}
                     <div className="flex items-center justify-between mb-3 pt-1">
                       <div className="flex items-center gap-2">
@@ -1451,9 +1454,7 @@ export function Landing360({
         <section id="cta" className="px-5 py-20 sm:px-8 lg:px-14 landing-section-alt text-center">
           <div className="max-w-4xl mx-auto flex flex-col items-center">
             <h2 className="font-display text-3xl sm:text-5xl font-extrabold landing-title-gradient tracking-tight leading-tight text-center mx-auto">
-              <span>
-                Pronto para colocar sua operação comercial sob comando?
-              </span>
+              <span>Pronto para colocar sua operação comercial sob comando?</span>
             </h2>
             <p className="landing-subtitle mt-4 text-base sm:text-lg max-w-2xl mx-auto text-center">
               Acesse a plataforma corporativa do Birth Hub 360° e conecte dados, equipe e execução
@@ -1687,7 +1688,8 @@ export function Landing360({
                     Single Sign-On Corporativo
                   </h4>
                   <p className="font-sans text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
-                    Autenticação federada SAML 2.0 / Okta / Azure AD configurada para o subdomínio da sua organização.
+                    Autenticação federada SAML 2.0 / Okta / Azure AD configurada para o subdomínio
+                    da sua organização.
                   </p>
                   <div className="space-y-1.5 text-left">
                     <label
@@ -1796,7 +1798,11 @@ export function Landing360({
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-[#00D4FF] transition-colors p-1"
                         aria-label="Mostrar ou ocultar senha"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -1906,19 +1912,33 @@ export function Landing360({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                 <div className="flex flex-col items-center">
                   <span className="font-mono text-[10px] font-bold text-[#00D4FF]">TLS 1.3</span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">Em Trânsito</span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Em Trânsito
+                  </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#00D4FF]">AES-256-GCM</span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">Em Repouso</span>
+                  <span className="font-mono text-[10px] font-bold text-[#00D4FF]">
+                    AES-256-GCM
+                  </span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Em Repouso
+                  </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#F59E0B]">LGPD / Art. 18</span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">Conformidade</span>
+                  <span className="font-mono text-[10px] font-bold text-[#F59E0B]">
+                    LGPD / Art. 18
+                  </span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Conformidade
+                  </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#10B981]">Multi-Tenant</span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">Isolamento</span>
+                  <span className="font-mono text-[10px] font-bold text-[#10B981]">
+                    Multi-Tenant
+                  </span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Isolamento
+                  </span>
                 </div>
               </div>
             </div>
