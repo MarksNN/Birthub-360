@@ -613,7 +613,7 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
 }
 
 .landing-neon-root .flow-step-card {
-  background: var(--landing-bg-card) !important;
+  background: var(--landing-bg-card);
   border: 2.5px solid var(--landing-card-border);
   border-radius: var(--radius-card, 20px);
   transition: all 0.3s ease;
