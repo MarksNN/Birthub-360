@@ -11,9 +11,10 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { AuditService } from '../../../lib/audit/audit.service.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import type { CopilotoTranscriptionQueuePort } from '../../../shared/contracts/copilotoTranscription.contract.js';
+import type { LiveCallRiskPort } from '../../../shared/contracts/liveCallRisk.contract.js';
+import { container } from '../../../shared/di/container.js';
 import { AppError } from '../../../shared/middlewares/errorHandler.js';
-import { ingestLiveCallInsight } from '../../commercial-intelligence/application/dealRiskDetection.service.js';
-import { enqueueTranscribeConversationJob } from '../../copiloto-ia/jobs/transcribeConversation.worker.js';
 import type { FieldMeetingAudioPayload } from '../offlineSync.service.js';
 
 export interface MobileFieldMeetingSyncResult {
@@ -27,6 +28,28 @@ export interface MobileFieldMeetingSyncResult {
 }
 
 export class MobileFieldMeetingService {
+  constructor(
+    private transcriptionPort?: CopilotoTranscriptionQueuePort,
+    private liveCallRiskPort?: LiveCallRiskPort,
+  ) {}
+
+  private getTranscriptionPort(): CopilotoTranscriptionQueuePort | null {
+    if (this.transcriptionPort) return this.transcriptionPort;
+    try {
+      return container.resolve<CopilotoTranscriptionQueuePort>('CopilotoTranscriptionQueuePort');
+    } catch {
+      return null;
+    }
+  }
+
+  private getLiveCallRiskPort(): LiveCallRiskPort | null {
+    if (this.liveCallRiskPort) return this.liveCallRiskPort;
+    try {
+      return container.resolve<LiveCallRiskPort>('LiveCallRiskPort');
+    } catch {
+      return null;
+    }
+  }
   /**
    * Sincroniza uma reunião presencial de campo originada no app mobile.
    */
@@ -171,7 +194,10 @@ export class MobileFieldMeetingService {
 
     // 7. Enfileira job de transcrição via Whisper
     try {
-      await enqueueTranscribeConversationJob({ conversationId, organizationId });
+      const port = this.getTranscriptionPort();
+      if (port) {
+        await port.enqueueTranscribeConversationJob({ conversationId, organizationId });
+      }
     } catch (jobErr: any) {
       logger.warn(
         { err: jobErr },
@@ -183,47 +209,49 @@ export class MobileFieldMeetingService {
     // Se o lead foi informado e há anotações de campo, avalia preventivamente riscos imediatos (concorrentes ou objeções)
     if (input.leadId && input.meetingNotes?.trim()) {
       try {
-        const notesLower = input.meetingNotes.toLowerCase();
-        const competitorMatches = [
-          'concorrente',
-          'proposta concorrente',
-          'outro fornecedor',
-        ].filter((c) => notesLower.includes(c));
-        const competitorMentioned =
-          competitorMatches.length > 0 ? 'Concorrente citado em campo' : null;
+        const riskPort = this.getLiveCallRiskPort();
+        if (riskPort) {
+          const notesLower = input.meetingNotes.toLowerCase();
+          const competitorMatches = [
+            'concorrente',
+            'proposta concorrente',
+            'outro fornecedor',
+          ].filter((c) => notesLower.includes(c));
+          const competitorMentioned =
+            competitorMatches.length > 0 ? 'Concorrente citado em campo' : null;
 
-        const isNegative =
-          notesLower.includes('insatisfeito') ||
-          notesLower.includes('caro') ||
-          notesLower.includes('rejeit');
-        const objectionCategory =
-          notesLower.includes('preço') || notesLower.includes('caro')
-            ? 'preco_ou_orcamento'
-            : competitorMentioned
-              ? 'concorrente'
-              : null;
+          const isNegative =
+            notesLower.includes('insatisfeito') ||
+            notesLower.includes('caro') ||
+            notesLower.includes('rejeit');
+          const objectionCategory =
+            notesLower.includes('preço') || notesLower.includes('caro')
+              ? 'preco_ou_orcamento'
+              : competitorMentioned
+                ? 'concorrente'
+                : null;
 
-        await ingestLiveCallInsight(
-          organizationId,
-          {
-            callId: `field-meeting-${conversationId.substring(0, 8)}`,
-            dealId: input.leadId,
-            timestamp: now,
-            sentimentScore: isNegative ? -0.3 : 0.4,
-            objectionCategory,
-            competitorMentioned,
-            suggestedRebuttal: objectionCategory
-              ? 'Agendar alinhamento executivo para demonstrar ROI e diferenciais'
-              : null,
-          },
-          now,
-          { notify: true },
-        );
+          await riskPort.ingestLiveCallInsight(
+            organizationId,
+            {
+              callId: `field-meeting-${conversationId.substring(0, 8)}`,
+              dealId: input.leadId,
+              timestamp: now,
+              sentimentScore: isNegative ? -0.3 : 0.4,
+              objectionCategory,
+              competitorMentioned,
+              suggestedRebuttal: objectionCategory
+                ? 'Agendar alinhamento executivo para demonstrar ROI e diferenciais'
+                : null,
+            },
+            now,
+            { notify: true },
+          );
+        }
       } catch (riskErr: any) {
         logger.warn(
           { err: riskErr, leadId: input.leadId },
           'Detecção de risco preventivo em reunião de campo não bloqueia sincronização',
-        );
       }
     }
 
