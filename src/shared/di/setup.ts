@@ -18,6 +18,7 @@ import { AutomationUseCases } from '../../features/automations/application/Autom
 import { automationEngine } from '../../features/automations/automation.engine.js';
 import { PrismaAutomationRepository } from '../../features/automations/infra/PrismaAutomationRepository.js';
 import { AutomationController } from '../../features/automations/presentation/AutomationController.js';
+import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { UsageUseCases } from '../../features/billing/application/UsageUseCases.js';
 import { PrismaUsageRepository } from '../../features/billing/infra/PrismaUsageRepository.js';
 import { UsageController } from '../../features/billing/presentation/UsageController.js';
