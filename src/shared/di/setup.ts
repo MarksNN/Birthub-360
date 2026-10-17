@@ -109,6 +109,7 @@ import { ObjectionMatrixController } from '../../features/playbook/objection-mat
 import { QualificationMatrixUseCases } from '../../features/playbook/qualification-matrix/application/QualificationMatrixUseCases.js';
 import { PrismaQualificationMatrixRepository } from '../../features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
 import { QualificationMatrixController } from '../../features/playbook/qualification-matrix/presentation/QualificationMatrixController.js';
+import { PlaybookRoleplayAdapter } from '../../features/playbook/infra/PlaybookRoleplayAdapter.js';
 import { InMemoryEventBus } from '../infra/events/InMemoryEventBus.js';
 import { container } from './container.js';
 
@@ -248,6 +249,7 @@ export function setupDI() {
   container.register('FeatureFlagsUseCases', featureFlagsUseCases);
   container.register('CopilotoIaUseCases', copilotoIaUseCases);
   container.register('CopilotoBitrixWritebackUseCases', copilotoBitrixWritebackUseCases);
+  container.register('RoleplayPlaybookPort', new PlaybookRoleplayAdapter());
 
   // 4. Controllers
   container.register('NoteController', new NoteController(noteUseCases));

@@ -1120,11 +1120,11 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card p-6 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center font-bold mb-4">
+              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center font-bold mb-4 border border-[#00D4FF]/30">
                   <Workflow className="w-6 h-6" />
                 </div>
-                <h3 className="font-display text-base font-bold text-[#00D4FF] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2 text-center">
                   Sincronização Multi-CRM
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -1133,11 +1133,11 @@ export function Landing360({
                 </p>
               </div>
 
-              <div className="section-card p-6 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center font-bold mb-4">
+              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center font-bold mb-4 border border-[#FF2D9B]/30">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="font-display text-base font-bold text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
                   Gatilhos de Comportamento
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -1146,11 +1146,11 @@ export function Landing360({
                 </p>
               </div>
 
-              <div className="section-card p-6 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold mb-4">
+              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold mb-4 border border-[#F59E0B]/30">
                   <Target className="w-6 h-6" />
                 </div>
-                <h3 className="font-display text-base font-bold text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
                   Distribuição Inteligente
                 </h3>
                 <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
@@ -1179,51 +1179,51 @@ export function Landing360({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="section-card card-semantic-cyan p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#00D4FF] uppercase font-bold tracking-wider mb-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+              <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center">
+                <div className="font-mono text-xs sm:text-sm text-[#00D4FF] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/30">
                   Taxa de Conversão
                 </div>
-                <div className="font-display text-2xl font-extrabold text-[#00D4FF] my-1 text-center">
+                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#0284c7] dark:text-[#00D4FF] my-2 text-center">
                   Funil 360°
                 </div>
-                <p className="landing-subtitle text-xs text-center">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Acompanhamento da taxa de conversão entre cada etapa do pipeline.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-pink p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#FF2D9B] uppercase font-bold tracking-wider mb-1">
+              <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center">
+                <div className="font-mono text-xs sm:text-sm text-[#FF2D9B] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#FF2D9B]/10 border border-[#FF2D9B]/30">
                   Velocidade de Vendas
                 </div>
-                <div className="font-display text-2xl font-extrabold text-[#FF2D9B] my-1 text-center">
+                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#db2777] dark:text-[#FF2D9B] my-2 text-center">
                   Ciclo Médio
                 </div>
-                <p className="landing-subtitle text-xs text-center">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Identificação do tempo exato que um lead leva da qualificação ao fechamento.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-gold p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#F59E0B] uppercase font-bold tracking-wider mb-1">
+              <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center">
+                <div className="font-mono text-xs sm:text-sm text-[#F59E0B] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30">
                   Gestão de Metas
                 </div>
-                <div className="font-display text-2xl font-extrabold text-[#F59E0B] my-1 text-center">
+                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#d97706] dark:text-[#F59E0B] my-2 text-center">
                   Ritmo &amp; Pace
                 </div>
-                <p className="landing-subtitle text-xs text-center">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Comparativo diário de faturamento atingido versus meta mensal estabelecida.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-iris p-5 text-center flex flex-col items-center">
-                <div className="font-mono text-xs text-[#8B7DFF] uppercase font-bold tracking-wider mb-1">
+              <div className="section-card card-semantic-iris p-6 text-center flex flex-col items-center">
+                <div className="font-mono text-xs sm:text-sm text-[#8B7DFF] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#8B7DFF]/10 border border-[#8B7DFF]/30">
                   Motivos de Perda
                 </div>
-                <div className="font-display text-2xl font-extrabold text-[#8B7DFF] my-1 text-center">
+                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#7c3aed] dark:text-[#8B7DFF] my-2 text-center">
                   Win / Loss
                 </div>
-                <p className="landing-subtitle text-xs text-center">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Análise estruturada de causas de perda para correção contínua do produto.
                 </p>
               </div>
