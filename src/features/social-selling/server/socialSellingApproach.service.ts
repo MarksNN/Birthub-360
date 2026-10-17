@@ -20,7 +20,8 @@ export class SocialSellingApproachService {
     const company = input.targetCompany?.trim() || 'empresa-alvo';
     const role = input.targetRole?.trim() || 'Decisor Comercial';
     const segment = input.segment?.trim() || 'B2B Corporativo';
-    const trigger = input.triggerEvent?.trim() || 'Crescimento e eficiência operacional da área comercial';
+    const trigger =
+      input.triggerEvent?.trim() || 'Crescimento e eficiência operacional da área comercial';
 
     const systemPrompt = `Você é o estrategista de Social Selling e Prospecção Consultiva do Birth Hub 360°.
 Sua missão é estruturar abordagens comerciais de altíssima relevância, sem clichês, sem spam e orientadas a valor para decisores de negócios.
@@ -48,35 +49,50 @@ Formato de Saída (JSON Estrito):
 
     const model = getAiModel('local-llama3-fast', 0.4, 'social-selling-outreach');
 
+    const startTime = Date.now();
+
     try {
       const response = await model.invoke([
         new SystemMessage(systemPrompt),
         new HumanMessage(userPrompt),
       ]);
 
-      const content = typeof response.content === 'string' ? response.content : JSON.stringify(response.content);
+      const content =
+        typeof response.content === 'string' ? response.content : JSON.stringify(response.content);
       const parsed = cleanAndParseJson<Partial<GeneratedApproachResult>>(content);
 
       const headline = parsed.headline || `Estratégia comercial e previsibilidade para ${company}`;
-      const hook = parsed.hook || `Olá! Acompanhando o cenário de ${segment}, percebo o desafio crescente de manter o pipeline previsível.`;
-      const body = parsed.body || `Muitas operações enfrentam gargalos no repasse entre pré-vendas e fechamento, gerando perda silenciosa de oportunidades qualificadas.`;
-      const callToAction = parsed.callToAction || `Como vocês têm estruturado a governança e o diagnóstico desses leads hoje?`;
+      const hook =
+        parsed.hook ||
+        `Olá! Acompanhando o cenário de ${segment}, percebo o desafio crescente de manter o pipeline previsível.`;
+      const body =
+        parsed.body ||
+        `Muitas operações enfrentam gargalos no repasse entre pré-vendas e fechamento, gerando perda silenciosa de oportunidades qualificadas.`;
+      const callToAction =
+        parsed.callToAction ||
+        `Como vocês têm estruturado a governança e o diagnóstico desses leads hoje?`;
       const fullMessage = parsed.fullMessage || `${hook}\n\n${body}\n\n${callToAction}`;
 
-      const totalTokens = response.usage?.totalTokens ?? 320;
+      const usage = response.response_metadata?.tokenUsage ?? {
+        totalTokens: 320,
+        promptTokens: 160,
+        completionTokens: 160,
+      };
+      const totalTokens = usage.totalTokens;
 
       // Registro FinOps de consumo via logAiUsage (vinculado a organizationId e userId)
       try {
         await logAiUsage({
-          organizationId,
-          userId,
+          model: 'local-llama3-fast',
+          usage,
+          latencyMs: Math.max(1, Date.now() - startTime),
           promptId: 'social-selling-outreach',
-          modelName: 'local-llama3-fast',
-          totalTokens,
-          success: true,
         });
       } catch (logErr) {
-        logger.warn('Falha no log de uso FinOps de Social Selling (best-effort)', { error: logErr });
+        logger.warn(
+          { error: logErr },
+          'Falha no log de uso FinOps de Social Selling (best-effort)',
+        );
       }
 
       return {
@@ -91,7 +107,14 @@ Formato de Saída (JSON Estrito):
         estimatedTokens: totalTokens,
       };
     } catch (error) {
-      logger.error('Erro ao gerar abordagem de Social Selling via AI Gateway', { error, organizationId, input });
+      logger.error(
+        {
+          error,
+          organizationId,
+          input,
+        },
+        'Erro ao gerar abordagem de Social Selling via AI Gateway',
+      );
       throw error;
     }
   }

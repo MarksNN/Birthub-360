@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { SocialSellingController } from './SocialSellingController.js';
+import { socialSellingController } from './SocialSellingController.js';
 
 const router = Router();
 
-router.post('/approach/generate', SocialSellingController.generateApproach);
+router.post('/approach/generate', socialSellingController.generateApproach);
 
 export const socialSellingRoutes = router;

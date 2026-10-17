@@ -6,10 +6,9 @@ import type {
 
 export const socialSellingApi = {
   generateApproach: async (input: GenerateApproachInput): Promise<GeneratedApproachResult> => {
-    const response = await api.post<{ data?: GeneratedApproachResult; success?: boolean } & GeneratedApproachResult>(
-      '/api/social-selling/approach/generate',
-      input,
-    );
+    const response = await api.post<
+      { data?: GeneratedApproachResult; success?: boolean } & GeneratedApproachResult
+    >('/api/social-selling/approach/generate', input);
     if ('headline' in response && response.headline) {
       return response;
     }
