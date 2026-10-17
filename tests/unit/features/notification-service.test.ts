@@ -23,8 +23,12 @@ import { notificationService } from '@/features/notifications/notification.servi
 const notif = prisma.notification as unknown as Record<string, ReturnType<typeof vi.fn>>;
 const ORG = 'org-1';
 const USER = 'user-1';
+const USER_B = 'user-2';
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  notificationService.clearBroadcastReadsCache();
+});
 
 describe('NotificationService.create', () => {
   it('aplica os padrões: kind Info e destinatário para toda a organização', async () => {
@@ -75,20 +79,54 @@ describe('NotificationService.list', () => {
 describe('NotificationService.markRead', () => {
   it('devolve false quando o id não é do tenant, sem alterar nada', async () => {
     notif.updateMany.mockResolvedValue({ count: 0 });
+    notif.findMany.mockResolvedValue([]);
     expect(await notificationService.markRead(ORG, 'de-outro-tenant', USER)).toBe(false);
   });
 
-  it('escopa a atualização por organização, só age sobre não lidas e só sobre notificações do próprio usuário (ou da organização inteira)', async () => {
+  it('escopa a atualização direta por organização e só altera no banco notificações pessoais do próprio usuário', async () => {
     notif.updateMany.mockResolvedValue({ count: 1 });
     expect(await notificationService.markRead(ORG, 'n1', USER)).toBe(true);
 
     const { where } = notif.updateMany.mock.calls[0][0];
-    expect(where).toMatchObject({ id: 'n1', organizationId: ORG, readAt: null });
-    expect(where.OR).toEqual([{ userId: USER }, { userId: null }]);
+    expect(where).toEqual({ id: 'n1', organizationId: ORG, readAt: null, userId: USER });
   });
 
-  it('markAllRead devolve quantas foram marcadas', async () => {
-    notif.updateMany.mockResolvedValue({ count: 4 });
+  it('DEBT-NOT-001: quando Usuário A lê uma notificação broadcast (userId: null), Usuário B continua vendo-a como não lida até lê-la', async () => {
+    const broadcastItem = {
+      id: 'bcast-1',
+      title: 'Alerta de Equipe',
+      body: 'Importação concluída',
+      kind: 'Info',
+      entity: null,
+      entityId: null,
+      userId: null,
+      readAt: null,
+      createdAt: new Date('2026-10-15T10:00:00Z'),
+      automation: null,
+    };
+
+    // updateMany pessoal retorna 0 (é broadcast), findMany confirma que broadcast existe no tenant
+    notif.updateMany.mockResolvedValue({ count: 0 });
+    notif.findMany.mockResolvedValueOnce([{ id: 'bcast-1' }]);
+
+    expect(await notificationService.markRead(ORG, 'bcast-1', USER)).toBe(true);
+
+    // Listagem onlyUnread para Usuário A -> vazia (já leu)
+    notif.findMany.mockResolvedValueOnce([broadcastItem]);
+    const unreadForA = await notificationService.list(ORG, USER, true);
+    expect(unreadForA).toHaveLength(0);
+
+    // Listagem onlyUnread para Usuário B -> continua contendo o broadcast não lido!
+    notif.findMany.mockResolvedValueOnce([broadcastItem]);
+    const unreadForB = await notificationService.list(ORG, USER_B, true);
+    expect(unreadForB).toHaveLength(1);
+    expect(unreadForB[0]?.id).toBe('bcast-1');
+    expect(unreadForB[0]?.readAt).toBeNull();
+  });
+
+  it('markAllRead devolve quantas foram marcadas (pessoais + broadcasts não lidos pelo usuário)', async () => {
+    notif.updateMany.mockResolvedValue({ count: 3 });
+    notif.findMany.mockResolvedValue([{ id: 'bcast-2' }]);
     expect(await notificationService.markAllRead(ORG, USER)).toBe(4);
   });
 });

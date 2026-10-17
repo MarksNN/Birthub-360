@@ -60,6 +60,48 @@ html.dark,
   --on-brand: var(--palette-neon-black);
 }
 
+html.light,
+:root.light,
+[data-theme="light"],
+:root[data-theme="light"] {
+  --brand: #0369a1;
+  --color-brand: #0369a1;
+  --color-brand-primary: #0369a1;
+  --color-interactive-primary: #0369a1;
+  --color-interactive-hover: #075985;
+  --color-brand-active: #075985;
+  --on-brand: #f8fafc;
+  --color-on-brand: #f8fafc;
+  --color-heading-gold: #b45309;
+  --color-heading-cyan: #0369a1;
+  --color-text-secondary: #475569;
+  --palette-muted: #475569;
+  --ink-2: #475569;
+}
+
+[data-theme="light"] .text-brand,
+html.light .text-brand {
+  color: #0369a1;
+}
+
+[data-theme="light"] .text-ink-2,
+html.light .text-ink-2 {
+  color: #475569;
+}
+
+[data-theme="light"] .vancouver-gradient-text,
+html.light .vancouver-gradient-text,
+[data-theme="light"] .gradient-text,
+html.light .gradient-text {
+  color: #b45309;
+}
+
+[data-theme="light"] .vancouver-btn-outline,
+html.light .vancouver-btn-outline {
+  color: #0369a1;
+  border-color: #0369a1;
+}
+
 /* Utility compatibility without changing the official focus shorthand. */
 .text-brand-ink {
   color: var(--color-heading-cyan);
@@ -77,19 +119,45 @@ body {
   font-feature-settings: var(--font-features-rounded);
   letter-spacing: var(--tracking-rounded);
 }
-.bh-platform-card {
+.bh-landing-card {
   --card-accent: var(--page-accent, var(--color-heading-cyan));
   background: var(--color-surface);
   border: 1px solid var(--card-accent);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
-.bh-platform-card:hover {
+.bh-landing-card:hover {
   border-color: var(--card-accent);
   box-shadow: var(--shadow-elevated);
 }
-.bh-platform-card :is(h1, h2, h3, h4, h5, h6) {
+.bh-landing-card :is(h1, h2, h3, h4, h5, h6) {
   color: var(--card-accent);
+}
+.bh-platform-card:not(.bh-landing-card) {
+  --card-accent: var(--ink);
+  background: var(--color-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+.bh-platform-card:not(.bh-landing-card):hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-elevated);
+}
+.bh-platform-card:not(.bh-landing-card) :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ink);
+  text-shadow: none;
+}
+.bh-platform-card:not(.bh-landing-card)[data-accent] {
+  box-shadow:
+    inset 0 1px 0 var(--card-accent),
+    var(--shadow-card);
+}
+.bh-platform-card:not(.bh-landing-card)[data-accent]:hover {
+  box-shadow:
+    inset 0 1px 0 var(--card-accent),
+    var(--shadow-elevated);
 }
 .bh-platform-card[data-accent="gold"] {
   --card-accent: var(--color-heading-gold);
@@ -113,7 +181,6 @@ body {
   --card-accent: var(--color-heading-blue);
 }
 .bh-official-control {
-  border-radius: var(--radius-control);
   font-family: var(--font-interface);
 }
 .bh-official-control:focus-visible {
@@ -154,11 +221,14 @@ html.dark,
 
 /* Domain accent is supplied by the application shell; body text stays neutral. */
 [data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--card-accent, var(--page-accent));
+  color: var(--ink);
   text-shadow: none;
 }
 .bh-platform-card .bh-label {
   color: var(--card-accent);
+}
+.bh-platform-card:not(.bh-landing-card) .bh-label {
+  color: var(--ink-2);
 }
 :root,
 html.light,
@@ -192,4 +262,149 @@ html.dark,
 
 .bh-platform-card[data-accent="cyan"] {
   --card-accent: var(--color-heading-cyan);
+}
+
+/* ==========================================================================
+   Catálogo Oficial de Componentes — Utilitários de Superfície e Efeitos
+   ========================================================================== */
+
+/* Glassmorphism Oficial 360° (Catálogo #29) */
+.bh-glass {
+  background: color-mix(in srgb, var(--color-surface) 75%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border);
+}
+
+/* Bordas com Efeito Neon Glow (Catálogo #29) */
+.border-glow-brand,
+.border-glow-cyan {
+  border-color: var(--color-heading-cyan);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.35);
+}
+.border-glow-pink {
+  border-color: var(--color-heading-pink);
+  box-shadow: 0 0 20px rgba(255, 45, 155, 0.35);
+}
+.border-glow-gold {
+  border-color: var(--color-heading-gold);
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.35);
+}
+
+/* Glow Shadows */
+.shadow-glow-blue {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.45);
+}
+.shadow-glow-pink {
+  box-shadow: 0 0 20px rgba(255, 45, 155, 0.45);
+}
+.shadow-glow-gold {
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.45);
+}
+
+/* Gradientes Oficiais em Texto e Fundo */
+.text-gradient-brand {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-gradient-cta {
+  background: var(--grad-cta);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Anel de Órbita Cônico 360° (Catálogo #30) */
+.bg-orbit-conic {
+  background: var(--grad-orbit);
+}
+
+/* Badges Coolors Oficiais (Catálogo #23) */
+.badge-coolors-yellow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--color-heading-gold);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+}
+.badge-coolors-blue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 212, 255, 0.15);
+  color: var(--color-heading-cyan);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+}
+.badge-coolors-pink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 45, 155, 0.15);
+  color: var(--color-heading-pink);
+  border: 1px solid rgba(255, 45, 155, 0.35);
+}
+.badge-coolors-iris {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(139, 125, 255, 0.15);
+  color: var(--color-heading-iris);
+  border: 1px solid rgba(139, 125, 255, 0.35);
+}
+.badge-coolors-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-heading-success);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+/* Botões do Catálogo Oficial (#5 e #6) */
+.btn-neon-cta {
+  background: var(--grad-cta);
+  color: #0d0d0d;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 18px rgba(0, 212, 255, 0.4);
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-neon-cta:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-vancouver-outline {
+  border: 1px solid var(--color-heading-cyan);
+  color: var(--color-heading-cyan);
+  background: transparent;
+  border-radius: var(--radius-pill);
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-vancouver-outline:hover {
+  background: rgba(0, 212, 255, 0.12);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.25);
+  transform: translateY(-1px);
 }

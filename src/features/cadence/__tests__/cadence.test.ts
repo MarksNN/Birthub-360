@@ -34,8 +34,8 @@ const SEQUENCE: CadenceSequenceDefinition = {
   id: 'seq-1',
   name: 'E-mail → WhatsApp → Voz',
   touches: [
-    { order: 1, channel: 'email', delayHoursFromPrevious: 0 },
-    { order: 2, channel: 'whatsapp', delayHoursFromPrevious: 24 },
+    { order: 1, channel: 'email', delayHoursFromPrevious: 0, templateRef: 'tmpl-email-1' },
+    { order: 2, channel: 'whatsapp', delayHoursFromPrevious: 24, templateRef: 'tmpl-whatsapp-2' },
     { order: 3, channel: 'voice', delayHoursFromPrevious: 48 },
   ],
 };
@@ -56,7 +56,7 @@ describe('validateSequence', () => {
       id: 's',
       name: 'com lacuna',
       touches: [
-        { order: 1, channel: 'email', delayHoursFromPrevious: 0 },
+        { order: 1, channel: 'email', delayHoursFromPrevious: 0, templateRef: 'tmpl-email' },
         { order: 3, channel: 'voice', delayHoursFromPrevious: 24 },
       ],
     });
@@ -68,12 +68,36 @@ describe('validateSequence', () => {
       id: 's',
       name: 'com fallback válido',
       touches: [
-        { order: 1, channel: 'whatsapp', delayHoursFromPrevious: 0, fallbackTouchOrder: 3 },
+        {
+          order: 1,
+          channel: 'whatsapp',
+          delayHoursFromPrevious: 0,
+          fallbackTouchOrder: 3,
+          templateRef: 'tmpl-whatsapp',
+        },
         { order: 2, channel: 'voice', delayHoursFromPrevious: 24 },
-        { order: 3, channel: 'email', delayHoursFromPrevious: 24 },
+        {
+          order: 3,
+          channel: 'email',
+          delayHoursFromPrevious: 24,
+          templateRef: 'tmpl-email',
+        },
       ],
     });
     expect(errors).toEqual([]);
+  });
+
+  it('rejeita toque de email ou whatsapp sem templateRef', () => {
+    const errors = validateSequence({
+      id: 's',
+      name: 'sem template',
+      touches: [
+        { order: 1, channel: 'email', delayHoursFromPrevious: 0 },
+        { order: 2, channel: 'whatsapp', delayHoursFromPrevious: 24, templateRef: '   ' },
+      ],
+    });
+    expect(errors).toContain('Toque 1: conteúdo obrigatório para email.');
+    expect(errors).toContain('Toque 2: conteúdo obrigatório para whatsapp.');
   });
 
   it('rejeita fallbackTouchOrder apontando para o próprio toque', () => {

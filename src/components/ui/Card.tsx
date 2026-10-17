@@ -8,32 +8,25 @@ const cardVariants = cva('bh-platform-card relative overflow-hidden rounded-card
   variants: {
     variant: {
       default:
-        'bg-surface border border-line shadow-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-line-strong hover:shadow-md hover:-translate-y-0.5',
-      stat: 'bg-surface border border-line shadow-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-line-strong hover:shadow-md hover:-translate-y-0.5',
+        'bg-surface border border-line shadow-card motion-safe:transition-shadow motion-safe:duration-200 hover:border-line-strong',
+      stat: 'bg-surface border border-line shadow-card motion-safe:transition-shadow motion-safe:duration-200 hover:border-line-strong',
       outline:
-        'border border-line bg-transparent transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-line-strong hover:bg-surface-interactive',
-      accent:
-        'bg-surface border border-brand/40 shadow-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-brand/80 hover:-translate-y-0.5',
-      elevated:
-        'bg-surface border border-line shadow-md transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-line-strong hover:shadow-lg hover:-translate-y-0.5',
+        'border border-line bg-transparent motion-safe:transition-colors motion-safe:duration-200 hover:border-line-strong hover:bg-surface-interactive',
+      accent: 'bg-surface border border-line shadow-card',
+      elevated: 'bg-surface border border-line shadow-card',
       interactive:
-        'group bg-surface border border-line shadow-sm cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-brand/50 hover:bg-surface-interactive hover:-translate-y-0.5 active:scale-[0.99]',
+        'group bg-surface border border-line shadow-card cursor-pointer motion-safe:transition-colors motion-safe:duration-200 hover:border-line-strong hover:bg-surface-interactive',
       // Variantes estruturais recomendadas pelo Design System v2.0
-      surface:
-        'bg-surface-2 border border-line shadow-none hover:border-line-strong transition-all duration-300',
-      panel:
-        'bg-surface border border-line shadow-sm hover:border-line-strong transition-all duration-300',
-      metric:
-        'bg-surface border border-line shadow-sm hover:border-brand/50 transition-all duration-300 hover:-translate-y-0.5',
-      data: 'bg-surface-2 border border-line shadow-none hover:border-brand/30 transition-all duration-300',
-      feature:
-        'bg-gradient-to-br from-surface to-surface-2 border border-brand/20 shadow-sm hover:border-brand/50 transition-all duration-300 hover:-translate-y-0.5',
-      floating:
-        'bg-surface-elevated/95 border border-line shadow-lg backdrop-blur-xl transition-all duration-300',
-      bento:
-        'bg-surface border border-line shadow-sm hover:border-brand/30 hover:-translate-y-1 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
-      cosmic:
-        'bg-gradient-to-br from-surface-elevated/90 to-brand/10 backdrop-blur-2xl border border-brand/50 shadow-card hover:border-brand hover:shadow-glow-brand-strong hover:-translate-y-1 transition-all duration-300',
+      surface: 'bg-surface-2 border border-line shadow-none hover:border-line-strong',
+      panel: 'bg-surface border border-line shadow-card hover:border-line-strong',
+      metric: 'bg-surface border border-line shadow-card',
+      data: 'bg-surface-2 border border-line shadow-none',
+      feature: 'bg-surface border border-line shadow-card',
+      floating: 'bg-surface border border-line shadow-card',
+      bento: 'bg-surface border border-line shadow-card hover:border-line-strong',
+      cosmic: 'bg-surface border border-line shadow-card',
+      glass: 'border border-line bg-surface shadow-card',
+      neon: 'bg-surface border border-line shadow-card',
     },
     padding: {
       default: 'p-6',
@@ -96,6 +89,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     ref,
   ) => {
     const [isHovered, setIsHovered] = React.useState(false);
+    const isInteractive = Boolean(onClick);
+    const isHoverAware =
+      spotlight || soundHover || Boolean(onMouseEnter || onMouseLeave || onPointerMove);
 
     const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
       onPointerMove?.(e);
@@ -139,17 +135,21 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           cardVariants({ variant, padding, className }),
           (isLoading || borderBeam || spotlight) && 'overflow-hidden isolate',
         )}
-        onPointerMove={handlePointerMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        {...(onClick
+        {...(isHoverAware
+          ? {
+              onPointerMove: handlePointerMove,
+              onMouseEnter: handleMouseEnter,
+              onMouseLeave: handleMouseLeave,
+            }
+          : {})}
+        {...(isInteractive
           ? {
               role: 'button',
               tabIndex: 0,
               onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+                  e.currentTarget.click();
                 }
               },
               onClick: handleClick,
@@ -210,7 +210,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
     <h3
       ref={ref}
       className={cn(
-        'font-display font-semibold leading-tight tracking-tight text-[color:var(--card-accent)]',
+        'font-display font-semibold leading-tight tracking-[-0.02em] text-ink',
         className,
       )}
       {...props}

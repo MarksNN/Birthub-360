@@ -35,17 +35,19 @@ const KNOWN_REDIS_UNAVAILABLE_PATTERNS = [
   /getaddrinfo ENOTFOUND/,
 ];
 
-function isKnownRedisUnavailableRejection(reason: unknown): boolean {
+export function isKnownRedisUnavailableRejection(reason: unknown): boolean {
   if (!(reason instanceof Error)) return false;
   const message = reason.message || '';
+  const rawCode = (reason as { code?: unknown }).code;
+  const code = typeof rawCode === 'string' ? rawCode : '';
   const looksLikeIoredis =
     reason.name === 'MaxRetriesPerRequestError' ||
-    reason.constructor?.name === 'AbortError' ||
+    /redis|ioredis|bullmq/i.test(reason.name || '') ||
     /redis|ioredis|bullmq/i.test(reason.stack || '');
-  const matchesKnownPattern = KNOWN_REDIS_UNAVAILABLE_PATTERNS.some((pattern) =>
-    pattern.test(message),
+  const matchesKnownPattern = KNOWN_REDIS_UNAVAILABLE_PATTERNS.some(
+    (pattern) => pattern.test(message) || (code !== '' && pattern.test(code)),
   );
-  return matchesKnownPattern && (looksLikeIoredis || matchesKnownPattern);
+  return matchesKnownPattern && looksLikeIoredis;
 }
 
 export function registerProcessGuards(): void {

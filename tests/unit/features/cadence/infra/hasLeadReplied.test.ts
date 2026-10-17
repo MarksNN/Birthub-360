@@ -10,11 +10,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const whatsAppFindFirst = vi.fn();
 const emailFindFirst = vi.fn();
+const voiceCallFindFirst = vi.fn();
 
 vi.mock('../../../../../src/lib/prisma.js', () => ({
   prisma: {
     whatsAppMessage: { findFirst: (...args: unknown[]) => whatsAppFindFirst(...args) },
     emailMessage: { findFirst: (...args: unknown[]) => emailFindFirst(...args) },
+    voiceCallLog: { findFirst: (...args: unknown[]) => voiceCallFindFirst(...args) },
   },
 }));
 
@@ -23,6 +25,7 @@ const { hasLeadReplied } = await import('../../../../../src/features/cadence/inf
 beforeEach(() => {
   whatsAppFindFirst.mockResolvedValue(null);
   emailFindFirst.mockResolvedValue(null);
+  voiceCallFindFirst.mockResolvedValue(null);
 });
 
 afterEach(() => {
@@ -44,7 +47,12 @@ describe('hasLeadReplied', () => {
     await expect(hasLeadReplied('org-1', 'lead-1')).resolves.toBe(true);
   });
 
-  it('filtra por organizationId/leadId/direction=inbound nas duas tabelas', async () => {
+  it('true quando há chamada de voz com conversa/atendimento completado', async () => {
+    voiceCallFindFirst.mockResolvedValue({ id: 'call-1' });
+    await expect(hasLeadReplied('org-1', 'lead-1')).resolves.toBe(true);
+  });
+
+  it('filtra por organizationId/leadId nas tabelas de mensagens e voz', async () => {
     await hasLeadReplied('org-1', 'lead-1');
 
     expect(whatsAppFindFirst).toHaveBeenCalledWith({
@@ -55,5 +63,14 @@ describe('hasLeadReplied', () => {
       where: { organizationId: 'org-1', leadId: 'lead-1', direction: 'inbound' },
       select: { id: true },
     });
+    expect(voiceCallFindFirst).toHaveBeenCalledWith({
+      where: {
+        organizationId: 'org-1',
+        leadId: 'lead-1',
+        outcome: { in: ['completed', 'conversa'] },
+      },
+      select: { id: true },
+    });
   });
 });
+

@@ -18,18 +18,23 @@ import {
   type SalesSummaryMetrics,
   WON,
 } from '../domain/Analytics.js';
+import {
+  brazilMonthKey,
+  brazilMonthRange,
+  shiftBrazilMonth,
+} from '../../../shared/time/brazilCalendar.js';
 
 function startOfCurrentMonth(now: Date): Date {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+  return brazilMonthRange(brazilMonthKey(now)).start;
 }
 
-/** Primeiro dia do mês, `monthsBack` meses atrás. */
+/** Primeiro dia do mês, `monthsBack` meses atrás, sempre segundo Brasília. */
 function startOfMonthsAgo(now: Date, monthsBack: number): Date {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - monthsBack, 1, 0, 0, 0, 0));
+  return brazilMonthRange(shiftBrazilMonth(brazilMonthKey(now), -monthsBack)).start;
 }
 
 function monthKey(date: Date): string {
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+  return brazilMonthKey(date);
 }
 
 /** Converte um agrupamento bruto do repositório numa distribuição ordenada por contagem. */

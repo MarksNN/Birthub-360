@@ -55,6 +55,12 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           icon: TAB_META.dashboard.icon,
           primaryTab: 'dashboard',
         },
+        {
+          id: 'workspace',
+          label: TAB_META.workspace.label,
+          icon: TAB_META.workspace.icon,
+          primaryTab: 'workspace',
+        },
       ],
     },
     {
@@ -62,7 +68,8 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
       groups: [
         {
           id: 'revenue_tree',
-          label: 'Pipeline & CRM',
+          label: 'Pipeline CRM',
+          ariaLabel: 'Pipeline CRM',
           icon: TAB_META.crm.icon,
           primaryTab: 'crm',
           subItems: [
@@ -97,7 +104,8 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           ? [
               {
                 id: 'commercial_intelligence',
-                label: 'Revenue Intelligence',
+                label: TAB_META.commercial_intelligence.label,
+                ariaLabel: 'Comercial Inteligente',
                 icon: TAB_META.commercial_intelligence.icon,
                 primaryTab: 'commercial_intelligence' as TabType,
               },
@@ -152,6 +160,12 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           primaryTab: 'cadence',
         },
         {
+          id: 'activities',
+          label: 'Agenda',
+          icon: TAB_META.activities.icon,
+          primaryTab: 'activities',
+        },
+        {
           id: 'workflows',
           label: 'Workflows',
           icon: TAB_META.jornadas.icon,
@@ -197,8 +211,8 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
       groups: [
         {
           id: 'performance',
-          label: 'Performance Comercial',
-          ariaLabel: 'Performance Comercial Analytics',
+          label: TAB_META.analytics.label,
+          ariaLabel: TAB_META.analytics.label,
           icon: TAB_META.analytics.icon,
           primaryTab: 'analytics',
         },
@@ -210,9 +224,9 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
         },
         {
           id: 'gamification',
-          label: 'Gamificação',
-          icon: TAB_META.roleplay.icon,
-          primaryTab: 'roleplay',
+          label: TAB_META.gamification.label,
+          icon: TAB_META.gamification.icon,
+          primaryTab: 'gamification',
         },
       ],
     },

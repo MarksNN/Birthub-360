@@ -9,38 +9,38 @@ import { cn } from '../../lib/utils.js';
 import { Magnetic } from './Magnetic.js';
 
 const buttonVariants = cva(
-  'bh-official-control inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control text-sm font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:pointer-events-none disabled:bg-surface-subtle disabled:text-ink-2 disabled:border-transparent',
+  'bh-official-control inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[13px] font-semibold tracking-[-0.011em] motion-safe:transition-colors motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:pointer-events-none disabled:bg-surface-subtle disabled:text-ink-2 disabled:border-transparent',
   {
     variants: {
       variant: {
-        default:
-          'bg-brand text-on-brand hover:bg-brand-active hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] shadow-sm',
-        primary:
-          'bg-brand text-on-brand hover:bg-brand-active hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] shadow-sm',
-        tertiary:
-          'bg-surface border-transparent text-ink hover:bg-surface-interactive hover:text-ink hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
+        default: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
+        primary: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
+        tertiary: 'bg-surface text-ink hover:bg-surface-interactive',
         success:
-          'bg-ok-solid text-[color:var(--palette-neon-white)] font-bold shadow-sm hover:brightness-110 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98]',
+          'bg-ok-solid text-[color:var(--palette-neon-white)] shadow-sm hover:brightness-110',
         destructive:
           // A03-P1-07: bg-btn-danger (globals.css) garante >= 4.5:1 com texto branco; #EF4444 cru dava 3.76:1.
-          'bg-btn-danger text-[color:var(--palette-neon-white)] font-bold shadow-sm hover:bg-btn-danger-hover hover:-translate-y-0.5 active:bg-btn-danger-hover',
+          'bg-btn-danger text-[color:var(--palette-neon-white)] shadow-sm hover:bg-btn-danger-hover',
         outline:
-          'border border-input bg-transparent text-ink hover:border-line-strong hover:bg-surface-interactive active:bg-surface-subtle',
+          'border border-line bg-transparent text-ink hover:border-line-strong hover:bg-surface-interactive',
         secondary:
-          'border border-line bg-surface text-ink shadow-sm hover:bg-surface-interactive hover:border-line-strong active:bg-surface-subtle',
+          'border border-line bg-surface text-ink shadow-sm hover:bg-surface-interactive hover:border-line-strong',
         ghost:
-          'border border-transparent text-ink-2 hover:bg-surface-interactive hover:text-ink active:bg-surface-subtle',
-        link: 'text-brand-ink dark:text-brand underline-offset-4 hover:underline',
-        cosmic:
-          'bg-brand text-on-brand hover:bg-brand-active hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] shadow-sm',
+          'border border-transparent text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink',
+        link: 'text-primary underline-offset-4 hover:underline',
+        cosmic: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
+        brand: 'bg-brand text-on-brand font-display shadow-sm hover:bg-brand-active',
+        vancouver:
+          'border border-[color:var(--brand-text)] bg-transparent text-primary hover:bg-[color:color-mix(in_srgb,var(--brand)_8%,transparent)]',
       },
       size: {
         default: 'h-9 px-4 py-2',
         sm: 'h-8 px-3 text-xs',
         lg: 'h-10 px-8',
-        icon: 'h-9 w-9 p-0',
-        'icon-sm': 'h-8 w-8 p-0',
-        'icon-lg': 'h-10 w-10 p-0',
+        pill: 'h-10 px-6 rounded-full font-display font-bold',
+        icon: 'h-9 w-9 p-0 rounded-full',
+        'icon-sm': 'h-8 w-8 p-0 rounded-full',
+        'icon-lg': 'h-10 w-10 p-0 rounded-full',
       },
     },
     defaultVariants: {
@@ -74,7 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       soundHover = false,
       sound,
       shine = false,
-      magnetic = variant === 'default' || variant === 'primary' || variant === 'cosmic',
+      magnetic = false,
       disabled,
       children,
       ...props

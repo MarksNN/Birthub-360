@@ -62,37 +62,78 @@ function backoffDelayMs(attempt: number): number {
  * DNS rebinding (host resolvia IP público na validação, IP privado na conexão real seguinte) não
  * seria pego nem na primeira vez, nem nos testes de conexão seguintes.
  */
+async function readJsonWithSignal<T>(response: Response, signal: AbortSignal): Promise<T | null> {
+  if (signal.aborted) {
+    throw signal.reason ?? new DOMException('The operation was aborted.', 'AbortError');
+  }
+  return new Promise<T | null>((resolve, reject) => {
+    const onAbort = () => {
+      reject(signal.reason ?? new DOMException('The operation was aborted.', 'AbortError'));
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    response
+      .json()
+      .then(
+        (val) => resolve(val as T),
+        (err) => {
+          if (signal.aborted) {
+            reject(err);
+            return;
+          }
+          resolve(null);
+        },
+      )
+      .finally(() => {
+        signal.removeEventListener('abort', onAbort);
+      });
+  });
+}
+
 export async function testWebhook(webhookUrl: string): Promise<{ portalDomain: string }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);
 
   let response: Response;
+  let data: { error?: string; error_description?: string } | null = null;
   try {
-    response = await safeFetch(`${webhookUrl}profile.json`, { signal: controller.signal });
-  } catch (error: any) {
-    // Erro do guard de SSRF (URL/host reprovado por `safeFetch`) já vem com a mensagem certa —
-    // não reescreve para o genérico de falha de rede abaixo.
-    if (error instanceof AppError) throw error;
-    if (controller.signal.aborted) {
-      throw new AppError('Tempo limite esgotado ao testar essa URL (timeout 15s).', 504);
+    try {
+      response = await safeFetch(`${webhookUrl}profile.json`, { signal: controller.signal });
+    } catch (error: any) {
+      // Erro do guard de SSRF (URL/host reprovado por `safeFetch`) já vem com a mensagem certa —
+      // não reescreve para o genérico de falha de rede abaixo.
+      if (error instanceof AppError) throw error;
+      if (controller.signal.aborted) {
+        throw new AppError('Tempo limite esgotado ao testar essa URL (timeout 15s).', 504);
+      }
+      logger.warn({ err: error }, '[bitrix] Falha de rede ao testar webhook');
+      throw new AppError(
+        'Não foi possível conectar a essa URL. Confira o endereço do webhook.',
+        400,
+      );
     }
-    logger.warn({ err: error }, '[bitrix] Falha de rede ao testar webhook');
-    throw new AppError('Não foi possível conectar a essa URL. Confira o endereço do webhook.', 400);
+
+    if (!response.ok) {
+      throw new AppError(
+        `Bitrix24 respondeu com erro HTTP ${response.status} — confira a URL do webhook.`,
+        400,
+      );
+    }
+
+    try {
+      data = await readJsonWithSignal<{ error?: string; error_description?: string }>(
+        response,
+        controller.signal,
+      );
+    } catch {
+      if (controller.signal.aborted) {
+        throw new AppError('Tempo limite esgotado ao testar essa URL (timeout 15s).', 504);
+      }
+      data = null;
+    }
   } finally {
     clearTimeout(timeout);
   }
 
-  if (!response.ok) {
-    throw new AppError(
-      `Bitrix24 respondeu com erro HTTP ${response.status} — confira a URL do webhook.`,
-      400,
-    );
-  }
-
-  const data = (await response.json().catch(() => null)) as {
-    error?: string;
-    error_description?: string;
-  } | null;
   if (!data || data.error) {
     throw new AppError(
       data?.error_description ||
@@ -165,55 +206,70 @@ async function attemptBitrixCall<T>(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
+  let data: (T & { error?: string; error_description?: string }) | null = null;
   try {
-    response = await safeFetch(`${webhookUrl}${method}.json`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params || {}),
-      signal: controller.signal,
-    });
-  } catch (err: any) {
-    clearTimeout(timeout);
-    // Erro do guard de SSRF nunca é transiente/retentável — propaga cru (fora do contrato de
-    // `TransientBitrixError`/`BitrixDefinitiveError`, `callBitrix` já trata isso como erro
-    // inesperado que não deve ser retentado, ver comentário lá).
-    if (err instanceof AppError) throw err;
-    if (controller.signal.aborted) {
+    try {
+      response = await safeFetch(`${webhookUrl}${method}.json`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params || {}),
+        signal: controller.signal,
+      });
+    } catch (err: any) {
+      // Erro do guard de SSRF nunca é transiente/retentável — propaga cru (fora do contrato de
+      // `TransientBitrixError`/`BitrixDefinitiveError`, `callBitrix` já trata isso como erro
+      // inesperado que não deve ser retentado, ver comentário lá).
+      if (err instanceof AppError) throw err;
+      if (controller.signal.aborted) {
+        throw new TransientBitrixError(
+          `Tempo limite esgotado ao comunicar com o Bitrix24 (timeout ${REQUEST_TIMEOUT_MS / 1000}s).`,
+          504,
+        );
+      }
+      // Falha de rede (DNS, conexão recusada, etc.) — recuperável, o próximo attempt pode ter sucesso.
+      throw new TransientBitrixError('Falha de rede ao comunicar com o Bitrix24.', 502, err);
+    }
+
+    if (response.status === 429) {
       throw new TransientBitrixError(
-        `Tempo limite esgotado ao comunicar com o Bitrix24 (timeout ${REQUEST_TIMEOUT_MS / 1000}s).`,
-        504,
+        'Bitrix24 aplicou limite de chamadas (HTTP 429).',
+        429,
+        undefined,
+        parseRetryAfterMs(response) ?? undefined,
       );
     }
-    // Falha de rede (DNS, conexão recusada, etc.) — recuperável, o próximo attempt pode ter sucesso.
-    throw new TransientBitrixError('Falha de rede ao comunicar com o Bitrix24.', 502, err);
-  }
-  clearTimeout(timeout);
+    if (response.status >= 500) {
+      throw new TransientBitrixError(
+        `Bitrix24 respondeu com erro de servidor (HTTP ${response.status}).`,
+        502,
+      );
+    }
+    if (response.status === 401 || response.status === 403) {
+      throw new BitrixDefinitiveError(
+        'Webhook do Bitrix24 sem permissão ou token revogado — reconecte o portal.',
+        response.status,
+        correlationId,
+      );
+    }
 
-  if (response.status === 429) {
-    throw new TransientBitrixError(
-      'Bitrix24 aplicou limite de chamadas (HTTP 429).',
-      429,
-      undefined,
-      parseRetryAfterMs(response) ?? undefined,
-    );
-  }
-  if (response.status >= 500) {
-    throw new TransientBitrixError(
-      `Bitrix24 respondeu com erro de servidor (HTTP ${response.status}).`,
-      502,
-    );
-  }
-  if (response.status === 401 || response.status === 403) {
-    throw new BitrixDefinitiveError(
-      'Webhook do Bitrix24 sem permissão ou token revogado — reconecte o portal.',
-      response.status,
-      correlationId,
-    );
+    try {
+      data = await readJsonWithSignal<T & { error?: string; error_description?: string }>(
+        response,
+        controller.signal,
+      );
+    } catch {
+      if (controller.signal.aborted) {
+        throw new TransientBitrixError(
+          `Tempo limite esgotado ao comunicar com o Bitrix24 (timeout ${REQUEST_TIMEOUT_MS / 1000}s).`,
+          504,
+        );
+      }
+      data = null;
+    }
+  } finally {
+    clearTimeout(timeout);
   }
 
-  const data = (await response.json().catch(() => null)) as
-    | (T & { error?: string; error_description?: string })
-    | null;
   if (!response.ok) {
     throw new BitrixDefinitiveError(
       `Bitrix24 respondeu com erro (HTTP ${response.status}).`,

@@ -26,11 +26,72 @@ enrichmentQueue?.on('error', (err) =>
   logger.warn({ message: err.message }, 'enrichmentQueue offline'),
 );
 
-interface EnrichmentJobData {
+export interface EnrichmentJobData {
   companyId: string;
   organizationId: string;
   cnpj?: string;
   segmentKeywords?: string[];
+}
+
+/**
+ * Agenda o enriquecimento cadastral/firmográfico de uma empresa no BullMQ,
+ * com fallback para execução em segundo plano direta caso filas Redis estejam desabilitadas.
+ */
+export async function queueCompanyEnrichment(
+  data: EnrichmentJobData,
+  options?: { force?: boolean },
+): Promise<{ enqueued: boolean; executedDirectly?: boolean; reason?: string }> {
+  if (queuesEnabled && enrichmentQueue) {
+    await enrichmentQueue.add('enrich-company', data);
+    return { enqueued: true };
+  }
+
+  // Fallback quando as filas estão desabilitadas (ex.: ambiente de desenvolvimento local sem Redis):
+  // executa em segundo plano com requestContext isolado para não bloquear a requisição HTTP.
+  setImmediate(() => {
+    void requestContext.run({ tenantId: data.organizationId }, async () => {
+      try {
+        const enrichResult = await enrichCompany(data.organizationId, data.companyId, {
+          cnpj: data.cnpj,
+          segmentKeywords: data.segmentKeywords,
+          force: options?.force,
+        });
+        if (enrichResult?.fit) {
+          const { prisma } = await import('../prisma.js');
+          await prisma.lead.updateMany({
+            where: {
+              organizationId: data.organizationId,
+              companyId: data.companyId,
+              deletedAt: null,
+            },
+            data: {
+              score: enrichResult.fit.score,
+              temperature: enrichResult.fit.temperature,
+            },
+          });
+        }
+        try {
+          const { sseService } = await import('../../features/notifications/sse.service.js');
+          sseService.notifyCompanyEnriched(data.organizationId, data.companyId, {
+            fit: enrichResult?.fit,
+          });
+        } catch {
+          // SSE broadcast é best-effort e não bloqueia a conclusão do job
+        }
+        logger.info(
+          { companyId: data.companyId, organizationId: data.organizationId },
+          'Direct background enrichment completed successfully',
+        );
+      } catch (err) {
+        logger.error(
+          { err, companyId: data.companyId, organizationId: data.organizationId },
+          'Direct background enrichment failed',
+        );
+      }
+    });
+  });
+
+  return { enqueued: true, executedDirectly: true };
 }
 
 export function createEnrichmentWorker() {
@@ -44,7 +105,32 @@ export function createEnrichmentWorker() {
       // manualmente para que o Prisma extension aplique o RLS e encontre a empresa.
       await requestContext.run({ tenantId: organizationId }, async () => {
         try {
-          await enrichCompany(organizationId, companyId, { cnpj, segmentKeywords });
+          const enrichResult = await enrichCompany(organizationId, companyId, {
+            cnpj,
+            segmentKeywords,
+          });
+          if (enrichResult?.fit) {
+            const { prisma } = await import('../prisma.js');
+            await prisma.lead.updateMany({
+              where: {
+                organizationId,
+                companyId,
+                deletedAt: null,
+              },
+              data: {
+                score: enrichResult.fit.score,
+                temperature: enrichResult.fit.temperature,
+              },
+            });
+          }
+          try {
+            const { sseService } = await import('../../features/notifications/sse.service.js');
+            sseService.notifyCompanyEnriched(organizationId, companyId, {
+              fit: enrichResult?.fit,
+            });
+          } catch {
+            // SSE broadcast é best-effort
+          }
           logger.info({ companyId, organizationId }, 'Enrichment job completed successfully');
         } catch (error: any) {
           logger.error({ err: error, jobId: job.id, companyId }, 'Enrichment job failed');

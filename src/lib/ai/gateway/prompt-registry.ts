@@ -33,6 +33,11 @@ export const PROMPT_REGISTRY = {
     version: 1,
     description: 'Relatório de coaching de vendedor gerado a partir de atividades recentes.',
   },
+  'social-selling-outreach': {
+    owner: 'src/features/social-selling/server/socialSellingApproach.service.ts',
+    version: 1,
+    description: 'Geração de abordagens consultivas e posts de social selling orientados por IA.',
+  },
   'proposal-generation': {
     owner: 'src/features/document-editor/services/proposal-ai.service.ts',
     version: 1,

@@ -2,6 +2,19 @@ export interface ApiRequestOptions extends RequestInit {
   timeoutMs?: number;
 }
 
+export function resolveApiUrl(endpoint: string): string {
+  const baseUrl =
+    typeof window !== 'undefined' &&
+    window.location?.origin &&
+    window.location.origin !== 'null' &&
+    !window.location.origin.startsWith('about')
+      ? window.location.origin
+      : 'http://localhost';
+  return endpoint.startsWith('http://') || endpoint.startsWith('https://')
+    ? endpoint
+    : `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+}
+
 export async function apiFetch<T>(endpoint: string, options?: ApiRequestOptions): Promise<T> {
   // FormData (upload de arquivo) precisa que o navegador defina o Content-Type sozinho, com o
   // boundary do multipart — forçar 'application/json' aqui quebraria o parse no servidor.
@@ -29,17 +42,7 @@ export async function apiFetch<T>(endpoint: string, options?: ApiRequestOptions)
   try {
     const requestOptions = { ...(options || {}) };
     requestOptions.timeoutMs = undefined;
-    const baseUrl =
-      typeof window !== 'undefined' &&
-      window.location?.origin &&
-      window.location.origin !== 'null' &&
-      !window.location.origin.startsWith('about')
-        ? window.location.origin
-        : 'http://localhost';
-    const targetUrl =
-      endpoint.startsWith('http://') || endpoint.startsWith('https://')
-        ? endpoint
-        : `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const targetUrl = resolveApiUrl(endpoint);
     response = await (globalThis.fetch || fetch)(targetUrl, {
       ...requestOptions,
       signal,

@@ -1,37 +1,40 @@
-# Product
+# PRODUCT.md — Birth Hub 360°
 
 <!-- impeccable:product-schema 1 -->
 
 ## Platform
 
-web
+Web (Desktop & Mobile) com empacotamento Android/Capacitor.
 
 ## Users
 
-Operadores comerciais (SDR/closers) e gestores/founders no dia a dia Operate (dashboard autenticado). Precisam de densidade executiva, scan rápido de estado e próxima ação clara — não de landing marketing.
+Operadores comerciais (SDRs, BDRs, Closers) e liderança executiva (Gestores, Diretores e Founders). Necessitam de densidade executiva, foco operacional sem latência, recomendações de IA contextualizadas e visão unificada 360° do pipeline de receita.
 
 ## Product Purpose
 
-Birth Hub 360° é a central inteligente que conecta dados, inteligência, decisões e execução comercial (CRM, prospecção, integrações Bitrix, analytics, automações). Sucesso = operar o pipeline e a inteligência com confiança, velocidade de leitura e consistência visual em light e dark.
+O Birth Hub 360° é o **Sistema Operacional de Revenue Intelligence** projetado para unificar inteligência preditiva, orquestração de vendas e execução em tempo real. Não é um CRM convencional: conecta dados, decisões automatizadas e cadências ativas.
 
-## Positioning
+## Os 4 Imperativos Funcionais
 
-Ferramenta operacional SaaS premium de uso recorrente (“command center”), não template genérico. Marca única Birth Hub 360° (Antique Gold `#D4AF37` e tokens semânticos do Design System). Distinção por tenant/origem de dado (quando existir) não confundir com identidade de marca.
+1. **Dados em Movimento, Não Arquivados:** Sincronização bidirecional resiliente com Bitrix24, enriquecimento automático e eliminação de inputs manuais.
+2. **IA Ativa e Copiloto Contextual:** Operando no mesmo espaço da decisão comercial (HUD ao vivo, NBA e síntese executiva).
+3. **Velocidade e Foco Operacional:** Resposta sub-segundo, Command Palette global (⌘K) e layouts de alta densidade (Bento Grids).
+4. **Resiliência e Observabilidade:** Implementação obrigatória dos 4 estados de tela (Loading, Empty, Error, Stale).
 
-## Constraints
+## Os 8 Pilares do Ecossistema 360°
 
-- Repo canônico: MaarkssN/Birthub-360.
-- Redesign visual light+dark autorizado pelo Coordenador 00 (exceção de freeze): escopo `src/components/ui/**`, `src/styles/**`, e import CSS mínimo em `main.tsx` se necessário.
-- Sem feature de produto nova nesta onda.
-- Proibido sem handoff: `App.tsx`, Sidebar/navegação (02); `identidade-visual/**` (11); `voice-hub/**` (12); PredictiveScoringNbaCard* (00); arquivos do PR #689; `prisma/**`; workflows/Docker (08).
-- `package.json`/lockfile: deps novas só com aprovação explícita do 00.
-- Acessibilidade: WCAG 2.2 AA como piso; teclado, foco, contraste, `prefers-reduced-motion`.
-- Tipografia de produto (Constituição): Sora (títulos/labels) + Inter (UI/corpo), self-hosted quando possível.
-- Referência de inspiração Operate: https://vancouverplus-template.modulify.website/ — hierarquia clara, cards, tipografia moderna; **não** copiar só dark; entregar light e dark.
-- Base de tokens a11y: branch/PR #692 (`agente/03-audit-a11y-ui`).
+1. **Hub Central:** Visão consolidada 360°, feed de alertas inteligentes e cockpit diário.
+2. **Intelligence & Scoring:** Modelos preditivos de propensão, ICP Matching e diagnósticos.
+3. **Sales Orchestration:** Playbooks vivos, roteiros dinâmicos e matriz de objeções.
+4. **Real-time Performance:** Métricas ao vivo, ranking de metas e saúde do pipeline.
+5. **Revenue Forecast:** Projeções ponderadas de receita, análise de dispersão e win/loss.
+6. **Copiloto IA:** Agente conversacional especializado em vendas B2B e simulador com roleplay.
+7. **Automações & Gatilhos:** Distribuição de leads, notificações de estagnação e sincronizações em background.
+8. **Cadência & Engajamento:** Sequenciamento multicanal (E-mail, WhatsApp, LinkedIn e Voz via 3CX/Baileys).
 
-## Voice and brand commitments
+## Governança & Restrições Estritas
 
-- Tom: premium, executivo, tecnológico, preciso.
-- Não distorcer logotipo; consumir abstrações em `src/components/brand/`.
-- Cores de produto via tokens semânticos (`src/styles/globals.css` / tema vigente), não hex ad hoc quando existir token.
+- **Regra do Usuário:** É expressamente proibido alterar a Landing Page e a Tela de Login.
+- **Zero Mock em Produção:** Proibido inventar dados. Na ausência de dados, exibir Zero State explícito.
+- **Multi-tenancy Rigoroso:** Isolamento por tenant em todas as queries com RLS.
+- **LGPD:** Sanitização de PII e garantia de exclusão/anonimização do titular.

@@ -74,9 +74,14 @@ export function parseAuditReport(stdout: string): AuditReport {
 const AUDIT_COMMAND = 'npm audit --audit-level=high --json';
 
 function runAudit(): AuditReport {
+  const auditEnv = { ...process.env };
+  delete auditEnv.npm_config_allow_scripts;
+  delete auditEnv.npm_config_allowscripts;
+
   try {
     const stdout = execSync(AUDIT_COMMAND, {
       encoding: 'utf-8',
+      env: auditEnv,
       // `npm audit` sai com código != 0 quando encontra achado — isso é esperado e não é
       // falha de execução do comando em si, então não deixamos o child_process lançar.
       maxBuffer: 20 * 1024 * 1024,

@@ -14,12 +14,16 @@ import {
 } from './icons/Isometric3DIcons.js';
 import { TiltCard } from './TiltCard.js';
 
+import type { SellerScore } from '../../features/gamification/domain/Gamification.js';
+import { BADGE_DEFINITIONS } from '../../features/gamification/domain/Gamification.js';
+
 export interface GamificationWidgetProps {
   initialXp?: number;
   nextLevelXp?: number;
   level?: number;
   streakDays?: number;
   show3DCore?: boolean;
+  sellerScore?: SellerScore | null;
 }
 
 export function GamificationWidget({
@@ -28,55 +32,88 @@ export function GamificationWidget({
   level = 1,
   streakDays = 0,
   show3DCore = true,
+  sellerScore = null,
 }: GamificationWidgetProps) {
   const [activeTab, setActiveTab] = useState<'missions' | 'achievements'>('missions');
   const [showPanel, setShowPanel] = useState(false);
-  const [currentLevel, setCurrentLevel] = useState(level);
-  const [xp, setXp] = useState(initialXp);
-  const [streak, setStreak] = useState(streakDays);
+  const currentLevel = sellerScore ? sellerScore.level : level;
+  const [localBonusXp, setLocalBonusXp] = useState(0);
+  const xp = sellerScore ? sellerScore.totalPoints + localBonusXp : initialXp + localBonusXp;
+  const streak = sellerScore ? sellerScore.streakDays : streakDays;
   const [soundActive, setSoundActive] = useState(() => SoundFX.isEnabled());
 
   const [missions, setMissions] = useState([
     { id: 1, title: 'Completar perfil do SDR e ICP', xp: 250, done: false },
-    { id: 2, title: 'Qualificar 5 novos leads corporativos hoje', xp: 500, done: false },
-    { id: 3, title: 'Agendar 2 reuniões de demonstração executiva', xp: 800, done: false },
-    { id: 4, title: 'Enviar 10 cold emails inteligentes com IA', xp: 450, done: false },
+    {
+      id: 2,
+      title: 'Qualificar 5 novos leads corporativos hoje',
+      xp: 500,
+      done: Boolean(sellerScore && sellerScore.qualifiedCount >= 5),
+    },
+    {
+      id: 3,
+      title: 'Agendar 2 reuniões de demonstração executiva',
+      xp: 800,
+      done: Boolean(sellerScore && sellerScore.meetingsCount >= 2),
+    },
+    {
+      id: 4,
+      title: 'Realizar ligações e contatos comerciais ativos',
+      xp: 450,
+      done: Boolean(sellerScore && sellerScore.callsCount >= 10),
+    },
   ]);
 
-  const [achievements] = useState([
-    {
-      id: 'first-deal',
-      title: 'Pioneiro Comercial',
-      desc: 'Qualificou o primeiro lead com IA',
-      icon: Trophy3DIcon,
-      unlocked: true,
-      reward: '+300 XP',
-    },
-    {
-      id: 'streak-master',
-      title: 'Mestre da Constância',
-      desc: 'Manteve 3 dias seguidos de prospecção',
-      icon: FlameStreakIcon,
-      unlocked: streak >= 3,
-      reward: '+500 XP',
-    },
-    {
-      id: 'shield-guard',
-      title: 'Guardião de Dados',
-      desc: 'Validação de CNPJ e dados em fontes oficiais',
-      icon: ShieldSecurityIcon,
-      unlocked: true,
-      reward: '+400 XP',
-    },
-    {
-      id: 'crystal-closer',
-      title: 'Orbe de Alta Pressão',
-      desc: 'Interagiu com o Cristal 3D Cósmico',
-      icon: Gem3DIcon,
-      unlocked: true,
-      reward: '+250 XP',
-    },
-  ]);
+  const achievements = sellerScore?.badges?.length
+    ? sellerScore.badges.map((b) => ({
+        id: b.id,
+        title: b.title,
+        desc: b.description,
+        icon:
+          b.id === 'CLOSER_ELITE'
+            ? Trophy3DIcon
+            : b.id === 'DISCIPLINE_STREAK'
+              ? FlameStreakIcon
+              : b.id === 'MEETING_PRO'
+                ? Gem3DIcon
+                : ShieldSecurityIcon,
+        unlocked: b.unlocked,
+        reward: `+${b.id === 'CLOSER_ELITE' ? 1000 : 300} XP`,
+      }))
+    : [
+        {
+          id: 'first-deal',
+          title: BADGE_DEFINITIONS.FIRST_BLOOD.title,
+          desc: BADGE_DEFINITIONS.FIRST_BLOOD.description,
+          icon: Trophy3DIcon,
+          unlocked: Boolean(sellerScore && sellerScore.dealsClosed >= 1),
+          reward: '+300 XP',
+        },
+        {
+          id: 'streak-master',
+          title: BADGE_DEFINITIONS.DISCIPLINE_STREAK.title,
+          desc: BADGE_DEFINITIONS.DISCIPLINE_STREAK.description,
+          icon: FlameStreakIcon,
+          unlocked: streak >= 3,
+          reward: '+500 XP',
+        },
+        {
+          id: 'call-master',
+          title: BADGE_DEFINITIONS.CALL_MASTER.title,
+          desc: BADGE_DEFINITIONS.CALL_MASTER.description,
+          icon: ShieldSecurityIcon,
+          unlocked: Boolean(sellerScore && sellerScore.callsCount >= 50),
+          reward: '+400 XP',
+        },
+        {
+          id: 'closer-elite',
+          title: BADGE_DEFINITIONS.CLOSER_ELITE.title,
+          desc: BADGE_DEFINITIONS.CLOSER_ELITE.description,
+          icon: Gem3DIcon,
+          unlocked: Boolean(sellerScore && sellerScore.wonRevenue >= 100000),
+          reward: '+1000 XP',
+        },
+      ];
 
   const toggleSound = () => {
     const next = SoundFX.toggleMute();
@@ -84,17 +121,17 @@ export function GamificationWidget({
   };
 
   const handleOrbBoost = () => {
-    setXp((prev) => {
-      const nextXp = prev + 25;
-      if (nextXp >= nextLevelXp) {
+    setLocalBonusXp((prev) => {
+      const nextBonus = prev + 25;
+      const basePoints = sellerScore ? sellerScore.totalPoints : initialXp;
+      if (basePoints + nextBonus >= nextLevelXp) {
         triggerLevelUp();
       }
-      return nextXp;
+      return nextBonus;
     });
   };
 
   const triggerLevelUp = () => {
-    setCurrentLevel((lvl) => lvl + 1);
     SoundFX.play('success');
     confetti({
       particleCount: 90,
@@ -116,18 +153,17 @@ export function GamificationWidget({
           const newDone = !m.done;
           if (newDone) {
             SoundFX.play('confirm');
-            setXp((currentXp) => {
-              const updated = currentXp + m.xp;
-              if (updated >= nextLevelXp) {
+            setLocalBonusXp((currentBonus) => {
+              const updatedBonus = currentBonus + m.xp;
+              const basePoints = sellerScore ? sellerScore.totalPoints : initialXp;
+              if (basePoints + updatedBonus >= nextLevelXp) {
                 setTimeout(triggerLevelUp, 300);
               }
-              return updated;
+              return updatedBonus;
             });
-            // Aumenta streak se for a primeira missão do dia
-            if (streak === 0) setStreak(1);
           } else {
             SoundFX.play('click');
-            setXp((currentXp) => Math.max(0, currentXp - m.xp));
+            setLocalBonusXp((currentBonus) => Math.max(0, currentBonus - m.xp));
           }
           return { ...m, done: newDone };
         }

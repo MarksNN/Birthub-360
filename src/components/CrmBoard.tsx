@@ -119,6 +119,8 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
   // na URL como `owner`/`q`, mesmo mecanismo já usado para `funnel`/`lead`.
   const ownerFilter = searchParams.get('owner') ?? '';
   const searchQuery = searchParams.get('q') ?? '';
+  const enrichmentFilter = searchParams.get('enrichment') ?? '';
+  const temperatureFilter = searchParams.get('temp') ?? '';
 
   const ownerNameById = useMemo(
     () => Object.fromEntries(users.map((u) => [u.id, u.name])),
@@ -129,6 +131,13 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
     const query = searchQuery.trim().toLowerCase();
     return leads.filter((lead) => {
       if (ownerFilter && lead.owner !== ownerFilter) return false;
+      if (enrichmentFilter) {
+        const status = lead.company?.enrichmentStatus || 'Pendente';
+        if (enrichmentFilter === 'Enriquecido' && status !== 'Enriquecido') return false;
+        if (enrichmentFilter === 'Pendente' && status !== 'Pendente') return false;
+        if (enrichmentFilter === 'Falhou' && status !== 'Falhou') return false;
+      }
+      if (temperatureFilter && lead.temperature !== temperatureFilter) return false;
       if (query) {
         const haystack = [lead.company?.tradeName, lead.company?.legalName, lead.contact?.name]
           .filter(Boolean)
@@ -138,7 +147,7 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
       }
       return true;
     });
-  }, [leads, ownerFilter, searchQuery]);
+  }, [leads, ownerFilter, searchQuery, enrichmentFilter, temperatureFilter]);
 
   useEffect(() => {
     // /api/users nunca existiu como rota (404 silencioso todo carregamento — achado do teste
@@ -158,6 +167,9 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
         if (data.type === 'voice-qualified') {
           toast.success(data.message);
           // Atualiza a lista para refletir possíveis mudanças
+          fetchLeads();
+        } else if (data.type === 'company-enriched') {
+          toast.info(data.message || 'Dados de empresa e lead enriquecidos!');
           fetchLeads();
         }
       } catch (err: any) {
@@ -518,6 +530,32 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
     }
   };
 
+  const handleBatchEnrichSelected = async () => {
+    if (selectedLeadIds.size === 0) return;
+    setIsBatchUpdating(true);
+    try {
+      const res = await api.post<{
+        success: boolean;
+        data: { enqueued: number; enfileirado?: boolean; motivo?: string };
+      }>('/api/leads/enrich-batch', { leadIds: Array.from(selectedLeadIds) });
+      if (res.data?.enqueued > 0) {
+        toast.success(
+          `${res.data.enqueued} lead(s) selecionado(s) enviado(s) para enriquecimento com IA!`,
+        );
+        fetchLeads();
+        setSelectedLeadIds(new Set());
+      } else if (res.data?.enfileirado === false) {
+        toast.error(`Falha ao enfileirar: ${res.data.motivo}`);
+      } else {
+        toast.info('Nenhum lead com empresa associada encontrado na seleção.');
+      }
+    } catch (err: any) {
+      toast.error(err instanceof Error ? err.message : 'Falha ao enriquecer leads selecionados.');
+    } finally {
+      setIsBatchUpdating(false);
+    }
+  };
+
   const handleFunnelChange = useCallback(
     (next: 'Lead' | 'Negocio') => {
       if (funnelProp) return; // funil fixado por prop — toggle não se aplica
@@ -567,6 +605,36 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
     [setSearchParams],
   );
 
+  const handleEnrichmentFilterChange = useCallback(
+    (value: string) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (value) next.set('enrichment', value);
+          else next.delete('enrichment');
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  const handleTemperatureFilterChange = useCallback(
+    (value: string) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (value) next.set('temp', value);
+          else next.delete('temp');
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
   const handleSearchQueryChange = useCallback(
     (value: string) => {
       setSearchParams(
@@ -588,6 +656,8 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
         const next = new URLSearchParams(prev);
         next.delete('owner');
         next.delete('q');
+        next.delete('enrichment');
+        next.delete('temp');
         return next;
       },
       { replace: true },
@@ -802,7 +872,39 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
             ))}
           </select>
         </div>
-        {(ownerFilter || searchQuery) && (
+        <div className="flex items-center gap-1.5">
+          <label htmlFor="crm-board-enrichment-filter" className="text-xs font-semibold text-ink-2">
+            Enriquecimento:
+          </label>
+          <select
+            id="crm-board-enrichment-filter"
+            value={enrichmentFilter}
+            onChange={(e) => handleEnrichmentFilterChange(e.target.value)}
+            className="rounded-control border border-line bg-surface-elevated px-2.5 py-2 text-xs font-medium text-ink focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+          >
+            <option value="">Todos</option>
+            <option value="Enriquecido">Enriquecidos</option>
+            <option value="Pendente">Pendentes</option>
+            <option value="Falhou">Falhou</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <label htmlFor="crm-board-temp-filter" className="text-xs font-semibold text-ink-2">
+            Temperatura:
+          </label>
+          <select
+            id="crm-board-temp-filter"
+            value={temperatureFilter}
+            onChange={(e) => handleTemperatureFilterChange(e.target.value)}
+            className="rounded-control border border-line bg-surface-elevated px-2.5 py-2 text-xs font-medium text-ink focus:outline-none focus:border-brand focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 transition-all"
+          >
+            <option value="">Todas</option>
+            <option value="Quente">🔥 Quente</option>
+            <option value="Morno">🌤️ Morno</option>
+            <option value="Frio">❄️ Frio</option>
+          </select>
+        </div>
+        {(ownerFilter || searchQuery || enrichmentFilter || temperatureFilter) && (
           <>
             <button
               type="button"
@@ -919,7 +1021,10 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
           {/* Mover Etapa em Massa */}
           <Tooltip content="Transfere todos os leads selecionados para a nova etapa de funil indicada.">
             <div className="flex items-center gap-1.5 cursor-pointer">
-              <label htmlFor="crm-board-batch-stage" className="text-[11px] font-semibold text-ink-2 cursor-pointer">
+              <label
+                htmlFor="crm-board-batch-stage"
+                className="text-[11px] font-semibold text-ink-2 cursor-pointer"
+              >
                 Etapa:
               </label>
               <select
@@ -946,7 +1051,10 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
           {/* Reatribuir Vendedor */}
           <Tooltip content="Reatribui a responsabilidade dos leads selecionados para outro membro da equipe.">
             <div className="flex items-center gap-1.5 cursor-pointer">
-              <label htmlFor="crm-board-batch-owner" className="text-[11px] font-semibold text-ink-2 cursor-pointer">
+              <label
+                htmlFor="crm-board-batch-owner"
+                className="text-[11px] font-semibold text-ink-2 cursor-pointer"
+              >
                 Dono:
               </label>
               <select
@@ -968,6 +1076,23 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
                 ))}
               </select>
             </div>
+          </Tooltip>
+
+          {/* Enriquecer Selecionados com IA */}
+          <Tooltip content="Dispara o enriquecimento cadastral, firmográfico e Fit Score para os leads selecionados.">
+            <button
+              type="button"
+              onClick={handleBatchEnrichSelected}
+              disabled={isBatchUpdating}
+              className="px-3 py-1.5 bg-brand hover:bg-brand-hover text-on-brand rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            >
+              {isBatchUpdating ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5" />
+              )}
+              Enriquecer com IA
+            </button>
           </Tooltip>
 
           {/* Enviar Selecionados para Bitrix */}

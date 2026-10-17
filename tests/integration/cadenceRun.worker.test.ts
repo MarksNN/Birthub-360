@@ -137,7 +137,9 @@ async function seedActiveRun(
   });
 }
 
-const SINGLE_WHATSAPP_TOUCH = [{ order: 1, channel: 'whatsapp', delayHoursFromPrevious: 0 }];
+const SINGLE_WHATSAPP_TOUCH = [
+  { order: 1, channel: 'whatsapp', delayHoursFromPrevious: 0, templateRef: 'Olá! Tudo bem?' },
+];
 const NOW = new Date('2026-08-03T12:00:00Z');
 
 afterEach(async () => {

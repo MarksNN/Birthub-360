@@ -22,7 +22,6 @@ import { SoundFX } from '../../lib/soundEffects.js';
 import type { Company, Contact, PaginatedResponse } from '../../types/index.js';
 import type { TabType } from '../layout/tabMeta.js';
 import { isNavHiddenTab, TAB_META } from '../layout/tabMeta.js';
-import { BorderBeam } from './BorderBeam.js';
 
 type ResultItem = {
   id: string;
@@ -391,7 +390,7 @@ export function CommandPalette() {
     // existe, não falta suporte.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
-      className="fixed inset-0 z-[1000] flex items-start justify-center bg-black/50 sm:px-4 sm:pt-[12vh] backdrop-blur-sm"
+      className="fixed inset-0 z-[1000] flex items-start justify-center bg-overlay sm:px-4 sm:pt-[12vh]"
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
@@ -404,22 +403,20 @@ export function CommandPalette() {
     >
       <div
         ref={panelRef}
-        className="w-full h-full sm:h-auto sm:max-w-2xl overflow-hidden sm:rounded-2xl border-0 sm:border border-brand/40 bg-surface-elevated/95 backdrop-blur-2xl shadow-glow-brand flex flex-col relative"
+        className="relative flex h-full w-full flex-col overflow-hidden border-0 bg-surface shadow-card sm:h-auto sm:max-w-2xl sm:rounded-card sm:border sm:border-line"
       >
-        <BorderBeam variant="brand" size={260} duration={10} borderWidth={1.5} radius={16} glow />
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent pointer-events-none" />
-        <div className="flex items-center gap-3 border-b border-line/80 px-4 py-3.5 bg-surface/50">
-          <Search className="h-5 w-5 shrink-0 text-brand" />
+        <div className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3.5">
+          <Search className="h-4 w-4 shrink-0 text-ink-2" strokeWidth={1.5} />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleInputKeydown}
             placeholder="Buscar empresa, decisor ou comando…"
-            className="flex-1 bg-transparent text-sm font-medium text-ink outline-none focus-visible:ring-0 placeholder:text-ink-2/60"
+            className="flex-1 bg-transparent text-sm font-medium tracking-[-0.011em] text-ink outline-none placeholder:text-ink-2 focus-visible:ring-0"
           />
           {entityLoading && <Loader2 className="h-4 w-4 shrink-0 animate-spin text-brand" />}
-          <kbd className="hidden shrink-0 rounded-lg border border-line bg-surface-2 px-2 py-0.5 text-[10px] font-bold text-ink-2 sm:block shadow-xs">
+          <kbd className="hidden shrink-0 rounded-full border border-line bg-surface-2 px-2 py-0.5 text-[10px] font-medium text-ink-2 sm:block">
             ESC
           </kbd>
         </div>
@@ -438,7 +435,7 @@ export function CommandPalette() {
             return (
               <div key={item.id}>
                 {showHeader && (
-                  <p className="px-3 pb-1 pt-3 text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-ink dark:text-brand/80 first:pt-1">
+                  <p className="px-3 pb-1 pt-3 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-2 first:pt-1">
                     {item.group}
                   </p>
                 )}
@@ -451,20 +448,20 @@ export function CommandPalette() {
                     }
                   }}
                   onClick={item.onSelect}
-                  className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all duration-300 ${
+                  className={`group flex w-full items-center gap-3 rounded-full px-3 py-2 text-left text-[13px] tracking-[-0.011em] motion-safe:transition-colors motion-safe:duration-200 ${
                     isActive
-                      ? 'bg-brand/15 text-ink shadow-glow-brand ring-1 ring-brand/50 translate-x-0.5'
-                      : 'text-ink-2 hover:bg-surface-2/70 hover:text-ink hover:shadow-glow-brand'
+                      ? 'bg-[color:color-mix(in_srgb,var(--brand)_12%,var(--surface))] font-semibold text-ink'
+                      : 'font-medium text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink'
                   }`}
                 >
                   <span
-                    className={`flex h-7 w-7 items-center justify-center rounded-lg border shrink-0 transition-colors ${
+                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${
                       isActive
-                        ? 'border-brand/50 bg-gradient-to-br from-brand to-brand-2 text-on-brand shadow-glow-brand-strong'
-                        : 'border-line bg-surface text-ink-2 group-hover:border-brand/40 group-hover:text-brand'
+                        ? 'bg-[color:color-mix(in_srgb,var(--brand)_18%,var(--surface))] text-primary ring-1 ring-[color:var(--brand-text)]'
+                        : 'text-ink-2'
                     }`}
                   >
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
                   </span>
                   <span className="flex-1 truncate font-semibold">{item.label}</span>
                   {item.sublabel && (
@@ -473,7 +470,7 @@ export function CommandPalette() {
                     </span>
                   )}
                   {isActive && (
-                    <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-brand transition-transform group-hover:translate-x-0.5" />
+                    <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-ink-2" strokeWidth={1.5} />
                   )}
                 </button>
               </div>
@@ -481,7 +478,7 @@ export function CommandPalette() {
           })}
         </div>
 
-        <div className="flex items-center justify-between border-t border-line/80 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-ink-2 bg-surface/40">
+        <div className="flex items-center justify-between border-t border-line bg-surface px-4 py-2.5 text-[11px] font-medium text-ink-2">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="flex items-center gap-0.5 rounded border border-line bg-surface px-1 py-0.5 text-[9px]">
@@ -497,9 +494,7 @@ export function CommandPalette() {
               Confirmar
             </span>
           </div>
-          <span className="text-brand font-mono text-[9px] uppercase tracking-widest hidden sm:inline">
-            Spotlight 2026
-          </span>
+          <span className="hidden text-[11px] sm:inline">Spotlight 2026</span>
         </div>
       </div>
     </div>

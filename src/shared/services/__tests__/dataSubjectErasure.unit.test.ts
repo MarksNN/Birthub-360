@@ -13,7 +13,9 @@ const copilotoTranscriptSegmentUpdateManyMock = vi.fn();
 const copilotoInsightUpdateManyMock = vi.fn();
 const copilotoCrmFieldSuggestionUpdateManyMock = vi.fn();
 const copilotoCoachingEvaluationUpdateManyMock = vi.fn();
+const optOutRecordCreateMock = vi.fn();
 const deleteObjectMock = vi.fn();
+const optOutCreateMock = vi.fn();
 
 vi.mock('@/lib/storage', () => ({
   deleteObject: (...args: unknown[]) => deleteObjectMock(...args),
@@ -25,11 +27,18 @@ vi.mock('@/lib/prisma', () => ({
       findFirst: (...args: unknown[]) => findFirstMock(...args),
       update: (...args: unknown[]) => updateMock(...args),
     },
+
     whatsAppMessage: {
       updateMany: (...args: unknown[]) => updateManyMock(...args),
     },
     lead: {
       findMany: (...args: unknown[]) => leadFindManyMock(...args),
+    },
+    optOutRecord: {
+      create: (...args: unknown[]) => optOutCreateMock(...args),
+    },
+    agentMemory: {
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     conversationSignal: {
       updateMany: (...args: unknown[]) => conversationSignalUpdateManyMock(...args),
@@ -73,6 +82,7 @@ beforeEach(() => {
   deleteObjectMock.mockResolvedValue(true);
   updateManyMock.mockResolvedValue({ count: 3 });
   leadFindManyMock.mockResolvedValue([{ id: 'lead-1' }, { id: 'lead-2' }]);
+  optOutCreateMock.mockResolvedValue({ id: 'opt-1' });
   conversationSignalUpdateManyMock.mockResolvedValue({ count: 2 });
   timelineEventUpdateManyMock.mockResolvedValue({ count: 4 });
   voiceCallLogUpdateManyMock.mockResolvedValue({ count: 5 });
@@ -98,6 +108,7 @@ describe('eraseDataSubject — mecanismo técnico de exclusão/anonimização LG
       where: { id: CONTACT_ID, organizationId: ORG_ID },
     });
     expect(updateMock).not.toHaveBeenCalled();
+    expect(optOutCreateMock).not.toHaveBeenCalled();
   });
 
   it('anonimiza todos os campos identificadores do contato e mascara o WhatsApp ligado a ele', async () => {
@@ -109,6 +120,10 @@ describe('eraseDataSubject — mecanismo técnico de exclusão/anonimização LG
 
     const result = await eraseDataSubject({ organizationId: ORG_ID, contactId: CONTACT_ID });
 
+    expect(optOutCreateMock).toHaveBeenCalled();
+    expect(optOutCreateMock.mock.invocationCallOrder[0]).toBeLessThan(
+      updateMock.mock.invocationCallOrder[0],
+    );
     expect(updateMock).toHaveBeenCalledWith({
       where: { id: CONTACT_ID },
       data: {
@@ -264,5 +279,23 @@ describe('eraseDataSubject — mecanismo técnico de exclusão/anonimização LG
     expect(updateMock).not.toHaveBeenCalled();
     expect(updateManyMock).toHaveBeenCalled();
     expect(result.alreadyAnonymized).toBe(true);
+  });
+
+  it('aborta antes de destruir email/telefone do contato se optOutRecord.create falhar (DEBT-LGPD-001)', async () => {
+    findFirstMock.mockResolvedValue({
+      id: CONTACT_ID,
+      name: 'Fulano de Tal',
+      email: 'fulano@example.com',
+      phone: '+5511999999999',
+      organizationId: ORG_ID,
+    });
+    optOutCreateMock.mockRejectedValueOnce(new Error('opt-out storage failure'));
+
+    await expect(
+      eraseDataSubject({ organizationId: ORG_ID, contactId: CONTACT_ID }),
+    ).rejects.toThrow('opt-out storage failure');
+
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(updateManyMock).not.toHaveBeenCalled();
   });
 });

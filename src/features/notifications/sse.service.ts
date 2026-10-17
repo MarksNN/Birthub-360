@@ -4,14 +4,22 @@ import { connection, queuesEnabled } from '../../lib/queue/redis.js';
 
 const clients = new Set<{ id: string; orgId: string; res: Response }>();
 
-type VoiceNotification = {
-  type: 'voice-qualified';
-  organizationId: string;
-  leadId: string;
-  message: string;
-};
+type AppNotification =
+  | {
+      type: 'voice-qualified';
+      organizationId: string;
+      leadId: string;
+      message: string;
+    }
+  | {
+      type: 'company-enriched';
+      organizationId: string;
+      companyId: string;
+      message: string;
+      fit?: { score: number; temperature: string };
+    };
 
-function deliverLocally(payload: VoiceNotification) {
+function deliverLocally(payload: AppNotification) {
   for (const client of clients) {
     if (client.orgId === payload.organizationId) {
       client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
@@ -40,7 +48,7 @@ if (subscriber) {
     if (channel !== 'voice-notifications') return;
 
     try {
-      deliverLocally(JSON.parse(message) as VoiceNotification);
+      deliverLocally(JSON.parse(message) as AppNotification);
     } catch (err: any) {
       logger.warn(
         { message: err instanceof Error ? err.message : String(err) },
@@ -67,7 +75,7 @@ export const sseService = {
   },
 
   notifyVoiceQualified(organizationId: string, leadId: string, message: string) {
-    const payload: VoiceNotification = {
+    const payload: AppNotification = {
       type: 'voice-qualified',
       organizationId,
       leadId,
@@ -85,6 +93,36 @@ export const sseService = {
         logger.warn(
           { message: err instanceof Error ? err.message : String(err) },
           'Could not publish voice notification through Redis; delivering locally',
+        );
+        deliverLocally(payload);
+      });
+  },
+
+  notifyCompanyEnriched(
+    organizationId: string,
+    companyId: string,
+    details?: { fit?: { score: number; temperature: string }; message?: string },
+  ) {
+    const payload: AppNotification = {
+      type: 'company-enriched',
+      organizationId,
+      companyId,
+      message:
+        details?.message || 'Dados da empresa e pontuação de fit do lead enriquecidos com sucesso.',
+      fit: details?.fit,
+    };
+
+    if (!queuesEnabled) {
+      deliverLocally(payload);
+      return;
+    }
+
+    void connection
+      .publish('voice-notifications', JSON.stringify(payload))
+      .catch((err: unknown) => {
+        logger.warn(
+          { message: err instanceof Error ? err.message : String(err) },
+          'Could not publish company enrichment notification through Redis; delivering locally',
         );
         deliverLocally(payload);
       });

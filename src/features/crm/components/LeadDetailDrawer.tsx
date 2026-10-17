@@ -284,8 +284,14 @@ export function LeadDetailDrawer({ leadId, onClose, onChanged }: LeadDetailDrawe
     if (!lead) return;
     setEnriching(true);
     try {
-      const result = await api.post<{ lead: Lead }>(`/api/leads/${lead.id}/enrich`, {});
-      setLead(result.lead);
+      const result = await api.post<{ lead?: Lead; data?: { lead?: Lead } }>(
+        `/api/leads/${lead.id}/enrich`,
+        {},
+      );
+      const updatedLead = result.lead || result.data?.lead;
+      if (updatedLead) {
+        setLead(updatedLead);
+      }
       onChanged();
       SoundFX.play('success');
       toast.success('Lead enriquecido com sucesso!');
@@ -606,6 +612,68 @@ export function LeadDetailDrawer({ leadId, onClose, onChanged }: LeadDetailDrawe
                         >
                           <Globe className="w-3 h-3" /> {company.website}
                         </a>
+                      </div>
+                    )}
+                    {company.enrichmentStatus && (
+                      <div>
+                        <span className="text-[10px] text-ink-2 font-medium block">
+                          Enriquecimento
+                        </span>
+                        <span
+                          className={`text-xs font-semibold ${
+                            company.enrichmentStatus === 'Enriquecido'
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : company.enrichmentStatus === 'Enriquecendo'
+                                ? 'text-amber-500'
+                                : 'text-ink-2'
+                          }`}
+                        >
+                          {company.enrichmentStatus}
+                          {company.enrichmentSource ? ` (${company.enrichmentSource})` : ''}
+                        </span>
+                      </div>
+                    )}
+                    {company.capitalSocial != null && company.capitalSocial > 0 && (
+                      <div>
+                        <span className="text-[10px] text-ink-2 font-medium block">
+                          Capital Social
+                        </span>
+                        <span className="text-xs font-semibold text-ink">
+                          {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                          }).format(company.capitalSocial)}
+                        </span>
+                      </div>
+                    )}
+                    {company.googleRating != null && (
+                      <div>
+                        <span className="text-[10px] text-ink-2 font-medium block">
+                          Avaliação Google
+                        </span>
+                        <span className="text-xs font-semibold text-amber-500 flex items-center gap-1">
+                          ★ {company.googleRating}
+                          {company.googleReviewsCount
+                            ? ` (${company.googleReviewsCount} avaliações)`
+                            : ''}
+                        </span>
+                      </div>
+                    )}
+                    {company.technologies && company.technologies.length > 0 && (
+                      <div className="col-span-2 pt-2 border-t border-line">
+                        <span className="text-[10px] text-ink-2 font-medium block mb-1">
+                          Tecnologias Identificadas
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {company.technologies.slice(0, 8).map((tech: string, i: number) => (
+                            <span
+                              key={i}
+                              className="px-2 py-0.5 rounded-md text-[10px] bg-surface border border-line text-ink font-medium"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

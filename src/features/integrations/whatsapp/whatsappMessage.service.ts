@@ -7,6 +7,7 @@ import { prisma, withRlsContext } from '../../../lib/prisma.js';
 import { scheduleConversationAnalysis } from '../../../lib/queue/whatsappSignal.worker.js';
 import { recordOptOut } from '../../cadence/application/optOutService.js';
 import { prismaOptOutRepository } from '../../cadence/infra/PrismaOptOutRepository.js';
+import { isOptOutKeyword } from '../../../shared/services/optOutCheck.service.js';
 
 /** Grupos (`@g.us`) e o próprio status (`status@broadcast`) não correspondem a um contato do CRM. */
 function isIndividualChat(remoteJid: string | null | undefined): boolean {
@@ -139,8 +140,7 @@ export async function persistWhatsAppMessage(input: PersistWhatsAppMessageInput)
   });
 
   if (lead && input.direction === 'inbound') {
-    const textLower = (input.body || '').trim().toLowerCase();
-    if (['sair', 'parar', 'stop'].includes(textLower)) {
+    if (isOptOutKeyword(input.body)) {
       const currentFields = (lead.customFields as Record<string, unknown>) || {};
       // Mantém o flag legado (`customFields.optOutWhatsApp`) — outros pontos do código já
       // dependem dele (crm/jobs/followUp.worker.ts, birth-voice/*.webhook.ts) e não são

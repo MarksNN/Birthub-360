@@ -28,7 +28,7 @@ export function createWhatsAppCommandWorker(): Worker<WhatsAppCommand> {
             command.number,
             command.text,
             command.buttons,
-            command.context,
+            { ...command.context, fromWorker: true },
           );
           return;
       }

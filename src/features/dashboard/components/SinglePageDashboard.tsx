@@ -129,7 +129,7 @@ export function SinglePageDashboard() {
                 <Radar className="w-3.5 h-3.5 animate-spin-slow" />
                 Command Center 360°
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
                 SISTEMA OPERACIONAL
               </span>
@@ -145,22 +145,22 @@ export function SinglePageDashboard() {
           <motion.div className="flex flex-wrap items-center gap-3" variants={staggerItem}>
             <Button
               type="button"
-              variant="secondary"
+              variant="vancouver"
               onClick={() => navigate('/app/prospect')}
-              className="gap-2"
+              className="gap-2 rounded-full"
             >
-              <Search className="w-4 h-4 text-brand" />
+              <Search className="w-4 h-4 text-[#00D4FF]" />
               <span>Buscar Mercado</span>
             </Button>
 
             <Button
               type="button"
-              variant="default"
+              variant="brand"
               onClick={() => navigate('/app/crm')}
-              className="gap-2 font-bold shadow-md"
+              className="gap-2 rounded-full"
             >
               <Activity className="w-4 h-4" />
-              <span>Abrir Cockpit CRM</span>
+              <span>Abrir Cockpit CRM 360°</span>
             </Button>
           </motion.div>
         </motion.header>

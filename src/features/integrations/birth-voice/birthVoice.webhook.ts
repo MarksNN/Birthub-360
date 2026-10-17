@@ -14,6 +14,8 @@ import {
 } from '../../../shared/security/webhookReplayGuard.js';
 import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
 import { sendWhatsAppMessage } from '../whatsapp/whatsapp.service.js';
+import { checkOptOutStatus } from '../../../shared/services/optOutCheck.service.js';
+import { syncActivityToBitrix } from '../bitrix/service/outboundSync.js';
 import {
   buildObservations,
   type CallEndedData,
@@ -153,12 +155,19 @@ async function recordCallResult(
       phone?: string | null;
     } | null;
     const currentFields = (lead.customFields as Record<string, unknown>) || {};
-    if (
-      !hadConversation &&
-      !detection.optOut &&
-      !currentFields.optOutWhatsApp &&
-      contactForWhatsApp
-    ) {
+    let isOptedOutWhatsApp = Boolean(detection.optOut || currentFields.optOutWhatsApp);
+    if (!isOptedOutWhatsApp && lead.contactId) {
+      try {
+        const optOutCheck = await checkOptOutStatus(lead.contactId, 'whatsapp', organizationId);
+        if (optOutCheck.blocked) {
+          isOptedOutWhatsApp = true;
+        }
+      } catch {
+        // Falha de consulta não mascara estado local
+      }
+    }
+
+    if (!hadConversation && !isOptedOutWhatsApp && contactForWhatsApp) {
       const whatsappNumber = contactForWhatsApp.whatsapp || contactForWhatsApp.phone;
       if (whatsappNumber) {
         try {
@@ -208,6 +217,22 @@ async function recordCallResult(
     await resolveCadencePendingVoiceTouch(organizationId, leadId, providerMessageId, {
       result: hadConversation || data.status === 'completed' ? 'sent' : 'failed',
       error: data.outcome || data.status || null,
+    });
+
+    // Espelha atividade de voz no Bitrix24 (crm.activity.add)
+    syncActivityToBitrix(organizationId, leadId, {
+      type: 'call',
+      subject: `Ligação SDR Birth Voices: ${hadConversation ? 'Conversa realizada' : 'Tentativa sem conversa'}`,
+      description: `Estado: ${outcome}. Duração: ${data.durationSeconds || 0}s. Resumo: ${data.outcome || data.status || 'Sem resumo'}.`,
+      completed: hadConversation,
+      direction: 'outbound',
+      durationSeconds:
+        typeof data.durationSeconds === 'number' ? Math.round(data.durationSeconds) : 0,
+    }).catch((err) => {
+      logger.warn(
+        { err, callSid: data.callSid, leadId },
+        'Falha ao espelhar atividade de chamada de voz no Bitrix24.',
+      );
     });
 
     return 'recorded';

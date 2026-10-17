@@ -54,16 +54,6 @@ export default defineConfig(() => {
           globPatterns: ['**/*.js', '**/*.css', '**/*.html', '**/*.ico', '**/*.png', '**/*.svg', '**/*.woff2'],
           runtimeCaching: [
             {
-              // API do CRM: StaleWhileRevalidate — mostra dado cacheado, busca novo em BG
-              urlPattern: /^https?:\/\/.*\/api\/(companies|contacts|deals|activities)/,
-              handler: 'StaleWhileRevalidate',
-              options: {
-                cacheName: 'atlas-crm-data',
-                expiration: { maxAgeSeconds: 300, maxEntries: 200 },
-                cacheableResponse: { statuses: [0, 200] },
-              },
-            },
-            {
               // Assets de fontes e ícones: CacheFirst
               urlPattern: /\.(woff2?|ttf|otf|eot)$/,
               handler: 'CacheFirst',

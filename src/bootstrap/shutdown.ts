@@ -23,7 +23,11 @@ export interface ShutdownDeps {
   logger: ShutdownLogger;
   /** Só para teste: evita chamar process.exit(0) de verdade. Default: process.exit. */
   exit?: (code: number) => void;
+  /** Tempo máximo (ms) para aguardar o dreno de conexões HTTP antes de prosseguir. Default: 10000. */
+  httpCloseTimeoutMs?: number;
 }
+
+const DEFAULT_HTTP_CLOSE_TIMEOUT_MS = 10_000;
 
 /**
  * Constrói o handler de graceful shutdown, sem registrá-lo nos sinais do processo — separado de
@@ -31,7 +35,7 @@ export interface ShutdownDeps {
  * `process.on`. A ordem de encerramento é intencional e preservada do server.ts original:
  *
  * 1. para de aceitar novas conexões HTTP (`server.close`);
- * 2. fecha os clientes SSE (`sseService`) — dependem da conexão HTTP já fechada;
+ * 2. fecha os clientes SSE (`sseService`) enquanto o servidor HTTP drena conexões abertas;
  * 3. fecha todos os workers BullMQ embutidos (param de puxar novos jobs);
  * 4. encerra Langfuse (flush de traces pendentes) e desconecta o Prisma;
  * 5. por último, fecha as três conexões Redis (dados, rate limiter, cache) — usadas por quase
@@ -53,6 +57,7 @@ export function createGracefulShutdown(deps: ShutdownDeps): (signal: string) => 
     cacheConnection,
     logger,
     exit = (code: number) => process.exit(code),
+    httpCloseTimeoutMs = DEFAULT_HTTP_CLOSE_TIMEOUT_MS,
   } = deps;
 
   // Deriva a lista de `EmbeddedWorkersHandle` em vez de enumerar campo por campo: uma lista
@@ -65,25 +70,65 @@ export function createGracefulShutdown(deps: ShutdownDeps): (signal: string) => 
   return async function shutdown(signal: string): Promise<void> {
     logger.info(`${signal} received: closing gracefully`);
 
-    await new Promise<void>((resolve) => {
-      httpServer.close((err) => {
-        if (err) {
-          logger.error({ err }, 'Erro ao fechar o servidor HTTP');
-        } else {
-          logger.info('Servidor HTTP fechado com sucesso');
-        }
+    const httpClosePromise = new Promise<void>((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
         resolve();
-      });
+      };
+      const timer = setTimeout(() => {
+        logger.error(
+          { timeoutMs: httpCloseTimeoutMs },
+          'Timeout ao aguardar o encerramento do servidor HTTP; prosseguindo com shutdown',
+        );
+        finish();
+      }, httpCloseTimeoutMs);
+      timer.unref?.();
+
+      try {
+        httpServer.close((err) => {
+          if (err) {
+            logger.error({ err }, 'Erro ao fechar o servidor HTTP');
+          } else {
+            logger.info('Servidor HTTP fechado com sucesso');
+          }
+          finish();
+        });
+      } catch (err) {
+        logger.error({ err }, 'Erro ao iniciar fechamento do servidor HTTP');
+        finish();
+      }
     });
 
-    await sseService.closeAll();
-
-    for (const worker of workerList()) {
-      await worker?.close();
+    try {
+      await sseService.closeAll();
+    } catch (err) {
+      logger.error({ err }, 'Erro ao fechar clientes SSE durante shutdown');
     }
 
-    await shutdownLangfuse();
-    await prisma.$disconnect();
+    await httpClosePromise;
+
+    for (const worker of workerList()) {
+      try {
+        await worker?.close();
+      } catch (err) {
+        logger.error({ err }, 'Erro ao fechar worker durante shutdown');
+      }
+    }
+
+    try {
+      await shutdownLangfuse();
+    } catch (err) {
+      logger.error({ err }, 'Erro ao encerrar Langfuse durante shutdown');
+    }
+
+    try {
+      await prisma.$disconnect();
+    } catch (err) {
+      logger.error({ err }, 'Erro ao desconectar Prisma durante shutdown');
+    }
 
     await Promise.allSettled([
       connection.quit().catch(() => connection.disconnect()),

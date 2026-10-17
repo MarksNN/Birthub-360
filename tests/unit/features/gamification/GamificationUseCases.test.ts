@@ -79,4 +79,47 @@ describe('GamificationUseCases', () => {
     expect(profile.level).toBe(1);
     expect(profile.levelTitle).toBe('Consultor Trainee');
   });
+
+  it('enriquece o leaderboard com métricas de performance agregadas', async () => {
+    const mockRepo: GamificationRepository = {
+      getLeaderboard: vi.fn().mockResolvedValue([
+        { sellerName: 'Carlos', totalPoints: 1500 } as SellerScore,
+      ]),
+      getSellerScore: vi.fn().mockResolvedValue({
+        sellerName: 'Carlos',
+        totalPoints: 1500,
+        level: 3,
+        levelTitle: 'Closer Sênior',
+        callsCount: 30,
+        meetingsCount: 8,
+        qualifiedCount: 15,
+        dealsClosed: 4,
+        wonRevenue: 80000,
+        badges: [],
+        streakDays: 5,
+      } as SellerScore),
+    };
+
+    const mockAggregator = {
+      compute: vi.fn().mockResolvedValue({
+        callsMade: 30,
+        meetingsScheduled: 8,
+        dealsClosed: 4,
+        avgTicket: 20000,
+        conversionRatePercent: 26.7,
+        topLossReason: 'Preço',
+      }),
+    };
+
+    const useCases = new GamificationUseCases(mockRepo, mockAggregator as any);
+    const leaderboard = await useCases.getLeaderboard('org-1', 'month');
+
+    expect(leaderboard.rankings[0].performance).toBeDefined();
+    expect(leaderboard.rankings[0].performance?.conversionRatePercent).toBe(26.7);
+    expect(leaderboard.rankings[0].performance?.avgTicket).toBe(20000);
+
+    const profile = await useCases.getSellerProfile('org-1', 'Carlos');
+    expect(profile.performance).toBeDefined();
+    expect(profile.performance?.topLossReason).toBe('Preço');
+  });
 });

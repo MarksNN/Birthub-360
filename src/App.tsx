@@ -263,6 +263,11 @@ const DocumentEditor = lazy(() =>
 const Team = lazy(() =>
   import('./features/team/components/Team.js').then((m) => ({ default: m.Team })),
 );
+const GamificationView = lazy(() =>
+  import('./features/gamification/components/GamificationView.js').then((m) => ({
+    default: m.GamificationView,
+  })),
+);
 const ModuleAccessAdmin = lazy(() =>
   import('./features/module-access/components/ModuleAccessAdmin.js').then((m) => ({
     default: m.ModuleAccessAdmin,
@@ -394,8 +399,14 @@ function AppLayout() {
               }
             />
             <Route path="signals-risks" element={<SignalsAndRisksHub />} />
-            <Route path="signals-risks/radar" element={<SignalsAndRisksHub initialView="radar" />} />
-            <Route path="signals-risks/deal-risks" element={<SignalsAndRisksHub initialView="deal-risks" />} />
+            <Route
+              path="signals-risks/radar"
+              element={<SignalsAndRisksHub initialView="radar" />}
+            />
+            <Route
+              path="signals-risks/deal-risks"
+              element={<SignalsAndRisksHub initialView="deal-risks" />}
+            />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
             {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,
@@ -429,6 +440,7 @@ function AppLayout() {
             <Route path="roteiros" element={<RoteirosHub />} />
             <Route path="chatbook" element={<ChatbookHub />} />
             <Route path="roleplay" element={<RoleplayHub />} />
+            <Route path="gamification" element={<GamificationView />} />
             <Route path="qualification_matrix" element={<QualificationMatrixPage />} />
             <Route path="objections_matrix" element={<ObjectionsMatrixPage />} />
             <Route path="topic_training" element={<TopicTrainingAcademy />} />
@@ -437,6 +449,7 @@ function AppLayout() {
             <Route path="integrations" element={<Integrations />} />
             <Route path="knowledge" element={<KnowledgeBase />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="gamification" element={<GamificationView />} />
             <Route path="winloss" element={<WinLossAnalysis />} />
             <Route path="market-intelligence" element={<Ldr />} />
             <Route path="market-intelligence/hub" element={<InteligenciaMercadoHub />} />

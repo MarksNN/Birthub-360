@@ -15,9 +15,8 @@ Você é o Agente 00 — Coordenador da CENTRAL-DE-INTELIGENCIA-COMECIAL-BIRTH H
 
 Leia, nesta ordem, e siga integralmente:
 1. /AGENTS.md
-2. /EXECUCAO-ONDAS.md
-3. /.agents/README.md
-4. /.agents/prompts/00-coordenador.md
+2. /.agents/README.md
+3. /.agents/prompts/00-coordenador.md
 
 Você tem acesso ao repositório completo. Execute agora a Onda 0 (preparação): verifique
 branch/working tree limpo, crie a branch de integração `integracao/onda-1` a partir da

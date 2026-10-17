@@ -184,7 +184,8 @@ export class LeadController {
   enrichBatch = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { organizationId: orgId } = (req as AuthRequest).user;
-      const result = await this.leadUseCases.enqueueBatchEnrichment(orgId);
+      const leadIds = Array.isArray(req.body?.leadIds) ? req.body.leadIds : undefined;
+      const result = await this.leadUseCases.enqueueBatchEnrichment(orgId, leadIds);
       res.json({ success: true, data: result });
     } catch (error: any) {
       next(error);

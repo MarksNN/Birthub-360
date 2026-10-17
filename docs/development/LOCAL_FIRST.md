@@ -4,6 +4,8 @@
 > Todos os caminhos de produção em nuvem (Render, Neon, Cloudflare, Kubernetes/ArgoCD, OCI) estão
 > **desativados por enquanto**. O repositório e os serviços locais (`docker-compose.yml`) são a
 > única fonte de execução ativa da plataforma, sem qualquer dependência ou deploy para provedores cloud.
+> A publicação de imagens no GitHub Container Registry (GHCR via `docker-publish.yml`) serve exclusivamente
+> para empacotamento auditado de artefatos após CI verde, não constituindo deploy nem execução em nuvem.
 > Ver `docs/deploy/README.md`.
 
 
@@ -36,7 +38,7 @@ O `docker-compose.yml` é a base da infraestrutura local de apoio (Redis, Meilis
 ## Subida local
 
 1. Copie `.env.example` para `.env`.
-2. Configure `DATABASE_URL=postgresql://prospector:prospector_pass@localhost:5434/prospectordb`.
+2. Configure `DATABASE_URL` para `localhost:5434`, banco `prospectordb`, usando o papel `prospector_app` e a senha definida em `APP_DB_PASSWORD`. Esse papel é `NOSUPERUSER` e preserva RLS; o papel `prospector` é reservado ao bootstrap. Configure `DIRECT_URL` com a conexão de migração autorizada, separada do papel usado pela aplicação (o Prisma CLI prioriza essa variável).
 3. Para storage local, configure:
 
 ```env

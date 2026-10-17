@@ -5,9 +5,16 @@ import type {
   SellerScore,
 } from '../domain/Gamification.js';
 import { prismaGamificationRepository } from '../infra/PrismaGamificationRepository.js';
+import {
+  type SellerPerformanceAggregatorService,
+  sellerPerformanceAggregator,
+} from '../services/sellerPerformanceAggregator.service.js';
 
 export class GamificationUseCases {
-  constructor(private repository: GamificationRepository = prismaGamificationRepository) {}
+  constructor(
+    private repository: GamificationRepository = prismaGamificationRepository,
+    private performanceAggregator: SellerPerformanceAggregatorService = sellerPerformanceAggregator,
+  ) {}
 
   async getLeaderboard(
     organizationId: string,
@@ -24,7 +31,28 @@ export class GamificationUseCases {
       since.setHours(0, 0, 0, 0);
     }
 
-    const rankings = await this.repository.getLeaderboard(organizationId, since);
+    const rawRankings = await this.repository.getLeaderboard(organizationId, since);
+
+    const perfPeriod = {
+      from: since ?? new Date(now.getFullYear(), 0, 1),
+      to: now,
+    };
+
+    const rankings: SellerScore[] = await Promise.all(
+      rawRankings.map(async (score) => {
+        try {
+          const perf = await this.performanceAggregator.compute(
+            organizationId,
+            score.sellerName,
+            perfPeriod,
+          );
+          return { ...score, performance: perf };
+        } catch {
+          return score;
+        }
+      }),
+    );
+
     return { period, rankings };
   }
 
@@ -45,6 +73,17 @@ export class GamificationUseCases {
         streakDays: 0,
       };
     }
-    return profile;
+
+    try {
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const perf = await this.performanceAggregator.compute(organizationId, sellerName, {
+        from: monthStart,
+        to: now,
+      });
+      return { ...profile, performance: perf };
+    } catch {
+      return profile;
+    }
   }
 }

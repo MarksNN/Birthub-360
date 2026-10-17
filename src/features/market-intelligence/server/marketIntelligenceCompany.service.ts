@@ -219,7 +219,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '15000000.00' as any,
     municipioIbge: '3106200',
@@ -250,7 +251,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '42000000.00' as any,
     municipioIbge: '3518800',
@@ -281,7 +283,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '18500000.00' as any,
     municipioIbge: '3543402',
@@ -312,7 +315,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '12000000.00' as any,
     municipioIbge: '3118601',
@@ -343,7 +347,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '5229099',
-    cnaePrincipalDescricao: 'Outras atividades auxiliares dos transportes terrestres não especificadas anteriormente',
+    cnaePrincipalDescricao:
+      'Outras atividades auxiliares dos transportes terrestres não especificadas anteriormente',
     porte: 'DEMAIS',
     capitalSocial: '25000000.00' as any,
     municipioIbge: '3550308',
@@ -374,7 +379,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '8500000.00' as any,
     municipioIbge: '4204202',
@@ -405,7 +411,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '9800000.00' as any,
     municipioIbge: '3518800',
@@ -436,7 +443,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '11000000.00' as any,
     municipioIbge: '3501608',
@@ -467,7 +475,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '5200000.00' as any,
     municipioIbge: '4314902',
@@ -498,7 +507,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'DEMAIS',
     capitalSocial: '4500000.00' as any,
     municipioIbge: '5208707',
@@ -560,7 +570,8 @@ export const SAMPLE_COMPANIES = [
     situacaoCadastralCodigo: '02',
     situacaoCadastral: 'ATIVA',
     cnaePrincipal: '4930202',
-    cnaePrincipalDescricao: 'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
+    cnaePrincipalDescricao:
+      'Transporte rodoviário de carga, exceto perigosa, intermunicipal, interestadual e internacional',
     porte: 'MEDIO',
     capitalSocial: '2100000.00' as any,
     municipioIbge: '4106902',
@@ -591,7 +602,8 @@ async function fetchDirectReceitaFederalCnpj(cleanCnpj: string) {
     if (res.ok) {
       const data = (await res.json()) as any;
       const cnae = String(data.cnae_fiscal || '');
-      const isTransport = cnae.startsWith('4930') || cnae.startsWith('5229') || cnae.startsWith('5211');
+      const isTransport =
+        cnae.startsWith('4930') || cnae.startsWith('5229') || cnae.startsWith('5211');
       return {
         id: `mic-${cleanCnpj}`,
         datasetId: SAMPLE_DATASET.id,
@@ -615,7 +627,9 @@ async function fetchDirectReceitaFederalCnpj(cleanCnpj: string) {
         uf: data.uf || 'BR',
         opcaoSimples: data.opcao_pelo_simples ? 'SIM' : 'NAO',
         opcaoMei: data.opcao_pelo_mei ? 'SIM' : 'NAO',
-        icpTier: isTransport ? MarketIntelligenceIcpTier.MUITO_ALTO : MarketIntelligenceIcpTier.ALTO,
+        icpTier: isTransport
+          ? MarketIntelligenceIcpTier.MUITO_ALTO
+          : MarketIntelligenceIcpTier.ALTO,
         icpScore: isTransport ? 92 : 78,
         hasRntrc: isTransport,
         rntrcStatus: isTransport ? 'ATIVO' : null,
@@ -625,7 +639,10 @@ async function fetchDirectReceitaFederalCnpj(cleanCnpj: string) {
       };
     }
   } catch (err: unknown) {
-    logger.warn({ err: (err as Error).message, cleanCnpj }, 'BrasilAPI falhou ou timeout; tentando MinhaReceita');
+    logger.warn(
+      { err: (err as Error).message, cleanCnpj },
+      'BrasilAPI falhou ou timeout; tentando MinhaReceita',
+    );
   }
 
   // Fallback para MinhaReceita
@@ -640,7 +657,8 @@ async function fetchDirectReceitaFederalCnpj(cleanCnpj: string) {
     if (res.ok) {
       const data = (await res.json()) as any;
       const cnae = String(data.cnae_fiscal || '');
-      const isTransport = cnae.startsWith('4930') || cnae.startsWith('5229') || cnae.startsWith('5211');
+      const isTransport =
+        cnae.startsWith('4930') || cnae.startsWith('5229') || cnae.startsWith('5211');
       return {
         id: `mic-${cleanCnpj}`,
         datasetId: SAMPLE_DATASET.id,
@@ -664,7 +682,9 @@ async function fetchDirectReceitaFederalCnpj(cleanCnpj: string) {
         uf: data.uf || 'BR',
         opcaoSimples: data.opcao_pelo_simples ? 'SIM' : 'NAO',
         opcaoMei: data.opcao_pelo_mei ? 'SIM' : 'NAO',
-        icpTier: isTransport ? MarketIntelligenceIcpTier.MUITO_ALTO : MarketIntelligenceIcpTier.ALTO,
+        icpTier: isTransport
+          ? MarketIntelligenceIcpTier.MUITO_ALTO
+          : MarketIntelligenceIcpTier.ALTO,
         icpScore: isTransport ? 92 : 78,
         hasRntrc: isTransport,
         rntrcStatus: isTransport ? 'ATIVO' : null,
@@ -804,11 +824,13 @@ export async function listMarketIntelligenceCompanies(query: CompanyCatalogQuery
       const munNorm = query.municipio.toUpperCase();
       filtered = filtered.filter((c) => (c.municipioNome || '').toUpperCase().includes(munNorm));
     }
-    if (query.cnae) filtered = filtered.filter((c) => (c.cnaePrincipal || '').startsWith(query.cnae!));
+    if (query.cnae)
+      filtered = filtered.filter((c) => (c.cnaePrincipal || '').startsWith(query.cnae!));
     if (query.icpTier) filtered = filtered.filter((c) => c.icpTier === query.icpTier);
     if (query.situacao) filtered = filtered.filter((c) => c.situacaoCadastral === query.situacao);
     if (query.porte) filtered = filtered.filter((c) => c.porte === query.porte);
-    if (query.matrizFilial) filtered = filtered.filter((c) => c.matrizFilial === query.matrizFilial);
+    if (query.matrizFilial)
+      filtered = filtered.filter((c) => c.matrizFilial === query.matrizFilial);
     if (query.q) {
       const qNorm = query.q.toUpperCase();
       filtered = filtered.filter(

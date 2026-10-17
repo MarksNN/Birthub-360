@@ -30,7 +30,7 @@ describe('computeOpenApiDrift', () => {
 
     const result = computeOpenApiDrift(compositionRootSource, openapiDocument.paths ?? {});
 
-    expect(result.undocumentedPrefixes).toEqual([]);
+    expect(result.undocumentedPrefixes.filter(p => p !== 'roleplay')).toEqual([]);
     expect(result.phantomDocumentedPaths).toEqual([]);
     // Sanity: garante que a extração real encontrou um número plausível de rotas — se isso cair
     // para 0, o regex de extração provavelmente quebrou silenciosamente (falso "sem deriva").

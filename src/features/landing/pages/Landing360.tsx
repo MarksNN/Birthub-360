@@ -3,38 +3,41 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  BarChart3,
-  Bot,
   Check,
   CheckCircle2,
   Compass,
-  Cpu,
   Eye,
   EyeOff,
-  Layers,
   Loader2,
   Lock,
   Mail,
-  Network,
-  Server,
-  ShieldAlert,
-  ShieldCheck,
-  Sparkles,
+  Menu,
+  Moon,
+  Sun,
   Target,
-  TrendingUp,
   Workflow,
+  X,
   Zap,
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext.js';
+import { useTheme } from '../../../contexts/ThemeContext.js';
 import { authClient } from '../../../lib/auth-client.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
+import {
+  AiDiagnosticLayerIcon,
+  ExecutionLayerIcon,
+  LostDealsCardIcon,
+  MultiCrmDataLayerIcon,
+  ReactiveCardIcon,
+  SilosCardIcon,
+} from '../../../components/brand/LandingTitleIcons.js';
 import './Landing360.css';
 
-// 8 PILARES OFICIAIS COMPLETOS DO BIRTH HUB 360° (PALETA NEON OFICIAL)
+// 8 PILARES OFICIAIS COMPLETOS DO BIRTH HUB 360° (PALETA NEON OFICIAL - DOURADO RADIANTE)
 const OFFICIAL_PILLARS = [
   {
     id: '01',
@@ -42,7 +45,7 @@ const OFFICIAL_PILLARS = [
     name: 'HUB COMERCIAL',
     desc: 'Centralização de contas, pipeline comercial unificado e visão 360° de cada oportunidade em negociação.',
     symbol: '◉',
-    color: 'var(--color-heading-cyan)', // Azul Neon
+    color: '#00D4FF', // Azul Neon
     tag: 'Pipeline Central',
     focus: 'Gestão Unificada de Oportunidades',
   },
@@ -52,7 +55,7 @@ const OFFICIAL_PILLARS = [
     name: 'INTELIGÊNCIA DE MERCADO',
     desc: 'Enriquecimento analítico de dados B2B, sinais de compra, qualificação precisa e inteligência de decisores.',
     symbol: '◎',
-    color: 'var(--color-heading-pink)', // Rosa Neon
+    color: '#FF2D9B', // Rosa Neon
     tag: 'Decisão por Dados',
     focus: 'Sinais & Qualificação Preditiva',
   },
@@ -62,7 +65,7 @@ const OFFICIAL_PILLARS = [
     name: 'ORQUESTRAÇÃO DE VENDAS',
     desc: 'Cadências multicanal coordenadas, regras de transição de bastão e alinhamento operacional de ponta a ponta.',
     symbol: '⟶',
-    color: 'var(--color-heading-cyan)', // Azul Neon
+    color: '#00D4FF', // Azul Neon
     tag: 'Fluxos Integrados',
     focus: 'Cadências & Passagem de Bastão',
   },
@@ -72,7 +75,7 @@ const OFFICIAL_PILLARS = [
     name: 'PERFORMANCE COMERCIAL',
     desc: 'Telemetria de conversão, velocidade de avanço no funil, metas operacionais e produtividade da equipe.',
     symbol: '▥',
-    color: 'var(--color-heading-gold)', // Dourado Neon
+    color: '#F59E0B', // Dourado Radiante
     tag: 'Metas & Velocidade',
     focus: 'Métricas & Conversão em Tempo Real',
   },
@@ -82,7 +85,7 @@ const OFFICIAL_PILLARS = [
     name: 'PREVISIBILIDADE COMERCIAL',
     desc: 'Modelagem estatística de probabilidade, análise de pipeline ponderado e cenários embasados no histórico real.',
     symbol: '⌁',
-    color: 'var(--color-heading-gold)', // Dourado Neon
+    color: '#F59E0B', // Dourado Radiante
     tag: 'Pipeline Ponderado',
     focus: 'Cenários & Probabilidade Real',
   },
@@ -92,19 +95,19 @@ const OFFICIAL_PILLARS = [
     name: 'INTELIGÊNCIA ARTIFICIAL',
     desc: 'Copiloto comercial ancorado nos dados da empresa, diagnóstico de entraves e suporte ativo em negociações.',
     symbol: '✦',
-    color: 'var(--color-heading-iris)', // Rosa Neon
+    color: '#8B7DFF', // Íris / Roxo Neon
     tag: 'Copiloto & Modelos',
     focus: 'Agentes & Diagnóstico Contextual',
   },
   {
     id: '07',
     slug: 'AUTO',
-    name: 'AUTOMAÇÃO & CONECTIVIDADE',
-    desc: 'Sincronização contínua bidirecional, gatilhos de follow-up em tempo real e integração profunda com Bitrix24.',
+    name: 'AUTOMAÇÃO & CONECTIVIDADE MULTI-CRM',
+    desc: 'Sincronização bidirecional em tempo real, gatilhos automáticos e integração profunda com Bitrix24, HubSpot, Salesforce, Pipedrive e APIs abertas.',
     symbol: '◇',
-    color: 'var(--color-heading-cyan)', // Azul Neon
-    tag: 'Gatilhos & Bitrix24',
-    focus: 'Integrações & Ações Instantâneas',
+    color: '#00D4FF', // Azul Neon
+    tag: 'Multi-CRM & Webhooks',
+    focus: 'Integrações Multi-CRM & Ações Instantâneas',
   },
   {
     id: '08',
@@ -112,28 +115,73 @@ const OFFICIAL_PILLARS = [
     name: 'ENGAJAMENTO COMERCIAL',
     desc: 'Comunicação integrada, telefonia em nuvem, histórico de interações e rastreabilidade total de contatos.',
     symbol: '◌',
-    color: 'var(--color-heading-pink)', // Rosa Neon
+    color: '#FF2D9B', // Rosa Neon
     tag: 'Voz & Omnichannel',
     focus: 'Telefonia & Registro de Contato',
   },
 ] as const;
 
-// TAGS DE CAPACIDADES DA PLATAFORMA (PALETA NEON OFICIAL)
+// TAGS DE CAPACIDADES DA PLATAFORMA (PALETA NEON OFICIAL COM CONECTIVIDADE MULTI-CRM)
 const FEATURE_TAGS = [
-  { label: 'Pipeline Centralizado', color: 'var(--color-heading-cyan)' },
-  { label: 'Inteligência B2B', color: 'var(--color-heading-pink)' },
-  { label: 'Cadências Automatizadas', color: 'var(--color-heading-cyan)' },
-  { label: 'Velocidade de Ciclo', color: 'var(--color-heading-gold)' },
-  { label: 'Cenários Ponderados', color: 'var(--color-heading-gold)' },
-  { label: 'Copiloto Comercial IA', color: 'var(--color-heading-pink)' },
-  { label: 'Conectividade Bitrix24', color: 'var(--color-heading-cyan)' },
-  { label: 'Telefonia & Voz Ativa', color: 'var(--color-heading-pink)' },
+  {
+    kicker: 'GESTÃO UNIFICADA',
+    label: 'Pipeline Centralizado',
+    color: '#00D4FF',
+    desc: 'Reúna oportunidades, etapas e histórico comercial em uma visão organizada.',
+  },
+  {
+    kicker: 'ENRIQUECIMENTO ICP',
+    label: 'Inteligência B2B',
+    color: '#FF2D9B',
+    desc: 'Contextualize empresas e contatos com dados para apoiar a qualificação.',
+  },
+  {
+    kicker: 'FLUXO OPERACIONAL',
+    label: 'Cadências Automatizadas',
+    color: '#00D4FF',
+    desc: 'Organize sequências de contato e próximos passos ao longo da negociação.',
+  },
+  {
+    kicker: 'TELEMETRIA DE FUNIL',
+    label: 'Velocidade de Ciclo',
+    color: '#F59E0B',
+    desc: 'Acompanhe o tempo entre etapas e identifique pontos de estagnação.',
+  },
+  {
+    kicker: 'FORECAST ESTATÍSTICO',
+    label: 'Cenários Ponderados',
+    color: '#F59E0B',
+    desc: 'Compare projeções considerando etapas, probabilidades e histórico do pipeline.',
+  },
+  {
+    kicker: 'COPILOTO DE DEALS',
+    label: 'Copiloto Comercial IA',
+    color: '#FF2D9B',
+    desc: 'Apoie diagnósticos e próximas ações com o contexto das negociações.',
+  },
+  {
+    kicker: 'ECOSSISTEMA ABERTO',
+    label: 'Conectividade Multi-CRM',
+    color: '#00D4FF',
+    desc: 'Conecte registros e fluxos comerciais com Bitrix24, Salesforce, HubSpot e Pipedrive.',
+  },
+  {
+    kicker: 'TELEFONIA INTEGRADA',
+    label: 'Telefonia & Voz Ativa',
+    color: '#FF2D9B',
+    desc: 'Integre interações de voz ao acompanhamento das oportunidades comerciais.',
+  },
 ];
 
 function BH360LogoMark({ size = 52 }: { size?: number }) {
   return (
-    <span style={{ width: size, height: size }} className="inline-block">
-      <BirthHubLogo variant="icon" title="Birth Hub 360º" className="w-full h-full" />
+    <span style={{ width: size, height: size }} className="inline-block relative">
+      <BirthHubLogo
+        variant="icon"
+        title="Birth Hub 360º"
+        className="w-full h-full"
+        animated={true}
+      />
     </span>
   );
 }
@@ -145,6 +193,7 @@ export function Landing360({
 } = {}) {
   const [activeScreen, setActiveScreen] = useState<'intro' | 'login'>(initialScreen);
   const { currentUser, isPending: isAuthPending } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
 
@@ -160,6 +209,11 @@ export function Landing360({
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedPillar, setSelectedPillar] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Birth Hub 360° · Sistema Operacional Comercial Multi-CRM';
+  }, []);
 
   // Redirecionamento se já autenticado
   useEffect(() => {
@@ -175,7 +229,7 @@ export function Landing360({
 
   const handleGoToLogin = () => {
     SoundFX.play('confirm');
-    navigate('/login');
+    setActiveScreen('login');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -254,158 +308,270 @@ export function Landing360({
     }
   };
 
-  const handleSocialLogin = (provider: 'google' | 'microsoft') => {
-    SoundFX.play('click');
-    (authClient.signIn as any)?.social({
-      provider,
-      callbackURL: '/app',
-    });
-  };
-
   if (isAuthPending) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-brand w-10 h-10" />
+      <div
+        className={`min-h-screen flex items-center justify-center transition-colors ${
+          theme === 'dark' ? 'bg-[#0B1120]' : 'bg-[#F8FAFC]'
+        }`}
+      >
+        <Loader2 className="animate-spin text-[#00D4FF] w-10 h-10" />
       </div>
     );
   }
 
   return (
-    <main className="relative w-full min-h-screen bg-background text-ink-2 font-sans selection:bg-pink/30 selection:text-brand landing-neon-root">
+    <main
+      className={`relative w-full min-h-screen font-sans selection:bg-[#FF2D9B]/30 selection:text-[#00D4FF] landing-neon-root transition-colors duration-300 ${
+        theme === 'dark' ? 'bg-[#0B1120] text-slate-100' : 'bg-[#F8FAFC] text-slate-800'
+      }`}
+    >
       {/* ════════════════════════════════════════════════════════════════════
-          TELA 1: LANDING COMPLETA (PALETA NEON OFICIAL)
+          TELA 1: LANDING COMPLETA
       ════════════════════════════════════════════════════════════════════ */}
       <div className={activeScreen === 'intro' ? 'block' : 'hidden'}>
-        {/* 1. NAVBAR */}
-        <header className="navbar-sticky w-full px-5 py-3 sm:px-8 lg:px-14">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <a href="#hero" className="flex items-center gap-3 group">
-              <BH360LogoMark size={46} />
+        {/* 1. NAVBAR FIXA — PRESENÇA INSTITUCIONAL & ENTERPRISE */}
+        <header className="navbar-sticky w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-3.5">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
+            <a href="#hero" className="flex items-center gap-3.5 group shrink-0">
+              <BH360LogoMark size={48} />
               <div className="flex flex-col">
                 <span className="font-display text-xl font-bold leading-tight tracking-tight">
-                  <span className="text-brand">Birth Hub</span>
-                  <span className="text-pink ml-1 font-extrabold">360°</span>
+                  <span className="landing-title-cyan font-bold">Birth Hub</span>
+                  <span className="landing-title-pink ml-1 font-extrabold">360°</span>
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-brand/70 font-semibold">
-                  Command Center
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#00D4FF] font-semibold">
+                  Revenue Command Center
                 </span>
               </div>
             </a>
 
-            {/* Links de navegação desktop */}
-            <nav className="hidden xl:flex items-center gap-6 font-mono text-xs font-semibold text-ink-2/70">
-              <a href="#problema" className="hover:text-brand transition-colors">
+            {/* Links de navegação desktop — Cada item como um botão pill, sem sobreposição */}
+            <nav className="hidden xl:flex items-center justify-center gap-1.5 2xl:gap-2 flex-1 mx-2">
+              <a href="#problema" className="nav-pill-btn">
                 Problema
               </a>
-              <a href="#plataforma" className="hover:text-brand transition-colors">
+              <a href="#plataforma" className="nav-pill-btn">
                 Plataforma
               </a>
-              <a href="#pilares" className="hover:text-brand transition-colors">
+              <a href="#pilares" className="nav-pill-btn">
                 8 Pilares
               </a>
-              <a href="#fluxo" className="hover:text-brand transition-colors">
+              <a href="#fluxo" className="nav-pill-btn">
                 Fluxo
               </a>
-              <a href="#ia" className="hover:text-brand transition-colors">
+              <a href="#ia" className="nav-pill-btn">
                 IA
               </a>
-              <a href="#automacao" className="hover:text-brand transition-colors">
+              <a href="#automacao" className="nav-pill-btn">
                 Automação
               </a>
-              <a href="#performance" className="hover:text-brand transition-colors">
+              <a href="#performance" className="nav-pill-btn">
                 Performance
               </a>
-              <a href="#previsibilidade" className="hover:text-brand transition-colors">
+              <a href="#previsibilidade" className="nav-pill-btn">
                 Previsibilidade
               </a>
-              <a href="#ecossistema" className="hover:text-brand transition-colors">
+              <a href="#ecossistema" className="nav-pill-btn">
                 Ecossistema
               </a>
             </nav>
+
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Botão de Alternância de Tema (Light / Dark) */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="landing-theme-toggle-btn"
+                aria-label={theme === 'dark' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
+                title={theme === 'dark' ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-sky-600" />
+                )}
+              </button>
+
+              {/* Botão de Login no Topo com animação de piscar/pulsar */}
+              <button
+                type="button"
+                onClick={handleGoToLogin}
+                className="btn-cta-light btn-cta-pulse hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider cursor-pointer shadow-md"
+              >
+                <span>Acessar Plataforma</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              {/* Botão Hambúrguer Mobile (< xl) */}
+              <button
+                type="button"
+                onClick={() => {
+                  SoundFX.play('click');
+                  setMobileMenuOpen(!mobileMenuOpen);
+                }}
+                aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+                aria-expanded={mobileMenuOpen}
+                className="xl:hidden inline-flex items-center justify-center p-2 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-200 hover:text-[#00D4FF] hover:border-[#00D4FF] transition-all cursor-pointer shadow-md"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 text-[#FF2D9B]" />
+                ) : (
+                  <Menu className="w-5 h-5 text-[#00D4FF]" />
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* Gaveta de Navegação Mobile */}
+          {mobileMenuOpen && (
+            <div className="xl:hidden max-w-7xl mx-auto mt-3 pt-3 border-t border-slate-700/60 bg-slate-900/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-slate-800/80 animate-in fade-in slide-in-from-top-2 duration-200">
+              <nav className="flex flex-col gap-1.5 font-mono text-xs font-semibold text-slate-300">
+                {[
+                  { href: '#problema', label: 'Problema' },
+                  { href: '#plataforma', label: 'Plataforma' },
+                  { href: '#pilares', label: '8 Pilares' },
+                  { href: '#fluxo', label: 'Fluxo Operacional' },
+                  { href: '#ia', label: 'Inteligência Artificial' },
+                  { href: '#automacao', label: 'Automação' },
+                  { href: '#performance', label: 'Performance' },
+                  { href: '#previsibilidade', label: 'Previsibilidade' },
+                  { href: '#ecossistema', label: 'Ecossistema Multi-CRM' },
+                ].map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => {
+                      SoundFX.play('click');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-[#00D4FF] transition-colors flex items-center justify-between"
+                  >
+                    <span>{item.label}</span>
+                    <span className="text-slate-500 font-mono text-[10px]">→</span>
+                  </a>
+                ))}
+                <div className="pt-2 mt-1 border-t border-slate-700/60 flex items-center justify-between">
+                  <span className="text-xs font-mono text-slate-300">Alternar tema:</span>
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="landing-theme-toggle-btn"
+                    aria-label={
+                      theme === 'dark' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'
+                    }
+                  >
+                    {theme === 'dark' ? (
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                        <Sun className="w-4 h-4" /> Claro
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-sky-600">
+                        <Moon className="w-4 h-4" /> Escuro
+                      </span>
+                    )}
+                  </button>
+                </div>
+                <div className="pt-2 mt-1 border-t border-slate-700/60 sm:hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleGoToLogin();
+                    }}
+                    className="btn-cta-light w-full py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                  >
+                    <span>Acessar Plataforma</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </nav>
+            </div>
+          )}
         </header>
 
-        {/* 2. HERO */}
+        {/* 2. HERO SECTION */}
         <section
           id="hero"
-          className="relative px-5 py-12 sm:px-8 lg:px-14 overflow-hidden border-b border-brand bg-background"
+          className="relative px-5 py-16 sm:px-8 lg:px-14 overflow-hidden border-b border-slate-700/60 transition-colors"
         >
-          {/* Fundo estrutural em grid e halos sutis neon */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-40"
-            aria-hidden="true"
-            style={{
-              backgroundImage: 'none',
-              backgroundSize: '48px 48px',
-            }}
-          />
-          <div className="pointer-events-none absolute top-10 right-10 w-[500px] h-[500px] rounded-full blur-[130px] bg-brand/15" />
-          <div className="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full blur-[130px] bg-pink/15" />
+          {/* Halos luminosos neon sutis */}
+          <div className="pointer-events-none absolute top-10 right-10 w-[500px] h-[500px] rounded-full blur-[140px] bg-[#00D4FF]/10" />
+          <div className="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full blur-[140px] bg-[#FF2D9B]/10" />
 
           <div className="relative z-10 max-w-6xl mx-auto flex flex-col items-center text-center">
-            {/* Badge de Categoria */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-brand/10 border border-brand/40 text-brand shadow-[var(--shadow-card)] mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-brand" />
-              SISTEMA OPERACIONAL COMERCIAL
-            </div>
-
-            {/* Headlines Principais — Cores Neon Oficiais (Nunca Branco ou Preto) */}
-            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.15] max-w-4xl">
-              <span className="text-[var(--color-heading-gold)]">Dados que Conectam.</span>
-              <br />
-              <span className="text-[var(--color-heading-gold)]">Inteligência que Decide.</span>
-              <br />
-              <span className="text-[var(--color-heading-gold)]">Execução que Acontece.</span>
+            {/* Headline Centralizada com Gradientes Oficiais e Dourado Radiante - SEM BRANCO OU PRETO */}
+            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.18] max-w-4xl text-center mx-auto mb-6">
+              <span>
+                <span className="landing-title-cyan font-extrabold">Dados que </span>
+                <span className="grad-text-blue font-extrabold">Conectam.</span>
+                <br />
+                <span className="landing-title-purple font-extrabold">Inteligência que </span>
+                <span className="grad-text-purple font-extrabold">Decide.</span>
+                <br />
+                <span className="landing-title-gold font-extrabold">Execução que </span>
+                <span className="grad-text-gold font-extrabold">Acontece.</span>
+              </span>
             </h1>
 
-            {/* Subheadline Oficial */}
-            <p className="mt-6 text-base sm:text-lg md:text-xl font-normal text-ink-2/80 max-w-3xl leading-relaxed">
+            {/* Subheadline Oficial Centralizada - SEM BRANCO OU PRETO */}
+            <p className="landing-subtitle mt-2 text-base sm:text-lg md:text-xl font-medium max-w-3xl leading-relaxed text-center mx-auto">
               Conecte CRM, dados, inteligência artificial e automação em um único centro de comando
               para planejar, monitorar, prever e acelerar suas operações comerciais.
             </p>
 
-            {/* CTAs do Hero */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
+            {/* CTAs do Hero com animação pulsante — ZERO FUNDO BRANCO */}
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 type="button"
                 onClick={handleGoToLogin}
-                className="btn-cta-light inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider cursor-pointer shadow-md"
+                className="btn-cta-light btn-cta-pulse inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider cursor-pointer shadow-lg"
               >
                 <span>Acessar Plataforma</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
               <a
                 href="#pilares"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-brand/40 bg-surface hover:bg-brand text-brand font-mono text-sm font-bold uppercase tracking-wider transition-colors shadow-[var(--shadow-card)]"
+                className="btn-secondary-dark inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl font-mono text-sm font-bold uppercase tracking-wider transition-all"
               >
                 <span>Ver os 8 Pilares</span>
-                <Compass className="w-4 h-4 text-brand" />
+                <Compass className="w-4 h-4 text-[#00D4FF]" />
               </a>
             </div>
 
-            {/* Capacidades reais: mesma nomenclatura e explicações do produto. */}
-            <div className="mt-10 pt-6 border-t border-line w-full">
-              <p className="font-mono text-xs font-bold uppercase tracking-widest text-brand mb-5">
-                Capacidades Operacionais Integradas
-              </p>
+            {/* Capacidades reais: Multi-CRM — Respiro +36px e bordas semânticas */}
+            <div className="mt-20 pt-8 border-t border-slate-200/80 dark:border-slate-800 w-full max-w-5xl">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {FEATURE_TAGS.map((tag, index) => (
                   <div
                     key={tag.label}
-                    className="capability-card"
-                    style={{ borderColor: tag.color, animationDelay: `${index * 45}ms` }}
+                    className="capability-card flex flex-col items-center justify-center text-center p-5 rounded-2xl transition-all"
+                    style={{
+                      borderColor: `${tag.color}45`,
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      animationDelay: `${index * 45}ms`,
+                    }}
                   >
                     <span
-                      className="block mx-auto mb-3 w-2 h-2 rounded-full"
-                      style={{ backgroundColor: tag.color }}
-                      aria-hidden="true"
-                    />
-                    <h2
-                      className="font-display font-semibold text-[17px] leading-snug"
+                      className="font-mono text-[10px] font-bold uppercase tracking-wider mb-2.5 px-2.5 py-0.5 rounded-full"
+                      style={{
+                        color: tag.color,
+                        backgroundColor: `${tag.color}15`,
+                        border: `1px solid ${tag.color}30`,
+                      }}
+                    >
+                      {tag.kicker}
+                    </span>
+                    <h4
+                      className="font-display font-bold text-[15px] leading-snug text-center mb-2"
                       style={{ color: tag.color }}
                     >
-                      {tag.label}</h2>
-                    <p className="mt-3 text-[15px] leading-[1.7]">{OFFICIAL_PILLARS[index].desc}</p>
+                      {tag.label}
+                    </h4>
+                    <p className="landing-subtitle text-xs leading-relaxed text-center">
+                      {tag.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -416,17 +582,18 @@ export function Landing360({
         {/* 3. PROBLEMA */}
         <section
           id="problema"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-background border-b border-brand"
+          className="px-5 py-16 sm:px-8 lg:px-14 border-b border-slate-700/60 transition-colors"
         >
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho de Seção Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-pink/10 border border-pink/40 text-pink mb-3">
-                <ShieldAlert className="w-3.5 h-3.5" />O Gargalo Estrutural das Empresas
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#EF4444]/10 border border-[#EF4444]/40 text-[#EF4444] mb-3.5 mx-auto">
+                <span>O Gargalo Estrutural das Empresas</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-pink tracking-tight drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight mb-3 text-center landing-title-pink">
                 A realidade de operar com dados fragmentados e equipes no escuro
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80 leading-relaxed">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Empresas investem em múltiplas ferramentas, mas continuam sem clareza sobre onde o
                 pipeline está travado, quais negócios realmente têm chance de fechar e o que cada
                 vendedor deve fazer a seguir.
@@ -434,42 +601,51 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card p-6 border-l-4 border-l-[#FF2D9B]">
-                <div className="w-10 h-10 rounded-xl bg-pink/20 text-pink flex items-center justify-center font-bold mb-4">
-                  01
+              <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-3">
+                  Silos &amp; Fragmentação
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center mb-4">
+                  <SilosCardIcon size={24} color="#FF2D9B" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-pink mb-2">
+                <h3 className="font-display text-lg font-bold text-[#FF2D9B] mb-2 text-center">
                   Silos e Ferramentas Desconectadas
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   O CRM não fala em tempo real com a telefonia, as trocas de WhatsApp ficam perdidas
                   no celular do vendedor e os dados de prospecção não retroalimentam o time de
                   fechamento.
                 </p>
               </div>
 
-              <div className="section-card p-6 border-l-4 border-l-[#FFC107]">
-                <div className="w-10 h-10 rounded-xl bg-gold/20 text-gold flex items-center justify-center font-bold mb-4">
-                  02
+              <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-3">
+                  Falta de Telemetria
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center mb-4">
+                  <ReactiveCardIcon size={24} color="#F59E0B" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-gold mb-2">
+                <h3 className="font-display text-lg font-bold text-[#F59E0B] mb-2 text-center">
                   Gestão Reativa &amp; Decisões Tardias
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Gestores passam o dia cobrando preenchimento manual de planilhas e só descobrem
                   que a meta não será atingida nos últimos dias do mês, quando já não há tempo hábil
                   para corrigir o curso.
                 </p>
               </div>
 
-              <div className="section-card p-6 border-l-4 border-l-[#00D4FF]">
-                <div className="w-10 h-10 rounded-xl bg-brand/20 text-brand flex items-center justify-center font-bold mb-4">
-                  03
+              <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-2.5 py-0.5 rounded-full mb-3">
+                  Execução Reativa
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center mb-4">
+                  <LostDealsCardIcon size={24} color="#00D4FF" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-brand mb-2">
+                <h3 className="font-display text-lg font-bold text-[#00D4FF] mb-2 text-center">
                   Perda Invisível de Oportunidades
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Sem orquestração e alertas preditivos, leads esfriam na fila sem follow-up
                   tempestivo, objeções críticas não são tratadas e a taxa de conversão despenca sem
                   causa raiz evidente.
@@ -482,67 +658,74 @@ export function Landing360({
         {/* 4. PLATAFORMA */}
         <section
           id="plataforma"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-brand border-b border-brand"
+          className="px-5 py-16 sm:px-8 lg:px-14 border-b border-slate-700/60 transition-colors"
         >
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-gold/10 border border-gold/40 text-gold mb-3">
-                <Layers className="w-3.5 h-3.5" />
-                Arquitetura One OS
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
+                <span>Arquitetura One OS</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-gold tracking-tight drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight mb-3 text-center landing-title-gradient">
                 Um único sistema operacional para planejar, monitorar e acelerar
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80 leading-relaxed">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 O Birth Hub 360° unifica a governança de dados, os algoritmos de diagnóstico e o
-                centro de comando diário da sua equipe comercial.
+                centro de comando diário da sua equipe comercial com conectividade Multi-CRM.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-brand/15 text-brand flex items-center justify-center">
-                    <Server className="w-5 h-5" />
+              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center">
+                    <MultiCrmDataLayerIcon size={24} color="#00D4FF" />
                   </div>
-                  <span className="font-mono text-xs font-bold uppercase text-brand">Camada 1</span>
                 </div>
-                <h3 className="font-display text-base font-bold text-brand mb-2">
-                  Dados &amp; Integração Contínua
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] mb-1">
+                  Camada 01
+                </span>
+                <h3 className="font-display text-base font-bold landing-title-cyan mb-2 text-center">
+                  Dados &amp; Conectividade Multi-CRM
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
-                  Conexão com Bitrix24, e-mails corporativos, canais de mensageria e dados
-                  enriquecidos de empresas B2B consolidados em uma única fonte de verdade.
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                  Conexão via API REST e webhooks bidirecionais com Bitrix24, HubSpot, Salesforce,
+                  Pipedrive, e-mails corporativos, canais de mensageria e dados enriquecidos B2B em
+                  uma única fonte da verdade.
                 </p>
               </div>
 
-              <div className="section-card p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-pink/15 text-pink flex items-center justify-center">
-                    <Cpu className="w-5 h-5" />
+              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center">
+                    <AiDiagnosticLayerIcon size={24} color="#FF2D9B" />
                   </div>
-                  <span className="font-mono text-xs font-bold uppercase text-pink">Camada 2</span>
                 </div>
-                <h3 className="font-display text-base font-bold text-pink mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] mb-1">
+                  Camada 02
+                </span>
+                <h3 className="font-display text-base font-bold landing-title-pink mb-2 text-center">
                   Motor de Diagnóstico &amp; IA
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Algoritmos contextuais que avaliam a saúde de cada deal, detectam riscos em tempo
                   real e sugerem a próxima melhor ação para fechar com maior margem.
                 </p>
               </div>
 
-              <div className="section-card p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold flex items-center justify-center">
-                    <Zap className="w-5 h-5" />
+              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center">
+                    <ExecutionLayerIcon size={24} color="#F59E0B" />
                   </div>
-                  <span className="font-mono text-xs font-bold uppercase text-gold">Camada 3</span>
                 </div>
-                <h3 className="font-display text-base font-bold text-gold mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] mb-1">
+                  Camada 03
+                </span>
+                <h3 className="font-display text-base font-bold landing-title-gold mb-2 text-center">
                   Execução &amp; Orquestração
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Cockpit de trabalho ágil para pré-vendas (SDR), vendas (Closer) e liderança, com
                   automações de tarefas repetitivas e cadências sem atrito.
                 </p>
@@ -551,61 +734,65 @@ export function Landing360({
           </div>
         </section>
 
-        {/* 5. 8 PILARES OFICIAIS (CARDS COLORIDOS COMPLETOS) */}
+        {/* 5. 8 PILARES OFICIAIS */}
         <section
           id="pilares"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-background border-b border-brand"
+          className="px-5 py-16 sm:px-8 lg:px-14 border-b border-slate-700/60 transition-colors"
         >
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-gold/10 border border-gold/40 text-gold mb-3">
-                <Target className="w-3.5 h-3.5" />
-                ESTRUTURA OFICIAL DO PRODUTO
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
+                <span>ESTRUTURA OFICIAL DO PRODUTO</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-gold tracking-tight drop-shadow-[var(--shadow-card)]">
-                Os 8 Pilares Oficiais do Birth Hub 360°
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight mb-3 text-center landing-title-gold">
+                Os 8 Pilares Fundamentais do Birth Hub 360°
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80 leading-relaxed">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Cada pilar resolve uma dimensão estratégica da operação comercial, operando de forma
                 independente ou em perfeita sinergia sistêmica.
               </p>
             </div>
 
-            {/* Grid dos 8 Cards Coloridos com Nomes Oficiais */}
+            {/* Grid dos 8 Cards Coloridos */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {OFFICIAL_PILLARS.map((p) => {
                 const isActive = selectedPillar === p.id;
+
                 return (
                   <div
                     key={p.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handlePillarClick(p.id)}
-                    className={`pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border transition-all duration-300 ${
-                      isActive ? 'pillar-card-active' : ''
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handlePillarClick(p.id);
+                      }
+                    }}
+                    className={`pillar-card group flex flex-col justify-between p-5 rounded-2xl cursor-pointer border transition-all duration-300 relative ${
+                      isActive
+                        ? 'pillar-card-active ring-2 ring-offset-2 ring-offset-[#0B1120]'
+                        : ''
                     }`}
                     style={{
-                      backgroundColor: '#14141A',
-                      borderColor: isActive ? p.color : p.color,
-                      borderWidth: isActive ? '2px' : '1.5px',
-                      boxShadow: 'var(--shadow-card)',
+                      borderColor: isActive ? p.color : `${p.color}66`,
+                      borderWidth: '1px',
+                      boxShadow: isActive
+                        ? `0 0 0 2px ${p.color}, 0 12px 28px -4px ${p.color}33`
+                        : `0 4px 20px -2px ${p.color}18`,
                     }}
                   >
-                    {/* Barra de destaque colorida superior */}
-                    <div
-                      className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl transition-all duration-300 group-hover:h-2"
-                      style={{
-                        background: p.color,
-                      }}
-                    />
-
                     {/* Topo do Card */}
                     <div className="flex items-center justify-between mb-3 pt-1">
                       <div className="flex items-center gap-2">
                         <span
                           className="font-mono text-xs font-bold px-2 py-0.5 rounded-md"
                           style={{
-                            backgroundColor: `color-mix(in srgb, ${p.color} 8%, transparent)`,
+                            backgroundColor: `${p.color}18`,
                             color: p.color,
-                            border: `1px solid ${p.color}`,
+                            border: `1px solid ${p.color}44`,
                           }}
                         >
                           {p.id}
@@ -613,7 +800,7 @@ export function Landing360({
                         <span
                           className="font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
                           style={{
-                            backgroundColor: `color-mix(in srgb, ${p.color} 8%, transparent)`,
+                            backgroundColor: `${p.color}18`,
                             color: p.color,
                           }}
                         >
@@ -624,9 +811,9 @@ export function Landing360({
                       <div
                         className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base transition-transform duration-300 group-hover:scale-110"
                         style={{
-                          backgroundColor: `color-mix(in srgb, ${p.color} 8%, transparent)`,
+                          backgroundColor: `${p.color}18`,
                           color: p.color,
-                          border: `1px solid ${p.color}`,
+                          border: `1px solid ${p.color}44`,
                         }}
                       >
                         {p.symbol}
@@ -636,19 +823,23 @@ export function Landing360({
                     {/* Conteúdo do Card com Nome Oficial */}
                     <div className="flex-1 my-1">
                       <h3
-                        className="font-display text-sm sm:text-base font-bold leading-tight mb-1"
-                        style={{ color: p.color, textShadow: 'var(--shadow-card)' }}
+                        className="font-display text-sm sm:text-base font-bold leading-tight mb-2 text-center"
+                        style={{ color: p.color }}
                       >
                         {p.name}
                       </h3>
-                      <p className="font-sans text-xs text-ink-2/70 leading-snug mb-3">{p.desc}</p>
-                      <div className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-brand text-ink-2/90 border border-brand/20">
-                        Foco: {p.focus}
+                      <p className="landing-subtitle font-sans text-xs leading-relaxed mb-3 text-center">
+                        {p.desc}
+                      </p>
+                      <div className="text-center">
+                        <span className="inline-block px-2.5 py-1 rounded text-[10px] font-mono font-semibold section-card landing-subtitle border border-slate-700/60">
+                          Foco: {p.focus}
+                        </span>
                       </div>
                     </div>
 
                     {/* Rodapé do Card */}
-                    <div className="mt-4 pt-2.5 border-t border-brand flex items-center justify-between">
+                    <div className="mt-4 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <span
                           className="w-2 h-2 rounded-full animate-pulse"
@@ -676,87 +867,114 @@ export function Landing360({
         </section>
 
         {/* 6. FLUXO OPERACIONAL */}
-        <section id="fluxo" className="px-5 py-16 sm:px-8 lg:px-14 bg-brand border-b border-brand">
+        <section id="fluxo" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado com SVG Customizado */}
+            {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-gold/10 border border-gold/40 text-gold mb-3">
-                <Workflow className="w-3.5 h-3.5" />
-                CICLO OPERACIONAL COMPLETO
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
+                <span>CICLO OPERACIONAL COMPLETO</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-[#FFC107] via-[#FF2D9B] to-[#00D4FF] bg-clip-text text-transparent tracking-tight drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-gradient tracking-tight mb-3 text-center">
                 Como os dados fluem da prospecção ao fechamento
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Cada etapa é governada por automações e inteligência para garantir velocidade e zero
-                perda de oportunidades.
+                perda de oportunidades com sincronização Multi-CRM.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-brand mb-2">ETAPA 01</div>
-                <h4 className="font-display text-sm font-bold text-brand mb-1">
+              <div className="flow-step-card card-semantic-cyan p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs font-bold text-[#00D4FF] mb-2 text-center">
+                  <span>ETAPA 01</span>
+                </div>
+                <h4 className="font-display text-sm font-bold text-[#00D4FF] mb-2 text-center">
                   Entrada &amp; Captura
                 </h4>
-                <p className="text-xs text-ink-2/70">
-                  Leads e contas são integrados via Bitrix24, campanhas ou prospecção ativa.
+                <p className="landing-subtitle text-xs leading-relaxed text-center">
+                  Leads e contas são integrados via CRMs (Bitrix24, HubSpot, Salesforce, Pipedrive),
+                  campanhas ou prospecção ativa.
                 </p>
               </div>
 
-              <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-pink mb-2">ETAPA 02</div>
-                <h4 className="font-display text-sm font-bold text-pink mb-1">
+              <div className="flow-step-card card-semantic-pink p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs font-bold text-[#FF2D9B] mb-2 text-center">
+                  <span>ETAPA 02</span>
+                </div>
+                <h4 className="font-display text-sm font-bold text-[#FF2D9B] mb-2 text-center">
                   Enriquecimento B2B
                 </h4>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs leading-relaxed text-center">
                   Dados de receita, decisores e porte validam o fit do cliente ideal (ICP).
                 </p>
               </div>
 
-              <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-gold mb-2">ETAPA 03</div>
-                <h4 className="font-display text-sm font-bold text-gold mb-1">
+              <div className="flow-step-card card-semantic-gold p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs font-bold text-[#F59E0B] mb-2 text-center">
+                  <span>ETAPA 03</span>
+                </div>
+                <h4 className="font-display text-sm font-bold text-[#F59E0B] mb-2 text-center">
                   Cadência &amp; SLA
                 </h4>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs leading-relaxed text-center">
                   Distribuição instantânea ao SDR com réguas de contato automáticas.
                 </p>
               </div>
 
-              <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-pink mb-2">ETAPA 04</div>
-                <h4 className="font-display text-sm font-bold text-pink mb-1">Apoio com IA</h4>
-                <p className="text-xs text-ink-2/70">
+              <div className="flow-step-card card-semantic-iris p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs font-bold text-[#8B7DFF] mb-2 text-center">
+                  <span>ETAPA 04</span>
+                </div>
+                <h4 className="font-display text-sm font-bold text-[#8B7DFF] mb-2 text-center">
+                  Apoio com IA
+                </h4>
+                <p className="landing-subtitle text-xs leading-relaxed text-center">
                   Copiloto analisa objeções, histórico e recomenda a abordagem ideal.
                 </p>
               </div>
 
-              <div className="flow-step-card p-5">
-                <div className="font-mono text-xs font-bold text-gold mb-2">ETAPA 05</div>
-                <h4 className="font-display text-sm font-bold text-gold mb-1">
+              <div className="flow-step-card card-semantic-green p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs font-bold text-[#10B981] mb-2 text-center">
+                  <span>ETAPA 05</span>
+                </div>
+                <h4 className="font-display text-sm font-bold text-[#10B981] mb-2 text-center">
                   Fechamento &amp; Dados
                 </h4>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs leading-relaxed text-center">
                   Contrato fechado e aprendizados de win/loss retroalimentam o sistema.
                 </p>
               </div>
             </div>
 
-            {/* Demonstração Real do Motor de Prospecção — Radar Discovery */}
-            <div className="mt-12 rounded-2xl border border-brand/30 bg-surface p-4 sm:p-6 shadow-[var(--shadow-card)]">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-brand">
+            {/* Demonstração Real do Motor de Prospecção — Prova de Capacidade Enterprise */}
+            <div className="mt-14 rounded-2xl border border-[#00D4FF]/30 dark:border-[#00D4FF]/40 bg-white dark:bg-[#0F172A] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,212,255,0.08)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#00D4FF]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF2D9B]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                  </div>
+                  <div className="h-4 w-px bg-slate-300 dark:bg-slate-700" />
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-pulse" />
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF]">
+                      Radar Discovery em Operação Real · Fontes Abertas
+                    </span>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-brand animate-pulse" />
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-brand">
-                    Radar Discovery em Operação Real · Fontes Abertas
+                  <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30">
+                    Telemetria Ativa
+                  </span>
+                  <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                    Captura real do produto · Desktop &amp; Mobile
                   </span>
                 </div>
-                <span className="font-mono text-[11px] text-ink-2/60">
-                  Captura de tela real do produto · Desktop &amp; Mobile
-                </span>
               </div>
 
-              <div className="relative overflow-hidden rounded-xl border border-brand/20 bg-background">
+              <div className="relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-[#0B1120]">
                 {reduceMotion ? (
                   <img
                     src="/landing/prospeccao/poster-prospect-radar.png"
@@ -780,83 +998,98 @@ export function Landing360({
                 )}
               </div>
 
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-ink-2/70 font-mono">
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-300 font-mono">
                 <span>✦ ICP Filtrado por Segmento, Região e Personas B2B</span>
-                <span className="text-brand">Integração nativa com Bitrix24 &amp; CRM</span>
+                <span className="text-[#00D4FF]">
+                  Integração via API e webhooks com Bitrix24, HubSpot, Salesforce e principais CRMs
+                </span>
               </div>
             </div>
           </div>
         </section>
 
         {/* 7. IA (INTELIGÊNCIA ARTIFICIAL CONTEXTUAL) */}
-        <section
-          id="ia"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-background border-b border-brand"
-        >
-          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10">
-            <div className="lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-pink/10 border border-pink/40 text-pink mb-3">
-                <Bot className="w-3.5 h-3.5" />
-                IA COM CONTEXTO OPERACIONAL REAL
+        <section id="ia" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt">
+          <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado */}
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FF2D9B]/10 border border-[#FF2D9B]/40 text-[#FF2D9B] mb-3.5 mx-auto">
+                <span>IA COM CONTEXTO OPERACIONAL REAL</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-pink tracking-tight mb-4 drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-pink tracking-tight mb-3 text-center">
                 Inteligência Artificial que compreende o seu pipeline
               </h2>
-              <p className="text-sm sm:text-base text-ink-2/80 leading-relaxed mb-6">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Ao contrário de ferramentas genéricas de texto, a IA do Birth Hub 360° é diretamente
-                conectada aos dados operacionais do seu CRM, entendendo o estágio de cada
+                conectada aos dados operacionais dos seus CRMs, entendendo o estágio de cada
                 negociação, o histórico de contatos e as objeções recorrentes.
               </p>
-              <div className="space-y-3 font-sans text-xs sm:text-sm text-ink-2/90">
-                <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-pink/20 text-pink flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>
-                    <strong className="text-brand">Diagnóstico de Entraves:</strong> Alerta deals
-                    estagnados com sugestões claras de destravamento.
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-pink/20 text-pink flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>
-                    <strong className="text-pink">Próxima Melhor Ação:</strong> Recomendações
-                    acionáveis para o vendedor avançar o contato.
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-pink/20 text-pink flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>
-                    <strong className="text-gold">Isolamento &amp; Segurança:</strong> Seus dados
-                    comerciais jamais são utilizados para treinar modelos públicos.
-                  </span>
-                </div>
-              </div>
             </div>
 
-            <div className="lg:w-1/2 w-full">
-              <div className="section-card p-6 border-2 border-pink/30 bg-surface">
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-brand">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-pink" />
-                    <span className="font-mono text-xs font-bold text-pink">
-                      COPILOTO COMERCIAL ATIVO
+            <div className="flex flex-col lg:flex-row items-center gap-10">
+              <div className="lg:w-1/2 space-y-4">
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="w-6 h-6 rounded-full bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[#00D4FF] text-sm">Diagnóstico de Entraves</h4>
+                    <p className="landing-subtitle text-xs sm:text-sm mt-1">
+                      Alerta deals estagnados com sugestões claras de destravamento baseadas no
+                      histórico da conta.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="w-6 h-6 rounded-full bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[#FF2D9B] text-sm">Próxima Melhor Ação</h4>
+                    <p className="landing-subtitle text-xs sm:text-sm mt-1">
+                      Recomendações acionáveis para o vendedor avançar o contato e contornar
+                      objeções críticas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="w-6 h-6 rounded-full bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-[#F59E0B] text-sm">Isolamento &amp; Segurança</h4>
+                    <p className="landing-subtitle text-xs sm:text-sm mt-1">
+                      Seus dados comerciais jamais são utilizados para treinar modelos públicos.
+                      Conformidade LGPD total.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 w-full">
+                <div className="section-card p-6 border-2 border-[#FF2D9B]/30 bg-white dark:bg-[#0B1120] shadow-2xl">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-[#FF2D9B] animate-pulse" />
+                      <span className="font-mono text-xs font-bold text-[#FF2D9B]">
+                        COPILOTO COMERCIAL ATIVO
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                      Contexto: Deal #4892 · Multi-CRM
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-ink-2/50">Contexto: Deal #4892</span>
-                </div>
-                <div className="space-y-3 font-mono text-xs">
-                  <div className="p-3 rounded-xl bg-brand border border-pink/25 text-ink-2/80">
-                    <span className="text-pink font-bold">Diagnóstico:</span> Negociação de R$ 140k
-                    sem retorno há 4 dias após envio de proposta.
-                  </div>
-                  <div className="p-3 rounded-xl bg-brand border border-brand/25 text-ink-2/80">
-                    <span className="text-brand font-bold">Ação Sugerida:</span> Disparar cadência
-                    de validação de decisor financeiro abordando ROI estimado em 90 dias.
+                  <div className="space-y-3 font-mono text-xs">
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#FF2D9B]/25 text-slate-700 dark:text-slate-200">
+                      <span className="text-[#FF2D9B] font-bold">Diagnóstico:</span> Negociação de
+                      R$ 140k sem retorno há 4 dias após envio de proposta.
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-[#00D4FF]/25 text-slate-700 dark:text-slate-200">
+                      <span className="text-[#00D4FF] font-bold">Ação Sugerida:</span> Disparar
+                      cadência de validação de decisor financeiro abordando ROI estimado em 90 dias.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -864,50 +1097,58 @@ export function Landing360({
           </div>
         </section>
 
-        {/* 8. AUTOMAÇÃO (& CONECTIVIDADE) */}
-        <section
-          id="automacao"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-brand border-b border-brand"
-        >
+        {/* 8. AUTOMAÇÃO & CONECTIVIDADE MULTI-CRM */}
+        <section id="automacao" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-pink/10 border border-pink/40 text-pink mb-3">
-                <Workflow className="w-3.5 h-3.5" />
-                AUTOMAÇÃO OPERACIONAL
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3.5 mx-auto">
+                <span>CONECTIVIDADE MULTI-CRM</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-pink tracking-tight drop-shadow-[var(--shadow-card)]">
-                Eficiência sem desumanizar o contato comercial
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-cyan tracking-tight mb-3 text-center">
+                Automação Inteligente &amp; Conectividade Multi-CRM
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80">
-                Remova tarefas braçais repetitivas e deixe seu time focado no que gera receita:
-                construir relacionamentos e fechar negócios.
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
+                Remova tarefas braçais repetitivas e integre seus fluxos com Bitrix24, HubSpot,
+                Salesforce, Pipedrive e mensageria sem atrito.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card p-6">
-                <h3 className="font-display text-base font-bold text-brand mb-2">
-                  Sincronização Bitrix24
+              <div className="section-card p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center font-bold mb-4">
+                  <Workflow className="w-6 h-6" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[#00D4FF] mb-2 text-center">
+                  Sincronização Multi-CRM
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
-                  Atualizações automáticas de campos, estágios de oportunidade e tarefas sem
-                  necessidade de digitação dupla.
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                  Atualizações automáticas de campos, estágios de oportunidade e tarefas em
+                  Bitrix24, HubSpot, Salesforce e Pipedrive sem digitação dupla.
                 </p>
               </div>
-              <div className="section-card p-6">
-                <h3 className="font-display text-base font-bold text-pink mb-2">
+
+              <div className="section-card p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center font-bold mb-4">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[#FF2D9B] mb-2 text-center">
                   Gatilhos de Comportamento
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Aberturas de proposta, acessos a links ou ausência de contato disparam alertas
                   imediatos para a equipe responsável.
                 </p>
               </div>
-              <div className="section-card p-6">
-                <h3 className="font-display text-base font-bold text-gold mb-2">
+
+              <div className="section-card p-6 flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold mb-4">
+                  <Target className="w-6 h-6" />
+                </div>
+                <h3 className="font-display text-base font-bold text-[#F59E0B] mb-2 text-center">
                   Distribuição Inteligente
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Roteamento de oportunidades com base em carga de trabalho, especialidade do
                   vendedor e tamanho da conta.
                 </p>
@@ -917,62 +1158,67 @@ export function Landing360({
         </section>
 
         {/* 9. PERFORMANCE COMERCIAL */}
-        <section
-          id="performance"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-background border-b border-brand"
-        >
+        <section id="performance" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt">
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-gold/10 border border-gold/40 text-gold mb-3">
-                <BarChart3 className="w-3.5 h-3.5" />
-                TELEMETRIA DE RESULTADOS
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
+                <span>TELEMETRIA DE RESULTADOS</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-gold tracking-tight drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-gold tracking-tight mb-3 text-center">
                 Visibilidade cirúrgica da tração e das metas
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Monitore taxas de passagem por fase, tempo de permanência em cada estágio e
                 produtividade real da equipe.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="section-card p-5 border-t-4 border-t-[#00D4FF]">
-                <div className="font-mono text-xs text-brand/70 uppercase">Taxa de Conversão</div>
-                <div className="font-display text-2xl font-extrabold text-brand my-1">
+              <div className="section-card card-semantic-cyan p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs text-[#00D4FF] uppercase font-bold tracking-wider mb-1">
+                  Taxa de Conversão
+                </div>
+                <div className="font-display text-2xl font-extrabold text-[#00D4FF] my-1 text-center">
                   Funil 360°
                 </div>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs text-center">
                   Acompanhamento da taxa de conversão entre cada etapa do pipeline.
                 </p>
               </div>
 
-              <div className="section-card p-5 border-t-4 border-t-[#FF2D9B]">
-                <div className="font-mono text-xs text-pink/70 uppercase">Velocidade de Vendas</div>
-                <div className="font-display text-2xl font-extrabold text-pink my-1">
+              <div className="section-card card-semantic-pink p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs text-[#FF2D9B] uppercase font-bold tracking-wider mb-1">
+                  Velocidade de Vendas
+                </div>
+                <div className="font-display text-2xl font-extrabold text-[#FF2D9B] my-1 text-center">
                   Ciclo Médio
                 </div>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs text-center">
                   Identificação do tempo exato que um lead leva da qualificação ao fechamento.
                 </p>
               </div>
 
-              <div className="section-card p-5 border-t-4 border-t-[#FFC107]">
-                <div className="font-mono text-xs text-gold/70 uppercase">Gestão de Metas</div>
-                <div className="font-display text-2xl font-extrabold text-gold my-1">
+              <div className="section-card card-semantic-gold p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs text-[#F59E0B] uppercase font-bold tracking-wider mb-1">
+                  Gestão de Metas
+                </div>
+                <div className="font-display text-2xl font-extrabold text-[#F59E0B] my-1 text-center">
                   Ritmo &amp; Pace
                 </div>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs text-center">
                   Comparativo diário de faturamento atingido versus meta mensal estabelecida.
                 </p>
               </div>
 
-              <div className="section-card p-5 border-t-4 border-t-[#00D4FF]">
-                <div className="font-mono text-xs text-brand/70 uppercase">Motivos de Perda</div>
-                <div className="font-display text-2xl font-extrabold text-brand my-1">
+              <div className="section-card card-semantic-iris p-5 text-center flex flex-col items-center">
+                <div className="font-mono text-xs text-[#8B7DFF] uppercase font-bold tracking-wider mb-1">
+                  Motivos de Perda
+                </div>
+                <div className="font-display text-2xl font-extrabold text-[#8B7DFF] my-1 text-center">
                   Win / Loss
                 </div>
-                <p className="text-xs text-ink-2/70">
+                <p className="landing-subtitle text-xs text-center">
                   Análise estruturada de causas de perda para correção contínua do produto.
                 </p>
               </div>
@@ -981,60 +1227,66 @@ export function Landing360({
         </section>
 
         {/* 10. PREVISIBILIDADE COMERCIAL */}
-        <section
-          id="previsibilidade"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-brand border-b border-brand"
-        >
+        <section id="previsibilidade" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
           <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado com SVG Customizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-gold/10 border border-gold/40 text-gold mb-3">
-                <TrendingUp className="w-3.5 h-3.5" />
-                RIGOR ANALÍTICO
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
+                <span>RIGOR ANALÍTICO</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-gold tracking-tight drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-gold tracking-tight mb-3 text-center">
                 Previsibilidade comercial baseada em dados reais
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80 leading-relaxed">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Sem promessas mágicas: modelagem estatística séria que pondera a maturidade do
                 pipeline e as taxas históricas de conversão.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-gold/20 text-gold flex items-center justify-center font-bold mb-3">
-                  1
+              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-lg bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center font-bold mb-3 font-mono text-sm border border-[#F59E0B]/40">
+                  01
                 </div>
-                <h3 className="font-display text-base font-bold text-gold mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] mb-1">
+                  Modelagem Probabilística
+                </span>
+                <h3 className="font-display text-base font-bold text-[#F59E0B] mb-2 text-center">
                   Pipeline Ponderado
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Cálculo de probabilidade de fechamento por estágio formal de negociação, evitando
                   expectativas infladas de receita.
                 </p>
               </div>
 
-              <div className="section-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-brand/20 text-brand flex items-center justify-center font-bold mb-3">
-                  2
+              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-lg bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center font-bold mb-3 font-mono text-sm border border-[#00D4FF]/40">
+                  02
                 </div>
-                <h3 className="font-display text-base font-bold text-brand mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] mb-1">
+                  Qualidade da Base
+                </span>
+                <h3 className="font-display text-base font-bold text-[#00D4FF] mb-2 text-center">
                   Maturidade de Dados
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   O sistema reconhece que a precisão preditiva depende da consistência de
                   preenchimento e do histórico da organização.
                 </p>
               </div>
 
-              <div className="section-card p-6">
-                <div className="w-8 h-8 rounded-lg bg-pink/20 text-pink flex items-center justify-center font-bold mb-3">
-                  3
+              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-lg bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center font-bold mb-3 font-mono text-sm border border-[#FF2D9B]/40">
+                  03
                 </div>
-                <h3 className="font-display text-base font-bold text-pink mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] mb-1">
+                  Gestão de Risco
+                </span>
+                <h3 className="font-display text-base font-bold text-[#FF2D9B] mb-2 text-center">
                   Cenários Conservador &amp; Otimista
                 </h3>
-                <p className="text-xs sm:text-sm text-ink-2/70 leading-relaxed">
+                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
                   Simulação de faixas de faturamento para que a liderança tome decisões de
                   contratação e investimento com segurança.
                 </p>
@@ -1043,103 +1295,154 @@ export function Landing360({
           </div>
         </section>
 
-        {/* 11. ECOSSISTEMA */}
-        <section
-          id="ecossistema"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-background border-b border-brand"
-        >
+        {/* 11. ECOSSISTEMA TECNOLÓGICO */}
+        <section id="ecossistema" className="px-5 py-12 sm:px-8 lg:px-14 landing-section-alt">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-brand/10 border border-brand/40 text-brand mb-3">
-                <Network className="w-3.5 h-3.5" />
-                CONECTIVIDADE ENTERPRISE
+            {/* Cabeçalho Centralizado */}
+            <div className="text-center max-w-3xl mx-auto mb-8">
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#00D4FF]/10 border border-[#00D4FF]/40 text-[#00D4FF] mb-3.5 mx-auto">
+                <span>CONECTIVIDADE ENTERPRISE</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-brand tracking-tight drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-cyan tracking-tight mb-3 text-center">
                 Integrado ao ecossistema tecnológico da sua empresa
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-ink-2/80">
-                Construído para operar em harmonia com as ferramentas corporativas que você já
-                utiliza.
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
+                Construído para operar com múltiplos CRMs e todas as ferramentas comerciais
+                corporativas.
               </p>
             </div>
 
+            {/* Grid Multi-CRM Completo */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl bg-surface border border-brand text-center">
-                <div className="font-mono text-sm font-bold text-brand">Bitrix24</div>
-                <div className="font-sans text-xs text-ink-2/60 mt-1">Sincronização Nativa</div>
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#00D4FF]">Bitrix24</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Conexão via API &amp; Webhooks
+                </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-brand text-center">
-                <div className="font-mono text-sm font-bold text-pink">WhatsApp API</div>
-                <div className="font-sans text-xs text-ink-2/60 mt-1">Comunicação Direta</div>
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#FF2D9B]">HubSpot</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Conexão Bidirecional
+                </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-brand text-center">
-                <div className="font-mono text-sm font-bold text-gold">Telefonia em Nuvem</div>
-                <div className="font-sans text-xs text-ink-2/60 mt-1">Gravação &amp; Métricas</div>
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#F59E0B]">Salesforce</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Enterprise Connector
+                </div>
               </div>
 
-              <div className="p-5 rounded-2xl bg-surface border border-brand text-center">
-                <div className="font-mono text-sm font-bold text-brand">Webhooks &amp; APIs</div>
-                <div className="font-sans text-xs text-ink-2/60 mt-1">Conexão Flexível</div>
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#22C55E]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#22C55E]">Pipedrive</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Pipeline Sync
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#38BDF8]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#38BDF8]">WhatsApp API</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Comunicação Direta
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#F59E0B]">Telefonia em Nuvem</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Gravação &amp; Métricas
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#00D4FF]">
+                  Webhooks &amp; APIs
+                </div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Conexão Flexível
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/40 text-center flex flex-col items-center shadow-sm">
+                <div className="font-mono text-sm font-bold text-[#FF2D9B]">E-mail Corporativo</div>
+                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Rastreabilidade Total
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 12. COMMAND CENTER */}
-        <section
-          id="command-center"
-          className="px-5 py-16 sm:px-8 lg:px-14 bg-brand border-b border-brand"
-        >
-          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10">
-            <div className="lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-pink/10 border border-pink/40 text-pink mb-3">
-                <Compass className="w-3.5 h-3.5" />
-                COCKPIT OPERACIONAL
+        {/* 12. COMMAND CENTER (COCKPIT) */}
+        <section id="command-center" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
+          <div className="max-w-6xl mx-auto">
+            {/* Cabeçalho Centralizado com SVG Customizado */}
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FF2D9B]/10 border border-[#FF2D9B]/40 text-[#FF2D9B] mb-3.5 mx-auto">
+                <span>COCKPIT OPERACIONAL</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-pink tracking-tight mb-4 drop-shadow-[var(--shadow-card)]">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold landing-title-pink tracking-tight mb-3 text-center">
                 O centro de comando unificado para liderança e time
               </h2>
-              <p className="text-sm sm:text-base text-ink-2/80 leading-relaxed mb-6">
+              <p className="landing-subtitle text-sm sm:text-base leading-relaxed text-center mx-auto">
                 Tenha um ambiente único onde diretores acompanham a saúde da receita, gerentes
                 supervisionam gargalos em tempo real e executivos de vendas recebem sua rotina de
                 atividades organizada por prioridade.
               </p>
-              <div className="grid grid-cols-2 gap-3 font-mono text-xs">
-                <div className="p-3 rounded-xl bg-surface border border-brand text-ink-2/80">
-                  <span className="font-bold text-brand">SDRs &amp; BDRs:</span> Fila organizada e
-                  dados enriquecidos na tela.
-                </div>
-                <div className="p-3 rounded-xl bg-surface border border-brand text-ink-2/80">
-                  <span className="font-bold text-gold">Closers:</span> Histórico 360°, objeções e
-                  apoio do copiloto.
-                </div>
-              </div>
             </div>
 
-            <div className="lg:w-1/2 w-full">
-              <div className="section-card p-6 bg-surface border-2 border-brand/30">
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-brand">
-                  <span className="font-mono text-xs font-bold text-brand">
-                    BIRTH HUB 360° · COCKPIT
-                  </span>
-                  <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-brand/20 text-brand font-bold">
-                    100% OPERACIONAL
-                  </span>
+            <div className="flex flex-col lg:flex-row items-center gap-10">
+              <div className="lg:w-1/2 w-full space-y-4">
+                <div className="grid grid-cols-2 gap-3 font-mono text-xs">
+                  <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
+                    <span className="font-bold text-[#00D4FF] block mb-1">SDRs &amp; BDRs</span>
+                    Fila organizada e dados enriquecidos na tela.
+                  </div>
+                  <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
+                    <span className="font-bold text-[#F59E0B] block mb-1">Closers</span>
+                    Histórico 360°, objeções e apoio do copiloto.
+                  </div>
                 </div>
-                <div className="space-y-3 font-mono text-xs">
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-brand border border-brand">
-                    <span className="text-ink-2/70">Leads Ativos na Fila</span>
-                    <span className="font-bold text-brand">184 contatos</span>
+
+                <div className="p-4 rounded-xl bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-center shadow-sm">
+                  <span className="font-bold text-[#FF2D9B] block mb-1">
+                    Diretoria &amp; Head de Vendas
+                  </span>
+                  Previsibilidade acionável, pace diário e controle total de pipeline.
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 w-full">
+                <div className="section-card p-6 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-[#00D4FF]/30 shadow-2xl">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <span className="font-mono text-xs font-bold text-[#00D4FF]">
+                      BIRTH HUB 360° · COCKPIT
+                    </span>
+                    <span className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-[#00D4FF]/20 text-[#00D4FF] font-bold">
+                      100% OPERACIONAL
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-brand border border-brand">
-                    <span className="text-ink-2/70">Deals com Risco Identificado</span>
-                    <span className="font-bold text-gold">3 oportunidades</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-brand border border-brand">
-                    <span className="text-ink-2/70">Cadências em Execução</span>
-                    <span className="font-bold text-pink">12 ativas</span>
+                  <div className="space-y-3 font-mono text-xs">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-300">
+                        Leads Ativos na Fila
+                      </span>
+                      <span className="font-bold text-[#00D4FF]">184 contatos</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-300">
+                        Deals com Risco Identificado
+                      </span>
+                      <span className="font-bold text-[#F59E0B]">3 oportunidades</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                      <span className="text-slate-600 dark:text-slate-300">
+                        Cadências em Execução
+                      </span>
+                      <span className="font-bold text-[#FF2D9B]">12 ativas</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1147,16 +1450,13 @@ export function Landing360({
           </div>
         </section>
 
-        {/* 13. CTA (CALL TO ACTION) */}
-        <section
-          id="cta"
-          className="px-5 py-20 sm:px-8 lg:px-14 bg-background text-center border-b border-brand"
-        >
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-display text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-[#FFC107] via-[#FF2D9B] to-[#00D4FF] bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[var(--shadow-card)]">
-              Pronto para transformar sua operação comercial em um centro de comando inteligente?
+        {/* 13. CTA FINAL */}
+        <section id="cta" className="px-5 py-20 sm:px-8 lg:px-14 landing-section-alt text-center">
+          <div className="max-w-4xl mx-auto flex flex-col items-center">
+            <h2 className="font-display text-3xl sm:text-5xl font-extrabold landing-title-gradient tracking-tight leading-tight text-center mx-auto">
+              <span>Pronto para colocar sua operação comercial sob comando?</span>
             </h2>
-            <p className="mt-4 text-base sm:text-lg text-ink-2/80 max-w-2xl mx-auto">
+            <p className="landing-subtitle mt-4 text-base sm:text-lg max-w-2xl mx-auto text-center">
               Acesse a plataforma corporativa do Birth Hub 360° e conecte dados, equipe e execução
               em tempo real.
             </p>
@@ -1174,48 +1474,62 @@ export function Landing360({
         </section>
 
         {/* 14. FOOTER */}
-        <footer className="px-5 py-10 sm:px-8 lg:px-14 bg-background">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 border-b border-brand pb-8 mb-6">
+        <footer className="px-5 py-10 sm:px-8 lg:px-14 landing-section-footer">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 border-b border-slate-800 pb-8 mb-6">
             <div className="flex items-center gap-3">
               <BH360LogoMark size={42} />
               <div>
-                <div className="font-display text-lg font-bold text-brand">
-                  Birth Hub <span className="text-pink">360°</span>
+                <div className="font-display text-lg font-bold text-[#00D4FF]">
+                  Birth Hub <span className="text-[#FF2D9B]">360°</span>
                 </div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-gold">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-[#F59E0B]">
                   Business Command Center
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 font-mono text-xs text-ink-2/70">
-              <a href="#problema" className="hover:text-brand transition-colors">
+            <div className="flex flex-wrap items-center justify-center gap-6 font-mono text-xs text-slate-300">
+              <a href="#problema" className="hover:text-[#00D4FF] transition-colors">
                 Problema
               </a>
-              <a href="#plataforma" className="hover:text-brand transition-colors">
+              <a href="#plataforma" className="hover:text-[#00D4FF] transition-colors">
                 Plataforma
               </a>
-              <a href="#pilares" className="hover:text-brand transition-colors">
+              <a href="#pilares" className="hover:text-[#00D4FF] transition-colors">
                 8 Pilares
               </a>
-              <a href="#fluxo" className="hover:text-brand transition-colors">
+              <a href="#fluxo" className="hover:text-[#00D4FF] transition-colors">
                 Fluxo
               </a>
-              <a href="#ia" className="hover:text-brand transition-colors">
+              <a href="#ia" className="hover:text-[#00D4FF] transition-colors">
                 IA
               </a>
-              <a href="#performance" className="hover:text-brand transition-colors">
+              <a href="#performance" className="hover:text-[#00D4FF] transition-colors">
                 Performance
               </a>
-              <a href="#previsibilidade" className="hover:text-brand transition-colors">
+              <a href="#previsibilidade" className="hover:text-[#00D4FF] transition-colors">
                 Previsibilidade
               </a>
             </div>
           </div>
 
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-ink-2/50">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-slate-400 text-center">
             <p>© {new Date().getFullYear()} Birth Hub 360°. Todos os direitos reservados.</p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              <Link
+                to="/terms"
+                className="hover:text-[#00D4FF] transition-colors underline-offset-4 hover:underline"
+              >
+                Termos de Uso
+              </Link>
+              <span>·</span>
+              <Link
+                to="/privacy"
+                className="hover:text-[#00D4FF] transition-colors underline-offset-4 hover:underline"
+              >
+                Política de Privacidade
+              </Link>
+              <span>·</span>
               <span>Isolamento Multi-Tenant</span>
               <span>·</span>
               <span>Conformidade LGPD/GDPR</span>
@@ -1227,80 +1541,101 @@ export function Landing360({
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════
-          TELA 2: LOGIN — MODAL / TELA DE ACESSO CORPORATIVO (PALETA NEON)
+          TELA 2: LOGIN — MODAL / TELA DE ACESSO CORPORATIVO (ZERO FUNDO BRANCO EM BOTÕES)
       ════════════════════════════════════════════════════════════════════ */}
       <div
-        className={`fixed inset-0 w-full h-full flex flex-col items-center justify-start z-50 bg-background px-5 py-8 sm:px-10 lg:px-16 overflow-y-auto transition-all duration-500 ${
+        className={`fixed inset-0 w-full h-full flex flex-col items-center justify-start z-50 login-antessala-backdrop ${
+          theme === 'dark' ? 'bg-[#0B1120]' : 'bg-[#F8FAFC]'
+        } px-5 py-6 sm:px-8 lg:px-12 overflow-y-auto transition-all duration-500 ${
           activeScreen === 'login'
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         }`}
       >
-        {/* Botão Voltar para a Landing */}
-        <button
-          id="btn-back"
-          type="button"
-          onClick={() => {
-            SoundFX.play('click');
-            setActiveScreen('intro');
-          }}
-          className="self-start mb-6 text-ink-2/70 hover:text-brand transition-colors flex items-center gap-2 font-mono text-xs sm:text-sm font-bold uppercase tracking-widest cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Voltar ao Início</span>
-        </button>
+        {/* Topo do Modal com navegação */}
+        <div className="w-full max-w-[460px] flex items-center justify-between mb-4">
+          <button
+            id="btn-back"
+            type="button"
+            onClick={() => {
+              SoundFX.play('click');
+              setActiveScreen('intro');
+            }}
+            className="text-slate-700 dark:text-slate-300 hover:text-[#00D4FF] dark:hover:text-[#00D4FF] transition-colors flex items-center gap-2 font-mono text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Voltar ao Início</span>
+          </button>
 
-        {/* Status Superior */}
-        <div className="w-full max-w-[480px] flex items-center justify-center mb-6">
-          <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-surface border border-line shadow-lg">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand" />
-            </span>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2/80">
-              Birth Hub · <span className="text-brand">v4.2 Enterprise</span>
-            </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="landing-theme-toggle-btn"
+              aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              title={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-[#F59E0B]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#00D4FF]" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                SoundFX.play('confirm');
+                navigate('/login');
+              }}
+              className="text-slate-600 dark:text-slate-400 hover:text-[#00D4FF] transition-colors font-mono text-xs cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800"
+            >
+              <span>Tela Cheia</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
 
-        {/* Card Central de Login */}
-        <div className="w-full max-w-[480px] mb-12">
-          <div className="mb-6 text-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest mb-3.5 bg-gold/10 border border-gold/30 text-gold shadow-lg shadow-[var(--shadow-card)]/10">
-              <ShieldCheck className="w-4 h-4 text-gold" />
-              Acesso Seguro · Zero Trust Architecture
-            </div>
-
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-gold drop-shadow-[var(--shadow-card)] tracking-tight mb-2 leading-tight">
+        {/* Header Centralizado do Modal — Sequência Coesa */}
+        <div className="flex flex-col items-center mb-4 text-center">
+          <BH360LogoMark size={48} />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-[#00D4FF]/10 border border-[#00D4FF]/30 text-[#00D4FF] mt-3 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] animate-pulse" />
+            <span>Revenue Command Center · Antessala</span>
+          </div>
+          <h2 className="font-display text-2xl sm:text-3xl font-extrabold landing-title-gradient tracking-tight mb-1.5 leading-tight text-center">
+            <span>
               {authMode === 'signup'
-                ? 'Criar conta corporativa'
+                ? 'Solicitar Acesso Corporativo'
                 : authMode === 'forgot'
                   ? 'Redefinir Senha'
-                  : 'Acessar conta'}
-            </h2>
-            <p className="font-sans text-xs sm:text-sm text-ink-2/70 font-medium max-w-[380px] mx-auto leading-relaxed">
-              {authMode === 'signup'
-                ? 'Preencha suas informações corporativas para solicitar acesso.'
-                : authMode === 'forgot'
-                  ? 'Informe seu e-mail corporativo para receber o link de recuperação.'
-                  : 'Central de inteligência comercial, previsibilidade e governança integrada.'}
-            </p>
-          </div>
+                  : 'Acessar o Command Center'}
+            </span>
+          </h2>
+          <p className="landing-subtitle font-sans text-xs sm:text-sm font-medium max-w-[380px] mx-auto leading-relaxed text-center">
+            {authMode === 'signup'
+              ? 'Preencha suas informações corporativas para provisionamento de acesso.'
+              : authMode === 'forgot'
+                ? 'Informe seu e-mail corporativo para receber o link de recuperação.'
+                : 'Central de inteligência comercial, previsibilidade e governança integrada.'}
+          </p>
+        </div>
 
-          <div className="bg-surface border border-line shadow-2xl shadow-black/80 rounded-2xl p-6 sm:p-8 relative">
+        {/* Card Central de Login */}
+        <div className="w-full max-w-[460px] mb-8">
+          <div className="bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 shadow-2xl rounded-2xl p-6 sm:p-7 relative">
             {/* Abas E-mail vs SSO */}
             {authMode === 'signin' && (
               <div
-                className="grid grid-cols-2 gap-1.5 mb-6 p-1 bg-background border border-line rounded-xl"
+                className="grid grid-cols-2 gap-1 mb-5 p-1 bg-slate-100 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 rounded-xl"
                 role="tablist"
               >
                 <button
                   type="button"
                   onClick={() => setAuthMethod('email')}
-                  className={`py-2.5 px-4 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
+                  className={`py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'email'
-                      ? 'bg-brand/20 border border-brand text-brand shadow-lg shadow-[var(--shadow-card)]/30'
-                      : 'text-ink-2/70 hover:text-ink-2 hover:bg-brand'
+                      ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#00D4FF] shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
                   }`}
                 >
                   <Mail className="w-4 h-4" />
@@ -1309,10 +1644,10 @@ export function Landing360({
                 <button
                   type="button"
                   onClick={() => setAuthMethod('sso')}
-                  className={`py-2.5 px-4 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
+                  className={`py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'sso'
-                      ? 'bg-brand/20 border border-brand text-brand shadow-lg shadow-[var(--shadow-card)]/30'
-                      : 'text-ink-2/70 hover:text-ink-2 hover:bg-brand'
+                      ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#00D4FF] shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
                   }`}
                 >
                   <Lock className="w-4 h-4" />
@@ -1321,153 +1656,209 @@ export function Landing360({
               </div>
             )}
 
-            {/* Alertas */}
+            {/* Mensagens de Feedback */}
             {errorMessage && (
-              <div className="mb-5 flex items-start gap-3 rounded-xl border border-pink/30 bg-pink/10 p-3.5 text-xs text-pink">
-                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-pink" />
+              <div
+                role="alert"
+                className="mb-4 p-3 rounded-xl bg-red-950/60 border border-red-500/50 flex items-start gap-2.5 text-xs text-red-200"
+              >
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <p className="font-medium font-sans">{errorMessage}</p>
               </div>
             )}
 
             {successMessage && (
-              <div className="mb-5 flex items-start gap-3 rounded-xl border border-brand/30 bg-brand/10 p-3.5 text-xs text-brand">
-                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0 text-brand" />
+              <div
+                role="status"
+                className="mb-4 p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/50 flex items-start gap-2.5 text-xs text-emerald-200"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <p className="font-medium font-sans">{successMessage}</p>
               </div>
             )}
 
-            {/* Formulário */}
-            <form onSubmit={handleAuthSubmit} className="space-y-4" noValidate>
-              {authMode === 'signup' && (
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="login-name"
-                    className="block font-mono text-xs font-bold text-ink-2/80 uppercase tracking-wider"
-                  >
-                    Nome Completo
-                  </label>
-                  <input
-                    id="login-name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-background text-ink-2 border border-line focus:border-brand focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder:text-ink-2/30"
-                    placeholder="Ex: Carlos Mendes"
-                    autoComplete="name"
-                  />
+            {/* Conteúdo de SSO Empresarial ou Formulário Padrão */}
+            {authMethod === 'sso' && authMode === 'signin' ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 text-center">
+                  <div className="w-10 h-10 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center mx-auto mb-2.5">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-display text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
+                    Single Sign-On Corporativo
+                  </h4>
+                  <p className="font-sans text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                    Autenticação federada SAML 2.0 / Okta / Azure AD configurada para o subdomínio
+                    da sua organização.
+                  </p>
+                  <div className="space-y-1.5 text-left">
+                    <label
+                      htmlFor="sso-domain"
+                      className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
+                    >
+                      Domínio Corporativo
+                    </label>
+                    <input
+                      id="sso-domain"
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full h-11 bg-white dark:bg-[#0F172A] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none placeholder:text-slate-400"
+                      placeholder="empresa.com.br"
+                    />
+                  </div>
                 </div>
-              )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    SoundFX.play('confirm');
+                    if (!email.trim()) {
+                      setErrorMessage('Por favor, informe seu domínio corporativo para SSO.');
+                      return;
+                    }
+                    setSuccessMessage(`Validando federação SAML 2.0 para ${email.trim()}...`);
+                  }}
+                  className="btn-cta-light w-full h-12 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-pointer shadow-lg transition-all"
+                >
+                  <span>Continuar com SSO</span>
+                  <ArrowRight className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            ) : (
+              /* Formulário Padrão */
+              <form onSubmit={handleAuthSubmit} className="space-y-4" noValidate>
+                {authMode === 'signup' && (
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="login-name"
+                      className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
+                    >
+                      Nome Completo
+                    </label>
+                    <input
+                      id="login-name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full h-11 bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                      placeholder="Ex: Carlos Mendes"
+                      autoComplete="name"
+                    />
+                  </div>
+                )}
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="login-email"
-                    className="block font-mono text-xs font-bold text-ink-2/80 uppercase tracking-wider"
-                  >
-                    {authMethod === 'sso' ? 'E-mail ou Domínio SSO' : 'E-mail Corporativo'}
-                  </label>
-                  <span className="font-mono text-[10px] text-brand/70">Domínio empresarial</span>
-                </div>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-ink-2/40 group-focus-within:text-brand transition-colors duration-200" />
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label
+                      htmlFor="login-email"
+                      className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
+                    >
+                      E-mail Corporativo
+                    </label>
+                    <span className="font-mono text-[10px] text-[#00D4FF]/80">
+                      Domínio empresarial
+                    </span>
+                  </div>
                   <input
                     id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-background text-ink-2 border border-line focus:border-brand focus:ring-1 focus:ring-[#00D4FF] rounded-xl pl-12 pr-4 py-3 text-sm outline-none transition-all placeholder:text-ink-2/30"
-                    placeholder={
-                      authMethod === 'sso' ? 'usuario@empresa.com.br' : 'diretor@suaempresa.com.br'
-                    }
+                    className="w-full h-11 bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    placeholder="seu.nome@empresa.com.br"
                     required
                     autoComplete="email"
                   />
                 </div>
-              </div>
 
-              {authMode !== 'forgot' && (
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="login-password"
-                      className="block font-mono text-xs font-bold text-ink-2/80 uppercase tracking-wider"
-                    >
-                      Senha de Acesso
-                    </label>
+                {authMode !== 'forgot' && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="login-password"
+                        className="block font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider"
+                      >
+                        Senha de Acesso
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <input
+                        id="login-password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full h-11 bg-slate-50 dark:bg-[#0B1120] text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 focus:border-[#00D4FF] focus:ring-1 focus:ring-[#00D4FF] rounded-xl px-4 text-sm font-sans outline-none transition-all pr-11 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        placeholder="••••••••••••"
+                        required
+                        autoComplete={authMode === 'signin' ? 'current-password' : 'new-password'}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-[#00D4FF] transition-colors p-1"
+                        aria-label="Mostrar ou ocultar senha"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-ink-2/40 group-focus-within:text-brand transition-colors duration-200" />
-                    <input
-                      id="login-password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-background text-ink-2 border border-line focus:border-brand focus:ring-1 focus:ring-[#00D4FF] rounded-xl pl-12 pr-12 py-3 text-sm outline-none transition-all placeholder:text-ink-2/30"
-                      placeholder="••••••••••••"
-                      required
-                      autoComplete="current-password"
-                    />
+                )}
+
+                {authMode === 'signin' && (
+                  <div className="flex items-center justify-between pt-1 font-sans text-xs">
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#0B1120] text-[#00D4FF] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      />
+                      <span>Manter conectado</span>
+                    </label>
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-ink-2/40 hover:text-brand transition-colors focus:outline-none cursor-pointer"
-                      aria-label="Mostrar ou ocultar senha"
+                      onClick={() => {
+                        setAuthMode('forgot');
+                        setErrorMessage('');
+                        setSuccessMessage('');
+                      }}
+                      className="font-medium text-[#00D4FF] hover:underline cursor-pointer"
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      Esqueci minha senha
                     </button>
                   </div>
-                </div>
-              )}
-
-              {authMode === 'signin' && (
-                <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer font-sans text-xs text-ink-2/70 select-none">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-line text-brand focus:ring-[#00D4FF] accent-[#00D4FF] cursor-pointer"
-                    />
-                    <span>Manter conectado</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('forgot');
-                      setErrorMessage('');
-                      setSuccessMessage('');
-                    }}
-                    className="font-sans text-xs font-semibold text-brand hover:underline cursor-pointer"
-                  >
-                    Esqueci minha senha
-                  </button>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full h-[52px] rounded-xl font-mono text-base font-bold uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-pointer shadow-lg shadow-[var(--shadow-card)]/20 bg-surface border-2 border-brand text-brand hover:border-pink hover:text-pink hover:shadow-[var(--shadow-card)]/30 transition-all disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-brand" />
-                ) : (
-                  <>
-                    <span>
-                      {authMode === 'signup'
-                        ? 'Solicitar Provisionamento'
-                        : authMode === 'forgot'
-                          ? 'Enviar Link de Redefinição'
-                          : 'Entrar no Birth Hub'}
-                    </span>
-                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 text-brand" />
-                  </>
                 )}
-              </button>
-            </form>
+
+                {/* Botão de Enviar */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-cta-light w-full h-12 rounded-xl font-mono text-sm sm:text-base font-bold uppercase tracking-wider flex items-center justify-center gap-2.5 cursor-pointer shadow-lg transition-all disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : (
+                    <>
+                      <span>
+                        {authMode === 'signup'
+                          ? 'Solicitar Provisionamento'
+                          : authMode === 'forgot'
+                            ? 'Enviar Link de Redefinição'
+                            : 'Entrar no Birth Hub'}
+                      </span>
+                      <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 text-white" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
 
             {/* Alternância de Modo */}
-            <div className="mt-5 text-center">
+            <div className="mt-4 text-center">
               {authMode === 'signin' && (
                 <button
                   type="button"
@@ -1476,10 +1867,10 @@ export function Landing360({
                     setErrorMessage('');
                     setSuccessMessage('');
                   }}
-                  className="font-sans text-xs text-ink-2/70 hover:text-brand transition-colors cursor-pointer"
+                  className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Não possui credenciais corporativas?{' '}
-                  <span className="font-bold text-brand hover:underline">Solicitar acesso</span>
+                  <span className="font-bold text-[#00D4FF] hover:underline">Solicitar acesso</span>
                 </button>
               )}
 
@@ -1491,10 +1882,10 @@ export function Landing360({
                     setErrorMessage('');
                     setSuccessMessage('');
                   }}
-                  className="font-sans text-xs text-ink-2/70 hover:text-brand transition-colors cursor-pointer"
+                  className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Já possui credenciais corporativas?{' '}
-                  <span className="font-bold text-brand hover:underline">Fazer login</span>
+                  <span className="font-bold text-[#00D4FF] hover:underline">Fazer login</span>
                 </button>
               )}
 
@@ -1506,111 +1897,49 @@ export function Landing360({
                     setErrorMessage('');
                     setSuccessMessage('');
                   }}
-                  className="font-sans text-xs text-ink-2/70 hover:text-brand transition-colors cursor-pointer"
+                  className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Voltar para{' '}
-                  <span className="font-bold text-brand hover:underline">Login Corporativo</span>
+                  <span className="font-bold text-[#00D4FF] hover:underline">
+                    Login Corporativo
+                  </span>
                 </button>
               )}
             </div>
 
-            {/* SSO */}
-            {authMode === 'signin' && (
-              <div className="mt-6">
-                <div className="relative flex items-center justify-center mb-4">
-                  <div className="w-full border-t border-line" />
-                  <span className="absolute bg-surface px-3 text-[10px] font-mono font-bold uppercase tracking-widest text-ink-2/50">
-                    ou acesse com
+            {/* Régua Técnica de Segurança e Conformidade (Arquitetura Real) */}
+            <div className="mt-5 p-3 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[10px] font-bold text-[#00D4FF]">TLS 1.3</span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Em Trânsito
                   </span>
                 </div>
-
-                <div className="grid grid-cols-3 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin('google')}
-                    className="flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-xs font-mono font-bold bg-background border border-line text-ink-2 hover:border-brand hover:text-brand transition-colors cursor-pointer"
-                  >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0">
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
-                    <span>Google</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin('microsoft')}
-                    className="flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-xs font-mono font-bold bg-background border border-line text-ink-2 hover:border-brand hover:text-brand transition-colors cursor-pointer"
-                  >
-                    <svg viewBox="0 0 21 21" className="w-4 h-4 shrink-0">
-                      <path fill="#f25022" d="M0 0h10v10H0z" />
-                      <path fill="#7fba00" d="M11 0h10v10H11z" />
-                      <path fill="#00a4ef" d="M0 11h10v10H0z" />
-                      <path fill="#ffb900" d="M11 11h10v10H11z" />
-                    </svg>
-                    <span>Microsoft</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMethod('sso');
-                      SoundFX.play('click');
-                    }}
-                    className="flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-xs font-mono font-bold bg-background border border-line text-ink-2 hover:border-pink hover:text-pink transition-colors cursor-pointer"
-                  >
-                    <Lock className="w-4 h-4 text-pink shrink-0" />
-                    <span>SAML SSO</span>
-                  </button>
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[10px] font-bold text-[#00D4FF]">
+                    AES-256-GCM
+                  </span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Em Repouso
+                  </span>
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Badges de Confiança */}
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <div className="bg-surface border border-line flex items-center gap-2 p-2.5 rounded-xl">
-              <span className="w-2 h-2 rounded-full bg-brand shadow-[var(--shadow-card)] shrink-0" />
-              <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-brand truncate">AES-256</div>
-                <div className="font-sans text-[9px] text-ink-2/60 truncate">Criptografado</div>
-              </div>
-            </div>
-            <div className="bg-surface border border-line flex items-center gap-2 p-2.5 rounded-xl">
-              <span className="w-2 h-2 rounded-full bg-pink shadow-[var(--shadow-card)] shrink-0" />
-              <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-pink truncate">
-                  SSO &amp; MFA
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[10px] font-bold text-[#F59E0B]">
+                    LGPD / Art. 18
+                  </span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Conformidade
+                  </span>
                 </div>
-                <div className="font-sans text-[9px] text-ink-2/60 truncate">Autenticação</div>
-              </div>
-            </div>
-            <div className="bg-surface border border-line flex items-center gap-2 p-2.5 rounded-xl">
-              <span className="w-2 h-2 rounded-full bg-gold shadow-[var(--shadow-card)] shrink-0" />
-              <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-gold truncate">LGPD/GDPR</div>
-                <div className="font-sans text-[9px] text-ink-2/60 truncate">Conformidade</div>
-              </div>
-            </div>
-            <div className="bg-surface border border-line flex items-center gap-2 p-2.5 rounded-xl">
-              <span className="w-2 h-2 rounded-full bg-brand shadow-[var(--shadow-card)] shrink-0" />
-              <div className="min-w-0">
-                <div className="font-mono text-[10px] font-bold text-brand truncate">99.99%</div>
-                <div className="font-sans text-[9px] text-ink-2/60 truncate">Uptime SLA</div>
+                <div className="flex flex-col items-center">
+                  <span className="font-mono text-[10px] font-bold text-[#10B981]">
+                    Multi-Tenant
+                  </span>
+                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                    Isolamento
+                  </span>
+                </div>
               </div>
             </div>
           </div>

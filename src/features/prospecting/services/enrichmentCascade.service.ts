@@ -10,6 +10,7 @@ import {
   guessDomainAndEmails,
   resolveEmailStatus,
 } from './enrichment/domainGuess.js';
+import { computeFitScore } from './enrichment/fitScore.js';
 import { findEmailViaHunter, findPeopleViaDomainSearch } from './hunter.service.js';
 import { searchGooglePlaceDetailed } from './places.service.js';
 
@@ -346,6 +347,46 @@ export async function runEnrichmentCascade(
       enrichedAt: new Date(),
     },
   });
+
+  if (status !== 'failed') {
+    const fetchCompanyFn = prisma.company.findUnique || prisma.company.findFirst;
+    const freshCompany = fetchCompanyFn
+      ? await fetchCompanyFn({ where: { id: companyId } as any })
+      : null;
+    if (freshCompany && prisma.lead?.updateMany) {
+      const fit = computeFitScore({
+        situacaoCadastral: freshCompany.situacaoCadastral,
+        capitalSocial: freshCompany.capitalSocial,
+        employeeCountEstimate: freshCompany.employeeCount,
+        segment: freshCompany.segment,
+        city: freshCompany.city,
+        state: freshCompany.state,
+        technologies: freshCompany.technologies,
+      });
+
+      await prisma.lead.updateMany({
+        where: {
+          companyId,
+          organizationId,
+          deletedAt: null,
+        },
+        data: {
+          score: fit.score,
+          temperature: fit.temperature,
+        },
+      });
+
+      try {
+        const { sseService } = await import('../../notifications/sse.service.js');
+        sseService.notifyCompanyEnriched(organizationId, companyId, {
+          fit: { score: fit.score, temperature: fit.temperature },
+          message: `Empresa ${companyName} enriquecida em cascata com ICP Fit ${fit.score}/100 (${fit.temperature}).`,
+        });
+      } catch {
+        // SSE broadcast é best-effort
+      }
+    }
+  }
 
   await prisma.enrichmentLog.create({
     data: {

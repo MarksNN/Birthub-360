@@ -108,6 +108,56 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
 
       const alreadyAnonymized = contact.name === ANONYMIZED_CONTACT_NAME;
 
+      // Leads deste titular nesta organização (um contato pode ter tido mais de um Lead ao longo
+      // do tempo) — organizationId explícito no where como defesa em profundidade além do RLS.
+      const leads = await prisma.lead.findMany({
+        where: { contactId: target.contactId, organizationId: target.organizationId },
+        select: { id: true },
+      });
+      const leadIds = leads.map((l) => l.id);
+
+      // Supressão ANTES de destruir e-mail e telefone (DEBT-LGPD-001). Se o opt-out falhar,
+      // a anonimização não começa: um retry ainda encontra os identificadores e nenhum canal
+      // reabre o contato (B-13 e §27). Falha de supressão deve interromper a exclusão antes de destruir os identificadores.
+      const { toE164BR } = await import('../../lib/phone.js');
+      const phoneE164 =
+        contact.phone || contact.whatsapp
+          ? toE164BR(contact.whatsapp ?? contact.phone ?? undefined)
+          : null;
+      const emailNormalized = contact.email ? contact.email.trim().toLowerCase() : null;
+
+      if (leadIds.length > 0) {
+        for (const leadId of leadIds) {
+          await prisma.optOutRecord.create({
+            data: {
+              organizationId: target.organizationId,
+              scope: 'Global',
+              leadId,
+              email: emailNormalized,
+              phoneE164,
+              originChannel: 'manual',
+              reason: 'LGPD Art. 18 - Direito de exclusão exercido pelo titular',
+              evidence: 'Exercício de direito do titular sob LGPD',
+              requestedBy: target.actorUserId ?? null,
+            },
+          });
+        }
+      } else if (emailNormalized || phoneE164) {
+        await prisma.optOutRecord.create({
+          data: {
+            organizationId: target.organizationId,
+            scope: 'Global',
+            leadId: null,
+            email: emailNormalized,
+            phoneE164,
+            originChannel: 'manual',
+            reason: 'LGPD Art. 18 - Direito de exclusão exercido pelo titular',
+            evidence: 'Exercício de direito do titular sob LGPD',
+            requestedBy: target.actorUserId ?? null,
+          },
+        });
+      }
+
       if (!alreadyAnonymized) {
         await prisma.contact.update({
           where: { id: target.contactId },
@@ -130,65 +180,6 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
         where: { contactId: target.contactId, body: { not: null } },
         data: { body: null },
       });
-
-      // Leads deste titular nesta organização (um contato pode ter tido mais de um Lead ao longo
-      // do tempo) — organizationId explícito no where como defesa em profundidade além do RLS.
-      const leads = await prisma.lead.findMany({
-        where: { contactId: target.contactId, organizationId: target.organizationId },
-        select: { id: true },
-      });
-      const leadIds = leads.map((l) => l.id);
-
-      // Grava supressão irreversível em OptOutRecord para garantir que nenhum disparo
-      // multicanal futuro alcance este titular ou seus leads (B-13 e §27).
-      if ((prisma as any).optOutRecord?.create) {
-        try {
-          const { toE164BR } = await import('../../lib/phone.js');
-          const phoneE164 =
-            contact.phone || contact.whatsapp
-              ? toE164BR(contact.whatsapp ?? contact.phone ?? undefined)
-              : null;
-          const emailNormalized = contact.email ? contact.email.trim().toLowerCase() : null;
-
-          if (leadIds.length > 0) {
-            for (const leadId of leadIds) {
-              await (prisma as any).optOutRecord
-                .create({
-                  data: {
-                    organizationId: target.organizationId,
-                    scope: 'Global',
-                    leadId,
-                    email: emailNormalized,
-                    phoneE164,
-                    originChannel: 'manual',
-                    reason: 'LGPD Art. 18 - Direito de exclusão exercido pelo titular',
-                    evidence: 'Exercício de direito do titular sob LGPD',
-                    requestedBy: target.actorUserId ?? null,
-                  },
-                })
-                .catch(() => {});
-            }
-          } else if (emailNormalized || phoneE164) {
-            await (prisma as any).optOutRecord
-              .create({
-                data: {
-                  organizationId: target.organizationId,
-                  scope: 'Global',
-                  leadId: null,
-                  email: emailNormalized,
-                  phoneE164,
-                  originChannel: 'manual',
-                  reason: 'LGPD Art. 18 - Direito de exclusão exercido pelo titular',
-                  evidence: 'Exercício de direito do titular sob LGPD',
-                  requestedBy: target.actorUserId ?? null,
-                },
-              })
-              .catch(() => {});
-          }
-        } catch {
-          // não bloqueia o fluxo de anonimização caso ocorra erro no registro auxiliar
-        }
-      }
 
       let conversationSignalsRedacted = 0;
       let timelineEventsRedacted = 0;
@@ -312,6 +303,20 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
           },
         });
         voiceCallLogsRedacted = voiceCallLogsCount;
+
+        // DEBT-LGPD-002: Localiza e anonimiza memórias conversacionais de agentes (AgentMemory)
+        // atreladas aos leads deste titular antes do expurgo temporal ordinário de 90 dias
+        for (const leadId of leadIds) {
+          await prisma.agentMemory.updateMany({
+            where: {
+              organizationId: target.organizationId,
+              sessionId: { contains: `lead_${leadId}` },
+            },
+            data: {
+              messages: [],
+            },
+          });
+        }
       }
 
       logger.info(

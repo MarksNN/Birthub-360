@@ -1,10 +1,12 @@
 import { Prisma, type PrismaClient } from '@prisma/client';
+import { getTenantId, TenantContextMissingError } from '../../../../../../lib/async-context.js';
 import { Lead, type LeadProps, type LeadStatus } from '../../../domain/entities/Lead.js';
 import { PhoneNumber } from '../../../domain/value-objects/PhoneNumber.js';
 import type { LeadRepository } from '../../../application/ports/LeadRepository.js';
 
 interface LeadRow {
   id: string;
+  organization_id?: string;
   campaign_id: string;
   name: string;
   phone: string;
@@ -18,6 +20,7 @@ interface LeadRow {
 function rowToProps(row: LeadRow): LeadProps {
   return {
     id: row.id,
+    ...(row.organization_id ? { organizationId: row.organization_id } : {}),
     campaignId: row.campaign_id,
     name: row.name,
     phone: PhoneNumber.create(row.phone),
@@ -30,18 +33,31 @@ function rowToProps(row: LeadRow): LeadProps {
 }
 
 /**
- * Quantidade de leads por INSERT multi-linha em `saveMany`. Cada lead usa 9
+ * Quantidade de leads por INSERT multi-linha em `saveMany`. Cada lead usa 10
  * parâmetros; o limite do protocolo do Postgres é 65535 parâmetros por
- * query, então 500 (4500 parâmetros) fica bem folgado, mantendo o SQL
+ * query, então 500 (5000 parâmetros) fica bem folgado, mantendo o SQL
  * gerado em um tamanho razoável para logging/debug.
  */
 const BULK_UPSERT_CHUNK_SIZE = 500;
 
 export class PgLeadRepository implements LeadRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly defaultOrganizationId?: string,
+  ) {}
 
-  async save(lead: Lead): Promise<void> {
-    await this.upsertMany([lead]);
+  private resolveOrganizationId(explicitOrgId?: string, entityOrgId?: string): string {
+    const resolved = explicitOrgId ?? entityOrgId ?? this.defaultOrganizationId ?? getTenantId();
+    if (!resolved || resolved.trim() === '') {
+      throw new TenantContextMissingError(
+        'PgLeadRepository requires organizationId via argument, entity, constructor, or requestContext',
+      );
+    }
+    return resolved.trim();
+  }
+
+  async save(lead: Lead, organizationId?: string): Promise<void> {
+    await this.upsertMany([lead], organizationId);
   }
 
   /**
@@ -51,21 +67,23 @@ export class PgLeadRepository implements LeadRepository {
    * milhares de leads de dezenas de milhares de round-trips ao banco para
    * dezenas.
    */
-  async saveMany(leads: readonly Lead[]): Promise<void> {
+  async saveMany(leads: readonly Lead[], organizationId?: string): Promise<void> {
     if (leads.length === 0) {
       return;
     }
     for (let offset = 0; offset < leads.length; offset += BULK_UPSERT_CHUNK_SIZE) {
       const chunk = leads.slice(offset, offset + BULK_UPSERT_CHUNK_SIZE);
-      await this.upsertMany(chunk);
+      await this.upsertMany(chunk, organizationId);
     }
   }
 
-  async findById(id: string): Promise<Lead | null> {
+  async findById(id: string, organizationId?: string): Promise<Lead | null> {
+    const orgId = this.resolveOrganizationId(organizationId);
     const rows = await this.prisma.$queryRaw<LeadRow[]>(Prisma.sql`
-      SELECT id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at
+      SELECT id, organization_id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at
       FROM leads
-      WHERE id = ${id}::uuid`);
+      WHERE id = ${id}::uuid
+        AND organization_id = ${orgId}`);
     const row = rows[0];
     return row === undefined ? null : Lead.restore(rowToProps(row));
   }
@@ -80,14 +98,21 @@ export class PgLeadRepository implements LeadRepository {
    * aconteçam na mesma transação implícita, sem janela para outro processo
    * roubar a mesma linha entre o SELECT e o UPDATE.
    */
-  async claimNextEligible(campaignId: string, now: Date, limit: number): Promise<Lead[]> {
+  async claimNextEligible(
+    campaignId: string,
+    now: Date,
+    limit: number,
+    organizationId?: string,
+  ): Promise<Lead[]> {
     if (limit <= 0) {
       return [];
     }
+    const orgId = this.resolveOrganizationId(organizationId);
     const rows = await this.prisma.$queryRaw<LeadRow[]>(Prisma.sql`
       WITH candidates AS (
         SELECT id FROM leads
-        WHERE campaign_id = ${campaignId}::uuid
+        WHERE organization_id = ${orgId}
+          AND campaign_id = ${campaignId}::uuid
           AND status = 'pending'
           AND (next_attempt_at IS NULL OR next_attempt_at <= ${now})
         ORDER BY created_at ASC
@@ -98,19 +123,30 @@ export class PgLeadRepository implements LeadRepository {
       SET status = 'in_progress', updated_at = ${now}
       FROM candidates
       WHERE leads.id = candidates.id
+        AND leads.organization_id = ${orgId}
       RETURNING leads.*`);
     return rows.map((row) => Lead.restore(rowToProps(row)));
   }
 
-  async existsByCampaignAndPhone(campaignId: string, phoneE164: string): Promise<boolean> {
+  async existsByCampaignAndPhone(
+    campaignId: string,
+    phoneE164: string,
+    organizationId?: string,
+  ): Promise<boolean> {
+    const orgId = this.resolveOrganizationId(organizationId);
     const rows = await this.prisma.$queryRaw<{ exists: number }[]>(Prisma.sql`
       SELECT 1 AS exists FROM leads
-      WHERE campaign_id = ${campaignId}::uuid AND phone = ${phoneE164}
+      WHERE organization_id = ${orgId}
+        AND campaign_id = ${campaignId}::uuid
+        AND phone = ${phoneE164}
       LIMIT 1`);
     return rows.length > 0;
   }
 
-  async getCampaignStats(campaignId: string): Promise<{
+  async getCampaignStats(
+    campaignId: string,
+    organizationId?: string,
+  ): Promise<{
     campaignId: string;
     totalLeads: number;
     pending: number;
@@ -121,6 +157,7 @@ export class PgLeadRepository implements LeadRepository {
     invalidNumber: number;
     contactRatePercent: number;
   }> {
+    const orgId = this.resolveOrganizationId(organizationId);
     const rows = await this.prisma.$queryRaw<
       {
         total_leads: string;
@@ -141,7 +178,8 @@ export class PgLeadRepository implements LeadRepository {
         COUNT(*) FILTER (WHERE status = 'do_not_call')::text AS do_not_call,
         COUNT(*) FILTER (WHERE status = 'invalid_number')::text AS invalid_number
       FROM leads
-      WHERE campaign_id = ${campaignId}::uuid`);
+      WHERE organization_id = ${orgId}
+        AND campaign_id = ${campaignId}::uuid`);
 
     const row = rows[0];
     const totalLeads = row ? Number.parseInt(row.total_leads, 10) : 0;
@@ -168,13 +206,21 @@ export class PgLeadRepository implements LeadRepository {
     };
   }
 
-  private async upsertMany(leads: readonly Lead[]): Promise<void> {
+  private async upsertMany(leads: readonly Lead[], organizationId?: string): Promise<void> {
     if (leads.length === 0) return;
 
+    const batchOrgId = this.resolveOrganizationId(organizationId, leads[0]?.organizationId);
     const rowFragments: Prisma.Sql[] = leads.map((lead) => {
       const props = lead.toProps();
+      const orgId = this.resolveOrganizationId(organizationId, props.organizationId);
+      if (orgId !== batchOrgId) {
+        throw new TenantContextMissingError(
+          'PgLeadRepository.saveMany cannot mix multiple organizationIds in the same batch',
+        );
+      }
       return Prisma.sql`(
         ${props.id}::uuid,
+        ${orgId},
         ${props.campaignId}::uuid,
         ${props.name},
         ${props.phone.toE164()},
@@ -187,12 +233,13 @@ export class PgLeadRepository implements LeadRepository {
     });
 
     await this.prisma.$executeRaw(Prisma.sql`
-      INSERT INTO leads (id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at)
+      INSERT INTO leads (id, organization_id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at)
       VALUES ${Prisma.join(rowFragments)}
       ON CONFLICT (id) DO UPDATE SET
         status = EXCLUDED.status,
         attempts = EXCLUDED.attempts,
         next_attempt_at = EXCLUDED.next_attempt_at,
-        updated_at = EXCLUDED.updated_at`);
+        updated_at = EXCLUDED.updated_at
+      WHERE leads.organization_id = ${batchOrgId}`);
   }
 }

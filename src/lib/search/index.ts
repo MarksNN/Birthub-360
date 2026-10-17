@@ -69,6 +69,43 @@ function escapeMeiliFilterValue(value: string): string {
 
 const MEILI_SEARCH_TIMEOUT_MS = 3_000;
 
+export interface MeiliIdPageResult {
+  ids: string[];
+  total: number;
+}
+
+/**
+ * Busca paginada no Meilisearch restrita ao tenant, retornando IDs da página solicitada e o total
+ * real de hits (`estimatedTotalHits` / `totalHits`). Retorna `null` quando o Meilisearch está
+ * indisponível.
+ */
+export async function searchCompaniesPage(
+  organizationId: string,
+  query: string,
+  limit = 50,
+  offset = 0,
+): Promise<MeiliIdPageResult | null> {
+  try {
+    const result = await withMeiliTimeout(
+      meili.index('companies').search(query, {
+        filter: `organizationId = "${escapeMeiliFilterValue(organizationId)}"`,
+        limit,
+        offset,
+        attributesToRetrieve: ['id'],
+      }),
+    );
+    const ids = result.hits.map((hit) => (hit as { id: string }).id);
+    const rawTotal =
+      (result as { totalHits?: number; estimatedTotalHits?: number }).totalHits ??
+      result.estimatedTotalHits;
+    const total = typeof rawTotal === 'number' ? rawTotal : offset + ids.length;
+    return { ids, total };
+  } catch (err: any) {
+    logger.warn({ err }, 'Busca no Meilisearch indisponível — usando fallback do Postgres');
+    return null;
+  }
+}
+
 /**
  * Busca full-text tolerante a erros de digitação, sempre restrita ao tenant. Retorna `null` (em
  * vez de lançar) quando o Meilisearch está indisponível ou a busca falha — o chamador deve tratar
@@ -79,20 +116,10 @@ export async function searchCompanyIds(
   organizationId: string,
   query: string,
   limit = 50,
+  offset = 0,
 ): Promise<string[] | null> {
-  try {
-    const result = await withMeiliTimeout(
-      meili.index('companies').search(query, {
-        filter: `organizationId = "${escapeMeiliFilterValue(organizationId)}"`,
-        limit,
-        attributesToRetrieve: ['id'],
-      }),
-    );
-    return result.hits.map((hit) => (hit as { id: string }).id);
-  } catch (err: any) {
-    logger.warn({ err }, 'Busca no Meilisearch indisponível — usando fallback do Postgres');
-    return null;
-  }
+  const page = await searchCompaniesPage(organizationId, query, limit, offset);
+  return page ? page.ids : null;
 }
 
 function withMeiliTimeout<T>(promise: Promise<T>): Promise<T> {

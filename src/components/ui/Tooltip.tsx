@@ -1,7 +1,7 @@
 import {
   autoUpdate,
-  flip,
   FloatingPortal,
+  flip,
   offset,
   type Placement,
   shift,
@@ -52,11 +52,7 @@ export function Tooltip({
     onOpenChange: setIsOpen,
     placement,
     whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(8),
-      flip({ fallbackAxisSideDirection: 'start' }),
-      shift({ padding: 8 }),
-    ],
+    middleware: [offset(8), flip({ fallbackAxisSideDirection: 'start' }), shift({ padding: 8 })],
   });
 
   const hover = useHover(context, {
@@ -69,12 +65,7 @@ export function Tooltip({
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: 'tooltip' });
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    focus,
-    dismiss,
-    role,
-  ]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover, focus, dismiss, role]);
 
   if (!isValidElement(children)) {
     return <>{children}</>;
@@ -105,7 +96,7 @@ export function Tooltip({
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
               className={cn(
-                'z-[9999] max-w-xs rounded-xl border border-line bg-surface-elevated/95 px-3 py-1.5 text-xs font-medium text-ink shadow-xl backdrop-blur-md pointer-events-none select-none',
+                'z-[9999] max-w-xs rounded-card border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink shadow-card pointer-events-none select-none',
                 className,
               )}
               {...getFloatingProps()}

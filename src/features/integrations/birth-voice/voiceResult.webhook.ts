@@ -19,6 +19,9 @@ import {
   classifyCallOutcome,
   detectRecordingConsentFromRawTranscript,
 } from './birthVoice.helpers.js';
+import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
+import { checkOptOutStatus } from '../../../shared/services/optOutCheck.service.js';
+import { syncActivityToBitrix } from '../bitrix/service/outboundSync.js';
 
 /**
  * Webhook de resultado de ligação da Bland AI (rota legada /api/webhooks/voice-result).
@@ -302,7 +305,19 @@ ${transcript || 'Nenhuma transcrição gravada.'}`;
       // conversou; agradecimento para quem conversou de verdade) — nunca dispara duas vezes
       // por causa do guard de idempotência (`existing`) logo acima, então uma reentrega deste
       // mesmo call_id não gera uma segunda mensagem.
-      if (!currentFields.optOutWhatsApp && lead.contact) {
+      let isOptedOutWhatsApp = Boolean(currentFields.optOutWhatsApp);
+      if (!isOptedOutWhatsApp && lead.contactId) {
+        try {
+          const optOutCheck = await checkOptOutStatus(lead.contactId, 'whatsapp', organizationId);
+          if (optOutCheck.blocked) {
+            isOptedOutWhatsApp = true;
+          }
+        } catch {
+          // Em caso de erro na consulta, mantém flag local
+        }
+      }
+
+      if (!isOptedOutWhatsApp && lead.contact) {
         const contact = lead.contact as { whatsapp?: string | null; phone?: string | null };
         const phone = contact.whatsapp || contact.phone;
         if (phone) {
@@ -368,6 +383,34 @@ ${transcript || 'Nenhuma transcrição gravada.'}`;
           );
         }
       }
+
+      // Desbloqueio de toques pendentes de voz na cadência multicanal
+      if (callId && callId !== 'sem-id') {
+        await resolveCadencePendingVoiceTouch(organizationId, lead.id, callId, {
+          result: hadConversation || classifiedOutcome === 'completed' ? 'sent' : 'failed',
+          error: classifiedOutcome !== 'completed' ? classifiedOutcome : null,
+        }).catch((err) => {
+          logger.warn(
+            { err, callId, leadId: lead.id },
+            'Falha ao resolver toque pendente de cadência via webhook Bland AI.',
+          );
+        });
+      }
+
+      // Espelhamento da atividade de voz no Bitrix24 (crm.activity.add)
+      syncActivityToBitrix(organizationId, lead.id, {
+        type: 'call',
+        subject: `Ligação SDR Bland: ${hadConversation ? 'Conversa realizada' : 'Tentativa sem conversa'}`,
+        description: `Estado: ${classifiedOutcome}. Duração: ${callLength * 60}s. Resumo: ${summary || 'Sem resumo'}.`,
+        completed: hadConversation,
+        direction: 'outbound',
+        durationSeconds: callLength * 60,
+      }).catch((err) => {
+        logger.warn(
+          { err, callId, leadId: lead.id },
+          'Falha ao espelhar atividade de chamada de voz no Bitrix24.',
+        );
+      });
 
       return { leadFound: true as const, duplicate: false, leadId: lead.id };
     });

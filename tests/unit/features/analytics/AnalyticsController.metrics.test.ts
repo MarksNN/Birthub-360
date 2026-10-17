@@ -34,9 +34,10 @@ describe('AnalyticsController — tratamento defensivo em /api/analytics', () =>
     );
   });
 
-  it('retorna { metrics: [], total: 0 } com status 200 defensivamente quando a agregação estoura exceção', async () => {
+  it('encaminha o erro para next() quando a agregação estoura exceção', async () => {
+    const testError = new Error('Connection failed or table empty');
     const mockUseCases = {
-      getMetrics: vi.fn().mockRejectedValue(new Error('Connection failed or table empty')),
+      getMetrics: vi.fn().mockRejectedValue(testError),
     } as unknown as AnalyticsUseCases;
 
     const controller = new AnalyticsController(mockUseCases);
@@ -55,13 +56,8 @@ describe('AnalyticsController — tratamento defensivo em /api/analytics', () =>
 
     await controller.getMetrics(req, res, next);
 
-    expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        metrics: [],
-        total: 0,
-      }),
-    );
-    expect(next).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(testError);
+    expect(statusMock).not.toHaveBeenCalled();
+    expect(jsonMock).not.toHaveBeenCalled();
   });
 });

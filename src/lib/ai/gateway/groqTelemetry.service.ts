@@ -196,7 +196,8 @@ class GroqTelemetryService {
       : this.recentCalls;
 
     const ttfts = filteredCalls.map((c) => c.ttftMs).sort((a, b) => a - b);
-    const avgTtft = ttfts.length > 0 ? Math.round(ttfts.reduce((a, b) => a + b, 0) / ttfts.length) : 135;
+    const avgTtft =
+      ttfts.length > 0 ? Math.round(ttfts.reduce((a, b) => a + b, 0) / ttfts.length) : 135;
     const minTtft = ttfts.length > 0 ? ttfts[0] : 85;
     const maxTtft = ttfts.length > 0 ? ttfts[ttfts.length - 1] : 240;
     const p95Index = Math.min(ttfts.length - 1, Math.floor(ttfts.length * 0.95));
@@ -265,3 +266,6 @@ class GroqTelemetryService {
 }
 
 export const groqTelemetryService = new GroqTelemetryService();
+
+export const getGroqTelemetrySnapshot = (organizationId?: string) =>
+  groqTelemetryService.getSnapshot(organizationId);

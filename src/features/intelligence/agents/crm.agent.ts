@@ -80,7 +80,23 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
   }
 
   async run(inputData: string, sessionId?: string) {
-    const result = await super.run(inputData, sessionId);
+    const { searchLeadsTool, getLeadContextTool } = await import('../tools/crmTools.js');
+    const { summarizeLeadTool } = await import('../tools/summarizeLeadTool.js');
+    const { checkDealHealthTool } = await import('../tools/dealHealthTool.js');
+    const { searchPlaybookTool } = await import('../tools/playbookTool.js');
+
+    const result = await this.runWithTools(
+      inputData,
+      [
+        searchLeadsTool,
+        getLeadContextTool,
+        summarizeLeadTool,
+        checkDealHealthTool,
+        searchPlaybookTool,
+      ],
+      sessionId,
+    );
+
     return {
       action: result.output as string | undefined,
       error: result.error,

@@ -43,7 +43,7 @@ export class SearchService {
   async hybridSearch(organizationId: string, query: string, limit = 8): Promise<SearchResponse> {
     const trimmed = query.trim();
     if (!trimmed) {
-      return { hits: [], semanticAvailable: true, query: trimmed };
+      return { hits: [], semanticAvailable: true, keywordAvailable: true, query: trimmed };
     }
 
     const [semanticRows, keywordRows] = await Promise.all([
@@ -52,12 +52,21 @@ export class SearchService {
     ]);
 
     const semanticAvailable = semanticRows !== null;
-    const fused = this.fuse(semanticRows ?? [], keywordRows);
+    const keywordAvailable = keywordRows !== null;
+
+    if (!semanticAvailable && !keywordAvailable) {
+      throw new Error(
+        'Base de Conhecimento temporariamente indisponível: falha nas buscas semântica e textual.',
+      );
+    }
+
+    const fused = this.fuse(semanticRows ?? [], keywordRows ?? []);
     const reordered = await this.applyReranking(trimmed, fused);
 
     return {
       hits: reordered.slice(0, limit),
       semanticAvailable,
+      keywordAvailable,
       query: trimmed,
     };
   }
@@ -134,7 +143,7 @@ export class SearchService {
    * documentos. `websearch_to_tsquery` aceita a sintaxe que o usuário já conhece de buscador
    * (aspas para frase exata, `-` para excluir) sem quebrar em entrada malformada.
    */
-  private async keywordSearch(organizationId: string, query: string): Promise<RawRow[]> {
+  private async keywordSearch(organizationId: string, query: string): Promise<RawRow[] | null> {
     try {
       return await withRlsContext(
         (tx) => tx.$queryRaw<RawRow[]>`
@@ -176,7 +185,7 @@ export class SearchService {
         );
       } catch (fallbackErr: any) {
         logger.error({ err: fallbackErr }, 'Busca por palavra-chave falhou');
-        return [];
+        return null;
       }
     }
   }

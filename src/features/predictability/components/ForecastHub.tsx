@@ -1,4 +1,13 @@
-import { Calculator, DollarSign, Info, Layers, LineChart, Scale, Target, TrendingUp } from 'lucide-react';
+import {
+  Calculator,
+  DollarSign,
+  Info,
+  Layers,
+  LineChart,
+  Scale,
+  Target,
+  TrendingUp,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
@@ -201,7 +210,8 @@ export function ForecastHub() {
                     Explicabilidade do Modelo de Forecast & Pesos do Funil
                   </CardTitle>
                   <p className="text-xs text-[var(--ink-2)] mt-1">
-                    Cálculo determinístico transparente: fórmula matemática e pesos de probabilidade oficiais por etapa do funil (ativo mesmo com funil zerado).
+                    Cálculo determinístico transparente: fórmula matemática e pesos de probabilidade
+                    oficiais por etapa do funil (ativo mesmo com funil zerado).
                   </p>
                 </div>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 self-start sm:self-auto">
@@ -229,17 +239,22 @@ export function ForecastHub() {
                   <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
                     <div className="font-semibold text-blue-400">2. Commit (P ≥ 70%)</div>
                     <p className="text-[var(--ink-2)] mt-0.5">
-                      100% do valor integral dos negócios com alta convicção e prontos para assinatura.
+                      100% do valor integral dos negócios com alta convicção e prontos para
+                      assinatura.
                     </p>
                   </div>
                   <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
-                    <div className="font-semibold text-amber-400">3. Best Case (40% ≤ P &lt; 70%)</div>
+                    <div className="font-semibold text-amber-400">
+                      3. Best Case (40% ≤ P &lt; 70%)
+                    </div>
                     <p className="text-[var(--ink-2)] mt-0.5">
                       100% do valor dos negócios em proposta ou negociação avançada.
                     </p>
                   </div>
                   <div className="p-3 rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]">
-                    <div className="font-semibold text-purple-400">4. Pipeline (10% ≤ P &lt; 40%)</div>
+                    <div className="font-semibold text-purple-400">
+                      4. Pipeline (10% ≤ P &lt; 40%)
+                    </div>
                     <p className="text-[var(--ink-2)] mt-0.5">
                       Valor ponderado estatisticamente pelo produto exato (Valor × P%).
                     </p>
@@ -288,7 +303,8 @@ export function ForecastHub() {
                         </td>
                         <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Pipeline</td>
                         <td className="py-2.5 text-xs text-[var(--ink-2)]">
-                          Primeiro contato efetivo realizado, dor do cliente e orçamento confirmados.
+                          Primeiro contato efetivo realizado, dor do cliente e orçamento
+                          confirmados.
                         </td>
                       </tr>
                       <tr>
@@ -298,7 +314,9 @@ export function ForecastHub() {
                             40%
                           </span>
                         </td>
-                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Best Case</td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">
+                          Best Case
+                        </td>
                         <td className="py-2.5 text-xs text-[var(--ink-2)]">
                           Solução apresentada aos decisores e alinhamento técnico concluído.
                         </td>
@@ -310,7 +328,9 @@ export function ForecastHub() {
                             50%
                           </span>
                         </td>
-                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Best Case</td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">
+                          Best Case
+                        </td>
                         <td className="py-2.5 text-xs text-[var(--ink-2)]">
                           Proposta formal enviada com valores, escopo e prazos em análise executiva.
                         </td>
@@ -322,7 +342,9 @@ export function ForecastHub() {
                             60%
                           </span>
                         </td>
-                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">Best Case</td>
+                        <td className="py-2.5 text-center text-xs text-[var(--ink-2)]">
+                          Best Case
+                        </td>
                         <td className="py-2.5 text-xs text-[var(--ink-2)]">
                           Contorno de objeções concluído, negociação de valores e termos aprovados.
                         </td>
@@ -346,7 +368,9 @@ export function ForecastHub() {
                             100%
                           </span>
                         </td>
-                        <td className="py-2.5 text-center text-xs text-emerald-400 font-semibold">Fechado</td>
+                        <td className="py-2.5 text-center text-xs text-emerald-400 font-semibold">
+                          Fechado
+                        </td>
                         <td className="py-2.5 text-xs text-[var(--ink-2)]">
                           Contrato devidamente assinado, ordem de faturamento e onboarding iniciado.
                         </td>
@@ -363,26 +387,33 @@ export function ForecastHub() {
                   Calibração Dinâmica do Motor (Ajuste Explicável por Sinais)
                 </div>
                 <p className="text-xs text-[var(--ink-2)]">
-                  Cada oportunidade parte da probabilidade base da etapa e recebe ajustes objetivos de acordo com sinais observáveis em tempo real:
+                  Cada oportunidade parte da probabilidade base da etapa e recebe ajustes objetivos
+                  de acordo com sinais observáveis em tempo real:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
                   <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
-                    <span className="font-semibold text-emerald-400">+10%</span> Próxima ação agendada nos próximos 14 dias
+                    <span className="font-semibold text-emerald-400">+10%</span> Próxima ação
+                    agendada nos próximos 14 dias
                   </div>
                   <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
-                    <span className="font-semibold text-rose-400">-15%</span> Próxima ação vencida há &gt;7 dias ou sem ação
+                    <span className="font-semibold text-rose-400">-15%</span> Próxima ação vencida
+                    há &gt;7 dias ou sem ação
                   </div>
                   <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
-                    <span className="font-semibold text-emerald-400">+5%</span> Interação recente registrada nos últimos 7 dias
+                    <span className="font-semibold text-emerald-400">+5%</span> Interação recente
+                    registrada nos últimos 7 dias
                   </div>
                   <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
-                    <span className="font-semibold text-rose-400">-10%</span> Sem nenhuma interação há mais de 30 dias
+                    <span className="font-semibold text-rose-400">-10%</span> Sem nenhuma interação
+                    há mais de 30 dias
                   </div>
                   <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
-                    <span className="font-semibold text-emerald-400">+5%</span> Previsão de fechamento para os próximos 30 dias
+                    <span className="font-semibold text-emerald-400">+5%</span> Previsão de
+                    fechamento para os próximos 30 dias
                   </div>
                   <div className="p-2.5 rounded-lg bg-[var(--bg)] border border-[var(--line)]">
-                    <span className="font-semibold text-rose-400">-5% a -15%</span> Penalidade por adiamento da data prevista
+                    <span className="font-semibold text-rose-400">-5% a -15%</span> Penalidade por
+                    adiamento da data prevista
                   </div>
                 </div>
               </div>

@@ -23,7 +23,13 @@ import {
   Zap,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/Card.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../../../components/ui/Card.js';
 import { Button } from '../../../components/ui/Button.js';
 import { Skeleton } from '../../../components/ui/Skeleton.js';
 import { api } from '../../../lib/api.js';
@@ -162,7 +168,8 @@ export function GroqTelemetryPanel() {
               </span>
             </div>
             <p className="text-xs text-ink-2">
-              Telemetria de ultra-baixa latência, consumo de tokens e custo dos modelos Llama 3 & Qwen.
+              Telemetria de ultra-baixa latência, consumo de tokens e custo dos modelos Llama 3 &
+              Qwen.
             </p>
           </div>
         </div>
@@ -203,7 +210,12 @@ export function GroqTelemetryPanel() {
       >
         {/* Card 1: TTFT (Time to First Token) */}
         <motion.div variants={staggerItem}>
-          <Card padding="default" variant="bento" spotlight className="relative overflow-hidden group">
+          <Card
+            padding="default"
+            variant="bento"
+            spotlight
+            className="relative overflow-hidden group"
+          >
             <div className="flex items-center justify-between text-xs font-medium text-ink-2 mb-2">
               <span className="flex items-center gap-1.5 font-bold text-ink">
                 <Gauge className="w-4 h-4 text-orange-500" /> TTFT Médio
@@ -219,15 +231,24 @@ export function GroqTelemetryPanel() {
               <span className="text-xs font-bold text-ink-2">ms</span>
             </div>
             <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-2 border-t border-line/60 pt-2">
-              <span>Mínimo: <strong className="text-ink font-mono">{snapshot.minTtftMs}ms</strong></span>
-              <span>Máximo: <strong className="text-ink font-mono">{snapshot.maxTtftMs}ms</strong></span>
+              <span>
+                Mínimo: <strong className="text-ink font-mono">{snapshot.minTtftMs}ms</strong>
+              </span>
+              <span>
+                Máximo: <strong className="text-ink font-mono">{snapshot.maxTtftMs}ms</strong>
+              </span>
             </div>
           </Card>
         </motion.div>
 
         {/* Card 2: Consumo de Tokens */}
         <motion.div variants={staggerItem}>
-          <Card padding="default" variant="bento" spotlight className="relative overflow-hidden group">
+          <Card
+            padding="default"
+            variant="bento"
+            spotlight
+            className="relative overflow-hidden group"
+          >
             <div className="flex items-center justify-between text-xs font-medium text-ink-2 mb-2">
               <span className="flex items-center gap-1.5 font-bold text-ink">
                 <Coins className="w-4 h-4 text-sky-500" /> Consumo de Tokens
@@ -243,15 +264,30 @@ export function GroqTelemetryPanel() {
               <span className="text-xs font-bold text-ink-2">tokens</span>
             </div>
             <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-2 border-t border-line/60 pt-2">
-              <span>Prompt: <strong className="text-ink font-mono">{snapshot.promptTokens.toLocaleString('pt-BR')}</strong></span>
-              <span>Saída: <strong className="text-ink font-mono">{snapshot.completionTokens.toLocaleString('pt-BR')}</strong></span>
+              <span>
+                Prompt:{' '}
+                <strong className="text-ink font-mono">
+                  {snapshot.promptTokens.toLocaleString('pt-BR')}
+                </strong>
+              </span>
+              <span>
+                Saída:{' '}
+                <strong className="text-ink font-mono">
+                  {snapshot.completionTokens.toLocaleString('pt-BR')}
+                </strong>
+              </span>
             </div>
           </Card>
         </motion.div>
 
         {/* Card 3: Custo Estimado */}
         <motion.div variants={staggerItem}>
-          <Card padding="default" variant="bento" spotlight className="relative overflow-hidden group">
+          <Card
+            padding="default"
+            variant="bento"
+            spotlight
+            className="relative overflow-hidden group"
+          >
             <div className="flex items-center justify-between text-xs font-medium text-ink-2 mb-2">
               <span className="flex items-center gap-1.5 font-bold text-ink">
                 <DollarSign className="w-4 h-4 text-emerald-500" /> Custo Estimado
@@ -267,14 +303,24 @@ export function GroqTelemetryPanel() {
               </span>
             </div>
             <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-2 border-t border-line/60 pt-2">
-              <span>Média/chamada: <strong className="text-ink font-mono">US$ {(snapshot.totalCostUsd / Math.max(1, snapshot.totalRequests)).toFixed(5)}</strong></span>
+              <span>
+                Média/chamada:{' '}
+                <strong className="text-ink font-mono">
+                  US$ {(snapshot.totalCostUsd / Math.max(1, snapshot.totalRequests)).toFixed(5)}
+                </strong>
+              </span>
             </div>
           </Card>
         </motion.div>
 
         {/* Card 4: Volume de Requisições */}
         <motion.div variants={staggerItem}>
-          <Card padding="default" variant="bento" spotlight className="relative overflow-hidden group">
+          <Card
+            padding="default"
+            variant="bento"
+            spotlight
+            className="relative overflow-hidden group"
+          >
             <div className="flex items-center justify-between text-xs font-medium text-ink-2 mb-2">
               <span className="flex items-center gap-1.5 font-bold text-ink">
                 <Activity className="w-4 h-4 text-violet-500" /> Requisições
@@ -290,8 +336,12 @@ export function GroqTelemetryPanel() {
               <span className="text-xs font-bold text-ink-2">chamadas</span>
             </div>
             <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-2 border-t border-line/60 pt-2">
-              <span>Status: <strong className="text-emerald-500 font-semibold">100% Saudável</strong></span>
-              <span>Provedor: <strong className="text-ink">Groq Cloud</strong></span>
+              <span>
+                Status: <strong className="text-emerald-500 font-semibold">100% Saudável</strong>
+              </span>
+              <span>
+                Provedor: <strong className="text-ink">Groq Cloud</strong>
+              </span>
             </div>
           </Card>
         </motion.div>
@@ -322,7 +372,10 @@ export function GroqTelemetryPanel() {
             </thead>
             <tbody>
               {snapshot.models.map((m) => (
-                <tr key={m.model} className="border-b border-line/50 hover:bg-surface-2 transition-colors">
+                <tr
+                  key={m.model}
+                  className="border-b border-line/50 hover:bg-surface-2 transition-colors"
+                >
                   <td className="py-3 pr-4">
                     <div className="font-bold text-ink">{m.displayName}</div>
                     <div className="text-[11px] text-ink-2 font-mono">{m.model}</div>
@@ -354,7 +407,9 @@ export function GroqTelemetryPanel() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-brand" />
-            <h3 className="text-sm font-bold text-ink">Histórico de Chamadas Recentes (Live Stream)</h3>
+            <h3 className="text-sm font-bold text-ink">
+              Histórico de Chamadas Recentes (Live Stream)
+            </h3>
           </div>
           <span className="text-xs text-ink-2">Últimas inferências registradas</span>
         </div>
@@ -377,7 +432,9 @@ export function GroqTelemetryPanel() {
                     </span>
                   </div>
                   <div className="text-[11px] text-ink-2 mt-0.5">
-                    Latência total: <span className="font-mono text-ink">{call.latencyMs}ms</span> · Tokens: <span className="font-mono text-ink">{call.totalTokens}</span> ({call.promptTokens} in / {call.completionTokens} out)
+                    Latência total: <span className="font-mono text-ink">{call.latencyMs}ms</span> ·
+                    Tokens: <span className="font-mono text-ink">{call.totalTokens}</span> (
+                    {call.promptTokens} in / {call.completionTokens} out)
                   </div>
                 </div>
               </div>

@@ -73,7 +73,7 @@ function KpiCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-2">{label}</p>
-          <p className="mt-2 text-2xl font-black tracking-tight text-ink [font-variant-numeric:tabular-nums]">
+          <p className="mt-2 text-2xl font-bold font-mono tracking-tight text-ink [font-variant-numeric:tabular-nums]">
             {value}
           </p>
           <p className="mt-1 text-xs text-ink-2">{detail}</p>

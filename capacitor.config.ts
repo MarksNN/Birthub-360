@@ -38,7 +38,15 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // e mesmo assim só afeta build de debug, já que o manifest de release não declara
 // usesCleartextTraffic (ver android/app/src/main/AndroidManifest.xml e
 // android/app/src/debug/AndroidManifest.xml).
-const PRODUCTION_URL = process.env.CAPACITOR_SERVER_URL || 'https://birthhub-360.onrender.com';
+const DEFAULT_APP_URL = 'https://app.birthhub360.com.br';
+
+if (process.env.CI && process.env.NODE_ENV === 'production' && !process.env.CAPACITOR_SERVER_URL) {
+  throw new Error(
+    'CAPACITOR_SERVER_URL obrigatória em builds de produção no CI (o endpoint legado do Render está desativado).',
+  );
+}
+
+const PRODUCTION_URL = process.env.CAPACITOR_SERVER_URL || DEFAULT_APP_URL;
 const IS_LOCAL_TEST_URL = PRODUCTION_URL.startsWith('http://');
 
 const config: CapacitorConfig = {

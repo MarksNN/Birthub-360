@@ -83,13 +83,13 @@ export function AppBreadcrumbs({ className, items }: AppBreadcrumbsProps) {
               ) : item.href ? (
                 <Link
                   to={item.href}
-                  className="hover:text-brand transition-colors flex items-center gap-1 text-ink-2/80 truncate max-w-[150px]"
+                  className="hover:text-brand transition-colors flex items-center gap-1 text-ink-2 truncate max-w-[150px]"
                 >
                   {isFirst && <Home className="h-3 w-3 shrink-0" aria-hidden="true" />}
                   <span>{item.label}</span>
                 </Link>
               ) : (
-                <span className="text-ink-2/80 truncate max-w-[150px]">{item.label}</span>
+                <span className="text-ink-2 truncate max-w-[150px]">{item.label}</span>
               )}
             </li>
           );

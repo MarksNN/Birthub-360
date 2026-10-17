@@ -3,7 +3,7 @@ import { toDeterministicCnpj } from '../../../lib/cnpj.js';
 import { env } from '../../../config/env.js';
 import { fromPrismaCompanyStatus, toPrismaCompanyStatus } from '../../../lib/enumMap.js';
 import { prisma } from '../../../lib/prisma.js';
-import { searchCompanyIds } from '../../../lib/search/index.js';
+import { searchCompaniesPage } from '../../../lib/search/index.js';
 import type { CompanyStatus } from '../../../lib/zod.js';
 import type { Company, CompanyRepository } from '../domain/Company.js';
 
@@ -33,6 +33,7 @@ export class PrismaCompanyRepository implements CompanyRepository {
     limit: number = 50,
   ): Promise<{ data: Company[]; meta: unknown }> {
     const where: Prisma.CompanyWhereInput = { organizationId };
+    const skip = (page - 1) * limit;
 
     if (query) {
       // Com ENABLE_SEARCH=true, prioriza o Meilisearch (tolerante a erros de digitação e
@@ -40,30 +41,59 @@ export class PrismaCompanyRepository implements CompanyRepository {
       // Meilisearch está indisponível/falhou — cai de volta para o filtro OR abaixo. Um array
       // vazio é uma resposta legítima do Meilisearch (busca funcionou, sem resultados) e deve
       // ser respeitado, não sobrescrito pelo fallback.
-      const meiliIds = env.ENABLE_SEARCH
-        ? await searchCompanyIds(organizationId, query, limit)
+      const meiliPage = env.ENABLE_SEARCH
+        ? await searchCompaniesPage(organizationId, query, limit, skip)
         : null;
-      if (meiliIds !== null) {
-        where.id = { in: meiliIds };
-      } else {
-        // Company.cnpj é gravado normalizado (só dígitos, ver src/lib/cnpj.ts) — comparar contra
-        // `query` cru faria uma busca por "12.345.678/0001-99" nunca bater com o dado salvo.
-        // Extrai os dígitos da busca e só adiciona a condição de cnpj quando sobrar algum (uma
-        // busca sem nenhum dígito, ex. "Acme", não deve virar `contains: ''`, que bateria com
-        // toda empresa independente de ter CNPJ).
-        const cnpjDigits = query.replace(/\D/g, '');
-        where.OR = [
-          { tradeName: { contains: query, mode: 'insensitive' } },
-          { legalName: { contains: query, mode: 'insensitive' } },
-          ...(cnpjDigits ? [{ cnpj: { contains: cnpjDigits } }] : []),
-          { emails: { hasSome: [query] } },
-          { phones: { hasSome: [query] } },
-          { website: { contains: query, mode: 'insensitive' } },
-        ];
-      }
-    }
+      if (meiliPage !== null) {
+        if (meiliPage.ids.length === 0) {
+          return {
+            data: [],
+            meta: {
+              total: meiliPage.total,
+              page,
+              limit,
+              totalPages: Math.ceil(meiliPage.total / limit),
+            },
+          };
+        }
 
-    const skip = (page - 1) * limit;
+        where.id = { in: meiliPage.ids };
+        const rows = await prisma.company.findMany({
+          where,
+          take: limit,
+          include: { contacts: true, leads: true },
+        });
+        const orderIndex = new Map(meiliPage.ids.map((id, idx) => [id, idx]));
+        const sortedRows = [...rows].sort(
+          (a, b) => (orderIndex.get(a.id) ?? 0) - (orderIndex.get(b.id) ?? 0),
+        );
+
+        return {
+          data: sortedRows.map((c) => serializeCompanyStatus(c)) as Company[],
+          meta: {
+            total: meiliPage.total,
+            page,
+            limit,
+            totalPages: Math.ceil(meiliPage.total / limit),
+          },
+        };
+      }
+
+      // Company.cnpj é gravado normalizado (só dígitos, ver src/lib/cnpj.ts) — comparar contra
+      // `query` cru faria uma busca por "12.345.678/0001-99" nunca bater com o dado salvo.
+      // Extrai os dígitos da busca e só adiciona a condição de cnpj quando sobrar algum (uma
+      // busca sem nenhum dígito, ex. "Acme", não deve virar `contains: ''`, que bateria com
+      // toda empresa independente de ter CNPJ).
+      const cnpjDigits = query.replace(/\D/g, '');
+      where.OR = [
+        { tradeName: { contains: query, mode: 'insensitive' } },
+        { legalName: { contains: query, mode: 'insensitive' } },
+        ...(cnpjDigits ? [{ cnpj: { contains: cnpjDigits } }] : []),
+        { emails: { hasSome: [query] } },
+        { phones: { hasSome: [query] } },
+        { website: { contains: query, mode: 'insensitive' } },
+      ];
+    }
 
     const [data, total] = await prisma.$transaction([
       prisma.company.findMany({

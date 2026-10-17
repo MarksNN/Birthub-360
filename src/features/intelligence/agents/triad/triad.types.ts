@@ -140,6 +140,7 @@ export interface AgentCenterTrace {
 export interface SellerWorkspaceOverview {
   metrics: {
     monthTarget: number;
+    targetConfigured?: boolean;
     closedWon: number;
     gap: number;
     influencablePipeline: number;

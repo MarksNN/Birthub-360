@@ -65,6 +65,7 @@ import { prospectingRoutes } from '../features/prospecting/routes/prospecting.ro
 import { prospectingToolsRoutes } from '../features/prospecting/routes/prospecting-tools.routes.js';
 import { roleplayRoutes } from '../features/roleplay/routes/roleplay.routes.js';
 import { salesOrchestrationRoutes } from '../features/sales-orchestration/server/salesOrchestration.routes.js';
+import { socialSellingRoutes } from '../features/social-selling/server/socialSelling.routes.js';
 import { teamRoutes } from '../features/team/routes/team.routes.js';
 import { COMMERCIAL_INTELLIGENCE_ROLES, COPILOTO_IA_ROLES } from '../lib/auth/authorization.js';
 import { type AuthRequest, authenticateToken } from '../shared/middlewares/authenticateToken.js';
@@ -248,6 +249,7 @@ export function mountFeatureRoutes(app: Express): void {
   // (requireRole dentro do router).
   app.use('/api/market-intelligence', authenticateToken, requireTenant, accountIntelligenceRoutes);
   app.use('/api/sales-orchestration', authenticateToken, requireTenant, salesOrchestrationRoutes);
+  app.use('/api/social-selling', authenticateToken, requireTenant, socialSellingRoutes);
 
   // Qualquer /api/* que não bateu em nenhuma rota acima deve 404 aqui, e nunca
   // cair no fallback do Vite/SPA (mountFrontend, em frontend.ts): em dev, `vite.middlewares`

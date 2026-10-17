@@ -8,10 +8,15 @@ import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { assertPiiExternalConsent, rehydratePii } from '../services/guardrails.service.js';
 import { copywriterTool } from '../tools/copywriterTool.js';
-import { getLeadContextTool, updateLeadQualificationTool } from '../tools/crmTools.js';
+import {
+  getLeadContextTool,
+  searchLeadsTool,
+  updateLeadQualificationTool,
+} from '../tools/crmTools.js';
 import { marketResearchTool } from '../tools/marketResearchTool.js';
 import { searchPlaybookTool } from '../tools/playbookTool.js';
 import { summarizeLeadTool } from '../tools/summarizeLeadTool.js';
+import { getObjectionBattlecardTool } from '../tools/battlecardTool.js';
 import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 import { getLearningProfile } from './learning.agent.js';
 import {
@@ -23,8 +28,10 @@ import {
 
 // As ferramentas que o SDR Autônomo tem acesso
 const tools = [
+  searchLeadsTool,
   getLeadContextTool,
   searchPlaybookTool,
+  getObjectionBattlecardTool,
   updateLeadQualificationTool,
   marketResearchTool,
   copywriterTool,

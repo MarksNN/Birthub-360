@@ -163,6 +163,33 @@ export async function promoteToCrm(input: PromoteInput) {
     include: { company: true, contact: true, timeline: true },
   });
 
+  // Atribuição automática (round-robin) para o lead recém-promovido, alinhado com createLead
+  try {
+    const { assignLeadRoundRobin } = await import(
+      '../../../../shared/services/leadAssignment.service.js'
+    );
+    const assignedOwner = await assignLeadRoundRobin(input.organizationId, lead.id);
+    if (assignedOwner) {
+      lead.owner = assignedOwner;
+    }
+  } catch (err: any) {
+    logger.warn(
+      { err, leadId: lead.id },
+      'Round-robin assignment skipped or failed during promote',
+    );
+  }
+
+  // Notificação em tempo real via SSE para o CRM board refletir o novo lead e seu score imediatamente
+  try {
+    const { sseService } = await import('../../../notifications/sse.service.js');
+    sseService.notifyCompanyEnriched(input.organizationId, company.id, {
+      fit,
+      message: `Lead "${company.tradeName || company.legalName}" promovido da Prospecção para o CRM!`,
+    });
+  } catch {
+    // SSE é best-effort
+  }
+
   // Fire-and-forget: Atlas → Bitrix24 é automático (nunca exige clique manual), mas nunca deve
   // atrasar nem derrubar a resposta de criação do lead — pushLeadToBitrix já engole os próprios
   // erros e vira no-op se a organização não tiver Bitrix conectado. O push em si foi movido para uma fila.

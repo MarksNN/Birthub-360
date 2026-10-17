@@ -12,6 +12,7 @@
 import type { BaseMessage } from '@langchain/core/messages';
 import { requestContext } from '../../async-context.js';
 import { assertAiBudgetNotExceeded } from '../budget.js';
+import { tokenQuotaService } from '../finops/tokenQuota.service.js';
 import { recordAiUsageCost } from '../metrics.js';
 import { isCircuitOpen, recordCircuitFailure, recordCircuitSuccess } from './circuit-breaker.js';
 import { normalizeTemperature, resolveFallbackTimeoutMs } from './http-client.js';
@@ -31,6 +32,19 @@ export async function* streamChatCompletion(
 ): AsyncGenerator<AiStreamChunk, AiStreamResult> {
   await assertAiBudgetNotExceeded();
 
+  const resolvedModel = resolveModelName(modelName);
+  let effectiveModel = resolvedModel;
+  const tenantId = requestContext.getStore()?.tenantId;
+  if (tenantId) {
+    const quotaDecision = await tokenQuotaService.enforceTokenQuota({
+      organizationId: tenantId,
+      requestedModel: resolvedModel,
+    });
+    if (quotaDecision.effectiveModel && quotaDecision.effectiveModel !== resolvedModel) {
+      effectiveModel = resolveModelName(quotaDecision.effectiveModel);
+    }
+  }
+
   if (!process.env.GROQ_API_KEY) {
     throw new Error('Streaming de IA requer GROQ_API_KEY configurada.');
   }
@@ -40,8 +54,7 @@ export async function* streamChatCompletion(
     );
   }
 
-  const resolvedModel = resolveModelName(modelName);
-  const groqModel = resolveGroqModelName(resolvedModel);
+  const groqModel = resolveGroqModelName(effectiveModel);
   const requestMessages = toChatCompletionMessages(messages);
   const timeoutMs = resolveFallbackTimeoutMs();
   const startedAt = Date.now();
@@ -135,11 +148,17 @@ export async function* streamChatCompletion(
   const ttftMs = firstTokenAt ? firstTokenAt - startedAt : Date.now() - startedAt;
   const latencyMs = Date.now() - startedAt;
 
-  recordAiUsageCost(
-    'groq',
-    requestContext.getStore()?.tenantId,
-    estimatedCost,
-  );
+  recordAiUsageCost('groq', requestContext.getStore()?.tenantId, estimatedCost);
+
+  if (usage?.total_tokens) {
+    tokenQuotaService
+      .recordUsage({
+        organizationId: requestContext.getStore()?.tenantId,
+        model: modelUsed,
+        tokens: usage.total_tokens,
+      })
+      .catch(() => {});
+  }
 
   groqTelemetryService.recordGroqCall({
     model: modelUsed,

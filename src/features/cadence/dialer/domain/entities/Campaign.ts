@@ -2,6 +2,7 @@ export type CampaignStatus = 'draft' | 'active' | 'paused' | 'finished';
 
 export interface CampaignProps {
   id: string;
+  organizationId?: string;
   name: string;
   status: CampaignStatus;
   createdAt: Date;
@@ -25,10 +26,16 @@ export class InvalidCampaignTransitionError extends Error {
 export class Campaign {
   private constructor(private props: CampaignProps) {}
 
-  static create(input: { id: string; name: string; now?: Date }): Campaign {
+  static create(input: {
+    id: string;
+    name: string;
+    organizationId?: string;
+    now?: Date;
+  }): Campaign {
     const now = input.now ?? new Date();
     return new Campaign({
       id: input.id,
+      ...(input.organizationId ? { organizationId: input.organizationId } : {}),
       name: input.name,
       status: 'draft',
       createdAt: now,
@@ -42,6 +49,10 @@ export class Campaign {
 
   get id(): string {
     return this.props.id;
+  }
+
+  get organizationId(): string | undefined {
+    return this.props.organizationId;
   }
 
   get name(): string {
