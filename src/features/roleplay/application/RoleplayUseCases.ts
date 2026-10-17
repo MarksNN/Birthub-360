@@ -1,3 +1,7 @@
+import type { ObjectionMatrixItemRepository } from '../../playbook/objection-matrix/domain/ObjectionMatrixItem.js';
+import { PrismaObjectionMatrixRepository } from '../../playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.js';
+import type { QualificationMatrixItemRepository } from '../../playbook/qualification-matrix/domain/QualificationMatrixItem.js';
+import { PrismaQualificationMatrixRepository } from '../../playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
 import type {
   RoleplayFeedback,
   RoleplayMessage,
@@ -12,6 +16,8 @@ export class RoleplayUseCases {
   constructor(
     private repository: RoleplayRepository = prismaRoleplayRepository,
     private aiService: RoleplayAiService = new RoleplayAiService(),
+    private qualificationRepo: QualificationMatrixItemRepository = new PrismaQualificationMatrixRepository(),
+    private objectionRepo: ObjectionMatrixItemRepository = new PrismaObjectionMatrixRepository(),
   ) {}
 
   async listPersonas(): Promise<RoleplayPersona[]> {
@@ -88,11 +94,27 @@ export class RoleplayUseCases {
       text: m.content,
     }));
 
+    // Busca matrizes ativas da organização para contextualizar a simulação (DT-007)
+    let qualificationCriteria: string[] = [];
+    let objections: string[] = [];
+    try {
+      const [qualRes, objRes] = await Promise.all([
+        this.qualificationRepo.findAllWithFilters(organizationId, undefined, 1, 50),
+        this.objectionRepo.findAllWithFilters(organizationId, undefined, 1, 50),
+      ]);
+      qualificationCriteria = qualRes.data.map((q) => `${q.questionCategory}: ${q.questionText}`);
+      objections = objRes.data.map((o) => `${o.objectionTitle} (${o.objectionText})`);
+    } catch {
+      // Degradação graciosa em caso de falha de leitura secundária
+    }
+
     // Execução real do LLM provider (DT-007: sem MOCK_DATA no caminho produtivo)
     const aiResponse = await this.aiService.simulateCustomerResponse({
       persona: personaInput,
       history,
       userMessage: userText,
+      qualificationCriteria,
+      objections,
     });
 
     const replyText = aiResponse.personaReply;
@@ -136,8 +158,25 @@ export class RoleplayUseCases {
       text: m.content,
     }));
 
+    // Busca matrizes ativas da organização para enriquecer o parecer de avaliação pedagógica
+    let qualificationCriteria: string[] = [];
+    let objections: string[] = [];
+    try {
+      const [qualRes, objRes] = await Promise.all([
+        this.qualificationRepo.findAllWithFilters(organizationId, undefined, 1, 50),
+        this.objectionRepo.findAllWithFilters(organizationId, undefined, 1, 50),
+      ]);
+      qualificationCriteria = qualRes.data.map((q) => `${q.questionCategory}: ${q.questionText}`);
+      objections = objRes.data.map((o) => `${o.objectionTitle} (${o.objectionText})`);
+    } catch {
+      // Degradação graciosa
+    }
+
     // Avaliação real da IA (DT-007: sem fórmulas matemáticas arbitrárias falsificando avaliação de IA)
-    const aiEvaluation = await this.aiService.evaluateSession(personaInput, history);
+    const aiEvaluation = await this.aiService.evaluateSession(personaInput, history, {
+      qualificationCriteria,
+      objections,
+    });
 
     const feedback: RoleplayFeedback = {
       overallScore: aiEvaluation.overallScore,

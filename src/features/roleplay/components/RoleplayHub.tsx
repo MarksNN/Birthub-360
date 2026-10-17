@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { EmptyState } from '../../../components/ui/EmptyState.js';
 import { Skeleton } from '../../../components/ui/Skeleton.js';
 import { useActivePlaybook } from '../../../hooks/useActivePlaybook.js';
+import { usePlaybookMatrixData } from '../../../hooks/usePlaybookMatrixData.js';
 import { api } from '../../../lib/api.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { toast } from '../../../lib/toast.js';
@@ -19,6 +20,7 @@ import type { CallAnalysisResult, CallMessage } from './roleplay-hub/types.js';
 
 export function RoleplayHub() {
   const { playbook, info: playbookMeta } = useActivePlaybook();
+  const { objections, qualifications } = usePlaybookMatrixData(playbook);
 
   const [selectedPersona, setSelectedPersona] = useState('gestor_frota');
   const [difficulty, setDifficulty] = useState<'facil' | 'medio' | 'dificil'>('medio');
@@ -249,21 +251,38 @@ export function RoleplayHub() {
     setIsThinking(true);
 
     const persona = personaKeyFor(selectedPersona);
+    // Prioriza matrizes dinâmicas cadastradas pelo tenant via playbookApi com fallback retroativo para estáticos
+    const liveCriteria =
+      qualifications.length > 0
+        ? qualifications.map((item) => ({
+            category: item.questionCategory,
+            criteria: item.idealAnswer,
+            question: item.questionText,
+          }))
+        : QUALIFICATION_CRITERIA.map((item) => ({
+            category: item.category,
+            criteria: item.atlas,
+            question: item.spinQuestionAtlas,
+          }));
+
+    const liveObjections =
+      objections.length > 0
+        ? objections.map((item) => ({
+            title: item.objectionTitle,
+            technique: item.keyDifferentiator,
+            guidance: item.responseScript,
+          }))
+        : OBJECTIONS_DATA.map((item) => ({
+            title: item.title,
+            technique: item.technique,
+            guidance: item.bestResponseAtlas,
+          }));
+
     const playbookContext = JSON.stringify({
       difficulty,
       persona: currentPersonas.find((item) => item.id === selectedPersona),
-      // Provisório: mesmo raciocínio do initialGreeting acima — usa sempre o lado
-      // atlas/logística de playbookData.ts até a consolidação de conteúdo do playbook único.
-      qualificationCriteria: QUALIFICATION_CRITERIA.map((item) => ({
-        category: item.category,
-        criteria: item.atlas,
-        question: item.spinQuestionAtlas,
-      })),
-      objections: OBJECTIONS_DATA.map((item) => ({
-        title: item.title,
-        technique: item.technique,
-        guidance: item.bestResponseAtlas,
-      })),
+      qualificationCriteria: liveCriteria,
+      objections: liveObjections,
     });
 
     try {
