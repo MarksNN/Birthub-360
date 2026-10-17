@@ -15,8 +15,10 @@ import { AttachmentUseCases } from '../../features/attachments/application/Attac
 import { PrismaAttachmentRepository } from '../../features/attachments/infra/PrismaAttachmentRepository.js';
 import { AttachmentController } from '../../features/attachments/presentation/AttachmentController.js';
 import { AutomationUseCases } from '../../features/automations/application/AutomationUseCases.js';
+import { automationEngine } from '../../features/automations/automation.engine.js';
 import { PrismaAutomationRepository } from '../../features/automations/infra/PrismaAutomationRepository.js';
 import { AutomationController } from '../../features/automations/presentation/AutomationController.js';
+import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { UsageUseCases } from '../../features/billing/application/UsageUseCases.js';
 import { PrismaUsageRepository } from '../../features/billing/infra/PrismaUsageRepository.js';
 import { UsageController } from '../../features/billing/presentation/UsageController.js';
