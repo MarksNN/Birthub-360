@@ -1,6 +1,6 @@
 # Inventário de dependências — RC/beta e deprecated
 
-Gerado automaticamente por `npm run security:dependency-inventory` (`scripts/security/dependency-inventory.ts`). **Não edite manualmente** — rode o script de novo para atualizar. Última geração: 2026-10-12.
+Gerado automaticamente por `npm run security:dependency-inventory` (`scripts/security/dependency-inventory.ts`). **Não edite manualmente** — rode o script de novo para atualizar. Última geração: 2026-10-17.
 
 Este arquivo cobre visibilidade (o que existe e por quê). Para vulnerabilidade conhecida (CVE/GHSA) e o waiver formal correspondente, a fonte de verdade continua sendo `docs/security/AUDIT_WAIVERS.md` — não duplique um waiver de vulnerabilidade aqui.
 
