@@ -442,6 +442,79 @@ export const COMMERCIAL_AGENT_REGISTRY: CommercialAgentDefinition[] = [
     httpRoute: '/api/agent/commercial-cell/revenue-intelligence/run',
     noRouteReason: null,
   },
+  {
+    id: 'account-detective',
+    name: 'Agente Detetive de Conta — Dossiê Executivo',
+    role: 'Account Detective',
+    layer: 'control',
+    status: 'REAL_EM_PRODUCAO',
+    risk: 'LOW',
+    requiresApproval: false,
+    mission:
+      'Investigação aprofundada de contas, reunindo dados firmográficos, fatos verificados e hipóteses de dor em Dossiê Executivo.',
+    capabilities: [
+      'firmographic_dossier',
+      'verified_facts_extraction',
+      'commercial_risk_detection',
+      'pain_hypothesis_generation',
+      'discovery_questions',
+    ],
+    handoffs: ['bdr-outbound', 'sdr-qualification', 'manager-commercial'],
+    bindings: [
+      'Implementado em src/features/intelligence/agents/tactical/accountDetective.agent.ts.',
+    ],
+    agentModule: './tactical/accountDetective.agent.js',
+    httpRoute: '/api/agent/commercial-cell/account-detective/run',
+    noRouteReason: null,
+  },
+  {
+    id: 'promise-guardian',
+    name: 'Agente Guardião de Promessas — Compromissos Comerciais',
+    role: 'Promise Guardian',
+    layer: 'control',
+    status: 'REAL_EM_PRODUCAO',
+    risk: 'MEDIUM',
+    requiresApproval: true,
+    mission:
+      'Identificar compromissos e prazos comerciais em interações reais com aprovação humana obrigatória para criação de tarefas no CRM.',
+    capabilities: [
+      'promise_extraction',
+      'due_date_detection',
+      'evidence_snippet_verification',
+      'crm_task_suggestion',
+    ],
+    handoffs: ['closer-sales', 'manager-commercial', 'coordinator-commercial'],
+    bindings: [
+      'Implementado em src/features/intelligence/agents/tactical/promiseGuardian.agent.ts.',
+    ],
+    agentModule: './tactical/promiseGuardian.agent.js',
+    httpRoute: '/api/agent/commercial-cell/promise-guardian/run',
+    noRouteReason: null,
+  },
+  {
+    id: 'devils-advocate',
+    name: 'Agente Advogado do Diabo — Auditoria Preventiva de Forecast',
+    role: 'Devils Advocate',
+    layer: 'control',
+    status: 'REAL_EM_PRODUCAO',
+    risk: 'LOW',
+    requiresApproval: false,
+    mission:
+      'Questionar previsões de forecast excessivamente otimistas e inconsistências no funil, alertando estagnações e objeções não tratadas.',
+    capabilities: [
+      'forecast_optimism_bias_check',
+      'stagnation_metrics_audit',
+      'unresolved_objection_correlation',
+      'probability_recalibration_recommendation',
+    ],
+    handoffs: ['revenue-intelligence', 'manager-commercial', 'closer-sales'],
+    bindings: [
+      'Implementado em src/features/intelligence/agents/tactical/devilsAdvocate.agent.ts.',
+    ],
+    agentModule: './tactical/devilsAdvocate.agent.js',
+    httpRoute: '/api/agent/commercial-cell/devils-advocate/run',
+    noRouteReason: null,
+  },
 ];
 
 export function getCommercialAgentDefinition(

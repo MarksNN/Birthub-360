@@ -212,6 +212,10 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
     return [...this.outboxStore];
   }
 
+  getOutboxRecords(): OutboxRecord[] {
+    return this.getOutbox();
+  }
+
   clearProcessedEvents(): void {
     this.processedEventIds.clear();
     this.outboxStore = [];

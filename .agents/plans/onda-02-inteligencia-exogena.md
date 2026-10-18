@@ -1,91 +1,69 @@
-# PLANO DE EXECUÇÃO — ONDA 02: INTELIGÊNCIA COMERCIAL EXÓGENA
+# PLANO DE EXECUÇÃO — ONDA 02: INTELIGÊNCIA COMERCIAL EXÓGENA, GRAFO DE CONTAS E DECISORES, SWARM TÁTICO, MARKET SENSING E WIN-LOSS DEEP AUTOPSY
 **Projeto:** BIRTH HUB 360  
-**Versão:** 1.0.0 — Data: 2026-10-18  
+**Versão:** 2.0.0 — Data: 2026-10-18  
 **Coordenador:** Agente 00  
 **Auditor Independente:** Agente 24  
 **Branch de Integração:** `integracao/onda-02`  
 
 ---
 
-## 1. Visão Geral e Arquitetura Unificada da Onda 02
+## 1. Visão Geral da Onda 02
 
-A Onda 02 expande a inteligência comercial interna do Birth Hub 360 (consolidada nas Ondas 00 e 01) para capturar, analisar e agir sobre sinais de mercado externos (gatilhos exógenos), mapeamento de decisores B2B, algoritmos preditivos de FitScore e alertas inteligentes de risco de churn e estagnação em pipeline.
+A Onda 02 consolida o Birth Hub 360 como uma plataforma autônoma de inteligência comercial B2B, integrando 4 eixos estratégicos sobre a infraestrutura da Onda 01 (DomainEventMesh, RAG Híbrido, Data Flywheel, Proteção de PII e FinOps):
 
-### Diagrama Arquitetural de Fluxo da Onda 02 (Mermaid)
-
-```mermaid
-flowchart TD
-    subgraph E05["Evolução 05: Sinais de Expansão & Vagas"]
-        RAW[Coletores de Notícias, DO e Vagas]
-        TAX[Normalizador de Taxonomia de Sinais]
-        RADAR[Radar de Oportunidades & Sinais]
-    end
-
-    subgraph E06["Evolução 06: Comitê de Decisão B2B"]
-        COM[Mapeamento de Cargos & Influência]
-        GRAF[Grafo de Decisores / Champions / Bloqueadores]
-        GAP[Análise de Lacunas do Comitê]
-    end
-
-    subgraph E07["Evolução 07: FitScore Preditivo Dinâmico"]
-        ICP[Definição Dinâmica de ICP]
-        CALC[Motor de Score Ponderado 0-100]
-        EXP[Explicabilidade de Fatores Pró e Contra]
-    end
-
-    subgraph E08["Evolução 08: Alertas de Churn & Estagnação"]
-        CHURN[Preditor de Risco de Churn]
-        STAG[Monitor de Oportunidades Estagnadas]
-        ALERT[Notificações Proativas & Ações Recomendadas]
-    end
-
-    subgraph CORE["Núcleo de Infraestrutura (Onda 01)"]
-        DEM[DomainEventMesh]
-        CACHE[SemanticCache]
-        PII[PiiTokenizer]
-        RLS[PostgreSQL RLS]
-    end
-
-    %% Integrações
-    RAW --> TAX --> RADAR
-    RADAR --> DEM
-    COM --> GRAF --> GAP
-    GAP --> DEM
-    ICP --> CALC --> EXP
-    EXP --> DEM
-    CHURN --> ALERT
-    STAG --> ALERT
-    ALERT --> DEM
-
-    DEM --> CORE
-    CORE --> PII
-    CORE --> RLS
-```
+1. **Eixo 6 — Knowledge Graph:** Grafo Semântico de Contas, Empresas, Decisores e Relacionamentos com Multi-Threading para Social Selling.
+2. **Eixo 11 — Multi-Agent Tactical Swarm:** 3 Agentes Táticos Especializados com supervisão humana:
+   - *Detetive de Conta (Account Detective)*: Dossiê executivo em 10 seções sem alucinação de dados.
+   - *Guardião de Promessas (Promise Guardian)*: Extração de compromissos em interações e aprovação com criação de tarefa no CRM.
+   - *Advogado do Diabo (Devil's Advocate)*: Contrapeso a previsões hiper-otimistas e auditoria de estagnação.
+3. **Eixo 12 — Market Sensing:** Inteligência Exógena e Sinais de Mercado (notícias, vagas, Diário Oficial, M&A, expansões).
+4. **Eixo 19 — Win-Loss Deep Autopsy:** Análise forense de negócios ganhos e perdidos em 9 seções estruturadas (A-I), com retroalimentação direta para Playbook, Roleplay e RevOps.
 
 ---
 
-## 2. Roteiro Cirúrgico de Execução em 5 Fases
+## 2. As Cinco Jornadas Integradas E2E
 
-### Fase 1: Contratos Compartilhados (Agente 18)
-- `src/shared/contracts/marketSignals.contract.ts`: Interfaces de sinais externos, fontes (vagas, diários, notícias), confiança e taxonomia.
-- `src/shared/contracts/decisionCommittee.contract.ts`: Tipagem de papéis do comitê (Decisor Econômico, Champion, Usuário, Bloqueador, Financeiro).
-- `src/shared/contracts/fitScore.contract.ts`: Contrato de cálculo de FitScore com decomposição de atributos e explicabilidade.
+1. **Jornada 1 — Pesquisa de Conta:**
+   `CRM -> Grafo de Contas -> Detetive de Conta -> Market Sensing -> Dossiê Executivo -> Social Selling Multi-Threading`
+2. **Jornada 2 — Mudança Externa:**
+   `Notícia / Regulatório -> Verificação -> Conta Relacionada -> RevOps -> Alerta Comercial -> Abordagem Consultiva`
+3. **Jornada 3 — Compromisso Comercial:**
+   `VoiceHub / Mobile -> Transcrição -> Guardião de Promessas -> Tarefa de CRM -> Acompanhamento Supervisionado`
+4. **Jornada 4 — Deal Perdido:**
+   `Bitrix24 -> DEAL_LOST -> Win-Loss Deep Autopsy -> Curadoria Gestor -> Playbook -> Roleplay Simulator`
+5. **Jornada 5 — Forecast Preventivo:**
+   `CRM -> RevOps -> Advogado do Diabo -> Evidências de Risco -> Recomendação Calibrada de Forecast`
 
-### Fase 2: Evoluções 05 e 06 — Sinais e Comitê B2B (Agente 05 & 13)
-- Consolidação do `src/features/market-intelligence/domain/accountSignalTaxonomy.ts`.
-- Refinamento do serviço `src/features/contacts/services/decision-committee.service.ts` com cálculo de completude de comitê.
-- Coletor de sinais de expansão com isolamento de tenant.
+---
 
-### Fase 3: Evoluções 07 e 08 — FitScore e Alertas de Receita (Agente 04 & 13)
-- Otimização do `src/features/prospecting/services/enrichment/fitScore.ts` com calibração explicável.
-- Automação de alertas em `src/features/analytics/services/churn-prediction.service.ts` e integração com `DomainEventMesh`.
+## 3. Roteiro Cirúrgico de Execução e Entregas
 
-### Fase 4: Integração com as 6 Capacidades e Event Mesh (Agente 00)
-- Publicação de eventos `SIGNAL_DETECTED`, `COMMITTEE_MAPPED`, `FITSCORE_CALCULATED`, `REVENUE_RISK_DETECTED`.
-- Envio de alertas de churn e sinais para o Radar e CRM.
-
-### Fase 5: Testes Abrangentes, Verificação e Auditoria 24 (Agente 08 & 24)
-- Testes unitários para cada serviço e cálculo matemático de FitScore.
-- Testes de integração cross-feature comprovando persistência com RLS.
-- Quality gates completos (`typecheck`, `lint`, `test:architecture`, `npm run build`).
-- Auditoria e emissão do parecer pelo Agente 24.
+- **Fase 1: Contratos Canônicos (Agente 18)**
+  - `src/shared/contracts/accountKnowledgeGraph.contract.ts`
+  - `src/shared/contracts/tacticalSwarm.contract.ts`
+  - `src/shared/contracts/marketSignals.contract.ts`
+  - `src/shared/contracts/winLossAutopsy.contract.ts`
+  - `src/shared/contracts/domainEventMesh.contract.ts` (eventos da Onda 02)
+- **Fase 2: Grafo Semântico de Contas & Multi-Threading (Agentes 04, 05, 06)**
+  - `src/features/knowledge/services/accountKnowledgeGraph.service.ts`
+- **Fase 3: Swarm Tático de Apoio Comercial (Agentes 13, 07)**
+  - `src/features/intelligence/agents/tactical/accountDetective.agent.ts`
+  - `src/features/intelligence/agents/tactical/promiseGuardian.agent.ts`
+  - `src/features/intelligence/agents/tactical/devilsAdvocate.agent.ts`
+  - `src/features/intelligence/agents/commercialAgentRegistry.ts`
+- **Fase 4: Market Sensing & Sinais Exógenos (Agentes 05, 06, 07)**
+  - `src/features/market-intelligence/server/marketSensing.service.ts`
+- **Fase 5: Win-Loss Deep Autopsy & Flywheel (Agentes 04, 07, 13)**
+  - `src/features/intelligence/services/winLossAutopsy.service.ts`
+- **Fase 6: Suíte de Testes Automatizados & E2E (Agente 08)**
+  - `tests/unit/contracts/onda02Contracts.test.ts`
+  - `tests/unit/knowledge/accountKnowledgeGraph.service.test.ts`
+  - `tests/unit/intelligence/tacticalSwarm.test.ts`
+  - `tests/unit/tactical/tacticalSwarm.agents.test.ts`
+  - `tests/unit/market-intelligence/marketSensing.service.test.ts`
+  - `tests/unit/intelligence/winLossAutopsy.service.test.ts`
+  - `tests/integration/onda-02/onda02ComprehensiveFlow.integration.test.ts`
+  - `tests/integration/onda-02/onda02EndToEndFlow.integration.test.ts`
+- **Fase 7: Auditoria Independente do Agente 24**
+  - Revisão de conformidade com AGENTS.md, P1-P4, RLS multi-tenant, LGPD e proveniência.
+  - Emissão de parecer formal `APROVADO`.
