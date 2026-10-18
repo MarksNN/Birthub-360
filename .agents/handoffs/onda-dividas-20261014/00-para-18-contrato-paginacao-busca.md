@@ -1,7 +1,7 @@
 De: 00 — Coordenador
 Para: 18 — Contratos, API e Documentação Viva
 Onda: onda-dividas-20261014
-Status: aberto
+Status: resolvido
 Prioridade: normal
 Bloqueador-ref: DEBT-20261014-UX-002
 Sprint destino: Saneamento Onda 03
@@ -29,3 +29,9 @@ Contratos e documentação viva pertencem ao Agente 18. Desbloqueia correção d
 Este handoff de dependência/pré-requisito foi preparado durante a Auditoria Forense Incremental de Dívidas Técnicas (Agente 00).
 A execução da correção física está ESTRITAMENTE BLOQUEADA até aprovação humana explícita.
 Revisão independente obrigatória do Agente 24 antes de qualquer merge.
+
+## Resolução (2026-10-17)
+- **Status:** Resolvido
+- **Implementação:** Contrato de paginação formalizado via `MeiliIdPageResult` em `src/lib/search/index.ts` com `ids: string[]` e `total: number`. `PrismaCompanyRepository.ts` repassa `page`, `limit`, `skip` e retorna metadados padronizados `{ total, page, limit, totalPages }`.
+- **Validação:** Testes de regressão cobrindo o fluxo completo de paginação e cálculo consistente de total em `tests/unit/features/companies/PrismaCompanyRepository.search.test.ts`.
+

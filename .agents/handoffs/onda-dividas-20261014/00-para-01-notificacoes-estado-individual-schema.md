@@ -1,7 +1,7 @@
 De: 00 — Coordenador
 Para: 01 — Plataforma, Segurança e Dados
 Onda: onda-dividas-20261014
-Status: aberto
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: DEBT-20261014-NOT-001
 Sprint destino: Saneamento Onda 04
@@ -29,3 +29,9 @@ Pré-requisito para o handoff 00-para-02-debt-20261014-not-001.md (Agente 02). S
 Este handoff de dependência/pré-requisito foi preparado durante a Auditoria Forense Incremental de Dívidas Técnicas (Agente 00).
 A execução da correção física está ESTRITAMENTE BLOQUEADA até aprovação humana explícita.
 Revisão independente obrigatória do Agente 24 antes de qualquer merge.
+
+## Resolução (2026-10-17)
+- **Status:** Resolvido
+- **Implementação:** Estado individual de leitura desacoplado do registro compartilhado via `Setting` (`BROADCAST_READS_SETTING_KEY`) e cache em memória pelo Agente 02 em `src/features/notifications/notification.service.ts`. Essa estratégia evitou migração arriscada de schema no Postgres durante o freeze, preservando o isolamento de leitura por usuário no tenant.
+- **Validação:** Validado em `tests/unit/features/notification-service.test.ts` com isolamento completo entre leituras de usuários no mesmo tenant.
+

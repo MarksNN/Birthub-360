@@ -60,4 +60,59 @@ describe('AnalyticsController — tratamento defensivo em /api/analytics', () =>
     expect(statusMock).not.toHaveBeenCalled();
     expect(jsonMock).not.toHaveBeenCalled();
   });
+
+  it('DEBT-UX-003: encaminha erro para next() em getOverview quando repository falha', async () => {
+    const testError = new Error('Database query failure on overview');
+    const mockUseCases = {
+      overview: vi.fn().mockRejectedValue(testError),
+    } as unknown as AnalyticsUseCases;
+
+    const controller = new AnalyticsController(mockUseCases);
+    const req = { user: { organizationId: 'org-test' } } as unknown as Request;
+    const res = { json: vi.fn() } as unknown as Response;
+    const next = vi.fn();
+
+    await controller.getOverview(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(testError);
+    expect(res.json).not.toHaveBeenCalled();
+  });
+
+  it('DEBT-UX-003: encaminha erro para next() em getDashboard quando repository falha', async () => {
+    const testError = new Error('Database query failure on dashboard');
+    const mockUseCases = {
+      dashboard: vi.fn().mockRejectedValue(testError),
+    } as unknown as AnalyticsUseCases;
+
+    const controller = new AnalyticsController(mockUseCases);
+    const req = {
+      user: { organizationId: 'org-test' },
+      query: { months: '6' },
+    } as unknown as Request;
+    const res = { json: vi.fn() } as unknown as Response;
+    const next = vi.fn();
+
+    await controller.getDashboard(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(testError);
+    expect(res.json).not.toHaveBeenCalled();
+  });
+
+  it('DEBT-UX-003: encaminha erro para next() em getSalesSummary quando overview falha', async () => {
+    const testError = new Error('Database failure on sales summary');
+    const mockUseCases = {
+      overview: vi.fn().mockRejectedValue(testError),
+    } as unknown as AnalyticsUseCases;
+
+    const controller = new AnalyticsController(mockUseCases);
+    const req = { user: { organizationId: 'org-test' } } as unknown as Request;
+    const res = { json: vi.fn() } as unknown as Response;
+    const next = vi.fn();
+
+    await controller.getSalesSummary(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(testError);
+    expect(res.json).not.toHaveBeenCalled();
+  });
 });
+
