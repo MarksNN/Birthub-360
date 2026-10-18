@@ -3,7 +3,10 @@
  * Onda 02 — Evolução 07
  */
 
-import type { FitScoreInput, ScoreBreakdownItem } from '../../features/prospecting/services/enrichment/fitScore.js';
+import type {
+  FitScoreInput,
+  ScoreBreakdownItem,
+} from '../../features/prospecting/services/enrichment/fitScore.js';
 
 export type FitScoreGrade = 'A' | 'B' | 'C' | 'D';
 
@@ -18,5 +21,7 @@ export interface EnrichedFitScoreResult {
 
 export interface IFitScorePort {
   calculateScore(input: FitScoreInput): EnrichedFitScoreResult;
-  batchCalculateScores(inputs: Array<{ id: string; data: FitScoreInput }>): Record<string, EnrichedFitScoreResult>;
+  batchCalculateScores(
+    inputs: Array<{ id: string; data: FitScoreInput }>,
+  ): Record<string, EnrichedFitScoreResult>;
 }

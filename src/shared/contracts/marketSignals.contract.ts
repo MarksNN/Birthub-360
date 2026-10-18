@@ -38,7 +38,9 @@ export interface SignalQueryFilter {
 }
 
 export interface IMarketSignalsPort {
-  ingestSignal(signal: Omit<MarketSignalEnvelope, 'id' | 'detectedAt'>): Promise<MarketSignalEnvelope>;
+  ingestSignal(
+    signal: Omit<MarketSignalEnvelope, 'id' | 'detectedAt'>,
+  ): Promise<MarketSignalEnvelope>;
   getSignalsByCompany(organizationId: string, companyId: string): Promise<MarketSignalEnvelope[]>;
   searchSignals(filter: SignalQueryFilter): Promise<MarketSignalEnvelope[]>;
 }

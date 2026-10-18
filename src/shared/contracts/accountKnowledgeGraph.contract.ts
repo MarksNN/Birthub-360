@@ -70,5 +70,8 @@ export interface IAccountKnowledgeGraphPort {
   getAccountGraph(organizationId: string, accountId: string): Promise<AccountGraphView>;
   addRelationship(edge: Omit<GraphEdge, 'id' | 'discoveredAt'>): Promise<GraphEdge>;
   removeRelationship(organizationId: string, edgeId: string): Promise<boolean>;
-  generateMultiThreadingStrategy(organizationId: string, accountId: string): Promise<MultiThreadingApproach[]>;
+  generateMultiThreadingStrategy(
+    organizationId: string,
+    accountId: string,
+  ): Promise<MultiThreadingApproach[]>;
 }
