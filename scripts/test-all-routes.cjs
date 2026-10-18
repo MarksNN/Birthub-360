@@ -21,7 +21,8 @@ const routesToTest = [
 ];
 
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || (fs.existsSync('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe') ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : undefined);
+  const browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 }
   });

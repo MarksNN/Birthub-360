@@ -42,11 +42,15 @@ export function getAccessibleBrandForeground(
   brandHex: string | null | undefined,
   bgHex?: string,
 ): string {
-  if (!brandHex) return bgHex === '#0f172a' ? '#38bdf8' : '#0284c7';
+  if (brandHex === null) return '#000000';
+  if (brandHex === undefined)
+    return bgHex && relativeLuminance(bgHex) < 0.2 ? '#38bdf8' : '#0369a1';
+  if (!hexToRgb(brandHex)) return brandHex;
   const targetBg = bgHex || '#ffffff';
   const ratioCurrent = contrastRatio(brandHex, targetBg);
   if (ratioCurrent >= 4.5) return brandHex;
-  return targetBg === '#0f172a' ? '#38bdf8' : '#0284c7';
+  const isDark = relativeLuminance(targetBg) < 0.2;
+  return isDark ? '#38bdf8' : '#0369a1';
 }
 
 export const colors = {

@@ -115,4 +115,3 @@ describe('AnalyticsController — tratamento defensivo em /api/analytics', () =>
     expect(res.json).not.toHaveBeenCalled();
   });
 });
-
