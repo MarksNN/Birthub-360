@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "project": "Birth Hub 360°",
+  "wave": "00 — Fundação e Preparação",
+  "timestamp": "2026-10-18T01:42:00Z",
+  "repository": "MarksNN/Birthub-360",
+  "baseCommit": "aa46f0f64f118a80b55b2da9176fbdbcb64eec3d",
+  "integrationBranch": "integracao/onda-00",
+  "coordinator": "Agente 00 — Chief Commercial Intelligence Engineering Orchestrator",
+  "independentAuditor": "Agente 24 — Revisão Independente",
+  "globalVerdict": "GO_CONDICIONAL_STAGING",
+  "localGates": {
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "filesChecked": 1936,
+      "errors": 0,
+      "warnings": 546,
+      "status": "PASS"
+    },
+    "formatCheck": {
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "filesChecked": 1936,
+      "durationMs": 1461,
+      "status": "PASS"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "filesChecked": 1937,
+      "errors": 0,
+      "status": "PASS"
+    },
+    "architecture": {
+      "command": "npm run test:architecture",
+      "exitCode": 0,
+      "modulesCruised": 1681,
+      "dependenciesCruised": 5602,
+      "newViolations": 0,
+      "coveragePercent": 100,
+      "hotspotsChecked": 1625,
+      "hotspotsAboveLimitWithoutException": 0,
+      "status": "PASS"
+    },
+    "openapiDrift": {
+      "command": "npm run verify:openapi-drift",
+      "exitCode": 0,
+      "mountedRoutePrefixes": 73,
+      "documentedEndpoints": 443,
+      "routerFilesVerified": 74,
+      "structuralDriftCount": 0,
+      "status": "PASS"
+    },
+    "dependencyAuditWaivers": {
+      "command": "npm run security:audit-waivers",
+      "exitCode": 0,
+      "highSeverityVulnerabilities": 0,
+      "criticalSeverityVulnerabilities": 0,
+      "status": "PASS"
+    },
+    "prismaSchema": {
+      "command": "npx prisma validate",
+      "exitCode": 0,
+      "schemaValid": true,
+      "migrationsAppliedCount": 139,
+      "status": "PASS"
+    },
+    "externalIntegrations": {
+      "command": "npm run verify:integrations",
+      "exitCode": 0,
+      "providers": {
+        "googlePlaces": { "ok": true, "detail": "1 resultado recebido" },
+        "apollo": { "ok": true, "detail": "1 resultado recebido" },
+        "brasilApiCnpj": { "ok": true, "detail": "consulta gratuita disponível" },
+        "groq": { "ok": true, "detail": "chave válida" }
+      },
+      "status": "PASS"
+    },
+    "aiStudioGeneration": {
+      "command": "npm run verify:ai",
+      "exitCode": 0,
+      "model": "openai/gpt-oss-120b",
+      "tasks": {
+        "email": { "ok": true, "fields": ["subject", "body", "icpAnalysis"], "latencyMs": 3583 },
+        "b2bMatrix": { "ok": true, "fields": ["pains", "questions", "objections"], "latencyMs": 1983 }
+      },
+      "status": "PASS"
+    },
+    "productionBuild": {
+      "command": "npm run build",
+      "exitCode": 0,
+      "serverBundle": "dist/server.cjs",
+      "serverBundleSizeMb": 3.0,
+      "pwaPrecachedAssetsCount": 179,
+      "pwaPrecachedSizeKiB": 14141.20,
+      "status": "PASS"
+    },
+    "unitTests": {
+      "command": "npm run test:unit",
+      "exitCode": 1,
+      "totalTests": 4686,
+      "passedTests": 4559,
+      "failedTests": 126,
+      "totalTestFiles": 597,
+      "passedTestFiles": 555,
+      "failedTestFiles": 42,
+      "classification": "BASELINE_LOCAL_DEPENDENCY",
+      "status": "BASELINE"
+    }
+  },
+  "remoteCiAnalysis": {
+    "latestPushStatus": "BLOCKED_RUNNER_DISPATCH",
+    "cause": "GitHub Actions account spending limit reached",
+    "rawAnnotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings.",
+    "classification": "Categoria 4 — Falha de permissão ou plano",
+    "priorHistoricalRuns": {
+      "sonarQube": { "runId": "38998470734", "status": "SUCCESS", "suites": 524, "tests": 4231 },
+      "codeql": { "runId": "38998470617", "status": "SUCCESS" },
+      "bundleBudget": { "runId": "38998470781", "status": "SUCCESS" }
+    }
+  },
+  "sixStrategicCapabilities": {
+    "C1_RevOps": { "maturity": "Nivel 4 (Produção)", "testsPassing": 25, "contract": "LiveCallRiskPort" },
+    "C2_Gamification": { "maturity": "Nivel 4 (Produção)", "testsPassing": 24, "contract": "Cockpit / Leaderboard" },
+    "C3_Roleplay": { "maturity": "Nivel 4 (Produção)", "testsPassing": 31, "contract": "RoleplayPlaybookPort" },
+    "C4_SocialSelling": { "maturity": "Nivel 4 (Produção)", "testsPassing": 8, "contract": "SocialSellingEndpoints" },
+    "C5_VoiceHub": { "maturity": "Nivel 4 (Produção)", "testsPassing": 53, "contract": "CopilotoVoiceIngestionPort" },
+    "C6_Mobile": { "maturity": "Nivel 4 (Produção)", "testsPassing": 28, "contract": "CopilotoTranscriptionQueuePort" }
+  },
+  "essentialAdjustments": {
+    "ajuste1_curatedMemory": "DOCUMENTED_AND_BOUND",
+    "ajuste2_causalLearning": "DOCUMENTED_AND_BOUND",
+    "ajuste3_safeMultiTenantRag": "DOCUMENTED_AND_BOUND",
+    "ajuste4_reliableEvents": "DOCUMENTED_AND_BOUND",
+    "ajuste5_supervisedExplainableAi": "DOCUMENTED_AND_BOUND"
+  }
+}
