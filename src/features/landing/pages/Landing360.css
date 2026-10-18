@@ -386,9 +386,9 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
    ========================================================================== */
 
 /* Botões primários com gradiente de alta energia */
-.landing-neon-root .btn-cta-light,
-.landing-neon-root .btn-primary-gradient,
-.landing-neon-root .vancouver-btn-gradient {
+.landing-neon-root .btn-cta-light:not(.hidden),
+.landing-neon-root .btn-primary-gradient:not(.hidden),
+.landing-neon-root .vancouver-btn-gradient:not(.hidden) {
   position: relative;
   display: inline-flex;
   align-items: center;

@@ -342,7 +342,7 @@ export function Landing360({
 
   return (
     <main
-      className={`relative w-full min-h-screen font-sans selection:bg-[#FF2D9B]/30 selection:text-[#00D4FF] landing-neon-root transition-colors duration-300 ${
+      className={`relative w-full min-h-screen overflow-x-clip font-sans selection:bg-[#FF2D9B]/30 selection:text-[#00D4FF] landing-neon-root transition-colors duration-300 ${
         theme === 'dark' ? 'bg-[#0B1120] text-slate-100' : 'bg-[#F8FAFC] text-slate-800'
       }`}
     >
@@ -351,8 +351,8 @@ export function Landing360({
       ════════════════════════════════════════════════════════════════════ */}
       <div className={activeScreen === 'intro' ? 'block' : 'hidden'}>
         {/* 1. NAVBAR FIXA — PRESENÇA INSTITUCIONAL & ENTERPRISE (+12% PRESENÇA) */}
-        <header className="navbar-sticky w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-4">
-          <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
+        <header className="navbar-sticky w-full px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 lg:gap-6">
             <a href="#hero" className="flex items-center gap-3.5 group shrink-0">
               <BH360LogoMark size={52} />
               <div className="flex flex-col">
@@ -367,7 +367,7 @@ export function Landing360({
             </a>
 
             {/* Links de navegação desktop — Cada item como um botão pill, sem sobreposição */}
-            <nav className="hidden xl:flex items-center justify-center gap-2 2xl:gap-2.5 flex-1 mx-3">
+            <nav className="hidden xl:flex items-center justify-center gap-1 xl:gap-1.5 2xl:gap-2.5 flex-1 mx-1.5 2xl:mx-3">
               <a href="#problema" className="nav-pill-btn">
                 Problema
               </a>
@@ -397,7 +397,7 @@ export function Landing360({
               </a>
             </nav>
 
-            <div className="flex items-center gap-3.5 shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               {/* Botão de Alternância de Tema (Light / Dark) */}
               <button
                 type="button"
@@ -417,7 +417,7 @@ export function Landing360({
               <button
                 type="button"
                 onClick={handleGoToLogin}
-                className="btn-cta-light btn-cta-pulse hidden sm:inline-flex items-center gap-2.5 px-6 py-2.75 rounded-xl font-sans text-[13px] font-bold uppercase tracking-wider cursor-pointer shadow-md"
+                className="btn-cta-light btn-cta-pulse hidden sm:inline-flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-xl font-sans text-xs xl:text-[13px] font-bold uppercase tracking-wider cursor-pointer shadow-md shrink-0"
               >
                 <span>Acessar Plataforma</span>
                 <ArrowRight className="w-4 h-4" />
@@ -516,8 +516,8 @@ export function Landing360({
           className="relative px-5 py-16 sm:px-8 lg:px-14 overflow-hidden border-b border-slate-700/60 transition-colors"
         >
           {/* Halos luminosos neon sutis */}
-          <div className="pointer-events-none absolute top-10 right-10 w-[500px] h-[500px] rounded-full blur-[140px] bg-[#00D4FF]/10" />
-          <div className="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] rounded-full blur-[140px] bg-[#FF2D9B]/10" />
+          <div className="pointer-events-none absolute top-10 right-10 w-[500px] h-[500px] max-w-full rounded-full blur-[140px] bg-[#00D4FF]/10" />
+          <div className="pointer-events-none absolute bottom-0 left-10 w-[450px] h-[450px] max-w-full rounded-full blur-[140px] bg-[#FF2D9B]/10" />
 
           <div className="relative z-10 max-w-6xl mx-auto flex flex-col items-center text-center">
             {/* Headline Centralizada com Animação Luminous das 3 Frases */}
@@ -1820,7 +1820,7 @@ export function Landing360({
         } px-5 py-6 sm:px-8 lg:px-12 overflow-y-auto transition-all duration-500 ${
           activeScreen === 'login'
             ? 'opacity-100 pointer-events-auto'
-            : 'opacity-0 pointer-events-none'
+            : 'hidden opacity-0 pointer-events-none'
         }`}
       >
         {/* Topo do Modal com navegação */}
