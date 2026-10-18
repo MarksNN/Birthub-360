@@ -24,7 +24,7 @@ import {
   Shield,
   StarOff,
 } from 'lucide-react';
-import { auth } from '../lib/auth.js';
+import { auth } from '../../../lib/auth.js';
 import { useSessionStore } from '../store/useSessionStore.js';
 import { useTheme } from './design-system/ThemeContext.js';
 import { useToast, AtlasLogo } from './design-system/index.js';

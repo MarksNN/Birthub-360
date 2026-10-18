@@ -21,16 +21,18 @@ const mockGetVideosOperation = vi.fn();
 
 vi.mock('@google/genai', () => {
   return {
-    GoogleGenAI: vi.fn().mockImplementation(() => ({
-      models: {
-        generateContent: mockGenerateContent,
-        generateContentStream: mockGenerateContentStream,
-        generateVideos: mockGenerateVideos,
-      },
-      operations: {
-        getVideosOperation: mockGetVideosOperation,
-      },
-    })),
+    GoogleGenAI: vi.fn().mockImplementation(function () {
+      return {
+        models: {
+          generateContent: mockGenerateContent,
+          generateContentStream: mockGenerateContentStream,
+          generateVideos: mockGenerateVideos,
+        },
+        operations: {
+          getVideosOperation: mockGetVideosOperation,
+        },
+      };
+    }),
     GenerateVideosOperation: vi.fn().mockImplementation(function (this: { name?: string }) {
       this.name = '';
     }),

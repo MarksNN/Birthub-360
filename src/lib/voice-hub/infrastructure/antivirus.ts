@@ -1,5 +1,4 @@
 import { Readable } from 'node:stream';
-import NodeClam from 'clamscan';
 import { logger } from '../../../lib/logger.js';
 
 /**
@@ -33,6 +32,8 @@ export class AntivirusUnavailableError extends Error {
 }
 
 export async function createAntivirusScanner() {
+  const NodeClamModule = await import('clamscan' as string);
+  const NodeClam = NodeClamModule.default || NodeClamModule;
   const clam = await new NodeClam().init({
     clamdscan: {
       host: process.env.CLAMAV_HOST ?? '127.0.0.1',

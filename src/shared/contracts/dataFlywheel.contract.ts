@@ -52,8 +52,21 @@ export interface FewShotCopyItem {
 }
 
 export interface ICuratedObjectionPort {
-  ingestDetectedObjection(objection: Omit<CuratedObjectionItem, 'id' | 'version' | 'curationStatus'>): Promise<CuratedObjectionItem>;
-  promoteObjection(organizationId: string, id: string, userId: string): Promise<CuratedObjectionItem>;
-  retractObjection(organizationId: string, id: string, reason: string): Promise<CuratedObjectionItem>;
-  listEligibleForRoleplay(organizationId: string, segment?: string): Promise<CuratedObjectionItem[]>;
+  ingestDetectedObjection(
+    objection: Omit<CuratedObjectionItem, 'id' | 'version' | 'curationStatus'>,
+  ): Promise<CuratedObjectionItem>;
+  promoteObjection(
+    organizationId: string,
+    id: string,
+    userId: string,
+  ): Promise<CuratedObjectionItem>;
+  retractObjection(
+    organizationId: string,
+    id: string,
+    reason: string,
+  ): Promise<CuratedObjectionItem>;
+  listEligibleForRoleplay(
+    organizationId: string,
+    segment?: string,
+  ): Promise<CuratedObjectionItem[]>;
 }

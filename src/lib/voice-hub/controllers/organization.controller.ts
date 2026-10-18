@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { findTenantById } from '../repositories/organizationRepository.js';
+import { findTenantById } from '../repositories/tenantRepository.js';
 
 export async function listOrganizationsHandler(req: Request, res: Response) {
   const tenant = await findTenantById(req.organizationId!);

@@ -78,7 +78,8 @@ export class ModelCascadeRouter {
           complexity: 'HIGH',
           estimatedCostPer1kTokensUsd: 0.005,
           expectedLatencyMs: 1400,
-          reasoning: 'Tarefa de alta complexidade com raciocínio analítico profundo e avaliação pedagógica',
+          reasoning:
+            'Tarefa de alta complexidade com raciocínio analítico profundo e avaliação pedagógica',
         };
     }
   }

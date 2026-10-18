@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../lib/prisma.js', () => ({
+vi.mock('@/lib/prisma.js', () => ({
   prisma: {
     birthhub360CallResult: {
       upsert: vi.fn(),

@@ -100,11 +100,7 @@ export class PiiTokenizerService {
    * Reconstitui os dados reais na resposta retornada pela IA apenas se a requisição
    * estiver autorizada para a organização e sessão corretas.
    */
-  detokenize(
-    organizationId: string,
-    sessionId: string,
-    textWithTokens: string,
-  ): string {
+  detokenize(organizationId: string, sessionId: string, textWithTokens: string): string {
     const storeKey = `${organizationId}:${sessionId}`;
     const expiresAt = this.sessionExpirations.get(storeKey);
 

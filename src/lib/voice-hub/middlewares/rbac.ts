@@ -46,13 +46,14 @@ export async function hasPermission(
 
 export const requirePermission = (permission: string) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.voiceHubUser) {
+    const session = req.voiceHubUser ?? (req as any).user;
+    if (!session) {
       return res.status(401).json({ error: 'Não autorizado.' });
     }
 
     // Returning the promise is harmless for Express (the return value is ignored) and lets
     // callers/tests await this middleware deterministically instead of racing the async check.
-    return hasPermission(req.voiceHubUser, permission)
+    return hasPermission(session, permission)
       .then((allowed) => {
         if (!allowed) {
           return res

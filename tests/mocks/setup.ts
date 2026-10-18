@@ -12,6 +12,7 @@ if (!process.env.PII_BLIND_INDEX_KEY || process.env.PII_BLIND_INDEX_KEY.includes
 // espalhado por vários testes. Agora todos usam os handlers em `tests/mocks/handlers/` e
 // sobrescrevem pontualmente com `server.use(...)` quando precisam de uma resposta diferente.
 import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import { server } from './server';
 
@@ -68,6 +69,7 @@ beforeEach(() => {
 });
 
 afterEach(async () => {
+  cleanup();
   server.resetHandlers();
   try {
     const apiModule = (await import('../../src/lib/api')) as Record<string, unknown>;

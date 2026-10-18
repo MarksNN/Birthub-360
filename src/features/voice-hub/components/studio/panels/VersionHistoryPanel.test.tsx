@@ -41,7 +41,7 @@ describe('VersionHistoryPanel', () => {
   it('fetches versions scoped to the current workflow id when opened, and lists them newest-first', async () => {
     useStudioStore.setState({ isVersionHistoryOpen: true, workflowId: 'wf-1' });
     vi.mocked(fetch).mockImplementation((url) => {
-      expect(String(url)).toBe('/api/workflow/wf-1/versions');
+      expect(String(url)).toBe('/api/voice-hub/workflow/wf-1/versions');
       return jsonResponse({
         versions: [
           { version: 3, publishedAt: '2026-01-03T00:00:00.000Z', publishedBy: 'user-2' },
@@ -118,14 +118,17 @@ describe('VersionHistoryPanel', () => {
 
     vi.mocked(fetch).mockImplementation((url, init) => {
       const href = String(url);
-      if (href === '/api/workflow/wf-1/versions' && (!init || init.method === undefined)) {
+      if (
+        href === '/api/voice-hub/workflow/wf-1/versions' &&
+        (!init || init.method === undefined)
+      ) {
         return jsonResponse({
           versions: [
             { version: 1, publishedAt: '2026-01-01T00:00:00.000Z', publishedBy: 'user-1' },
           ],
         });
       }
-      if (href === '/api/workflow/wf-1/versions/1/rollback' && init?.method === 'POST') {
+      if (href === '/api/voice-hub/workflow/wf-1/versions/1/rollback' && init?.method === 'POST') {
         return jsonResponse({
           success: true,
           workflow: { id: 'wf-1', version: 2, nodes: restoredNodes, edges: [] },
@@ -154,14 +157,14 @@ describe('VersionHistoryPanel', () => {
 
     vi.mocked(fetch).mockImplementation((url, init) => {
       const href = String(url);
-      if (href === '/api/workflow/wf-1/versions' && !init) {
+      if (href === '/api/voice-hub/workflow/wf-1/versions' && !init) {
         return jsonResponse({
           versions: [
             { version: 1, publishedAt: '2026-01-01T00:00:00.000Z', publishedBy: 'user-1' },
           ],
         });
       }
-      if (href === '/api/workflow/wf-1/versions/1/rollback' && init?.method === 'POST') {
+      if (href === '/api/voice-hub/workflow/wf-1/versions/1/rollback' && init?.method === 'POST') {
         return jsonResponse(
           {
             error: 'O fluxo contém erros de validação e não pode ser publicado/ativado.',

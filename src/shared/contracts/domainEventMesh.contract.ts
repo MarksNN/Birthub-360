@@ -42,6 +42,11 @@ export interface DomainEventSubscription {
 }
 
 export interface IDomainEventMeshPort {
-  publish<T = Record<string, unknown>>(event: Omit<DomainEventEnvelope<T>, 'eventId' | 'occurredAt'>): Promise<DomainEventEnvelope<T>>;
-  subscribe(eventType: DomainEventType, handler: (event: DomainEventEnvelope) => Promise<void>): void;
+  publish<T = Record<string, unknown>>(
+    event: Omit<DomainEventEnvelope<T>, 'eventId' | 'occurredAt'>,
+  ): Promise<DomainEventEnvelope<T>>;
+  subscribe(
+    eventType: DomainEventType,
+    handler: (event: DomainEventEnvelope) => Promise<void>,
+  ): void;
 }

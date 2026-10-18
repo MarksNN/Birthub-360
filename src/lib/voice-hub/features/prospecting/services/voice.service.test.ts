@@ -14,7 +14,11 @@ vi.mock('../../../services/settingService.js', () => ({
 
 import { claimIdempotencyKey } from '../lib/webhookIdempotency.js';
 import { getAiConsent } from '../../../services/settingService.js';
-import { BlandConfigurationError, VoiceProspectingService } from './voice.service.js';
+import {
+  BlandConfigurationError,
+  ExternalAiConsentRequiredError,
+  VoiceProspectingService,
+} from './voice.service.js';
 
 const mockClaim = vi.mocked(claimIdempotencyKey);
 const mockGetAiConsent = vi.mocked(getAiConsent);
@@ -29,91 +33,92 @@ const ORIGINAL_ENV = { ...process.env };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  process.env = { ...ORIGINAL_ENV };
+  process.env = {
+    ...ORIGINAL_ENV,
+    BLAND_API_KEY: 'bland-test-key',
+    BLAND_WEBHOOK_TOKEN: 'token-123',
+    WEBHOOK_BASE_URL: 'https://api.birthhub360.com',
+    BIRTHHUB360_TENANT_ID: 'tenant-123',
+  };
 });
 
 afterEach(() => {
   process.env = ORIGINAL_ENV;
 });
 
-describe('VoiceProspectingService.dispatchBirthhub360Outbound', () => {
+describe('VoiceProspectingService.triggerOutboundCall', () => {
   it('should throw BlandConfigurationError if BLAND_API_KEY is not defined', async () => {
     delete process.env.BLAND_API_KEY;
     const service = new VoiceProspectingService();
-    await expect(service.dispatchBirthhub360Outbound(basePayload)).rejects.toThrow(
-      BlandConfigurationError,
-    );
+    await expect(service.triggerOutboundCall(basePayload)).rejects.toThrow(BlandConfigurationError);
   });
 
-  it('should throw Error if AI consent is false', async () => {
-    process.env.BLAND_API_KEY = 'bland-test-key';
-    mockGetAiConsent.mockResolvedValue(false);
+  it('should throw ExternalAiConsentRequiredError if AI consent is false', async () => {
+    mockGetAiConsent.mockResolvedValue({ granted: false } as any);
 
     const service = new VoiceProspectingService();
-    await expect(service.dispatchBirthhub360Outbound(basePayload)).rejects.toThrow(
-      'Lead não possui consentimento para IA/contato ativo',
+    await expect(service.triggerOutboundCall(basePayload)).rejects.toThrow(
+      ExternalAiConsentRequiredError,
     );
   });
 
-  it('should return already_claimed if idempotency key is already used', async () => {
-    process.env.BLAND_API_KEY = 'bland-test-key';
-    mockGetAiConsent.mockResolvedValue(true);
+  it('should return duplicate:true if idempotency key is already claimed', async () => {
+    mockGetAiConsent.mockResolvedValue({ granted: true } as any);
     mockClaim.mockResolvedValue(false); // Já usado
 
     const service = new VoiceProspectingService();
-    const result = await service.dispatchBirthhub360Outbound(basePayload);
-    expect(result).toEqual({ status: 'already_claimed' });
+    const result = await service.triggerOutboundCall(basePayload);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        duplicate: true,
+      }),
+    );
   });
 
   it('should throw if Bland API fetch fails', async () => {
-    process.env.BLAND_API_KEY = 'bland-test-key';
-    process.env.BLAND_PATHWAY_ID_B2B_OUTBOUND = 'path-123';
-    process.env.BLAND_VOICE_ID = 'voice-123';
-    mockGetAiConsent.mockResolvedValue(true);
+    mockGetAiConsent.mockResolvedValue({ granted: true } as any);
     mockClaim.mockResolvedValue(true);
 
     const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
       ok: false,
       status: 400,
-      json: async () => ({ message: 'Bad request' }),
+      text: async () => JSON.stringify({ message: 'Bad request' }),
     } as Response);
 
     const service = new VoiceProspectingService();
-    await expect(service.dispatchBirthhub360Outbound(basePayload)).rejects.toThrow(
-      'Falha ao despachar call: 400 - {"message":"Bad request"}',
-    );
+    await expect(service.triggerOutboundCall(basePayload)).rejects.toThrow('Bad request');
 
     fetchSpy.mockRestore();
   });
 
-  it('should return dispatched if successful', async () => {
-    process.env.BLAND_API_KEY = 'bland-test-key';
-    process.env.BLAND_PATHWAY_ID_B2B_OUTBOUND = 'path-123';
-    process.env.BLAND_VOICE_ID = 'voice-123';
-    process.env.NRO_TLF_PADRAO = '+5511900000000';
-    mockGetAiConsent.mockResolvedValue(true);
+  it('should return call details if successful', async () => {
+    mockGetAiConsent.mockResolvedValue({ granted: true } as any);
     mockClaim.mockResolvedValue(true);
 
     const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue({
       ok: true,
-      json: async () => ({ call_id: 'bland-call-abc' }),
+      text: async () => JSON.stringify({ call_id: 'bland-call-abc', status: 'queued' }),
     } as Response);
 
     const service = new VoiceProspectingService();
-    const result = await service.dispatchBirthhub360Outbound(basePayload);
+    const result = await service.triggerOutboundCall(basePayload);
 
     expect(result).toEqual({
-      status: 'dispatched',
-      blandCallId: 'bland-call-abc',
+      success: true,
+      duplicate: false,
+      message: 'Outbound call triggered successfully via Bland AI',
+      callId: 'bland-call-abc',
+      status: 'queued',
     });
 
     expect(fetchSpy).toHaveBeenCalledWith('https://api.bland.ai/v1/calls', {
       method: 'POST',
       headers: {
-        authorization: 'bland-test-key',
-        'content-type': 'application/json',
+        Authorization: 'bland-test-key',
+        'Content-Type': 'application/json',
       },
-      body: expect.stringContaining('"pathway_id":"path-123"'),
+      body: expect.stringContaining('"phone_number":"+5511999998888"'),
     });
 
     fetchSpy.mockRestore();

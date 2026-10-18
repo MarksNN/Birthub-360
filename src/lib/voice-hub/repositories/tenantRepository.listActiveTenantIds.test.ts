@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../lib/prisma.js', () => ({
+vi.mock('@/lib/prisma.js', () => ({
   prisma: {
     tenant: {
       findMany: vi.fn(),
@@ -9,7 +9,7 @@ vi.mock('../lib/prisma.js', () => ({
 }));
 
 import { prisma } from '@/lib/prisma.js';
-import { listActiveTenantIds } from './organizationRepository.js';
+import { listActiveTenantIds } from './tenantRepository.js';
 
 beforeEach(() => vi.clearAllMocks());
 

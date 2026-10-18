@@ -18,6 +18,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      clamscan: fileURLToPath(new URL('./tests/mocks/clamscan.ts', import.meta.url)),
+      twilio: fileURLToPath(new URL('./tests/mocks/twilio.ts', import.meta.url)),
     },
   },
   test: {

@@ -31,10 +31,10 @@ export class PlaybookRoleplayAdapter implements RoleplayPlaybookPort {
 
     // Conhecimento vivo originado do Data Flywheel
     const curated = await curatedObjectionService.listEligibleForRoleplay(organizationId);
-    const curatedObjections = curated.map((c) => `[Flywheel] ${c.category}: ${c.anonymizedEvidence}`);
+    const curatedObjections = curated.map(
+      (c) => `[Flywheel] ${c.category}: ${c.anonymizedEvidence}`,
+    );
 
     return [...repoObjections, ...curatedObjections];
   }
 }
-
-

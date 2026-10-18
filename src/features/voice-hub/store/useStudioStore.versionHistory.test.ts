@@ -42,7 +42,7 @@ describe('useStudioStore — version history & rollback', () => {
     it("requests the list scoped to this session's own workflow id, newest-first as returned by the server", async () => {
       useStudioStore.setState({ workflowId: 'wf-tenant-a' });
       vi.mocked(fetch).mockImplementation((url) => {
-        expect(String(url)).toBe('/api/workflow/wf-tenant-a/versions');
+        expect(String(url)).toBe('/api/voice-hub/workflow/wf-tenant-a/versions');
         return jsonResponse({
           versions: [
             { version: 2, publishedAt: '2026-01-02T00:00:00.000Z', publishedBy: 'user-2' },
@@ -104,13 +104,16 @@ describe('useStudioStore — version history & rollback', () => {
       let listFetchCount = 0;
       vi.mocked(fetch).mockImplementation((url, init) => {
         const href = String(url);
-        if (href === '/api/workflow/wf-1/versions/1/rollback' && init?.method === 'POST') {
+        if (
+          href === '/api/voice-hub/workflow/wf-1/versions/1/rollback' &&
+          init?.method === 'POST'
+        ) {
           return jsonResponse({
             success: true,
             workflow: { id: 'wf-1', version: 4, nodes: restoredNodes, edges: restoredEdges },
           });
         }
-        if (href === '/api/workflow/wf-1/versions') {
+        if (href === '/api/voice-hub/workflow/wf-1/versions') {
           listFetchCount += 1;
           return jsonResponse({ versions: [] });
         }

@@ -3,7 +3,7 @@ import { Redis } from 'ioredis';
 import { getRedisConnectionOptions, getRedisUrl, getRedisRetryStrategy } from '../lib/env.js';
 import { logger } from '../../../lib/logger.js';
 import { checkPlatformHealth } from '../controllers/health.controller.js';
-import { listActiveTenantIds } from '../repositories/organizationRepository.js';
+import { listActiveTenantIds } from '../repositories/tenantRepository.js';
 import { createMetric } from './metricService.js';
 
 /**

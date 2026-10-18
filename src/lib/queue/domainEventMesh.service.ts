@@ -20,7 +20,10 @@ export interface OutboxRecord {
 }
 
 export class DomainEventMeshService implements IDomainEventMeshPort {
-  private handlers = new Map<DomainEventType, Array<(event: DomainEventEnvelope) => Promise<void>>>();
+  private handlers = new Map<
+    DomainEventType,
+    Array<(event: DomainEventEnvelope) => Promise<void>>
+  >();
   private processedEventIds = new Set<string>();
   private outboxStore: OutboxRecord[] = [];
   private static MAX_CAUSATION_DEPTH = 5;
@@ -51,7 +54,11 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
     };
 
     // Prevenção de ciclos recursivos baseada na profundidade da cadeia causal
-    if (envelope.causationId && this.calculateCausationDepth(envelope.causationId) >= DomainEventMeshService.MAX_CAUSATION_DEPTH) {
+    if (
+      envelope.causationId &&
+      this.calculateCausationDepth(envelope.causationId) >=
+        DomainEventMeshService.MAX_CAUSATION_DEPTH
+    ) {
       logger.warn(
         {
           eventId: envelope.eventId,
@@ -96,7 +103,10 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
   /**
    * Registra um handler de consumo para um tipo específico de evento.
    */
-  subscribe(eventType: DomainEventType, handler: (event: DomainEventEnvelope) => Promise<void>): void {
+  subscribe(
+    eventType: DomainEventType,
+    handler: (event: DomainEventEnvelope) => Promise<void>,
+  ): void {
     const current = this.handlers.get(eventType) || [];
     current.push(handler);
     this.handlers.set(eventType, current);

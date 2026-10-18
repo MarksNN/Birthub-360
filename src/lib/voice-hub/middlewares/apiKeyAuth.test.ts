@@ -36,10 +36,19 @@ vi.mock('../lib/prisma.js', () => ({
   },
 }));
 
+vi.mock('@/lib/prisma.js', () => ({
+  prisma: {
+    tenant: { upsert: vi.fn().mockResolvedValue({}) },
+    user: { upsert: vi.fn().mockResolvedValue({}) },
+  },
+}));
+
 import { authenticateApiKey } from '../services/apiKeyService.js';
 import { attachAuthIfPresent, getAuthUser } from './index.js';
 
 beforeEach(() => {
+  process.env.JWT_SECRET = 'test-jwt-secret-for-voice-hub-auth-tokens-123';
+  process.env.REFRESH_TOKEN_SECRET = 'test-refresh-secret-for-voice-hub-456';
   vi.clearAllMocks();
   redisState.counts.clear();
 });

@@ -142,6 +142,7 @@ export const attachAuthIfPresent = async (
   const session = await getAuthUser(req, res);
   if (session) {
     req.user = session;
+    req.voiceHubUser = session;
     req.organizationId = session.organizationId;
 
     // Auto-upsert User and Tenant in Dev environment so old JWT cookies don't break fresh databases

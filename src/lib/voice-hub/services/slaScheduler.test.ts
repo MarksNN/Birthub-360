@@ -1,9 +1,33 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockAdd = vi.fn().mockResolvedValue(undefined);
-const mockQueueClose = vi.fn().mockResolvedValue(undefined);
-const mockWorkerClose = vi.fn().mockResolvedValue(undefined);
-const mockOn = vi.fn();
+const {
+  mockAdd,
+  mockQueueClose,
+  mockWorkerClose,
+  mockOn,
+  mockRedisDisconnect,
+  mockRedisOn,
+  RedisMock,
+} = vi.hoisted(() => {
+  const mockAdd = vi.fn().mockResolvedValue(undefined);
+  const mockQueueClose = vi.fn().mockResolvedValue(undefined);
+  const mockWorkerClose = vi.fn().mockResolvedValue(undefined);
+  const mockOn = vi.fn();
+  const mockRedisDisconnect = vi.fn();
+  const mockRedisOn = vi.fn();
+  const RedisMock = vi.fn().mockImplementation(function Redis() {
+    return { on: mockRedisOn, disconnect: mockRedisDisconnect, ping: vi.fn() };
+  });
+  return {
+    mockAdd,
+    mockQueueClose,
+    mockWorkerClose,
+    mockOn,
+    mockRedisDisconnect,
+    mockRedisOn,
+    RedisMock,
+  };
+});
 
 let lastWorkerProcessor: (() => unknown) | undefined;
 
@@ -17,12 +41,9 @@ vi.mock('bullmq', () => ({
   }),
 }));
 
-const mockRedisDisconnect = vi.fn();
-const mockRedisOn = vi.fn();
 vi.mock('ioredis', () => ({
-  Redis: vi.fn().mockImplementation(function Redis() {
-    return { on: mockRedisOn, disconnect: mockRedisDisconnect, ping: vi.fn() };
-  }),
+  default: RedisMock,
+  Redis: RedisMock,
 }));
 
 vi.mock('../lib/env.js', () => ({
@@ -37,7 +58,7 @@ vi.mock('../controllers/health.controller.js', () => ({
 }));
 
 const mockListActiveTenantIds = vi.fn();
-vi.mock('../repositories/organizationRepository.js', () => ({
+vi.mock('../repositories/tenantRepository.js', () => ({
   listActiveTenantIds: () => mockListActiveTenantIds(),
 }));
 
@@ -46,7 +67,7 @@ vi.mock('./metricService.js', () => ({
   createMetric: (...args: unknown[]) => mockCreateMetric(...args),
 }));
 
-vi.mock('../lib/logger.js', () => ({
+vi.mock('../../../lib/logger.js', () => ({
   logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 

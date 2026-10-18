@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../lib/prisma.js', () => ({
+vi.mock('@/lib/prisma.js', () => ({
   prisma: {
     tenantWebhookEndpoint: {
       count: vi.fn(),

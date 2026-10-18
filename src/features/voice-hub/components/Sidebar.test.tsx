@@ -9,7 +9,7 @@ const mockSetTheme = vi.fn();
 const mockShowToast = vi.fn();
 const mockLogout = vi.fn();
 
-vi.mock('../lib/auth.js', () => ({
+vi.mock('../../../lib/auth.js', () => ({
   auth: {
     getToken: () => 'true',
     logout: () => mockLogout(),
@@ -36,7 +36,7 @@ vi.mock('./design-system/ThemeContext.js', () => ({
   useTheme: () => ({ theme: 'light', setTheme: mockSetTheme, resolvedTheme: 'light' }),
 }));
 
-vi.mock('./design-system.js', async (importOriginal) => {
+vi.mock('./design-system/index.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./design-system/index.js')>();
   return {
     ...actual,
@@ -46,7 +46,7 @@ vi.mock('./design-system.js', async (importOriginal) => {
 
 // NotificationCenter (Agente 12) owns its own fetch/open-close/state — isolate the Sidebar tree
 // from it here and cover its real behavior in components/NotificationCenter/NotificationCenter.test.tsx.
-vi.mock('./NotificationCenter.js', () => ({
+vi.mock('./NotificationCenter/index.js', () => ({
   NotificationCenter: () => <div data-testid="notification-center-stub" />,
 }));
 

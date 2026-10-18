@@ -10,9 +10,7 @@ import { PrismaObjectionMatrixRepository } from '../objection-matrix/infra/Prism
 export class CuratedObjectionService implements ICuratedObjectionPort {
   private inMemoryStore: Map<string, CuratedObjectionItem> = new Map();
 
-  constructor(
-    private objectionRepo = new PrismaObjectionMatrixRepository(),
-  ) {}
+  constructor(private objectionRepo = new PrismaObjectionMatrixRepository()) {}
 
   /**
    * Ingere uma objeção detectada a partir de transcrição ou anotação de campo.
@@ -39,9 +37,9 @@ export class CuratedObjectionService implements ICuratedObjectionPort {
     );
 
     let curationStatus: ObjectionCurationStatus = 'DETECTED';
-    if (input.confidenceScore >= 0.90) {
+    if (input.confidenceScore >= 0.9) {
       curationStatus = 'VERIFIED';
-    } else if (input.confidenceScore >= 0.70) {
+    } else if (input.confidenceScore >= 0.7) {
       curationStatus = 'REVIEW_REQUIRED';
     }
 
@@ -100,11 +98,11 @@ export class CuratedObjectionService implements ICuratedObjectionPort {
         persona: item.commercialContext,
         objectionTitle: item.category,
         objectionText: item.anonymizedEvidence,
-        responseScript: item.suggestedResponse || 'Validar dor do cliente e apresentar diferencial competitivo',
+        responseScript:
+          item.suggestedResponse || 'Validar dor do cliente e apresentar diferencial competitivo',
         keyDifferentiator: 'Conhecimento extraído do flywheel de atendimento real',
       });
     } catch (err) {
-
       logger.warn(
         { err, id, organizationId },
         'CuratedObjection: Repositório de banco indisponível durante promoção, preservando estado em memória',

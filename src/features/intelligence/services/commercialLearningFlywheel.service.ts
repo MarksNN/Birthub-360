@@ -83,7 +83,11 @@ export class CommercialLearningFlywheelService {
 
     if (diffDays < 0 || diffDays > CommercialLearningFlywheelService.ATTRIBUTION_WINDOW_DAYS) {
       logger.warn(
-        { leadId: outcome.leadId, diffDays, windowLimit: CommercialLearningFlywheelService.ATTRIBUTION_WINDOW_DAYS },
+        {
+          leadId: outcome.leadId,
+          diffDays,
+          windowLimit: CommercialLearningFlywheelService.ATTRIBUTION_WINDOW_DAYS,
+        },
         'CommercialLearningFlywheel: Resultado fora da janela de atribuição causal. Não promovido.',
       );
       return null;
