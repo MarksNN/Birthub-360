@@ -350,24 +350,24 @@ export function Landing360({
           TELA 1: LANDING COMPLETA
       ════════════════════════════════════════════════════════════════════ */}
       <div className={activeScreen === 'intro' ? 'block' : 'hidden'}>
-        {/* 1. NAVBAR FIXA — PRESENÇA INSTITUCIONAL & ENTERPRISE */}
-        <header className="navbar-sticky w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-3.5">
+        {/* 1. NAVBAR FIXA — PRESENÇA INSTITUCIONAL & ENTERPRISE (+12% PRESENÇA) */}
+        <header className="navbar-sticky w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-4">
           <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-3 sm:gap-6">
             <a href="#hero" className="flex items-center gap-3.5 group shrink-0">
-              <BH360LogoMark size={48} />
+              <BH360LogoMark size={52} />
               <div className="flex flex-col">
-                <span className="font-display text-xl font-bold leading-tight tracking-tight">
+                <span className="font-display text-[22px] sm:text-2xl font-bold leading-tight tracking-tight">
                   <span className="landing-title-cyan font-bold">Birth Hub</span>
                   <span className="landing-title-pink ml-1 font-extrabold">360°</span>
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#00D4FF] font-semibold">
+                <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-[#00D4FF] font-semibold">
                   Revenue Command Center
                 </span>
               </div>
             </a>
 
             {/* Links de navegação desktop — Cada item como um botão pill, sem sobreposição */}
-            <nav className="hidden xl:flex items-center justify-center gap-1.5 2xl:gap-2 flex-1 mx-2">
+            <nav className="hidden xl:flex items-center justify-center gap-2 2xl:gap-2.5 flex-1 mx-3">
               <a href="#problema" className="nav-pill-btn">
                 Problema
               </a>
@@ -397,7 +397,7 @@ export function Landing360({
               </a>
             </nav>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-3.5 shrink-0">
               {/* Botão de Alternância de Tema (Light / Dark) */}
               <button
                 type="button"
@@ -407,9 +407,9 @@ export function Landing360({
                 title={theme === 'dark' ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
               >
                 {theme === 'dark' ? (
-                  <Sun className="w-4 h-4 text-amber-400" />
+                  <Sun className="w-[18px] h-[18px] text-amber-400" />
                 ) : (
-                  <Moon className="w-4 h-4 text-sky-600" />
+                  <Moon className="w-[18px] h-[18px] text-sky-600" />
                 )}
               </button>
 
@@ -417,7 +417,7 @@ export function Landing360({
               <button
                 type="button"
                 onClick={handleGoToLogin}
-                className="btn-cta-light btn-cta-pulse hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider cursor-pointer shadow-md"
+                className="btn-cta-light btn-cta-pulse hidden sm:inline-flex items-center gap-2.5 px-6 py-2.75 rounded-xl font-sans text-[13px] font-bold uppercase tracking-wider cursor-pointer shadow-md"
               >
                 <span>Acessar Plataforma</span>
                 <ArrowRight className="w-4 h-4" />
@@ -564,7 +564,7 @@ export function Landing360({
             </div>
 
             {/* Capacidades reais: Multi-CRM — Respiro +36px e bordas semânticas */}
-            <div className="mt-20 pt-8 border-t border-slate-200/80 dark:border-slate-800 w-full max-w-5xl">
+            <div className="mt-20 pt-8 border-t border-slate-200/80 dark:border-slate-800 w-full max-w-6xl xl:max-w-7xl">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {FEATURE_TAGS.map((tag, index) => (
                   <div
@@ -605,7 +605,7 @@ export function Landing360({
           id="problema"
           className="px-5 py-16 sm:px-8 lg:px-14 border-b border-slate-700/60 transition-colors"
         >
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* Cabeçalho de Seção Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#EF4444]/10 border border-[#EF4444]/40 text-[#EF4444] mb-3.5 mx-auto">
@@ -681,7 +681,7 @@ export function Landing360({
           id="plataforma"
           className="px-5 py-16 sm:px-8 lg:px-14 border-b border-slate-700/60 transition-colors"
         >
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
@@ -760,7 +760,7 @@ export function Landing360({
           id="pilares"
           className="px-5 py-16 sm:px-8 lg:px-14 border-b border-slate-700/60 transition-colors"
         >
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
@@ -798,12 +798,16 @@ export function Landing360({
                         : ''
                     }`}
                     style={{
-                      borderColor: isActive ? p.color : `${p.color}90`,
-                      borderWidth: '2.5px',
+                      borderColor: isActive ? p.color : `${p.color}75`,
+                      borderWidth: '1px',
                       borderStyle: 'solid',
                       boxShadow: isActive
-                        ? `0 0 0 3px ${p.color}, 0 16px 40px -4px ${p.color}55, 0 0 24px 2px ${p.color}40`
-                        : `0 10px 30px -2px ${p.color}28, 0 0 18px 2px ${p.color}18`,
+                        ? theme === 'dark'
+                          ? `0 0 0 2px ${p.color}, 0 12px 28px -4px rgba(0,0,0,0.65), 0 0 14px 1px ${p.color}35`
+                          : `0 0 0 2px ${p.color}, 0 8px 24px -2px rgba(15,23,42,0.1), 0 0 10px ${p.color}20`
+                        : theme === 'dark'
+                          ? `0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 0 8px 0 ${p.color}10`
+                          : `0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)`,
                     }}
                   >
                     {/* Topo do Card */}
@@ -868,14 +872,14 @@ export function Landing360({
                           style={{ backgroundColor: p.color }}
                         />
                         <span
-                          className="font-mono text-[10px] font-bold uppercase tracking-wider"
+                          className="font-mono text-[11px] font-bold uppercase tracking-wider"
                           style={{ color: p.color }}
                         >
                           {p.tag}
                         </span>
                       </div>
                       <span
-                        className="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-bold"
+                        className="font-mono text-[11px] opacity-0 group-hover:opacity-100 transition-opacity font-bold"
                         style={{ color: p.color }}
                       >
                         CONECTADO →
@@ -990,8 +994,7 @@ export function Landing360({
 
         {/* 6. FLUXO OPERACIONAL */}
         <section id="fluxo" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-base">
-          <div className="max-w-6xl mx-auto">
-            {/* Cabeçalho Centralizado com SVG Customizado */}
+          <div className="max-w-7xl mx-auto">
             {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#F59E0B]/10 border border-[#F59E0B]/40 text-[#F59E0B] mb-3.5 mx-auto">
@@ -1080,7 +1083,7 @@ export function Landing360({
             </div>
 
             {/* Demonstração Real do Motor de Prospecção — Prova de Capacidade Enterprise */}
-            <div className="mt-14 rounded-2xl border-[2.5px] border-[#00D4FF]/60 dark:border-[#00D4FF]/80 bg-gradient-to-b from-white to-sky-50/60 dark:from-[#0F172A] dark:to-[#081C30] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,212,255,0.15)]">
+            <div className="mt-14 rounded-2xl border border-[#00D4FF]/45 dark:border-[#00D4FF]/60 ring-1 ring-[#00D4FF]/20 bg-gradient-to-b from-white via-sky-50/40 to-slate-50 dark:from-[#0F172A] dark:via-[#0c192c] dark:to-[#081524] p-5 sm:p-7 lg:p-8 shadow-[0_20px_50px_-10px_rgba(15,23,42,0.1)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.7)]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
@@ -1097,7 +1100,7 @@ export function Landing360({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30">
+                  <span className="font-mono text-[11px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/30">
                     Telemetria Ativa
                   </span>
                   <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
@@ -1106,7 +1109,7 @@ export function Landing360({
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-[#0B1120]">
+              <div className="relative overflow-hidden rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-slate-100 dark:bg-[#0B1120] shadow-inner">
                 {reduceMotion ? (
                   <img
                     src="/landing/prospeccao/poster-prospect-radar.png"
@@ -1130,9 +1133,9 @@ export function Landing360({
                 )}
               </div>
 
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-300 font-mono">
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300 font-mono">
                 <span>✦ ICP Filtrado por Segmento, Região e Personas B2B</span>
-                <span className="text-[#00D4FF]">
+                <span className="text-[#0284c7] dark:text-[#00D4FF] font-medium">
                   Integração via API e webhooks com Bitrix24, HubSpot, Salesforce e principais CRMs
                 </span>
               </div>
@@ -1142,7 +1145,7 @@ export function Landing360({
 
         {/* 7. IA (INTELIGÊNCIA ARTIFICIAL CONTEXTUAL) */}
         <section id="ia" className="px-5 py-16 sm:px-8 lg:px-14 landing-section-alt">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* Cabeçalho Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#FF2D9B]/10 border border-[#FF2D9B]/40 text-[#FF2D9B] mb-3.5 mx-auto">
@@ -1168,7 +1171,7 @@ export function Landing360({
                     <h4 className="font-display font-bold text-base text-[#0284c7] dark:text-[#00D4FF]">
                       Diagnóstico de Entraves
                     </h4>
-                    <p className="landing-subtitle text-sm font-medium mt-1">
+                    <p className="landing-subtitle text-sm font-medium leading-relaxed mt-1">
                       Alerta deals estagnados com sugestões claras de destravamento baseadas no
                       histórico da conta.
                     </p>
@@ -1183,7 +1186,7 @@ export function Landing360({
                     <h4 className="font-display font-bold text-base text-[#db2777] dark:text-[#FF2D9B]">
                       Próxima Melhor Ação
                     </h4>
-                    <p className="landing-subtitle text-sm font-medium mt-1">
+                    <p className="landing-subtitle text-sm font-medium leading-relaxed mt-1">
                       Recomendações acionáveis para o vendedor avançar o contato e contornar
                       objeções críticas.
                     </p>
@@ -1198,7 +1201,7 @@ export function Landing360({
                     <h4 className="font-display font-bold text-base text-[#d97706] dark:text-[#F59E0B]">
                       Isolamento &amp; Segurança
                     </h4>
-                    <p className="landing-subtitle text-sm font-medium mt-1">
+                    <p className="landing-subtitle text-sm font-medium leading-relaxed mt-1">
                       Seus dados comerciais jamais são utilizados para treinar modelos públicos.
                       Conformidade LGPD total.
                     </p>
@@ -1215,7 +1218,7 @@ export function Landing360({
                         COPILOTO COMERCIAL ATIVO
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                    <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
                       Contexto: Deal #4892 · Multi-CRM
                     </span>
                   </div>
