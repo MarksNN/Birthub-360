@@ -35,6 +35,8 @@ export default defineConfig({
     include: [
       'tests/unit/**/*.test.ts',
       'src/**/__tests__/**/*.test.ts',
+      'src/**/*.test.ts',
+      'src/**/*.test.tsx',
       'tests/unit/**/*.test.tsx',
     ],
     coverage: {

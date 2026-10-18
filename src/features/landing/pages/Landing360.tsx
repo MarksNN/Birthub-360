@@ -885,6 +885,106 @@ export function Landing360({
                 );
               })}
             </div>
+
+            {/* Detalhamento Interativo do Pilar Selecionado (Executive Drawer) */}
+            {selectedPillar &&
+              (() => {
+                const pilar = OFFICIAL_PILLARS.find((p) => p.id === selectedPillar);
+                if (!pilar) return null;
+
+                return (
+                  <div
+                    className="pillar-detail-drawer mt-8 p-6 sm:p-8 rounded-2xl relative shadow-2xl transition-all"
+                    style={{
+                      border: `2.5px solid ${pilar.color}`,
+                      background:
+                        theme === 'dark'
+                          ? 'linear-gradient(135deg, #0F172A 0%, #0B1120 100%)'
+                          : 'linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%)',
+                      boxShadow: `0 16px 48px -4px ${pilar.color}35, 0 0 28px 4px ${pilar.color}25`,
+                    }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+                      <div className="flex items-center gap-3.5">
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shadow-sm shrink-0"
+                          style={{
+                            backgroundColor: `${pilar.color}22`,
+                            color: pilar.color,
+                            border: `1.5px solid ${pilar.color}55`,
+                          }}
+                        >
+                          {pilar.symbol}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full"
+                              style={{
+                                backgroundColor: `${pilar.color}20`,
+                                color: pilar.color,
+                              }}
+                            >
+                              PILAR {pilar.id}
+                            </span>
+                            <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+                              TAG: {pilar.tag}
+                            </span>
+                          </div>
+                          <h3
+                            className="font-display text-xl sm:text-2xl font-extrabold mt-0.5"
+                            style={{ color: pilar.color }}
+                          >
+                            {pilar.name}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          SoundFX.play('click');
+                          setSelectedPillar(null);
+                        }}
+                        className="self-start sm:self-center px-4 py-2 rounded-xl font-mono text-xs font-bold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 cursor-pointer transition-all"
+                      >
+                        ✕ Fechar Detalhes
+                      </button>
+                    </div>
+
+                    <p className="landing-subtitle text-base font-medium leading-relaxed max-w-3xl mb-5">
+                      {pilar.desc}
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 font-mono text-xs">
+                      <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                        <span className="text-slate-500 dark:text-slate-400 block mb-1">
+                          Foco Estratégico:
+                        </span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                          {pilar.focus}
+                        </span>
+                      </div>
+                      <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                        <span className="text-slate-500 dark:text-slate-400 block mb-1">
+                          Integração &amp; Dados:
+                        </span>
+                        <span className="font-bold text-[#00D4FF] text-sm">
+                          Sincronização Contínua Multi-CRM
+                        </span>
+                      </div>
+                      <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
+                        <span className="text-slate-500 dark:text-slate-400 block mb-1">
+                          Governança &amp; Acesso:
+                        </span>
+                        <span className="font-bold text-[#10B981] text-sm">
+                          Isolamento Multi-Tenant Ativo
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
           </div>
         </section>
 
@@ -1370,77 +1470,101 @@ export function Landing360({
               </p>
             </div>
 
-            {/* Grid Multi-CRM Completo */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#00D4FF]">
+            {/* Grid Multi-CRM Completo — Zero Fundo Branco Chapado */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
+              <div className="section-card card-semantic-cyan p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0284c7] dark:text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● API &amp; Webhooks
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#0284c7] dark:text-[#00D4FF]">
                   Bitrix24
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Conexão via API &amp; Webhooks
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Sincronização Contínua
                 </div>
               </div>
 
-              <div className="section-card card-semantic-pink p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">
+              <div className="section-card card-semantic-pink p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#db2777] dark:text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● Bidirecional
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#db2777] dark:text-[#FF2D9B]">
                   HubSpot
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Conexão Bidirecional
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Conexão de Pipeline
                 </div>
               </div>
 
-              <div className="section-card card-semantic-gold p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">
+              <div className="section-card card-semantic-gold p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#d97706] dark:text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● Enterprise Sync
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#d97706] dark:text-[#F59E0B]">
                   Salesforce
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Enterprise Connector
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Conector de Contas
                 </div>
               </div>
 
-              <div className="section-card card-semantic-green p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#059669] dark:text-[#22C55E]">
+              <div className="section-card card-semantic-green p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#059669] dark:text-[#10B981] bg-[#10B981]/10 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● Pipeline Sync
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#059669] dark:text-[#10B981]">
                   Pipedrive
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Pipeline Sync
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Fluxos em Tempo Real
                 </div>
               </div>
 
-              <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#38BDF8]">
+              <div className="section-card card-semantic-cyan p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0284c7] dark:text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● Direto na Fila
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#0284c7] dark:text-[#00D4FF]">
                   WhatsApp API
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Comunicação Direta
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Mensageria Ativa
                 </div>
               </div>
 
-              <div className="section-card card-semantic-gold p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">
-                  Telefonia em Nuvem
+              <div className="section-card card-semantic-gold p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#d97706] dark:text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● Telefonia Cloud
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#d97706] dark:text-[#F59E0B]">
+                  Voz Integrada
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
                   Gravação &amp; Métricas
                 </div>
               </div>
 
-              <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#00D4FF]">
+              <div className="section-card card-semantic-cyan p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0284c7] dark:text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● REST &amp; Hooks
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#0284c7] dark:text-[#00D4FF]">
                   Webhooks &amp; APIs
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Conexão Flexível
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Arquitetura Aberta
                 </div>
               </div>
 
-              <div className="section-card card-semantic-pink p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">
+              <div className="section-card card-semantic-pink p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#db2777] dark:text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                  ● Rastreabilidade
+                </span>
+                <div className="font-display text-base sm:text-lg font-bold text-[#db2777] dark:text-[#FF2D9B]">
                   E-mail Corporativo
                 </div>
-                <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Rastreabilidade Total
+                <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
+                  Histórico Auditável
                 </div>
               </div>
             </div>
@@ -1468,62 +1592,97 @@ export function Landing360({
             <div className="flex flex-col lg:flex-row items-center gap-10">
               <div className="lg:w-1/2 w-full space-y-4">
                 <div className="grid grid-cols-2 gap-3.5 font-mono text-xs">
-                  <div className="section-card card-semantic-cyan p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                    <span className="font-bold text-[#0284c7] dark:text-[#00D4FF] block mb-1.5 text-sm">
+                  <div className="section-card card-semantic-cyan p-5 sm:p-6 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
+                    <span className="font-bold text-[#0284c7] dark:text-[#00D4FF] block mb-2 text-base">
                       SDRs &amp; BDRs
                     </span>
-                    Fila organizada e dados enriquecidos na tela.
+                    <p className="landing-subtitle text-xs sm:text-sm font-medium leading-relaxed">
+                      Fila priorizada por inteligência, roteiro de qualificação e dados de decisores
+                      enriquecidos na tela.
+                    </p>
                   </div>
-                  <div className="section-card card-semantic-gold p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                    <span className="font-bold text-[#d97706] dark:text-[#F59E0B] block mb-1.5 text-sm">
+                  <div className="section-card card-semantic-gold p-5 sm:p-6 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
+                    <span className="font-bold text-[#d97706] dark:text-[#F59E0B] block mb-2 text-base">
                       Closers
                     </span>
-                    Histórico 360°, objeções e apoio do copiloto.
+                    <p className="landing-subtitle text-xs sm:text-sm font-medium leading-relaxed">
+                      Visão 360° do deal, mapeamento de objeções históricas e suporte preditivo do
+                      copiloto comercial.
+                    </p>
                   </div>
                 </div>
 
-                <div className="section-card card-semantic-pink p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                  <span className="font-bold text-[#db2777] dark:text-[#FF2D9B] block mb-1.5 text-sm">
+                <div className="section-card card-semantic-pink p-5 sm:p-6 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
+                  <span className="font-bold text-[#db2777] dark:text-[#FF2D9B] block mb-2 text-base">
                     Diretoria &amp; Head de Vendas
                   </span>
-                  Previsibilidade acionável, pace diário e controle total de pipeline.
+                  <p className="landing-subtitle text-xs sm:text-sm font-medium leading-relaxed">
+                    Previsibilidade acionável, telemetria diária de faturamento e controle
+                    irrestrito de cada etapa do pipeline.
+                  </p>
                 </div>
               </div>
 
               <div className="lg:w-1/2 w-full">
-                <div className="section-card card-semantic-cyan p-6 shadow-2xl">
+                <div className="section-card card-semantic-cyan p-6 sm:p-7 shadow-2xl rounded-2xl">
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
                     <span className="font-mono text-xs font-bold text-[#0284c7] dark:text-[#00D4FF]">
-                      BIRTH HUB 360° · COCKPIT
+                      BIRTH HUB 360° · COCKPIT ATIVO
                     </span>
                     <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-[#00D4FF]/20 text-[#0284c7] dark:text-[#00D4FF] font-bold border border-[#00D4FF]/30">
                       100% OPERACIONAL
                     </span>
                   </div>
                   <div className="space-y-3 font-mono text-xs">
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/30 shadow-sm">
-                      <span className="text-slate-600 dark:text-slate-300 font-medium">
-                        Leads Ativos na Fila
-                      </span>
-                      <span className="font-bold text-[#0284c7] dark:text-[#00D4FF]">
-                        184 contatos
-                      </span>
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#00D4FF]/35 shadow-sm">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">
+                          Leads Ativos na Fila
+                        </span>
+                        <span className="font-extrabold text-[#0284c7] dark:text-[#00D4FF] text-sm sm:text-base">
+                          184 contatos
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-[#00D4FF] h-full rounded-full"
+                          style={{ width: '78%' }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/30 shadow-sm">
-                      <span className="text-slate-600 dark:text-slate-300 font-medium">
-                        Deals com Risco Identificado
-                      </span>
-                      <span className="font-bold text-[#d97706] dark:text-[#F59E0B]">
-                        3 oportunidades
-                      </span>
+
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/35 shadow-sm">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">
+                          Deals com Risco Identificado
+                        </span>
+                        <span className="font-extrabold text-[#d97706] dark:text-[#F59E0B] text-sm sm:text-base">
+                          3 oportunidades
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-[#F59E0B] h-full rounded-full"
+                          style={{ width: '18%' }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/30 shadow-sm">
-                      <span className="text-slate-600 dark:text-slate-300 font-medium">
-                        Cadências em Execução
-                      </span>
-                      <span className="font-bold text-[#db2777] dark:text-[#FF2D9B]">
-                        12 ativas
-                      </span>
+
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/35 shadow-sm">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-slate-600 dark:text-slate-300 font-medium">
+                          Cadências em Execução
+                        </span>
+                        <span className="font-extrabold text-[#db2777] dark:text-[#FF2D9B] text-sm sm:text-base">
+                          12 ativas
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-[#FF2D9B] h-full rounded-full"
+                          style={{ width: '92%' }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1617,7 +1776,13 @@ export function Landing360({
           </div>
 
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-slate-400 text-center">
-            <p>© {new Date().getFullYear()} Birth Hub 360°. Todos os direitos reservados.</p>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Sistemas Operacionais · Latência 22ms · 99.98% Uptime</span>
+              </div>
+              <p>© {new Date().getFullYear()} Birth Hub 360°. Todos os direitos reservados.</p>
+            </div>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <Link
                 to="/terms"

@@ -40,24 +40,39 @@ if (typeof window !== 'undefined') {
 // Mock do BullMQ para que testes unitários não tentem conectar no Redis real (evitando warnings "searchQueue offline")
 vi.mock('bullmq', async (importOriginal) => {
   const actual = await importOriginal<typeof import('bullmq')>();
+  class MockQueue {
+    name: string;
+    constructor(name: string) {
+      this.name = name;
+    }
+    add = vi.fn().mockResolvedValue({ id: 'mocked-job-id' });
+    on = vi.fn();
+    close = vi.fn();
+    upsertJobScheduler = vi.fn().mockResolvedValue(undefined);
+  }
+  class MockWorker {
+    name: string;
+    processor: any;
+    constructor(name: string, processor: any) {
+      this.name = name;
+      this.processor = processor;
+    }
+    on = vi.fn();
+    close = vi.fn();
+  }
+  class MockQueueEvents {
+    name: string;
+    constructor(name: string) {
+      this.name = name;
+    }
+    on = vi.fn();
+    close = vi.fn();
+  }
   return {
     ...actual,
-    Queue: vi.fn().mockImplementation((name) => ({
-      name,
-      add: vi.fn().mockResolvedValue({ id: 'mocked-job-id' }),
-      on: vi.fn(),
-      close: vi.fn(),
-    })),
-    Worker: vi.fn().mockImplementation((name, processor) => ({
-      name,
-      on: vi.fn(),
-      close: vi.fn(),
-    })),
-    QueueEvents: vi.fn().mockImplementation((name) => ({
-      name,
-      on: vi.fn(),
-      close: vi.fn(),
-    })),
+    Queue: MockQueue,
+    Worker: MockWorker,
+    QueueEvents: MockQueueEvents,
   };
 });
 
