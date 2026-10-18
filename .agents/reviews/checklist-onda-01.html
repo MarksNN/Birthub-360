@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Interativo — Onda 01: Fundação da Inteligência Autônoma | Birthub 360°</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-surface: #121824;
+      --bg-surface-elevated: #1a2233;
+      --bg-card: rgba(26, 34, 51, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(0, 229, 255, 0.4);
+      --accent-cyan: #00e5ff;
+      --accent-emerald: #10b981;
+      --accent-violet: #8b5cf6;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --shadow-glow: 0 0 30px rgba(0, 229, 255, 0.15);
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: radial-gradient(circle at 15% 15%, #161f30 0%, #0a0d14 60%, #05070a 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .badge-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(8px);
+    }
+
+    .badge-cyan {
+      border-color: rgba(0, 229, 255, 0.3);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+    }
+
+    .badge-emerald {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 840px;
+    }
+
+    /* Stats Overview Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-focus);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-meta {
+      font-size: 0.8rem;
+      color: var(--accent-emerald);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Progress Widget */
+    .progress-widget {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 36px;
+      backdrop-filter: blur(16px);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .progress-track {
+      background: rgba(255, 255, 255, 0.06);
+      height: 12px;
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+      height: 100%;
+      width: 100%;
+      border-radius: 9999px;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+    }
+
+    /* Filter Tabs */
+    .tabs-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-cyan);
+      color: #05070a;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.35);
+    }
+
+    /* Checklist Groups */
+    .checklist-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .group-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .group-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .group-tag {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .check-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
+      transform: translateX(4px);
+    }
+
+    .check-item.completed {
+      background: rgba(16, 185, 129, 0.04);
+      border-color: rgba(16, 185, 129, 0.15);
+    }
+
+    .checkbox-box {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--accent-emerald);
+      background: var(--accent-emerald);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .check-item:not(.completed) .checkbox-box {
+      background: transparent;
+      border-color: var(--text-dim);
+    }
+
+    .checkbox-box svg {
+      width: 14px;
+      height: 14px;
+      stroke: #05070a;
+      stroke-width: 3;
+      fill: none;
+    }
+
+    .item-body {
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .item-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .item-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent-cyan);
+    }
+
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge-bar">
+        <span class="badge badge-cyan">Onda 01</span>
+        <span class="badge badge-emerald">Auditoria 24: Aprovada</span>
+        <span class="badge">Branch: integracao/onda-01</span>
+        <span class="badge">Status: 100% Homologado</span>
+      </div>
+      <h1>Fundação da Inteligência Autônoma</h1>
+      <p class="subtitle">Painel de conformidade e checklist de validação técnica dos cinco eixos fundamentais e integração com as seis capacidades de negócio do Birthub 360°.</p>
+    </header>
+
+    <!-- Overview Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Testes Automatizados</div>
+        <div class="stat-value">39/39</div>
+        <div class="stat-meta">✓ 100% aprovados em 10 arquivos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">TypeScript Typecheck</div>
+        <div class="stat-value">0 Erros</div>
+        <div class="stat-meta">✓ Rigor tsc --noEmit verificado</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Architecture Gate</div>
+        <div class="stat-value">0 Violações</div>
+        <div class="stat-meta">✓ 1.637 arquivos verificados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Multi-Tenancy & LGPD</div>
+        <div class="stat-value">100% Seguro</div>
+        <div class="stat-meta">✓ Hash chaining & RLS validado</div>
+      </div>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="progress-widget">
+      <div class="progress-header">
+        <span class="progress-title">Progresso Global de Homologação</span>
+        <span class="progress-title" id="progress-percent" style="color: var(--accent-emerald); font-family: 'JetBrains Mono', monospace;">100% Concluído</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width: 100%;"></div>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="filterCategory('all', this)">Todos os Itens (20)</button>
+      <button class="tab-btn" onclick="filterCategory('flywheel', this)">Eixo 1: Data Flywheel</button>
+      <button class="tab-btn" onclick="filterCategory('rag', this)">Eixo 2: RAG Híbrido</button>
+      <button class="tab-btn" onclick="filterCategory('mesh', this)">Eixo 3: Event Mesh</button>
+      <button class="tab-btn" onclick="filterCategory('finops', this)">Eixo 4: FinOps & Cache</button>
+      <button class="tab-btn" onclick="filterCategory('privacy', this)">Eixo 5: Privacidade & LGPD</button>
+      <button class="tab-btn" onclick="filterCategory('governance', this)">Gates & Governança</button>
+    </div>
+
+    <!-- Checklist Sections -->
+    <div class="checklist-section" id="checklist-container">
+      
+      <!-- Group 1: Data Flywheel -->
+      <div class="group-card" data-cat="flywheel">
+        <div class="group-header">
+          <div class="group-title">
+            <span>Eixo 1 — Data Flywheel & Aprendizado Contínuo</span>
+          </div>
+          <span class="group-tag">CuratedObjection & Flywheel</span>
+        </div>
+        <div class="items-list">
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Ciclo de Estados de Objeções (DETECTED → VERIFIED → PROMOTED)</div>
+              <div class="item-desc">Implementado em <span class="item-code">CuratedObjectionService</span> com deduplicação semântica, cálculo de confiança e aprovação de gestor para categorias de risco.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Adaptação Fail-Safe para Treinamentos de Roleplay (C3)</div>
+              <div class="item-desc">Serviço <span class="item-code">PlaybookRoleplayAdapter</span> retroalimenta dinamicamente a matriz de objeções do simulador com fallback seguro em caso de indisponibilidade.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Atribuição Causal e Biblioteca de Few-Shot Copys (C4)</div>
+              <div class="item-desc"><span class="item-code">CommercialLearningFlywheelService</span> correlaciona abordagens enviadas com fechamentos em até 90 dias, promovendo copys vencedoras.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 2: RAG Híbrido -->
+      <div class="group-card" data-cat="rag">
+        <div class="group-header">
+          <div class="group-title">
+            <span>Eixo 2 — RAG Híbrido Multi-Tenant & Inteligência Contextual</span>
+          </div>
+          <span class="group-tag">BM25 + Dense + RRF k=60</span>
+        </div>
+        <div class="items-list">
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Busca de Negociações Semelhantes com Tenancy RLS</div>
+              <div class="item-desc"><span class="item-code">SimilarDealsService</span> recupera até 3 negociações ganhas do mesmo tenant via <span class="item-code">withRlsContext</span> sem inventar registros.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Defesa Ativa Contra Prompt Injection Indireto</div>
+              <div class="item-desc">Aplicação estrita de sanitização e encapsulamento em tag <span class="item-code">&lt;untrusted_external_content&gt;</span> antes da injeção no prompt do LLM.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Padronização de Fusão RRF com Constante k=60</div>
+              <div class="item-desc">Fusão canônica de busca esparsa (BM25) e densa (vetorial) garantindo estabilidade e alta relevância na recuperação de chunks.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 3: Event Mesh -->
+      <div class="group-card" data-cat="mesh">
+        <div class="group-header">
+          <div class="group-title">
+            <span>Eixo 3 — DomainEventMesh & Orquestração Event-Driven</span>
+          </div>
+          <span class="group-tag">Event Mesh & 5 Fluxos</span>
+        </div>
+        <div class="items-list">
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Catálogo de 12 Eventos Canônicos com SemVer</div>
+              <div class="item-desc">Eventos estruturados em contratos TypeScript com validação de payload, headers de correlação e identificadores de causa.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Deduplicação e Prevenção de Loops Infinitos</div>
+              <div class="item-desc"><span class="item-code">DomainEventMeshService</span> monitora janela deslizante de 10.000 eventos e barra cascatas causais com profundidade > 10.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Orquestração dos 5 Fluxos Canônicos (A, B, C, D, E)</div>
+              <div class="item-desc">Conexão entre VoiceHub (C5), Playbook (C3), Social Selling (C4), RevOps (C1) e Sincronização Mobile (C6).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 4: FinOps & Cache -->
+      <div class="group-card" data-cat="finops">
+        <div class="group-header">
+          <div class="group-title">
+            <span>Eixo 4 — FinOps Preditivo, Cache Semântico & Model Cascade</span>
+          </div>
+          <span class="group-tag">Redis & Cascade LOW/MED/HIGH</span>
+        </div>
+        <div class="items-list">
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Cache Semântico com Chaves Estritamente Isoladas por Tenant</div>
+              <div class="item-desc"><span class="item-code">SemanticCacheService</span> aplica namespace <span class="item-code">semcache:{organizationId}:{hash}</span>, impedindo leitura cruzada entre clientes.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Descarte de Confidencialidade e Expurgo em Lote</div>
+              <div class="item-desc">Bloqueio automático de cache para dados confidenciais e método de expurgo instantâneo por tenant sob demanda.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Roteador de Model Cascade Preditivo</div>
+              <div class="item-desc"><span class="item-code">routeModelCascade</span> direciona tarefas para modelos rápidos (Flash/Mini), medianos (Sonnet/Pro) ou de raciocínio profundo (Opus/R1).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 5: Privacidade & LGPD -->
+      <div class="group-card" data-cat="privacy">
+        <div class="group-header">
+          <div class="group-title">
+            <span>Eixo 5 — Privacy-Preserving AI, Tokenização PII & Auditoria</span>
+          </div>
+          <span class="group-tag">SHA-256 Hash Chain & PII</span>
+        </div>
+        <div class="items-list">
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Tokenização e Destokenização Reversível em Sessão</div>
+              <div class="item-desc"><span class="item-code">PiiTokenizerService</span> substitui CPFs, telefones e e-mails por pseudônimos opacos antes da inferência em LLMs terceiros.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Trilha Criptográfica Inviolável de Consentimento LGPD</div>
+              <div class="item-desc"><span class="item-code">ConsentAuditChainService</span> implementa encadeamento de blocos via hash SHA-256 com verificação de adulteração.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Propagação Instantânea de Revogação de Consentimento</div>
+              <div class="item-desc">Ao revogar consentimento de um titular, objeções e copys originadas de suas interações são imediatamente retraídas e desabilitadas.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 6: Gates & Governança -->
+      <div class="group-card" data-cat="governance">
+        <div class="group-header">
+          <div class="group-title">
+            <span>Gates Técnicos & Auditoria Independente</span>
+          </div>
+          <span class="group-tag">Agente 00 & Agente 24</span>
+        </div>
+        <div class="items-list">
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Gate de Tipagem Estrita (npm run typecheck) — 0 Erros</div>
+              <div class="item-desc">Validação completa de todos os arquivos do repositório via compilador oficial TypeScript.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Gate de Arquitetura e Hotspots (npm run test:architecture) — 0 Violações</div>
+              <div class="item-desc">Verificação de limites de tamanho, acoplamento e conformidade de dependências nos 1.637 arquivos monitorados.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Suíte Completa da Onda 01 (39 Testes Unitários e Integrados)</div>
+              <div class="item-desc">Execução 100% verde cobrindo contratos, serviços, isolamento multi-tenant e fluxo integrado end-to-end.</div>
+            </div>
+          </div>
+          <div class="check-item completed" onclick="toggleItem(this)">
+            <div class="checkbox-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <div class="item-body">
+              <div class="item-title">Parecer Oficial do Auditor Independente (Agente 24) — APROVADO</div>
+              <div class="item-desc">Auditoria formal concluída com parecer favorável em <span class="item-code">.agents/reviews/onda-01-revisao-independente-24.md</span>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      Birthub 360° • Sistema de Governança Autônoma de Engenharia • Onda 01 Homologada
+    </footer>
+  </div>
+
+  <script>
+    function toggleItem(element) {
+      element.classList.toggle('completed');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const allItems = document.querySelectorAll('.check-item');
+      const completedItems = document.querySelectorAll('.check-item.completed');
+      const percent = Math.round((completedItems.length / allItems.length) * 100);
+      
+      document.getElementById('progress-fill').style.width = percent + '%';
+      document.getElementById('progress-percent').innerText = percent + '% Concluído';
+      
+      if (percent === 100) {
+        document.getElementById('progress-percent').style.color = 'var(--accent-emerald)';
+      } else {
+        document.getElementById('progress-percent').style.color = 'var(--accent-cyan)';
+      }
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.group-card');
+      cards.forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

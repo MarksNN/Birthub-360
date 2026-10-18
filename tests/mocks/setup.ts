@@ -11,6 +11,7 @@ if (!process.env.PII_BLIND_INDEX_KEY || process.env.PII_BLIND_INDEX_KEY.includes
 // (`global.fetch = vi.fn()` / `vi.spyOn(globalThis, 'fetch')` / `vi.mock` da camada de API),
 // espalhado por vários testes. Agora todos usam os handlers em `tests/mocks/handlers/` e
 // sobrescrevem pontualmente com `server.use(...)` quando precisam de uma resposta diferente.
+import '@testing-library/jest-dom/vitest';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import { server } from './server';
 
