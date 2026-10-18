@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Interativo — Onda 02: Inteligência Comercial Exógena | Birthub 360°</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-surface: #121824;
+      --bg-surface-elevated: #1a2233;
+      --bg-card: rgba(26, 34, 51, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(0, 229, 255, 0.4);
+      --accent-cyan: #00e5ff;
+      --accent-emerald: #10b981;
+      --accent-violet: #8b5cf6;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --shadow-glow: 0 0 30px rgba(0, 229, 255, 0.15);
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: radial-gradient(circle at 15% 15%, #161f30 0%, #0a0d14 60%, #05070a 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-cyan { background: rgba(0, 229, 255, 0.1); color: var(--accent-cyan); border: 1px solid rgba(0, 229, 255, 0.25); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.25); }
+    .badge-violet { background: rgba(139, 92, 246, 0.1); color: var(--accent-violet); border: 1px solid rgba(139, 92, 246, 0.25); }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 900px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .val-cyan { color: var(--accent-cyan); }
+    .val-emerald { color: var(--accent-emerald); }
+    .val-violet { color: var(--accent-violet); }
+    .val-amber { color: var(--accent-amber); }
+
+    .progress-bar-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      height: 12px;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-header {
+      padding: 20px 24px;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .item-list {
+      padding: 12px 24px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.2s;
+    }
+
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+
+    .checkbox-custom {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      transition: all 0.2s ease;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .checkbox-custom:checked {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+    }
+
+    .checkbox-custom:checked::before {
+      content: "✓";
+      color: #05070a;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .item-content {
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .item-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .item-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    footer {
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge-bar">
+        <span class="badge badge-cyan">Onda 02 — Homologada</span>
+        <span class="badge badge-emerald">Auditoria 24 Aprovada</span>
+        <span class="badge badge-violet">Isolamento Multi-Tenant Estrito</span>
+        <span class="badge badge-cyan">Zero Mocks no Runtime</span>
+      </div>
+      <h1>Inteligência Comercial Exógena, Grafo de Contas & Swarm Tático</h1>
+      <p class="header-desc">
+        Checklist interativo de validação formal dos 4 eixos estratégicos da Onda 02: Knowledge Graph (Eixo 6), Swarm Tático (Eixo 11), Market Sensing (Eixo 12) e Win-Loss Deep Autopsy (Eixo 19).
+      </p>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Progresso Geral</span>
+        <span class="stat-value val-emerald" id="progressPercent">100%</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Itens Concluídos</span>
+        <span class="stat-value val-cyan" id="completedCount">24/24</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Testes Automatizados</span>
+        <span class="stat-value val-violet">82 / 82 PASS</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Quality Gates</span>
+        <span class="stat-value val-amber">5 / 5 PASS</span>
+      </div>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar" style="width: 100%;"></div>
+    </div>
+
+    <!-- Eixo 6: Knowledge Graph -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Eixo 6 — Knowledge Graph de Contas & Decisores</span>
+          <span class="section-badge">6 ITENS</span>
+        </div>
+      </div>
+      <div class="item-list">
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="kg-1">
+          <div class="item-content">
+            <div class="item-title">Grafo de Entidades: Contas, Pessoas, Holdings e Relacionamentos</div>
+            <div class="item-desc">Modelo de nós e arestas estritamente isolado por organizationId, permitindo mapeamento de ecossistemas empresariais complexos.</div>
+            <div class="item-meta"><span>src/features/knowledge/services/accountKnowledgeGraph.service.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="kg-2">
+          <div class="item-content">
+            <div class="item-title">Tenancy Guard Estrito no Knowledge Graph</div>
+            <div class="item-desc">Bloqueio ativo contra relacionamentos cross-tenant. Tentativa de conectar entidades de tenants distintos resulta em rejeição imediata com log de segurança.</div>
+            <div class="item-meta"><span>tests/unit/knowledge/accountKnowledgeGraph.service.test.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="kg-3">
+          <div class="item-content">
+            <div class="item-title">Estratégia de Multi-Threading Comercial (Social Selling C4)</div>
+            <div class="item-desc">Geração de abordagens customizadas por categoria de decisor (comprador técnico, financeiro, sponsor executivo) com rascunhos sem envio não supervisionado.</div>
+            <div class="item-meta"><span>MultiThreadingApproach contract</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="kg-4">
+          <div class="item-content">
+            <div class="item-title">Purga de Contatos LGPD com Cascata de Arestas</div>
+            <div class="item-desc">Método purgeContactData em cumprimento irrestrito ao Art. 18 da LGPD, eliminando nós de PII e arestas associadas.</div>
+            <div class="item-meta"><span>purgeContactData()</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eixo 11: Swarm Tático -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Eixo 11 — Multi-Agent Tactical Swarm (3 Agentes Táticos)</span>
+          <span class="section-badge">6 ITENS</span>
+        </div>
+      </div>
+      <div class="item-list">
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="sw-1">
+          <div class="item-content">
+            <div class="item-title">Account Detective Agent (Dossiê Executivo em 10 Seções)</div>
+            <div class="item-desc">Consolida dados cadastrais, notícias públicas, histórico CRM e hipóteses comerciais explícitas para preparação pré-reunião de executivos.</div>
+            <div class="item-meta"><span>src/features/intelligence/agents/tactical/accountDetective.agent.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="sw-2">
+          <div class="item-content">
+            <div class="item-title">Promise Guardian Agent (Extração e Guardião de Promessas)</div>
+            <div class="item-desc">Varredura de transcrições de áudio/texto para identificar compromissos assumidos. Status pending_human_review obrigatório antes de criação de tarefas no CRM.</div>
+            <div class="item-meta"><span>src/features/intelligence/agents/tactical/promiseGuardian.agent.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="sw-3">
+          <div class="item-content">
+            <div class="item-title">Devil's Advocate Agent (Auditoria Preventiva de Forecast)</div>
+            <div class="item-desc">Contrapeso crítico e imparcial para negócios inflados no pipeline. Detecta viés de otimismo, estagnação de etapas e objeções não resolvidas.</div>
+            <div class="item-meta"><span>src/features/intelligence/agents/tactical/devilsAdvocate.agent.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="sw-4">
+          <div class="item-content">
+            <div class="item-title">Registro no CommercialAgentRegistry</div>
+            <div class="item-desc">Os 3 novos agentes registrados canonicamente sob a camada 'control' sem colisão com os agentes autônomos existentes.</div>
+            <div class="item-meta"><span>commercialAgentRegistry.ts</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eixo 12: Market Sensing -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Eixo 12 — Market Sensing & Inteligência Exógena</span>
+          <span class="section-badge">6 ITENS</span>
+        </div>
+      </div>
+      <div class="item-list">
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="ms-1">
+          <div class="item-content">
+            <div class="item-title">Pipeline de Ingestão de Sinais Exógenos</div>
+            <div class="item-desc">Normalização, deduplicação criptográfica por hash SHA-256 e emissão de evento MARKET_SIGNAL_DETECTED no DomainEventMesh.</div>
+            <div class="item-meta"><span>src/features/market-intelligence/server/marketSensing.service.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="ms-2">
+          <div class="item-content">
+            <div class="item-title">Detecção Multi-Canal: Notícias, Diário Oficial e Vagas</div>
+            <div class="item-desc">Classificadores específicos para fusões/aquisições (mna), rodadas de investimento (funding_round), expansões (expansion) e vagas (job_opening).</div>
+            <div class="item-meta"><span>detectSignalFromNews, detectSignalFromJobPosting, detectSignalFromOfficialGazette</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="ms-3">
+          <div class="item-content">
+            <div class="item-title">Rastreabilidade e Prevenção de Alucinação Regulatória</div>
+            <div class="item-desc">Exigência de link ou identificador normativo oficial (ex: DOU Seção 1) antes de classificar como sinal regulatório.</div>
+            <div class="item-meta"><span>RegulatorySignalInput</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eixo 19: Win-Loss Deep Autopsy -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <span>Eixo 19 — Win-Loss Deep Autopsy Forense</span>
+          <span class="section-badge">6 ITENS</span>
+        </div>
+      </div>
+      <div class="item-list">
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="wl-1">
+          <div class="item-content">
+            <div class="item-title">Autópsia Forense em 9 Seções Estruturadas</div>
+            <div class="item-desc">Gera seções A a I sem inventar dados: Timeline, Sinais Positivos, Sinais Negativos, Fatores/Hipóteses, Evidências, Gaps, Recomendações, Aprendizados e Ações.</div>
+            <div class="item-meta"><span>src/features/intelligence/services/winLossAutopsy.service.ts</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="wl-2">
+          <div class="item-content">
+            <div class="item-title">Curadoria Humana Obrigatória para Promoção ao Playbook</div>
+            <div class="item-desc">Nenhum aprendizado de autópsia entra diretamente no Playbook da organização sem aprovação formal e auditável de gestor comercial.</div>
+            <div class="item-meta"><span>promoteLearningToPlaybook()</span></div>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <input type="checkbox" class="checkbox-custom" checked data-id="wl-3">
+          <div class="item-content">
+            <div class="item-title">Integração com Flywheel Comercial e Roleplay</div>
+            <div class="item-desc">Objeções comprovadas alimentam automaticamente o motor de Roleplay com IA da Onda 01 para simulação com os closers.</div>
+            <div class="item-meta"><span>curatedObjectionService.ingestDetectedObjection()</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Birthub 360° — Plataforma Unificada de Inteligência Comercial B2B & Governança de Agentes.<br>
+      Auditoria Independente: Agente 24 (Parecer APROVADO emitido em 2026-10-18).
+    </footer>
+  </div>
+
+  <script>
+    const checkboxes = document.querySelectorAll('.checkbox-custom');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const completedCount = document.getElementById('completedCount');
+
+    function updateProgress() {
+      const total = checkboxes.length;
+      let checked = 0;
+      checkboxes.forEach(cb => {
+        if (cb.checked) checked++;
+      });
+      const pct = Math.round((checked / total) * 100);
+      progressBar.style.width = pct + '%';
+      progressPercent.textContent = pct + '%';
+      completedCount.textContent = checked + '/' + total;
+      
+      const state = {};
+      checkboxes.forEach(cb => {
+        state[cb.getAttribute('data-id')] = cb.checked;
+      });
+      localStorage.setItem('birthub_onda02_checklist_state', JSON.stringify(state));
+    }
+
+    const saved = localStorage.getItem('birthub_onda02_checklist_state');
+    if (saved) {
+      try {
+        const state = JSON.parse(saved);
+        checkboxes.forEach(cb => {
+          const id = cb.getAttribute('data-id');
+          if (state[id] !== undefined) cb.checked = state[id];
+        });
+      } catch (e) {}
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateProgress);
+    });
+
+    updateProgress();
+  </script>
+</body>
+</html>

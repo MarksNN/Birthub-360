@@ -16,7 +16,12 @@ export type DomainEventType =
   | 'CRM_MEETING_SCHEDULED'
   | 'DEAL_WON'
   | 'DEAL_LOST'
-  | 'KNOWLEDGE_DOCUMENT_REVOKED';
+  | 'KNOWLEDGE_DOCUMENT_REVOKED'
+  | 'MARKET_SIGNAL_DETECTED'
+  | 'PROMISE_COMMITMENT_DETECTED'
+  | 'DEVILS_ADVOCATE_ALERT'
+  | 'WIN_LOSS_AUTOPSY_COMPLETED'
+  | 'GRAPH_RELATIONSHIP_UPDATED';
 
 export interface DomainEventEnvelope<T = Record<string, unknown>> {
   eventId: string;

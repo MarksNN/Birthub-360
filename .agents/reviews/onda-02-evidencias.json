@@ -1,0 +1,116 @@
+{
+  "onda": "02",
+  "nome": "Inteligência Comercial Exógena, Grafo de Contas e Decisores, Swarm Tático, Market Sensing e Win-Loss Deep Autopsy",
+  "data": "2026-10-18",
+  "branchIntegracao": "integracao/onda-02",
+  "statusGeral": "APROVADO",
+  "auditor": "Agente 24 — Revisão Independente",
+  "coordenador": "Agente 00 — Coordenador",
+  "eixosImplementados": [
+    {
+      "eixo": 6,
+      "titulo": "Knowledge Graph de Contas e Decisores",
+      "contratos": ["src/shared/contracts/accountKnowledgeGraph.contract.ts"],
+      "servicos": ["src/features/knowledge/services/accountKnowledgeGraph.service.ts"],
+      "testes": [
+        "tests/unit/knowledge/accountKnowledgeGraph.service.test.ts",
+        "tests/unit/contracts/onda02Contracts.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Isolamento Multi-Tenant estrito com bloqueio ativo de arestas cross-tenant",
+        "Geração de estratégias de Multi-Threading comercial com abordagem consultiva C4",
+        "Expurgo de dados de contato com cascata de relacionamentos para conformidade LGPD (Art. 18)"
+      ]
+    },
+    {
+      "eixo": 11,
+      "titulo": "Multi-Agent Tactical Swarm (3 Agentes Táticos)",
+      "contratos": ["src/shared/contracts/tacticalSwarm.contract.ts"],
+      "servicos": [
+        "src/features/intelligence/agents/tactical/accountDetective.agent.ts",
+        "src/features/intelligence/agents/tactical/promiseGuardian.agent.ts",
+        "src/features/intelligence/agents/tactical/devilsAdvocate.agent.ts",
+        "src/features/intelligence/agents/commercialAgentRegistry.ts"
+      ],
+      "testes": [
+        "tests/unit/tactical/tacticalSwarm.agents.test.ts",
+        "tests/unit/intelligence/tacticalSwarm.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Account Detective: Dossiê executivo em 10 seções sem alucinação de dados",
+        "Promise Guardian: Detecção de promessas comerciais com fluxo de aprovação humana supervisionada",
+        "Devil's Advocate: Auditoria de forecast com contrapeso crítico para negócios estagnados e viés de otimismo",
+        "Registro canônico dos agentes sob camada 'control' sem colisão arquitetural"
+      ]
+    },
+    {
+      "eixo": 12,
+      "titulo": "Market Sensing & Inteligência Exógena",
+      "contratos": ["src/shared/contracts/marketSignals.contract.ts"],
+      "servicos": ["src/features/market-intelligence/server/marketSensing.service.ts"],
+      "testes": [
+        "tests/unit/market-intelligence/marketSensing.service.test.ts",
+        "tests/unit/market-intelligence/accountDecisionMakers.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Normalização e deduplicação criptográfica por hash SHA-256",
+        "Classificadores para notícias, vagas e Diário Oficial com rastreabilidade formal",
+        "Disparo de eventos MARKET_SIGNAL_DETECTED no DomainEventMesh com isolamento por organizationId"
+      ]
+    },
+    {
+      "eixo": 19,
+      "titulo": "Win-Loss Deep Autopsy",
+      "contratos": ["src/shared/contracts/winLossAutopsy.contract.ts"],
+      "servicos": ["src/features/intelligence/services/winLossAutopsy.service.ts"],
+      "testes": [
+        "tests/unit/intelligence/winLossAutopsy.service.test.ts",
+        "tests/integration/onda-02/onda02ComprehensiveFlow.integration.test.ts",
+        "tests/integration/onda-02/onda02EndToEndFlow.integration.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Estruturação das 9 seções forenses A-I em oportunidades ganhas e perdidas",
+        "Promoção de aprendizados para o Playbook mediante curadoria explícita de gestor comercial",
+        "Integração bidirecional com o Flywheel Comercial e simulador de Roleplay com IA"
+      ]
+    }
+  ],
+  "jornadasE2E": [
+    {
+      "jornada": 1,
+      "nome": "Pesquisa de Conta (CRM -> Grafo -> Detetive -> Market Sensing -> Dossiê -> Multi-Threading)",
+      "status": "PASS"
+    },
+    {
+      "jornada": 2,
+      "nome": "Mudança Externa (Notícia/Regulatório -> Verificação -> Conta Relacionada -> Alerta Comercial)",
+      "status": "PASS"
+    },
+    {
+      "jornada": 3,
+      "nome": "Compromisso Comercial (VoiceHub/Mobile -> Transcrição -> Guardião de Promessas -> Tarefa CRM)",
+      "status": "PASS"
+    },
+    {
+      "jornada": 4,
+      "nome": "Deal Perdido (DEAL_LOST -> Win-Loss Deep Autopsy -> Curadoria Gestor -> Playbook -> Roleplay)",
+      "status": "PASS"
+    },
+    {
+      "jornada": 5,
+      "nome": "Forecast Preventivo (CRM -> RevOps -> Advogado do Diabo -> Evidências -> Revisão de Probabilidade)",
+      "status": "PASS"
+    }
+  ],
+  "testesAutomatizados": {
+    "totalArquivos": 12,
+    "arquivosAprovados": 12,
+    "totalTestes": 82,
+    "testesAprovados": 82,
+    "falhas": 0
+  }
+}

@@ -28,7 +28,10 @@ export type CommercialAgentId =
   | 'churn-retention'
   | 'contract-signature'
   | 'bitrix-guardian'
-  | 'revenue-intelligence';
+  | 'revenue-intelligence'
+  | 'account-detective'
+  | 'promise-guardian'
+  | 'devils-advocate';
 
 export type CommercialAgentRisk = 'LOW' | 'MEDIUM' | 'HIGH';
 
