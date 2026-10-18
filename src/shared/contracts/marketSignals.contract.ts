@@ -3,7 +3,18 @@
  * Onda 02 — Evolução 05
  */
 
-import type { AccountSignalType } from '../../features/market-intelligence/domain/accountSignalTaxonomy.js';
+export type MarketSignalType =
+  | 'funding_round'
+  | 'executive_change'
+  | 'mass_hiring'
+  | 'geographic_expansion'
+  | 'mna'
+  | 'news_mention'
+  | 'job_opening'
+  | 'expansion'
+  | 'regulatory_change'
+  | 'fiscal_change'
+  | 'partnership';
 
 export type MarketSignalSource =
   | 'news'
@@ -19,7 +30,7 @@ export interface MarketSignalEnvelope {
   organizationId: string;
   companyId?: string;
   companyName: string;
-  signalType: AccountSignalType | 'job_opening' | 'expansion';
+  signalType: MarketSignalType;
   source: MarketSignalSource;
   title: string;
   summary: string;
