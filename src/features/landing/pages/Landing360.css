@@ -826,13 +826,13 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   border-color: rgba(0, 212, 255, 0.85) !important;
   box-shadow:
     0 12px 40px -4px rgba(0, 212, 255, 0.45),
-    0 0 28px 4px rgba(0, 212, 255, 0.30) !important;
+    0 0 28px 4px rgba(0, 212, 255, 0.3) !important;
 }
 .landing-neon-root .card-semantic-cyan:hover {
   border-color: rgba(0, 212, 255, 1) !important;
   box-shadow:
     0 16px 48px -4px rgba(0, 212, 255, 0.55),
-    0 0 36px 6px rgba(0, 212, 255, 0.40) !important;
+    0 0 36px 6px rgba(0, 212, 255, 0.4) !important;
   transform: translateY(-3px);
 }
 
@@ -849,13 +849,13 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   border-color: rgba(255, 45, 155, 0.85) !important;
   box-shadow:
     0 12px 40px -4px rgba(255, 45, 155, 0.45),
-    0 0 28px 4px rgba(255, 45, 155, 0.30) !important;
+    0 0 28px 4px rgba(255, 45, 155, 0.3) !important;
 }
 .landing-neon-root .card-semantic-pink:hover {
   border-color: rgba(255, 45, 155, 1) !important;
   box-shadow:
     0 16px 48px -4px rgba(255, 45, 155, 0.55),
-    0 0 36px 6px rgba(255, 45, 155, 0.40) !important;
+    0 0 36px 6px rgba(255, 45, 155, 0.4) !important;
   transform: translateY(-3px);
 }
 
@@ -872,13 +872,13 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   border-color: rgba(245, 158, 11, 0.85) !important;
   box-shadow:
     0 12px 40px -4px rgba(245, 158, 11, 0.45),
-    0 0 28px 4px rgba(245, 158, 11, 0.30) !important;
+    0 0 28px 4px rgba(245, 158, 11, 0.3) !important;
 }
 .landing-neon-root .card-semantic-gold:hover {
   border-color: rgba(245, 158, 11, 1) !important;
   box-shadow:
     0 16px 48px -4px rgba(245, 158, 11, 0.55),
-    0 0 36px 6px rgba(245, 158, 11, 0.40) !important;
+    0 0 36px 6px rgba(245, 158, 11, 0.4) !important;
   transform: translateY(-3px);
 }
 
@@ -895,13 +895,13 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   border-color: rgba(139, 125, 255, 0.85) !important;
   box-shadow:
     0 12px 40px -4px rgba(139, 125, 255, 0.45),
-    0 0 28px 4px rgba(139, 125, 255, 0.30) !important;
+    0 0 28px 4px rgba(139, 125, 255, 0.3) !important;
 }
 .landing-neon-root .card-semantic-iris:hover {
   border-color: rgba(139, 125, 255, 1) !important;
   box-shadow:
     0 16px 48px -4px rgba(139, 125, 255, 0.55),
-    0 0 36px 6px rgba(139, 125, 255, 0.40) !important;
+    0 0 36px 6px rgba(139, 125, 255, 0.4) !important;
   transform: translateY(-3px);
 }
 
@@ -918,13 +918,13 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   border-color: rgba(16, 185, 129, 0.85) !important;
   box-shadow:
     0 12px 40px -4px rgba(16, 185, 129, 0.45),
-    0 0 28px 4px rgba(16, 185, 129, 0.30) !important;
+    0 0 28px 4px rgba(16, 185, 129, 0.3) !important;
 }
 .landing-neon-root .card-semantic-green:hover {
   border-color: rgba(16, 185, 129, 1) !important;
   box-shadow:
     0 16px 48px -4px rgba(16, 185, 129, 0.55),
-    0 0 36px 6px rgba(16, 185, 129, 0.40) !important;
+    0 0 36px 6px rgba(16, 185, 129, 0.4) !important;
   transform: translateY(-3px);
 }
 

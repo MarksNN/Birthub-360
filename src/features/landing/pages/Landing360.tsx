@@ -1049,7 +1049,9 @@ export function Landing360({
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-base text-[#0284c7] dark:text-[#00D4FF]">Diagnóstico de Entraves</h4>
+                    <h4 className="font-display font-bold text-base text-[#0284c7] dark:text-[#00D4FF]">
+                      Diagnóstico de Entraves
+                    </h4>
                     <p className="landing-subtitle text-sm font-medium mt-1">
                       Alerta deals estagnados com sugestões claras de destravamento baseadas no
                       histórico da conta.
@@ -1062,7 +1064,9 @@ export function Landing360({
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-base text-[#db2777] dark:text-[#FF2D9B]">Próxima Melhor Ação</h4>
+                    <h4 className="font-display font-bold text-base text-[#db2777] dark:text-[#FF2D9B]">
+                      Próxima Melhor Ação
+                    </h4>
                     <p className="landing-subtitle text-sm font-medium mt-1">
                       Recomendações acionáveis para o vendedor avançar o contato e contornar
                       objeções críticas.
@@ -1075,7 +1079,9 @@ export function Landing360({
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-base text-[#d97706] dark:text-[#F59E0B]">Isolamento &amp; Segurança</h4>
+                    <h4 className="font-display font-bold text-base text-[#d97706] dark:text-[#F59E0B]">
+                      Isolamento &amp; Segurança
+                    </h4>
                     <p className="landing-subtitle text-sm font-medium mt-1">
                       Seus dados comerciais jamais são utilizados para treinar modelos públicos.
                       Conformidade LGPD total.
@@ -1331,42 +1337,54 @@ export function Landing360({
             {/* Grid Multi-CRM Completo */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#00D4FF]">Bitrix24</div>
+                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#00D4FF]">
+                  Bitrix24
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Conexão via API &amp; Webhooks
                 </div>
               </div>
 
               <div className="section-card card-semantic-pink p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">HubSpot</div>
+                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">
+                  HubSpot
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Conexão Bidirecional
                 </div>
               </div>
 
               <div className="section-card card-semantic-gold p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">Salesforce</div>
+                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">
+                  Salesforce
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Enterprise Connector
                 </div>
               </div>
 
               <div className="section-card card-semantic-green p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#059669] dark:text-[#22C55E]">Pipedrive</div>
+                <div className="font-mono text-sm font-bold text-[#059669] dark:text-[#22C55E]">
+                  Pipedrive
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Pipeline Sync
                 </div>
               </div>
 
               <div className="section-card card-semantic-cyan p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#38BDF8]">WhatsApp API</div>
+                <div className="font-mono text-sm font-bold text-[#0284c7] dark:text-[#38BDF8]">
+                  WhatsApp API
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Comunicação Direta
                 </div>
               </div>
 
               <div className="section-card card-semantic-gold p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">Telefonia em Nuvem</div>
+                <div className="font-mono text-sm font-bold text-[#d97706] dark:text-[#F59E0B]">
+                  Telefonia em Nuvem
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Gravação &amp; Métricas
                 </div>
@@ -1382,7 +1400,9 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-pink p-5 rounded-2xl text-center flex flex-col items-center shadow-sm">
-                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">E-mail Corporativo</div>
+                <div className="font-mono text-sm font-bold text-[#db2777] dark:text-[#FF2D9B]">
+                  E-mail Corporativo
+                </div>
                 <div className="font-sans text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Rastreabilidade Total
                 </div>
@@ -1413,11 +1433,15 @@ export function Landing360({
               <div className="lg:w-1/2 w-full space-y-4">
                 <div className="grid grid-cols-2 gap-3.5 font-mono text-xs">
                   <div className="section-card card-semantic-cyan p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                    <span className="font-bold text-[#0284c7] dark:text-[#00D4FF] block mb-1.5 text-sm">SDRs &amp; BDRs</span>
+                    <span className="font-bold text-[#0284c7] dark:text-[#00D4FF] block mb-1.5 text-sm">
+                      SDRs &amp; BDRs
+                    </span>
                     Fila organizada e dados enriquecidos na tela.
                   </div>
                   <div className="section-card card-semantic-gold p-5 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                    <span className="font-bold text-[#d97706] dark:text-[#F59E0B] block mb-1.5 text-sm">Closers</span>
+                    <span className="font-bold text-[#d97706] dark:text-[#F59E0B] block mb-1.5 text-sm">
+                      Closers
+                    </span>
                     Histórico 360°, objeções e apoio do copiloto.
                   </div>
                 </div>
@@ -1445,19 +1469,25 @@ export function Landing360({
                       <span className="text-slate-600 dark:text-slate-300 font-medium">
                         Leads Ativos na Fila
                       </span>
-                      <span className="font-bold text-[#0284c7] dark:text-[#00D4FF]">184 contatos</span>
+                      <span className="font-bold text-[#0284c7] dark:text-[#00D4FF]">
+                        184 contatos
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#F59E0B]/30 shadow-sm">
                       <span className="text-slate-600 dark:text-slate-300 font-medium">
                         Deals com Risco Identificado
                       </span>
-                      <span className="font-bold text-[#d97706] dark:text-[#F59E0B]">3 oportunidades</span>
+                      <span className="font-bold text-[#d97706] dark:text-[#F59E0B]">
+                        3 oportunidades
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-[#FF2D9B]/30 shadow-sm">
                       <span className="text-slate-600 dark:text-slate-300 font-medium">
                         Cadências em Execução
                       </span>
-                      <span className="font-bold text-[#db2777] dark:text-[#FF2D9B]">12 ativas</span>
+                      <span className="font-bold text-[#db2777] dark:text-[#FF2D9B]">
+                        12 ativas
+                      </span>
                     </div>
                   </div>
                 </div>

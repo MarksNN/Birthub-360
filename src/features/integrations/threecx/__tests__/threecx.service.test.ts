@@ -82,9 +82,7 @@ beforeEach(() => {
 });
 
 describe('get3CXConnectionsForOrg / save3CXConnectionForOrg / delete3CXConnectionForOrg', () => {
-  it(
-    'lista sempre consulta o Prisma filtrado por organizationId — nenhum cache em memória entre chamadas',
-    async () => {
+  it('lista sempre consulta o Prisma filtrado por organizationId — nenhum cache em memória entre chamadas', async () => {
     const { get3CXConnectionsForOrg } = await import('../threecx.service.js');
     prismaMock.threeCXConnection.findMany.mockResolvedValueOnce([
       { id: 'conn-1', organizationId: 'org-a' },
