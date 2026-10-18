@@ -3,10 +3,25 @@
  * Onda 02 — Evolução 07
  */
 
-import type {
-  FitScoreInput,
-  ScoreBreakdownItem,
-} from '../../features/prospecting/services/enrichment/fitScore.js';
+export interface ScoreBreakdownItem {
+  label: string;
+  points: number;
+  detail: string;
+}
+
+export interface FitScoreInput {
+  situacaoCadastral?: string | null;
+  capitalSocial?: number | null;
+  employeeCountEstimate?: number | null;
+  size?: string | null;
+  cnaeDescription?: string | null;
+  segmentKeywords?: string[];
+  segment?: string | null;
+  city?: string | null;
+  state?: string | null;
+  fleetSizeHint?: string | null;
+  technologies?: string[] | null;
+}
 
 export type FitScoreGrade = 'A' | 'B' | 'C' | 'D';
 
