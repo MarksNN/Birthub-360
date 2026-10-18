@@ -34,3 +34,39 @@
    - 13 filas BullMQ e workers em `src/lib/queue/`, entrypoint dedicado `worker.ts`.
 5. **Integração das 6 Capacidades:**
    - C1 (RevOps), C2 (Gamificação), C3 (Roleplay), C4 (Social Selling), C5 (VoiceHub), C6 (Mobile) consolidadas, com portas arquiteturais desacopladas em `src/shared/contracts/`.
+
+---
+
+## 3. Metas Técnicas e Critérios de Aceite da Onda 01
+
+1. **Contratos Compartilhados:**
+   - Tipagem estrita de envelopes de eventos (`IDomainEventMeshPort`).
+   - Ciclo de vida da curadoria de playbook (`IDataFlywheelPort`).
+   - Cache semântico multi-tenant com TTL determinístico (`ISemanticCachePort`).
+   - Trilha de auditoria criptográfica de consentimento (`IConsentAuditChainPort`).
+2. **Resiliência e Desacoplamento:**
+   - Event Mesh com Transactional Outbox e deduplicação em Redis por TTL.
+   - Prevenção formal de ciclos de causalidade (profundidade máxima de 5 níveis).
+3. **FinOps & Otimização:**
+   - Redução de latência e consumo de tokens via Model Cascade e Cache Semântico isolado por `organizationId`.
+4. **Privacidade e Governança:**
+   - Minimização de PII antes de qualquer tráfego para provedores LLM.
+   - Revogação imediata de artefatos de IA associados a leads que exerceram opt-out.
+
+---
+
+## 4. Governança de Concorrência e Execução Multiagente
+
+A execução da Onda 01 seguiu a matriz de concorrência definida em `.agents/runs/onda-01-matriz-propriedade.md`, garantindo propriedade disjunta de arquivos entre os especialistas:
+- **Agente 00:** Coordenação, baseline e orquestração.
+- **Agente 01 / 18:** Contratos compartilhados em `src/shared/contracts/`.
+- **Agente 07 / 13:** Data Flywheel, Curadoria de Objeções e RAG Híbrido.
+- **Agente 15 / 21:** Tokenização PII e Consent Hash Chaining.
+- **Agente 16:** DomainEventMesh e infraestrutura de filas.
+- **Agente 08 / 24:** Testes integrados e auditoria formal independente.
+
+---
+
+## 5. Conclusão do Baseline
+
+A infraestrutura básica da Onda 01 encontra-se completamente implementada, validada e auditada, fornecendo o arcabouço estável para a evolução das próximas ondas de inteligência do Birth Hub 360°.
