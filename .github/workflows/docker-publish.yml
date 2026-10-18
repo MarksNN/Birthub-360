@@ -8,10 +8,9 @@ name: Publish private container image
 # PASS = NO DEPLOY", sem exceção para disparo manual — antes desta mudança, workflow_dispatch
 # publicava a imagem sem checar CI nenhum).
 on:
-  workflow_run:
-    workflows: ['Central Birth Hub 360 Release']
-    types: [completed]
-    branches: [main]
+  # Desacoplado de workflow_run automático em conformidade com a política LOCAL_FIRST.md
+  # e handoffs 00-para-08-politica-publicacao-ghcr.md / DEBT-20261014-GOV-002.
+  # A publicação de imagem no GHCR ocorre estritamente sob demanda autorizada via workflow_dispatch.
   workflow_dispatch:
     inputs:
       sha:
