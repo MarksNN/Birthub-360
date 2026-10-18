@@ -3,6 +3,7 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   Check,
   CheckCircle2,
   Compass,
@@ -186,6 +187,13 @@ function BH360LogoMark({ size = 52 }: { size?: number }) {
   );
 }
 
+function getSemanticCardClass(color: string): string {
+  if (color === '#FF2D9B') return 'card-semantic-pink';
+  if (color === '#F59E0B') return 'card-semantic-gold';
+  if (color === '#8B7DFF') return 'card-semantic-iris';
+  return 'card-semantic-cyan';
+}
+
 export function Landing360({
   initialScreen = 'intro',
 }: {
@@ -196,6 +204,9 @@ export function Landing360({
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
+
+  // Estado do botão flutuante de voltar ao topo
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Form State para autenticação
   const [authMode, setAuthMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
@@ -213,6 +224,15 @@ export function Landing360({
 
   useEffect(() => {
     document.title = 'Birth Hub 360° · Sistema Operacional Comercial Multi-CRM';
+  }, []);
+
+  // Monitorar scroll para exibição do botão Voltar ao Topo
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Redirecionamento se já autenticado
@@ -549,12 +569,8 @@ export function Landing360({
                 {FEATURE_TAGS.map((tag, index) => (
                   <div
                     key={tag.label}
-                    className="capability-card flex flex-col items-center justify-center text-center p-6 rounded-2xl transition-all"
+                    className={`capability-card ${getSemanticCardClass(tag.color)} flex flex-col items-center justify-center text-center p-6 rounded-2xl transition-all shadow-md`}
                     style={{
-                      borderColor: `${tag.color}60`,
-                      borderWidth: '2.5px',
-                      borderStyle: 'solid',
-                      boxShadow: `0 8px 24px -2px ${tag.color}25, 0 0 14px 1px ${tag.color}15`,
                       animationDelay: `${index * 45}ms`,
                     }}
                   >
@@ -563,7 +579,7 @@ export function Landing360({
                       style={{
                         color: tag.color,
                         backgroundColor: `${tag.color}18`,
-                        border: `1px solid ${tag.color}40`,
+                        border: `1.5px solid ${tag.color}55`,
                       }}
                     >
                       {tag.kicker}
@@ -574,7 +590,7 @@ export function Landing360({
                     >
                       {tag.label}
                     </h4>
-                    <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                    <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                       {tag.desc}
                     </p>
                   </div>
@@ -606,51 +622,51 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-3 py-1 rounded-full mb-3">
+              <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/35 px-3 py-1 rounded-full mb-3">
                   Silos &amp; Fragmentação
                 </span>
-                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center mb-4 border border-[#FF2D9B]/30">
                   <SilosCardIcon size={24} color="#FF2D9B" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
                   Silos e Ferramentas Desconectadas
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   O CRM não fala em tempo real com a telefonia, as trocas de WhatsApp ficam perdidas
                   no celular do vendedor e os dados de prospecção não retroalimentam o time de
                   fechamento.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-3 py-1 rounded-full mb-3">
+              <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/35 px-3 py-1 rounded-full mb-3">
                   Falta de Telemetria
                 </span>
-                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center mb-4 border border-[#F59E0B]/30">
                   <ReactiveCardIcon size={24} color="#F59E0B" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
                   Gestão Reativa &amp; Decisões Tardias
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Gestores passam o dia cobrando preenchimento manual de planilhas e só descobrem
                   que a meta não será atingida nos últimos dias do mês, quando já não há tempo hábil
                   para corrigir o curso.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-3 py-1 rounded-full mb-3">
+              <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/35 px-3 py-1 rounded-full mb-3">
                   Execução Reativa
                 </span>
-                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center mb-4 border border-[#00D4FF]/30">
                   <LostDealsCardIcon size={24} color="#00D4FF" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#00D4FF] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2 text-center">
                   Perda Invisível de Oportunidades
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Sem orquestração e alertas preditivos, leads esfriam na fila sem follow-up
                   tempestivo, objeções críticas não são tratadas e a taxa de conversão despenca sem
                   causa raiz evidente.
@@ -681,56 +697,56 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
+              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center border border-[#00D4FF]/30">
                     <MultiCrmDataLayerIcon size={24} color="#00D4FF" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-3 py-1 rounded-full mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/35 px-3 py-1 rounded-full mb-2">
                   Camada 01
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold landing-title-cyan mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2 text-center">
                   Dados &amp; Conectividade Multi-CRM
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Conexão via API REST e webhooks bidirecionais com Bitrix24, HubSpot, Salesforce,
                   Pipedrive, e-mails corporativos, canais de mensageria e dados enriquecidos B2B em
                   uma única fonte da verdade.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
+              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center border border-[#FF2D9B]/30">
                     <AiDiagnosticLayerIcon size={24} color="#FF2D9B" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-3 py-1 rounded-full mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/35 px-3 py-1 rounded-full mb-2">
                   Camada 02
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold landing-title-pink mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
                   Motor de Diagnóstico &amp; IA
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Algoritmos contextuais que avaliam a saúde de cada deal, detectam riscos em tempo
                   real e sugerem a próxima melhor ação para fechar com maior margem.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
+              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center border border-[#F59E0B]/30">
                     <ExecutionLayerIcon size={24} color="#F59E0B" />
                   </div>
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-3 py-1 rounded-full mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/35 px-3 py-1 rounded-full mb-2">
                   Camada 03
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold landing-title-gold mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
                   Execução &amp; Orquestração
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Cockpit de trabalho ágil para pré-vendas (SDR), vendas (Closer) e liderança, com
                   automações de tarefas repetitivas e cadências sem atrito.
                 </p>
@@ -1137,40 +1153,40 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center font-bold mb-4 border border-[#00D4FF]/30">
+              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/15 text-[#00D4FF] flex items-center justify-center font-bold mb-4 border border-[#00D4FF]/35">
                   <Workflow className="w-6 h-6" />
                 </div>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2 text-center">
                   Sincronização Multi-CRM
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Atualizações automáticas de campos, estágios de oportunidade e tarefas em
                   Bitrix24, HubSpot, Salesforce e Pipedrive sem digitação dupla.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center font-bold mb-4 border border-[#FF2D9B]/30">
+              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center font-bold mb-4 border border-[#FF2D9B]/35">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
                   Gatilhos de Comportamento
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Aberturas de proposta, acessos a links ou ausência de contato disparam alertas
                   imediatos para a equipe responsável.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold mb-4 border border-[#F59E0B]/30">
+              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
+                <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold mb-4 border border-[#F59E0B]/35">
                   <Target className="w-6 h-6" />
                 </div>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
                   Distribuição Inteligente
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Roteamento de oportunidades com base em carga de trabalho, especialidade do
                   vendedor e tamanho da conta.
                 </p>
@@ -1197,50 +1213,70 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-              <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center">
-                <div className="font-mono text-xs sm:text-sm text-[#00D4FF] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/30">
+              <div className="section-card card-semantic-cyan p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <div className="font-mono text-xs text-[#0284c7] dark:text-[#00D4FF] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/30">
                   Taxa de Conversão
                 </div>
                 <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#0284c7] dark:text-[#00D4FF] my-2 text-center">
                   Funil 360°
                 </div>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <div className="mb-2.5">
+                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#00D4FF]/15 text-[#0284c7] dark:text-[#00D4FF] border border-[#00D4FF]/30">
+                    +24% Eficiência
+                  </span>
+                </div>
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Acompanhamento da taxa de conversão entre cada etapa do pipeline.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center">
-                <div className="font-mono text-xs sm:text-sm text-[#FF2D9B] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#FF2D9B]/10 border border-[#FF2D9B]/30">
+              <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <div className="font-mono text-xs text-[#db2777] dark:text-[#FF2D9B] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#FF2D9B]/10 border border-[#FF2D9B]/30">
                   Velocidade de Vendas
                 </div>
                 <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#db2777] dark:text-[#FF2D9B] my-2 text-center">
                   Ciclo Médio
                 </div>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <div className="mb-2.5">
+                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FF2D9B]/15 text-[#db2777] dark:text-[#FF2D9B] border border-[#FF2D9B]/30">
+                    -38% Duração
+                  </span>
+                </div>
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Identificação do tempo exato que um lead leva da qualificação ao fechamento.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center">
-                <div className="font-mono text-xs sm:text-sm text-[#F59E0B] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30">
+              <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <div className="font-mono text-xs text-[#d97706] dark:text-[#F59E0B] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30">
                   Gestão de Metas
                 </div>
                 <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#d97706] dark:text-[#F59E0B] my-2 text-center">
                   Ritmo &amp; Pace
                 </div>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <div className="mb-2.5">
+                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#d97706] dark:text-[#F59E0B] border border-[#F59E0B]/30">
+                    Tempo Real
+                  </span>
+                </div>
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Comparativo diário de faturamento atingido versus meta mensal estabelecida.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-iris p-6 text-center flex flex-col items-center">
-                <div className="font-mono text-xs sm:text-sm text-[#8B7DFF] uppercase font-bold tracking-wider mb-2 px-3 py-0.5 rounded-full bg-[#8B7DFF]/10 border border-[#8B7DFF]/30">
+              <div className="section-card card-semantic-iris p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
+                <div className="font-mono text-xs text-[#7c3aed] dark:text-[#8B7DFF] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#8B7DFF]/10 border border-[#8B7DFF]/30">
                   Motivos de Perda
                 </div>
                 <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#7c3aed] dark:text-[#8B7DFF] my-2 text-center">
                   Win / Loss
                 </div>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <div className="mb-2.5">
+                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#8B7DFF]/15 text-[#7c3aed] dark:text-[#8B7DFF] border border-[#8B7DFF]/30">
+                    Diagnóstico IA
+                  </span>
+                </div>
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Análise estruturada de causas de perda para correção contínua do produto.
                 </p>
               </div>
@@ -1266,49 +1302,49 @@ export function Landing360({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center">
+              <div className="section-card card-semantic-gold p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
                 <div className="w-11 h-11 rounded-xl bg-[#F59E0B]/20 text-[#F59E0B] flex items-center justify-center font-bold mb-3 font-mono text-base border border-[#F59E0B]/40">
                   01
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-3 py-1 rounded-full mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/35 px-3 py-1 rounded-full mb-2">
                   Modelagem Probabilística
                 </span>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
                   Pipeline Ponderado
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Cálculo de probabilidade de fechamento por estágio formal de negociação, evitando
                   expectativas infladas de receita.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center">
+              <div className="section-card card-semantic-cyan p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
                 <div className="w-11 h-11 rounded-xl bg-[#00D4FF]/20 text-[#00D4FF] flex items-center justify-center font-bold mb-3 font-mono text-base border border-[#00D4FF]/40">
                   02
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/30 px-3 py-1 rounded-full mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#00D4FF] bg-[#00D4FF]/10 border border-[#00D4FF]/35 px-3 py-1 rounded-full mb-2">
                   Qualidade da Base
                 </span>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-[#0284c7] dark:text-[#00D4FF] mb-2 text-center">
                   Maturidade de Dados
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   O sistema reconhece que a precisão preditiva depende da consistência de
                   preenchimento e do histórico da organização.
                 </p>
               </div>
 
-              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center">
+              <div className="section-card card-semantic-pink p-6 flex flex-col items-center text-center rounded-2xl shadow-md">
                 <div className="w-11 h-11 rounded-xl bg-[#FF2D9B]/20 text-[#FF2D9B] flex items-center justify-center font-bold mb-3 font-mono text-base border border-[#FF2D9B]/40">
                   03
                 </div>
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-3 py-1 rounded-full mb-2">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/35 px-3 py-1 rounded-full mb-2">
                   Gestão de Risco
                 </span>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
                   Cenários Conservador &amp; Otimista
                 </h3>
-                <p className="landing-subtitle text-xs sm:text-sm leading-relaxed text-center">
+                <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
                   Simulação de faixas de faturamento para que a liderança tome decisões de
                   crescimento, contratação e investimento com segurança.
                 </p>
@@ -1496,21 +1532,42 @@ export function Landing360({
           </div>
         </section>
 
-        {/* 13. CTA FINAL */}
+        {/* 13. CTA FINAL — EXECUTIVE COMMAND DECK */}
         <section id="cta" className="px-5 py-20 sm:px-8 lg:px-14 landing-section-alt text-center">
-          <div className="max-w-4xl mx-auto flex flex-col items-center">
-            <h2 className="font-display text-3xl sm:text-5xl font-extrabold landing-title-gradient tracking-tight leading-tight text-center mx-auto">
+          <div className="max-w-4xl mx-auto cta-command-deck p-8 sm:p-12 text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] mb-5">
+              <span className="w-2 h-2 rounded-full bg-[#00D4FF] animate-pulse" />
+              <span>SISTEMA OPERACIONAL COMERCIAL B2B</span>
+            </div>
+            <h2 className="font-display text-3xl sm:text-5xl font-extrabold landing-title-gradient tracking-tight leading-tight text-center mx-auto max-w-2xl">
               <span>Pronto para colocar sua operação comercial sob comando?</span>
             </h2>
-            <p className="landing-subtitle mt-4 text-base sm:text-lg max-w-2xl mx-auto text-center">
+            <p className="landing-subtitle mt-4 text-base sm:text-lg max-w-2xl mx-auto text-center font-medium leading-relaxed">
               Acesse a plataforma corporativa do Birth Hub 360° e conecte dados, equipe e execução
-              em tempo real.
+              em tempo real com governança Multi-CRM.
             </p>
+
+            {/* Badges de Confiança Enterprise */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs font-mono font-semibold">
+              <span className="px-3 py-1 rounded-full bg-[#00D4FF]/10 text-[#0284c7] dark:text-[#00D4FF] border border-[#00D4FF]/30">
+                ✦ SLA 99.9%
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#FF2D9B]/10 text-[#db2777] dark:text-[#FF2D9B] border border-[#FF2D9B]/30">
+                ✦ Isolamento Multi-Tenant
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#F59E0B]/10 text-[#d97706] dark:text-[#F59E0B] border border-[#F59E0B]/30">
+                ✦ Conexão Multi-CRM
+              </span>
+              <span className="px-3 py-1 rounded-full bg-[#10B981]/10 text-[#059669] dark:text-[#10B981] border border-[#10B981]/30">
+                ✦ LGPD Compliant
+              </span>
+            </div>
+
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 type="button"
                 onClick={handleGoToLogin}
-                className="btn-cta-light inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-mono text-base font-bold uppercase tracking-wider cursor-pointer shadow-lg"
+                className="btn-cta-light btn-cta-pulse inline-flex items-center justify-center gap-3 px-10 py-4 rounded-xl font-mono text-base font-bold uppercase tracking-wider cursor-pointer shadow-lg"
               >
                 <span>Acessar Plataforma</span>
                 <ArrowRight className="w-5 h-5" />
@@ -1666,9 +1723,9 @@ export function Landing360({
           </p>
         </div>
 
-        {/* Card Central de Login */}
+        {/* Card Central de Login — Command Deck (Zero Fundo Branco Chapado) */}
         <div className="w-full max-w-[460px] mb-8">
-          <div className="bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 shadow-2xl rounded-2xl p-6 sm:p-7 relative">
+          <div className="card-login-command p-6 sm:p-7 relative">
             {/* Abas E-mail vs SSO */}
             {authMode === 'signin' && (
               <div
@@ -1992,6 +2049,24 @@ export function Landing360({
           </div>
         </div>
       </div>
+
+      {/* ════════════════════════════════════════════════════════════════════
+          BOTÃO FLUTUANTE VOLTAR AO TOPO (NEON FLOATING ACTION BUTTON)
+      ════════════════════════════════════════════════════════════════════ */}
+      {showScrollTop && activeScreen === 'intro' && (
+        <button
+          type="button"
+          onClick={() => {
+            SoundFX.play('click');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="btn-floating-top"
+          aria-label="Voltar ao topo da página"
+          title="Voltar ao topo"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
     </main>
   );
 }
