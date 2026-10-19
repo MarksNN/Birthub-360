@@ -1,0 +1,155 @@
+{
+  "onda": "03",
+  "nome": "Autonomia Comercial: Agentes Autônomos Supervisionados e Execução Multicanal Confiável",
+  "data": "2026-10-18",
+  "branchIntegracao": "integracao/onda-03",
+  "statusGeral": "APROVADO",
+  "auditor": "Agente 24 — Revisão Independente",
+  "coordenador": "Agente 00 — Coordenador",
+  "evolucoesImplementadas": [
+    {
+      "evolucao": 9,
+      "titulo": "SDR Autônomo com Discagem Ativa e Google Calendar",
+      "contratos": ["src/shared/contracts/autonomousSdr.contract.ts"],
+      "servicos": ["src/features/ai-voice/server/autonomousSdr.service.ts"],
+      "testes": [
+        "tests/unit/ai-voice/autonomousSdr.service.test.ts",
+        "tests/unit/contracts/onda03Contracts.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Bloqueio estrito e determinístico de discagens fora da janela comercial permitida (08:00 às 18:00 seg-sex)",
+        "Qualificação autônoma de intenção do lead com registro de transcrição e MOS de áudio",
+        "Reserva automática de horários livres no Google Calendar corporativo emitindo MEETING_SCHEDULED",
+        "Processamento imediato de descadastramento verbal com emissão de evento de Opt-Out"
+      ]
+    },
+    {
+      "evolucao": 10,
+      "titulo": "Cadência Multicanal Adaptativa e Opt-Out Unificado",
+      "contratos": [
+        "src/shared/contracts/multichannelCadence.contract.ts",
+        "src/shared/contracts/selfDrivingCrm.contract.ts"
+      ],
+      "servicos": [
+        "src/features/cadence/services/adaptiveMultichannelCadence.service.ts",
+        "src/features/cadence/services/selfDrivingCrm.service.ts"
+      ],
+      "testes": [
+        "tests/unit/cadence/adaptiveMultichannelCadence.service.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Opt-out unificado cross-channel: descadastramento em WhatsApp bloqueia chamadas de voz e envios de e-mail promocional (Art. 18 LGPD)",
+        "Roteamento adaptativo de canal baseado no histórico real de taxas de resposta e engajamento do lead",
+        "Self-Driving CRM detecta leads estagnados e sugere reativação submetida ao gate humano"
+      ]
+    },
+    {
+      "evolucao": 11,
+      "titulo": "Rascunho Automático de Propostas Comerciais e Assinatura Digital",
+      "contratos": ["src/shared/contracts/proposalAutomation.contract.ts"],
+      "servicos": ["src/features/proposals/proposalAutomation.service.ts"],
+      "testes": [
+        "tests/unit/proposals/proposalAutomation.service.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Geração estruturada de proposta com sumário executivo, TCV, ARR, MRR e cronograma de implantação",
+        "Trava de alçada comercial: descontos superiores a 10% retêm o documento em rascunho exigindo aprovação expressa",
+        "Geração de pacote auditável com hash SHA-256 e signatários validados para despacho a plataformas de e-signature"
+      ]
+    },
+    {
+      "evolucao": 12,
+      "titulo": "Painel de SLO e Trava de Limites de Autonomia (Human-in-the-loop)",
+      "contratos": ["src/shared/contracts/autonomyLimits.contract.ts"],
+      "servicos": ["src/features/intelligence/services/autonomyGovernor.service.ts"],
+      "testes": [
+        "tests/unit/intelligence/autonomyGovernor.service.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Definição de 4 tiers de autonomia de agentes (Tier 0 Leitura a Tier 3 Operação Crítica)",
+        "Ações financeiras ou destrutivas de Tier 3 são sumariamente bloqueadas para execução puramente autônoma",
+        "Circuit Breaker operacional: desarme automático para Tier 0 sob taxa de erro superior a 5% em janela de 15 minutos",
+        "Isolamento multi-tenant rígido de orçamentos de risco e cotas de autonomia"
+      ]
+    },
+    {
+      "evolucao": "Capacidades Complementares",
+      "titulo": "Revenue Oracle, ROI Simulator, Value Realization e Behavioral Engine",
+      "contratos": [
+        "src/shared/contracts/predictiveRevenueOracle.contract.ts",
+        "src/shared/contracts/roiSimulator.contract.ts",
+        "src/shared/contracts/valueRealization.contract.ts",
+        "src/shared/contracts/behavioralEngine.contract.ts"
+      ],
+      "servicos": [
+        "src/features/commercial-intelligence/services/predictiveRevenueOracle.service.ts",
+        "src/features/commercial-intelligence/services/roiSimulator.service.ts",
+        "src/features/commercial-intelligence/services/valueRealization.service.ts",
+        "src/features/gamification/services/behavioralEngine.service.ts"
+      ],
+      "testes": [
+        "tests/unit/commercial-intelligence/predictiveRevenueOracle.service.test.ts",
+        "tests/unit/commercial-intelligence/roiSimulator.service.test.ts",
+        "tests/unit/commercial-intelligence/valueRealization.service.test.ts",
+        "tests/unit/gamification/behavioralEngine.service.test.ts"
+      ],
+      "status": "PASS",
+      "evidencias": [
+        "Projeções probabilísticas de receita com Monte Carlo e detecção de gargalos de conversão",
+        "Simulação de ROI e cálculo de payback auditável",
+        "Mecanismo de comprovação contínua de valor de software pós-venda (Value Realization)",
+        "Gamificação comportamental com missões adaptativas e concessão de XP a vendedores"
+      ]
+    }
+  ],
+  "jornadasE2E": [
+    {
+      "jornada": "A",
+      "nome": "SDR Ativo por Voz (Discagem -> Qualificação -> Agendamento Google Calendar)",
+      "status": "PASS"
+    },
+    {
+      "jornada": "B",
+      "nome": "Cadência Multicanal Adaptativa (Lead Estagnado -> Sugestão Canal -> Opt-out Unificado Respeitado)",
+      "status": "PASS"
+    },
+    {
+      "jornada": "C",
+      "nome": "Propostas Comerciais (Geração -> Alçada Desconto >10% Retida para Aprovação -> Assinatura Digital)",
+      "status": "PASS"
+    },
+    {
+      "jornada": "D",
+      "nome": "Governança de Autonomia & SLOs (Tiers de Risco -> Gate Humano -> Circuit Breaker Desarma)",
+      "status": "PASS"
+    },
+    {
+      "jornada": "E",
+      "nome": "Revenue Oracle & Gamificação (Previsão Monte Carlo -> Missão Adaptativa -> Concessão de XP)",
+      "status": "PASS"
+    },
+    {
+      "jornada": "Multi-Tenant",
+      "nome": "Isolamento Estrito Multi-Tenant (Tenant Alpha nunca vaza nem altera dados do Tenant Beta)",
+      "status": "PASS"
+    }
+  ],
+  "testesAutomatizados": {
+    "totalArquivos": 12,
+    "arquivosAprovados": 12,
+    "totalTestes": 64,
+    "testesAprovados": 64,
+    "falhas": 0
+  },
+  "gatesCanônicos": {
+    "typecheck": "APROVADO (0 erros)",
+    "lint": "APROVADO (0 erros)",
+    "arquitetura": "APROVADO (0 violações, 1667 arquivos verificados)",
+    "buildWeb": "APROVADO (179 entradas de precache)",
+    "buildWorker": "APROVADO (1019.2kb gerado)"
+  }
+}
