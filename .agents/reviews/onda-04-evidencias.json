@@ -1,82 +1,129 @@
 {
-  "onda": "04",
-  "data": "2026-10-18T22:40:00Z",
-  "base": "integracao/onda-04",
-  "orquestrador": "00 — Coordenador Global",
-  "auditor": "24 — Auditor Independente",
-  "status_geral": "APROVADO",
+  "wave": "04",
+  "title": "Experiência Comercial Avançada, Voz em Tempo Real, Mentoria Inteligente, Mobile Edge AI, War Room e Personalização de Comunicação",
+  "branch": "integracao/onda-04",
+  "date": "2026-10-18T22:49:00-03:00",
+  "coordinator": "Agente 00",
+  "auditor": "Agente 24",
+  "status": "READY_FOR_INDEPENDENT_AUDIT",
   "gates": {
-    "gate_05_bimodal_live": {
-      "status": "APROVADO",
-      "ttfa_ms": 380,
-      "latency_p50_ms": 420,
-      "latency_p95_ms": 650,
-      "latency_p99_ms": 820,
-      "barge_in_speed_ms": 85,
-      "fallback_verified": true,
-      "testes": [
-        "tests/unit/voice/bimodalLive.service.test.ts",
-        "tests/unit/ai-voice/bimodalLiveVoice.service.test.ts"
-      ]
+    "typecheck": {
+      "status": "PASSED",
+      "command": "npm run typecheck",
+      "errors": 0
     },
-    "gate_08_digital_twins": {
-      "status": "APROVADO",
-      "clonagem_humana_bloqueada": true,
-      "is_synthetic_guarantee": true,
-      "amostra_minima_enforced": true,
-      "testes": [
-        "tests/unit/roleplay/methodologicalTwin.service.test.ts",
-        "tests/unit/intelligence/methodologicalDigitalTwin.service.test.ts",
-        "tests/unit/roleplay/methodologicalMentor.service.test.ts"
-      ]
+    "lint": {
+      "status": "PASSED",
+      "command": "npm run lint",
+      "errors": 0
     },
-    "gate_09_mobile_edge_ai": {
-      "status": "APROVADO",
-      "briefings_em_cache": true,
-      "stale_indicator": true,
-      "geofencing_gravacao_proibida": true,
-      "expurgo_logout_auditado": true,
-      "testes": [
-        "tests/unit/mobile/mobileEdgeAi.service.test.ts",
-        "tests/unit/mobile/mobileEdgeBriefing.service.test.ts"
-      ]
+    "architecture": {
+      "status": "PASSED",
+      "command": "npm run test:architecture",
+      "hotspotsViolations": 0
     },
-    "gate_14_war_room_arena": {
-      "status": "APROVADO",
-      "duelos_de_objecoes": true,
-      "criterios_objetivos": true,
-      "recompensas_idempotentes": true,
-      "contestacao_pedagogica": true,
-      "testes": [
-        "tests/unit/roleplay/warRoomArena.service.test.ts",
-        "tests/unit/gamification/warRoomArena.service.test.ts"
-      ]
+    "openapiDrift": {
+      "status": "PASSED",
+      "command": "npm run verify:openapi-drift",
+      "driftCount": 0
     },
-    "gate_15_shadow_copywriting": {
-      "status": "APROVADO",
-      "opt_in_obrigatorio": true,
-      "revisao_humana_obrigatoria": true,
-      "fatos_preservados": true,
-      "revogacao_art18_lgpd": true,
-      "testes": [
-        "tests/unit/social-selling/shadowCopywriting.service.test.ts"
-      ]
-    },
-    "gate_multi_tenant_isolation": {
-      "status": "APROVADO",
-      "cross_tenant_access_blocked": true,
-      "testes": [
-        "tests/integration/onda-04/onda04ComprehensiveFlow.integration.test.ts",
-        "tests/integration/onda04ComprehensiveFlow.integration.test.ts"
-      ]
+    "onda04Suites": {
+      "status": "PASSED",
+      "testFiles": 7,
+      "testsTotal": 38,
+      "testsPassed": 38,
+      "testsFailed": 0
     }
   },
-  "metricas_qualidade": {
-    "total_testes": 51,
-    "testes_passados": 51,
-    "testes_falhados": 0,
-    "biome_format": "PASS",
-    "biome_lint": "PASS",
-    "hotspots_architecture": "PASS"
-  }
+  "eixos": [
+    {
+      "eixo": "Eixo 5 — Bimodal Live Voice",
+      "service": "src/features/ai-voice/server/bimodalLiveVoice.service.ts",
+      "contract": "src/shared/contracts/bimodalLiveVoice.contract.ts",
+      "unitTest": "tests/unit/ai-voice/bimodalLiveVoice.service.test.ts",
+      "verifiedMetrics": {
+        "bargeInLatencyMs": 85,
+        "fallbackSupported": true,
+        "identityVoiceCloningProhibited": true
+      }
+    },
+    {
+      "eixo": "Eixo 8 — Digital Twins Metodológicos",
+      "service": "src/features/intelligence/services/methodologicalDigitalTwin.service.ts",
+      "contract": "src/shared/contracts/methodologicalDigitalTwin.contract.ts",
+      "unitTest": "tests/unit/intelligence/methodologicalDigitalTwin.service.test.ts",
+      "verifiedMetrics": {
+        "identityCloningProhibited": true,
+        "spinAndTcoScoring": true,
+        "pedagogicalFeedback": true
+      }
+    },
+    {
+      "eixo": "Eixo 9 — Mobile Edge AI e Offline-First",
+      "service": "src/features/mobile/mobileEdgeAi.service.ts",
+      "contract": "src/shared/contracts/mobileEdgeAi.contract.ts",
+      "unitTest": "tests/unit/mobile/mobileEdgeAi.service.test.ts",
+      "verifiedMetrics": {
+        "offlineBriefingCache": true,
+        "geofenceConsentEnforced": true,
+        "autoRecordingProhibited": true,
+        "purgeOnLogout": true
+      }
+    },
+    {
+      "eixo": "Eixo 14 — War Room Arena",
+      "service": "src/features/gamification/services/warRoomArena.service.ts",
+      "contract": "src/shared/contracts/warRoomArena.contract.ts",
+      "unitTest": "tests/unit/gamification/warRoomArena.service.test.ts",
+      "verifiedMetrics": {
+        "pedagogicalEvaluation": true,
+        "gamificationXpReward": true,
+        "objectionDuelWorkflow": true
+      }
+    },
+    {
+      "eixo": "Eixo 15 — Shadow Copywriting",
+      "service": "src/features/social-selling/server/shadowCopywriting.service.ts",
+      "contract": "src/shared/contracts/shadowCopywriting.contract.ts",
+      "unitTest": "tests/unit/social-selling/shadowCopywriting.service.test.ts",
+      "verifiedMetrics": {
+        "sellerOptInRequired": true,
+        "factualDistortionProhibited": true,
+        "humanReviewMandatory": true,
+        "lgpdPurgeOnRevoke": true
+      }
+    }
+  ],
+  "comprehensiveE2EJourneys": [
+    {
+      "id": "Jornada A",
+      "name": "Roleplay Live com Barge-in e Gamificação",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada B",
+      "name": "Mentoria Metodológica Sintética (SPIN & TCO)",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada C",
+      "name": "Visita Mobile Offline e Geofencing Protetivo",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada D",
+      "name": "War Room Arena: Duelo de Objeções e XP Gamificado",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada E",
+      "name": "Shadow Copywriting com Opt-In e Revisão Humana Obrigatória",
+      "status": "PASSED"
+    },
+    {
+      "id": "Multi-Tenant Isolation",
+      "name": "Isolamento Estrito entre Tenant Alpha e Tenant Beta",
+      "status": "PASSED"
+    }
+  ]
 }
