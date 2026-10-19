@@ -57,6 +57,36 @@ export const FEATURE_FLAG_REGISTRY: readonly FeatureFlagDefinition[] = [
       'Ativa as recomendações supervisionadas de redistribuição equilibrada de contas e leads (Eixo 20).',
     enabledByDefault: true,
   },
+  {
+    key: 'BIMODAL_LIVE_VOICE_ENABLED',
+    description:
+      'Ativa o copiloto de voz bidirecional em tempo real para VoiceHub e Roleplay com suporte a barge-in (Eixo 5).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'METHODOLOGICAL_TWINS_ENABLED',
+    description:
+      'Ativa os Digital Twins Metodológicos agregados e mentoria de técnicas comerciais de alta performance (Eixo 8).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'MOBILE_EDGE_AI_ENABLED',
+    description:
+      'Ativa inteligência local no mobile, cache de briefings de visita e geofencing consentido (Eixo 9).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'WAR_ROOM_ARENA_ENABLED',
+    description:
+      'Ativa a War Room Arena para duelos e treinamentos colaborativos de superação de objeções com gamificação (Eixo 14).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'SHADOW_COPYWRITING_ENABLED',
+    description:
+      'Ativa o Shadow Copywriting para personalização de abordagens comerciais por vendedor com revisão humana obrigatória (Eixo 15).',
+    enabledByDefault: true,
+  },
 ];
 
 export interface ResolvedFeatureFlag {

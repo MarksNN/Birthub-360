@@ -29,6 +29,12 @@ vi.mock('../repositories/workflowRepository.js', () => ({
   ),
 }));
 
+vi.mock('../../studio/ValidationEngine.js', () => ({
+  validationEngine: {
+    validate: vi.fn(() => ({ isValid: true, issues: [] })),
+  },
+}));
+
 import * as workflowRepository from '../repositories/workflowRepository.js';
 import {
   publishWorkflow,

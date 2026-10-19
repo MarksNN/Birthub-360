@@ -310,7 +310,7 @@ describe('GET /api/agent/commercial-cell — caminho de entrega explícito (AIAG
     const res = await request(buildApp()).get('/api/agent/commercial-cell');
 
     expect(res.status).toBe(200);
-    expect(res.body.data).toHaveLength(12);
+    expect(res.body.data).toHaveLength(15);
     for (const agent of res.body.data) {
       expect(agent).toHaveProperty('httpRoute');
       expect(agent).toHaveProperty('noRouteReason');
