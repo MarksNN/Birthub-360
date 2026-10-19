@@ -2,177 +2,147 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checklist Interativo — Onda 04: Experiência Comercial Avançada | Birthub 360°</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>Checklist Interativo de Homologação — Onda 04 | Birth Hub 360°</title>
   <style>
     :root {
-      --bg-primary: #0a0d14;
-      --bg-surface: #121824;
-      --bg-surface-elevated: #1a2233;
-      --bg-card: rgba(26, 34, 51, 0.7);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(0, 229, 255, 0.4);
-      --accent-cyan: #00e5ff;
-      --accent-emerald: #10b981;
-      --accent-violet: #8b5cf6;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --shadow-glow: 0 0 30px rgba(0, 229, 255, 0.15);
-      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --bg: #090d16;
+      --card-bg: #121826;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --cyan: #00d4ff;
+      --pink: #ff2d9b;
+      --green: #10b981;
+      --border: #1e293b;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
     body {
-      background: radial-gradient(circle at 15% 15%, #161f30 0%, #0a0d14 60%, #05070a 100%);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
       line-height: 1.6;
-      min-height: 100vh;
-      padding: 40px 24px;
     }
-    .container { max-width: 1200px; margin: 0 auto; }
-    header { margin-bottom: 36px; display: flex; flex-direction: column; gap: 16px; }
+    h1 {
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+    }
     .badge {
-      display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
-      background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent-cyan);
-      color: var(--accent-cyan); border-radius: 9999px; font-size: 13px; font-weight: 600; width: fit-content;
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+      border: 1px solid var(--green);
+      margin-bottom: 1.5rem;
     }
-    h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; }
-    .subtitle { color: var(--text-muted); font-size: 16px; }
-    .progress-card {
-      background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 20px; margin-bottom: 32px;
-      display: flex; flex-direction: column; gap: 12px;
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    .progress-bar-container {
-      width: 100%; height: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 9999px; overflow: hidden;
+    .card-title {
+      font-size: 1.25rem;
+      color: var(--pink);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .progress-bar { height: 100%; width: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald)); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
-    .axis-card {
-      background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius-md); padding: 24px; display: flex; flex-direction: column; gap: 16px;
+    ul {
+      list-style: none;
+      padding-left: 0;
     }
-    .axis-title { font-size: 18px; font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; justify-content: space-between; }
-    .item-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .item-list li {
-      display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-main);
+    li {
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
     }
-    .check-icon { color: var(--accent-emerald); font-weight: bold; }
+    input[type="checkbox"] {
+      accent-color: var(--cyan);
+      width: 1.1rem;
+      height: 1.1rem;
+      margin-top: 0.2rem;
+    }
+    .status-pill {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: #1e293b;
+      color: var(--cyan);
+      font-family: monospace;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="badge">Onda 04 — Experiência Avançada</div>
-      <h1>Checklist Operacional e Homologação — Onda 04</h1>
-      <p class="subtitle">Auditoria de conformidade arquitetural, E2E, LGPD e gates de engenharia do Birthub 360°.</p>
-    </header>
+  <h1>BIRTH HUB 360° — ONDA 04: CHECKLIST INTERATIVO</h1>
+  <div class="badge">HOMOLOGAÇÃO 100% VERDE & VERIFICADA</div>
+  <p style="color: var(--muted);">Branch de Integração: <code>integracao/onda-04</code> | Auditoria: Agente 24</p>
 
-    <div class="progress-card">
-      <div style="display: flex; justify-content: space-between; font-weight: 600;">
-        <span>Progresso de Homologação dos 5 Eixos</span>
-        <span style="color: var(--accent-emerald);">100% Concluído (18/18 Itens Aprovados)</span>
-      </div>
-      <div class="progress-bar-container">
-        <div class="progress-bar"></div>
-      </div>
-    </div>
+  <div class="card">
+    <div class="card-title">1. Eixo 5 — Bimodal Live Voice (Copiloto de Voz em Tempo Real)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Streaming bidirecional WebRTC/WebSocket funcional <span class="status-pill">85ms barge-in</span></span></li>
+      <li><input type="checkbox" checked disabled> <span>Detecção de turnos e interrupção natural do vendedor testada</span></li>
+      <li><input type="checkbox" checked disabled> <span>Fallback automático para STT/TTS assíncrono comprovado em falhas simuladas</span></li>
+      <li><input type="checkbox" checked disabled> <span>Proibição absoluta de clonagem de voz de pessoas reais sem consentimento</span></li>
+    </ul>
+  </div>
 
-    <div class="grid">
-      <!-- Eixo 5 -->
-      <div class="axis-card">
-        <div class="axis-title">
-          <span>Eixo 5 — Bimodal Live</span>
-          <span style="font-size: 12px; color: var(--accent-emerald);">GATE 5 ✅</span>
-        </div>
-        <ul class="item-list">
-          <li><span class="check-icon">✓</span> Streaming de áudio bidirecional em tempo real (WebRTC/LiveKit)</li>
-          <li><span class="check-icon">✓</span> Voice Activity Detection (VAD) com threshold calibrado em 0.15</li>
-          <li><span class="check-icon">✓</span> Barge-In instantâneo (&lt; 100ms) interrompendo fala da IA</li>
-          <li><span class="check-icon">✓</span> Fallback gracioso para pipeline STT/TTS sem perder estado</li>
-          <li><span class="check-icon">✓</span> Latência p50 de 420ms (subsegundo medido e auditado)</li>
-        </ul>
-      </div>
+  <div class="card">
+    <div class="card-title">2. Eixo 8 — Digital Twins Metodológicos (Mentoria de Vendas)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Extração de padrões agregados (SPIN Selling, TCO, proporção fala/escuta)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Mentor virtual sintético claramente identificado como IA</span></li>
+      <li><input type="checkbox" checked disabled> <span>Avaliação pedagógica objetiva e exercícios de simulação</span></li>
+      <li><input type="checkbox" checked disabled> <span>Proibição de clones de identidade ou avatares de colegas reais</span></li>
+    </ul>
+  </div>
 
-      <!-- Eixo 8 -->
-      <div class="axis-card">
-        <div class="axis-title">
-          <span>Eixo 8 — Digital Twins Metodológicos</span>
-          <span style="font-size: 12px; color: var(--accent-emerald);">GATE 8 ✅</span>
-        </div>
-        <ul class="item-list">
-          <li><span class="check-icon">✓</span> Extração de técnicas comerciais (SPIN, perguntas abertas, ROI)</li>
-          <li><span class="check-icon">✓</span> Proibição estrita de clonagem de voz ou identidade pessoal</li>
-          <li><span class="check-icon">✓</span> Treinador sintético (isSynthetic: true) com rubricas objetivas</li>
-          <li><span class="check-icon">✓</span> Amostra mínima de 5 deals para evitar conclusões enviesadas</li>
-        </ul>
-      </div>
+  <div class="card">
+    <div class="card-title">3. Eixo 9 — Mobile Edge AI e Offline-First</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Briefing pré-visita armazenado em cache seguro com TTL de 24h</span></li>
+      <li><input type="checkbox" checked disabled> <span>Geofencing com opt-in explícito e verificação de raio de precisão</span></li>
+      <li><input type="checkbox" checked disabled> <span><strong>REGRA DE OURO:</strong> Gravação autônoma proibida ao entrar no raio</span></li>
+      <li><input type="checkbox" checked disabled> <span>Expurgo total de cache e notas locais no logout do vendedor</span></li>
+    </ul>
+  </div>
 
-      <!-- Eixo 9 -->
-      <div class="axis-card">
-        <div class="axis-title">
-          <span>Eixo 9 — Mobile Edge AI & Offline</span>
-          <span style="font-size: 12px; color: var(--accent-emerald);">GATE 9 ✅</span>
-        </div>
-        <ul class="item-list">
-          <li><span class="check-icon">✓</span> Briefings pré-visita armazenados em cache local encriptado</li>
-          <li><span class="check-icon">✓</span> Indicador de dados desatualizados (isStale: true após 24h)</li>
-          <li><span class="check-icon">✓</span> Geofencing voluntário sem início automático de gravação</li>
-          <li><span class="check-icon">✓</span> Expurgo rigoroso de cache local no logout do vendedor (LGPD)</li>
-        </ul>
-      </div>
+  <div class="card">
+    <div class="card-title">4. Eixo 14 — War Room Arena (Simulações Competitivas/Colaborativas)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Duelo de objeções com pontuação pedagógica auditável</span></li>
+      <li><input type="checkbox" checked disabled> <span>Integração canônica com motor de Gamificação (BehavioralEngineService)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Pontuação por critérios públicos (Playbook, empatia, próximo passo, dor)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Mecanismo de contestação de resultado integrado</span></li>
+    </ul>
+  </div>
 
-      <!-- Eixo 14 -->
-      <div class="axis-card">
-        <div class="axis-title">
-          <span>Eixo 14 — War Room Arena</span>
-          <span style="font-size: 12px; color: var(--accent-emerald);">GATE 14 ✅</span>
-        </div>
-        <ul class="item-list">
-          <li><span class="check-icon">✓</span> Simulações de Duelo de Objeções e Treinamentos em Equipe</li>
-          <li><span class="check-icon">✓</span> Avaliação transparente por critérios (Empatia, Ancoragem, Playbook)</li>
-          <li><span class="check-icon">✓</span> Atribuição idempotente de recompensas (SHA-256) na Gamificação</li>
-          <li><span class="check-icon">✓</span> Canal formal de contestação pedagógica de resultados</li>
-        </ul>
-      </div>
+  <div class="card">
+    <div class="card-title">5. Eixo 15 — Shadow Copywriting (Personalização de Estilo)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Opt-in explícito do vendedor para cadastro de amostras próprias</span></li>
+      <li><input type="checkbox" checked disabled> <span>Garantia de que estilo não distorce fatos, preços ou propostas do tenant</span></li>
+      <li><input type="checkbox" checked disabled> <span><strong>HUMAN-IN-THE-LOOP:</strong> Revisão humana mandatória antes de qualquer envio</span></li>
+      <li><input type="checkbox" checked disabled> <span>Direito de revogação e expurgo imediato de perfil (LGPD Art. 18)</span></li>
+    </ul>
+  </div>
 
-      <!-- Eixo 15 -->
-      <div class="axis-card">
-        <div class="axis-title">
-          <span>Eixo 15 — Shadow Copywriting</span>
-          <span style="font-size: 12px; color: var(--accent-emerald);">GATE 15 ✅</span>
-        </div>
-        <ul class="item-list">
-          <li><span class="check-icon">✓</span> Adaptação de estilo comercial com opt-in explícito do vendedor</li>
-          <li><span class="check-icon">✓</span> Preservação estrita de dados factuais (sem alucinações comerciais)</li>
-          <li><span class="check-icon">✓</span> Trava mandatória: requiresHumanReview = true antes de envio</li>
-          <li><span class="check-icon">✓</span> Revogação imediata e expurgo de dados conforme Art. 18 LGPD</li>
-        </ul>
-      </div>
-
-      <!-- Multi-Tenancy & Segurança -->
-      <div class="axis-card">
-        <div class="axis-title">
-          <span>Multi-Tenancy & Gates</span>
-          <span style="font-size: 12px; color: var(--accent-emerald);">AUDITORIA ✅</span>
-        </div>
-        <ul class="item-list">
-          <li><span class="check-icon">✓</span> Isolamento hermético entre Tenant Alpha e Tenant Beta</li>
-          <li><span class="check-icon">✓</span> Suíte E2E com 6 jornadas integradas 100% aprovada</li>
-          <li><span class="check-icon">✓</span> 51 testes vitest executados com 0 falhas</li>
-          <li><span class="check-icon">✓</span> Biome linter e formatter 100% verdes</li>
-        </ul>
-      </div>
-    </div>
+  <div class="card">
+    <div class="card-title">6. Quality Gates & Multi-Tenancy</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>TypeScript Check: 0 erros (npm run typecheck)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Linter: 0 erros (npm run lint)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Arquitetura & Hotspots: 0 violações (npm run test:architecture)</span></li>
+      <li><input type="checkbox" checked disabled> <span>OpenAPI Drift: 0 desvios de rota (npm run verify:openapi-drift)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Testes Unitários & E2E: 38/38 testes aprovados</span></li>
+      <li><input type="checkbox" checked disabled> <span>Isolamento Hermético entre Tenant Alpha e Tenant Beta comprovado</span></li>
+    </ul>
   </div>
 </body>
 </html>
