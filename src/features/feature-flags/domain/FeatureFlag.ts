@@ -21,6 +21,42 @@ export const FEATURE_FLAG_REGISTRY: readonly FeatureFlagDefinition[] = [
     description: 'Exibe o botão flutuante "Reportar problema" no frontend, para todas as marcas.',
     enabledByDefault: true,
   },
+  {
+    key: 'BEHAVIORAL_ENGINE_ENABLED',
+    description:
+      'Ativa o motor de gamificação adaptativa e missões baseadas em gargalos comerciais (Eixo 4).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'ADAPTIVE_CADENCE_ENABLED',
+    description:
+      'Ativa a otimização inteligente de cadências e resgate de leads estagnados do Self-Driving CRM (Eixo 7).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'ROI_SIMULATOR_ENABLED',
+    description:
+      'Ativa a simulação econômica determinística em 3 cenários e geração de Business Cases (Eixo 17).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'VALUE_REALIZATION_ENABLED',
+    description:
+      'Ativa o acompanhamento contínuo pós-venda de promessas e valor entregue ao cliente (Eixo 17).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'REVENUE_ORACLE_ENABLED',
+    description:
+      'Ativa o Cockpit Executivo de projeção de receita, backtesting e simulação What-If (Eixo 20).',
+    enabledByDefault: true,
+  },
+  {
+    key: 'TERRITORY_RECOMMENDATIONS_ENABLED',
+    description:
+      'Ativa as recomendações supervisionadas de redistribuição equilibrada de contas e leads (Eixo 20).',
+    enabledByDefault: true,
+  },
 ];
 
 export interface ResolvedFeatureFlag {
