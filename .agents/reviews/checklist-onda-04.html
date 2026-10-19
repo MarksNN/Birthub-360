@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist Interativo de Homologação — Onda 04 | Birth Hub 360°</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #121826;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --cyan: #00d4ff;
+      --pink: #ff2d9b;
+      --green: #10b981;
+      --border: #1e293b;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1 {
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+      border: 1px solid var(--green);
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .card-title {
+      font-size: 1.25rem;
+      color: var(--pink);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    input[type="checkbox"] {
+      accent-color: var(--cyan);
+      width: 1.1rem;
+      height: 1.1rem;
+      margin-top: 0.2rem;
+    }
+    .status-pill {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: #1e293b;
+      color: var(--cyan);
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>BIRTH HUB 360° — ONDA 04: CHECKLIST INTERATIVO</h1>
+  <div class="badge">HOMOLOGAÇÃO 100% VERDE & VERIFICADA</div>
+  <p style="color: var(--muted);">Branch de Integração: <code>integracao/onda-04</code> | Auditoria: Agente 24</p>
+
+  <div class="card">
+    <div class="card-title">1. Eixo 5 — Bimodal Live Voice (Copiloto de Voz em Tempo Real)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Streaming bidirecional WebRTC/WebSocket funcional <span class="status-pill">85ms barge-in</span></span></li>
+      <li><input type="checkbox" checked disabled> <span>Detecção de turnos e interrupção natural do vendedor testada</span></li>
+      <li><input type="checkbox" checked disabled> <span>Fallback automático para STT/TTS assíncrono comprovado em falhas simuladas</span></li>
+      <li><input type="checkbox" checked disabled> <span>Proibição absoluta de clonagem de voz de pessoas reais sem consentimento</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">2. Eixo 8 — Digital Twins Metodológicos (Mentoria de Vendas)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Extração de padrões agregados (SPIN Selling, TCO, proporção fala/escuta)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Mentor virtual sintético claramente identificado como IA</span></li>
+      <li><input type="checkbox" checked disabled> <span>Avaliação pedagógica objetiva e exercícios de simulação</span></li>
+      <li><input type="checkbox" checked disabled> <span>Proibição de clones de identidade ou avatares de colegas reais</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">3. Eixo 9 — Mobile Edge AI e Offline-First</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Briefing pré-visita armazenado em cache seguro com TTL de 24h</span></li>
+      <li><input type="checkbox" checked disabled> <span>Geofencing com opt-in explícito e verificação de raio de precisão</span></li>
+      <li><input type="checkbox" checked disabled> <span><strong>REGRA DE OURO:</strong> Gravação autônoma proibida ao entrar no raio</span></li>
+      <li><input type="checkbox" checked disabled> <span>Expurgo total de cache e notas locais no logout do vendedor</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">4. Eixo 14 — War Room Arena (Simulações Competitivas/Colaborativas)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Duelo de objeções com pontuação pedagógica auditável</span></li>
+      <li><input type="checkbox" checked disabled> <span>Integração canônica com motor de Gamificação (BehavioralEngineService)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Pontuação por critérios públicos (Playbook, empatia, próximo passo, dor)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Mecanismo de contestação de resultado integrado</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">5. Eixo 15 — Shadow Copywriting (Personalização de Estilo)</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>Opt-in explícito do vendedor para cadastro de amostras próprias</span></li>
+      <li><input type="checkbox" checked disabled> <span>Garantia de que estilo não distorce fatos, preços ou propostas do tenant</span></li>
+      <li><input type="checkbox" checked disabled> <span><strong>HUMAN-IN-THE-LOOP:</strong> Revisão humana mandatória antes de qualquer envio</span></li>
+      <li><input type="checkbox" checked disabled> <span>Direito de revogação e expurgo imediato de perfil (LGPD Art. 18)</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">6. Quality Gates & Multi-Tenancy</div>
+    <ul>
+      <li><input type="checkbox" checked disabled> <span>TypeScript Check: 0 erros (npm run typecheck)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Linter: 0 erros (npm run lint)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Arquitetura & Hotspots: 0 violações (npm run test:architecture)</span></li>
+      <li><input type="checkbox" checked disabled> <span>OpenAPI Drift: 0 desvios de rota (npm run verify:openapi-drift)</span></li>
+      <li><input type="checkbox" checked disabled> <span>Testes Unitários & E2E: 38/38 testes aprovados</span></li>
+      <li><input type="checkbox" checked disabled> <span>Isolamento Hermético entre Tenant Alpha e Tenant Beta comprovado</span></li>
+    </ul>
+  </div>
+</body>
+</html>

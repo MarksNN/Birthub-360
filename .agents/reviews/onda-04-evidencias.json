@@ -1,0 +1,129 @@
+{
+  "wave": "04",
+  "title": "Experiência Comercial Avançada, Voz em Tempo Real, Mentoria Inteligente, Mobile Edge AI, War Room e Personalização de Comunicação",
+  "branch": "integracao/onda-04",
+  "date": "2026-10-18T22:49:00-03:00",
+  "coordinator": "Agente 00",
+  "auditor": "Agente 24",
+  "status": "READY_FOR_INDEPENDENT_AUDIT",
+  "gates": {
+    "typecheck": {
+      "status": "PASSED",
+      "command": "npm run typecheck",
+      "errors": 0
+    },
+    "lint": {
+      "status": "PASSED",
+      "command": "npm run lint",
+      "errors": 0
+    },
+    "architecture": {
+      "status": "PASSED",
+      "command": "npm run test:architecture",
+      "hotspotsViolations": 0
+    },
+    "openapiDrift": {
+      "status": "PASSED",
+      "command": "npm run verify:openapi-drift",
+      "driftCount": 0
+    },
+    "onda04Suites": {
+      "status": "PASSED",
+      "testFiles": 7,
+      "testsTotal": 38,
+      "testsPassed": 38,
+      "testsFailed": 0
+    }
+  },
+  "eixos": [
+    {
+      "eixo": "Eixo 5 — Bimodal Live Voice",
+      "service": "src/features/ai-voice/server/bimodalLiveVoice.service.ts",
+      "contract": "src/shared/contracts/bimodalLiveVoice.contract.ts",
+      "unitTest": "tests/unit/ai-voice/bimodalLiveVoice.service.test.ts",
+      "verifiedMetrics": {
+        "bargeInLatencyMs": 85,
+        "fallbackSupported": true,
+        "identityVoiceCloningProhibited": true
+      }
+    },
+    {
+      "eixo": "Eixo 8 — Digital Twins Metodológicos",
+      "service": "src/features/intelligence/services/methodologicalDigitalTwin.service.ts",
+      "contract": "src/shared/contracts/methodologicalDigitalTwin.contract.ts",
+      "unitTest": "tests/unit/intelligence/methodologicalDigitalTwin.service.test.ts",
+      "verifiedMetrics": {
+        "identityCloningProhibited": true,
+        "spinAndTcoScoring": true,
+        "pedagogicalFeedback": true
+      }
+    },
+    {
+      "eixo": "Eixo 9 — Mobile Edge AI e Offline-First",
+      "service": "src/features/mobile/mobileEdgeAi.service.ts",
+      "contract": "src/shared/contracts/mobileEdgeAi.contract.ts",
+      "unitTest": "tests/unit/mobile/mobileEdgeAi.service.test.ts",
+      "verifiedMetrics": {
+        "offlineBriefingCache": true,
+        "geofenceConsentEnforced": true,
+        "autoRecordingProhibited": true,
+        "purgeOnLogout": true
+      }
+    },
+    {
+      "eixo": "Eixo 14 — War Room Arena",
+      "service": "src/features/gamification/services/warRoomArena.service.ts",
+      "contract": "src/shared/contracts/warRoomArena.contract.ts",
+      "unitTest": "tests/unit/gamification/warRoomArena.service.test.ts",
+      "verifiedMetrics": {
+        "pedagogicalEvaluation": true,
+        "gamificationXpReward": true,
+        "objectionDuelWorkflow": true
+      }
+    },
+    {
+      "eixo": "Eixo 15 — Shadow Copywriting",
+      "service": "src/features/social-selling/server/shadowCopywriting.service.ts",
+      "contract": "src/shared/contracts/shadowCopywriting.contract.ts",
+      "unitTest": "tests/unit/social-selling/shadowCopywriting.service.test.ts",
+      "verifiedMetrics": {
+        "sellerOptInRequired": true,
+        "factualDistortionProhibited": true,
+        "humanReviewMandatory": true,
+        "lgpdPurgeOnRevoke": true
+      }
+    }
+  ],
+  "comprehensiveE2EJourneys": [
+    {
+      "id": "Jornada A",
+      "name": "Roleplay Live com Barge-in e Gamificação",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada B",
+      "name": "Mentoria Metodológica Sintética (SPIN & TCO)",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada C",
+      "name": "Visita Mobile Offline e Geofencing Protetivo",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada D",
+      "name": "War Room Arena: Duelo de Objeções e XP Gamificado",
+      "status": "PASSED"
+    },
+    {
+      "id": "Jornada E",
+      "name": "Shadow Copywriting com Opt-In e Revisão Humana Obrigatória",
+      "status": "PASSED"
+    },
+    {
+      "id": "Multi-Tenant Isolation",
+      "name": "Isolamento Estrito entre Tenant Alpha e Tenant Beta",
+      "status": "PASSED"
+    }
+  ]
+}

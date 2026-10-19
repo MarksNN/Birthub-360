@@ -17,6 +17,34 @@ export class BehavioralEngineService implements IBehavioralEnginePort {
   private sellerXpStore = new Map<string, number>(); // key: `${orgId}:${sellerId}` -> XP acumulado
 
   /**
+   * Concede XP ao vendedor com validação de multi-tenancy e auditoria de evento.
+   */
+  async rewardSellerXp(params: {
+    organizationId: string;
+    sellerId: string;
+    xpAmount: number;
+    reason: string;
+    activityType: string;
+  }): Promise<{ success: boolean; newXp: number; level: number }> {
+    if (!params.organizationId || params.organizationId.trim() === '') {
+      throw new Error('Tenancy violation: organizationId obrigatório');
+    }
+    const key = `${params.organizationId}:${params.sellerId}`;
+    const currentXp = this.sellerXpStore.get(key) || 0;
+    const newXp = currentXp + params.xpAmount;
+    this.sellerXpStore.set(key, newXp);
+
+    const level = calculateSellerLevel(newXp).level;
+
+    logger.info(
+      { org: params.organizationId, seller: params.sellerId, xp: params.xpAmount, newXp },
+      '[BehavioralEngine] XP creditado com sucesso',
+    );
+
+    return { success: true, newXp, level };
+  }
+
+  /**
    * Identifica gargalos comerciais reais com base em volume e métricas observadas.
    * Amostra mínima necessária: pelo menos 10 atividades (calls/reuniões) para evitar falso julgamento.
    */
