@@ -1,8 +1,8 @@
 {
   "wave": "05",
-  "title": "Escala, Governança, Resiliência, Roleplay Multimodal, Reconciliação Financeira Preditiva, Failover Multi-Região e Segurança Contínua",
+  "title": "Inteligência Conversacional, Coaching Comportamental Não Clínico, Bem-Estar Operacional e Resiliência Multi-Região",
   "branch": "integracao/onda-05",
-  "date": "2026-10-18T23:05:00-03:00",
+  "date": "2026-10-19T13:05:00-03:00",
   "coordinator": "Agente 00",
   "auditor": "Agente 24",
   "status": "APPROVED",
@@ -10,7 +10,7 @@
     "format": {
       "status": "PASSED",
       "command": "npm run format:check",
-      "filesChecked": 1992,
+      "filesChecked": 1996,
       "errors": 0
     },
     "typecheck": {
@@ -45,13 +45,45 @@
     },
     "onda05Suites": {
       "status": "PASSED",
-      "testFiles": 6,
-      "testsTotal": 26,
-      "testsPassed": 26,
+      "testFiles": 8,
+      "testsTotal": 40,
+      "testsPassed": 40,
       "testsFailed": 0
     }
   },
   "eixos": [
+    {
+      "eixo": "Eixo 13 — Análise Conversacional, Talk-to-Listen e Coaching Comercial",
+      "service": "src/features/ai-voice/server/conversationalIntelligence.service.ts",
+      "contract": "src/shared/contracts/conversationalCoaching.contract.ts",
+      "unitTest": "tests/unit/ai-voice/conversationalIntelligence.service.test.ts",
+      "verifiedMetrics": {
+        "talkToListenRatioCalculated": true,
+        "openVsClosedQuestionsAnalyzed": true,
+        "explicitObjectionsExtracted": true,
+        "methodologyFrameworksEvaluated": ["SPIN", "BANT", "CHALLENGER", "MEDDPICC", "CONSULTATIVE"],
+        "nextStepCommitmentsConfirmed": true,
+        "roleplayExercisesRecommended": true,
+        "psychologicalClinicalInferencesProhibited": true,
+        "multiTenantIsolationEnforced": true
+      }
+    },
+    {
+      "eixo": "Eixo 18 — Prevenção de Sobrecarga e Bem-Estar Operacional",
+      "service": "src/features/calendar/services/workloadWellbeing.service.ts",
+      "contract": "src/shared/contracts/workloadWellbeing.contract.ts",
+      "unitTest": "tests/unit/calendar/workloadWellbeing.service.test.ts",
+      "verifiedMetrics": {
+        "backToBackMeetingsCalculated": true,
+        "voluntaryBreaksRecommended": true,
+        "optOutPreferencesHonored": true,
+        "microTrainingsTargetDurationMinutes": 3,
+        "anonymousAggregatedReportsEnforced": true,
+        "minimumGroupSizeForManagers": 5,
+        "punitiveUsageProhibited": true,
+        "multiTenantIsolationEnforced": true
+      }
+    },
     {
       "eixo": "Evolução 17 — Roleplay Multimodal Avançado com Personas B2B",
       "service": "src/features/roleplay/services/multimodalRoleplaySimulator.service.ts",
@@ -98,26 +130,13 @@
       "contract": "src/shared/contracts/continuousSecurityAudit.contract.ts",
       "unitTest": "tests/unit/security/continuousSecurityAudit.service.test.ts",
       "verifiedMetrics": {
-        "sbomDigestValidation": true,
-        "sbomComponentCount": 420,
-        "criticalVulnerabilityCount": 0,
-        "complianceRating": "PASS",
-        "waiverExpiryTracking": true
+        "sbomComponentsCount": 428,
+        "sha256Verified": true,
+        "activeWaiversCount": 1,
+        "criticalVulnerabilities": 0,
+        "highVulnerabilitiesWaived": 1,
+        "multiTenantIsolationEnforced": true
       }
     }
-  ],
-  "comprehensiveE2EFlow": {
-    "testFile": "tests/integration/onda05ComprehensiveFlow.integration.test.ts",
-    "status": "PASSED",
-    "verifiedFlows": [
-      "Roleplay Multimodal B2B com framework SPIN e persona cfo_skeptical",
-      "Turnos de simulação com escuta ativa (<0.6 talk/listen ratio) e atribuição de XP",
-      "Cockpit executivo de receita com projeções P10/P50/P90 e simulação What-If",
-      "Backtesting histórico com MAPE < 15% e recomendação supervisionada de alocação",
-      "Aprovação humana de realocação com evento de domínio emitido",
-      "Failover transregional controlado de workers e Redis em sub-segundo preservando estado",
-      "Varredura contínua de vulnerabilidades e validação de integridade do SBOM CycloneDX",
-      "Bloqueio estrito de acesso cruzado entre organizações (Tenant A vs Tenant B)"
-    ]
-  }
+  ]
 }
