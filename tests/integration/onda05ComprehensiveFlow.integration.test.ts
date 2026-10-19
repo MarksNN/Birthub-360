@@ -164,5 +164,115 @@ describe('Onda 05 — Teste Integrado E2E: Escala, Governança e Resiliência', 
       roleplaySession.sessionId,
     );
     expect(tenantBProbe).toBeNull();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 6. Eixo 13: Inteligência Conversacional, Talk-to-Listen e Coaching
+    // ─────────────────────────────────────────────────────────────────────────
+    const { conversationalIntelligenceService } = await import(
+      '../../src/features/ai-voice/server/conversationalIntelligence.service.js'
+    );
+    const coachingReport = await conversationalIntelligenceService.generatePostCallReport({
+      organizationId: tenantA,
+      callId: 'call-e2e-onda05',
+      sellerId: sellerLucas,
+      callGoal: 'Qualificação de Oportunidade e Alinhamento Técnico',
+      turns: [
+        {
+          turnId: 't-1',
+          speaker: 'seller',
+          startTimeSeconds: 0,
+          endTimeSeconds: 30,
+          durationSeconds: 30,
+          text: 'Como vocês estruturam hoje o controle de SLA de entrega?',
+        },
+        {
+          turnId: 't-2',
+          speaker: 'customer',
+          startTimeSeconds: 32,
+          endTimeSeconds: 62,
+          durationSeconds: 30,
+          text: 'Hoje enfrentamos problemas de visibilidade e o custo atual é bem puxado.',
+        },
+        {
+          turnId: 't-3',
+          speaker: 'seller',
+          startTimeSeconds: 63,
+          endTimeSeconds: 90,
+          durationSeconds: 27,
+          text: 'Podemos agendar a demonstração na próxima quinta-feira às 15h?',
+        },
+      ],
+      expectedFramework: 'SPIN',
+    });
+
+    expect(coachingReport.reportId).toBe('coaching-call-e2e-onda05');
+    expect(coachingReport.dynamics.sellerTalkRatio).toBeCloseTo(0.66, 1);
+    expect(coachingReport.commitments.length).toBeGreaterThan(0);
+    expect(coachingReport.objections.some((o) => o.category === 'price')).toBe(true);
+
+    // Multi-tenant check no relatório de coaching
+    const tenantBAccessCoaching = conversationalIntelligenceService.getReport(
+      coachingReport.reportId,
+      tenantB,
+    );
+    expect(tenantBAccessCoaching).toBeNull();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 7. Eixo 18: Bem-Estar Operacional, Gestão de Carga e Microtreinamento
+    // ─────────────────────────────────────────────────────────────────────────
+    const { workloadWellbeingService } = await import(
+      '../../src/features/calendar/services/workloadWellbeing.service.js'
+    );
+    const metrics = workloadWellbeingService.calculateDailyWorkloadMetrics(
+      tenantA,
+      sellerLucas,
+      '2026-10-19',
+      [
+        {
+          id: 'm1',
+          title: 'Reunião A',
+          startTime: '2026-10-19T10:00:00Z',
+          endTime: '2026-10-19T11:00:00Z',
+          isCommercialMeeting: true,
+        },
+        {
+          id: 'm2',
+          title: 'Reunião B',
+          startTime: '2026-10-19T11:00:00Z',
+          endTime: '2026-10-19T12:00:00Z',
+          isCommercialMeeting: true,
+        },
+      ],
+    );
+
+    const recs = workloadWellbeingService.generateRecommendations(
+      tenantA,
+      sellerLucas,
+      metrics,
+      {
+        id: 'm3',
+        title: 'Demo Importante',
+        startTime: '2026-10-19T14:00:00Z',
+        endTime: '2026-10-19T15:00:00Z',
+        isCommercialMeeting: true,
+      },
+    );
+
+    expect(recs.some((r) => r.type === 'SUGGEST_BREAK')).toBe(true);
+    expect(recs.some((r) => r.type === 'PRE_MEETING_PREPARATION')).toBe(true);
+
+    // Inicia microtreinamento voluntário de 3 minutos
+    const microTraining = workloadWellbeingService.createMicroTrainingSession(
+      tenantA,
+      sellerLucas,
+      'PRICE_OBJECTION_REHEARSAL',
+    );
+    expect(microTraining.targetDurationMinutes).toBe(3);
+    const completedTraining = workloadWellbeingService.completeMicroTraining(
+      microTraining.trainingId,
+      tenantA,
+      5,
+    );
+    expect(completedTraining.isCompleted).toBe(true);
   });
 });
