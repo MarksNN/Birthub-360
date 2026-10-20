@@ -1,147 +1,129 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { predictiveRevenueOracleService } from '../../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
+import { describe, expect, it, vi } from 'vitest';
 
-describe('PredictiveRevenueOracleService — Eixo 20 (Predictive Revenue Oracle & What-If)', () => {
-  const orgA = 'org-oracle-alpha';
+vi.mock('../../../src/lib/queue/domainEventMesh.service.js', () => ({
+  domainEventMesh: { publish: vi.fn(async () => undefined) },
+}));
 
-  beforeEach(() => {
-    predictiveRevenueOracleService.clear();
+import {
+  ORACLE_MIN_CLOSED_WON_DEALS,
+  PredictiveRevenueOracleService,
+  percentile,
+} from '../../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
+import { InMemoryOracleReader, ORACLE_FIXED_NOW, seedRealHistory } from './oracleTestDoubles.js';
+
+const orgA = 'org-oracle-alpha';
+const orgB = 'org-oracle-beta';
+
+function build() {
+  const reader = new InMemoryOracleReader();
+  const service = new PredictiveRevenueOracleService({ reader, now: () => ORACLE_FIXED_NOW });
+  return { reader, service };
+}
+
+describe('PredictiveRevenueOracleService — REMED-03 (histórico real, sem constantes)', () => {
+  it('percentile: interpolação linear', () => {
+    expect(percentile([10, 20, 30, 40, 50], 0.5)).toBe(30);
+    expect(percentile([10, 20], 0.1)).toBeCloseTo(11);
   });
 
-  describe('Cockpit Executivo de Projeção de Receita', () => {
-    it('deve fornecer projeções de receita para 30, 90 e 180 dias com intervalos de confiança auditáveis', async () => {
-      const cockpit = await predictiveRevenueOracleService.getCockpitData(orgA);
+  it('com histórico suficiente: P10/P50/P90 vêm das janelas reais (não 145k/485k/980k)', async () => {
+    const { reader, service } = build();
+    seedRealHistory(reader, orgA);
+    const c = await service.getCockpitData(orgA);
 
-      expect(cockpit.organizationId).toBe(orgA);
-      expect(cockpit.currentQuota).toBe(150000);
-      expect(cockpit.closedWonRevenue).toBe(112000);
+    expect(c.status).toBe('ok');
+    const d30 = c.projections.days30;
+    // Receita mensal real: 15k..26k (12 meses) → percentis empíricos
+    expect(d30.sampleWindows).toBe(12);
+    expect(d30.confidenceInterval).toEqual({ p10: 16100, p50: 20500, p90: 24900 });
+    expect(d30.expectedRevenue).toBe(20500);
+    expect(d30.projectedWonDealsCount).toBe(2);
+    expect(d30.uncertaintyDegree).toBe('LOW'); // (24900−16100)/20500 ≈ 0,43
+    expect(d30.pipelineWeightedAmount).toBe(10000); // só o negócio que fecha em 30d (20k × 50%)
 
-      const { days30, days90, days180 } = cockpit.projections;
+    const d90 = c.projections.days90;
+    expect(d90.sampleWindows).toBe(10);
+    expect(d90.expectedRevenue).toBe(61500);
+    const d180 = c.projections.days180;
+    expect(d180.sampleWindows).toBe(7);
+    expect(d180.expectedRevenue).toBe(123000);
 
-      // 30 dias
-      expect(days30.horizonDays).toBe(30);
-      expect(days30.expectedRevenue).toBe(145000);
-      expect(days30.confidenceInterval.p10).toBeLessThan(days30.confidenceInterval.p50);
-      expect(days30.confidenceInterval.p50).toBeLessThan(days30.confidenceInterval.p90);
-      expect(days30.uncertaintyDegree).toBe('LOW');
-
-      // 90 dias
-      expect(days90.horizonDays).toBe(90);
-      expect(days90.expectedRevenue).toBe(485000);
-      expect(days90.uncertaintyDegree).toBe('MEDIUM');
-
-      // 180 dias
-      expect(days180.horizonDays).toBe(180);
-      expect(days180.expectedRevenue).toBe(980000);
-      expect(days180.uncertaintyDegree).toBe('HIGH');
-
-      // Negócios em risco e gargalos
-      expect(cockpit.dealsAtRisk.length).toBeGreaterThanOrEqual(1);
-      expect(cockpit.mainFunnelBottlenecks.length).toBeGreaterThanOrEqual(1);
-      expect(cockpit.modelConfidence).toBe('CALIBRATED_PROJECTION');
-    });
-
-    it('deve bloquear requisição de cockpit sem organizationId por garantia de Tenancy', async () => {
-      await expect(predictiveRevenueOracleService.getCockpitData('')).rejects.toThrow(
-        /Tenancy violation/,
-      );
-    });
+    for (const v of [145000, 485000, 980000]) {
+      expect([d30.expectedRevenue, d90.expectedRevenue, d180.expectedRevenue]).not.toContain(v);
+    }
+    expect(c.closedWonRevenue).toBe(7000);
+    expect(c.weightedPipelineRevenue).toBe(20000);
+    expect(c.currentQuota).toBeNull();
+    expect(c.dealsAtRisk).toEqual([]);
+    expect(c.currentPeriod).toBe('2026-10');
+    expect(c.modelConfidence).toBe('CALIBRATED_PROJECTION');
   });
 
-  describe('Motor What-If de Simulação Segura', () => {
-    it('deve simular impacto de aumento de prospecção (+15%) e conversão (+5%) sem alterar dados reais', async () => {
-      const sim = await predictiveRevenueOracleService.runWhatIfSimulation({
-        organizationId: orgA,
-        name: 'Aceleração de Prospecção Q4',
-        horizonDays: 90,
-        prospectingVolumeDeltaPercent: 15, // +15% prospecção
-        conversionRateDeltaPercent: 5, // +5% conversão
-      });
-
-      expect(sim.simulationId).toBeDefined();
-      expect(sim.baselineRevenue).toBe(485000);
-      expect(sim.simulatedRevenue).toBeGreaterThan(sim.baselineRevenue);
-      expect(sim.netRevenueDelta).toBeGreaterThan(0);
-      expect(sim.deltaPercent).toBeGreaterThan(0);
-      expect(sim.impactBreakdown.prospectingImpact).toBeGreaterThan(0);
-      expect(sim.impactBreakdown.conversionImpact).toBeGreaterThan(0);
-    });
-
-    it('deve refletir impacto negativo de aumento no ciclo de vendas (+15 dias)', async () => {
-      const sim = await predictiveRevenueOracleService.runWhatIfSimulation({
-        organizationId: orgA,
-        name: 'Cenário de Desaceleração de Ciclo',
-        horizonDays: 90,
-        salesCycleDeltaDays: 15,
-      });
-
-      expect(sim.baselineRevenue).toBe(485000);
-      expect(sim.impactBreakdown.cycleImpact).toBeLessThan(0);
-      expect(sim.simulatedRevenue).toBeLessThan(sim.baselineRevenue);
-    });
-
-    it('deve simular impacto de contratação de novos vendedores (+2 vendedores)', async () => {
-      const sim = await predictiveRevenueOracleService.runWhatIfSimulation({
-        organizationId: orgA,
-        name: 'Expansão de Time Comercial',
-        horizonDays: 90,
-        additionalSellersCount: 2,
-      });
-
-      expect(sim.impactBreakdown.capacityImpact).toBeGreaterThan(0);
-      expect(sim.simulatedRevenue).toBeGreaterThan(sim.baselineRevenue);
-    });
+  it('backtest real: snapshot mais antigo por mês vs realizado (não MAPE 8.4 / 142 amostras)', async () => {
+    const { reader, service } = build();
+    seedRealHistory(reader, orgA);
+    const b = await service.getBacktestMetrics(orgA);
+    expect(b.status).toBe('CALIBRATED');
+    expect(b.samplesEvaluated).toBe(3);
+    // |26-24|/24, |24-25|/25, |27-26|/26
+    expect(b.meanAbsolutePercentageError).toBeCloseTo(((2 / 24 + 1 / 25 + 1 / 26) / 3) * 100, 1);
+    expect(b.meanAbsoluteError).toBeCloseTo(4000 / 3, 1);
+    expect(b.predictionIntervalCoveragePercent).toBeNull();
   });
 
-  describe('Backtesting e Calibração Estatística', () => {
-    it('deve fornecer métricas auditáveis de acurácia, viés e calibração', async () => {
-      const metrics = await predictiveRevenueOracleService.getBacktestMetrics(orgA);
+  it('histórico insuficiente: status insufficient_data, valores null e motivo', async () => {
+    const { reader, service } = build();
+    reader.won.set(orgA, [{ amount: 5000, closedAt: new Date('2026-09-02T00:00:00Z') }]);
+    const c = await service.getCockpitData(orgA);
+    expect(c.status).toBe('insufficient_data');
+    expect(c.modelConfidence).toBe('INSUFFICIENT_DATA');
+    expect(c.insufficientDataReason).toContain(`mínimo ${ORACLE_MIN_CLOSED_WON_DEALS}`);
+    for (const h of [c.projections.days30, c.projections.days90, c.projections.days180]) {
+      expect(h.status).toBe('insufficient_data');
+      expect(h.expectedRevenue).toBeNull();
+      expect(h.confidenceInterval).toBeNull();
+      expect(h.uncertaintyDegree).toBeNull();
+    }
+    const b = await service.getBacktestMetrics(orgA);
+    expect(b.status).toBe('INSUFFICIENT_DATA');
+    expect(b.meanAbsolutePercentageError).toBeNull();
+    expect(b.isModelCalibrated).toBe(false);
 
-      expect(metrics.status).toBe('CALIBRATED');
-      expect(metrics.isModelCalibrated).toBe(true);
-      expect(metrics.samplesEvaluated).toBeGreaterThanOrEqual(100);
-      expect(metrics.meanAbsolutePercentageError).toBeLessThan(10.0); // MAPE < 10%
-      expect(Math.abs(metrics.predictionBias)).toBeLessThan(3.0); // Viés < 3%
-      expect(metrics.calibrationScore).toBeGreaterThanOrEqual(0.85); // Calibração > 0.85
-      expect(metrics.predictionIntervalCoveragePercent).toBeGreaterThanOrEqual(90); // Cobertura P10-P90 > 90%
-    });
+    const w = await service.runWhatIfSimulation({ organizationId: orgA, name: 'x', horizonDays: 90 });
+    expect(w.status).toBe('insufficient_data');
+    expect(w.baselineRevenue).toBeNull();
+    expect(w.impactBreakdown).toBeNull();
   });
 
-  describe('Alocação Inteligente e Supervisionada de Contas', () => {
-    it('deve gerar propostas de redistribuição com MatchScore e status PENDING_HUMAN_REVIEW', async () => {
-      const recommendations =
-        await predictiveRevenueOracleService.generateAccountAllocationRecommendations({
-          organizationId: orgA,
-          limit: 3,
-        });
+  it('isolamento de tenant: histórico de A não vaza para B', async () => {
+    const { reader, service } = build();
+    seedRealHistory(reader, orgA);
+    const b = await service.getCockpitData(orgB);
+    expect(b.status).toBe('insufficient_data');
+    expect(b.closedWonRevenue).toBe(0);
+  });
 
-      expect(recommendations.length).toBeGreaterThanOrEqual(1);
-      const rec = recommendations[0];
-      expect(rec.recommendationId).toBeDefined();
-      expect(rec.matchScore).toBeGreaterThanOrEqual(80);
-      expect(rec.approvalStatus).toBe('PENDING_HUMAN_REVIEW'); // NUNCA executa sem supervisão humana
-      expect(rec.rationale.industrySpecialization).toBe(true);
-      expect(rec.rationale.territoryCompliance).toBe(true);
-      expect(rec.estimatedConversionUpliftPercent).toBeGreaterThan(0);
+  it('What-If usa a linha de base real (P50)', async () => {
+    const { reader, service } = build();
+    seedRealHistory(reader, orgA);
+    const w = await service.runWhatIfSimulation({
+      organizationId: orgA,
+      name: 'Aceleração',
+      horizonDays: 90,
+      prospectingVolumeDeltaPercent: 10,
     });
+    expect(w.status).toBe('ok');
+    expect(w.baselineRevenue).toBe(61500);
+    expect(w.simulatedRevenue).toBeGreaterThan(61500);
+  });
 
-    it('deve efetivar a alocação mediante aprovação explícita do gestor', async () => {
-      const recommendations =
-        await predictiveRevenueOracleService.generateAccountAllocationRecommendations({
-          organizationId: orgA,
-          limit: 1,
-        });
-      const target = recommendations[0];
+  it('sem motor real de recomendação: lista vazia, nunca contas inventadas', async () => {
+    const { service } = build();
+    expect(await service.generateAccountAllocationRecommendations({ organizationId: orgA })).toEqual([]);
+  });
 
-      const approval = await predictiveRevenueOracleService.approveAccountAllocation({
-        organizationId: orgA,
-        recommendationId: target.recommendationId,
-        approvedBy: 'diretor-comercial-cro',
-      });
-
-      expect(approval.success).toBe(true);
-      expect(approval.executedAllocation.approvalStatus).toBe('APPROVED');
-      expect(approval.executedAllocation.suggestedOwnerName).toBe(target.suggestedOwnerName);
-    });
+  it('exige organizationId', async () => {
+    const { service } = build();
+    await expect(service.getCockpitData('')).rejects.toThrow(/Tenancy violation/);
   });
 });
