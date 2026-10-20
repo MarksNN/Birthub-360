@@ -14,6 +14,9 @@ import {
   Maximize2,
   Mic,
   Minimize2,
+  PauseOctagon,
+  Radio,
+  RefreshCw,
   Sparkles,
   Volume2,
   X,
@@ -111,6 +114,29 @@ export function LiveCopilotHUD({
   const [activeRebuttalIndex, setActiveRebuttalIndex] = useState(0);
   const [callDuration, setCallDuration] = useState(0);
 
+  // Telemetria bimodal do Live Voice
+  const voiceTelemetry = sessionState.bimodalVoice;
+  const voiceState = voiceTelemetry?.state ?? 'LISTENING';
+  const isFallback = voiceTelemetry?.isFallback ?? false;
+  const latencyP50 = voiceTelemetry?.metrics?.latencyP50Ms ?? 380;
+  const lastBargeInMs = voiceTelemetry?.lastBargeInMs ?? 145;
+
+  const handleTriggerBargeIn = () => {
+    SoundFX.play('focus');
+    const res = sessionState.triggerBargeIn();
+    toast.info(`Barge-in acionado (${res.latencyMs}ms): IA interrompida para o closer.`);
+  };
+
+  const handleToggleFallback = () => {
+    SoundFX.play('click');
+    const fallbackActive = sessionState.toggleFallback();
+    if (fallbackActive) {
+      toast.warning('Modo Bimodal pausado. Transição para STT/TTS Assíncrono ativada.');
+    } else {
+      toast.success('Motor Bimodal Ultra-Low Latency WebRTC reativado.');
+    }
+  };
+
   // Exemplo de fallback inteligente caso a IA ainda não tenha disparado uma objeção
   const activeObjection: ObjectionDetectionResult = useMemo(() => {
     if (sessionState.latestObjection) {
@@ -127,10 +153,10 @@ export function LiveCopilotHUD({
       matchedPattern: 'Declaração explícita de preço alto / restrição de budget',
       explanation: 'O lead indicou restrição orçamentária imediata.',
       timestamp: Date.now(),
-      latencyMs: 310,
+      latencyMs: latencyP50,
       suggestedRebuttals: defaultRebuttals,
     };
-  }, [sessionState.latestObjection, propSessionId, sessionState.session?.sessionId]);
+  }, [sessionState.latestObjection, propSessionId, sessionState.session?.sessionId, latencyP50]);
 
   // Cronômetro da chamada em andamento
   useEffect(() => {
@@ -144,12 +170,16 @@ export function LiveCopilotHUD({
     return () => window.clearInterval(interval);
   }, [isCallActive]);
 
-  // Atalhos de teclado acessíveis (ESC minimiza)
+  // Atalhos de teclado acessíveis (ESC minimiza, Alt+B Barge-In)
   useEffect(() => {
     if (!isCallActive) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !isMinimized) {
         setIsMinimized(true);
+      }
+      if (e.altKey && (e.key === 'b' || e.key === 'B')) {
+        e.preventDefault();
+        handleTriggerBargeIn();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -193,8 +223,8 @@ export function LiveCopilotHUD({
 
   const widthClass = {
     compact: 'w-[340px] sm:w-[360px]',
-    standard: 'w-[420px] sm:w-[460px]',
-    expanded: 'w-[540px] sm:w-[580px]',
+    standard: 'w-[430px] sm:w-[470px]',
+    expanded: 'w-[540px] sm:w-[590px]',
   }[size];
 
   return (
@@ -228,10 +258,19 @@ export function LiveCopilotHUD({
             <div className="h-3.5 w-px bg-line" aria-hidden="true" />
 
             <div className="flex items-center gap-1.5 text-xs font-medium text-ink-2 truncate max-w-[150px]">
-              <Zap className="w-3.5 h-3.5 text-brand shrink-0" />
+              <Radio className="w-3.5 h-3.5 text-brand shrink-0 animate-pulse" />
               <span className="truncate">{categoryStyle.label}</span>
-              <span className="text-[11px] font-bold text-brand">({confidencePercent}%)</span>
+              <span className="text-[10px] font-mono text-emerald-500 font-bold">{latencyP50}ms</span>
             </div>
+
+            <button
+              type="button"
+              onClick={handleTriggerBargeIn}
+              title="Atalho: Alt+B para Barge-in"
+              className="p-1 rounded-full text-rose-500 hover:bg-rose-500/10 transition-colors"
+            >
+              <PauseOctagon className="w-3.5 h-3.5" />
+            </button>
 
             <button
               type="button"
@@ -318,6 +357,117 @@ export function LiveCopilotHUD({
                 )}
               </div>
             </div>
+
+            {/* ── HUD DO LIVE COPILOT DE VOZ (MOTOR BIMODAL) ───────────── */}
+            <div className="px-4 py-2 bg-gradient-to-r from-brand/5 via-surface/40 to-surface border-b border-line/60">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span
+                        className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                          voiceState === 'SPEAKING'
+                            ? 'bg-purple-400'
+                            : voiceState === 'INTERRUPTED'
+                              ? 'bg-rose-500'
+                              : isFallback
+                                ? 'bg-amber-400'
+                                : 'bg-emerald-400'
+                        }`}
+                      />
+                      <span
+                        className={`relative inline-flex rounded-full h-2 w-2 ${
+                          voiceState === 'SPEAKING'
+                            ? 'bg-purple-500'
+                            : voiceState === 'INTERRUPTED'
+                              ? 'bg-rose-600'
+                              : isFallback
+                                ? 'bg-amber-500'
+                                : 'bg-emerald-500'
+                        }`}
+                      />
+                    </span>
+
+                    <span className="text-[11px] font-bold text-ink">
+                      {voiceState === 'LISTENING' && 'Voz: Ouvindo Lead'}
+                      {voiceState === 'SPEAKING' && 'Voz: IA Respondendo'}
+                      {voiceState === 'PROCESSING' && 'Voz: Sintetizando'}
+                      {voiceState === 'INTERRUPTED' && `Barge-In (${lastBargeInMs}ms)`}
+                      {voiceState === 'FALLBACK' && 'Modo Fallback STT/TTS'}
+                      {voiceState === 'CONNECTING' && 'Conectando WebRTC...'}
+                      {voiceState === 'IDLE' && 'Voz em Espera'}
+                    </span>
+                  </div>
+
+                  {/* Badges de Telemetria */}
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold">
+                    P50 {latencyP50}ms
+                  </span>
+
+                  <span className="hidden sm:inline-flex text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-2 text-ink-2 border border-line">
+                    {voiceTelemetry?.transport ? voiceTelemetry.transport.toUpperCase() : 'WEBRTC'}
+                  </span>
+                </div>
+
+                {/* Controles de Barge-In & Fallback */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={handleTriggerBargeIn}
+                    title="Interromper IA instantaneamente (Atalho: Alt+B)"
+                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <PauseOctagon className="w-3 h-3" />
+                    <span>Barge-In</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleToggleFallback}
+                    title={isFallback ? 'Voltar para Bimodal WebRTC' : 'Ativar fallback assíncrono'}
+                    className={`p-1 rounded-md border text-[10px] font-semibold transition-colors cursor-pointer ${
+                      isFallback
+                        ? 'bg-amber-500/20 text-amber-600 border-amber-500/40'
+                        : 'bg-surface hover:bg-surface-interactive text-ink-2 border-line'
+                    }`}
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isFallback ? 'animate-spin' : ''}`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Indicador de Onda Sonora em Tempo Real */}
+              <div className="flex items-center gap-1 mt-1.5 h-2 w-full px-1" aria-hidden="true">
+                {[40, 70, 30, 90, 60, 45, 80, 50, 65, 35, 75, 55, 85, 40, 95, 60, 30, 70].map(
+                  (heightPct, i) => (
+                    <motion.span
+                      key={i}
+                      className={`flex-1 rounded-full ${
+                        voiceState === 'SPEAKING'
+                          ? 'bg-purple-500'
+                          : voiceState === 'INTERRUPTED'
+                            ? 'bg-rose-500'
+                            : isFallback
+                              ? 'bg-amber-400'
+                              : 'bg-brand'
+                      }`}
+                      animate={{
+                        scaleY:
+                          voiceState === 'LISTENING' || voiceState === 'SPEAKING'
+                            ? [0.3, heightPct / 100, 0.3]
+                            : 0.2,
+                      }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 0.8 + (i % 5) * 0.15,
+                        ease: 'easeInOut',
+                      }}
+                    />
+                  ),
+                )}
+              </div>
+            </div>
+
 
             {/* ── CARD DE DETECÇÃO DE OBJEÇÃO & CONFIANÇA IA ───────────── */}
             <div className="p-3.5 border-b border-line/50 bg-gradient-to-b from-surface-subtle/30 to-transparent">

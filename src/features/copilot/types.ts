@@ -3,6 +3,11 @@ import type {
   ObjectionDetectionResult,
   SuggestedRebuttal,
 } from '../../shared/services/objectionDetection.service.js';
+import type {
+  LiveLatencyMetrics,
+  LiveVoiceSessionState,
+  LiveVoiceTransportType,
+} from '../../shared/contracts/bimodalLiveVoice.contract.js';
 
 export type HUDSize = 'compact' | 'standard' | 'expanded';
 
@@ -24,6 +29,14 @@ export interface LiveTranscriptionEntry {
   isFinal?: boolean;
 }
 
+export interface LiveBimodalVoiceTelemetry {
+  state: LiveVoiceSessionState;
+  transport: LiveVoiceTransportType;
+  metrics: LiveLatencyMetrics;
+  isFallback: boolean;
+  lastBargeInMs?: number;
+}
+
 export interface LiveCopilotState {
   isCallActive: boolean;
   session: LiveCallSession | null;
@@ -31,6 +44,15 @@ export interface LiveCopilotState {
   latestObjection: ObjectionDetectionResult | null;
   transcripts: LiveTranscriptionEntry[];
   isStreamingAudio: boolean;
+  bimodalVoice: LiveBimodalVoiceTelemetry;
 }
 
-export type { ObjectionCategory, ObjectionDetectionResult, SuggestedRebuttal };
+export type {
+  LiveLatencyMetrics,
+  LiveVoiceSessionState,
+  LiveVoiceTransportType,
+  ObjectionCategory,
+  ObjectionDetectionResult,
+  SuggestedRebuttal,
+};
+

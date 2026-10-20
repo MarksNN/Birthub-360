@@ -97,4 +97,12 @@
          com consentimento prévio do titular (LGPD) e enfileirar na fila do OfflineSyncService. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- ACCESS_FINE_LOCATION e ACCESS_COARSE_LOCATION — uso funcional real para geofencing
+         consentido em campo (Eixo 9 / Capacidade 6 - Mobile Edge AI).
+         Permite ao app sugerir briefings de visita quando o vendedor se aproxima da sede do cliente,
+         com opt-in voluntário e explícito do usuário, estritamente sem gravação autônoma ou
+         rastreamento contínuo em background (regras de governança e LGPD). -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 </manifest>

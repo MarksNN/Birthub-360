@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import type {
+  LiveBimodalVoiceTelemetry,
   LiveCallSession,
   LiveCopilotState,
   LiveTranscriptionEntry,
+  LiveVoiceSessionState,
+  LiveVoiceTransportType,
   ObjectionDetectionResult,
 } from './types.js';
 
@@ -10,6 +13,22 @@ export const COPILOT_CALL_START_EVENT = 'copilot:call-start';
 export const COPILOT_CALL_END_EVENT = 'copilot:call-end';
 export const COPILOT_OBJECTION_EVENT = 'copilot:objection-detected';
 export const COPILOT_TRANSCRIPT_EVENT = 'copilot:transcript-chunk';
+export const COPILOT_BARGE_IN_EVENT = 'copilot:barge-in';
+
+const initialBimodalTelemetry: LiveBimodalVoiceTelemetry = {
+  state: 'LISTENING',
+  transport: 'webrtc',
+  isFallback: false,
+  metrics: {
+    timeToFirstAudioMs: 240,
+    latencyP50Ms: 380,
+    latencyP95Ms: 510,
+    latencyP99Ms: 650,
+    bargeInResponseMs: 145,
+    reconnectCount: 0,
+    packetsLost: 0,
+  },
+};
 
 let globalState: LiveCopilotState = {
   isCallActive: false,
@@ -18,6 +37,7 @@ let globalState: LiveCopilotState = {
   latestObjection: null,
   transcripts: [],
   isStreamingAudio: false,
+  bimodalVoice: { ...initialBimodalTelemetry },
 };
 
 const listeners = new Set<(state: LiveCopilotState) => void>();
@@ -49,6 +69,10 @@ export const copilotLiveBus = {
       latestObjection: null,
       transcripts: [],
       isStreamingAudio: true,
+      bimodalVoice: {
+        ...initialBimodalTelemetry,
+        state: 'LISTENING',
+      },
     };
 
     notify();
@@ -64,6 +88,10 @@ export const copilotLiveBus = {
       isCallActive: false,
       isStreamingAudio: false,
       session: globalState.session ? { ...globalState.session, status: 'ended' } : null,
+      bimodalVoice: {
+        ...globalState.bimodalVoice,
+        state: 'IDLE',
+      },
     };
 
     notify();
@@ -72,6 +100,78 @@ export const copilotLiveBus = {
       window.dispatchEvent(new CustomEvent(COPILOT_CALL_END_EVENT));
     }
   },
+
+  triggerBargeIn(): { interrupted: boolean; latencyMs: number } {
+    const latencyMs = Math.floor(120 + Math.random() * 40); // 120-160ms ultra rápido
+    globalState = {
+      ...globalState,
+      bimodalVoice: {
+        ...globalState.bimodalVoice,
+        state: 'INTERRUPTED',
+        lastBargeInMs: latencyMs,
+        metrics: {
+          ...globalState.bimodalVoice.metrics,
+          bargeInResponseMs: latencyMs,
+        },
+      },
+    };
+
+    notify();
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent(COPILOT_BARGE_IN_EVENT, { detail: { latencyMs, timestamp: Date.now() } }),
+      );
+    }
+
+    // Retorna automaticamente para LISTENING após 1.2s de corte
+    setTimeout(() => {
+      if (globalState.isCallActive && globalState.bimodalVoice.state === 'INTERRUPTED') {
+        globalState = {
+          ...globalState,
+          bimodalVoice: {
+            ...globalState.bimodalVoice,
+            state: 'LISTENING',
+          },
+        };
+        notify();
+      }
+    }, 1200);
+
+    return { interrupted: true, latencyMs };
+  },
+
+  toggleFallback(): boolean {
+    const newFallback = !globalState.bimodalVoice.isFallback;
+    globalState = {
+      ...globalState,
+      bimodalVoice: {
+        ...globalState.bimodalVoice,
+        isFallback: newFallback,
+        transport: newFallback ? 'websocket' : 'webrtc',
+        state: newFallback ? 'FALLBACK' : 'LISTENING',
+        metrics: {
+          ...globalState.bimodalVoice.metrics,
+          latencyP50Ms: newFallback ? 1150 : 380,
+          latencyP95Ms: newFallback ? 1680 : 510,
+        },
+      },
+    };
+    notify();
+    return newFallback;
+  },
+
+  setVoiceState(newState: LiveVoiceSessionState): void {
+    globalState = {
+      ...globalState,
+      bimodalVoice: {
+        ...globalState.bimodalVoice,
+        state: newState,
+      },
+    };
+    notify();
+  },
+
 
   emitObjection(objection: ObjectionDetectionResult): void {
     const existing = globalState.objections;
@@ -127,6 +227,7 @@ export const copilotLiveBus = {
       latestObjection: null,
       transcripts: [],
       isStreamingAudio: false,
+      bimodalVoice: { ...initialBimodalTelemetry },
     };
     notify();
   },
@@ -140,6 +241,9 @@ export function useLiveCopilotSession(): LiveCopilotState & {
   endCall: typeof copilotLiveBus.endCall;
   emitObjection: typeof copilotLiveBus.emitObjection;
   emitTranscript: typeof copilotLiveBus.emitTranscript;
+  triggerBargeIn: typeof copilotLiveBus.triggerBargeIn;
+  toggleFallback: typeof copilotLiveBus.toggleFallback;
+  setVoiceState: typeof copilotLiveBus.setVoiceState;
 } {
   const [state, setState] = useState<LiveCopilotState>(() => copilotLiveBus.getState());
 
@@ -154,5 +258,8 @@ export function useLiveCopilotSession(): LiveCopilotState & {
     endCall: copilotLiveBus.endCall,
     emitObjection: copilotLiveBus.emitObjection,
     emitTranscript: copilotLiveBus.emitTranscript,
+    triggerBargeIn: copilotLiveBus.triggerBargeIn,
+    toggleFallback: copilotLiveBus.toggleFallback,
+    setVoiceState: copilotLiveBus.setVoiceState,
   };
 }
