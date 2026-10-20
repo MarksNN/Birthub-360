@@ -172,7 +172,6 @@ export const copilotLiveBus = {
     notify();
   },
 
-
   emitObjection(objection: ObjectionDetectionResult): void {
     const existing = globalState.objections;
     globalState = {

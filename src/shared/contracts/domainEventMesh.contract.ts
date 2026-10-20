@@ -116,4 +116,3 @@ export interface BitrixWebhookEventPayload {
   qualification?: Record<string, unknown>;
   leadFields?: Record<string, unknown>;
 }
-
