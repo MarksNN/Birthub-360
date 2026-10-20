@@ -10,7 +10,7 @@
 
 | Antes (≤ `3a1611f5`) | Depois (`27463513`) |
 |---|---|
-| `IPredictiveRevenueOraclePort` retornava `ExecutiveRevenueCockpit`, `WhatIfSimulationResult`, `BacktestValidationMetrics` | Renomeado para **`IPredictiveRevenueOraclePortLegacy`** (`@deprecated`), sem `approveAccountAllocation` |
+| `IPredictiveRevenueOraclePort` retornava `ExecutiveRevenueCockpit`, `WhatIfSimulationResult`, `BacktestValidationMetrics` | Renomeado para **`IPredictiveRevenueOraclePortLegacy`** (`@deprecated`), sem `approveAccountAllocation` **e também sem `generateAccountAllocationRecommendations`** — só `getCockpitData`, `runWhatIfSimulation` e `getBacktestMetrics` |
 | — | **`IPredictiveRevenueOraclePort`** (mesmo nome) agora retorna `ExecutiveRevenueCockpitV2`, `WhatIfSimulationResultV2`, `BacktestValidationMetricsV2`; mantém `generateAccountAllocationRecommendations` |
 | `approveAccountAllocation({ organizationId, recommendationId, approvedBy }) → { success, executedAllocation }` | **Removido.** Aprovação passa a ser `POST /api/commercial-intelligence/predictive/rebalance/approvals` e **não** executa a troca no CRM (`appliedToCrm: false`) |
 
@@ -55,7 +55,7 @@ Persistência: `AuditLog` (entity `RebalanceApproval`, action `REBALANCE_DECISIO
 - Qualquer consumidor que importasse `IPredictiveRevenueOraclePort` esperando a assinatura antiga ou chamasse `approveAccountAllocation`.
 
 ## 4. Como migrar
-1. Precisa do formato antigo temporariamente? Importe `IPredictiveRevenueOraclePortLegacy` (deprecated; será removido após a migração da UI).
+1. Precisa do formato antigo temporariamente? Importe `IPredictiveRevenueOraclePortLegacy` (deprecated; será removido após a migração da UI). Atenção: a Legacy **não** expõe `generateAccountAllocationRecommendations`; quem precisa das recomendações de alocação deve usar `IPredictiveRevenueOraclePort` (V2).
 2. Troque os tipos para `*V2` e trate `status === 'insufficient_data'`: exiba estado vazio com `insufficientDataReason`; nunca substitua `null` por 0 ou número de exemplo.
 3. Busque dados em `GET .../predictive/cockpit` e `GET .../predictive/backtest`; meta em `/goals`; riscos/gargalos em `/deals` e `/funnel-bottlenecks`.
 4. Substitua `approveAccountAllocation` por `POST .../predictive/rebalance/approvals`; trate 201/200 (replay), 404, 409 e 422. A troca de responsável continua no fluxo normal do CRM.
