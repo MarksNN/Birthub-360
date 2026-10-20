@@ -31,16 +31,49 @@ const findFirst = vi.fn(
         r.companyId === where.companyId,
     ) ?? null,
 );
+const updateMany = vi.fn(
+  async ({
+    where,
+    data,
+  }: {
+    where: { id: string; organizationId: string; companyId: string };
+    data: Partial<Rec>;
+  }) => {
+    const hits = store.recs.filter(
+      (r) =>
+        r.id === where.id &&
+        r.organizationId === where.organizationId &&
+        r.companyId === where.companyId,
+    );
+    hits.forEach((r) => Object.assign(r, data));
+    return { count: hits.length };
+  },
+);
 const callBitrix = vi.fn();
+const leadFindFirst = vi.fn(async (_args: unknown) => null as null | { id: string });
+const sequenceFindFirst = vi.fn(async (_args: unknown) => null as null | { id: string });
+const saveRun = vi.fn(async (_run: unknown) => undefined);
 
 vi.mock('../../../../lib/prisma.js', () => ({
-  withRlsContext: async (fn: (p: unknown) => unknown) =>
-    fn({
-      accountRecommendation: { findFirst, update },
-      user: { findUnique: async () => ({ bitrixUserId: 7 }) },
-      lead: { findFirst: async () => null },
-      cadenceSequence: { findFirst: async () => null },
-    }),
+  // Simula a transação real: qualquer throw faz rollback do estado gravado dentro dela.
+  withRlsContext: async (fn: (p: unknown) => unknown) => {
+    const before = structuredClone(store.recs);
+    try {
+      return await fn({
+        accountRecommendation: { findFirst, update, updateMany },
+        user: { findUnique: async () => ({ bitrixUserId: 7 }) },
+        lead: { findFirst: leadFindFirst },
+        cadenceSequence: { findFirst: sequenceFindFirst },
+      });
+    } catch (error) {
+      store.recs = before;
+      throw error;
+    }
+  },
+}));
+vi.mock('../../../cadence/domain/cadence.js', () => ({ startCadenceRun: (x: unknown) => x }));
+vi.mock('../../../cadence/infra/PrismaCadenceRunRepository.js', () => ({
+  prismaCadenceRunRepository: { save: (run: unknown) => saveRun(run) },
 }));
 vi.mock('../../../../lib/async-context.js', () => ({ getUserId: () => 'user-a' }));
 vi.mock('../../../integrations/bitrix/service/client.js', () => ({
@@ -72,6 +105,9 @@ function rec(over: Partial<Rec> & { org: string; webhook?: string }): Rec {
 describe('actionExecutorService.executeAction — tenancy e pré-condições', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    leadFindFirst.mockResolvedValue(null);
+    sequenceFindFirst.mockResolvedValue(null);
+    saveRun.mockResolvedValue(undefined);
     store.recs = [];
   });
 
@@ -122,5 +158,48 @@ describe('actionExecutorService.executeAction — tenancy e pré-condições', (
       actionExecutorService.executeAction('rec-1', 'co-1', 'org-a'),
     ).rejects.toMatchObject({ statusCode: 400 });
     expect(store.recs[0].status).toBe('Pending');
+  });
+
+  it('cadência já ativa (P2002) → 409 e status permanece Pending', async () => {
+    store.recs = [rec({ org: 'org-a', actionType: 'START_SDR_CADENCE' })];
+    leadFindFirst.mockResolvedValue({ id: 'lead-1' });
+    sequenceFindFirst.mockResolvedValue({ id: 'seq-1' });
+    saveRun.mockRejectedValueOnce(Object.assign(new Error('dup'), { code: 'P2002' }));
+    await expect(
+      actionExecutorService.executeAction('rec-1', 'co-1', 'org-a'),
+    ).rejects.toMatchObject({ statusCode: 409 });
+    expect(store.recs[0].status).toBe('Pending');
+  });
+
+  it('lead e sequência são buscados com o organizationId da sessão', async () => {
+    store.recs = [rec({ org: 'org-a', actionType: 'START_SDR_CADENCE' })];
+    leadFindFirst.mockResolvedValue({ id: 'lead-1' });
+    sequenceFindFirst.mockResolvedValue({ id: 'seq-1' });
+    await actionExecutorService.executeAction('rec-1', 'co-1', 'org-a');
+    expect(leadFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ organizationId: 'org-a', companyId: 'co-1' }),
+      }),
+    );
+    expect(sequenceFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ organizationId: 'org-a' }) }),
+    );
+    expect(store.recs[0].status).toBe('Executed');
+  });
+
+  it('falha real persiste Failed mesmo com rollback da transação de execução', async () => {
+    store.recs = [rec({ org: 'org-a', actionType: 'START_SDR_CADENCE' })];
+    leadFindFirst.mockResolvedValue({ id: 'lead-1' });
+    sequenceFindFirst.mockResolvedValue({ id: 'seq-1' });
+    saveRun.mockRejectedValueOnce(new Error('db down'));
+    await expect(actionExecutorService.executeAction('rec-1', 'co-1', 'org-a')).rejects.toThrow(
+      'db down',
+    );
+    expect(store.recs[0].status).toBe('Failed');
+    expect(updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'rec-1', organizationId: 'org-a', companyId: 'co-1' },
+      }),
+    );
   });
 });
