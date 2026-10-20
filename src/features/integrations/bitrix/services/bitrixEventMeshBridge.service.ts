@@ -1,4 +1,5 @@
 import { logger } from '../../../../lib/logger.js';
+import { prisma } from '../../../../lib/prisma.js';
 import { domainEventMesh } from '../../../../lib/queue/domainEventMesh.service.js';
 import type {
   BitrixWebhookEventPayload,
@@ -6,8 +7,6 @@ import type {
   WhatsAppMessageEventPayload,
 } from '../../../../shared/contracts/domainEventMesh.contract.js';
 import { postCommentToBitrix, syncActivityToBitrix } from '../service/outboundSync.js';
-import { sendWhatsAppMessage } from '../../whatsapp/whatsapp.service.js';
-import { prisma } from '../../../../lib/prisma.js';
 
 /**
  * Ponte entre o barramento canônico de eventos (DomainEventMesh) e as integrações
@@ -93,7 +92,7 @@ export class BitrixEventMeshBridgeService {
     direction: 'inbound' | 'outbound',
   ): Promise<void> {
     try {
-      const payload = event.payload as WhatsAppMessageEventPayload;
+      const payload = event.payload as unknown as WhatsAppMessageEventPayload;
       const leadId = payload.leadId;
       if (!leadId) {
         return;
@@ -131,11 +130,16 @@ export class BitrixEventMeshBridgeService {
   private async handleVoiceCall(event: DomainEventEnvelope): Promise<void> {
     try {
       const payload = (event.payload || {}) as Record<string, unknown>;
-      const leadId = (payload.leadId as string) || (event.aggregateId.startsWith('lead-') ? event.aggregateId.replace('lead-', '') : event.aggregateId);
+      const leadId =
+        (payload.leadId as string) ||
+        (event.aggregateId.startsWith('lead-')
+          ? event.aggregateId.replace('lead-', '')
+          : event.aggregateId);
 
       if (!leadId) return;
 
-      const duration = typeof payload.durationSeconds === 'number' ? payload.durationSeconds : undefined;
+      const duration =
+        typeof payload.durationSeconds === 'number' ? payload.durationSeconds : undefined;
       const summary = typeof payload.summary === 'string' ? payload.summary : '';
 
       await syncActivityToBitrix(event.organizationId, leadId, {
@@ -157,17 +161,24 @@ export class BitrixEventMeshBridgeService {
   private async handleMeetingScheduled(event: DomainEventEnvelope): Promise<void> {
     try {
       const payload = (event.payload || {}) as Record<string, unknown>;
-      const leadId = (payload.leadId as string) || (event.aggregateId.startsWith('lead-') ? event.aggregateId.replace('lead-', '') : event.aggregateId);
+      const leadId =
+        (payload.leadId as string) ||
+        (event.aggregateId.startsWith('lead-')
+          ? event.aggregateId.replace('lead-', '')
+          : event.aggregateId);
 
       if (!leadId) return;
 
-      const title = typeof payload.title === 'string' ? payload.title : 'Reunião comercial agendada';
+      const title =
+        typeof payload.title === 'string' ? payload.title : 'Reunião comercial agendada';
       const scheduledAt = typeof payload.scheduledAt === 'string' ? payload.scheduledAt : '';
 
       await syncActivityToBitrix(event.organizationId, leadId, {
         type: 'meeting',
         subject: `📅 ${title}`,
-        description: scheduledAt ? `Data agendada: ${scheduledAt}` : 'Reunião confirmada no calendário.',
+        description: scheduledAt
+          ? `Data agendada: ${scheduledAt}`
+          : 'Reunião confirmada no calendário.',
         completed: false,
       });
     } catch (err) {
@@ -185,7 +196,12 @@ export class BitrixEventMeshBridgeService {
 
       if (!leadId) return;
 
-      const reason = typeof payload.reason === 'string' ? payload.reason : typeof payload.risk === 'string' ? payload.risk : 'Risco elevado detectado na negociação';
+      const reason =
+        typeof payload.reason === 'string'
+          ? payload.reason
+          : typeof payload.risk === 'string'
+            ? payload.risk
+            : 'Risco elevado detectado na negociação';
       const score = payload.riskScore != null ? ` (Score de Risco: ${payload.riskScore})` : '';
 
       const comment = `⚠️ [Alerta IA Birth Hub 360 - ${event.eventType}]${score}\n${reason}\nRecomendação: Avaliar histórico do cliente ou acionar roleplay com o gestor.`;
@@ -206,7 +222,8 @@ export class BitrixEventMeshBridgeService {
 
       if (!leadId) return;
 
-      const bottleneck = typeof payload.bottleneck === 'string' ? payload.bottleneck : 'Gargalo no funil de vendas';
+      const bottleneck =
+        typeof payload.bottleneck === 'string' ? payload.bottleneck : 'Gargalo no funil de vendas';
       const comment = `🔍 [Gargalo Comercial Detectado]\n${bottleneck}\nSugerido avanço de etapa ou contato ativo.`;
 
       await postCommentToBitrix(event.organizationId, leadId, comment);
@@ -245,7 +262,8 @@ export class BitrixEventMeshBridgeService {
 
       if (!leadId) return;
 
-      const reason = typeof payload.reason === 'string' ? payload.reason : 'Solicitação do titular (LGPD)';
+      const reason =
+        typeof payload.reason === 'string' ? payload.reason : 'Solicitação do titular (LGPD)';
       const comment = `🛑 [LGPD / Opt-out Unificado Aplicado]\nO lead solicitou cancelamento de abordagens comerciais.\nMotivo: ${reason}\nTodos os canais automatizados (WhatsApp, Voz, E-mail) foram bloqueados para este contato.`;
 
       await postCommentToBitrix(event.organizationId, leadId, comment);
@@ -278,7 +296,7 @@ export class BitrixEventMeshBridgeService {
 
   private async handleBitrixWebhookInbound(event: DomainEventEnvelope): Promise<void> {
     try {
-      const payload = event.payload as BitrixWebhookEventPayload;
+      const payload = event.payload as unknown as BitrixWebhookEventPayload;
       if (!payload?.leadId) return;
 
       // Se o webhook informou mudança de estágio para um lead local existente:
@@ -288,7 +306,7 @@ export class BitrixEventMeshBridgeService {
         include: { contact: true },
       });
 
-      if (!lead || !lead.contact) return;
+      if (!lead?.contact) return;
 
       const phone = lead.contact.whatsapp || lead.contact.phone;
       if (!phone) return;
