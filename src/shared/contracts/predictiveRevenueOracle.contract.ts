@@ -110,17 +110,125 @@ export interface ExecutiveRevenueCockpit {
   lastCalculatedAt: string;
 }
 
-export interface IPredictiveRevenueOraclePort {
+/**
+ * @deprecated Contrato legado da UI estática (PredictiveRevenueCockpit.tsx, dono 02). O backend
+ * (REMED-03) responde com os tipos `*V2` abaixo; a UI deve migrar para eles.
+ */
+export interface IPredictiveRevenueOraclePortLegacy {
   getCockpitData(organizationId: string): Promise<ExecutiveRevenueCockpit>;
   runWhatIfSimulation(input: WhatIfSimulationInput): Promise<WhatIfSimulationResult>;
   getBacktestMetrics(organizationId: string): Promise<BacktestValidationMetrics>;
+}
+
+// ---------------------------------------------------------------------------------------------
+// REMED-03 (auditoria forense @281cfcd3) — contrato HONESTO do Revenue Oracle.
+// Todo número é derivado do histórico real do tenant. Sem histórico suficiente:
+// `status: 'insufficient_data'`, valores `null` e `insufficientDataReason` — nunca número inventado.
+// ---------------------------------------------------------------------------------------------
+export type OracleDataStatus = 'ok' | 'insufficient_data';
+
+export interface ProjectedRevenueHorizonV2 {
+  horizonDays: RevenueHorizonDays;
+  status: OracleDataStatus;
+  insufficientDataReason: string | null;
+  /** Quantas janelas históricas de `horizonDays` alimentaram o intervalo. */
+  sampleWindows: number;
+  expectedRevenue: number | null;
+  confidenceInterval: { p10: number; p50: number; p90: number } | null;
+  pipelineWeightedAmount: number;
+  projectedWonDealsCount: number | null;
+  keyDrivers: string[];
+  uncertaintyDegree: 'LOW' | 'MEDIUM' | 'HIGH' | null;
+}
+
+export interface WhatIfSimulationResultV2 {
+  simulationId: string;
+  organizationId: string;
+  name: string;
+  status: OracleDataStatus;
+  insufficientDataReason: string | null;
+  baselineRevenue: number | null;
+  simulatedRevenue: number | null;
+  netRevenueDelta: number | null;
+  deltaPercent: number | null;
+  impactBreakdown: WhatIfSimulationResult['impactBreakdown'] | null;
+  simulatedAt: string;
+}
+
+export interface BacktestValidationMetricsV2 {
+  evaluationPeriod: string;
+  samplesEvaluated: number;
+  meanAbsoluteError: number | null;
+  meanAbsolutePercentageError: number | null;
+  predictionBias: number | null;
+  calibrationScore: number | null;
+  /** null: snapshots persistidos não guardam P10/P90 — cobertura não mensurável. */
+  predictionIntervalCoveragePercent: number | null;
+  isModelCalibrated: boolean;
+  status: 'CALIBRATED' | 'UNCALIBRATED_ESTIMATE_ONLY' | 'INSUFFICIENT_DATA';
+  insufficientDataReason: string | null;
+}
+
+export interface ExecutiveRevenueCockpitV2 {
+  organizationId: string;
+  /** "YYYY-MM" (UTC). */
+  currentPeriod: string;
+  status: OracleDataStatus;
+  insufficientDataReason: string | null;
+  /** null: meta vive em CommercialGoal — ler GET /api/commercial-intelligence/goals. */
+  currentQuota: number | null;
+  closedWonRevenue: number;
+  quotaAttainmentPercent: number | null;
+  weightedPipelineRevenue: number;
+  projections: {
+    days30: ProjectedRevenueHorizonV2;
+    days90: ProjectedRevenueHorizonV2;
+    days180: ProjectedRevenueHorizonV2;
+  };
+  /** Sempre []: risco/gargalo reais vivem em /deals e /funnel-bottlenecks. */
+  dealsAtRisk: ExecutiveRevenueCockpit['dealsAtRisk'];
+  mainFunnelBottlenecks: ExecutiveRevenueCockpit['mainFunnelBottlenecks'];
+  activeRecommendationsCount: number;
+  modelConfidence: 'CALIBRATED_PROJECTION' | 'ESTIMATED_ONLY' | 'INSUFFICIENT_DATA';
+  lastCalculatedAt: string;
+}
+
+export interface IPredictiveRevenueOraclePort {
+  getCockpitData(organizationId: string): Promise<ExecutiveRevenueCockpitV2>;
+  runWhatIfSimulation(input: WhatIfSimulationInput): Promise<WhatIfSimulationResultV2>;
+  getBacktestMetrics(organizationId: string): Promise<BacktestValidationMetricsV2>;
   generateAccountAllocationRecommendations(params: {
     organizationId: string;
     limit?: number;
   }): Promise<AccountAllocationRecommendation[]>;
-  approveAccountAllocation(params: {
-    organizationId: string;
-    recommendationId: string;
-    approvedBy: string;
-  }): Promise<{ success: boolean; executedAllocation: AccountAllocationRecommendation }>;
+}
+
+// ---------------------------------------------------------------------------------------------
+// REMED-04 — aprovação humana de rebalanceamento de carteira (persistida + auditada).
+// POST /api/commercial-intelligence/predictive/rebalance/approvals
+// ---------------------------------------------------------------------------------------------
+export interface RebalanceApprovalRequest {
+  /** Id estável da proposta (chave de idempotência). */
+  recommendationId: string;
+  /** Lead/negócio (funil Negócio) cuja carteira muda — precisa existir no tenant. */
+  leadId: string;
+  fromOwner: string | null;
+  toOwner: string;
+  decision: 'APPROVED' | 'REJECTED';
+  note?: string;
+}
+
+export interface RebalanceApprovalRecord extends RebalanceApprovalRequest {
+  approvalId: string;
+  organizationId: string;
+  decidedBy: string;
+  decidedAt: string;
+  /** Aprovação registra a decisão; a troca de responsável segue pelo fluxo normal do CRM. */
+  appliedToCrm: false;
+}
+
+export interface RebalanceApprovalResponse {
+  approval: RebalanceApprovalRecord;
+  /** true quando a mesma decisão já existia (replay idempotente — nada novo foi gravado). */
+  alreadyRecorded: boolean;
 }
