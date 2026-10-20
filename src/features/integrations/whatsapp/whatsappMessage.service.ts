@@ -8,6 +8,7 @@ import { scheduleConversationAnalysis } from '../../../lib/queue/whatsappSignal.
 import { recordOptOut } from '../../cadence/application/optOutService.js';
 import { prismaOptOutRepository } from '../../cadence/infra/PrismaOptOutRepository.js';
 import { isOptOutKeyword } from '../../../shared/services/optOutCheck.service.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 
 /** Grupos (`@g.us`) e o próprio status (`status@broadcast`) não correspondem a um contato do CRM. */
 function isIndividualChat(remoteJid: string | null | undefined): boolean {
@@ -195,6 +196,31 @@ export async function persistWhatsAppMessage(input: PersistWhatsAppMessageInput)
       });
 
     await scheduleConversationAnalysis(lead.id, input.organizationId);
+
+    // Onda 05 - Opção 3: Publicação de sinal de engajamento no domainEventMesh
+    await domainEventMesh
+      .publish({
+        eventType: 'ENGAGEMENT_SIGNAL_RECEIVED',
+        eventVersion: '1.0.0',
+        organizationId: input.organizationId,
+        correlationId: `wa-msg-${input.waMessageId}`,
+        producer: 'whatsapp-message-service',
+        aggregateId: lead.id,
+        payload: {
+          integration: 'whatsapp',
+          waMessageId: input.waMessageId,
+          direction: input.direction,
+          phoneE164,
+          bodyLength: input.body?.length ?? 0,
+          hasContent: Boolean(input.body),
+        },
+      })
+      .catch((meshErr) => {
+        logger.warn(
+          { meshErr, leadId: lead.id },
+          '[whatsapp] Falha ao publicar evento no domainEventMesh',
+        );
+      });
   }
 }
 
