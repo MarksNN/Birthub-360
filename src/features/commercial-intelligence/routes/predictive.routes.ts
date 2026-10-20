@@ -11,6 +11,16 @@ import {
   rebalanceApprovalRequestSchema,
   rebalanceApprovalService,
 } from '../services/rebalanceApproval.service.js';
+import {
+  type RebalanceRecommendationService,
+  rebalanceRecommendationService,
+} from '../services/rebalanceRecommendation.service.js';
+import {
+  WhatIfInputError,
+  type WhatIfSimulationService,
+  whatIfRequestSchema,
+  whatIfSimulationService,
+} from '../services/whatIfSimulation.service.js';
 
 /**
  * Rotas do Revenue Oracle / rebalanceamento — montadas em `commercialIntelligence.routes.ts` sob
@@ -20,7 +30,11 @@ import {
 export function createPredictiveRoutes(deps?: {
   oracle?: PredictiveRevenueOracleService;
   approvals?: RebalanceApprovalService;
+  recommendations?: RebalanceRecommendationService;
+  whatIf?: WhatIfSimulationService;
 }): Router {
+  const recommendations = deps?.recommendations ?? rebalanceRecommendationService;
+  const whatIf = deps?.whatIf ?? whatIfSimulationService;
   const oracle = deps?.oracle ?? predictiveRevenueOracleService;
   const approvals = deps?.approvals ?? rebalanceApprovalService;
   const router = Router();
@@ -53,6 +67,39 @@ export function createPredictiveRoutes(deps?: {
     }
   });
 
+  router.get('/rebalance/recommendations', async (req, res, next: NextFunction) => {
+    try {
+      const t = tenantOf(req);
+      if (!t) return forbidden(res);
+      res.json({ success: true, data: await recommendations.list(t.organizationId) });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/what-if', async (req, res, next: NextFunction) => {
+    try {
+      const t = tenantOf(req);
+      if (!t) return forbidden(res);
+      const parsed = whatIfRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(422).json({
+          success: false,
+          error: 'Payload inválido.',
+          details: z.flattenError(parsed.error).fieldErrors,
+        });
+      }
+      res.json({ success: true, data: await whatIf.simulate(t.organizationId, parsed.data) });
+    } catch (err) {
+      if (err instanceof WhatIfInputError) {
+        return res
+          .status(422)
+          .json({ success: false, error: err.message, details: { [err.field]: [err.message] } });
+      }
+      next(err);
+    }
+  });
+
   router.post('/rebalance/approvals', async (req, res, next: NextFunction) => {
     try {
       const t = tenantOf(req);
@@ -74,7 +121,7 @@ export function createPredictiveRoutes(deps?: {
       res.status(result.alreadyRecorded ? 200 : 201).json({ success: true, data: result });
     } catch (err) {
       if (err instanceof RebalanceApprovalError) {
-        const status = err.code === 'NOT_FOUND' ? 404 : 409;
+        const status = err.code === 'NOT_FOUND' ? 404 : err.code === 'INVALID_OWNER' ? 422 : 409;
         return res.status(status).json({
           success: false,
           error: err.message,

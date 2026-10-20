@@ -252,6 +252,19 @@ export class PredictiveRevenueOracleService implements IPredictiveRevenueOracleP
   }
 
   /**
+   * Linha de base REAL de um horizonte (P50 das janelas móveis de receita ganha) — sem publicar
+   * evento. Usada pelo What-If V2 (`whatIfSimulation.service.ts`).
+   */
+  async getRevenueBaseline(
+    organizationId: string,
+    horizonDays: RevenueHorizonDays,
+  ): Promise<ProjectedRevenueHorizon> {
+    this.assertTenant(organizationId);
+    const history = await this.loadMonthlyHistory(organizationId);
+    return this.buildHorizon(horizonDays, history, []);
+  }
+
+  /**
    * What-If sobre a linha de base REAL (P50 do horizonte). As elasticidades abaixo são premissas
    * declaradas do simulador (não dados) e só são aplicadas quando há linha de base real.
    */

@@ -101,6 +101,7 @@ describe('Onda 05 — Teste Integrado E2E: Escala, Governança e Resiliência', 
     // Aprovação de rebalanceamento persistida/auditada (sem recomendação inventada)
     const approvalStore = new InMemoryRebalanceApprovalStore();
     approvalStore.addLead(tenantA, 'lead-alpha-1');
+    approvalStore.addUser(tenantA, 'seller-lucas-01');
     const approvals = new RebalanceApprovalService({ store: approvalStore });
     const approvedAllocation = await approvals.decide({
       organizationId: tenantA,

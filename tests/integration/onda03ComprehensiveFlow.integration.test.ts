@@ -271,6 +271,7 @@ describe('ONDA 03 — Fluxo Abrangente Integrado e Cinco Jornadas Comerciais E2E
     // 4. Aprovação formal do gestor (persistida + idempotente)
     const store = new InMemoryRebalanceApprovalStore();
     store.addLead(tenantA, 'lead-alpha-1');
+    store.addUser(tenantA, 'seller-b');
     const approvals = new RebalanceApprovalService({ store });
     const input = {
       recommendationId: 'rec-alpha-1',

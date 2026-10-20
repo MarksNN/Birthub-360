@@ -50,6 +50,8 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     store = new InMemoryRebalanceApprovalStore();
     store.addLead('org-a', 'lead-a1');
     store.addLead('org-b', 'lead-b1');
+    store.addUser('org-a', 'user-juliana');
+    store.addUser('org-b', 'user-juliana');
   });
 
   it('happy path: 201, persiste e registra trilha (decidedBy/tenant/ip)', async () => {
@@ -95,6 +97,14 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     const own = await request(buildApp(store, gestorB)).post(URL).send({ ...body, leadId: 'lead-b1' });
     expect(own.status).toBe(201); // mesmo recommendationId, outro tenant: sem colisão
     expect(own.body.data.approval.organizationId).toBe('org-b');
+  });
+
+  it('toOwner que não é User do tenant → 422 e nada gravado', async () => {
+    store.addUser('org-b', 'user-only-b');
+    const res = await request(buildApp(store, gestorA)).post(URL).send({ ...body, toOwner: 'user-only-b' });
+    expect(res.status).toBe(422);
+    expect(res.body.success).toBe(false);
+    expect(store.records).toHaveLength(0);
   });
 
   it.each(['SDR', 'CLOSER', 'VISUALIZADOR'])('papel %s → 403 e nada gravado', async (role) => {

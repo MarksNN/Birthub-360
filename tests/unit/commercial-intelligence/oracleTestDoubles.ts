@@ -50,6 +50,14 @@ export function seedRealHistory(reader: InMemoryOracleReader, org: string): void
 
 export class InMemoryRebalanceApprovalStore implements RebalanceApprovalStore {
   leads = new Map<string, Set<string>>();
+  users = new Map<string, Set<string>>();
+  addUser(org: string, userId: string) {
+    if (!this.users.has(org)) this.users.set(org, new Set());
+    this.users.get(org)!.add(userId);
+  }
+  async ownerIsOrgUser(org: string, userId: string) {
+    return this.users.get(org)?.has(userId) ?? false;
+  }
   records: Array<{ record: RebalanceApprovalRecord; ipAddress?: string }> = [];
   addLead(org: string, leadId: string) {
     if (!this.leads.has(org)) this.leads.set(org, new Set());

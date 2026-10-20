@@ -40,7 +40,7 @@ export const rebalanceApprovalRequestSchema = z
 
 export class RebalanceApprovalError extends Error {
   constructor(
-    public readonly code: 'NOT_FOUND' | 'CONFLICT',
+    public readonly code: 'NOT_FOUND' | 'CONFLICT' | 'INVALID_OWNER',
     message: string,
     public readonly existing?: RebalanceApprovalRecord,
   ) {
@@ -92,6 +92,12 @@ export class RebalanceApprovalService {
     }
     if (!(await store.leadExists(organizationId, input.leadId))) {
       throw new RebalanceApprovalError('NOT_FOUND', 'Negócio não encontrado nesta organização.');
+    }
+    if (!(await store.ownerIsOrgUser(organizationId, input.toOwner))) {
+      throw new RebalanceApprovalError(
+        'INVALID_OWNER',
+        'toOwner deve ser o id de um usuário desta organização (mesmo id devolvido em GET /rebalance/recommendations).',
+      );
     }
     const record: RebalanceApprovalRecord = {
       approvalId: randomUUID(),

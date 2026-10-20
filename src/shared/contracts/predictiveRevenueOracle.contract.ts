@@ -232,3 +232,121 @@ export interface RebalanceApprovalResponse {
   /** true quando a mesma decisão já existia (replay idempotente — nada novo foi gravado). */
   alreadyRecorded: boolean;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Recomendações de rebalanceamento V2 (Agente 04) — calculadas a partir de dados REAIS do tenant.
+// GET /api/commercial-intelligence/predictive/rebalance/recommendations
+// Ids de owner = `Lead.owner` resolvido para `User.id` do mesmo tenant; o POST /rebalance/approvals
+// aceita exatamente `recommendationId`, `leadId`, `fromOwner.id`, `toOwner.id` daqui.
+// ---------------------------------------------------------------------------------------------
+export type RebalanceRecommendationStatusV2 = 'PENDING_HUMAN_REVIEW' | 'APPROVED' | 'REJECTED';
+
+export interface RebalanceOwnerStatsV2 {
+  /** `User.id` (igual ao valor gravado em `Lead.owner`). */
+  id: string;
+  name: string;
+  openDeals: number;
+  /** Negócios encerrados (ganhos + perdidos) na janela de throughput. */
+  closedInWindow: number;
+  /** openDeals ÷ (closedInWindow ÷ janelaDias): dias para escoar a carteira no ritmo histórico. */
+  backlogDays: number;
+}
+
+export interface RebalanceRecommendationV2 {
+  /** Determinístico: hash(tenant, leadId, fromOwner, toOwner). Chave de idempotência do POST. */
+  recommendationId: string;
+  leadId: string;
+  leadTitle: string | null;
+  account: { companyId: string | null; name: string | null };
+  amount: number | null;
+  fromOwner: { id: string; name: string };
+  toOwner: { id: string; name: string };
+  reason: string;
+  evidence: {
+    from: RebalanceOwnerStatsV2;
+    to: RebalanceOwnerStatsV2;
+    teamMedianBacklogDays: number;
+    dealOpenSinceDays: number;
+  };
+  approvalStatus: RebalanceRecommendationStatusV2;
+  /** Decisão já registrada via POST /rebalance/approvals (AuditLog) ou null. */
+  decision: RebalanceApprovalRecord | null;
+}
+
+export interface RebalanceRecommendationsResponseV2 {
+  status: OracleDataStatus;
+  insufficientDataReason: string | null;
+  generatedAt: string;
+  rule: {
+    description: string;
+    throughputWindowDays: number;
+    minOwners: number;
+    minClosedPerOwner: number;
+    overloadRatio: number;
+    minOpenDealsToDonate: number;
+    maxMovesPerOwner: number;
+  };
+  teamMedianBacklogDays: number | null;
+  owners: RebalanceOwnerStatsV2[];
+  diagnostics: {
+    openDealsTotal: number;
+    unassignedOpenDeals: number;
+    /** `Lead.owner` preenchido mas que não corresponde a um `User.id` do tenant (ex.: nome livre). */
+    unresolvedOwnerOpenDeals: number;
+  };
+  recommendations: RebalanceRecommendationV2[];
+}
+
+// ---------------------------------------------------------------------------------------------
+// What-If V2 (Agente 04) — POST /api/commercial-intelligence/predictive/what-if
+// Identidade receita = volume × winRate × ticket; sem multiplicadores/elasticidades ocultos.
+// ---------------------------------------------------------------------------------------------
+export interface WhatIfLeversV2 {
+  /** Variação % no volume de negócios encerrados (ganhos+perdidos). -100..500. */
+  pipelineVolumeDeltaPercent: number;
+  /** Variação em PONTOS PERCENTUAIS na taxa de ganho. -100..100. */
+  winRateDeltaPp: number;
+  /** Variação % no ticket médio dos ganhos. -100..500. */
+  avgTicketDeltaPercent: number;
+}
+
+export interface WhatIfRequestV2 {
+  horizonDays: RevenueHorizonDays;
+  name?: string;
+  levers: Partial<WhatIfLeversV2>;
+}
+
+export interface WhatIfBaselineV2 {
+  /** P50 do Oracle para o horizonte (receita ganha real em janelas móveis). */
+  revenue: number;
+  closedDeals: number;
+  wonDeals: number;
+  /** wonDeals ÷ closedDeals (0..1) no lookback. */
+  winRate: number;
+  /** Receita ganha ÷ wonDeals no lookback. */
+  avgTicket: number;
+  lookbackMonths: number;
+  sampleWindows: number;
+}
+
+export interface WhatIfResultV2 {
+  status: OracleDataStatus;
+  insufficientDataReason: string | null;
+  name: string | null;
+  horizonDays: RevenueHorizonDays;
+  levers: WhatIfLeversV2;
+  baseline: WhatIfBaselineV2 | null;
+  result: {
+    simulatedRevenue: number;
+    netRevenueDelta: number;
+    deltaPercent: number;
+    factors: { volume: number; winRate: number; ticket: number };
+    simulatedWinRate: number;
+    simulatedAvgTicket: number;
+    /** Decomposição sequencial (volume → winRate → ticket); soma = netRevenueDelta. */
+    breakdown: { volumeImpact: number; winRateImpact: number; ticketImpact: number };
+  } | null;
+  formula: string;
+  assumptions: string[];
+  simulatedAt: string;
+}

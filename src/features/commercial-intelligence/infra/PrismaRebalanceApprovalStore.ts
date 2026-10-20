@@ -16,6 +16,11 @@ export class PrismaRebalanceApprovalStore implements RebalanceApprovalStore {
     return n > 0;
   }
 
+  async ownerIsOrgUser(organizationId: string, userId: string): Promise<boolean> {
+    const n = await prisma.user.count({ where: { id: userId, organizationId } });
+    return n > 0;
+  }
+
   async findByRecommendation(
     organizationId: string,
     recommendationId: string,

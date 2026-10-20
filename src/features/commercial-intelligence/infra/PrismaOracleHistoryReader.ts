@@ -25,10 +25,10 @@ type Row = {
   pipelineStage: { isWon: boolean; isLost: boolean } | null;
 };
 
-function isWon(r: Row): boolean {
+export function isWon(r: Pick<Row, 'status' | 'pipelineStage'>): boolean {
   return r.pipelineStage ? r.pipelineStage.isWon : FALLBACK_WON_STATUSES.has(r.status);
 }
-function isLost(r: Row): boolean {
+export function isLost(r: Pick<Row, 'status' | 'pipelineStage'>): boolean {
   return r.pipelineStage ? r.pipelineStage.isLost : FALLBACK_LOST_STATUSES.has(r.status);
 }
 

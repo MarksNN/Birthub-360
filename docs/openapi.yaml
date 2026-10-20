@@ -6877,7 +6877,69 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '422':
-          description: Payload inválido (Zod) — `details` traz fieldErrors
+          description: Payload inválido (Zod) — `details` traz fieldErrors — ou `toOwner` não é `User.id` desta organização
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+  /commercial-intelligence/predictive/rebalance/recommendations:
+    get:
+      tags: [Comercial Inteligente]
+      summary: Recomendações de rebalanceamento calculadas da carteira real do tenant (não altera o CRM) — somente ADMIN/GESTOR
+      description: |
+        Regra (rebalanceRecommendation.service.ts): backlogDays = abertos ÷ (encerrados em 90d ÷ 90)
+        por owner (`Lead.owner` = `User.id` do tenant, ≥ 3 encerrados em 90d). Doador: backlogDays >
+        1,5 × mediana e ≥ 5 abertos; receptor: backlogDays após receber ≤ mediana. Move os negócios
+        abertos mais antigos, até 5 por doador. Menos de 2 owners elegíveis → `status: insufficient_data`
+        e `recommendations: []`. `recommendationId` é determinístico (hash de tenant, lead, from, to) e
+        os ids devolvidos são exatamente os aceitos por POST /rebalance/approvals; decisões já gravadas
+        aparecem em `decision`/`approvalStatus`.
+      responses:
+        '200':
+          description: OK (inclusive insufficient_data)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RebalanceRecommendationsEnvelope' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /commercial-intelligence/predictive/what-if:
+    post:
+      tags: [Comercial Inteligente]
+      summary: Simulação What-If determinística sobre a baseline real do Revenue Oracle — somente ADMIN/GESTOR
+      description: |
+        simulada = baseline.revenue × (1 + pipelineVolumeDeltaPercent/100) × ((winRate + winRateDeltaPp/100) / winRate)
+        × (1 + avgTicketDeltaPercent/100). baseline.revenue = P50 do Oracle no horizonte; winRate e ticket
+        médio dos encerrados do funil Negócio nos últimos 24 meses. Sem elasticidades nem multiplicadores
+        ocultos. Sem baseline (ou < 10 encerrados) → `status: insufficient_data`, `baseline`/`result` null.
+        Schema Zod: `whatIfRequestSchema` (strict, inclusive `levers`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [horizonDays, levers]
+              properties:
+                horizonDays: { type: integer, enum: [30, 90, 180] }
+                name: { type: string, minLength: 1, maxLength: 120 }
+                levers:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    pipelineVolumeDeltaPercent: { type: number, minimum: -100, maximum: 500 }
+                    winRateDeltaPp:
+                      { type: number, minimum: -100, maximum: 100, description: 'Pontos percentuais; winRate resultante deve ficar em 0..100%' }
+                    avgTicketDeltaPercent: { type: number, minimum: -100, maximum: 500 }
+      responses:
+        '200':
+          description: OK (inclusive insufficient_data)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WhatIfEnvelope' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422':
+          description: Payload inválido (Zod) ou winRate resultante fora de 0..100% — `details` traz fieldErrors
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -11296,6 +11358,126 @@ components:
                 toOwner: { type: string }
                 decision: { type: string, enum: [APPROVED, REJECTED] }
                 note: { type: string }
+    RebalanceOwnerStats:
+      type: object
+      required: [id, name, openDeals, closedInWindow, backlogDays]
+      properties:
+        id: { type: string, description: User.id (= Lead.owner) }
+        name: { type: string }
+        openDeals: { type: integer }
+        closedInWindow: { type: integer }
+        backlogDays: { type: number }
+    RebalanceRecommendationsEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, enum: [true] }
+        data:
+          type: object
+          required: [status, insufficientDataReason, generatedAt, rule, teamMedianBacklogDays, owners, diagnostics, recommendations]
+          properties:
+            status: { type: string, enum: [ok, insufficient_data] }
+            insufficientDataReason: { type: string, nullable: true }
+            generatedAt: { type: string, format: date-time }
+            rule:
+              type: object
+              properties:
+                description: { type: string }
+                throughputWindowDays: { type: integer }
+                minOwners: { type: integer }
+                minClosedPerOwner: { type: integer }
+                overloadRatio: { type: number }
+                minOpenDealsToDonate: { type: integer }
+                maxMovesPerOwner: { type: integer }
+            teamMedianBacklogDays: { type: number, nullable: true }
+            owners: { type: array, items: { $ref: '#/components/schemas/RebalanceOwnerStats' } }
+            diagnostics:
+              type: object
+              properties:
+                openDealsTotal: { type: integer }
+                unassignedOpenDeals: { type: integer }
+                unresolvedOwnerOpenDeals: { type: integer }
+            recommendations:
+              type: array
+              items:
+                type: object
+                required: [recommendationId, leadId, leadTitle, account, amount, fromOwner, toOwner, reason, evidence, approvalStatus, decision]
+                properties:
+                  recommendationId: { type: string }
+                  leadId: { type: string }
+                  leadTitle: { type: string, nullable: true }
+                  account:
+                    type: object
+                    properties:
+                      companyId: { type: string, nullable: true }
+                      name: { type: string, nullable: true }
+                  amount: { type: number, nullable: true }
+                  fromOwner: { type: object, properties: { id: { type: string }, name: { type: string } } }
+                  toOwner: { type: object, properties: { id: { type: string }, name: { type: string } } }
+                  reason: { type: string }
+                  evidence:
+                    type: object
+                    properties:
+                      from: { $ref: '#/components/schemas/RebalanceOwnerStats' }
+                      to: { $ref: '#/components/schemas/RebalanceOwnerStats' }
+                      teamMedianBacklogDays: { type: number }
+                      dealOpenSinceDays: { type: integer }
+                  approvalStatus: { type: string, enum: [PENDING_HUMAN_REVIEW, APPROVED, REJECTED] }
+                  decision:
+                    nullable: true
+                    description: Registro de POST /rebalance/approvals (mesmo shape de RebalanceApprovalEnvelope.data.approval)
+                    type: object
+    WhatIfEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, enum: [true] }
+        data:
+          type: object
+          required: [status, insufficientDataReason, name, horizonDays, levers, baseline, result, formula, assumptions, simulatedAt]
+          properties:
+            status: { type: string, enum: [ok, insufficient_data] }
+            insufficientDataReason: { type: string, nullable: true }
+            name: { type: string, nullable: true }
+            horizonDays: { type: integer, enum: [30, 90, 180] }
+            levers:
+              type: object
+              properties:
+                pipelineVolumeDeltaPercent: { type: number }
+                winRateDeltaPp: { type: number }
+                avgTicketDeltaPercent: { type: number }
+            baseline:
+              type: object
+              nullable: true
+              properties:
+                revenue: { type: number }
+                closedDeals: { type: integer }
+                wonDeals: { type: integer }
+                winRate: { type: number }
+                avgTicket: { type: number }
+                lookbackMonths: { type: integer }
+                sampleWindows: { type: integer }
+            result:
+              type: object
+              nullable: true
+              properties:
+                simulatedRevenue: { type: number }
+                netRevenueDelta: { type: number }
+                deltaPercent: { type: number }
+                factors:
+                  type: object
+                  properties: { volume: { type: number }, winRate: { type: number }, ticket: { type: number } }
+                simulatedWinRate: { type: number }
+                simulatedAvgTicket: { type: number }
+                breakdown:
+                  type: object
+                  properties:
+                    volumeImpact: { type: number }
+                    winRateImpact: { type: number }
+                    ticketImpact: { type: number }
+            formula: { type: string }
+            assumptions: { type: array, items: { type: string } }
+            simulatedAt: { type: string, format: date-time }
     DataEnvelope:
       type: object
       description: Envelope de resposta genérico usado pela maioria dos endpoints
