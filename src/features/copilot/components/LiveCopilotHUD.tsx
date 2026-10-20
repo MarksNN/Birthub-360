@@ -131,7 +131,7 @@ export function LiveCopilotHUD({
     SoundFX.play('click');
     const fallbackActive = sessionState.toggleFallback();
     if (fallbackActive) {
-      toast.warning('Modo Bimodal pausado. Transição para STT/TTS Assíncrono ativada.');
+      toast.info('Modo Bimodal pausado. Transição para STT/TTS Assíncrono ativada.');
     } else {
       toast.success('Motor Bimodal Ultra-Low Latency WebRTC reativado.');
     }
