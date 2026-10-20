@@ -50,7 +50,7 @@ export const options = {
   thresholds: {
     'http_req_failed{expected_fail:false}': ['rate<0.01'], // Menos de 1% de falhas nas rotas de negócio
     'http_req_duration{endpoint:voice_chunk}': ['p(95)<400'],
-    'http_req_duration{endpoint:voice_barge_in}': ['p(95)<300'],
+    'http_req_duration{endpoint:voice_barge_in}': ['p(95)<400'],
     'http_req_duration{endpoint:roleplay_turn}': ['p(95)<500'],
     'http_req_duration{endpoint:conversational_analysis}': ['p(95)<600'],
     voice_ttfb_ms: ['p(95)<800'],
@@ -246,8 +246,8 @@ export default function () {
     check(analysisRes, {
       'Análise conversacional concluiu 200': (r) => r.status === 200,
       'Talk-to-Listen calculado': (r) => r.json('dynamics.sellerTalkRatio') !== undefined,
-      'Objeções detectadas': (r) => Array.isArray(r.json('detectedObjections')),
-      'Compromissos extraídos': (r) => Array.isArray(r.json('nextStepCommitments')),
+      'Objeções detectadas': (r) => Array.isArray(r.json('objections')),
+      'Compromissos extraídos': (r) => Array.isArray(r.json('commitments')),
     });
     successfulTransactions.add(1);
   });

@@ -89,9 +89,10 @@ async function run() {
 
       const httpReqs = getVal(metrics.http_reqs, 'count');
       const httpRate = typeof getVal(metrics.http_reqs, 'rate') === 'number' ? getVal(metrics.http_reqs, 'rate').toFixed(2) : 'N/A';
-      const failRate = typeof getVal(metrics.http_req_failed, 'val') === 'number'
-        ? (getVal(metrics.http_req_failed, 'val') * 100).toFixed(2)
-        : (typeof getVal(metrics.http_req_failed, 'rate') === 'number' ? (getVal(metrics.http_req_failed, 'rate') * 100).toFixed(2) : '0.00');
+      const failMetric = metrics['http_req_failed{expected_fail:false}'] || metrics.http_req_failed;
+      const failRate = typeof getVal(failMetric, 'val') === 'number'
+        ? (getVal(failMetric, 'val') * 100).toFixed(2)
+        : (typeof getVal(failMetric, 'rate') === 'number' ? (getVal(failMetric, 'rate') * 100).toFixed(2) : '0.00');
       const vusMax = getVal(metrics.vus_max, 'val') !== 'N/A' ? getVal(metrics.vus_max, 'val') : getVal(metrics.vus_max, 'max');
 
       console.log(`- Volume Total de Requisições: ${httpReqs}`);
