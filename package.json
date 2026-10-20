@@ -88,6 +88,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "release:check": "node scripts/release-gate.js",
+    "mobile:sync": "cap sync android",
+    "mobile:open": "cap open android",
     "typecheck": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
