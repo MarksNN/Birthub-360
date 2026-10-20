@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronDown, ChevronLeft, X } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { hasRequiredRole } from '../../lib/auth/authorization.js';
@@ -166,6 +166,7 @@ export function Sidebar({
     onToggleCollapse,
   });
   const isCollapsed = mobileOpen ? false : rawCollapsed;
+  const [popoverTop, setPopoverTop] = useState<number | null>(null);
 
   const { pathname } = useLocation();
   const appPath = currentAppPath(pathname);
@@ -191,10 +192,10 @@ export function Sidebar({
       {launch && <NavLaunchTransition launch={launch} onFinish={finishLaunch} />}
 
       <aside
-        className={`relative z-30 flex h-full flex-col bg-slate-50/90 dark:bg-[#0b1120]/95 backdrop-blur-xl font-sans text-ink select-none ${
+        className={`relative z-30 flex h-full flex-col bg-white/95 dark:bg-[#0c121e]/95 backdrop-blur-2xl font-sans text-ink select-none ${
           mobileOpen
             ? 'w-full'
-            : `hidden border-r border-slate-200/80 dark:border-slate-800/80 shadow-nav lg:flex motion-safe:transition-[width] motion-safe:duration-200 motion-safe:ease-out ${
+            : `hidden border-r border-slate-200/80 dark:border-slate-800/80 shadow-[4px_0_24px_rgba(0,0,0,0.03)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.25)] lg:flex motion-safe:transition-[width] motion-safe:duration-200 motion-safe:ease-out ${
                 isCollapsed ? 'w-[4.5rem]' : 'w-[17.5rem]'
               }`
         }`}
@@ -205,7 +206,13 @@ export function Sidebar({
             isCollapsed ? 'justify-center px-2' : 'justify-between gap-2 px-3.5'
           }`}
         >
-          <div className="flex min-w-0 items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => openTab('dashboard')}
+            className={`flex min-w-0 items-center gap-2.5 text-left rounded-xl p-1 transition-all ${FOCUS_RING} hover:opacity-95`}
+            title="Birth Hub 360° — Ir para Visão Geral"
+            aria-label="Birth Hub 360° — Ir para Visão Geral"
+          >
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-sm transition-transform duration-200 hover:scale-105">
               <BirthHubLogo
                 variant="mark"
@@ -221,12 +228,16 @@ export function Sidebar({
                     360°
                   </span>
                 </div>
-                <div className="mt-1 truncate font-mono text-[9.5px] font-bold uppercase tracking-wider text-[#0284c7] dark:text-[#00D4FF]">
-                  Revenue Intelligence
+                <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-[9.5px] font-bold uppercase tracking-wider text-[#0284c7] dark:text-[#00D4FF]">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full bg-[#00D4FF] animate-pulse"
+                    aria-hidden="true"
+                  />
+                  <span>Revenue Intelligence</span>
                 </div>
               </div>
             )}
-          </div>
+          </button>
 
           {mobileOpen ? (
             <button
@@ -269,29 +280,38 @@ export function Sidebar({
 
         <div
           aria-hidden="true"
-          className={`h-px shrink-0 bg-line ${isCollapsed ? 'mx-3' : 'mx-4'}`}
+          className={`h-px shrink-0 bg-slate-200/80 dark:bg-slate-800/80 ${isCollapsed ? 'mx-3' : 'mx-4'}`}
         />
 
         <nav
-          className={`flex-1 overflow-y-auto py-3 [scrollbar-color:color-mix(in_srgb,var(--ink)_28%,transparent)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-line ${
+          className={`sidebar-scroll-container flex-1 overflow-y-auto py-3 ${
             isCollapsed ? 'space-y-3 px-2' : 'space-y-4 px-3'
           }`}
         >
           {navSections.map((section) => {
             const sectionBadge = getSectionBadgeStyle(section.title);
             return (
-              <div key={section.title} className={isCollapsed ? 'space-y-1.5' : 'space-y-1.5'}>
+              <div key={section.title} className="space-y-1.5">
                 {!isCollapsed ? (
-                  <div className="px-1 pt-1 pb-1">
+                  <div className="flex items-center gap-2 px-1 pt-1.5 pb-1">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold uppercase tracking-wider border ${sectionBadge.bg} ${sectionBadge.border} ${sectionBadge.text}`}
                     >
-                      <span className={`h-1.5 w-1.5 rounded-full ${sectionBadge.dot}`} />
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${sectionBadge.dot} shadow-[0_0_6px_currentColor]`}
+                      />
                       {section.title}
                     </span>
+                    <div
+                      className="flex-1 h-px bg-slate-200/60 dark:bg-slate-800/60"
+                      aria-hidden="true"
+                    />
                   </div>
                 ) : (
-                  <div className="mx-auto my-1.5 h-px w-5 bg-line" aria-hidden="true" />
+                  <div
+                    className="mx-auto my-1.5 h-px w-5 bg-slate-300/80 dark:bg-slate-700/80"
+                    aria-hidden="true"
+                  />
                 )}
 
                 {section.groups.map((group) => {
@@ -315,8 +335,19 @@ export function Sidebar({
                       key={group.id}
                       aria-label={group.label}
                       className="relative"
-                      onMouseEnter={() => isCollapsed && setHoveredGroupId(group.id)}
-                      onMouseLeave={() => isCollapsed && setHoveredGroupId(null)}
+                      onMouseEnter={(e) => {
+                        if (isCollapsed) {
+                          setHoveredGroupId(group.id);
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setPopoverTop(rect.top);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (isCollapsed) {
+                          setHoveredGroupId(null);
+                          setPopoverTop(null);
+                        }
+                      }}
                     >
                       <button
                         type="button"
@@ -331,7 +362,7 @@ export function Sidebar({
                         className={`${ITEM} ${
                           isCollapsed
                             ? 'h-10 justify-center px-0'
-                            : 'h-10 justify-between gap-1.5 pr-2.5 pl-1.5'
+                            : 'h-10 justify-between gap-1.5 pr-2.5 pl-2'
                         } ${cardStyleClass}`}
                         aria-label={group.ariaLabel || group.label}
                         aria-current={isActive && !hasSubItems ? 'page' : undefined}
@@ -339,6 +370,21 @@ export function Sidebar({
                         title={isCollapsed ? group.label : undefined}
                         data-testid={`sidebar-nav-${group.id}`}
                       >
+                        {isActive && (
+                          <span
+                            aria-hidden="true"
+                            className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${
+                              accent === 'cyan'
+                                ? 'bg-[#00D4FF] shadow-[0_0_8px_#00D4FF]'
+                                : accent === 'gold'
+                                  ? 'bg-[#F59E0B] shadow-[0_0_8px_#F59E0B]'
+                                  : accent === 'pink'
+                                    ? 'bg-[#FF2D9B] shadow-[0_0_8px_#FF2D9B]'
+                                    : 'bg-[#8B7DFF] shadow-[0_0_8px_#8B7DFF]'
+                            }`}
+                          />
+                        )}
+
                         <span className="flex min-w-0 items-center gap-2">
                           <span
                             data-nav-icon
@@ -352,7 +398,7 @@ export function Sidebar({
                             <span
                               className={`truncate font-sans text-[13px] tracking-[-0.012em] ${
                                 isActive
-                                  ? 'font-bold text-slate-900 dark:text-white'
+                                  ? 'font-bold text-slate-950 dark:text-white'
                                   : 'font-medium text-slate-700 dark:text-slate-300'
                               }`}
                             >
@@ -387,7 +433,7 @@ export function Sidebar({
                                 key={(subItem.path ?? subItem.tab) + subItem.label}
                                 type="button"
                                 onClick={(e) => selectTab(subItem.tab, e, subItem.path)}
-                                className={`flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
+                                className={`group/sub flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
                                   isSubActive
                                     ? accent === 'cyan'
                                       ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] font-semibold shadow-sm'
@@ -401,6 +447,14 @@ export function Sidebar({
                                 aria-current={isSubActive ? 'page' : undefined}
                                 data-testid={`sidebar-sub-${subItem.path ?? subItem.tab}`}
                               >
+                                <span
+                                  className={`mr-2 h-1.5 w-1.5 shrink-0 rounded-full transition-colors ${
+                                    isSubActive
+                                      ? 'bg-current shadow-[0_0_6px_currentColor]'
+                                      : 'bg-slate-300 dark:bg-slate-600 group-hover/sub:bg-slate-400'
+                                  }`}
+                                  aria-hidden="true"
+                                />
                                 <span className="truncate">{subItem.label}</span>
                               </button>
                             );
@@ -409,10 +463,15 @@ export function Sidebar({
                       )}
 
                       {isCollapsed && hoveredGroupId === group.id && (
-                        <div className="sidebar-rail-popover-card fixed left-[4.5rem] z-50 ml-2 min-w-[13.5rem] p-2">
+                        <div
+                          className="sidebar-rail-popover-card fixed left-[4.75rem] z-50 ml-1 min-w-[14rem] p-2"
+                          style={{ top: popoverTop !== null ? `${popoverTop}px` : undefined }}
+                        >
                           <div className="flex items-center gap-1.5 px-2.5 pt-1 pb-1.5">
-                            <span className={`h-1.5 w-1.5 rounded-full ${sectionBadge.dot}`} />
-                            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${sectionBadge.dot} shadow-[0_0_6px_currentColor]`}
+                            />
+                            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
                               {group.label}
                             </p>
                           </div>
@@ -432,6 +491,7 @@ export function Sidebar({
                                     onClick={(e) => {
                                       selectTab(sub.tab, e, sub.path);
                                       setHoveredGroupId(null);
+                                      setPopoverTop(null);
                                     }}
                                     className={`flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
                                       isSubActive
@@ -452,6 +512,7 @@ export function Sidebar({
                                   if (group.primaryTab) {
                                     selectTab(group.primaryTab, e);
                                     setHoveredGroupId(null);
+                                    setPopoverTop(null);
                                   }
                                 }}
                                 className={`flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-all ${FOCUS_RING}`}
@@ -471,7 +532,7 @@ export function Sidebar({
         </nav>
 
         <div className={`shrink-0 ${isCollapsed ? 'px-2 pt-2 pb-3' : 'px-3 pt-2 pb-3'}`}>
-          <div aria-hidden="true" className="mb-2 h-px bg-line" />
+          <div aria-hidden="true" className="mb-2 h-px bg-slate-200/80 dark:bg-slate-800/80" />
           {!isCollapsed ? (
             <div className="sidebar-footer-card p-2.5">
               <button

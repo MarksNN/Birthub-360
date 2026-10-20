@@ -9,6 +9,7 @@ import { recordOptOut } from '../../cadence/application/optOutService.js';
 import { prismaOptOutRepository } from '../../cadence/infra/PrismaOptOutRepository.js';
 import { isOptOutKeyword } from '../../../shared/services/optOutCheck.service.js';
 import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
+import type { WhatsAppMessageEventPayload } from '../../../shared/contracts/domainEventMesh.contract.js';
 
 /** Grupos (`@g.us`) e o próprio status (`status@broadcast`) não correspondem a um contato do CRM. */
 function isIndividualChat(remoteJid: string | null | undefined): boolean {
@@ -139,6 +140,30 @@ export async function persistWhatsAppMessage(input: PersistWhatsAppMessageInput)
       leadId: lead?.id,
     },
   });
+
+  // Emissão de evento canônico de WhatsApp no DomainEventMesh
+  const waEventType = input.direction === 'inbound' ? 'WHATSAPP_MESSAGE_RECEIVED' : 'WHATSAPP_MESSAGE_SENT';
+  await domainEventMesh
+    .publish<WhatsAppMessageEventPayload>({
+      eventType: waEventType,
+      eventVersion: '1.0.0',
+      organizationId: input.organizationId,
+      correlationId: `wa-${input.waMessageId}`,
+      producer: 'integrations.whatsapp',
+      aggregateId: lead?.id || contact?.id || phoneE164,
+      payload: {
+        waMessageId: input.waMessageId,
+        phoneE164,
+        body: input.body,
+        direction: input.direction,
+        contactId: contact?.id ?? null,
+        leadId: lead?.id ?? null,
+        remoteJid: input.remoteJid,
+      },
+    })
+    .catch((err) => {
+      logger.warn({ err, waMessageId: input.waMessageId }, 'Falha ao emitir evento de WhatsApp no domainEventMesh');
+    });
 
   if (lead && input.direction === 'inbound') {
     if (isOptOutKeyword(input.body)) {

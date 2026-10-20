@@ -72,6 +72,7 @@ import { FeatureFlagsController } from '../../features/feature-flags/presentatio
 // `GoogleCalendarService` logo acima.
 import { callLead } from '../../features/integrations/birth-voice/birthVoice.service.js';
 import { BitrixLeadWritebackAdapter } from '../../features/integrations/bitrix/infra/BitrixLeadWritebackAdapter.js';
+import { bitrixEventMeshBridge } from '../../features/integrations/bitrix/services/bitrixEventMeshBridge.service.js';
 import { testBitrixConnection } from '../../features/integrations/bitrix/service/connections.js';
 // Meeting Hub (Google Meet no agendamento público) — mesmo motivo do comentário da Onda 43 acima:
 // `src/features/calendar/routes/booking.routes.ts` não pode importar

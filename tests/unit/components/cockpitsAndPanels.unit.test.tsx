@@ -67,21 +67,21 @@ describe('Cockpits e Painéis Operacionais (Opção 1)', () => {
     it('renderiza intervalos de confiança P10, P50 e P90 e horizontes temporais', () => {
       render(<PredictiveRevenueCockpit />);
 
-      expect(screen.getByText(/Cockpit Preditivo de Receita \(P10 \/ P50 \/ P90\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/P10 • Cenário Conservador/i)).toBeInTheDocument();
-      expect(screen.getByText(/P50 • Cenário Esperado/i)).toBeInTheDocument();
-      expect(screen.getByText(/P90 • Cenário Otimista/i)).toBeInTheDocument();
+      expect(screen.getByText(/Cockpit de Forecast Preditivo/i)).toBeInTheDocument();
+      expect(screen.getByText(/P10 · Conservador/i)).toBeInTheDocument();
+      expect(screen.getByText(/P50 · Cenário Base \(Mediana\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/P90 · Otimista/i)).toBeInTheDocument();
       expect(screen.getByText(/Simulação Dinâmica de Cenários \(What-If\)/i)).toBeInTheDocument();
     });
 
     it('permite alternar o horizonte temporal para 30 ou 180 dias', () => {
       render(<PredictiveRevenueCockpit />);
 
-      const btn30 = screen.getByText('30 Dias');
+      const btn30 = screen.getByText(/Horizonte 30d/i);
       fireEvent.click(btn30);
       expect(btn30).toBeInTheDocument();
 
-      const btn180 = screen.getByText('180 Dias');
+      const btn180 = screen.getByText(/Horizonte 180d/i);
       fireEvent.click(btn180);
       expect(btn180).toBeInTheDocument();
     });

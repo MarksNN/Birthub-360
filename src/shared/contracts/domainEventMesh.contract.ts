@@ -57,7 +57,11 @@ export type DomainEventType =
   | 'CONVERSATIONAL_COACHING_EVALUATED'
   | 'REALTIME_COACHING_HINT_EMITTED'
   | 'WORKLOAD_RECOMMENDATION_TRIGGERED'
-  | 'MICRO_TRAINING_COMPLETED';
+  | 'MICRO_TRAINING_COMPLETED'
+  | 'WHATSAPP_MESSAGE_RECEIVED'
+  | 'WHATSAPP_MESSAGE_SENT'
+  | 'BITRIX_WEBHOOK_RECEIVED'
+  | 'BITRIX_STAGE_SYNCHRONIZED';
 
 export interface DomainEventEnvelope<T = Record<string, unknown>> {
   eventId: string;
@@ -91,3 +95,25 @@ export interface IDomainEventMeshPort {
     handler: (event: DomainEventEnvelope) => Promise<void>,
   ): void;
 }
+
+export interface WhatsAppMessageEventPayload {
+  waMessageId: string;
+  phoneE164: string;
+  body: string | null;
+  direction: 'inbound' | 'outbound';
+  contactId?: string | null;
+  leadId?: string | null;
+  remoteJid?: string | null;
+}
+
+export interface BitrixWebhookEventPayload {
+  connectionId: string;
+  eventType: string;
+  bitrixRecordId: string;
+  entityType: 'lead' | 'deal';
+  leadId?: string | null;
+  stageId?: string;
+  qualification?: Record<string, unknown>;
+  leadFields?: Record<string, unknown>;
+}
+

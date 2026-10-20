@@ -14,6 +14,7 @@ import { callBitrix } from './service/client.js';
 import { applyInboundCustomFields, resolveEnumMaps } from './service/customFields.js';
 import { bitrixSyncFailuresTotal } from './service/metrics.js';
 import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
+import type { BitrixWebhookEventPayload } from '../../../shared/contracts/domainEventMesh.contract.js';
 
 // ── Webhook de ENTRADA (Bitrix → Atlas, "исходящий вебхук" no admin do portal) ──────────────────
 //
@@ -159,6 +160,32 @@ async function processEvent(
       });
 
       // Onda 05 - Opção 3: Publicação em tempo real no domainEventMesh para disparar agentes e workflows
+      await domainEventMesh
+        .publish<BitrixWebhookEventPayload>({
+          eventType: 'BITRIX_WEBHOOK_RECEIVED',
+          eventVersion: '1.0.0',
+          organizationId,
+          correlationId: `bitrix-inbound-${bitrixRecordId}-${Date.now()}`,
+          producer: 'bitrix-webhook-service',
+          aggregateId: lead.id,
+          payload: {
+            connectionId,
+            eventType,
+            entityType: spec.entity,
+            bitrixRecordId,
+            leadId: lead.id,
+            stageId,
+            qualification,
+            leadFields,
+          },
+        })
+        .catch((meshErr) => {
+          logger.warn(
+            { meshErr, leadId: lead.id },
+            '[bitrix] Falha ao publicar BITRIX_WEBHOOK_RECEIVED no domainEventMesh',
+          );
+        });
+
       await domainEventMesh
         .publish({
           eventType: 'ENGAGEMENT_SIGNAL_RECEIVED',
