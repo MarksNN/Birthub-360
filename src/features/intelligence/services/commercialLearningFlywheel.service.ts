@@ -1,6 +1,36 @@
 import { randomUUID } from 'node:crypto';
 import type { FewShotCopyItem } from '../../../shared/contracts/dataFlywheel.contract.js';
 import { logger } from '../../../lib/logger.js';
+import { consentAuditChain } from '../../../lib/security/consentAuditChain.service.js';
+
+/**
+ * REMED-06 / Ajuste 1 — expurgo durável do Flywheel ao revogar consentimento.
+ * Delegates estruturais dos models `FlywheelApproachRecord` e `FlywheelFewShotExample`
+ * (ainda inexistentes no schema — handoff ao Agente 01). Exclusão física (deleteMany),
+ * nunca soft-delete: o texto da abordagem é dado pessoal derivado do titular.
+ */
+export interface FlywheelPersistencePurger {
+  $transaction<T>(fn: (tx: FlywheelPurgeTx) => Promise<T>): Promise<T>;
+}
+export interface FlywheelPurgeTx {
+  flywheelFewShotExample: {
+    deleteMany(args: {
+      where: { organizationId: string; leadId: string };
+    }): Promise<{ count: number }>;
+  };
+  flywheelApproachRecord: {
+    deleteMany(args: {
+      where: { organizationId: string; leadId: string };
+    }): Promise<{ count: number }>;
+  };
+}
+
+export interface FlywheelPurgeResult {
+  approachesPurged: number;
+  fewShotPurged: number;
+  persistedApproachesPurged: number;
+  persistedFewShotPurged: number;
+}
 
 export interface ApproachRecord {
   id: string;
@@ -16,6 +46,57 @@ export class CommercialLearningFlywheelService {
   private approaches: Map<string, ApproachRecord> = new Map();
   private curatedFewShotLibrary: Map<string, FewShotCopyItem> = new Map();
   private static ATTRIBUTION_WINDOW_DAYS = 30;
+
+  constructor(private readonly persistence?: FlywheelPersistencePurger) {}
+
+  /**
+   * Retração com expurgo real (Ajuste 1): remove abordagens e exemplos few-shot do titular
+   * na memória e, se houver persistência configurada, no PostgreSQL (mesma transação).
+   */
+  async purgeSubject(organizationId: string, leadId: string): Promise<FlywheelPurgeResult> {
+    if (!organizationId || !leadId) {
+      throw new Error('Tenancy violation: purgeSubject exige organizationId e leadId');
+    }
+    let persistedApproachesPurged = 0;
+    let persistedFewShotPurged = 0;
+    if (this.persistence) {
+      const where = { organizationId, leadId };
+      const res = await this.persistence.$transaction(async (tx) => {
+        const fs = await tx.flywheelFewShotExample.deleteMany({ where });
+        const ap = await tx.flywheelApproachRecord.deleteMany({ where });
+        return { fs: fs.count, ap: ap.count };
+      });
+      persistedApproachesPurged = res.ap;
+      persistedFewShotPurged = res.fs;
+    }
+
+    let approachesPurged = 0;
+    for (const [id, a] of this.approaches) {
+      if (a.organizationId === organizationId && a.leadId === leadId) {
+        this.approaches.delete(id);
+        approachesPurged++;
+      }
+    }
+    let fewShotPurged = 0;
+    for (const [id, f] of this.curatedFewShotLibrary) {
+      if (f.organizationId === organizationId && f.attributionEvidence?.leadId === leadId) {
+        this.curatedFewShotLibrary.delete(id);
+        fewShotPurged++;
+      }
+    }
+
+    logger.warn(
+      {
+        organizationId,
+        approachesPurged,
+        fewShotPurged,
+        persistedApproachesPurged,
+        persistedFewShotPurged,
+      },
+      'CommercialLearningFlywheel: expurgo do titular concluído (retração Ajuste 1)',
+    );
+    return { approachesPurged, fewShotPurged, persistedApproachesPurged, persistedFewShotPurged };
+  }
 
   /**
    * Registra uma abordagem comercial gerada e enviada para um lead com autorização.
@@ -167,3 +248,8 @@ export class CommercialLearningFlywheelService {
 }
 
 export const commercialLearningFlywheel = new CommercialLearningFlywheelService();
+
+// Revogação de consentimento (subjectRef = leadId) dispara expurgo no Flywheel.
+consentAuditChain.onRevocation((organizationId, subjectRef) =>
+  commercialLearningFlywheel.purgeSubject(organizationId, subjectRef),
+);

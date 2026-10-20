@@ -5,31 +5,155 @@ import type {
 } from '../../shared/contracts/consentAudit.contract.js';
 import { logger } from '../logger.js';
 
-const GENESIS_HASH = '0000000000000000000000000000000000000000000000000000000000000000';
+export const GENESIS_HASH = '0'.repeat(64);
 
-export class ConsentAuditChainService implements IConsentAuditChainPort {
-  // Ledger imutável em memória estruturado por tenant: organizationId -> ConsentAuditEvent[]
-  private tenantChains = new Map<string, ConsentAuditEvent[]>();
+/** Evento persistido: inclui a posição na cadeia do tenant (sequence 1..n). */
+export interface StoredConsentAuditEvent extends ConsentAuditEvent {
+  sequence: number;
+}
 
-  private calculateHash(event: Omit<ConsentAuditEvent, 'currentHash'>): string {
-    const raw = [
-      event.previousHash,
-      event.id,
-      event.organizationId,
-      event.subjectRef,
-      event.purpose,
-      event.termsVersion,
-      event.status,
-      event.occurredAt,
-      event.operatorUserId || '',
-    ].join(':');
+export interface ChainLockContext {
+  last: StoredConsentAuditEvent | null;
+  append: (event: StoredConsentAuditEvent) => Promise<void>;
+}
 
-    return createHash('sha256').update(raw).digest('hex');
+/**
+ * REMED-06 — Porta de persistência da cadeia. A implementação durável é
+ * `PrismaConsentAuditChainRepository` (PostgreSQL). A implementação em memória
+ * existe apenas para testes/ambientes sem banco.
+ */
+export interface ConsentAuditChainRepository {
+  /**
+   * Executa `fn` com exclusão mútua por tenant (no Postgres: transação + advisory lock),
+   * entregando o último elo atual da cadeia e um `append` dentro da mesma transação.
+   */
+  withTenantLock<T>(organizationId: string, fn: (ctx: ChainLockContext) => Promise<T>): Promise<T>;
+  /** Cadeia completa do tenant ordenada por `sequence` ascendente. */
+  listChain(organizationId: string): Promise<StoredConsentAuditEvent[]>;
+}
+
+export class InMemoryConsentAuditChainRepository implements ConsentAuditChainRepository {
+  private chains = new Map<string, StoredConsentAuditEvent[]>();
+  private locks = new Map<string, Promise<unknown>>();
+
+  async withTenantLock<T>(
+    organizationId: string,
+    fn: (ctx: ChainLockContext) => Promise<T>,
+  ): Promise<T> {
+    const prev = this.locks.get(organizationId) ?? Promise.resolve();
+    const run = prev.then(async () => {
+      const chain = this.chains.get(organizationId) ?? [];
+      return fn({
+        last: chain.at(-1) ?? null,
+        append: async (event) => {
+          chain.push({ ...event });
+          this.chains.set(organizationId, chain);
+        },
+      });
+    });
+    this.locks.set(
+      organizationId,
+      run.catch(() => undefined),
+    );
+    return run;
   }
 
-  /**
-   * Registra um evento de consentimento na trilha criptográfica encadeada (Append-only).
-   */
+  async listChain(organizationId: string): Promise<StoredConsentAuditEvent[]> {
+    return (this.chains.get(organizationId) ?? []).map((e) => ({ ...e }));
+  }
+
+  /** Somente testes: acesso direto ao armazenamento para simular adulteração. */
+  rawChain(organizationId: string): StoredConsentAuditEvent[] {
+    return this.chains.get(organizationId) ?? [];
+  }
+
+  clear(): void {
+    this.chains.clear();
+    this.locks.clear();
+  }
+}
+
+/** Formato canônico do conteúdo hasheado. Alterar exige versionamento da cadeia (handoff 15). */
+export function computeConsentEventHash(
+  event: Omit<StoredConsentAuditEvent, 'currentHash'> | Omit<ConsentAuditEvent, 'currentHash'>,
+): string {
+  const sequence = 'sequence' in event ? event.sequence : '';
+  const raw = JSON.stringify([
+    'consent-chain/v2',
+    sequence,
+    event.previousHash,
+    event.id,
+    event.organizationId,
+    event.subjectRef,
+    event.purpose,
+    event.termsVersion,
+    event.status,
+    event.occurredAt,
+    event.operatorUserId ?? '',
+    event.retentionUntil ?? '',
+  ]);
+  return createHash('sha256').update(raw).digest('hex');
+}
+
+export interface ChainVerificationResult {
+  valid: boolean;
+  totalRecords: number;
+  brokenAtId?: string;
+  reason?: 'SEQUENCE_GAP' | 'PREVIOUS_HASH_MISMATCH' | 'HASH_MISMATCH' | 'TENANT_MISMATCH';
+}
+
+/** Função pura de verificação da cadeia (reutilizável por job/endpoint de auditoria). */
+export function verifyConsentChain(
+  organizationId: string,
+  chain: StoredConsentAuditEvent[],
+): ChainVerificationResult {
+  let expectedPrev = GENESIS_HASH;
+  for (let i = 0; i < chain.length; i++) {
+    const r = chain[i];
+    const fail = (reason: ChainVerificationResult['reason']): ChainVerificationResult => {
+      logger.error(
+        { organizationId, recordId: r.id, index: i, reason },
+        'ConsentAuditChain: violação de integridade detectada',
+      );
+      return { valid: false, totalRecords: chain.length, brokenAtId: r.id, reason };
+    };
+    if (r.organizationId !== organizationId) return fail('TENANT_MISMATCH');
+    if (r.sequence !== i + 1) return fail('SEQUENCE_GAP');
+    if (r.previousHash !== expectedPrev) return fail('PREVIOUS_HASH_MISMATCH');
+    const { currentHash, ...content } = r;
+    if (computeConsentEventHash(content) !== currentHash) return fail('HASH_MISMATCH');
+    expectedPrev = currentHash;
+  }
+  return { valid: true, totalRecords: chain.length };
+}
+
+export class ConsentAuditChainService implements IConsentAuditChainPort {
+  constructor(
+    private readonly repo: ConsentAuditChainRepository = new InMemoryConsentAuditChainRepository(),
+  ) {}
+
+  private assertTenant(organizationId: string): void {
+    if (!organizationId || organizationId.trim() === '') {
+      throw new Error('Tenancy violation: ConsentAuditChain exige organizationId');
+    }
+  }
+
+  private async append(
+    organizationId: string,
+    build: (seq: number, previousHash: string) => Omit<StoredConsentAuditEvent, 'currentHash'>,
+  ): Promise<StoredConsentAuditEvent> {
+    return this.repo.withTenantLock(organizationId, async ({ last, append }) => {
+      const partial = build((last?.sequence ?? 0) + 1, last?.currentHash ?? GENESIS_HASH);
+      const event: StoredConsentAuditEvent = {
+        ...partial,
+        currentHash: computeConsentEventHash(partial),
+      };
+      await append(event);
+      return event;
+    });
+  }
+
+  /** Registra consentimento na trilha encadeada (append-only, durável via repositório). */
   async recordConsent(input: {
     organizationId: string;
     subjectRef: string;
@@ -38,163 +162,76 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
     operatorUserId?: string;
     retentionDays?: number;
   }): Promise<ConsentAuditEvent> {
-    if (!input.organizationId || input.organizationId.trim() === '') {
-      throw new Error('Tenancy violation: ConsentAuditChain exige organizationId');
-    }
-
-    const chain = this.tenantChains.get(input.organizationId) || [];
-    const previousHash = chain.length > 0 ? chain[chain.length - 1].currentHash : GENESIS_HASH;
-
-    const id = `cst-${randomUUID()}`;
-    const occurredAt = new Date().toISOString();
-
-    const retentionUntil = input.retentionDays
-      ? new Date(Date.now() + input.retentionDays * 24 * 60 * 60 * 1000).toISOString()
-      : undefined;
-
-    const partialEvent: Omit<ConsentAuditEvent, 'currentHash'> = {
-      id,
+    this.assertTenant(input.organizationId);
+    const event = await this.append(input.organizationId, (sequence, previousHash) => ({
+      id: `cst-${randomUUID()}`,
+      sequence,
       organizationId: input.organizationId,
       subjectRef: input.subjectRef,
       purpose: input.purpose,
       termsVersion: input.termsVersion,
       previousHash,
-      occurredAt,
+      occurredAt: new Date().toISOString(),
       operatorUserId: input.operatorUserId,
       status: 'GRANTED',
-      retentionUntil,
-    };
-
-    const currentHash = this.calculateHash(partialEvent);
-    const event: ConsentAuditEvent = {
-      ...partialEvent,
-      currentHash,
-    };
-
-    chain.push(event);
-    this.tenantChains.set(input.organizationId, chain);
-
+      retentionUntil: input.retentionDays
+        ? new Date(Date.now() + input.retentionDays * 86_400_000).toISOString()
+        : undefined,
+    }));
     logger.info(
-      {
-        id: event.id,
-        organizationId: event.organizationId,
-        subjectRef: event.subjectRef,
-        purpose: event.purpose,
-        currentHash,
-        chainLength: chain.length,
-      },
-      'ConsentAuditChain: Consentimento registrado e selado criptograficamente na cadeia',
+      { id: event.id, organizationId: event.organizationId, sequence: event.sequence },
+      'ConsentAuditChain: consentimento registrado e selado na cadeia',
     );
-
     return event;
   }
 
-  /**
-   * Registra a revogação formal de consentimento (Direito do Titular LGPD).
-   */
+  /** Revogação formal (direito do titular). Dispara retração nos consumidores registrados. */
   async revokeConsent(
     organizationId: string,
     subjectRef: string,
     reason: string,
     operatorUserId?: string,
   ): Promise<ConsentAuditEvent> {
-    if (!organizationId) {
-      throw new Error('Tenancy violation: ConsentAuditChain exige organizationId');
-    }
-
-    const chain = this.tenantChains.get(organizationId) || [];
-    const previousHash = chain.length > 0 ? chain[chain.length - 1].currentHash : GENESIS_HASH;
-
-    const id = `rev-${randomUUID()}`;
-    const occurredAt = new Date().toISOString();
-
-    const partialEvent: Omit<ConsentAuditEvent, 'currentHash'> = {
-      id,
+    this.assertTenant(organizationId);
+    const event = await this.append(organizationId, (sequence, previousHash) => ({
+      id: `rev-${randomUUID()}`,
+      sequence,
       organizationId,
       subjectRef,
       purpose: `REVOCATION: ${reason}`,
       termsVersion: 'REVOKED',
       previousHash,
-      occurredAt,
+      occurredAt: new Date().toISOString(),
       operatorUserId,
       status: 'REVOKED',
-    };
-
-    const currentHash = this.calculateHash(partialEvent);
-    const event: ConsentAuditEvent = {
-      ...partialEvent,
-      currentHash,
-    };
-
-    chain.push(event);
-    this.tenantChains.set(organizationId, chain);
-
+    }));
     logger.warn(
-      {
-        id: event.id,
-        organizationId,
-        subjectRef,
-        reason,
-        currentHash,
-      },
-      'ConsentAuditChain: Consentimento REVOGADO com registro indelével na cadeia de blocos',
+      { id: event.id, organizationId, sequence: event.sequence },
+      'ConsentAuditChain: consentimento REVOGADO registrado na cadeia',
     );
-
+    for (const listener of this.revocationListeners) {
+      await listener(organizationId, subjectRef);
+    }
     return event;
   }
 
-  /**
-   * Verifica a integridade completa da cadeia do tenant, recalculando cada hash.
-   * Detecta qualquer tentativa de adulteração de registro anterior.
-   */
-  async verifyChainIntegrity(organizationId: string): Promise<{
-    valid: boolean;
-    totalRecords: number;
-    brokenAtId?: string;
-  }> {
-    const chain = this.tenantChains.get(organizationId) || [];
+  private revocationListeners: Array<
+    (organizationId: string, subjectRef: string) => Promise<unknown>
+  > = [];
 
-    if (chain.length === 0) {
-      return { valid: true, totalRecords: 0 };
-    }
-
-    let expectedPreviousHash = GENESIS_HASH;
-
-    for (let i = 0; i < chain.length; i++) {
-      const record = chain[i];
-
-      // 1. O previousHash deve bater com o currentHash do registro anterior
-      if (record.previousHash !== expectedPreviousHash) {
-        logger.error(
-          { organizationId, recordId: record.id, index: i },
-          'ConsentAuditChain: Violação de integridade detectada! Elo anterior quebrado.',
-        );
-        return { valid: false, totalRecords: chain.length, brokenAtId: record.id };
-      }
-
-      // 2. O currentHash deve ser o hash criptográfico exato do conteúdo
-      const { currentHash, ...content } = record;
-      const recalculated = this.calculateHash(content);
-      if (recalculated !== record.currentHash) {
-        logger.error(
-          { organizationId, recordId: record.id, recalculated, stored: record.currentHash },
-          'ConsentAuditChain: Violação de integridade detectada! Hash recalculado divergente do armazenado.',
-        );
-        return { valid: false, totalRecords: chain.length, brokenAtId: record.id };
-      }
-
-      expectedPreviousHash = record.currentHash;
-    }
-
-    return { valid: true, totalRecords: chain.length };
+  /** Consumidores (ex.: Flywheel) que precisam expurgar dados ao revogar consentimento. */
+  onRevocation(listener: (organizationId: string, subjectRef: string) => Promise<unknown>): void {
+    this.revocationListeners.push(listener);
   }
 
-  getChain(organizationId: string): ConsentAuditEvent[] {
-    return [...(this.tenantChains.get(organizationId) || [])];
+  async verifyChainIntegrity(organizationId: string): Promise<ChainVerificationResult> {
+    this.assertTenant(organizationId);
+    return verifyConsentChain(organizationId, await this.repo.listChain(organizationId));
   }
 
-  clear(): void {
-    this.tenantChains.clear();
+  async getChain(organizationId: string): Promise<StoredConsentAuditEvent[]> {
+    this.assertTenant(organizationId);
+    return this.repo.listChain(organizationId);
   }
 }
 

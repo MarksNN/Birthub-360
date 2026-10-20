@@ -27,6 +27,9 @@ export interface CalendarEventSummary {
   isCommercialMeeting: boolean;
 }
 
+/** REMED-07: K mínimo de vendedores distintos para liberar agregado coletivo. */
+export const WORKLOAD_K_ANONYMITY_MIN = 5;
+
 export class WorkloadWellbeingService {
   private preferences = new Map<string, WorkloadPreferences>();
   private recommendations = new Map<string, WorkloadRecommendation[]>();
@@ -348,32 +351,42 @@ export class WorkloadWellbeingService {
     orgId: string,
     metricsList: WorkloadObjectiveMetrics[],
   ): CollectiveAggregatedWorkload {
-    // Exigência ética: mínimo de 5 participantes para evitar reidentificação
-    const sampleSize = metricsList.length;
-    if (sampleSize < 5) {
+    // REMED-07 — k-anonymity estrita: mínimo de K vendedores DISTINTOS do próprio tenant.
+    // Métricas de outro tenant são descartadas; linhas duplicadas do mesmo vendedor não contam.
+    const tenantMetrics = metricsList.filter((m) => m.organizationId === orgId);
+    const distinctSellers = new Set(
+      tenantMetrics.map((m) => m.sellerId?.trim()).filter((id): id is string => !!id),
+    );
+    const sampleSize = tenantMetrics.length;
+    if (distinctSellers.size < WORKLOAD_K_ANONYMITY_MIN) {
+      logger.info(
+        { orgId, distinctSellers: distinctSellers.size, k: WORKLOAD_K_ANONYMITY_MIN },
+        'WorkloadWellbeing: agregado suprimido por k-anonymity',
+      );
       return {
         organizationId: orgId,
         periodStart: new Date().toISOString().split('T')[0],
         periodEnd: new Date().toISOString().split('T')[0],
-        anonymizedSampleCount: sampleSize,
+        // Não revela o tamanho exato de grupos abaixo de K (evita inferência por diferença).
+        anonymizedSampleCount: 0,
         averageDailyMeetingMinutes: 0,
         averageBackToBackOccurrences: 0,
         collectivePrepTimeAvailabilityPercent: 0,
       };
     }
 
-    const totalMinutes = metricsList.reduce((sum, m) => sum + m.totalMeetingMinutes, 0);
-    const totalBackToBack = metricsList.reduce((sum, m) => sum + m.backToBackMeetingsCount, 0);
-    const prepAvail = metricsList.filter(
+    const totalMinutes = tenantMetrics.reduce((sum, m) => sum + m.totalMeetingMinutes, 0);
+    const totalBackToBack = tenantMetrics.reduce((sum, m) => sum + m.backToBackMeetingsCount, 0);
+    const prepAvail = tenantMetrics.filter(
       (m) => m.availablePrepMinutesBeforeKeyMeetings > 10,
     ).length;
 
     return {
       organizationId: orgId,
-      periodStart: metricsList[0]?.date || new Date().toISOString().split('T')[0],
+      periodStart: tenantMetrics[0]?.date || new Date().toISOString().split('T')[0],
       periodEnd:
-        metricsList[metricsList.length - 1]?.date || new Date().toISOString().split('T')[0],
-      anonymizedSampleCount: sampleSize,
+        tenantMetrics[tenantMetrics.length - 1]?.date || new Date().toISOString().split('T')[0],
+      anonymizedSampleCount: distinctSellers.size,
       averageDailyMeetingMinutes: Math.round(totalMinutes / sampleSize),
       averageBackToBackOccurrences: Number((totalBackToBack / sampleSize).toFixed(1)),
       collectivePrepTimeAvailabilityPercent: Math.round((prepAvail / sampleSize) * 100),

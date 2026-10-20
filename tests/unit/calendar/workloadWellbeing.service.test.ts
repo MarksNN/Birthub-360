@@ -2,6 +2,7 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import {
   CalendarEventSummary,
   workloadWellbeingService,
+  WORKLOAD_K_ANONYMITY_MIN,
 } from '../../../src/features/calendar/services/workloadWellbeing.service.js';
 
 describe('WorkloadWellbeingService — Onda 05 (Eixo 18)', () => {
@@ -159,7 +160,7 @@ describe('WorkloadWellbeingService — Onda 05 (Eixo 18)', () => {
       orgId,
       insufficientMetrics,
     );
-    expect(reportSmall.anonymizedSampleCount).toBe(1);
+    expect(reportSmall.anonymizedSampleCount).toBe(0);
     expect(reportSmall.averageDailyMeetingMinutes).toBe(0);
 
     // Amostra de 5 participantes -> dados agregados calculados com sucesso
@@ -178,5 +179,62 @@ describe('WorkloadWellbeingService — Onda 05 (Eixo 18)', () => {
     const reportAggregated = workloadWellbeingService.getCollectiveAggregatedWorkload(orgId, sample5);
     expect(reportAggregated.anonymizedSampleCount).toBe(5);
     expect(reportAggregated.averageDailyMeetingMinutes).toBe(60);
+  });
+});
+
+describe('REMED-07 — k-anonymity estrita (K=5 vendedores distintos)', () => {
+  const org = 'org-kanon';
+  const mk = (sellerId: string, organizationId = org) => ({
+    sellerId,
+    organizationId,
+    date: '2026-10-19',
+    totalMeetingsCount: 1,
+    totalMeetingMinutes: 60,
+    backToBackMeetingsCount: 0,
+    maxConsecutiveMeetingMinutes: 60,
+    availablePrepMinutesBeforeKeyMeetings: 30,
+    pendingTasksCount: 0,
+    urgentTasksCount: 0,
+    isOverloadedThresholdMet: false,
+  });
+
+  it('K exportado é 5', () => {
+    expect(WORKLOAD_K_ANONYMITY_MIN).toBe(5);
+  });
+
+  it('4 vendedores distintos: nega (suprime e não revela o tamanho)', () => {
+    const r = workloadWellbeingService.getCollectiveAggregatedWorkload(
+      org,
+      ['a', 'b', 'c', 'd'].map((s) => mk(s)),
+    );
+    expect(r.anonymizedSampleCount).toBe(0);
+    expect(r.averageDailyMeetingMinutes).toBe(0);
+  });
+
+  it('5 vendedores distintos: aceita', () => {
+    const r = workloadWellbeingService.getCollectiveAggregatedWorkload(
+      org,
+      ['a', 'b', 'c', 'd', 'e'].map((s) => mk(s)),
+    );
+    expect(r.anonymizedSampleCount).toBe(5);
+    expect(r.averageDailyMeetingMinutes).toBe(60);
+  });
+
+  it('duplicados do mesmo vendedor não contam (5 linhas, 4 vendedores)', () => {
+    const r = workloadWellbeingService.getCollectiveAggregatedWorkload(
+      org,
+      ['a', 'b', 'c', 'd', 'd'].map((s) => mk(s)),
+    );
+    expect(r.anonymizedSampleCount).toBe(0);
+    expect(r.averageDailyMeetingMinutes).toBe(0);
+  });
+
+  it('vendedor com sellerId vazio ou de outro tenant não conta', () => {
+    const r = workloadWellbeingService.getCollectiveAggregatedWorkload(org, [
+      ...['a', 'b', 'c', 'd'].map((s) => mk(s)),
+      mk('  '),
+      mk('e', 'org-outro'),
+    ]);
+    expect(r.anonymizedSampleCount).toBe(0);
   });
 });
