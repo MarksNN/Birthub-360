@@ -220,10 +220,61 @@ describe('Onda 05 — Validação de Contratos Canônicos', () => {
       'MULTIMODAL_ROLEPLAY_EVALUATED',
       'MULTI_REGION_FAILOVER_TRIGGERED',
       'SECURITY_AUDIT_SWEEP_COMPLETED',
+      'CONVERSATIONAL_COACHING_EVALUATED',
+      'REALTIME_COACHING_HINT_EMITTED',
+      'WORKLOAD_RECOMMENDATION_TRIGGERED',
+      'MICRO_TRAINING_COMPLETED',
     ];
 
     expect(events).toContain('MULTIMODAL_ROLEPLAY_EVALUATED');
     expect(events).toContain('MULTI_REGION_FAILOVER_TRIGGERED');
     expect(events).toContain('SECURITY_AUDIT_SWEEP_COMPLETED');
+    expect(events).toContain('CONVERSATIONAL_COACHING_EVALUATED');
+    expect(events).toContain('WORKLOAD_RECOMMENDATION_TRIGGERED');
+  });
+
+  it('Eixo 13: Inteligência Conversacional — deve validar tipagem de métricas de dinâmica e coaching pós-chamada', async () => {
+    const { conversationalIntelligenceService } = await import(
+      '../../../src/features/ai-voice/server/conversationalIntelligence.service.js'
+    );
+    const metrics = conversationalIntelligenceService.calculateDynamicMetrics([
+      {
+        turnId: '1',
+        speaker: 'seller',
+        startTimeSeconds: 0,
+        endTimeSeconds: 20,
+        durationSeconds: 20,
+        text: 'Olá',
+      },
+      {
+        turnId: '2',
+        speaker: 'customer',
+        startTimeSeconds: 20,
+        endTimeSeconds: 40,
+        durationSeconds: 20,
+        text: 'Olá tudo bem',
+      },
+    ]);
+
+    expect(metrics.sellerTalkRatio).toBe(0.5);
+    expect(metrics.customerTalkRatio).toBe(0.5);
+    expect(metrics.isEstimate).toBe(false);
+  });
+
+  it('Eixo 18: Bem-Estar e Carga Operacional — deve validar preferências voluntárias e microtreinamentos', async () => {
+    const { workloadWellbeingService } = await import(
+      '../../../src/features/calendar/services/workloadWellbeing.service.js'
+    );
+    const pref = workloadWellbeingService.getOrCreatePreferences('org-contract-test', 'seller-contract');
+    expect(pref.enableBreakSuggestions).toBe(true);
+    expect(pref.optOutWellbeingFeatures).toBe(false);
+
+    const mt = workloadWellbeingService.createMicroTrainingSession(
+      'org-contract-test',
+      'seller-contract',
+      'PRE_MEETING_CHECKLIST',
+    );
+    expect(mt.targetDurationMinutes).toBe(3);
+    expect(mt.isCompleted).toBe(false);
   });
 });
