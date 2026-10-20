@@ -27,6 +27,21 @@ describe('resolveRouterLocalVarName', () => {
     expect(resolveRouterLocalVarName(src, 'predictiveRoutes')).toBe('router');
   });
 
+  it('resolve factory no formato createXRouter() (ex.: createAccountIntelligenceRouter)', () => {
+    const src = [
+      'export function createAccountIntelligenceRouter(',
+      '  service: AccountIntelligenceService = defaultService,',
+      '): Router {',
+      '  const router = Router();',
+      "  router.get('/:id/intelligence', h);",
+      '  return router;',
+      '}',
+      '',
+      'export const accountIntelligenceRoutes = createAccountIntelligenceRouter();',
+    ].join('\n');
+    expect(resolveRouterLocalVarName(src, 'accountIntelligenceRoutes')).toBe('router');
+  });
+
   it('resolve factory com express.Router() e nome de variável diferente', () => {
     const src = [
       'function createX() {',
