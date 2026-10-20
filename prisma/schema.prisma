@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  extensions = [vector]
+  extensions = [vector, pg_trgm]
 }
 
 enum CompanyStatus {
@@ -305,6 +305,7 @@ model Company {
   @@index([cnpj])
   @@index([legalName])
   @@index([tradeName])
+  @@index([tradeName(ops: raw("gin_trgm_ops"))], type: Gin, map: "Company_tradeName_trgm_idx")
   @@index([bitrixCompanyId])
 }
 
@@ -421,6 +422,9 @@ model MarketIntelligenceCompany {
   @@index([datasetId, icpScore])
   @@index([datasetId, capitalSocial])
   @@index([competencia])
+  @@index([razaoSocialSearch(ops: raw("gin_trgm_ops"))], type: Gin, map: "MarketIntelligenceCompany_razaoSocialSearch_trgm_idx")
+  @@index([nomeFantasiaSearch(ops: raw("gin_trgm_ops"))], type: Gin, map: "MarketIntelligenceCompany_nomeFantasiaSearch_trgm_idx")
+  @@index([cnaesSecundarios(ops: JsonbPathOps)], type: Gin, map: "MarketIntelligenceCompany_cnaesSecundarios_gin_idx")
 }
 
 /// Crosswalk persistido Receita -> IBGE; a API não associa município por texto em runtime.
@@ -546,6 +550,8 @@ model Contact {
   @@index([companyId])
   @@index([name])
   @@index([role])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Contact_name_trgm_idx")
+  @@index([role(ops: raw("gin_trgm_ops"))], type: Gin, map: "Contact_role_trgm_idx")
   @@index([bitrixContactId])
   // Substituem os antigos @@index([email])/@@index([phone])/@@index([whatsapp]) — inúteis contra
   // ciphertext (IV aleatório nunca repete), ver comentário nos campos acima. Também substituem
@@ -818,7 +824,7 @@ model Attachment {
   uploadedBy String?
 
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   createdAt    DateTime  @default(now())
   deletedAt    DateTime?
@@ -1040,6 +1046,7 @@ model Organization {
   dncLists               DncList[]
   customAiTools          CustomAiTool[]
   leadTouchpoints        LeadTouchpoint[]
+  knowledgeChunks        KnowledgeChunk[]              @ignore
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -1417,7 +1424,8 @@ model AccountRecommendation {
   // nome (truncado) real do indice para que `prisma migrate dev`/`migrate diff` nao o tratem como
   // drift nao gerenciado. NAO rode `prisma db push` contra um banco novo sem antes aplicar as
   // migrations — sem elas, essa constraint de unicidade nao vai existir de forma alguma.
-  @@index([organizationId, companyId, idempotencyKey], map: "AccountRecommendation_organizationId_companyId_idempotencyKey_u")
+  // Único parcial "..._idempotencyKey_u" vive só na migration (ver acima); removido daqui porque
+  // Prisma ignora índices parciais e o @@index gerava drift permanente (drift-fix 2026-10-20).
   @@index([organizationId, companyId, status, generatedAt(sort: Desc)])
   @@index([organizationId, status, priority])
   @@index([snapshotId])
@@ -3586,7 +3594,7 @@ model CadenceRun {
   /// `prisma migrate dev`/`migrate diff` não o tratem como drift não gerenciado) e também serve à
   /// consulta comum por `leadId`. NÃO rode `prisma db push` contra um banco novo sem antes aplicar
   /// as migrations — sem elas, essa constraint de unicidade não vai existir.
-  @@index([leadId], map: "CadenceRun_leadId_active_unique")
+  @@index([leadId]) // plain "CadenceRun_leadId_idx"; o único parcial vive só na migration (drift-fix 2026-10-20)
 }
 
 /// Uma tentativa real de disparo de um toque de cadência — nunca `Sent` sem confirmação real do
@@ -4079,7 +4087,7 @@ model UserJobRole {
   /// `prisma migrate dev`/`migrate diff` não o tratem como drift não gerenciado) e também serve à
   /// consulta comum por `userId`. NÃO rode `prisma db push` contra um banco novo sem antes aplicar
   /// as migrations — sem elas, essa constraint de unicidade não vai existir.
-  @@index([userId], map: "UserJobRole_one_active_primary_per_user")
+  @@index([userId]) // plain "UserJobRole_userId_idx"; o único parcial vive só na migration (drift-fix 2026-10-20)
 }
 
 /// Catálogo de agentes — IDENTIDADE e estado administrativo, nunca a implementação em si (código
@@ -4142,9 +4150,6 @@ model AgentVersion {
   deprecatedAt      DateTime?
 
   executions AgentExecution[]
-
-  @@unique([agentDefinitionId, version])
-  @@index([agentDefinitionId, status])
   /// PARTIAL unique index — a condição `WHERE "status" = 'ACTIVE'` vive só na migration SQL
   /// (`prisma/migrations/20260908020000_multi_cargo_agent_governance_foundation/migration.sql`);
   /// a sintaxe do Prisma schema não consegue expressar a condição WHERE parcial, então este
@@ -4152,7 +4157,11 @@ model AgentVersion {
   /// que `prisma migrate dev`/`migrate diff` não o tratem como drift não gerenciado). NÃO rode
   /// `prisma db push` contra um banco novo sem antes aplicar as migrations — sem elas, essa
   /// constraint de unicidade não vai existir.
-  @@index([agentDefinitionId], map: "AgentVersion_one_active_per_agent")
+  // "AgentVersion_one_active_per_agent" (único parcial) vive só na migration; Prisma ignora índices
+  // parciais na introspecção, então declará-lo aqui gerava drift permanente (drift-fix 2026-10-20).
+
+  @@unique([agentDefinitionId, version])
+  @@index([agentDefinitionId, status])
 }
 
 /// Responde "quais agentes este cargo pode usar?" — um mesmo `AgentDefinition` pode ser
@@ -4663,7 +4672,7 @@ model DocumentEmbedding {
   /// Metadados adicionais (tipo de documento, chunk index, etc.)
   metadata   Json?
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime @default(now()) @updatedAt
 
   @@index([tenantId, documentId])
   @@index([vectorId])
@@ -5538,4 +5547,22 @@ model LeadTouchpoint {
   @@index([leadId])
   @@index([campaign])
   @@index([occurredAt])
+}
+
+/// Legado (RAG-001): tabela ainda existe no banco (criada por migrations antigas, com RLS), mas nada
+/// no app lê/grava nela. Declarada com @@ignore só para o schema refletir o banco sem DROP de dados
+/// (drift-fix 2026-10-20); não gera API no Prisma Client. Remoção real = migration própria e decisão
+/// de retenção.
+model KnowledgeChunk {
+  id             String                      @id
+  content        String
+  metadata       Json?
+  embedding      Unsupported("vector(768)")?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+  organizationId String?
+  organization   Organization?               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@ignore
 }
