@@ -1,0 +1,3582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIRTH HUB 360° — Auditoria Forense Integral das 6 Ondas</title>
+  <style>
+    :root {
+      --bg-dark: #070B14;
+      --bg-card: #0D1527;
+      --bg-surface: #131E36;
+      --border-line: #1E2E4E;
+      --brand-primary: #F59E0B;
+      --brand-accent: #0D9488;
+      --brand-indigo: #6366F1;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --status-pass: #10B981;
+      --status-warn: #F59E0B;
+      --status-fail: #EF4444;
+      --status-block: #8B5CF6;
+      --status-info: #3B82F6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
+      padding: 24px;
+    }
+    .container { max-width: 1440px; margin: 0 auto; }
+    
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #0D1527 0%, #15203B 100%);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo-badge {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--brand-primary) 0%, #B45309 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      color: #000;
+    }
+    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #FFF; }
+    .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+    
+    .verdict-badge {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .verdict-staging {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--brand-primary);
+      color: var(--brand-primary);
+    }
+    .verdict-prod {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--status-fail);
+      color: var(--status-fail);
+      margin-left: 8px;
+    }
+    
+    .header-metadata {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      background: rgba(7, 11, 20, 0.6);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+    .meta-item strong { color: var(--brand-primary); display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 2px; }
+    
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 10px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--brand-primary);
+    }
+    .metric-card.pass::before { background: var(--status-pass); }
+    .metric-card.fail::before { background: var(--status-fail); }
+    .metric-card.warn::before { background: var(--status-warn); }
+    .metric-card.indigo::before { background: var(--brand-indigo); }
+    
+    .metric-label { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .metric-value { font-size: 28px; font-weight: 800; color: #FFF; }
+    .metric-foot { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-line);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover { color: #FFF; background: var(--bg-surface); }
+    .tab-btn.active {
+      color: #000;
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+    }
+    
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    
+    /* Cards & Containers */
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFF;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Tables */
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-line);
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      vertical-align: top;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    
+    /* Badges */
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .pill-pass { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .pill-fail { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .pill-warn { background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .pill-block { background: rgba(139, 92, 246, 0.2); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.4); }
+    .pill-info { background: rgba(59, 130, 246, 0.2); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.4); }
+    
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: var(--bg-surface);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-line);
+      align-items: center;
+    }
+    .filter-input {
+      flex: 1;
+      min-width: 240px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-line);
+      color: #FFF;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .filter-select {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-line);
+      color: #FFF;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-action {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-line);
+      color: #FFF;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: var(--brand-primary);
+      color: #000;
+      border-color: var(--brand-primary);
+    }
+    
+    /* Accordion items */
+    .req-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .req-item:hover { border-color: rgba(245, 158, 11, 0.4); }
+    .req-header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      gap: 12px;
+    }
+    .req-title-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .req-id { font-family: monospace; font-weight: 700; color: var(--brand-primary); font-size: 12px; }
+    .req-name { font-weight: 700; color: #FFF; font-size: 14px; }
+    .req-details {
+      padding: 16px 18px;
+      background: rgba(7, 11, 20, 0.5);
+      border-top: 1px solid var(--border-line);
+      display: none;
+      font-size: 13px;
+    }
+    .req-details.open { display: block; }
+    
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .detail-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 6px;
+    }
+    .detail-box strong { color: var(--text-muted); font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    
+    /* SVG Charts */
+    .chart-container {
+      margin: 20px 0;
+      background: rgba(7, 11, 20, 0.4);
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border-line);
+    }
+    
+    /* Print Styles */
+    @media print {
+      body { background: #FFF !important; color: #000 !important; padding: 0 !important; }
+      header, .content-card, .metric-card, .req-item { background: #FFF !important; color: #000 !important; border: 1px solid #CCC !important; box-shadow: none !important; }
+      .tabs-nav, .filter-bar, .btn-action { display: none !important; }
+      .tab-pane { display: block !important; margin-bottom: 30px; }
+      .req-details { display: block !important; background: #FAFAFA !important; }
+      h1, h2, .metric-value, .req-name { color: #000 !important; }
+      .pill { border: 1px solid #888 !important; color: #000 !important; background: #EEE !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header Executivo -->
+    <header>
+      <div class="header-top">
+        <div class="brand-title">
+          <div class="brand-logo-badge">360</div>
+          <div>
+            <h1>BIRTH HUB 360° — AUDITORIA FORENSE INTEGRAL DAS 6 ONDAS</h1>
+            <div class="subtitle">Verificação Real de Implementação, Contratos, Banco de Dados, Testes e Prontidão de Release</div>
+          </div>
+        </div>
+        <div>
+          <span class="verdict-badge verdict-staging">STAGING: GO CONDICIONAL</span>
+          <span class="verdict-badge verdict-prod">PRODUÇÃO: NO-GO</span>
+        </div>
+      </div>
+      
+      <div class="header-metadata">
+        <div class="meta-item">
+          <strong>Data da Auditoria</strong>
+          20 de Outubro de 2026 — 18:45 BRT
+        </div>
+        <div class="meta-item">
+          <strong>Repositório & Base</strong>
+          MarksNN/Birthub-360 (main)
+        </div>
+        <div class="meta-item">
+          <strong>SHA Auditado</strong>
+          <code style="color:#FFF;">281cfcd3d4dbd0d9</code>
+        </div>
+        <div class="meta-item">
+          <strong>Coordenador & Auditor</strong>
+          Agente 00 & Agente 24 (Independente)
+        </div>
+        <div class="meta-item">
+          <strong>Sincronização com Ondas</strong>
+          Main +15 commits à frente de integracao/onda-05
+        </div>
+        <div class="meta-item">
+          <strong>Destino Obrigatório</strong>
+          Área de Trabalho (C:\Users\Marks\Desktop)
+        </div>
+      </div>
+    </header>
+
+    <!-- Cards de Métricas e Indicadores -->
+    <div class="metrics-grid">
+      <div class="metric-card indigo">
+        <div class="metric-label">Requisitos Totais Auditados</div>
+        <div class="metric-value">45</div>
+        <div class="metric-foot">Ondas 00 a 05 + 20 Eixos + 6 Capacidades</div>
+      </div>
+      <div class="metric-card pass">
+        <div class="metric-label">Implementados & Validados</div>
+        <div class="metric-value">24</div>
+        <div class="metric-foot">53.3% com código, contrato e teste comprovados</div>
+      </div>
+      <div class="metric-card warn">
+        <div class="metric-label">Implementados Parcialmente</div>
+        <div class="metric-value">18</div>
+        <div class="metric-foot">Operam em memória ou faltam requisitos ponta a ponta</div>
+      </div>
+      <div class="metric-card fail">
+        <div class="metric-label">Falhas / Divergências</div>
+        <div class="metric-value">6</div>
+        <div class="metric-foot">14 erros de formatação + 5 divergências com relatórios</div>
+      </div>
+      <div class="metric-card fail">
+        <div class="metric-label">Bloqueadores Críticos (P0/P1)</div>
+        <div class="metric-value">20</div>
+        <div class="metric-foot">0 P0 (Ética/Segurança) | 20 P1 (Persistência/Gates)</div>
+      </div>
+      <div class="metric-card pass">
+        <div class="metric-label">Cobertura da Auditoria</div>
+        <div class="metric-value">100.0%</div>
+        <div class="metric-foot">Requisitos efetivamente inspecionados no código</div>
+      </div>
+    </div>
+
+    <!-- Navegação por Abas -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="openTab('visao-executiva')">1. Visão Executiva</button>
+      <button class="tab-btn" onclick="openTab('divergencias')">2. Divergências Forenses (Obrigatório)</button>
+      <button class="tab-btn" onclick="openTab('checklist-requisitos')">3. Matriz Completa de Requisitos</button>
+      <button class="tab-btn" onclick="openTab('quality-gates')">4. Quality Gates Reais</button>
+      <button class="tab-btn" onclick="openTab('eixos-capacidades')">5. 20 Eixos & 6 Capacidades</button>
+      <button class="tab-btn" onclick="openTab('cinco-ajustes')">6. Cinco Ajustes Essenciais</button>
+      <button class="tab-btn" onclick="openTab('plano-correcao')">7. Backlog Priorizado (P0-P3)</button>
+      <button class="tab-btn" onclick="openTab('parecer-24')">8. Parecer Agente 24</button>
+    </div>
+
+    <!-- ABA 1: VISÃO EXECUTIVA -->
+    <div id="visao-executiva" class="tab-pane active">
+      <div class="content-card">
+        <div class="card-title">Diagnóstico Geral das 6 Ondas: O que Realmente Existe vs Documentado</div>
+        <p style="color:var(--text-muted); margin-bottom:18px;">
+          Esta auditoria forense confrontou exaustivamente todos os relatórios, códigos-fonte, migrações do Prisma, testes automatizados e histórico do Git.
+          Diferente dos relatórios anteriores que declaravam 100% de homologação com base em execuções isoladas e mocks, a inspeção real do código revela que:
+        </p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div style="background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); padding:16px; border-radius:8px;">
+            <strong style="color:var(--status-pass); font-size:14px; display:block; margin-bottom:6px;">O Que Realmente Funciona e Existe no Código</strong>
+            <ul style="font-size:13px; color:var(--text-muted); margin-left:18px; line-height:1.6;">
+              <li><strong>Typecheck TypeScript Estrito:</strong> 0 erros em mais de 2.000 arquivos (Exit 0).</li>
+              <li><strong>Arquitetura e Boundaries:</strong> 1743 módulos cruzados via depcruise sem dependências circulares proibidas.</li>
+              <li><strong>Prisma Schema & Migrations:</strong> 140 migrações válidas, schema relacional íntegro.</li>
+              <li><strong>Algoritmos de IA & Dinâmica:</strong> Talk-to-Listen, diarização, re-ranking e detecção de sobrecarga passam com 234 testes unitários verdes.</li>
+              <li><strong>Salvaguarda Ética Inviolável:</strong> ZERO inferências de saúde mental, burnout ou emoções em contratos e serviços.</li>
+              <li><strong>Build de Produção:</strong> Vite + esbuild empacotam o frontend e backend (dist/server.cjs e dist/worker.cjs).</li>
+            </ul>
+          </div>
+
+          <div style="background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.2); padding:16px; border-radius:8px;">
+            <strong style="color:var(--status-fail); font-size:14px; display:block; margin-bottom:6px;">Lacunas Críticas, Volatilidade e Mocks Encontrados</strong>
+            <ul style="font-size:13px; color:var(--text-muted); margin-left:18px; line-height:1.6;">
+              <li><strong>Estado Apenas em Memória:</strong> Grafo de Contas, Behavioral Engine, Autópsia Win-Loss e Self-Driving CRM usam Map/Set em memória, sem persistência no PostgreSQL.</li>
+              <li><strong>Constantes Estáticas no Revenue Oracle:</strong> Projeções P10/P50/P90 (145k/485k/980k) e MAPE 8.4% são números fixos no código, sem regressão sobre histórico real.</li>
+              <li><strong>Simulação Sem Gateways:</strong> Discagem SDR, Bimodal Live e Assinatura Digital de propostas geram IDs e eventos sintéticos sem provedores reais conectados.</li>
+              <li><strong>Falha no Gate de Formatação:</strong> 14 arquivos recentes da Onda 05 falham no biome format (Exit Code 1).</li>
+              <li><strong>Aprovação de Rebalanceamento Fake:</strong> Botão de aprovação no Cockpit apenas altera useState local e exibe toast sem chamar API.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Gráfico SVG de Progresso por Onda (Declarado vs Comprovado) -->
+        <div class="card-title">Comparação Forense: Conclusão Declarada vs Implementação Comprovada</div>
+        <div class="chart-container">
+          <svg viewBox="0 0 800 240" style="width:100%; height:auto;">
+            <!-- Linhas de grade -->
+            <line x1="120" y1="30" x2="760" y2="30" stroke="#1E2E4E" stroke-dasharray="4" />
+            <line x1="120" y1="80" x2="760" y2="80" stroke="#1E2E4E" stroke-dasharray="4" />
+            <line x1="120" y1="130" x2="760" y2="130" stroke="#1E2E4E" stroke-dasharray="4" />
+            <line x1="120" y1="180" x2="760" y2="180" stroke="#1E2E4E" stroke-dasharray="4" />
+
+            <!-- Eixos Textos -->
+            <text x="110" y="35" fill="#9CA3AF" font-size="11" text-anchor="end">Onda 00</text>
+            <text x="110" y="70" fill="#9CA3AF" font-size="11" text-anchor="end">Onda 01</text>
+            <text x="110" y="105" fill="#9CA3AF" font-size="11" text-anchor="end">Onda 02</text>
+            <text x="110" y="140" fill="#9CA3AF" font-size="11" text-anchor="end">Onda 03</text>
+            <text x="110" y="175" fill="#9CA3AF" font-size="11" text-anchor="end">Onda 04</text>
+            <text x="110" y="210" fill="#9CA3AF" font-size="11" text-anchor="end">Onda 05</text>
+
+            <!-- Barras Onda 00 (Declarado 100%, Comprovado 85%) -->
+            <rect x="120" y="24" width="600" height="8" rx="4" fill="#3B82F6" opacity="0.3" />
+            <rect x="120" y="24" width="510" height="8" rx="4" fill="#10B981" />
+            <text x="640" y="32" fill="#10B981" font-size="11" font-weight="700">85%</text>
+
+            <!-- Barras Onda 01 (Declarado 100%, Comprovado 72%) -->
+            <rect x="120" y="59" width="600" height="8" rx="4" fill="#3B82F6" opacity="0.3" />
+            <rect x="120" y="59" width="432" height="8" rx="4" fill="#F59E0B" />
+            <text x="560" y="67" fill="#F59E0B" font-size="11" font-weight="700">72%</text>
+
+            <!-- Barras Onda 02 (Declarado 100%, Comprovado 55%) -->
+            <rect x="120" y="94" width="600" height="8" rx="4" fill="#3B82F6" opacity="0.3" />
+            <rect x="120" y="94" width="330" height="8" rx="4" fill="#F59E0B" />
+            <text x="460" y="102" fill="#F59E0B" font-size="11" font-weight="700">55%</text>
+
+            <!-- Barras Onda 03 (Declarado 100%, Comprovado 52%) -->
+            <rect x="120" y="129" width="600" height="8" rx="4" fill="#3B82F6" opacity="0.3" />
+            <rect x="120" y="129" width="312" height="8" rx="4" fill="#F59E0B" />
+            <text x="440" y="137" fill="#F59E0B" font-size="11" font-weight="700">52%</text>
+
+            <!-- Barras Onda 04 (Declarado 100%, Comprovado 68%) -->
+            <rect x="120" y="164" width="600" height="8" rx="4" fill="#3B82F6" opacity="0.3" />
+            <rect x="120" y="164" width="408" height="8" rx="4" fill="#F59E0B" />
+            <text x="540" y="172" fill="#F59E0B" font-size="11" font-weight="700">68%</text>
+
+            <!-- Barras Onda 05 (Declarado 100%, Comprovado 65%) -->
+            <rect x="120" y="199" width="600" height="8" rx="4" fill="#3B82F6" opacity="0.3" />
+            <rect x="120" y="199" width="390" height="8" rx="4" fill="#EF4444" />
+            <text x="520" y="207" fill="#EF4444" font-size="11" font-weight="700">65% (Fail Gate)</text>
+          </svg>
+          <div style="display:flex; justify-content:center; gap:24px; font-size:12px; margin-top:8px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:8px; background:#3B82F6; opacity:0.3; border-radius:2px;"></span> Declarado em Relatórios Anteriores (100%)</span>
+            <span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:8px; background:#10B981; border-radius:2px;"></span> Comprovado com Persistência & Testes</span>
+            <span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:8px; background:#F59E0B; border-radius:2px;"></span> Parcial / Em Memória</span>
+            <span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:8px; background:#EF4444; border-radius:2px;"></span> Com Falha de Gate</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 2: DIVERGÊNCIAS FORENSES -->
+    <div id="divergencias" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title" style="color:var(--status-fail);">
+          <span>⚠️</span> Seção Obrigatória: Declarado como Concluído vs Não Comprovado na Realidade
+        </div>
+        <p style="color:var(--text-muted); margin-bottom:18px;">
+          Confronto direto e auditável entre as afirmações registradas nos relatórios das ondas e a evidência empírica extraída do código e dos testes.
+        </p>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:80px;">ID</th>
+                <th style="width:240px;">Título do Achado</th>
+                <th>Afirmação Original no Relatório</th>
+                <th>Realidade Observada no Código</th>
+                <th style="width:100px;">Severidade</th>
+                <th style="width:180px;">Ação Recomendada</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td><span class="pill pill-fail">DIV-01</span></td>
+                  <td><strong style="color:#FFF;">Format Check da Onda 05 declarado como Aprovado, mas na Realidade Falha</strong><div style="font-size:11px; color:var(--text-muted);">.agents/reviews/24-onda-05-revisao-independente.md</div></td>
+                  <td style="color:#FCA5A5;">Parecer do Agente 24 (19/10/2026) reportou: "npm run format:check | 1996 arquivos verificados, 0 pendências | APROVADO".</td>
+                  <td style="color:#93C5FD;">Execução forense real do comando em 20/10/2026 resultou em exit code 1 com 14 erros de formatação no Biome em arquivos de serviço e contratos da Onda 05.</td>
+                  <td><span class="pill pill-fail">P1 — Alto</span></td>
+                  <td>Executar npm run format no branch isolado de QA e submeter nova validação.</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">DIV-02</span></td>
+                  <td><strong style="color:#FFF;">Persistência Real declarada como Pronta, mas Serviços Operam em Memória (Map/Set)</strong><div style="font-size:11px; color:var(--text-muted);">.agents/runs/programa-consolidado-ondas-00-a-05.md</div></td>
+                  <td style="color:#FCA5A5;">Relatórios executivos das Ondas 02 e 03 declararam: "Grafo de Contas, Behavioral Engine, Autópsia Win-Loss e Swarm Tático totalmente integrados e persistidos".</td>
+                  <td style="color:#93C5FD;">Inspeção do código-fonte revelou que accountKnowledgeGraph.service.ts, behavioralEngine.service.ts e winLossAutopsy.service.ts armazenam estado em Map/Set locais em memória, perdendo dados ao reiniciar a API.</td>
+                  <td><span class="pill pill-fail">P1 — Alto</span></td>
+                  <td>Agente 01 deve criar tabelas Prisma e repositórios PostgreSQL para substituir as coleções voláteis.</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">DIV-03</span></td>
+                  <td><strong style="color:#FFF;">Revenue Oracle & Backtest rotulados como Calibrados usam Constantes Fixas</strong><div style="font-size:11px; color:var(--text-muted);">src/features/commercial-intelligence/services/predictiveRevenueOracle.service.ts</div></td>
+                  <td style="color:#FCA5A5;">Relatório declarou: "Backtest calibrado com MAPE 8.4% em 142 amostras históricas com projeções P10/P50/P90 baseadas em regressão".</td>
+                  <td style="color:#93C5FD;">predictiveRevenueOracle.service.ts codifica 145000, 485000, 980000 e MAPE 8.4% como constantes estáticas sem efetuar regressão estatística sobre o histórico real.</td>
+                  <td><span class="pill pill-fail">P1 — Alto</span></td>
+                  <td>Agente 04 deve implementar cálculo estatístico real sobre negócios passados do banco de dados.</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">DIV-04</span></td>
+                  <td><strong style="color:#FFF;">Aprovação de Rebalanceamento no Cockpit é apenas Frontend (Sem Backend)</strong><div style="font-size:11px; color:var(--text-muted);">src/features/predictability/components/PredictiveRevenueCockpit.tsx</div></td>
+                  <td style="color:#FCA5A5;">Relatório declarou: "Cockpit Executivo com rebalanceamento supervisionado de carteiras sob aprovação humana obrigatória".</td>
+                  <td style="color:#93C5FD;">PredictiveRevenueCockpit.tsx apenas atualiza estado local React (useState) e exibe toast de sucesso; nenhuma chamada de API é disparada para alterar o responsável no CRM.</td>
+                  <td><span class="pill pill-fail">P1 — Alto</span></td>
+                  <td>Agente 02 e 18 devem criar a rota POST /api/v1/predictability/rebalance/approve e integrar o botão.</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">DIV-05</span></td>
+                  <td><strong style="color:#FFF;">Execução de SDR e Assinatura Digital são Simulações Sintéticas</strong><div style="font-size:11px; color:var(--text-muted);">src/features/ai-voice/server/autonomousSdr.service.ts</div></td>
+                  <td style="color:#FCA5A5;">Relatório declarou: "SDR Autônomo com Discagem Ativa por Voz e Propostas Comerciais com Assinatura Digital integrados".</td>
+                  <td style="color:#93C5FD;">autonomousSdr.service.ts e proposalAutomation.service.ts geram links e IDs UUID sintéticos em memória sem conexão ativa com gateways de telefonia ou provedores de assinatura.</td>
+                  <td><span class="pill pill-fail">P1 — Alto</span></td>
+                  <td>Documentar formalmente como ambiente de homologação simulado e planejar conectores de produção.</td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 3: MATRIZ COMPLETA DE REQUISITOS -->
+    <div id="checklist-requisitos" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title">Matriz Completa e Auditada de Requisitos (45 Itens)</div>
+
+        <!-- Barra de Filtros e Busca -->
+        <div class="filter-bar">
+          <input type="text" id="searchInput" class="filter-input" placeholder="Buscar por nome, arquivo, agente ou palavra-chave..." oninput="filterReqs()">
+          
+          <select id="waveFilter" class="filter-select" onchange="filterReqs()">
+            <option value="">Todas as Ondas</option>
+            <option value="00">Onda 00 — Fundação</option>
+            <option value="01">Onda 01 — Inteligência</option>
+            <option value="02">Onda 02 — Exógena</option>
+            <option value="03">Onda 03 — Autonomia</option>
+            <option value="04">Onda 04 — Experiência</option>
+            <option value="05">Onda 05 — Conversacional</option>
+          </select>
+
+          <select id="statusFilter" class="filter-select" onchange="filterReqs()">
+            <option value="">Todos os Status</option>
+            <option value="IMPLEMENTADO E VALIDADO">Implementado e Validado</option>
+            <option value="IMPLEMENTADO PARCIALMENTE">Implementado Parcialmente</option>
+            <option value="SOMENTE BACKEND">Somente Backend</option>
+            <option value="SOMENTE FRONTEND">Somente Frontend</option>
+            <option value="COM FALHA">Com Falha</option>
+          </select>
+
+          <button class="btn-action" onclick="toggleOnlyPending()">
+            <span>⚡</span> <span id="pendingBtnText">Apenas Pendências</span>
+          </button>
+
+          <button class="btn-action" onclick="exportMatrixJSON()">
+            <span>📥</span> Exportar JSON
+          </button>
+        </div>
+
+        <!-- Lista de Accordions -->
+        <div id="reqsContainer">
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(0)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-01</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Inventário Arquitetural & Boundaries de Domínio</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Governança & Arquitetura ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-0">
+                <p style="color:#FFF; margin-bottom:10px;">Controle de dependências circulares e acoplamento entre domínios via dependency-cruiser.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    depcruise sem violações não mapeadas; baseline atualizado.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Auditado via npm run test:architecture: 1743 módulos verificados com 0 violações.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">.dependency-cruiser.cjs, .dependency-cruiser-known-violations.json</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">08 — QA & 00 — Coordenador</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Manter monitoramento contínuo em PRs.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(1)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-02</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Controle de Hotspots (> 1000 linhas)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Governança & Qualidade ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-1">
+                <p style="color:#FFF; margin-bottom:10px;">Auditoria de tamanho de arquivos para evitar monolitos e degradação de manutenção.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Nenhum arquivo >1000 linhas sem exceção explícita em HOTSPOT_EXCEPTIONS.md.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Auditado: 1692 arquivos inspecionados. 18 exceções ativas com donos mapeados até 2026-11-30.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">scripts/architecture/check-hotspots.ts, HOTSPOT_EXCEPTIONS.md</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">08 — QA & 00 — Coordenador</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Refatorar e modularizar os 18 arquivos em sprints de saneamento dedicadas.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(2)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-03</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Isolamento de Branches e Governança de Worktrees</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Governança Git ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-2">
+                <p style="color:#FFF; margin-bottom:10px;">Políticas de branch por agente, integração em lote e proibição de push direto na main.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Branches agente/NN-*, integracao/onda-* com gates a cada 2-3 merges.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Ondas integradas via branches próprias, porém houve commits de refinamento acumulados diretamente na main após merge da Onda 05 sem gate PR formal.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">AGENTS.md, .agents/prompts/00-coordenador.md</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">00 — Coordenador & 08A — Git/AWS</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Restabelecer proteção de branch rígida no GitHub (branch protection rules).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(3)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-04</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Isolamento Multi-Tenant via RLS no PostgreSQL</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Segurança & RLS ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-3">
+                <p style="color:#FFF; margin-bottom:10px;">Políticas de Row-Level Security garantindo que nenhum tenant acerte dados de outro no DB.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    RLS habilitado em todas as tabelas de tenant; testes de acesso cruzado rejeitados.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Migrations de RLS criadas para tabelas do core, porém serviços recentes da Onda 02/03 operam em Map em memória sem RLS no PostgreSQL.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">prisma/migrations/*enable_rls*, tests/integration/rls-coverage.test.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">01 — Plataforma & 01A — Confiabilidade</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Criar tabelas Prisma e migrações de RLS para entidades de Grafo, Behavioral e Autópsia.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(4)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-05</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Unificação de Papéis e Permissões (RBAC)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Segurança & RBAC ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-4">
+                <p style="color:#FFF; margin-bottom:10px;">Controle de acesso granular baseado em papéis (Job Roles) em rotas e ações da API.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Nenhuma rota administrativa desprotegida; verificação no composition root.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    RBAC presente em 41 arquivos, porém algumas rotas legadas utilizam validação permissiva local.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/job-roles/, src/lib/voice-hub/middlewares/rbac.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">01 — Plataforma & 15 — Segurança</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Consolidar middleware RBAC único em todas as 74 rotas documentadas em openapi.yaml.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(5)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-06</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Prisma Schema & Integridade de Migrations</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Banco de Dados ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-5">
+                <p style="color:#FFF; margin-bottom:10px;">Schema declarativo de banco de dados e migrações relacionais auditadas.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    140 migrations válidas, schema sem drift e prisma validate aprovado.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Auditado: npx prisma validate exit code 0. 140 migrações estruturadas no histórico.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">prisma/schema.prisma, prisma/migrations/*</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">01 — Plataforma, Segurança e Dados</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Manter freeze de schema sem handoff formal para o Agente 01.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(6)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-07</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Runtime Assíncrono com BullMQ e Redis</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Runtime & Filas ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-6">
+                <p style="color:#FFF; margin-bottom:10px;">Processamento de tarefas em background, filas distribuídas e resiliência a picos.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    worker.ts empacotado e rodando separadamente da API HTTP server.ts.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    npm run build:worker compila com sucesso gerando dist/worker.cjs (1.0mb) em 105ms.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">worker.ts, src/lib/queue/index.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">16 — Runtime & Filas</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Garantir monitoramento do Bull-Board com senha e RLS em staging/prod.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="00" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(7)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-00-08</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 00</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Build de Produção e Precache PWA</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Frontend & PWA ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-7">
+                <p style="color:#FFF; margin-bottom:10px;">Empacotamento com Vite, esbuild server.cjs e manifesto de serviço offline PWA.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    npm run build exit 0; dist/sw.js com precache consistente.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    npm run build exit 0; Vite transformou 5857 módulos em 1m28s; 181 arquivos precacheados (14.28MB).
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">vite.config.ts, server.ts, scripts/pwa/verify-precache.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">02 — Produto & 08 — QA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Otimizar chunks >500kB (Sparkles, vendor-excel, echarts) com lazy loading adicional.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(8)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-01</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Extração Automática de Objeções Comerciais</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Data Flywheel (Eixo 1) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-8">
+                <p style="color:#FFF; margin-bottom:10px;">Detecção de objeções em transcrições e reuniões com proveniência e contextualização.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Objeções categorizadas e enviadas ao flywheel para análise pedagógica.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Serviço existe e extrai objeções por regex/heurística, mas promoção assume confiança fixa (0.85) e desfecho único, sem prova estatística com volume mínimo.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/intelligence/services/commercialLearningFlywheel.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">07 — IA e Automações</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Conectar cálculo probabilístico bayesiano e amostragem mínima de 10 ocorrências para promoção.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(9)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-02</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Promoção e Retração no Playbook Comercial</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Data Flywheel (Eixo 1) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-9">
+                <p style="color:#FFF; margin-bottom:10px;">Ciclo de vida de abordagens comerciais aprendidas: promoção supervisionada e retração.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Abordagens ineficazes ou desatualizadas são removidas do Playbook.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Contrato prevê promoção/retração, mas operação em memória não propaga deleção para a tabela de Playbook persistida no PostgreSQL.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/shared/contracts/dataFlywheel.contract.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">07 — IA & 04 — CRM/BI</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Implementar adapter Prisma para salvar itens promovidos na tabela PlaybookMatrixItem.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(10)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-03</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Busca Textual e Recuperação Vetorial Híbrida</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  RAG Híbrido (Eixo 2) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-10">
+                <p style="color:#FFF; margin-bottom:10px;">Combinação de busca textual BM25/trigram com busca vetorial por embeddings.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Recuperação com peso balanceado e filtro obrigatório por organizationId.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Código implementado e com suporte a pgvector, porém validação completa depende de extensão pgvector instalada no PostgreSQL de produção.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/knowledge/search.service.ts, vector-support.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">07 — IA & 01 — Plataforma</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Verificar script de migração setup-vector-db.ts em homologação e staging.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(11)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-04</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Re-Ranking Semântico e Similar Deals</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  RAG Híbrido (Eixo 2) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-11">
+                <p style="color:#FFF; margin-bottom:10px;">Algoritmo de reclassificação de relevância e recomendação de negócios semelhantes.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Re-ranking aplicado antes do envio de contexto para a LLM.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários dedicados em reranker.service.test.ts passando com sucesso.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/knowledge/services/reranker.service.ts, similarDeals.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">07 — IA e Automações</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(12)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-05</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Barramento de Eventos Unificado e Versionado</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  DomainEventMesh (Eixo 3) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-12">
+                <p style="color:#FFF; margin-bottom:10px;">Eventos de domínio tipados para orquestração assíncrona entre módulos.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Contratos estritos em domainEventMesh.contract.ts e publicação observável.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Contratos e serviço de mensageria com tipagem estrita e validação de schema implementados e aprovados nos testes unitários.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/shared/contracts/domainEventMesh.contract.ts, src/lib/queue/domainEventMesh.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">16 — Runtime & 18 — Contratos</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Expandir publicação de eventos para os webhooks legados do Bitrix24.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(13)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-06</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Outbox Transacional e Idempotência Durável</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  DomainEventMesh (Eixo 3) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-13">
+                <p style="color:#FFF; margin-bottom:10px;">Persistência de eventos antes do envio externo para evitar perda de dados em falhas.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Tabela de Outbox no PostgreSQL e processamento com backoff e retries.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    DomainEventMesh opera com emissão de eventos em memória/logs sem tabela de Outbox persistente no banco relacional.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/lib/queue/domainEventMesh.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">16 — Runtime & 01 — Plataforma</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Criar migration Prisma DomainEventOutbox e worker de reenvio de falhas com BullMQ.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(14)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-07</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Cache Semântico e Quotas de Tokens por Tenant</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  FinOps (Eixo 10) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-14">
+                <p style="color:#FFF; margin-bottom:10px;">Redução de custos de inferência de IA com cache e governança de orçamento.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Controle de limites por tenant e reuso de respostas para prompts repetidos.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    TokenQuotaService com controle de quotas mensais e testes unitários aprovados.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/lib/ai/finops/tokenQuota.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">23 — FinOps & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Integrar cache semântico diretamente no cluster Redis distribuído.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(15)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-08</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Minimização de PII e Tokenização Criptográfica</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Privacidade & LGPD (Eixo 16) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-15">
+                <p style="color:#FFF; margin-bottom:10px;">Sanitização de dados pessoais antes do envio para APIs externas e LLMs.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    PII substituída por tokens opacos reversíveis apenas internamente.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários em tests/unit/security/piiTokenizer.service.test.ts (4 testes) aprovados.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/lib/security/piiTokenizer.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">21 — Privacidade & 15 — Segurança</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="01" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(16)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-01-09</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 01</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Cadeia de Auditoria de Consentimento (Audit Chain)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Privacidade & LGPD (Eixo 16) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-16">
+                <p style="color:#FFF; margin-bottom:10px;">Registro criptográfico imutável de termos de consentimento e opt-ins.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Hash encadeado em blocos sha-256 e verificação de integridade da cadeia.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Algoritmo criptográfico validado em testes unitários, mas a cadeia reside em memória e se perde no restart da API.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/lib/security/consentAuditChain.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">21 — Privacidade & 15 — Segurança</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Persistir blocos da cadeia de consentimento em tabela PostgreSQL protegida por RLS.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="02" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(17)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-02-01</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 02</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Grafo Semântico de Contas, Decisores e Relações B2B</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Grafo de Contas (Eixo 6) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-17">
+                <p style="color:#FFF; margin-bottom:10px;">Mapeamento de organogramas, comitê de compras e relacionamentos inter-empresas.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Descoberta de multi-threading e conexões formais/inferidas com scoring.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Lógica algorítmica e testes em tests/unit/knowledge/accountKnowledgeGraph.service.test.ts (4 testes) aprovados, mas nós e arestas residem em Map em memória.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/knowledge/services/accountKnowledgeGraph.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Mapear entidade AccountKnowledgeNode e arestas no schema Prisma.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="02" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(18)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-02-02</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 02</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Agente Detetive de Conta</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Swarm Tático (Eixo 11) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-18">
+                <p style="color:#FFF; margin-bottom:10px;">Agente autônomo que investiga histórico, faturamento e riscos antes de calls.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Registro no catálogo de agentes e geração de dossiê investigativo.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Implementação existe com prompt e contrato em tacticalSwarm.contract.ts, mas endpoints dedicados de invocação na API REST pública estão ausentes.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/intelligence/agents/tactical/accountDetective.agent.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">13 — Swarm & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Expor rota REST POST /api/v1/intelligence/agents/account-detective/investigate.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="02" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(19)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-02-03</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 02</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Agente Guardião de Promessas</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Swarm Tático (Eixo 11) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-19">
+                <p style="color:#FFF; margin-bottom:10px;">Monitora compromissos comerciais verbais e evita promessas técnicas irrealizáveis.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Identificação de promessas de prazo/preço em propostas e mensagens.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários aprovados, mas tarefas de confirmação são geradas como UUIDs em memória sem registrar tarefa no CRM.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/intelligence/agents/tactical/promiseGuardian.agent.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">13 — Swarm & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Vincular compromissos aprovados à tabela Task do CRM relacional.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="02" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(20)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-02-04</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 02</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Agente Advogado do Diabo</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Swarm Tático (Eixo 11) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-20">
+                <p style="color:#FFF; margin-bottom:10px;">Simula objeções agressivas e contrapontos de concorrentes antes do fechamento.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Geração de stress test de propostas comerciais.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Lógica e testes unitários aprovados; geração sintética funcional, mas dependente de fallback local quando provider LLM não configurado.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/intelligence/agents/tactical/devilsAdvocate.agent.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">13 — Swarm & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Conectar provider Groq/OpenAI/Gemini com timeout resiliente de 3000ms.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="02" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(21)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-02-05</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 02</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Monitoramento de Sinais Externos e Notícias de Mercado</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Market Sensing (Eixo 12) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-21">
+                <p style="color:#FFF; margin-bottom:10px;">Captura de sinais de expansão, M&A e mudanças executivas para timing de abordagem.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Ingestão de feeds externos e correlação com contas do CRM.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes em tests/unit/market-intelligence/marketSensing.service.test.ts aprovados, mas coleta usa fixtures estáticas e armazenamento volátil.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/market-intelligence/server/marketSensing.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">05 — Prospecção & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Integrar crawler RSS e API de notícias reais com sanitização de fontes.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="02" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(22)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-02-06</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 02</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Autópsia Profunda de Negócios Ganhos e Perdidos</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Win-Loss Autopsy (Eixo 19) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-22">
+                <p style="color:#FFF; margin-bottom:10px;">Análise post-mortem de oportunidades com explicabilidade e hipóteses vs fatos.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Relatório estruturado com causa raiz de perda e aprendizados para o Playbook.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Lógica analítica completa em 455 linhas de código testadas, mas relatórios são persistidos em Map em memória sem tabela Prisma.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/intelligence/services/winLossAutopsy.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Criar migration Prisma WinLossReport e conectar ao gatilho de mudança de status no pipeline CRM.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="SOMENTE BACKEND" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(23)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-01</span>
+                  <span class="pill pill-warn">SOMENTE BACKEND</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">SDR Autônomo com Discagem Ativa por Voz</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  SDR Autônomo (Eixo 7) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-23">
+                <p style="color:#FFF; margin-bottom:10px;">Agente que realiza chamadas de qualificação por voz e agenda reuniões.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Discagem conectada à telefonia e integração com agenda.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários aprovados em testes sintéticos (autonomousSdr.service.test.ts), mas chamada real utiliza simulação sem tronco SIP/WebRTC externo ativo.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/ai-voice/server/autonomousSdr.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">12 — Voz & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Conectar gateway Asterisk/3CX/Twilio para chamadas em ambiente staging.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(24)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-02</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Motor Adaptativo de Cadência Multicanal</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Cadência Multicanal (Eixo 7) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-24">
+                <p style="color:#FFF; margin-bottom:10px;">Alternância inteligente entre canais (email, WhatsApp, telefone) baseada em engajamento.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Toques adaptados de acordo com sinais de abertura e respostas do lead.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Serviço implementado e validado com testes unitários em adaptiveMultichannelCadence.service.test.ts.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/cadence/services/adaptiveMultichannelCadence.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">17 — Cadência & 06 — Integrações</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(25)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-03</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Opt-Out Unificado e Respeito a Bloqueios</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Privacidade & Cadência (Eixo 7) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-25">
+                <p style="color:#FFF; margin-bottom:10px;">Bloqueio imediato e transversal de contatos após solicitação de opt-out em qualquer canal.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Nenhuma mensagem adicional disparada após registro de descadastro.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários validam bloqueio estrito em múltiplos canais após chamada de optOut.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/cadence/services/adaptiveMultichannelCadence.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">21 — Privacidade & 17 — Cadência</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(26)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-04</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Rascunho Automático de Propostas & Assinatura Digital</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Propostas Comerciais (Eixo 7) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-26">
+                <p style="color:#FFF; margin-bottom:10px;">Geração de PDF/HTML de proposta a partir de dados da oportunidade com link de aceite.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Criação de proposta versionada com rastreamento de abertura.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Geração de proposta e testes unitários aprovados, mas provedor externo de assinatura digital opera com mock sintético.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/proposals/services/proposalAutomation.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI & 18 — Contratos</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Integrar webhook de webhook de assinatura digital externa (ex: Clicksign/DocuSign).</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(27)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-05</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Motor Comportamental e Detecção de Gargalos</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Behavioral Engine (Eixo 4) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-27">
+                <p style="color:#FFF; margin-bottom:10px;">Análise de métricas do vendedor e emissão de missões de coaching adaptativo.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Identificação de taxas baixas de conversão em etapas específicas e emissão de XP.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    504 linhas de implementação testadas em tests/unit/gamification/behavioralEngine.service.test.ts (8 testes aprovados).
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/gamification/services/behavioralEngine.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI & 02 — Produto</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Persistir saldo de XP em tabela Prisma GamificationUserStats.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(28)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-06</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Simulador de ROI e Realização de Valor</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Previsibilidade Financeira (Eixo 17/20) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-28">
+                <p style="color:#FFF; margin-bottom:10px;">Calculadora de retorno sobre investimento B2B e acompanhamento pós-venda de valor prometido.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Cálculo de payback, VPL e geração de business case em PDF.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários aprovados em roiSimulator.service.test.ts e valueRealization.service.test.ts.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/commercial-intelligence/services/roiSimulator.service.ts, valueRealization.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(29)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-07</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Revenue Oracle (Previsão P10/P50/P90 e Backtest)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Previsibilidade Financeira (Eixo 20) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-29">
+                <p style="color:#FFF; margin-bottom:10px;">Motor estatístico de previsão de receitas multi-horizonte com distribuição de probabilidade.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Projeções derivadas de histórico real e métricas de erro (MAPE) calculadas.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Serviço existe e passa nos testes de contrato, mas valores 145k/485k/980k e MAPE 8.4% estão codificados como constantes sem cálculo sobre dados reais do banco.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/commercial-intelligence/services/predictiveRevenueOracle.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Implementar cálculo estatístico de regressão temporal e desvio padrão com dados reais da tabela Lead/Deal.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="03" data-status="SOMENTE FRONTEND" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(30)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-03-08</span>
+                  <span class="pill pill-warn">SOMENTE FRONTEND</span>
+                  <span class="pill pill-info">Onda 03</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Cockpit Executivo de Receita & Aprovação Humana</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Previsibilidade Financeira (Eixo 20) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-30">
+                <p style="color:#FFF; margin-bottom:10px;">Painel visual de simulação What-If e rebalanceamento de contas sob aprovação.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Rebalanceamento executado somente após clique de aprovação com persistência no DB.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    UI existe com gráficos de projeção, mas botão de aprovação dispara apenas setState e toast sem chamar endpoint backend para rebalancear contas.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/predictability/components/PredictiveRevenueCockpit.tsx</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">02 — Produto & 04 — CRM/BI</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Criar endpoint POST /api/v1/predictability/rebalance/approve e integrar chamada no frontend.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="04" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(31)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-04-01</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 04</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Streaming Bidirecional de Voz com Interrupção (Barge-In)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Voz Bimodal (Eixo 5) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-31">
+                <p style="color:#FFF; margin-bottom:10px;">Canal de voz contínuo via WebSocket com interrupção instantânea ao falar o usuário.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Latência de barge-in < 100ms; cancelamento imediato de geração de áudio.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários em tests/unit/ai-voice/bimodalLiveVoice.service.test.ts (6 testes) comprovam interrupção em 85ms e fallback resiliente. Falta teste com servidor WebSocket real em execução.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/ai-voice/server/bimodalLiveVoice.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">12 — Voz & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Conectar gateway WebSocket em ambiente staging para teste de tráfego de áudio PCM.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="04" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(32)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-04-02</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 04</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Gêmeos Digitais Metodológicos de Vendedores</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Digital Twins (Eixo 8) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-32">
+                <p style="color:#FFF; margin-bottom:10px;">Extração consentida de padrões dos melhores vendedores para mentoria sintética.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Geração de orientações metodológicas sem expor a identidade pessoal do vendedor.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários aprovados em tests/unit/intelligence/methodologicalDigitalTwin.service.test.ts.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/intelligence/services/methodologicalDigitalTwin.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">07 — IA & 02 — Produto</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="04" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(33)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-04-03</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 04</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Briefings Comerciais Offline e Expurgo no Logout</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Mobile Edge AI (Eixo 9) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-33">
+                <p style="color:#FFF; margin-bottom:10px;">Cache criptografado de dados do cliente no dispositivo móvel com expurgo estrito.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Nenhum briefing persiste no dispositivo após o encerramento da sessão.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários em tests/unit/mobile/mobileEdgeAi.service.test.ts (6 testes) comprovam expurgo completo de chaves e briefings no logout.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/mobile/mobileEdgeAi.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">09 — Mobile & 15 — Segurança</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Validar build nativo Android via scripts de sincronização do Capacitor.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="04" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(34)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-04-04</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 04</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Geofencing Consentido e Proteção Anti-Vigilância</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Mobile Edge AI (Eixo 9) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-34">
+                <p style="color:#FFF; margin-bottom:10px;">Sugestão de briefing de visita apenas com consentimento prévio e sem rastreamento contínuo.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Proibição de captura de GPS em segundo plano sem ação ativa do vendedor.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários comprovam que requisições de geofencing sem opt-in explícito são rejeitadas com erro de permissão.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/mobile/mobileEdgeAi.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">09 — Mobile & 21 — Privacidade</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="04" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(35)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-04-05</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 04</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Arena de Resolução de Objeções em Duelos</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  War Room Arena (Eixo 14) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-35">
+                <p style="color:#FFF; margin-bottom:10px;">Gamificação cooperativa para treinamento de superação de objeções complexas.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    IA avaliadora ética com feedback construtivo e atribuição de pontuação.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Implementação de 301 linhas e testes unitários em warRoomArena.service.test.ts (4 testes) aprovados.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/gamification/services/warRoomArena.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">02 — Produto & 03 — Design</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Persistir histórico de duelos em tabela relacional.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="04" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(36)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-04-06</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 04</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Assistente Estilístico com Trava Humana de Envio</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Shadow Copywriting (Eixo 15) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-36">
+                <p style="color:#FFF; margin-bottom:10px;">Redação de mensagens no tom de voz do vendedor, sem jamais disparar mensagens sem clique humano.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Proibição inviolável de envio autônomo e de adulteração de ofertas/preços.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários em tests/unit/social-selling/shadowCopywriting.service.test.ts comprovam bloqueio de auto-envio e integridade de preços.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/social-selling/server/shadowCopywriting.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(37)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-01</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Métricas Objetivas: Talk-to-Listen Ratio e Turnos</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Análise Conversacional (Eixo 13) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-37">
+                <p style="color:#FFF; margin-bottom:10px;">Cálculo da proporção de fala entre vendedor e cliente e identificação de monólogos.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Cálculo matemático sobre marcas de tempo sem inferência de emoção.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Implementação em 451 linhas e testes unitários em conversationalIntelligence.service.test.ts (6 testes) aprovados com sucesso.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/ai-voice/server/conversationalIntelligence.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">12 — Voz & 07 — IA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P0">
+              <div class="req-header" onclick="toggleReq(38)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-02</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P0</span>
+                  <span class="req-name">Salvaguarda Ética: Proibição de Inferência Emocional ou Médica</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Análise Conversacional (Eixo 13) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-38">
+                <p style="color:#FFF; margin-bottom:10px;">Proibição em código de detecção de estresse, ansiedade, burnout ou doenças mentais.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Nenhum campo ou métrica de saúde psicológica no contrato ou retorno.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Auditoria de código e contratos comprova total ausência de atributos de emoção/psicologia; conformidade estrita com diretriz ética de AGENTS.md.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/shared/contracts/conversationalCoaching.contract.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">12 — Voz & 21 — Privacidade</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Manter linter/ast-check proibindo a inclusão desses termos em PRs.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(39)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-03</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Prevenção de Sobrecarga e Sugestão de Pausas</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Bem-Estar Operacional (Eixo 18) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-39">
+                <p style="color:#FFF; margin-bottom:10px;">Alerta privativo ao vendedor após 3 reuniões consecutivas sugerindo intervalo.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Dados de pausa pertencem exclusivamente ao vendedor, sem acesso punitivo da gestão.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Implementação de 378 linhas e testes unitários em workloadWellbeing.service.test.ts (6 testes) aprovados.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/calendar/services/workloadWellbeing.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">04 — CRM/BI & 21 — Privacidade</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(40)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-04</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Anonimização de Relatórios de Carga com K-Anonymity (k=5)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Bem-Estar Operacional (Eixo 18) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-40">
+                <p style="color:#FFF; margin-bottom:10px;">Relatórios consolidados para gerência exigem no mínimo 5 vendedores distintos na amostra.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Se amostra < 5 vendedores, resultado suprimido para impedir dedução individual.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Código verifica total de reuniões/registros, mas deve garantir explicitamente 5 userIds distintos na agregação para cumprir k-anonymity estrito.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/calendar/services/workloadWellbeing.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">21 — Privacidade & 04 — CRM/BI</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Ajustar agregação para Set(records.map(r => r.userId)).size >= 5 antes de emitir relatório.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P2">
+              <div class="req-header" onclick="toggleReq(41)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-05</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-warn">P2</span>
+                  <span class="req-name">Simulador com Personas B2B Dinâmicas (CFO, CTO, COO)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Roleplay Multimodal (Evolução 17) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-41">
+                <p style="color:#FFF; margin-bottom:10px;">Treinamento de vendas multimodal com simulação de compradores executivos exigentes.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Personas reagem com objeções de preço, segurança e prazo conforme framework SPIN/BANT.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    307 linhas de implementação testadas em tests/unit/roleplay/multimodalRoleplaySimulator.service.test.ts.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/roleplay/services/multimodalRoleplaySimulator.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">07 — IA & 02 — Produto</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO PARCIALMENTE" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(42)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-06</span>
+                  <span class="pill pill-warn">IMPLEMENTADO PARCIALMENTE</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Failover Automatizado entre sa-east-1 e us-east-1</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Resiliência Multi-Região (Evolução 19) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-42">
+                <p style="color:#FFF; margin-bottom:10px;">Detecção de degradação de tráfego e comutação automática de endpoints de IA e voz.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    Failover simulado em menos de 500ms com preservação de estado da sessão.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Testes unitários em multiRegionResilience.service.test.ts aprovam simulação de failover em 280ms, mas chaveamento real de DNS/Envoy em nuvem não foi testado ao vivo.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/lib/runtime/services/multiRegionResilience.service.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">10 — Infraestrutura & 16 — Runtime</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Executar rehearsal de failover em ambiente AWS staging.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="IMPLEMENTADO E VALIDADO" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(43)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-07</span>
+                  <span class="pill pill-pass">IMPLEMENTADO E VALIDADO</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">SBOM CycloneDX & Monitoramento de Vulnerabilidades</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Governança & SBOM (Evolução 20) ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-43">
+                <p style="color:#FFF; margin-bottom:10px;">Geração reprodutível de manifesto de software e auditoria automatizada de waivers.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    cyclonedx-npm gera sbom.cdx.json; check-audit-waivers valida dependências.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Script security:audit-waivers exit code 0 sem achados HIGH/CRITICAL.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">package.json, scripts/security/check-audit-waivers.ts, sbom.cdx.json</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">15 — Segurança & 08 — QA</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Nenhuma ação impeditiva.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="req-item" data-wave="05" data-status="COM FALHA" data-criticality="P1">
+              <div class="req-header" onclick="toggleReq(44)">
+                <div class="req-title-area">
+                  <span class="req-id">REQ-05-08</span>
+                  <span class="pill pill-fail">COM FALHA</span>
+                  <span class="pill pill-info">Onda 05</span>
+                  <span class="pill pill-fail">P1</span>
+                  <span class="req-name">Conformidade de Formatação de Código (Biome)</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-muted);">
+                  Qualidade & Estilo ▾
+                </div>
+              </div>
+              <div class="req-details" id="req-detail-44">
+                <p style="color:#FFF; margin-bottom:10px;">Checagem estrita de formatação de código em todo o repositório.</p>
+                <div class="detail-grid">
+                  <div class="detail-box">
+                    <strong>Critério de Aceite Original</strong>
+                    npm run format:check exit code 0.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Evidência Forense Observada</strong>
+                    Execução real de npm run format:check falhou com código 1 em 14 arquivos da Onda 05. Divergência direta com pareceres anteriores.
+                  </div>
+                  <div class="detail-box">
+                    <strong>Arquivos & Contratos</strong>
+                    <code style="color:var(--brand-primary);">src/features/ai-voice/server/conversationalIntelligence.service.ts, src/shared/contracts/conversationalCoaching.contract.ts</code>
+                  </div>
+                  <div class="detail-box">
+                    <strong>Agente & Ação Necessária</strong>
+                    <span style="color:#FFF;">08 — QA e Release</span><br>
+                    <span style="color:var(--status-warn); font-size:12px;">Executar npx biome format --write nos 14 arquivos afetados em PR formal de QA.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 4: QUALITY GATES -->
+    <div id="quality-gates" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title">Quality Gates e Comandos Executados na Auditoria Real</div>
+        <p style="color:var(--text-muted); margin-bottom:16px;">
+          Resultado da execução de todos os scripts oficiais do package.json em 20/10/2026.
+        </p>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Gate / Script</th>
+                <th>Comando Real</th>
+                <th>Código de Saída</th>
+                <th>Resultado</th>
+                <th>Diagnóstico Forense</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td><strong>npm run lint</strong></td>
+                  <td><code>biome lint src</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">2001 arquivos verificados, 0 erros, 574 warnings, 8 infos</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run format:check</strong></td>
+                  <td><code>biome format src</code></td>
+                  <td><span class="pill pill-fail">1</span></td>
+                  <td><span class="pill pill-fail">FAIL</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">14 erros de formatação nos serviços recentes da Onda 05 (conversationalIntelligence, contracts)</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run typecheck</strong></td>
+                  <td><code>node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">Compilação TypeScript estrita concluída com 0 erros</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run test:architecture</strong></td>
+                  <td><code>depcruise && verify-cruise-coverage && check-hotspots</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">1743 módulos cruzados, 0 violações de camada, 0 hotspots não autorizados (18 exceções documentadas até 2026-11-30)</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run security:audit-waivers</strong></td>
+                  <td><code>tsx scripts/security/check-audit-waivers.ts</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">0 achados HIGH/CRITICAL em npm audit</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run verify:openapi-drift</strong></td>
+                  <td><code>tsx scripts/verify-openapi-drift.ts</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">73 prefixos, 443 rotas documentadas em openapi.yaml, 74 routers verificados, 0 derivo</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run build</strong></td>
+                  <td><code>vite build && esbuild server.ts && verify:pwa-precache</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">Vite build concluído (5857 módulos), server.cjs (3.0mb), PWA precache 181 entries (14.28MB)</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npm run build:worker</strong></td>
+                  <td><code>esbuild worker.ts --bundle --platform=node --format=cjs --outfile=dist/worker.cjs</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">dist/worker.cjs (1.0mb) gerado com sucesso em 105ms</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>npx prisma validate</strong></td>
+                  <td><code>npx prisma validate</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">Schema prisma/schema.prisma 100% válido, 140 migrations aplicadas</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>Testes Unitários das Ondas (Vitest)</strong></td>
+                  <td><code>npx vitest run tests/unit/{contracts,ai-voice,intelligence,gamification,cadence,commercial-intelligence,mobile,social-selling,calendar,roleplay,security}</code></td>
+                  <td><span class="pill pill-pass">0</span></td>
+                  <td><span class="pill pill-pass">PASS</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">38 arquivos de testes executados, 234 testes aprovados (0 falhas)</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>Testes de Integração & E2E</strong></td>
+                  <td><code>npm run test:integration / npm run test:e2e</code></td>
+                  <td><span class="pill pill-block">-1</span></td>
+                  <td><span class="pill pill-block">BLOCKED</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">Bloqueado no pretest: docker Postgres/Redis de teste não ativo no ambiente local do runner</td>
+                </tr>
+              
+                <tr>
+                  <td><strong>CI GitHub Actions Remoto</strong></td>
+                  <td><code>GitHub Action Run 39476055752 (PR #741 / main)</code></td>
+                  <td><span class="pill pill-fail">1</span></td>
+                  <td><span class="pill pill-fail">FAIL</span></td>
+                  <td style="color:var(--text-muted); font-size:12px;">Falha no passo Run Prettier check em ci.yml; passos posteriores pulados</td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 5: 20 EIXOS E 6 CAPACIDADES -->
+    <div id="eixos-capacidades" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title">Matriz das Seis Capacidades Estratégicas (C1 a C6)</div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Capacidade</th>
+                <th>Escopo Principal</th>
+                <th>Status Real</th>
+                <th>Cobertura de Código</th>
+                <th>Diagnóstico Forense</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>C1 — RevOps & Previsibilidade</strong></td>
+                <td>Projeções multi-horizonte (P10/P50/P90), backtesting e cockpit executivo.</td>
+                <td><span class="pill pill-warn">PARCIAL</span></td>
+                <td>predictiveRevenueOracle.service.ts</td>
+                <td>Serviço funcional, mas constantes estáticas no backtest; cockpit de aprovação apenas frontend.</td>
+              </tr>
+              <tr>
+                <td><strong>C2 — Gamificação Comportamental</strong></td>
+                <td>Behavioral Engine, missões adaptativas, XP, badges e War Room Arena.</td>
+                <td><span class="pill pill-pass">VALIDADO</span></td>
+                <td>behavioralEngine.service.ts, warRoomArena.service.ts</td>
+                <td>8 testes unitários aprovados; lógica íntegra, requer apenas migração de persistência no DB.</td>
+              </tr>
+              <tr>
+                <td><strong>C3 — Roleplay Multimodal & Coaching</strong></td>
+                <td>Simulador de compradores B2B, análise conversacional e Talk-to-Listen ratio.</td>
+                <td><span class="pill pill-pass">VALIDADO</span></td>
+                <td>conversationalIntelligence.service.ts</td>
+                <td>Métricas de diálogo testadas com precisão e salvaguarda ética estrita sem inferência emocional.</td>
+              </tr>
+              <tr>
+                <td><strong>C4 — Social Selling & Copywriting</strong></td>
+                <td>Assistente de escrita estilística consentida com trava humana obrigatória de envio.</td>
+                <td><span class="pill pill-pass">VALIDADO</span></td>
+                <td>shadowCopywriting.service.ts</td>
+                <td>Trava humana e proibição de alteração de preços testadas e comprovadas.</td>
+              </tr>
+              <tr>
+                <td><strong>C5 — VoiceHub & Telefonia Live</strong></td>
+                <td>Streaming bimodal bidirecional com interrupção instantânea (barge-in < 100ms).</td>
+                <td><span class="pill pill-warn">PARCIAL (SIMULADO)</span></td>
+                <td>bimodalLiveVoice.service.ts</td>
+                <td>Barge-in comprovado em 85ms em teste sintético; provedor real externo não conectado.</td>
+              </tr>
+              <tr>
+                <td><strong>C6 — Mobile Edge AI & Offline-First</strong></td>
+                <td>Briefings offline criptografados com expurgo imediato no logout e geofencing consentido.</td>
+                <td><span class="pill pill-pass">VALIDADO</span></td>
+                <td>mobileEdgeAi.service.ts</td>
+                <td>Expurgo comprovado em testes unitários; diretriz de privacidade estritamente atendida.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 6: CINCO AJUSTES ESSENCIAIS -->
+    <div id="cinco-ajustes" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title">Auditoria dos Cinco Ajustes Essenciais Transversais</div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Ajuste Essencial</th>
+                <th>Requisito Transversal</th>
+                <th>Status Auditado</th>
+                <th>Evidência de Código</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Ajuste 1: Memória com Curadoria</strong></td>
+                <td>Proveniência, minimização de PII, classificação de confiança e retração.</td>
+                <td><span class="pill pill-warn">PARCIAL</span></td>
+                <td>Retração no Flywheel opera em memória e não expurga matriz gravada no PostgreSQL.</td>
+              </tr>
+              <tr>
+                <td><strong>Ajuste 2: Aprendizado por Resultados</strong></td>
+                <td>Ausência de causalidade inventada ou métricas fabricadas.</td>
+                <td><span class="pill pill-fail">COM FALHA</span></td>
+                <td>Revenue Oracle usa MAPE 8.4% e 142 amostras em constantes estáticas.</td>
+              </tr>
+              <tr>
+                <td><strong>Ajuste 3: RAG Multi-Tenant Seguro</strong></td>
+                <td>Filtro organizationId inegociável, isolamento vetorial e ausência de vazamento.</td>
+                <td><span class="pill pill-pass">VALIDADO</span></td>
+                <td>Testes de isolamento entre 2 tenants em knowledge-rag-tenant-isolation.test.ts aprovados.</td>
+              </tr>
+              <tr>
+                <td><strong>Ajuste 4: Eventos Confiáveis</strong></td>
+                <td>Outbox transacional, idempotência durável, retries com backoff exponencial.</td>
+                <td><span class="pill pill-warn">PARCIAL</span></td>
+                <td>DomainEventMesh publica em memória/logs, falta tabela de Outbox transacional no banco.</td>
+              </tr>
+              <tr>
+                <td><strong>Ajuste 5: IA Supervisionada & Explicável</strong></td>
+                <td>Limites de autonomia, aprovação humana prévia e auditabilidade.</td>
+                <td><span class="pill pill-pass">VALIDADO</span></td>
+                <td>AutonomyGovernorService e travas humanas de Shadow Copywriting aprovados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 7: PLANO DE CORREÇÃO -->
+    <div id="plano-correcao" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title">Backlog de Remediação Priorizado para Liberação em Produção</div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:70px;">Prioridade</th>
+                <th style="width:90px;">Código</th>
+                <th>Ação Corretiva</th>
+                <th>Agente Proprietário</th>
+                <th>Arquivos Impactados</th>
+                <th>Esforço Estimado</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td><span class="pill pill-fail">P1</span></td>
+                  <td><code>REMED-01</code></td>
+                  <td><strong style="color:#FFF;">Correção dos 14 Erros de Formatação Biome da Onda 05</strong></td>
+                  <td>Agente 08 — QA</td>
+                  <td><code>conversationalIntelligence.service.ts, conversationalCoaching.contract.ts</code></td>
+                  <td>Baixo (15 min)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">P1</span></td>
+                  <td><code>REMED-02</code></td>
+                  <td><strong style="color:#FFF;">Persistência Relacional Prisma para Grafo de Contas e Autópsia</strong></td>
+                  <td>Agente 01 — Plataforma & Dados</td>
+                  <td><code>prisma/schema.prisma, accountKnowledgeGraph.service.ts, winLossAutopsy.service.ts</code></td>
+                  <td>Médio (2 dias)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">P1</span></td>
+                  <td><code>REMED-03</code></td>
+                  <td><strong style="color:#FFF;">Cálculo Estatístico Real no Revenue Oracle (Remoção de Constantes)</strong></td>
+                  <td>Agente 04 — CRM & BI</td>
+                  <td><code>predictiveRevenueOracle.service.ts</code></td>
+                  <td>Médio (1 dia)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">P1</span></td>
+                  <td><code>REMED-04</code></td>
+                  <td><strong style="color:#FFF;">Endpoint e Persistência de Aprovação de Rebalanceamento</strong></td>
+                  <td>Agente 02 — Produto & 04 — CRM</td>
+                  <td><code>PredictiveRevenueCockpit.tsx, predictive.routes.ts</code></td>
+                  <td>Baixo (4 horas)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-fail">P1</span></td>
+                  <td><code>REMED-05</code></td>
+                  <td><strong style="color:#FFF;">Outbox Transacional e Idempotência Durável no DomainEventMesh</strong></td>
+                  <td>Agente 16 — Runtime & 01 — Plataforma</td>
+                  <td><code>domainEventMesh.service.ts, prisma/schema.prisma</code></td>
+                  <td>Médio (2 dias)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-warn">P2</span></td>
+                  <td><code>REMED-06</code></td>
+                  <td><strong style="color:#FFF;">Persistência Durável da Cadeia de Consentimento Criptográfica</strong></td>
+                  <td>Agente 21 — Privacidade & 15 — Segurança</td>
+                  <td><code>consentAuditChain.service.ts</code></td>
+                  <td>Médio (1 dia)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-warn">P2</span></td>
+                  <td><code>REMED-07</code></td>
+                  <td><strong style="color:#FFF;">Validação Estrita de K-Anonymity (5 Vendedores Distintos)</strong></td>
+                  <td>Agente 21 — Privacidade & 04 — CRM</td>
+                  <td><code>workloadWellbeing.service.ts</code></td>
+                  <td>Baixo (2 horas)</td>
+                </tr>
+              
+                <tr>
+                  <td><span class="pill pill-warn">P2</span></td>
+                  <td><code>REMED-08</code></td>
+                  <td><strong style="color:#FFF;">Otimização de Chunks Grandes no Bundle de Frontend (>500kB)</strong></td>
+                  <td>Agente 02 — Produto & 08 — QA</td>
+                  <td><code>vite.config.ts, src/App.tsx</code></td>
+                  <td>Médio (1 dia)</td>
+                </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 8: PARECER AGENTE 24 -->
+    <div id="parecer-24" class="tab-pane">
+      <div class="content-card">
+        <div class="card-title">Parecer de Revisão Independente — Agente 24</div>
+        <div style="background:rgba(7,11,20,0.6); padding:20px; border-radius:8px; border:1px solid var(--border-line); font-family:monospace; font-size:13px; line-height:1.6;">
+          <p><strong style="color:var(--brand-primary);">PARECER OFICIAL DO AUDITOR INDEPENDENTE (AGENTE 24)</strong></p>
+          <p><strong>Missão:</strong> Auditoria Forense Definitiva das 6 Ondas (00 a 05)</p>
+          <p><strong>SHA Auditado:</strong> 281cfcd3d4dbd0d9159fbaa6b702603a1b6884a8</p>
+          <p><strong>Data:</strong> 2026-10-20</p>
+          <br>
+          <p><strong>1. Conclusão da Revisão Independente:</strong></p>
+          <p>O Agente 24 revisou os diffs, a matriz de rastreabilidade e as evidências executadas pelo Agente 00.</p>
+          <p>Fica comprovado que:</p>
+          <p>- As 6 Ondas representam um avanço estrutural e algorítmico gigantesco no repositório, com contratos consolidados, typecheck perfeito (0 erros) e testes unitários das ondas com 100% de sucesso (234/234 aprovados).</p>
+          <p>- A salvaguarda ética e conformidade com AGENTS.md (zero vigilância emocional, opt-out de privacidade e proteção ao vendedor) foi rigorosamente cumprida em código.</p>
+          <p>- Contudo, para PRODUÇÃO, a auditoria confirma 5 bloqueadores P1 (serviços operando em memória sem PostgreSQL, constantes fixas no backtesting do Revenue Oracle, simulação de gateways e falha no gate de formatação).</p>
+          <br>
+          <p><strong>2. Veredito Oficial do Agente 24:</strong></p>
+          <p><strong style="color:var(--status-warn);">STAGING / HOMOLOGAÇÃO: APROVADO COM RESSALVAS (GO CONDICIONAL)</strong></p>
+          <p><strong style="color:var(--status-fail);">PRODUÇÃO / GO-LIVE COMERCIAL: BLOQUEADO (NO-GO) até saneamento do Backlog P1.</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function toggleReq(idx) {
+      const el = document.getElementById('req-detail-' + idx);
+      if (el) el.classList.toggle('open');
+    }
+
+    let onlyPending = false;
+    function toggleOnlyPending() {
+      onlyPending = !onlyPending;
+      document.getElementById('pendingBtnText').innerText = onlyPending ? 'Exibir Todos' : 'Apenas Pendências';
+      filterReqs();
+    }
+
+    function filterReqs() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const wave = document.getElementById('waveFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      document.querySelectorAll('.req-item').forEach(el => {
+        const itemWave = el.getAttribute('data-wave');
+        const itemStatus = el.getAttribute('data-status');
+        const text = el.innerText.toLowerCase();
+
+        const matchQuery = !q || text.includes(q);
+        const matchWave = !wave || itemWave === wave;
+        const matchStatus = !status || itemStatus === status;
+        const matchPending = !onlyPending || (itemStatus !== 'IMPLEMENTADO E VALIDADO');
+
+        if (matchQuery && matchWave && matchStatus && matchPending) {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    function exportMatrixJSON() {
+      const matrixData = [
+  {
+    "id": "REQ-00-01",
+    "wave": "00",
+    "category": "Governança & Arquitetura",
+    "name": "Inventário Arquitetural & Boundaries de Domínio",
+    "desc": "Controle de dependências circulares e acoplamento entre domínios via dependency-cruiser.",
+    "criteria": "depcruise sem violações não mapeadas; baseline atualizado.",
+    "agent": "08 — QA & 00 — Coordenador",
+    "files": ".dependency-cruiser.cjs, .dependency-cruiser-known-violations.json",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "Auditado via npm run test:architecture: 1743 módulos verificados com 0 violações.",
+    "action": "Manter monitoramento contínuo em PRs."
+  },
+  {
+    "id": "REQ-00-02",
+    "wave": "00",
+    "category": "Governança & Qualidade",
+    "name": "Controle de Hotspots (> 1000 linhas)",
+    "desc": "Auditoria de tamanho de arquivos para evitar monolitos e degradação de manutenção.",
+    "criteria": "Nenhum arquivo >1000 linhas sem exceção explícita em HOTSPOT_EXCEPTIONS.md.",
+    "agent": "08 — QA & 00 — Coordenador",
+    "files": "scripts/architecture/check-hotspots.ts, HOTSPOT_EXCEPTIONS.md",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "Auditado: 1692 arquivos inspecionados. 18 exceções ativas com donos mapeados até 2026-11-30.",
+    "action": "Refatorar e modularizar os 18 arquivos em sprints de saneamento dedicadas."
+  },
+  {
+    "id": "REQ-00-03",
+    "wave": "00",
+    "category": "Governança Git",
+    "name": "Isolamento de Branches e Governança de Worktrees",
+    "desc": "Políticas de branch por agente, integração em lote e proibição de push direto na main.",
+    "criteria": "Branches agente/NN-*, integracao/onda-* com gates a cada 2-3 merges.",
+    "agent": "00 — Coordenador & 08A — Git/AWS",
+    "files": "AGENTS.md, .agents/prompts/00-coordenador.md",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "não aplicáveis",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Ondas integradas via branches próprias, porém houve commits de refinamento acumulados diretamente na main após merge da Onda 05 sem gate PR formal.",
+    "action": "Restabelecer proteção de branch rígida no GitHub (branch protection rules)."
+  },
+  {
+    "id": "REQ-00-04",
+    "wave": "00",
+    "category": "Segurança & RLS",
+    "name": "Isolamento Multi-Tenant via RLS no PostgreSQL",
+    "desc": "Políticas de Row-Level Security garantindo que nenhum tenant acerte dados de outro no DB.",
+    "criteria": "RLS habilitado em todas as tabelas de tenant; testes de acesso cruzado rejeitados.",
+    "agent": "01 — Plataforma & 01A — Confiabilidade",
+    "files": "prisma/migrations/*enable_rls*, tests/integration/rls-coverage.test.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "pendente",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Migrations de RLS criadas para tabelas do core, porém serviços recentes da Onda 02/03 operam em Map em memória sem RLS no PostgreSQL.",
+    "action": "Criar tabelas Prisma e migrações de RLS para entidades de Grafo, Behavioral e Autópsia."
+  },
+  {
+    "id": "REQ-00-05",
+    "wave": "00",
+    "category": "Segurança & RBAC",
+    "name": "Unificação de Papéis e Permissões (RBAC)",
+    "desc": "Controle de acesso granular baseado em papéis (Job Roles) em rotas e ações da API.",
+    "criteria": "Nenhuma rota administrativa desprotegida; verificação no composition root.",
+    "agent": "01 — Plataforma & 15 — Segurança",
+    "files": "src/features/job-roles/, src/lib/voice-hub/middlewares/rbac.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "RBAC presente em 41 arquivos, porém algumas rotas legadas utilizam validação permissiva local.",
+    "action": "Consolidar middleware RBAC único em todas as 74 rotas documentadas em openapi.yaml."
+  },
+  {
+    "id": "REQ-00-06",
+    "wave": "00",
+    "category": "Banco de Dados",
+    "name": "Prisma Schema & Integridade de Migrations",
+    "desc": "Schema declarativo de banco de dados e migrações relacionais auditadas.",
+    "criteria": "140 migrations válidas, schema sem drift e prisma validate aprovado.",
+    "agent": "01 — Plataforma, Segurança e Dados",
+    "files": "prisma/schema.prisma, prisma/migrations/*",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Auditado: npx prisma validate exit code 0. 140 migrações estruturadas no histórico.",
+    "action": "Manter freeze de schema sem handoff formal para o Agente 01."
+  },
+  {
+    "id": "REQ-00-07",
+    "wave": "00",
+    "category": "Runtime & Filas",
+    "name": "Runtime Assíncrono com BullMQ e Redis",
+    "desc": "Processamento de tarefas em background, filas distribuídas e resiliência a picos.",
+    "criteria": "worker.ts empacotado e rodando separadamente da API HTTP server.ts.",
+    "agent": "16 — Runtime & Filas",
+    "files": "worker.ts, src/lib/queue/index.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "npm run build:worker compila com sucesso gerando dist/worker.cjs (1.0mb) em 105ms.",
+    "action": "Garantir monitoramento do Bull-Board com senha e RLS em staging/prod."
+  },
+  {
+    "id": "REQ-00-08",
+    "wave": "00",
+    "category": "Frontend & PWA",
+    "name": "Build de Produção e Precache PWA",
+    "desc": "Empacotamento com Vite, esbuild server.cjs e manifesto de serviço offline PWA.",
+    "criteria": "npm run build exit 0; dist/sw.js com precache consistente.",
+    "agent": "02 — Produto & 08 — QA",
+    "files": "vite.config.ts, server.ts, scripts/pwa/verify-precache.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "npm run build exit 0; Vite transformou 5857 módulos em 1m28s; 181 arquivos precacheados (14.28MB).",
+    "action": "Otimizar chunks >500kB (Sparkles, vendor-excel, echarts) com lazy loading adicional."
+  },
+  {
+    "id": "REQ-01-01",
+    "wave": "01",
+    "category": "Data Flywheel (Eixo 1)",
+    "name": "Extração Automática de Objeções Comerciais",
+    "desc": "Detecção de objeções em transcrições e reuniões com proveniência e contextualização.",
+    "criteria": "Objeções categorizadas e enviadas ao flywheel para análise pedagógica.",
+    "agent": "07 — IA e Automações",
+    "files": "src/features/intelligence/services/commercialLearningFlywheel.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Serviço existe e extrai objeções por regex/heurística, mas promoção assume confiança fixa (0.85) e desfecho único, sem prova estatística com volume mínimo.",
+    "action": "Conectar cálculo probabilístico bayesiano e amostragem mínima de 10 ocorrências para promoção."
+  },
+  {
+    "id": "REQ-01-02",
+    "wave": "01",
+    "category": "Data Flywheel (Eixo 1)",
+    "name": "Promoção e Retração no Playbook Comercial",
+    "desc": "Ciclo de vida de abordagens comerciais aprendidas: promoção supervisionada e retração.",
+    "criteria": "Abordagens ineficazes ou desatualizadas são removidas do Playbook.",
+    "agent": "07 — IA & 04 — CRM/BI",
+    "files": "src/shared/contracts/dataFlywheel.contract.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Contrato prevê promoção/retração, mas operação em memória não propaga deleção para a tabela de Playbook persistida no PostgreSQL.",
+    "action": "Implementar adapter Prisma para salvar itens promovidos na tabela PlaybookMatrixItem."
+  },
+  {
+    "id": "REQ-01-03",
+    "wave": "01",
+    "category": "RAG Híbrido (Eixo 2)",
+    "name": "Busca Textual e Recuperação Vetorial Híbrida",
+    "desc": "Combinação de busca textual BM25/trigram com busca vetorial por embeddings.",
+    "criteria": "Recuperação com peso balanceado e filtro obrigatório por organizationId.",
+    "agent": "07 — IA & 01 — Plataforma",
+    "files": "src/features/knowledge/search.service.ts, vector-support.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Código implementado e com suporte a pgvector, porém validação completa depende de extensão pgvector instalada no PostgreSQL de produção.",
+    "action": "Verificar script de migração setup-vector-db.ts em homologação e staging."
+  },
+  {
+    "id": "REQ-01-04",
+    "wave": "01",
+    "category": "RAG Híbrido (Eixo 2)",
+    "name": "Re-Ranking Semântico e Similar Deals",
+    "desc": "Algoritmo de reclassificação de relevância e recomendação de negócios semelhantes.",
+    "criteria": "Re-ranking aplicado antes do envio de contexto para a LLM.",
+    "agent": "07 — IA e Automações",
+    "files": "src/features/knowledge/services/reranker.service.ts, similarDeals.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "Testes unitários dedicados em reranker.service.test.ts passando com sucesso.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-01-05",
+    "wave": "01",
+    "category": "DomainEventMesh (Eixo 3)",
+    "name": "Barramento de Eventos Unificado e Versionado",
+    "desc": "Eventos de domínio tipados para orquestração assíncrona entre módulos.",
+    "criteria": "Contratos estritos em domainEventMesh.contract.ts e publicação observável.",
+    "agent": "16 — Runtime & 18 — Contratos",
+    "files": "src/shared/contracts/domainEventMesh.contract.ts, src/lib/queue/domainEventMesh.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Contratos e serviço de mensageria com tipagem estrita e validação de schema implementados e aprovados nos testes unitários.",
+    "action": "Expandir publicação de eventos para os webhooks legados do Bitrix24."
+  },
+  {
+    "id": "REQ-01-06",
+    "wave": "01",
+    "category": "DomainEventMesh (Eixo 3)",
+    "name": "Outbox Transacional e Idempotência Durável",
+    "desc": "Persistência de eventos antes do envio externo para evitar perda de dados em falhas.",
+    "criteria": "Tabela de Outbox no PostgreSQL e processamento com backoff e retries.",
+    "agent": "16 — Runtime & 01 — Plataforma",
+    "files": "src/lib/queue/domainEventMesh.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "DomainEventMesh opera com emissão de eventos em memória/logs sem tabela de Outbox persistente no banco relacional.",
+    "action": "Criar migration Prisma DomainEventOutbox e worker de reenvio de falhas com BullMQ."
+  },
+  {
+    "id": "REQ-01-07",
+    "wave": "01",
+    "category": "FinOps (Eixo 10)",
+    "name": "Cache Semântico e Quotas de Tokens por Tenant",
+    "desc": "Redução de custos de inferência de IA com cache e governança de orçamento.",
+    "criteria": "Controle de limites por tenant e reuso de respostas para prompts repetidos.",
+    "agent": "23 — FinOps & 07 — IA",
+    "files": "src/lib/ai/finops/tokenQuota.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "TokenQuotaService com controle de quotas mensais e testes unitários aprovados.",
+    "action": "Integrar cache semântico diretamente no cluster Redis distribuído."
+  },
+  {
+    "id": "REQ-01-08",
+    "wave": "01",
+    "category": "Privacidade & LGPD (Eixo 16)",
+    "name": "Minimização de PII e Tokenização Criptográfica",
+    "desc": "Sanitização de dados pessoais antes do envio para APIs externas e LLMs.",
+    "criteria": "PII substituída por tokens opacos reversíveis apenas internamente.",
+    "agent": "21 — Privacidade & 15 — Segurança",
+    "files": "src/lib/security/piiTokenizer.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Testes unitários em tests/unit/security/piiTokenizer.service.test.ts (4 testes) aprovados.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-01-09",
+    "wave": "01",
+    "category": "Privacidade & LGPD (Eixo 16)",
+    "name": "Cadeia de Auditoria de Consentimento (Audit Chain)",
+    "desc": "Registro criptográfico imutável de termos de consentimento e opt-ins.",
+    "criteria": "Hash encadeado em blocos sha-256 e verificação de integridade da cadeia.",
+    "agent": "21 — Privacidade & 15 — Segurança",
+    "files": "src/lib/security/consentAuditChain.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Algoritmo criptográfico validado em testes unitários, mas a cadeia reside em memória e se perde no restart da API.",
+    "action": "Persistir blocos da cadeia de consentimento em tabela PostgreSQL protegida por RLS."
+  },
+  {
+    "id": "REQ-02-01",
+    "wave": "02",
+    "category": "Grafo de Contas (Eixo 6)",
+    "name": "Grafo Semântico de Contas, Decisores e Relações B2B",
+    "desc": "Mapeamento de organogramas, comitê de compras e relacionamentos inter-empresas.",
+    "criteria": "Descoberta de multi-threading e conexões formais/inferidas com scoring.",
+    "agent": "04 — CRM/BI & 07 — IA",
+    "files": "src/features/knowledge/services/accountKnowledgeGraph.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Lógica algorítmica e testes em tests/unit/knowledge/accountKnowledgeGraph.service.test.ts (4 testes) aprovados, mas nós e arestas residem em Map em memória.",
+    "action": "Mapear entidade AccountKnowledgeNode e arestas no schema Prisma."
+  },
+  {
+    "id": "REQ-02-02",
+    "wave": "02",
+    "category": "Swarm Tático (Eixo 11)",
+    "name": "Agente Detetive de Conta",
+    "desc": "Agente autônomo que investiga histórico, faturamento e riscos antes de calls.",
+    "criteria": "Registro no catálogo de agentes e geração de dossiê investigativo.",
+    "agent": "13 — Swarm & 07 — IA",
+    "files": "src/features/intelligence/agents/tactical/accountDetective.agent.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Implementação existe com prompt e contrato em tacticalSwarm.contract.ts, mas endpoints dedicados de invocação na API REST pública estão ausentes.",
+    "action": "Expor rota REST POST /api/v1/intelligence/agents/account-detective/investigate."
+  },
+  {
+    "id": "REQ-02-03",
+    "wave": "02",
+    "category": "Swarm Tático (Eixo 11)",
+    "name": "Agente Guardião de Promessas",
+    "desc": "Monitora compromissos comerciais verbais e evita promessas técnicas irrealizáveis.",
+    "criteria": "Identificação de promessas de prazo/preço em propostas e mensagens.",
+    "agent": "13 — Swarm & 07 — IA",
+    "files": "src/features/intelligence/agents/tactical/promiseGuardian.agent.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Testes unitários aprovados, mas tarefas de confirmação são geradas como UUIDs em memória sem registrar tarefa no CRM.",
+    "action": "Vincular compromissos aprovados à tabela Task do CRM relacional."
+  },
+  {
+    "id": "REQ-02-04",
+    "wave": "02",
+    "category": "Swarm Tático (Eixo 11)",
+    "name": "Agente Advogado do Diabo",
+    "desc": "Simula objeções agressivas e contrapontos de concorrentes antes do fechamento.",
+    "criteria": "Geração de stress test de propostas comerciais.",
+    "agent": "13 — Swarm & 07 — IA",
+    "files": "src/features/intelligence/agents/tactical/devilsAdvocate.agent.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Lógica e testes unitários aprovados; geração sintética funcional, mas dependente de fallback local quando provider LLM não configurado.",
+    "action": "Conectar provider Groq/OpenAI/Gemini com timeout resiliente de 3000ms."
+  },
+  {
+    "id": "REQ-02-05",
+    "wave": "02",
+    "category": "Market Sensing (Eixo 12)",
+    "name": "Monitoramento de Sinais Externos e Notícias de Mercado",
+    "desc": "Captura de sinais de expansão, M&A e mudanças executivas para timing de abordagem.",
+    "criteria": "Ingestão de feeds externos e correlação com contas do CRM.",
+    "agent": "05 — Prospecção & 07 — IA",
+    "files": "src/features/market-intelligence/server/marketSensing.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P2",
+    "finding": "Testes em tests/unit/market-intelligence/marketSensing.service.test.ts aprovados, mas coleta usa fixtures estáticas e armazenamento volátil.",
+    "action": "Integrar crawler RSS e API de notícias reais com sanitização de fontes."
+  },
+  {
+    "id": "REQ-02-06",
+    "wave": "02",
+    "category": "Win-Loss Autopsy (Eixo 19)",
+    "name": "Autópsia Profunda de Negócios Ganhos e Perdidos",
+    "desc": "Análise post-mortem de oportunidades com explicabilidade e hipóteses vs fatos.",
+    "criteria": "Relatório estruturado com causa raiz de perda e aprendizados para o Playbook.",
+    "agent": "04 — CRM/BI & 07 — IA",
+    "files": "src/features/intelligence/services/winLossAutopsy.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Lógica analítica completa em 455 linhas de código testadas, mas relatórios são persistidos em Map em memória sem tabela Prisma.",
+    "action": "Criar migration Prisma WinLossReport e conectar ao gatilho de mudança de status no pipeline CRM."
+  },
+  {
+    "id": "REQ-03-01",
+    "wave": "03",
+    "category": "SDR Autônomo (Eixo 7)",
+    "name": "SDR Autônomo com Discagem Ativa por Voz",
+    "desc": "Agente que realiza chamadas de qualificação por voz e agenda reuniões.",
+    "criteria": "Discagem conectada à telefonia e integração com agenda.",
+    "agent": "12 — Voz & 07 — IA",
+    "files": "src/features/ai-voice/server/autonomousSdr.service.ts",
+    "status": "SOMENTE BACKEND",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Testes unitários aprovados em testes sintéticos (autonomousSdr.service.test.ts), mas chamada real utiliza simulação sem tronco SIP/WebRTC externo ativo.",
+    "action": "Conectar gateway Asterisk/3CX/Twilio para chamadas em ambiente staging."
+  },
+  {
+    "id": "REQ-03-02",
+    "wave": "03",
+    "category": "Cadência Multicanal (Eixo 7)",
+    "name": "Motor Adaptativo de Cadência Multicanal",
+    "desc": "Alternância inteligente entre canais (email, WhatsApp, telefone) baseada em engajamento.",
+    "criteria": "Toques adaptados de acordo com sinais de abertura e respostas do lead.",
+    "agent": "17 — Cadência & 06 — Integrações",
+    "files": "src/features/cadence/services/adaptiveMultichannelCadence.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Serviço implementado e validado com testes unitários em adaptiveMultichannelCadence.service.test.ts.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-03-03",
+    "wave": "03",
+    "category": "Privacidade & Cadência (Eixo 7)",
+    "name": "Opt-Out Unificado e Respeito a Bloqueios",
+    "desc": "Bloqueio imediato e transversal de contatos após solicitação de opt-out em qualquer canal.",
+    "criteria": "Nenhuma mensagem adicional disparada após registro de descadastro.",
+    "agent": "21 — Privacidade & 17 — Cadência",
+    "files": "src/features/cadence/services/adaptiveMultichannelCadence.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Testes unitários validam bloqueio estrito em múltiplos canais após chamada de optOut.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-03-04",
+    "wave": "03",
+    "category": "Propostas Comerciais (Eixo 7)",
+    "name": "Rascunho Automático de Propostas & Assinatura Digital",
+    "desc": "Geração de PDF/HTML de proposta a partir de dados da oportunidade com link de aceite.",
+    "criteria": "Criação de proposta versionada com rastreamento de abertura.",
+    "agent": "04 — CRM/BI & 18 — Contratos",
+    "files": "src/features/proposals/services/proposalAutomation.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Geração de proposta e testes unitários aprovados, mas provedor externo de assinatura digital opera com mock sintético.",
+    "action": "Integrar webhook de webhook de assinatura digital externa (ex: Clicksign/DocuSign)."
+  },
+  {
+    "id": "REQ-03-05",
+    "wave": "03",
+    "category": "Behavioral Engine (Eixo 4)",
+    "name": "Motor Comportamental e Detecção de Gargalos",
+    "desc": "Análise de métricas do vendedor e emissão de missões de coaching adaptativo.",
+    "criteria": "Identificação de taxas baixas de conversão em etapas específicas e emissão de XP.",
+    "agent": "04 — CRM/BI & 02 — Produto",
+    "files": "src/features/gamification/services/behavioralEngine.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "504 linhas de implementação testadas em tests/unit/gamification/behavioralEngine.service.test.ts (8 testes aprovados).",
+    "action": "Persistir saldo de XP em tabela Prisma GamificationUserStats."
+  },
+  {
+    "id": "REQ-03-06",
+    "wave": "03",
+    "category": "Previsibilidade Financeira (Eixo 17/20)",
+    "name": "Simulador de ROI e Realização de Valor",
+    "desc": "Calculadora de retorno sobre investimento B2B e acompanhamento pós-venda de valor prometido.",
+    "criteria": "Cálculo de payback, VPL e geração de business case em PDF.",
+    "agent": "04 — CRM/BI",
+    "files": "src/features/commercial-intelligence/services/roiSimulator.service.ts, valueRealization.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "Testes unitários aprovados em roiSimulator.service.test.ts e valueRealization.service.test.ts.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-03-07",
+    "wave": "03",
+    "category": "Previsibilidade Financeira (Eixo 20)",
+    "name": "Revenue Oracle (Previsão P10/P50/P90 e Backtest)",
+    "desc": "Motor estatístico de previsão de receitas multi-horizonte com distribuição de probabilidade.",
+    "criteria": "Projeções derivadas de histórico real e métricas de erro (MAPE) calculadas.",
+    "agent": "04 — CRM/BI",
+    "files": "src/features/commercial-intelligence/services/predictiveRevenueOracle.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Serviço existe e passa nos testes de contrato, mas valores 145k/485k/980k e MAPE 8.4% estão codificados como constantes sem cálculo sobre dados reais do banco.",
+    "action": "Implementar cálculo estatístico de regressão temporal e desvio padrão com dados reais da tabela Lead/Deal."
+  },
+  {
+    "id": "REQ-03-08",
+    "wave": "03",
+    "category": "Previsibilidade Financeira (Eixo 20)",
+    "name": "Cockpit Executivo de Receita & Aprovação Humana",
+    "desc": "Painel visual de simulação What-If e rebalanceamento de contas sob aprovação.",
+    "criteria": "Rebalanceamento executado somente após clique de aprovação com persistência no DB.",
+    "agent": "02 — Produto & 04 — CRM/BI",
+    "files": "src/features/predictability/components/PredictiveRevenueCockpit.tsx",
+    "status": "SOMENTE FRONTEND",
+    "integration": "ausente",
+    "tests": "não executados",
+    "env": "desenvolvimento",
+    "security": "pendente",
+    "readiness": "bloqueada",
+    "criticality": "P1",
+    "finding": "UI existe com gráficos de projeção, mas botão de aprovação dispara apenas setState e toast sem chamar endpoint backend para rebalancear contas.",
+    "action": "Criar endpoint POST /api/v1/predictability/rebalance/approve e integrar chamada no frontend."
+  },
+  {
+    "id": "REQ-04-01",
+    "wave": "04",
+    "category": "Voz Bimodal (Eixo 5)",
+    "name": "Streaming Bidirecional de Voz com Interrupção (Barge-In)",
+    "desc": "Canal de voz contínuo via WebSocket com interrupção instantânea ao falar o usuário.",
+    "criteria": "Latência de barge-in < 100ms; cancelamento imediato de geração de áudio.",
+    "agent": "12 — Voz & 07 — IA",
+    "files": "src/features/ai-voice/server/bimodalLiveVoice.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Testes unitários em tests/unit/ai-voice/bimodalLiveVoice.service.test.ts (6 testes) comprovam interrupção em 85ms e fallback resiliente. Falta teste com servidor WebSocket real em execução.",
+    "action": "Conectar gateway WebSocket em ambiente staging para teste de tráfego de áudio PCM."
+  },
+  {
+    "id": "REQ-04-02",
+    "wave": "04",
+    "category": "Digital Twins (Eixo 8)",
+    "name": "Gêmeos Digitais Metodológicos de Vendedores",
+    "desc": "Extração consentida de padrões dos melhores vendedores para mentoria sintética.",
+    "criteria": "Geração de orientações metodológicas sem expor a identidade pessoal do vendedor.",
+    "agent": "07 — IA & 02 — Produto",
+    "files": "src/features/intelligence/services/methodologicalDigitalTwin.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "Testes unitários aprovados em tests/unit/intelligence/methodologicalDigitalTwin.service.test.ts.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-04-03",
+    "wave": "04",
+    "category": "Mobile Edge AI (Eixo 9)",
+    "name": "Briefings Comerciais Offline e Expurgo no Logout",
+    "desc": "Cache criptografado de dados do cliente no dispositivo móvel com expurgo estrito.",
+    "criteria": "Nenhum briefing persiste no dispositivo após o encerramento da sessão.",
+    "agent": "09 — Mobile & 15 — Segurança",
+    "files": "src/features/mobile/mobileEdgeAi.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Testes unitários em tests/unit/mobile/mobileEdgeAi.service.test.ts (6 testes) comprovam expurgo completo de chaves e briefings no logout.",
+    "action": "Validar build nativo Android via scripts de sincronização do Capacitor."
+  },
+  {
+    "id": "REQ-04-04",
+    "wave": "04",
+    "category": "Mobile Edge AI (Eixo 9)",
+    "name": "Geofencing Consentido e Proteção Anti-Vigilância",
+    "desc": "Sugestão de briefing de visita apenas com consentimento prévio e sem rastreamento contínuo.",
+    "criteria": "Proibição de captura de GPS em segundo plano sem ação ativa do vendedor.",
+    "agent": "09 — Mobile & 21 — Privacidade",
+    "files": "src/features/mobile/mobileEdgeAi.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Testes unitários comprovam que requisições de geofencing sem opt-in explícito são rejeitadas com erro de permissão.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-04-05",
+    "wave": "04",
+    "category": "War Room Arena (Eixo 14)",
+    "name": "Arena de Resolução de Objeções em Duelos",
+    "desc": "Gamificação cooperativa para treinamento de superação de objeções complexas.",
+    "criteria": "IA avaliadora ética com feedback construtivo e atribuição de pontuação.",
+    "agent": "02 — Produto & 03 — Design",
+    "files": "src/features/gamification/services/warRoomArena.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "Implementação de 301 linhas e testes unitários em warRoomArena.service.test.ts (4 testes) aprovados.",
+    "action": "Persistir histórico de duelos em tabela relacional."
+  },
+  {
+    "id": "REQ-04-06",
+    "wave": "04",
+    "category": "Shadow Copywriting (Eixo 15)",
+    "name": "Assistente Estilístico com Trava Humana de Envio",
+    "desc": "Redação de mensagens no tom de voz do vendedor, sem jamais disparar mensagens sem clique humano.",
+    "criteria": "Proibição inviolável de envio autônomo e de adulteração de ofertas/preços.",
+    "agent": "04 — CRM/BI & 07 — IA",
+    "files": "src/features/social-selling/server/shadowCopywriting.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Testes unitários em tests/unit/social-selling/shadowCopywriting.service.test.ts comprovam bloqueio de auto-envio e integridade de preços.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-05-01",
+    "wave": "05",
+    "category": "Análise Conversacional (Eixo 13)",
+    "name": "Métricas Objetivas: Talk-to-Listen Ratio e Turnos",
+    "desc": "Cálculo da proporção de fala entre vendedor e cliente e identificação de monólogos.",
+    "criteria": "Cálculo matemático sobre marcas de tempo sem inferência de emoção.",
+    "agent": "12 — Voz & 07 — IA",
+    "files": "src/features/ai-voice/server/conversationalIntelligence.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Implementação em 451 linhas e testes unitários em conversationalIntelligence.service.test.ts (6 testes) aprovados com sucesso.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-05-02",
+    "wave": "05",
+    "category": "Análise Conversacional (Eixo 13)",
+    "name": "Salvaguarda Ética: Proibição de Inferência Emocional ou Médica",
+    "desc": "Proibição em código de detecção de estresse, ansiedade, burnout ou doenças mentais.",
+    "criteria": "Nenhum campo ou métrica de saúde psicológica no contrato ou retorno.",
+    "agent": "12 — Voz & 21 — Privacidade",
+    "files": "src/shared/contracts/conversationalCoaching.contract.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P0",
+    "finding": "Auditoria de código e contratos comprova total ausência de atributos de emoção/psicologia; conformidade estrita com diretriz ética de AGENTS.md.",
+    "action": "Manter linter/ast-check proibindo a inclusão desses termos em PRs."
+  },
+  {
+    "id": "REQ-05-03",
+    "wave": "05",
+    "category": "Bem-Estar Operacional (Eixo 18)",
+    "name": "Prevenção de Sobrecarga e Sugestão de Pausas",
+    "desc": "Alerta privativo ao vendedor após 3 reuniões consecutivas sugerindo intervalo.",
+    "criteria": "Dados de pausa pertencem exclusivamente ao vendedor, sem acesso punitivo da gestão.",
+    "agent": "04 — CRM/BI & 21 — Privacidade",
+    "files": "src/features/calendar/services/workloadWellbeing.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Implementação de 378 linhas e testes unitários em workloadWellbeing.service.test.ts (6 testes) aprovados.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-05-04",
+    "wave": "05",
+    "category": "Bem-Estar Operacional (Eixo 18)",
+    "name": "Anonimização de Relatórios de Carga com K-Anonymity (k=5)",
+    "desc": "Relatórios consolidados para gerência exigem no mínimo 5 vendedores distintos na amostra.",
+    "criteria": "Se amostra < 5 vendedores, resultado suprimido para impedir dedução individual.",
+    "agent": "21 — Privacidade & 04 — CRM/BI",
+    "files": "src/features/calendar/services/workloadWellbeing.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Código verifica total de reuniões/registros, mas deve garantir explicitamente 5 userIds distintos na agregação para cumprir k-anonymity estrito.",
+    "action": "Ajustar agregação para Set(records.map(r => r.userId)).size >= 5 antes de emitir relatório."
+  },
+  {
+    "id": "REQ-05-05",
+    "wave": "05",
+    "category": "Roleplay Multimodal (Evolução 17)",
+    "name": "Simulador com Personas B2B Dinâmicas (CFO, CTO, COO)",
+    "desc": "Treinamento de vendas multimodal com simulação de compradores executivos exigentes.",
+    "criteria": "Personas reagem com objeções de preço, segurança e prazo conforme framework SPIN/BANT.",
+    "agent": "07 — IA & 02 — Produto",
+    "files": "src/features/roleplay/services/multimodalRoleplaySimulator.service.ts",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P2",
+    "finding": "307 linhas de implementação testadas em tests/unit/roleplay/multimodalRoleplaySimulator.service.test.ts.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-05-06",
+    "wave": "05",
+    "category": "Resiliência Multi-Região (Evolução 19)",
+    "name": "Failover Automatizado entre sa-east-1 e us-east-1",
+    "desc": "Detecção de degradação de tráfego e comutação automática de endpoints de IA e voz.",
+    "criteria": "Failover simulado em menos de 500ms com preservação de estado da sessão.",
+    "agent": "10 — Infraestrutura & 16 — Runtime",
+    "files": "src/lib/runtime/services/multiRegionResilience.service.ts",
+    "status": "IMPLEMENTADO PARCIALMENTE",
+    "integration": "parcial",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "condicionada",
+    "criticality": "P1",
+    "finding": "Testes unitários em multiRegionResilience.service.test.ts aprovam simulação de failover em 280ms, mas chaveamento real de DNS/Envoy em nuvem não foi testado ao vivo.",
+    "action": "Executar rehearsal de failover em ambiente AWS staging."
+  },
+  {
+    "id": "REQ-05-07",
+    "wave": "05",
+    "category": "Governança & SBOM (Evolução 20)",
+    "name": "SBOM CycloneDX & Monitoramento de Vulnerabilidades",
+    "desc": "Geração reprodutível de manifesto de software e auditoria automatizada de waivers.",
+    "criteria": "cyclonedx-npm gera sbom.cdx.json; check-audit-waivers valida dependências.",
+    "agent": "15 — Segurança & 08 — QA",
+    "files": "package.json, scripts/security/check-audit-waivers.ts, sbom.cdx.json",
+    "status": "IMPLEMENTADO E VALIDADO",
+    "integration": "conectada",
+    "tests": "aprovados",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "liberável",
+    "criticality": "P1",
+    "finding": "Script security:audit-waivers exit code 0 sem achados HIGH/CRITICAL.",
+    "action": "Nenhuma ação impeditiva."
+  },
+  {
+    "id": "REQ-05-08",
+    "wave": "05",
+    "category": "Qualidade & Estilo",
+    "name": "Conformidade de Formatação de Código (Biome)",
+    "desc": "Checagem estrita de formatação de código em todo o repositório.",
+    "criteria": "npm run format:check exit code 0.",
+    "agent": "08 — QA e Release",
+    "files": "src/features/ai-voice/server/conversationalIntelligence.service.ts, src/shared/contracts/conversationalCoaching.contract.ts",
+    "status": "COM FALHA",
+    "integration": "conectada",
+    "tests": "falhos",
+    "env": "desenvolvimento",
+    "security": "aprovada",
+    "readiness": "bloqueada",
+    "criticality": "P1",
+    "finding": "Execução real de npm run format:check falhou com código 1 em 14 arquivos da Onda 05. Divergência direta com pareceres anteriores.",
+    "action": "Executar npx biome format --write nos 14 arquivos afetados em PR formal de QA."
+  }
+];
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(matrixData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "BIRTHUB360_MATRIZ_FORENSE_AUDITADA.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+  </script>
+</body>
+</html>
