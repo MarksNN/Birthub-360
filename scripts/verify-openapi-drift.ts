@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 /**
  * CLI da verificação estática de deriva entre `docs/openapi.yaml` e as rotas reais montadas no
  * composition root da aplicação (`server.ts` + `src/bootstrap/*.ts`, ver ITEM-07).
@@ -157,13 +158,35 @@ function escapeForRegex(identifier: string): string {
  * `export const nome = router;` (alias) ou `export const nome = Router();` (direto). Sem um dos
  * dois padrões reconhecíveis, devolve `null` e o mount é pulado (sem falso positivo).
  */
-function resolveRouterLocalVarName(source: string, exportedName: string): string | null {
+export function resolveRouterLocalVarName(source: string, exportedName: string): string | null {
   const safeName = escapeForRegex(exportedName);
   const aliasMatch = new RegExp(`export const ${safeName}\\s*=\\s*([A-Za-z_$][\\w$]*)\\s*;`).exec(
     source,
   );
   if (aliasMatch) return aliasMatch[1];
   if (new RegExp(`export const ${safeName}\\s*=\\s*Router\\(`).test(source)) return exportedName;
+  // Factory no MESMO arquivo: `export const nome = createXRoutes();` onde
+  // `function createXRoutes(...) { const r = Router(); ... return r; }`. Só aceita quando a
+  // função declara exatamente um `const <v> = Router()` e retorna essa mesma variável — senão
+  // devolve null (pula, sem falso positivo). Ex.: predictive.routes.ts (createPredictiveRoutes).
+  const factoryMatch = new RegExp(
+    `export const ${safeName}\\s*=\\s*([A-Za-z_$][\\w$]*)\\([^)]*\\)\\s*;`,
+  ).exec(source);
+  if (factoryMatch) {
+    const fnName = escapeForRegex(factoryMatch[1]);
+    const fnStart = new RegExp(`function ${fnName}\\s*\\(`).exec(source);
+    if (!fnStart) return null;
+    const rest = source.slice(fnStart.index + fnStart[0].length);
+    const nextTopLevel = rest.search(/\n(?:export\s+)?(?:function|const|class)\s/);
+    const body = nextTopLevel === -1 ? rest : rest.slice(0, nextTopLevel);
+    const routerDecls = [
+      ...body.matchAll(/const\s+([A-Za-z_$][\w$]*)\s*=\s*(?:express\.)?Router\(/g),
+    ];
+    if (routerDecls.length !== 1) return null;
+    const varName = routerDecls[0][1];
+    if (!new RegExp(`return\\s+${escapeForRegex(varName)}\\s*;`).test(body)) return null;
+    return varName;
+  }
   return null;
 }
 
@@ -431,4 +454,8 @@ function main(): void {
   );
 }
 
-main();
+// Só roda main() quando executado diretamente (`tsx scripts/verify-openapi-drift.ts`), para que
+// o teste unitário possa importar `resolveRouterLocalVarName` sem disparar a verificação inteira.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}
