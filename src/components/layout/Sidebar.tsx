@@ -339,7 +339,10 @@ export function Sidebar({
                         if (isCollapsed) {
                           setHoveredGroupId(group.id);
                           const rect = e.currentTarget.getBoundingClientRect();
-                          setPopoverTop(rect.top);
+                          const viewportHeight =
+                            typeof window !== 'undefined' ? window.innerHeight : 800;
+                          const top = Math.min(rect.top, viewportHeight - 180);
+                          setPopoverTop(Math.max(16, top));
                         }
                       }}
                       onMouseLeave={() => {

@@ -21,6 +21,12 @@ vi.mock('../../../src/lib/toast.js', () => ({
   },
 }));
 
+vi.mock('../../../src/contexts/AuthContext.js', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 'usr-1', name: 'Vendedor Teste', email: 'test@birthhub.com', role: 'admin' },
+  })),
+}));
+
 vi.mock('../../../src/features/copilot/copilotLiveBus.js', () => ({
   useLiveCopilotSession: vi.fn(() => ({
     isCallActive: true,
@@ -36,22 +42,25 @@ vi.mock('../../../src/features/copilot/copilotLiveBus.js', () => ({
 
 describe('Cockpits e Painéis Operacionais (Opção 1)', () => {
   describe('WarRoomArenaView', () => {
-    it('renderiza título, modos de duelo e lista de objeções do playbook', () => {
+    it('renderiza título, modos de duelo e botão de entrada na arena', () => {
       render(<WarRoomArenaView />);
 
-      expect(screen.getByText(/Arena de Duelo de Objeções/i)).toBeInTheDocument();
-      expect(screen.getByText(/Duelo 1v1/i)).toBeInTheDocument();
-      expect(screen.getByText(/Desafio de Time/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/Preço & Orçamento/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/Arena Interativa de War Room/i)).toBeInTheDocument();
+      expect(screen.getByText(/Duelo de Objeções/i)).toBeInTheDocument();
+      expect(screen.getByText(/Desafio de Equipe/i)).toBeInTheDocument();
+      expect(screen.getByText(/Torneio Sazonal/i)).toBeInTheDocument();
+      expect(screen.getByText(/Entrar na Arena Agora/i)).toBeInTheDocument();
     });
 
-    it('permite alternar entre objeções do playbook e atualizar campo de defesa', () => {
+    it('inicia duelo e permite digitar defesa contra a objeção ativa', () => {
       render(<WarRoomArenaView />);
 
-      const concorrênciaBtn = screen.getByText(/Concorrência/i);
-      fireEvent.click(concorrênciaBtn);
+      const startBtn = screen.getByText(/Entrar na Arena Agora/i);
+      fireEvent.click(startBtn);
 
-      const textarea = screen.getByPlaceholderText(/Digite sua resposta estruturada/i);
+      expect(screen.getByText(/Round 1 de 3/i)).toBeInTheDocument();
+
+      const textarea = screen.getByPlaceholderText(/Estruture sua resposta/i);
       expect(textarea).toBeInTheDocument();
 
       fireEvent.change(textarea, {
@@ -71,7 +80,7 @@ describe('Cockpits e Painéis Operacionais (Opção 1)', () => {
       expect(screen.getByText(/P10 · Conservador/i)).toBeInTheDocument();
       expect(screen.getByText(/P50 · Cenário Base \(Mediana\)/i)).toBeInTheDocument();
       expect(screen.getByText(/P90 · Otimista/i)).toBeInTheDocument();
-      expect(screen.getByText(/Simulação Dinâmica de Cenários \(What-If\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/Simulador What-If de Sensibilidade/i)).toBeInTheDocument();
     });
 
     it('permite alternar o horizonte temporal para 30 ou 180 dias', () => {

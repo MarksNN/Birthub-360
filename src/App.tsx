@@ -268,6 +268,16 @@ const GamificationView = lazy(() =>
     default: m.GamificationView,
   })),
 );
+const WarRoomArenaView = lazy(() =>
+  import('./features/gamification/components/WarRoomArenaView.js').then((m) => ({
+    default: m.WarRoomArenaView,
+  })),
+);
+const MultiRegionFailoverPanel = lazy(() =>
+  import('./features/settings/components/MultiRegionFailoverPanel.js').then((m) => ({
+    default: m.MultiRegionFailoverPanel,
+  })),
+);
 const ModuleAccessAdmin = lazy(() =>
   import('./features/module-access/components/ModuleAccessAdmin.js').then((m) => ({
     default: m.ModuleAccessAdmin,
@@ -457,6 +467,7 @@ function AppLayout() {
             <Route path="analytics" element={<Analytics />} />
             <Route path="gamification" element={<GamificationView />} />
             <Route path="winloss" element={<WinLossAnalysis />} />
+            <Route path="war-room" element={<WarRoomArenaView />} />
             <Route path="market-intelligence" element={<Ldr />} />
             <Route path="market-intelligence/hub" element={<InteligenciaMercadoHub />} />
             <Route path="market-intelligence/accounts/:id" element={<Account360 />} />
@@ -510,6 +521,22 @@ function AppLayout() {
               }
             />
             <Route path="settings" element={<Settings />} />
+            <Route
+              path="failover"
+              element={
+                <RequireRole allowedRoles={['ADMIN', 'GESTOR']}>
+                  <MultiRegionFailoverPanel />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="resilience"
+              element={
+                <RequireRole allowedRoles={['ADMIN', 'GESTOR']}>
+                  <MultiRegionFailoverPanel />
+                </RequireRole>
+              }
+            />
 
             {/* PILAR 05 */}
             <Route path="forecast" element={<ForecastHub />} />

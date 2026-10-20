@@ -1,4 +1,15 @@
-import { BrainCircuit, Flag, GitMerge, Globe2, Moon, Puzzle, Shield, Sun, User, Users } from 'lucide-react';
+import {
+  BrainCircuit,
+  Flag,
+  GitMerge,
+  Globe2,
+  Moon,
+  Puzzle,
+  Shield,
+  Sun,
+  User,
+  Users,
+} from 'lucide-react';
 import { useState } from 'react';
 import { IconSliders } from '../../../components/icons/index.js';
 import {
@@ -8,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../../../components/ui/Card.js';
+import { PageHeader } from '../../../components/ui/PageHeader.js';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import { useTheme } from '../../../contexts/ThemeContext.js';
 import { hasRequiredRole } from '../../../lib/auth/authorization.js';
@@ -21,9 +33,7 @@ import { CompanyDedupPanel } from './CompanyDedupPanel.js';
 import { LeadDedupPanel } from './LeadDedupPanel.js';
 import { LearningProfilePanel } from './LearningProfilePanel.js';
 import { MemoryGovernancePanel } from './MemoryGovernancePanel.js';
-import { MultiRegionResiliencePanel } from './MultiRegionResiliencePanel.js';
-
-import { PageHeader } from '../../../components/ui/PageHeader.js';
+import { MultiRegionFailoverPanel } from './MultiRegionFailoverPanel.js';
 
 export function Settings() {
   const { theme, setThemeMode } = useTheme();
@@ -35,7 +45,14 @@ export function Settings() {
   const canViewAudit = hasRequiredRole(currentUser?.role ?? '', ['ADMIN', 'GESTOR']);
 
   const [activeTab, setActiveTab] = useState<
-    'profile' | 'users' | 'integrations' | 'featureFlags' | 'audit' | 'memory' | 'dedup' | 'resilience'
+    | 'profile'
+    | 'users'
+    | 'integrations'
+    | 'featureFlags'
+    | 'audit'
+    | 'memory'
+    | 'dedup'
+    | 'resilience'
   >('profile');
 
   return (
@@ -317,7 +334,7 @@ export function Settings() {
 
             {activeTab === 'resilience' && canViewAudit && (
               <div className="space-y-6">
-                <MultiRegionResiliencePanel />
+                <MultiRegionFailoverPanel />
               </div>
             )}
           </div>
