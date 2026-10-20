@@ -1,6 +1,6 @@
 import http from 'node:http';
-import express, { Request, Response } from 'express';
-import { WebSocketServer, WebSocket } from 'ws';
+import express, { type Request, type Response } from 'express';
+import { WebSocketServer, type WebSocket } from 'ws';
 import { bimodalLiveVoiceService } from '../../src/features/ai-voice/server/bimodalLiveVoice.service.js';
 import { conversationalIntelligenceService } from '../../src/features/ai-voice/server/conversationalIntelligence.service.js';
 import { multimodalRoleplaySimulatorService } from '../../src/features/roleplay/services/multimodalRoleplaySimulator.service.js';
