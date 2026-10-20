@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { copilotLiveBus } from '../../../src/features/copilot/copilotLiveBus.js';
 import { LiveCopilotHUD } from '../../../src/features/copilot/components/LiveCopilotHUD.js';
 import { WarRoomArenaView } from '../../../src/features/gamification/components/WarRoomArenaView.js';
-import { PredictiveRevenueCockpit } from '../../../src/features/predictability/components/PredictiveRevenueCockpit.js';
 import { MultiRegionFailoverPanel } from '../../../src/features/settings/components/MultiRegionFailoverPanel.js';
 
 // Mocks do ambiente de teste
@@ -108,35 +107,8 @@ describe('Cockpit Operacional e Telas de Gestão na UI', () => {
     });
   });
 
-  describe('3. Cockpit de Forecast Preditivo P10/P50/P90', () => {
-    it('deve exibir os intervalos de confiança P10, P50 e P90 no horizonte de 30 dias', () => {
-      render(<PredictiveRevenueCockpit />);
-
-      expect(screen.getByText('Cockpit de Forecast Preditivo')).toBeDefined();
-      expect(screen.getByText(/P10 · Conservador/i)).toBeDefined();
-      expect(screen.getByText(/P50 · Cenário Base/i)).toBeDefined();
-      expect(screen.getByText(/P90 · Otimista/i)).toBeDefined();
-    });
-
-    it('deve permitir alternar o horizonte de tempo para 90 dias', () => {
-      render(<PredictiveRevenueCockpit />);
-
-      const btn90d = screen.getByRole('button', { name: /Horizonte 90d/i });
-      fireEvent.click(btn90d);
-
-      expect(screen.getByText(/Horizonte 90d/i)).toBeDefined();
-    });
-
-    it('deve permitir aprovar recomendações de alocação de contas com feedback', () => {
-      render(<PredictiveRevenueCockpit />);
-
-      const approveBtns = screen.getAllByRole('button', { name: /Aprovar/i });
-      expect(approveBtns.length).toBeGreaterThan(0);
-
-      fireEvent.click(approveBtns[0]);
-      expect(screen.getByText('Aprovado')).toBeDefined();
-    });
-  });
+  // 3. Cockpit Preditivo: os testes antigos validavam números fictícios (INITIAL_*), removidos
+  // no REMED-03/04 — cobertura real em tests/unit/features/predictability/PredictiveRevenueCockpit.rebalance.test.tsx.
 
   describe('4. Visualizador de Failover Multi-Região', () => {
     it('deve exibir as 3 regiões canônicas (sa-east-1, us-east-1, us-west-2)', () => {

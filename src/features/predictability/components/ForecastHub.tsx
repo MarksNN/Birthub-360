@@ -13,8 +13,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
-import { PredictiveRevenueCockpit } from './PredictiveRevenueCockpit.js';
 import { PredictabilityEmptyState, PredictabilityStatusBanner } from './PredictabilityNoData.js';
+import { PredictiveRevenueCockpit } from './PredictiveRevenueCockpit.js';
 import {
   formatBRL,
   formatPct,

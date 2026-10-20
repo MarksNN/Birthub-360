@@ -125,7 +125,28 @@ export default defineConfig(() => {
         output: {
           manualChunks(id) {
             const normalizedId = id.replaceAll('\\', '/');
+            // REMED-08: helpers CJS do Rollup caíam em vendor-charts e faziam o entry pré-carregar o
+            // recharts inteiro (~420kB) só por um helper — ancorar no vendor-react (já eager).
+            // Idem para o preload-helper do Vite (caía em vendor-r3f → entry pré-carregava three).
+            if (
+              normalizedId.includes('commonjsHelpers') ||
+              normalizedId.includes('vite/preload-helper')
+            ) {
+              return 'vendor-react';
+            }
             if (!normalizedId.includes('/node_modules/')) return undefined;
+            // REMED-08: utilitários pequenos compartilhados entre entry e chunks lazy. Sem âncora
+            // explícita o Rollup os co-localizava em vendor-charts/vendor-r3f, e o entry passava a
+            // pré-carregar recharts/three inteiros só para importar `clsx`/helper do Babel.
+            if (
+              normalizedId.includes('/node_modules/clsx/') ||
+              normalizedId.includes('/node_modules/@babel/runtime/') ||
+              normalizedId.includes('/node_modules/tslib/') ||
+              normalizedId.includes('/node_modules/use-sync-external-store/') ||
+              normalizedId.includes('/node_modules/zustand/')
+            ) {
+              return 'vendor-react';
+            }
 
             if (
               normalizedId.includes('/react/') ||
@@ -144,9 +165,29 @@ export default defineConfig(() => {
             if (normalizedId.includes('/@dnd-kit/')) {
               return 'vendor-dnd';
             }
-            // ECharts é ~750kB antes de tree-shake — chunk dedicado para lazy load
-            if (normalizedId.includes('/echarts/') || normalizedId.includes('/zrender/')) {
+            // ECharts é ~750kB antes de tree-shake — chunk dedicado para lazy load.
+            // REMED-08: zrender separado do echarts para nenhum dos dois passar de 500kB.
+            if (normalizedId.includes('/zrender/')) {
+              return 'vendor-zrender';
+            }
+            if (normalizedId.includes('/echarts/')) {
               return 'vendor-echarts';
+            }
+            // REMED-08: three.js + R3F (orbs 3D, só via React.lazy) — antes viravam um chunk
+            // anônimo "Sparkles" de ~880kB. three separado do ecossistema R3F.
+            if (normalizedId.includes('/node_modules/three/')) {
+              return 'vendor-three';
+            }
+            if (
+              normalizedId.includes('/@react-three/') ||
+              normalizedId.includes('/react-use-measure/') ||
+              normalizedId.includes('/its-fine/')
+            ) {
+              return 'vendor-r3f';
+            }
+            // REMED-08: posthog-js (~310kB) era metade do entry `index`.
+            if (normalizedId.includes('/posthog-js/')) {
+              return 'vendor-analytics';
             }
             if (normalizedId.includes('/exceljs/')) {
               return 'vendor-excel';
