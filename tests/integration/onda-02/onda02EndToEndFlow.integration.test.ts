@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { prisma } from '../../../src/lib/prisma';
+import { requestContext } from '../../../src/lib/async-context';
 import { AccountKnowledgeGraphService } from '../../../src/features/knowledge/services/accountKnowledgeGraph.service.js';
 import { MarketSensingService } from '../../../src/features/market-intelligence/server/marketSensing.service.js';
 import { AccountDetectiveAgent } from '../../../src/features/intelligence/agents/tactical/accountDetective.agent.js';
@@ -14,6 +16,17 @@ describe('Onda 02 — Teste de Homologação E2E das 5 Jornadas Comerciais Integ
   const guardianAgent = new PromiseGuardianAgent();
   const devilsAdvocate = new DevilsAdvocateAgent();
   const winLossService = new WinLossAutopsyService();
+
+  // REMED-02: grafo e autópsia persistem no Postgres (FK Organization).
+  beforeAll(async () => {
+    await requestContext.run({ bypassRls: true }, () =>
+      prisma.organization.upsert({
+        where: { id: orgId },
+        create: { id: orgId, name: orgId },
+        update: {},
+      }),
+    );
+  });
 
   it('Jornada 1 — Pesquisa de Conta (CRM → Grafo de Contas → Detetive de Conta → Market Sensing → Dossiê → Social Selling)', async () => {
     // 1. Criar nós de conta e decisores no Grafo
@@ -98,7 +111,11 @@ describe('Onda 02 — Teste de Homologação E2E das 5 Jornadas Comerciais Integ
     });
 
     expect(commitments.length).toBeGreaterThan(0);
-    const approved = await guardianAgent.approveCommitment(orgId, commitments[0].id, 'coordenador-pedro');
+    const approved = await guardianAgent.approveCommitment(
+      orgId,
+      commitments[0].id,
+      'coordenador-pedro',
+    );
     expect(approved.status).toBe('APPROVED');
     expect(approved.crmTaskId).toBeDefined();
   });
@@ -115,7 +132,13 @@ describe('Onda 02 — Teste de Homologação E2E das 5 Jornadas Comerciais Integ
       closedAt: new Date().toISOString(),
       stageHistory: [{ stageName: 'Proposta', enteredAt: '2026-08-01', durationDays: 70 }],
       activities: [],
-      messagesAndNotes: [{ source: 'email', date: '2026-10-05', text: 'Fechamos com outra empresa por prazo de pagamento estendido.' }],
+      messagesAndNotes: [
+        {
+          source: 'email',
+          date: '2026-10-05',
+          text: 'Fechamos com outra empresa por prazo de pagamento estendido.',
+        },
+      ],
       unresolvedObjections: ['Prazo de pagamento muito curto'],
     });
 

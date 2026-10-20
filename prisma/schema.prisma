@@ -946,6 +946,9 @@ model Organization {
   externalCrmSyncLogs           ExternalCrmSyncLog[]
   externalEntityLinks           ExternalEntityLink[]
   externalCrmStageMappings      ExternalCrmStageMapping[]
+  accountGraphNodes             AccountGraphNode[]
+  accountGraphEdges             AccountGraphEdge[]
+  winLossAutopsyReports         WinLossAutopsyReport[]
   attachments                   Attachment[]
   optOutRecords                 OptOutRecord[]
   crmPipelines                  CrmPipeline[]
@@ -5538,4 +5541,57 @@ model LeadTouchpoint {
   @@index([leadId])
   @@index([campaign])
   @@index([occurredAt])
+}
+
+/// REMED-02 (auditoria forense @281cfcd3): Grafo de Contas persistido (antes Map em memória em
+/// accountKnowledgeGraph.service.ts). `nodeId` é o id lógico do domínio (account/contact/deal),
+/// único por tenant.
+model AccountGraphNode {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  nodeId         String
+  type           String
+  label          String
+  properties     Json         @default("{}")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, nodeId])
+  @@index([organizationId, type])
+}
+
+/// REMED-02: arestas do Grafo de Contas (antes Map em memória).
+model AccountGraphEdge {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sourceId       String
+  targetId       String
+  type           String
+  confidence     String
+  source         String
+  discoveredAt   DateTime     @default(now())
+  validUntil     DateTime?
+  properties     Json?
+
+  @@index([organizationId, sourceId])
+  @@index([organizationId, targetId])
+}
+
+/// REMED-02: Autópsia Win-Loss persistida (antes Map em memória em winLossAutopsy.service.ts).
+/// `report` guarda o WinLossAutopsyReport completo (9 seções); colunas indexáveis duplicadas.
+model WinLossAutopsyReport {
+  id                String       @id
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  dealId            String
+  outcome           String
+  humanReviewStatus String
+  report            Json
+  analyzedAt        DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([organizationId, dealId])
+  @@index([organizationId, analyzedAt])
 }

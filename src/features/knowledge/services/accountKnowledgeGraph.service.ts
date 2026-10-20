@@ -11,11 +11,14 @@ import type {
 } from '../../../shared/contracts/accountKnowledgeGraph.contract.js';
 import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import { logger } from '../../../lib/logger.js';
+import {
+  type AccountGraphRepository,
+  PrismaAccountGraphRepository,
+} from '../infra/accountGraphRepository.js';
 
 export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort {
-  // Armazenamento em memória com isolamento estrito de tenant (em produção respaldado pelo PostgreSQL/Prisma)
-  private nodesStore = new Map<string, GraphNode>();
-  private edgesStore = new Map<string, GraphEdge>();
+  // REMED-02: fonte da verdade é o PostgreSQL (AccountGraphNode/AccountGraphEdge, RLS por tenant).
+  constructor(private readonly repo: AccountGraphRepository = new PrismaAccountGraphRepository()) {}
 
   /**
    * Adiciona ou atualiza um nó no grafo semântico.
@@ -31,7 +34,6 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
       throw new Error('Tenancy violation: organizationId obrigatório para nós do grafo');
     }
 
-    const key = `${params.organizationId}:${params.id}`;
     const node: GraphNode = {
       id: params.id,
       organizationId: params.organizationId,
@@ -40,8 +42,7 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
       properties: params.properties || {},
     };
 
-    this.nodesStore.set(key, node);
-    return node;
+    return this.repo.upsertNode(node);
   }
 
   /**
@@ -52,21 +53,13 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
       throw new Error('Tenancy violation: organizationId obrigatório para relacionamentos');
     }
 
-    // Verificar se algum nó pertence a outro tenant (Isolamento Multi-Tenant estrito)
-    for (const node of this.nodesStore.values()) {
-      if (
-        (node.id === edgeInput.sourceId || node.id === edgeInput.targetId) &&
-        node.organizationId !== edgeInput.organizationId
-      ) {
-        throw new Error('Tenancy violation: tentativa de conectar com entidade de outro tenant');
-      }
+    // Isolamento multi-tenant estrito: as duas pontas precisam existir NESTE tenant. Com RLS,
+    // nós de outro tenant são invisíveis, então "não encontrado aqui" = violação.
+    const endpointIds = Array.from(new Set([edgeInput.sourceId, edgeInput.targetId]));
+    const found = await this.repo.findNodes(edgeInput.organizationId, endpointIds);
+    if (found.length !== endpointIds.length) {
+      throw new Error('Tenancy violation: tentativa de conectar com entidade de outro tenant');
     }
-
-    const sourceKey = `${edgeInput.organizationId}:${edgeInput.sourceId}`;
-    const targetKey = `${edgeInput.organizationId}:${edgeInput.targetId}`;
-
-    const sourceNode = this.nodesStore.get(sourceKey);
-    const targetNode = this.nodesStore.get(targetKey);
 
     const id = `edge-${randomUUID()}`;
     const discoveredAt = new Date().toISOString();
@@ -77,8 +70,7 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
       ...edgeInput,
     };
 
-    const edgeKey = `${edgeInput.organizationId}:${id}`;
-    this.edgesStore.set(edgeKey, edge);
+    await this.repo.createEdge(edge);
 
     // Publicar evento no DomainEventMesh
     await domainEventMesh.publish({
@@ -105,27 +97,14 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
    * Remove uma relação do grafo.
    */
   async removeRelationship(organizationId: string, edgeId: string): Promise<boolean> {
-    const key = `${organizationId}:${edgeId}`;
-    return this.edgesStore.delete(key);
+    return this.repo.deleteEdge(organizationId, edgeId);
   }
 
   /**
    * Expurgar nós de contato e suas arestas associadas em cumprimento à LGPD.
    */
   async purgeContactData(organizationId: string, contactId: string): Promise<number> {
-    const nodeKey = `${organizationId}:${contactId}`;
-    this.nodesStore.delete(nodeKey);
-
-    let removedEdges = 0;
-    for (const [key, edge] of this.edgesStore.entries()) {
-      if (
-        edge.organizationId === organizationId &&
-        (edge.sourceId === contactId || edge.targetId === contactId)
-      ) {
-        this.edgesStore.delete(key);
-        removedEdges++;
-      }
-    }
+    const removedEdges = await this.repo.purgeNode(organizationId, contactId);
 
     logger.info(
       `[AccountKnowledgeGraph] LGPD: Expurgo do contato ${contactId} concluído no tenant ${organizationId}. ${removedEdges} arestas removidas.`,
@@ -137,8 +116,7 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
    * Recupera a visualização consolidada do grafo de uma conta.
    */
   async getAccountGraph(organizationId: string, accountId: string): Promise<AccountGraphView> {
-    const accountKey = `${organizationId}:${accountId}`;
-    let accountNode = this.nodesStore.get(accountKey);
+    let accountNode = (await this.repo.findNode(organizationId, accountId)) ?? undefined;
 
     if (!accountNode) {
       accountNode = {
@@ -159,14 +137,23 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
     let hasChampion = false;
     let hasBlockerRisk = false;
 
-    for (const edge of this.edgesStore.values()) {
-      if (edge.organizationId !== organizationId) continue;
+    const accountEdges = await this.repo.listEdgesTouching(organizationId, accountId);
+    const neighbourIds = accountEdges.map((e) =>
+      e.sourceId === accountId ? e.targetId : e.sourceId,
+    );
+    const neighbours = new Map(
+      (await this.repo.findNodes(organizationId, Array.from(new Set(neighbourIds)))).map((n) => [
+        n.id,
+        n,
+      ]),
+    );
 
-      if (edge.sourceId === accountId || edge.targetId === accountId) {
+    for (const edge of accountEdges) {
+      {
         edges.push(edge);
 
         const otherId = edge.sourceId === accountId ? edge.targetId : edge.sourceId;
-        const otherNode = this.nodesStore.get(`${organizationId}:${otherId}`);
+        const otherNode = neighbours.get(otherId);
 
         if (otherNode) {
           if (
@@ -234,19 +221,16 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
   ): Promise<MultiThreadingApproach[]> {
     const approaches: MultiThreadingApproach[] = [];
 
-    for (const node of this.nodesStore.values()) {
-      if (node.organizationId !== organizationId || node.type !== 'contact') continue;
+    // Contatos vinculados à conta (via qualquer aresta que toque a conta), em ordem estável.
+    const accountEdges = await this.repo.listEdgesTouching(organizationId, accountId);
+    const linkedIds = Array.from(
+      new Set(accountEdges.map((e) => (e.sourceId === accountId ? e.targetId : e.sourceId))),
+    );
+    const contacts = (await this.repo.findNodes(organizationId, linkedIds)).filter(
+      (n) => n.type === 'contact',
+    );
 
-      // Verificar se o contato está vinculado à conta
-      const isLinkedToAccount = Array.from(this.edgesStore.values()).some(
-        (e) =>
-          e.organizationId === organizationId &&
-          (e.sourceId === node.id || e.targetId === node.id) &&
-          (e.sourceId === accountId || e.targetId === accountId),
-      );
-
-      if (!isLinkedToAccount) continue;
-
+    for (const node of contacts) {
       const role = ((node.properties?.role as string) || node.label || '').toLowerCase();
 
       if (
@@ -329,14 +313,6 @@ export class AccountKnowledgeGraphService implements IAccountKnowledgeGraphPort 
     }
 
     return approaches;
-  }
-
-  /**
-   * Limpa o estado em memória (utilitário para testes isolados).
-   */
-  clear(): void {
-    this.nodesStore.clear();
-    this.edgesStore.clear();
   }
 }
 

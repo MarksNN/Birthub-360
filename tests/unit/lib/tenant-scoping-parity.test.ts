@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  MODELS_WITH_ORGANIZATION_ID,
-  TENANT_INJECTED_MODELS,
-} from '@/lib/tenant-scoping-registry';
+import { MODELS_WITH_ORGANIZATION_ID, TENANT_INJECTED_MODELS } from '@/lib/tenant-scoping-registry';
 
 /**
  * TENANT-007 (docs/audits/repository-debt-audit/agents/TENANT.md) e Onda 1 — Segurança & Tenancy,
@@ -145,6 +142,11 @@ const KNOWN_RLS_ONLY_MODELS = [
   'WorkspaceLayout',
   'WorkspaceSection',
   'WorkspaceWidget',
+  // REMED-02: repositórios (accountGraphRepository/winLossAutopsyRepository) sempre passam
+  // organizationId explícito + withTenantContext; RLS FORCE cobre o resto.
+  'AccountGraphEdge',
+  'AccountGraphNode',
+  'WinLossAutopsyReport',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {
