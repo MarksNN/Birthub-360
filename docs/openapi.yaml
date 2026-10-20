@@ -421,7 +421,7 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          { description: Identificação, CNAE, endereço, contato público, ICP, RNTRC e proveniência }
+          { description: 'Identificação, CNAE, endereço, contato público, ICP, RNTRC e proveniência' }
         '400': { description: CNPJ inválido }
         '404': { description: CNPJ ausente no snapshot publicado }
   /market-intelligence/companies/{cnpj}/approve-to-pipeline:
@@ -682,7 +682,7 @@ paths:
                       success: { type: boolean }
                       taskId: { description: Id da task Bitrix (só CREATE_BITRIX_TASK) }
                       message: { type: string }
-        '400': { description: Parâmetros inválidos, já executada, Bitrix não conectado ou sem lead/sequência }
+        '400': { description: 'Parâmetros inválidos, já executada, Bitrix não conectado ou sem lead/sequência' }
         '401': { description: Sem sessão válida }
         '403': { description: Papel sem permissão de escrita }
         '404': { description: Recomendação não encontrada (ou não pertence à conta) }
