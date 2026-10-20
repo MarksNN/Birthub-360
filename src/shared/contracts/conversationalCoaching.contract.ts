@@ -3,7 +3,7 @@
  * Onda 05 — Eixo 13 (Comunicação Comercial Objetiva, Talk-to-Listen e Metodologia)
  * Dono: Agente 18 — Contratos e API
  * Especialistas: Agente 12 (Voz e Telefonia) & Agente 07 (IA e Automações) & Agente 04 (CRM e BI)
- * 
+ *
  * DIRETRIZES ÉTICAS E DE SEGURANÇA MANDATÓRIAS (AGENTS.md / Seção 2):
  * 1. Proibição estrita de inferências médicas, psicológicas, de estresse ou burnout.
  * 2. Proibição de scores de personalidade, ansiedade ou julgamento de características vocais/sotaque.
@@ -22,7 +22,14 @@ export interface SpeakerTurn {
   isQuestion?: boolean;
   questionType?: 'open' | 'closed' | 'none';
   detectedObjection?: {
-    category: 'price' | 'timing' | 'competition' | 'authority' | 'integration' | 'security' | 'priority';
+    category:
+      | 'price'
+      | 'timing'
+      | 'competition'
+      | 'authority'
+      | 'integration'
+      | 'security'
+      | 'priority';
     confidence: number;
     quote: string;
   };
@@ -55,7 +62,14 @@ export interface QuestionAnalysis {
 
 export interface ExplicitObjectionItem {
   objectionId: string;
-  category: 'price' | 'timing' | 'competition' | 'authority' | 'integration' | 'security' | 'priority';
+  category:
+    | 'price'
+    | 'timing'
+    | 'competition'
+    | 'authority'
+    | 'integration'
+    | 'security'
+    | 'priority';
   explicitQuote: string;
   timestampSeconds: number;
   playbookReferenceId?: string;
@@ -74,7 +88,12 @@ export interface MethodologyAdherence {
 }
 
 export interface NextStepCommitment {
-  commitmentType: 'meeting_scheduled' | 'proposal_to_send' | 'technical_validation' | 'pricing_review' | 'other';
+  commitmentType:
+    | 'meeting_scheduled'
+    | 'proposal_to_send'
+    | 'technical_validation'
+    | 'pricing_review'
+    | 'other';
   description: string;
   agreedDateOrDeadline?: string;
   explicitlyConfirmed: boolean;
@@ -95,7 +114,12 @@ export interface PostCallCoachingReport {
   pedagogicalRecommendations: {
     title: string;
     description: string;
-    category: 'active_listening' | 'discovery_questions' | 'objection_handling' | 'next_step_closing' | 'proposal_clarity';
+    category:
+      | 'active_listening'
+      | 'discovery_questions'
+      | 'objection_handling'
+      | 'next_step_closing'
+      | 'proposal_clarity';
     recommendedRoleplayExercise?: {
       scenarioId: string;
       framework: string;
@@ -110,7 +134,11 @@ export interface RealtimeCoachingHint {
   hintId: string;
   organizationId: string;
   callId: string;
-  category: 'objection_unanswered' | 'open_question_opportunity' | 'confirm_next_steps' | 'listen_more';
+  category:
+    | 'objection_unanswered'
+    | 'open_question_opportunity'
+    | 'confirm_next_steps'
+    | 'listen_more';
   message: string;
   priority: 'low' | 'medium';
   timestampSeconds: number;

@@ -260,7 +260,9 @@ export function LiveCopilotHUD({
             <div className="flex items-center gap-1.5 text-xs font-medium text-ink-2 truncate max-w-[150px]">
               <Radio className="w-3.5 h-3.5 text-brand shrink-0 animate-pulse" />
               <span className="truncate">{categoryStyle.label}</span>
-              <span className="text-[10px] font-mono text-emerald-500 font-bold">{latencyP50}ms</span>
+              <span className="text-[10px] font-mono text-emerald-500 font-bold">
+                {latencyP50}ms
+              </span>
             </div>
 
             <button
@@ -467,7 +469,6 @@ export function LiveCopilotHUD({
                 )}
               </div>
             </div>
-
 
             {/* ── CARD DE DETECÇÃO DE OBJEÇÃO & CONFIANÇA IA ───────────── */}
             <div className="p-3.5 border-b border-line/50 bg-gradient-to-b from-surface-subtle/30 to-transparent">

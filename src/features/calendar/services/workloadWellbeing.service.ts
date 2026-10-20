@@ -2,7 +2,7 @@
  * Serviço de Bem-Estar Operacional, Otimização de Carga e Microtreinamentos
  * Onda 05 — Eixo 18: Organização de Agenda, Intervalos Voluntários e Preparação
  * Donos: Agente 02 (UX) & Agente 04 (CRM e BI) & Agente 07 (IA e Automações) & Agente 13 (Swarm)
- * 
+ *
  * DIRETRIZES ÉTICAS E DE SEGURANÇA MANDATÓRIAS (AGENTS.md / Seção 2):
  * - ZERO inferências médicas, diagnósticos clínicos, vigilância de estresse ou burnout.
  * - Recomendações 100% voluntárias e explicáveis para apoio operacional ao vendedor.
@@ -257,7 +257,8 @@ export class WorkloadWellbeingService {
     > = {
       PRE_MEETING_CHECKLIST: {
         title: 'Checklist Rápido Pré-Reunião (3 min)',
-        objective: 'Revisar o objetivo primário da chamada, participantes e perguntas de diagnóstico',
+        objective:
+          'Revisar o objetivo primário da chamada, participantes e perguntas de diagnóstico',
         prompts: [
           'Qual a principal meta desta conversa (ex: qualificar dor, alinhar ROI, agendar comitê)?',
           'Qual pergunta de implicação será essencial fazer nos primeiros 10 minutos?',
@@ -313,7 +314,10 @@ export class WorkloadWellbeingService {
     };
 
     this.microTrainings.set(trainingId, session);
-    logger.info({ trainingId, orgId, sellerId, exerciseType }, 'Micro-training session initialized');
+    logger.info(
+      { trainingId, orgId, sellerId, exerciseType },
+      'Micro-training session initialized',
+    );
     return session;
   }
 
@@ -360,12 +364,15 @@ export class WorkloadWellbeingService {
 
     const totalMinutes = metricsList.reduce((sum, m) => sum + m.totalMeetingMinutes, 0);
     const totalBackToBack = metricsList.reduce((sum, m) => sum + m.backToBackMeetingsCount, 0);
-    const prepAvail = metricsList.filter((m) => m.availablePrepMinutesBeforeKeyMeetings > 10).length;
+    const prepAvail = metricsList.filter(
+      (m) => m.availablePrepMinutesBeforeKeyMeetings > 10,
+    ).length;
 
     return {
       organizationId: orgId,
       periodStart: metricsList[0]?.date || new Date().toISOString().split('T')[0],
-      periodEnd: metricsList[metricsList.length - 1]?.date || new Date().toISOString().split('T')[0],
+      periodEnd:
+        metricsList[metricsList.length - 1]?.date || new Date().toISOString().split('T')[0],
       anonymizedSampleCount: sampleSize,
       averageDailyMeetingMinutes: Math.round(totalMinutes / sampleSize),
       averageBackToBackOccurrences: Number((totalBackToBack / sampleSize).toFixed(1)),

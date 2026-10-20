@@ -2,7 +2,7 @@
  * Serviço de Inteligência Conversacional e Coaching Comercial
  * Onda 05 — Eixo 13: Análise Conversacional, Talk-to-Listen, Perguntas, Objeções e Próximos Passos
  * Donos: Agente 12 (Voz e Telefonia) & Agente 07 (IA e Automações) & Agente 04 (CRM e BI)
- * 
+ *
  * DIRETRIZES ÉTICAS E DE SEGURANÇA MANDATÓRIAS (AGENTS.md / Seção 2):
  * - ZERO inferências médicas, psicológicas, de estresse ou burnout.
  * - Baseado puramente em turnos estruturados de fala, perguntas abertas, detecção objetiva de objeções e compromissos.
@@ -162,7 +162,9 @@ export class ConversationalIntelligenceService {
         playbookId: 'playbook-competitive-differentiation',
       },
       authority: {
-        patterns: [/(?:preciso falar com o diretor|comitê|aprovação da diretoria|não decido sozinho)/i],
+        patterns: [
+          /(?:preciso falar com o diretor|comitê|aprovação da diretoria|não decido sozinho)/i,
+        ],
         playbookId: 'playbook-buying-committee-mapping',
       },
       integration: {
@@ -187,7 +189,9 @@ export class ConversationalIntelligenceService {
         if (matched) {
           // Verifica se o vendedor respondeu no turno seguinte
           const nextTurn = turns[turns.indexOf(turn) + 1];
-          const wasAddressed = Boolean(nextTurn && nextTurn.speaker === 'seller' && nextTurn.text.length > 20);
+          const wasAddressed = Boolean(
+            nextTurn && nextTurn.speaker === 'seller' && nextTurn.text.length > 20,
+          );
 
           objections.push({
             objectionId: `obj-${turn.turnId}-${cat}`,
@@ -222,32 +226,86 @@ export class ConversationalIntelligenceService {
       { criterion: string; pattern: RegExp }[]
     > = {
       SPIN: [
-        { criterion: 'Perguntas de Situação (Contexto atual)', pattern: /(?:como funciona|qual o cenário|atualmente como)/i },
-        { criterion: 'Perguntas de Problema (Dores operacionais)', pattern: /(?:qual a maior dificuldade|onde mais trava|o que tem sido um gargalo)/i },
-        { criterion: 'Perguntas de Implicação (Impacto financeiro ou de risco)', pattern: /(?:qual o custo disso|quanto tempo perde|qual o risco de manter)/i },
-        { criterion: 'Perguntas de Necessidade de Solução (Benefício concreto)', pattern: /(?:se conseguíssemos resolver|quão útil seria|o quanto facilitaria)/i },
+        {
+          criterion: 'Perguntas de Situação (Contexto atual)',
+          pattern: /(?:como funciona|qual o cenário|atualmente como)/i,
+        },
+        {
+          criterion: 'Perguntas de Problema (Dores operacionais)',
+          pattern: /(?:qual a maior dificuldade|onde mais trava|o que tem sido um gargalo)/i,
+        },
+        {
+          criterion: 'Perguntas de Implicação (Impacto financeiro ou de risco)',
+          pattern: /(?:qual o custo disso|quanto tempo perde|qual o risco de manter)/i,
+        },
+        {
+          criterion: 'Perguntas de Necessidade de Solução (Benefício concreto)',
+          pattern: /(?:se conseguíssemos resolver|quão útil seria|o quanto facilitaria)/i,
+        },
       ],
       BANT: [
-        { criterion: 'Budget (Capacidade orçamentária)', pattern: /(?:orçamento|verba|investimento previsto|faixa de valor)/i },
-        { criterion: 'Authority (Poder de decisão)', pattern: /(?:quem mais participa da decisão|quem assina|comitê)/i },
-        { criterion: 'Need (Necessidade premente)', pattern: /(?:prioridade estratégica|dor central|urgência)/i },
-        { criterion: 'Timeline (Prazo de implementação)', pattern: /(?:quando pretendem iniciar|prazo limite|go-live)/i },
+        {
+          criterion: 'Budget (Capacidade orçamentária)',
+          pattern: /(?:orçamento|verba|investimento previsto|faixa de valor)/i,
+        },
+        {
+          criterion: 'Authority (Poder de decisão)',
+          pattern: /(?:quem mais participa da decisão|quem assina|comitê)/i,
+        },
+        {
+          criterion: 'Need (Necessidade premente)',
+          pattern: /(?:prioridade estratégica|dor central|urgência)/i,
+        },
+        {
+          criterion: 'Timeline (Prazo de implementação)',
+          pattern: /(?:quando pretendem iniciar|prazo limite|go-live)/i,
+        },
       ],
       CHALLENGER: [
-        { criterion: 'Teach (Insights de mercado diferenciados)', pattern: /(?:tendência de mercado|dados do setor|estudo recente)/i },
-        { criterion: 'Tailor (Adaptação ao contexto do interlocutor)', pattern: /(?:especificamente no seu caso|para a sua área|no seu modelo)/i },
-        { criterion: 'Take Control (Condução firme do processo comercial)', pattern: /(?:o próximo passo recomendado|nossa experiência mostra que)/i },
+        {
+          criterion: 'Teach (Insights de mercado diferenciados)',
+          pattern: /(?:tendência de mercado|dados do setor|estudo recente)/i,
+        },
+        {
+          criterion: 'Tailor (Adaptação ao contexto do interlocutor)',
+          pattern: /(?:especificamente no seu caso|para a sua área|no seu modelo)/i,
+        },
+        {
+          criterion: 'Take Control (Condução firme do processo comercial)',
+          pattern: /(?:o próximo passo recomendado|nossa experiência mostra que)/i,
+        },
       ],
       MEDDPICC: [
-        { criterion: 'Metrics (Métricas quantificáveis)', pattern: /(?:kpi|métrica|porcentagem de ganho|redução de custo)/i },
-        { criterion: 'Economic Buyer (Comprador econômico identificado)', pattern: /(?:cfo|diretor financeiro|responsável pelo budget)/i },
-        { criterion: 'Decision Criteria (Critérios formais de escolha)', pattern: /(?:quais os critérios para escolha|requisitos mandatórios)/i },
-        { criterion: 'Decision Process (Fluxo formal de aprovação)', pattern: /(?:etapas para aprovação|processo de compras)/i },
+        {
+          criterion: 'Metrics (Métricas quantificáveis)',
+          pattern: /(?:kpi|métrica|porcentagem de ganho|redução de custo)/i,
+        },
+        {
+          criterion: 'Economic Buyer (Comprador econômico identificado)',
+          pattern: /(?:cfo|diretor financeiro|responsável pelo budget)/i,
+        },
+        {
+          criterion: 'Decision Criteria (Critérios formais de escolha)',
+          pattern: /(?:quais os critérios para escolha|requisitos mandatórios)/i,
+        },
+        {
+          criterion: 'Decision Process (Fluxo formal de aprovação)',
+          pattern: /(?:etapas para aprovação|processo de compras)/i,
+        },
       ],
       CONSULTATIVE: [
-        { criterion: 'Diagnóstico aprofundado', pattern: /(?:compreender a raiz|entender o processo|diagnosticar)/i },
-        { criterion: 'Alinhamento de expectativas', pattern: /(?:expectativa com o projeto|critério de sucesso)/i },
-        { criterion: 'Construção conjunta de solução', pattern: /(?:em conjunto|construirmos juntos|adaptarmos)/i },
+        {
+          criterion: 'Diagnóstico aprofundado',
+          pattern: /(?:compreender a raiz|entender o processo|diagnosticar)/i,
+        },
+        {
+          criterion: 'Alinhamento de expectativas',
+          pattern: /(?:expectativa com o projeto|critério de sucesso)/i,
+        },
+        {
+          criterion: 'Construção conjunta de solução',
+          pattern: /(?:em conjunto|construirmos juntos|adaptarmos)/i,
+        },
       ],
     };
 
@@ -337,7 +395,8 @@ export class ConversationalIntelligenceService {
     if (questions.openQuestionRatio < 0.4 && questions.totalQuestionsAskedBySeller > 0) {
       pedagogicalRecommendations.push({
         title: 'Aprofundamento com Perguntas Abertas',
-        description: 'A maioria das perguntas foi fechada (sim/não). Perguntas que começam com "Como" ou "Qual" geram maior diagnóstico do negócio.',
+        description:
+          'A maioria das perguntas foi fechada (sim/não). Perguntas que começam com "Como" ou "Qual" geram maior diagnóstico do negócio.',
         category: 'discovery_questions',
         recommendedRoleplayExercise: {
           scenarioId: 'roleplay-open-question-clinic',
@@ -366,7 +425,8 @@ export class ConversationalIntelligenceService {
     if (commitments.length === 0) {
       pedagogicalRecommendations.push({
         title: 'Garantia de Compromisso de Fechamento',
-        description: 'A conversa não terminou com uma data ou ação definida. Recomenda-se ancorar sempre data e horário antes de finalizar.',
+        description:
+          'A conversa não terminou com uma data ou ação definida. Recomenda-se ancorar sempre data e horário antes de finalizar.',
         category: 'next_step_closing',
         recommendedRoleplayExercise: {
           scenarioId: 'roleplay-next-step-closing-mastery',
@@ -397,7 +457,10 @@ export class ConversationalIntelligenceService {
     };
 
     this.reports.set(report.reportId, report);
-    logger.info({ reportId: report.reportId, orgId: input.organizationId }, 'Post-call coaching report generated successfully');
+    logger.info(
+      { reportId: report.reportId, orgId: input.organizationId },
+      'Post-call coaching report generated successfully',
+    );
     return report;
   }
 
@@ -429,7 +492,8 @@ export class ConversationalIntelligenceService {
         organizationId,
         callId,
         category: 'listen_more',
-        message: 'Você está falando há mais de 2 minutos. Que tal abrir espaço para uma pergunta de checagem?',
+        message:
+          'Você está falando há mais de 2 minutos. Que tal abrir espaço para uma pergunta de checagem?',
         priority: 'low',
         timestampSeconds: Date.now() / 1000,
       };

@@ -4,7 +4,7 @@
  * Dono: Agente 18 — Contratos e API
  * Especialistas: Agente 02 (Produto e UX), Agente 04 (CRM e BI), Agente 07 (IA e Automações), Agente 13 (Swarm)
  * Revisão de Governança: Agente 15 (Segurança) & Agente 21 (LGPD e Relações de Trabalho)
- * 
+ *
  * DIRETRIZES ÉTICAS E DE SEGURANÇA MANDATÓRIAS (AGENTS.md / Seção 2):
  * 1. Proibição categórica de vigilância emocional, inferência de burnout ou classificação clínica/psicológica.
  * 2. As recomendações de pausa e organização de agenda são 100% voluntárias e acionáveis pelo próprio vendedor.

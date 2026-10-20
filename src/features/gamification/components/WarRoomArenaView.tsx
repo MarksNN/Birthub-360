@@ -64,7 +64,9 @@ export function WarRoomArenaView() {
   const userName = currentUser?.name || 'Consultor Comercial';
 
   const [activeMode, setActiveMode] = useState<WarRoomMode>('objection_duel');
-  const [arenaState, setArenaState] = useState<'lobby' | 'active_round' | 'evaluating' | 'evaluated' | 'completed'>('lobby');
+  const [arenaState, setArenaState] = useState<
+    'lobby' | 'active_round' | 'evaluating' | 'evaluated' | 'completed'
+  >('lobby');
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(45);
   const [timerActive, setTimerActive] = useState(false);
@@ -185,17 +187,23 @@ export function WarRoomArenaView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-red-950/40 via-surface-elevated to-surface border border-red-500/30 shadow-xl backdrop-blur-xl">
         <div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30 font-bold text-xs gap-1">
+            <Badge
+              variant="outline"
+              className="bg-red-500/10 text-red-500 border-red-500/30 font-bold text-xs gap-1"
+            >
               <Swords className="h-3.5 w-3.5" /> War Room Arena
             </Badge>
-            <span className="text-xs font-semibold text-ink-2">Treinamento & Duelos de Objeção com IA</span>
+            <span className="text-xs font-semibold text-ink-2">
+              Treinamento & Duelos de Objeção com IA
+            </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-ink tracking-tight mt-1 flex items-center gap-2">
             Arena Interativa de War Room
             <Flame className="h-6 w-6 text-orange-500 animate-pulse" />
           </h1>
           <p className="text-sm text-ink-2 mt-0.5">
-            Coloque suas defesas de objeções à prova em tempo real. Avaliação pedagógica instantânea da IA por SPIN, ROI e empatia.
+            Coloque suas defesas de objeções à prova em tempo real. Avaliação pedagógica instantânea
+            da IA por SPIN, ROI e empatia.
           </p>
         </div>
 
@@ -243,7 +251,9 @@ export function WarRoomArenaView() {
                 <span className="p-2.5 rounded-xl bg-brand/10 text-brand">
                   <Swords className="h-6 w-6" />
                 </span>
-                <Badge variant="outline" className="text-[10px] font-bold">1v1 Express</Badge>
+                <Badge variant="outline" className="text-[10px] font-bold">
+                  1v1 Express
+                </Badge>
               </div>
               <h3 className="font-display font-bold text-lg text-ink mt-3">Duelo de Objeções</h3>
               <p className="text-xs text-ink-2 mt-1 leading-relaxed">
@@ -272,11 +282,14 @@ export function WarRoomArenaView() {
                 <span className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500">
                   <Users className="h-6 w-6" />
                 </span>
-                <Badge variant="outline" className="text-[10px] font-bold">Squad Mode</Badge>
+                <Badge variant="outline" className="text-[10px] font-bold">
+                  Squad Mode
+                </Badge>
               </div>
               <h3 className="font-display font-bold text-lg text-ink mt-3">Desafio de Equipe</h3>
               <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-                Toda a equipe responde ao mesmo caso crítico. A IA ranqueia a melhor abordagem do squad.
+                Toda a equipe responde ao mesmo caso crítico. A IA ranqueia a melhor abordagem do
+                squad.
               </p>
               <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs font-semibold text-indigo-500">
                 <span>Multiplayer Assíncrono</span>
@@ -301,11 +314,14 @@ export function WarRoomArenaView() {
                 <span className="p-2.5 rounded-xl bg-amber-500/10 text-amber-500">
                   <Crown className="h-6 w-6" />
                 </span>
-                <Badge variant="outline" className="text-[10px] font-bold">Torneio Q4</Badge>
+                <Badge variant="outline" className="text-[10px] font-bold">
+                  Torneio Q4
+                </Badge>
               </div>
               <h3 className="font-display font-bold text-lg text-ink mt-3">Torneio Sazonal</h3>
               <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-                Mata-mata de closers em contas enterprise de alta complexidade. Troféu permanente no perfil.
+                Mata-mata de closers em contas enterprise de alta complexidade. Troféu permanente no
+                perfil.
               </p>
               <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs font-semibold text-amber-500">
                 <span>Chaveamento de Elite</span>
@@ -317,9 +333,13 @@ export function WarRoomArenaView() {
           {/* Botão de Entrar na Arena */}
           <div className="p-6 rounded-2xl border border-line/70 bg-surface-elevated/60 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="space-y-1">
-              <h4 className="font-display font-bold text-ink text-base">Pronto para combater as objeções mais duras?</h4>
+              <h4 className="font-display font-bold text-ink text-base">
+                Pronto para combater as objeções mais duras?
+              </h4>
               <p className="text-xs text-ink-2">
-                Modo selecionado: <strong className="text-ink">{activeMode.replace('_', ' ').toUpperCase()}</strong>. Você defenderá o playbook contra o simulador cognitivo.
+                Modo selecionado:{' '}
+                <strong className="text-ink">{activeMode.replace('_', ' ').toUpperCase()}</strong>.
+                Você defenderá o playbook contra o simulador cognitivo.
               </p>
             </div>
 
@@ -335,7 +355,9 @@ export function WarRoomArenaView() {
       )}
 
       {/* ── ROUND ATIVO / AVALIANDO / AVALIADO ───────────────────────── */}
-      {(arenaState === 'active_round' || arenaState === 'evaluating' || arenaState === 'evaluated') && (
+      {(arenaState === 'active_round' ||
+        arenaState === 'evaluating' ||
+        arenaState === 'evaluated') && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Coluna Central: Campo de Batalha (2 colunas) */}
           <div className="lg:col-span-2 space-y-4">
@@ -343,10 +365,15 @@ export function WarRoomArenaView() {
               {/* Barra do Round & Timer */}
               <div className="flex items-center justify-between pb-4 border-b border-line/60">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="font-bold text-xs bg-brand/10 text-brand border-brand/30">
+                  <Badge
+                    variant="outline"
+                    className="font-bold text-xs bg-brand/10 text-brand border-brand/30"
+                  >
                     Round {currentRoundIndex + 1} de 3
                   </Badge>
-                  <span className="text-xs font-semibold text-ink-2">Tema: {activeObjection.theme}</span>
+                  <span className="text-xs font-semibold text-ink-2">
+                    Tema: {activeObjection.theme}
+                  </span>
                 </div>
 
                 {/* Cronômetro */}
@@ -376,7 +403,10 @@ export function WarRoomArenaView() {
                 </blockquote>
                 <div className="mt-3 flex items-center gap-2 text-[11px] text-ink-2">
                   <Sparkles className="h-3 w-3 text-brand" />
-                  <span>Dica de abordagem recomendada: <strong>{activeObjection.suggestedTechnique}</strong></span>
+                  <span>
+                    Dica de abordagem recomendada:{' '}
+                    <strong>{activeObjection.suggestedTechnique}</strong>
+                  </span>
                 </div>
               </div>
 
@@ -384,7 +414,9 @@ export function WarRoomArenaView() {
               <div className="space-y-3">
                 <label className="text-xs font-bold text-ink flex items-center justify-between">
                   <span>Sua Defesa de Objeção:</span>
-                  <span className="text-[10px] text-ink-3 font-normal">{defenderInput.length} caracteres</span>
+                  <span className="text-[10px] text-ink-3 font-normal">
+                    {defenderInput.length} caracteres
+                  </span>
                 </label>
 
                 <textarea
@@ -433,7 +465,9 @@ export function WarRoomArenaView() {
                         <h4 className="font-display font-bold text-base text-ink">
                           Nota do Round: {evaluation.compositeScore}/100
                         </h4>
-                        <span className="text-xs text-ink-2">+{evaluation.awardedXp} XP concedidos</span>
+                        <span className="text-xs text-ink-2">
+                          +{evaluation.awardedXp} XP concedidos
+                        </span>
                       </div>
                     </div>
 
@@ -456,19 +490,27 @@ export function WarRoomArenaView() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                     <div className="p-2.5 rounded-lg border border-line bg-surface/50 text-center">
                       <span className="text-[10px] text-ink-3 block">Clareza SPIN</span>
-                      <span className="text-base font-extrabold text-ink">{evaluation.needIdentificationScore}%</span>
+                      <span className="text-base font-extrabold text-ink">
+                        {evaluation.needIdentificationScore}%
+                      </span>
                     </div>
                     <div className="p-2.5 rounded-lg border border-line bg-surface/50 text-center">
                       <span className="text-[10px] text-ink-3 block">Ancoragem de ROI</span>
-                      <span className="text-base font-extrabold text-ink">{evaluation.valueAnchoringScore}%</span>
+                      <span className="text-base font-extrabold text-ink">
+                        {evaluation.valueAnchoringScore}%
+                      </span>
                     </div>
                     <div className="p-2.5 rounded-lg border border-line bg-surface/50 text-center">
                       <span className="text-[10px] text-ink-3 block">Aderência Playbook</span>
-                      <span className="text-base font-extrabold text-ink">{evaluation.playbookAdherenceScore}%</span>
+                      <span className="text-base font-extrabold text-ink">
+                        {evaluation.playbookAdherenceScore}%
+                      </span>
                     </div>
                     <div className="p-2.5 rounded-lg border border-line bg-surface/50 text-center">
                       <span className="text-[10px] text-ink-3 block">Empatia & Tom</span>
-                      <span className="text-base font-extrabold text-ink">{evaluation.clarityEmpathyScore}%</span>
+                      <span className="text-base font-extrabold text-ink">
+                        {evaluation.clarityEmpathyScore}%
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -495,7 +537,10 @@ export function WarRoomArenaView() {
                       <span className="text-[10px] text-ink-3">Desafiador</span>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] text-rose-500 border-rose-500/30 font-semibold">
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] text-rose-500 border-rose-500/30 font-semibold"
+                  >
                     Atacando
                   </Badge>
                 </div>
@@ -523,7 +568,10 @@ export function WarRoomArenaView() {
                   <h4 className="text-xs font-bold text-ink mb-2">Rounds Deste Duelo</h4>
                   <div className="space-y-2">
                     {duelHistory.map((r, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs p-2 rounded-lg bg-surface/40 border border-line">
+                      <div
+                        key={i}
+                        className="flex items-center justify-between text-xs p-2 rounded-lg bg-surface/40 border border-line"
+                      >
                         <span className="font-medium text-ink-2">Round {r.roundNumber}</span>
                         <span className="font-bold text-emerald-500">{r.score}/100</span>
                       </div>
@@ -545,9 +593,12 @@ export function WarRoomArenaView() {
             </span>
           </div>
 
-          <h2 className="font-display font-extrabold text-2xl text-ink">Duelo Concluído com Sucesso!</h2>
+          <h2 className="font-display font-extrabold text-2xl text-ink">
+            Duelo Concluído com Sucesso!
+          </h2>
           <p className="text-sm text-ink-2 max-w-md mx-auto">
-            Você enfrentou 3 rounds intensos de objeções reais. Sua pontuação e aprendizado foram computados na governança do perfil.
+            Você enfrentou 3 rounds intensos de objeções reais. Sua pontuação e aprendizado foram
+            computados na governança do perfil.
           </p>
 
           <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-surface border border-line text-lg font-black text-brand">
@@ -561,11 +612,7 @@ export function WarRoomArenaView() {
             >
               <RotateCcw className="h-4 w-4" /> Jogar Novamente
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setArenaState('lobby')}
-              className="font-bold"
-            >
+            <Button variant="outline" onClick={() => setArenaState('lobby')} className="font-bold">
               Voltar ao Lobby
             </Button>
           </div>

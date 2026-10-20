@@ -104,7 +104,9 @@ export function MultiRegionResiliencePanel() {
         ...prev,
       ]);
       SoundFX.play('confirm');
-      toast.success('Failover concluído com sucesso! us-east-1 assumiu como região primária ativa.');
+      toast.success(
+        'Failover concluído com sucesso! us-east-1 assumiu como região primária ativa.',
+      );
     }, 1200);
   };
 
@@ -170,7 +172,9 @@ export function MultiRegionResiliencePanel() {
           <span className="text-[10px] uppercase font-bold text-ink-2 block mb-1">
             RTO Alvo (Tempo de Recuperação)
           </span>
-          <span className="text-xl font-mono font-extrabold text-emerald-400">&lt; 30.0 segundos</span>
+          <span className="text-xl font-mono font-extrabold text-emerald-400">
+            &lt; 30.0 segundos
+          </span>
           <p className="text-[11px] text-ink-2 mt-1">Chaveamento automatizado DNS / Envoy.</p>
         </Card>
 

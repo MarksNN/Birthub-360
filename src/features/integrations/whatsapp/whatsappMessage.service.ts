@@ -142,7 +142,8 @@ export async function persistWhatsAppMessage(input: PersistWhatsAppMessageInput)
   });
 
   // Emissão de evento canônico de WhatsApp no DomainEventMesh
-  const waEventType = input.direction === 'inbound' ? 'WHATSAPP_MESSAGE_RECEIVED' : 'WHATSAPP_MESSAGE_SENT';
+  const waEventType =
+    input.direction === 'inbound' ? 'WHATSAPP_MESSAGE_RECEIVED' : 'WHATSAPP_MESSAGE_SENT';
   await domainEventMesh
     .publish<WhatsAppMessageEventPayload>({
       eventType: waEventType,
@@ -162,7 +163,10 @@ export async function persistWhatsAppMessage(input: PersistWhatsAppMessageInput)
       },
     })
     .catch((err) => {
-      logger.warn({ err, waMessageId: input.waMessageId }, 'Falha ao emitir evento de WhatsApp no domainEventMesh');
+      logger.warn(
+        { err, waMessageId: input.waMessageId },
+        'Falha ao emitir evento de WhatsApp no domainEventMesh',
+      );
     });
 
   if (lead && input.direction === 'inbound') {
