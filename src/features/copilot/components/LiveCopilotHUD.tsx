@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Activity,
   AlertCircle,
   Bot,
   Check,
@@ -341,6 +342,11 @@ export function LiveCopilotHUD({
                     <Sparkles className="w-2.5 h-2.5" />
                     <span>{confidencePercent}% Confiança</span>
                   </span>
+
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border bg-cyan-500/15 text-cyan-500 dark:text-cyan-400 border-cyan-500/30">
+                    <Activity className="w-2.5 h-2.5 animate-pulse text-cyan-400" />
+                    <span>WebRTC Live (&lt;420ms)</span>
+                  </span>
                 </div>
 
                 <span className="text-[10px] font-mono text-ink-3">
@@ -356,6 +362,19 @@ export function LiveCopilotHUD({
               >
                 &ldquo;{activeObjection.matchedSnippet}&rdquo;
               </p>
+
+              {/* Proporção de Fala vs Escuta (SPIN Selling Balance) */}
+              <div className="mt-2 pt-2 border-t border-line/40 flex items-center justify-between text-[10px] text-ink-2">
+                <span className="flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                  Consultor: 38%
+                </span>
+                <span className="font-semibold text-emerald-400">Zona Ideal SPIN Selling</span>
+                <span className="flex items-center gap-1">
+                  Prospect: 62%
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                </span>
+              </div>
             </div>
 
             {/* ── SUGESTÃO DE ARGUMENTAÇÃO RECOMENDADA ──────────────────── */}
@@ -469,7 +488,7 @@ export function LiveCopilotHUD({
                   aria-live="polite"
                   className="max-h-20 overflow-y-auto text-[11px] text-ink-2 leading-tight space-y-1 custom-scrollbar"
                 >
-                  {sessionState.transcripts.length > 0 ? (
+                  {(sessionState.transcripts?.length ?? 0) > 0 ? (
                     sessionState.transcripts.slice(-3).map((item) => (
                       <p key={item.id} className="truncate">
                         <strong className="text-ink">

@@ -1,4 +1,4 @@
-import { BrainCircuit, Flag, GitMerge, Moon, Puzzle, Shield, Sun, User, Users } from 'lucide-react';
+import { BrainCircuit, Flag, GitMerge, Globe2, Moon, Puzzle, Shield, Sun, User, Users } from 'lucide-react';
 import { useState } from 'react';
 import { IconSliders } from '../../../components/icons/index.js';
 import {
@@ -21,6 +21,7 @@ import { CompanyDedupPanel } from './CompanyDedupPanel.js';
 import { LeadDedupPanel } from './LeadDedupPanel.js';
 import { LearningProfilePanel } from './LearningProfilePanel.js';
 import { MemoryGovernancePanel } from './MemoryGovernancePanel.js';
+import { MultiRegionResiliencePanel } from './MultiRegionResiliencePanel.js';
 
 import { PageHeader } from '../../../components/ui/PageHeader.js';
 
@@ -34,7 +35,7 @@ export function Settings() {
   const canViewAudit = hasRequiredRole(currentUser?.role ?? '', ['ADMIN', 'GESTOR']);
 
   const [activeTab, setActiveTab] = useState<
-    'profile' | 'users' | 'integrations' | 'featureFlags' | 'audit' | 'memory' | 'dedup'
+    'profile' | 'users' | 'integrations' | 'featureFlags' | 'audit' | 'memory' | 'dedup' | 'resilience'
   >('profile');
 
   return (
@@ -154,6 +155,22 @@ export function Settings() {
                 }`}
               >
                 <GitMerge size={16} /> Deduplicação
+              </button>
+            )}
+            {canViewAudit && (
+              <button
+                type="button"
+                onClick={() => {
+                  SoundFX.play('navigate');
+                  setActiveTab('resilience');
+                }}
+                className={`flex items-center gap-2 pb-3 border-b-2 font-bold text-sm transition-colors whitespace-nowrap cursor-pointer ${
+                  activeTab === 'resilience'
+                    ? 'border-brand text-brand-ink dark:text-brand'
+                    : 'border-transparent text-ink-2 hover:text-ink hover:border-line'
+                }`}
+              >
+                <Globe2 size={16} /> Resiliência Multi-Região
               </button>
             )}
           </div>
@@ -295,6 +312,12 @@ export function Settings() {
               <div className="space-y-6">
                 <LeadDedupPanel />
                 <CompanyDedupPanel />
+              </div>
+            )}
+
+            {activeTab === 'resilience' && canViewAudit && (
+              <div className="space-y-6">
+                <MultiRegionResiliencePanel />
               </div>
             )}
           </div>

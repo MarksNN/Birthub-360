@@ -5,12 +5,15 @@ import {
   Layers,
   LineChart,
   Scale,
+  Sparkles,
   Target,
   TrendingUp,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
 import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import { KpiCard } from '../../../components/ui/KpiCard.js';
+import { PredictiveRevenueCockpit } from './PredictiveRevenueCockpit.js';
 import { PredictabilityEmptyState, PredictabilityStatusBanner } from './PredictabilityNoData.js';
 import {
   formatBRL,
@@ -22,6 +25,7 @@ import {
 // P0 #693 (Agente 02): leitura real via predictabilityApi (Agente 04, PR #697). Sem R$ inventado.
 
 export function ForecastHub() {
+  const [activeTab, setActiveTab] = useState<'standard' | 'predictiveOracle'>('standard');
   const { data, loading, error, noRealData, partial, reload } = usePredictabilityOverview();
   const f = data?.forecast ?? null;
   const cur = data?.meta.currency ?? 'BRL';
@@ -45,14 +49,45 @@ export function ForecastHub() {
       <CommandCenterHeader title="Forecast de Vendas" icon={LineChart} />
 
       <div className="flex-1 p-6 space-y-6 overflow-y-auto">
-        <div className="mb-4">
-          <p className="text-sm text-[var(--ink-2)]">
-            Projete seus resultados com base nos dados do CRM
-            {data ? ` · período ${data.meta.period}` : ''}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+          <div>
+            <p className="text-sm text-[var(--ink-2)]">
+              Projete seus resultados com base nos dados do CRM
+              {data ? ` · período ${data.meta.period}` : ''}
+            </p>
+          </div>
+
+          <div className="inline-flex rounded-xl border border-line bg-surface-2 p-1 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setActiveTab('standard')}
+              className={`rounded-lg px-3 py-1.5 transition-all flex items-center gap-1.5 ${
+                activeTab === 'standard'
+                  ? 'bg-brand text-on-brand shadow-sm font-bold'
+                  : 'text-ink-2 hover:text-ink'
+              }`}
+            >
+              <LineChart className="h-3.5 w-3.5" /> Forecast Operacional
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('predictiveOracle')}
+              className={`rounded-lg px-3 py-1.5 transition-all flex items-center gap-1.5 ${
+                activeTab === 'predictiveOracle'
+                  ? 'bg-brand text-on-brand shadow-sm font-bold'
+                  : 'text-ink-2 hover:text-ink'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Cockpit Preditivo (P10/P50/P90)
+            </button>
+          </div>
         </div>
 
-        <PredictabilityStatusBanner
+        {activeTab === 'predictiveOracle' ? (
+          <PredictiveRevenueCockpit />
+        ) : (
+          <>
+            <PredictabilityStatusBanner
           what="o forecast"
           loading={loading}
           error={error}
@@ -420,6 +455,8 @@ export function ForecastHub() {
             </CardContent>
           </Card>
         </div>
+      </>
+      )}
       </div>
     </div>
   );

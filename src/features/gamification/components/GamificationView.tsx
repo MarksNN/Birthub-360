@@ -5,6 +5,7 @@ import {
   PhoneCall,
   RefreshCw,
   Sparkles,
+  Swords,
   Target,
   Trophy,
 } from 'lucide-react';
@@ -18,9 +19,11 @@ import { cn } from '../../../lib/utils.js';
 import { gamificationApi } from '../api/gamification.api.js';
 import type { LeaderboardPeriod, LeaderboardRanking, SellerScore } from '../domain/Gamification.js';
 import { SellerCoachingCard } from './SellerCoachingCard.js';
+import { WarRoomArenaView } from './WarRoomArenaView.js';
 
 export function GamificationView() {
   const { currentUser } = useAuth();
+  const [activeSubTab, setActiveSubTab] = useState<'leaderboard' | 'warRoom'>('leaderboard');
   const [period, setPeriod] = useState<LeaderboardPeriod>('month');
   const [rankingData, setRankingData] = useState<LeaderboardRanking>({
     period: 'month',
@@ -89,6 +92,33 @@ export function GamificationView() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="inline-flex rounded-xl border border-line bg-surface-2 p-1 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('leaderboard')}
+              className={cn(
+                'rounded-lg px-3 py-1.5 transition-all flex items-center gap-1.5',
+                activeSubTab === 'leaderboard'
+                  ? 'bg-brand text-on-brand shadow-sm font-bold'
+                  : 'text-ink-2 hover:text-ink',
+              )}
+            >
+              <Trophy className="h-3.5 w-3.5" /> Ranking & Perfil
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('warRoom')}
+              className={cn(
+                'rounded-lg px-3 py-1.5 transition-all flex items-center gap-1.5',
+                activeSubTab === 'warRoom'
+                  ? 'bg-brand text-on-brand shadow-sm font-bold'
+                  : 'text-ink-2 hover:text-ink',
+              )}
+            >
+              <Swords className="h-3.5 w-3.5" /> War Room Arena
+            </button>
+          </div>
+
           <Button
             type="button"
             variant="secondary"
@@ -103,14 +133,18 @@ export function GamificationView() {
         </div>
       </div>
 
-      {/* Widget Interativo Conectado a Dados Reais */}
-      <GamificationWidget
-        initialXp={profile?.totalPoints ?? 0}
-        level={profile?.level ?? 1}
-        streakDays={profile?.streakDays ?? 0}
-        sellerScore={profile}
-        show3DCore
-      />
+      {activeSubTab === 'warRoom' ? (
+        <WarRoomArenaView />
+      ) : (
+        <>
+          {/* Widget Interativo Conectado a Dados Reais */}
+          <GamificationWidget
+            initialXp={profile?.totalPoints ?? 0}
+            level={profile?.level ?? 1}
+            streakDays={profile?.streakDays ?? 0}
+            sellerScore={profile}
+            show3DCore
+          />
 
       {/* Grid Principal: Ranking / Leaderboard + Perfil Individual */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -370,6 +404,8 @@ export function GamificationView() {
           </Card>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
