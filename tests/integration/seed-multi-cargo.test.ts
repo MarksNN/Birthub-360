@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { prisma } from '../../src/lib/prisma';
+import { JOB_ROLE_CATALOG } from '../../src/config/job-role-catalog';
 import { listJobRoles } from '../../src/features/job-roles/services/jobRole.service';
 import {
   listAgentsForJobRole,
@@ -30,11 +31,11 @@ describe('scripts/seed-multi-cargo.ts', () => {
     await prisma.userJobRole.deleteMany();
   });
 
-  it('semeia os 12 cargos e os 12 agentes da Célula Comercial, concedendo cada um ao seu cargo principal', async () => {
+  it('semeia os cargos canônicos e todos os agentes da Célula Comercial, concedendo cada um ao seu cargo principal', async () => {
     await runMultiCargoSeed();
 
     const jobRoles = await listJobRoles({ activeOnly: false });
-    expect(jobRoles).toHaveLength(12);
+    expect(jobRoles).toHaveLength(JOB_ROLE_CATALOG.length);
 
     for (const agent of COMMERCIAL_AGENT_REGISTRY) {
       const jobRoleCode = AGENT_ID_TO_JOB_ROLE_CODE[agent.id];
@@ -56,7 +57,7 @@ describe('scripts/seed-multi-cargo.ts', () => {
     await runMultiCargoSeed();
 
     const jobRoles = await listJobRoles({ activeOnly: false });
-    expect(jobRoles).toHaveLength(12);
+    expect(jobRoles).toHaveLength(JOB_ROLE_CATALOG.length);
 
     const agentDefinitions = await prisma.agentDefinition.findMany({
       where: { code: { in: COMMERCIAL_AGENT_REGISTRY.map((a) => a.id) } },
