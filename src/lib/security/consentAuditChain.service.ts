@@ -9,8 +9,12 @@ export const GENESIS_HASH = '0'.repeat(64);
 
 /** Evento persistido: inclui a posição na cadeia do tenant (sequence 1..n). */
 export interface StoredConsentAuditEvent extends ConsentAuditEvent {
+  /** 0 = registro gênese do tenant; eventos reais começam em 1. */
   sequence: number;
+  kind: ConsentChainEventKind;
 }
+
+export type ConsentChainEventKind = 'GENESIS' | 'CONSENT' | 'REVOCATION' | 'RETRACTION';
 
 export interface ChainLockContext {
   last: StoredConsentAuditEvent | null;
@@ -73,33 +77,42 @@ export class InMemoryConsentAuditChainRepository implements ConsentAuditChainRep
   }
 }
 
-/** Formato canônico do conteúdo hasheado. Alterar exige versionamento da cadeia (handoff 15). */
-export function computeConsentEventHash(
-  event: Omit<StoredConsentAuditEvent, 'currentHash'> | Omit<ConsentAuditEvent, 'currentHash'>,
-): string {
-  const sequence = 'sequence' in event ? event.sequence : '';
-  const raw = JSON.stringify([
-    'consent-chain/v2',
-    sequence,
-    event.previousHash,
-    event.id,
-    event.organizationId,
-    event.subjectRef,
-    event.purpose,
-    event.termsVersion,
-    event.status,
-    event.occurredAt,
-    event.operatorUserId ?? '',
-    event.retentionUntil ?? '',
-  ]);
-  return createHash('sha256').update(raw).digest('hex');
+/** JSON canônico: chaves ordenadas recursivamente, `undefined` omitido. */
+export function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map((v) => canonicalJson(v ?? null)).join(',')}]`;
+  const obj = value as Record<string, unknown>;
+  return `{${Object.keys(obj)
+    .filter((k) => obj[k] !== undefined)
+    .sort()
+    .map((k) => `${JSON.stringify(k)}:${canonicalJson(obj[k])}`)
+    .join(',')}}`;
+}
+
+/** hash = sha256(previousHash + JSON canônico do payload (todos os campos exceto os hashes)). */
+export function computeConsentEventHash(event: Omit<StoredConsentAuditEvent, 'currentHash'>): string {
+  const { previousHash, ...payload } = event;
+  return createHash('sha256')
+    .update(previousHash + canonicalJson(payload))
+    .digest('hex');
+}
+
+/** Pseudônimo irreversível do titular para eventos que não podem carregar PII. */
+export function pseudonymizeSubject(organizationId: string, subjectRef: string): string {
+  return `sha256:${createHash('sha256').update(`${organizationId}\u0000${subjectRef}`).digest('hex')}`;
 }
 
 export interface ChainVerificationResult {
   valid: boolean;
   totalRecords: number;
   brokenAtId?: string;
-  reason?: 'SEQUENCE_GAP' | 'PREVIOUS_HASH_MISMATCH' | 'HASH_MISMATCH' | 'TENANT_MISMATCH';
+  reason?:
+    | 'SEQUENCE_GAP'
+    | 'REORDERED'
+    | 'GENESIS_INVALID'
+    | 'PREVIOUS_HASH_MISMATCH'
+    | 'HASH_MISMATCH'
+    | 'TENANT_MISMATCH';
 }
 
 /** Função pura de verificação da cadeia (reutilizável por job/endpoint de auditoria). */
@@ -118,7 +131,8 @@ export function verifyConsentChain(
       return { valid: false, totalRecords: chain.length, brokenAtId: r.id, reason };
     };
     if (r.organizationId !== organizationId) return fail('TENANT_MISMATCH');
-    if (r.sequence !== i + 1) return fail('SEQUENCE_GAP');
+    if (r.sequence !== i) return fail(r.sequence < i ? 'REORDERED' : 'SEQUENCE_GAP');
+    if ((i === 0) !== (r.kind === 'GENESIS')) return fail('GENESIS_INVALID');
     if (r.previousHash !== expectedPrev) return fail('PREVIOUS_HASH_MISMATCH');
     const { currentHash, ...content } = r;
     if (computeConsentEventHash(content) !== currentHash) return fail('HASH_MISMATCH');
@@ -143,7 +157,24 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
     build: (seq: number, previousHash: string) => Omit<StoredConsentAuditEvent, 'currentHash'>,
   ): Promise<StoredConsentAuditEvent> {
     return this.repo.withTenantLock(organizationId, async ({ last, append }) => {
-      const partial = build((last?.sequence ?? 0) + 1, last?.currentHash ?? GENESIS_HASH);
+      let tip = last;
+      if (!tip) {
+        const genesisPartial: Omit<StoredConsentAuditEvent, 'currentHash'> = {
+          id: `gen-${randomUUID()}`,
+          kind: 'GENESIS',
+          sequence: 0,
+          organizationId,
+          subjectRef: '',
+          purpose: 'GENESIS',
+          termsVersion: 'consent-chain/v3',
+          status: 'GRANTED',
+          previousHash: GENESIS_HASH,
+          occurredAt: new Date().toISOString(),
+        };
+        tip = { ...genesisPartial, currentHash: computeConsentEventHash(genesisPartial) };
+        await append(tip);
+      }
+      const partial = build(tip.sequence + 1, tip.currentHash);
       const event: StoredConsentAuditEvent = {
         ...partial,
         currentHash: computeConsentEventHash(partial),
@@ -165,6 +196,7 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
     this.assertTenant(input.organizationId);
     const event = await this.append(input.organizationId, (sequence, previousHash) => ({
       id: `cst-${randomUUID()}`,
+      kind: 'CONSENT',
       sequence,
       organizationId: input.organizationId,
       subjectRef: input.subjectRef,
@@ -195,6 +227,7 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
     this.assertTenant(organizationId);
     const event = await this.append(organizationId, (sequence, previousHash) => ({
       id: `rev-${randomUUID()}`,
+      kind: 'REVOCATION',
       sequence,
       organizationId,
       subjectRef,
@@ -222,6 +255,37 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
   /** Consumidores (ex.: Flywheel) que precisam expurgar dados ao revogar consentimento. */
   onRevocation(listener: (organizationId: string, subjectRef: string) => Promise<unknown>): void {
     this.revocationListeners.push(listener);
+  }
+
+  /**
+   * Registra SOMENTE o fato da retração/expurgo (sem PII): titular pseudonimizado,
+   * sistema afetado e contagens. O conteúdo expurgado nunca entra na cadeia.
+   */
+  async recordRetraction(input: {
+    organizationId: string;
+    subjectRef: string;
+    system: string;
+    purgedCounts: Record<string, number>;
+  }): Promise<StoredConsentAuditEvent> {
+    this.assertTenant(input.organizationId);
+    const counts = canonicalJson(input.purgedCounts);
+    return this.append(input.organizationId, (sequence, previousHash) => ({
+      id: `ret-${randomUUID()}`,
+      kind: 'RETRACTION',
+      sequence,
+      organizationId: input.organizationId,
+      subjectRef: pseudonymizeSubject(input.organizationId, input.subjectRef),
+      purpose: `RETRACTION:${input.system}:${counts}`,
+      termsVersion: 'RETRACTED',
+      previousHash,
+      occurredAt: new Date().toISOString(),
+      status: 'REVOKED',
+    }));
+  }
+
+  /** Alias: verifica adulteração, reordenação e lacunas. */
+  async verify(organizationId: string): Promise<ChainVerificationResult> {
+    return this.verifyChainIntegrity(organizationId);
   }
 
   async verifyChainIntegrity(organizationId: string): Promise<ChainVerificationResult> {

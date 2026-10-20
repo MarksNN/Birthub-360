@@ -3,6 +3,8 @@ import {
   ConsentAuditChainService,
   InMemoryConsentAuditChainRepository,
   computeConsentEventHash,
+  canonicalJson,
+  GENESIS_HASH,
   verifyConsentChain,
 } from '../../../src/lib/security/consentAuditChain.service.js';
 import {
@@ -30,7 +32,10 @@ describe('ConsentAuditChainService Unit Tests', () => {
       retentionDays: 180,
     });
 
-    expect(event1.previousHash).toBe('0000000000000000000000000000000000000000000000000000000000000000');
+    const genesis = (await auditChain.getChain('org-tenant-1'))[0];
+    expect(genesis.kind).toBe('GENESIS');
+    expect(genesis.previousHash).toBe(GENESIS_HASH);
+    expect(event1.previousHash).toBe(genesis.currentHash);
     expect(event1.currentHash).toMatch(/^[a-f0-9]{64}$/);
 
     const event2 = await auditChain.recordConsent({
@@ -46,7 +51,7 @@ describe('ConsentAuditChainService Unit Tests', () => {
 
     const verification = await auditChain.verifyChainIntegrity('org-tenant-1');
     expect(verification.valid).toBe(true);
-    expect(verification.totalRecords).toBe(2);
+    expect(verification.totalRecords).toBe(3);
   });
 
   it('should append revocation event and maintain chain validity', async () => {
@@ -69,7 +74,7 @@ describe('ConsentAuditChainService Unit Tests', () => {
 
     const verification = await auditChain.verifyChainIntegrity('org-tenant-1');
     expect(verification.valid).toBe(true);
-    expect(verification.totalRecords).toBe(2);
+    expect(verification.totalRecords).toBe(3);
   });
 
   it('should detect tampering if an historical record is modified', async () => {
@@ -114,10 +119,11 @@ describe('ConsentAuditChainService Unit Tests', () => {
     const chainA = await auditChain.getChain('org-A');
     const chainB = await auditChain.getChain('org-B');
 
-    expect(chainA).toHaveLength(1);
-    expect(chainB).toHaveLength(1);
-    expect(chainA[0].previousHash).toBe('0000000000000000000000000000000000000000000000000000000000000000');
-    expect(chainB[0].previousHash).toBe('0000000000000000000000000000000000000000000000000000000000000000');
+    expect(chainA).toHaveLength(2);
+    expect(chainB).toHaveLength(2);
+    expect(chainA[0].kind).toBe('GENESIS');
+    expect(chainA[1].previousHash).toBe(chainA[0].currentHash);
+    expect(chainB[0].currentHash).not.toBe(chainA[0].currentHash);
   });
 
   it('REMED-06: getChain devolve cópia (adulterar retorno não afeta o armazenado)', async () => {
@@ -159,7 +165,7 @@ describe('ConsentAuditChainService Unit Tests', () => {
       ),
     );
     const r = await auditChain.verifyChainIntegrity('o');
-    expect(r).toEqual({ valid: true, totalRecords: 20 });
+    expect(r).toEqual({ valid: true, totalRecords: 21 });
   });
 
   it('REMED-06: revogação notifica consumidores para expurgo', async () => {
@@ -198,11 +204,70 @@ describe('ConsentAuditChainService Unit Tests', () => {
     const svc = new ConsentAuditChainService(new PrismaConsentAuditChainRepository(db));
     await svc.recordConsent({ organizationId: 'o', subjectRef: 'a', purpose: 'p', termsVersion: 'v', retentionDays: 30 });
     await svc.revokeConsent('o', 'a', 'r');
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(3);
     expect(rows[1].previousHash).toBe(rows[0].currentHash);
     expect(String(locks[0][0])).toContain('pg_advisory_xact_lock');
-    expect(await svc.verifyChainIntegrity('o')).toEqual({ valid: true, totalRecords: 2 });
-    rows[0].termsVersion = 'adulterado';
+    expect(await svc.verifyChainIntegrity('o')).toEqual({ valid: true, totalRecords: 3 });
+    rows[1].termsVersion = 'adulterado';
     expect((await svc.verifyChainIntegrity('o')).valid).toBe(false);
+  });
+
+  it('Agente 15 (1): hash = sha256(prevHash + JSON canônico com chaves ordenadas recursivamente)', async () => {
+    expect(canonicalJson({ b: 1, a: { d: [{ z: 1, y: 2 }], c: undefined } })).toBe(
+      '{"a":{"d":[{"y":2,"z":1}]},"b":1}',
+    );
+    const e = (await auditChain.recordConsent({
+      organizationId: 'o', subjectRef: 's', purpose: 'p', termsVersion: 'v',
+    })) as import('../../../src/lib/security/consentAuditChain.service.js').StoredConsentAuditEvent;
+    const { currentHash, previousHash, ...payload } = e;
+    const { createHash } = await import('node:crypto');
+    expect(currentHash).toBe(createHash('sha256').update(previousHash + canonicalJson(payload)).digest('hex'));
+  });
+
+  it('Agente 15 (3): detecta reordenação explícita de elos', async () => {
+    for (const s of ['a', 'b', 'c']) {
+      await auditChain.recordConsent({ organizationId: 'o', subjectRef: s, purpose: 'p', termsVersion: 'v' });
+    }
+    const raw = repo.rawChain('o');
+    [raw[1], raw[2]] = [raw[2], raw[1]];
+    const r = await auditChain.verify('o');
+    expect(r.valid).toBe(false);
+    expect(r.reason).toBe('SEQUENCE_GAP');
+    const reordered = [...raw];
+    // reordenação mesmo após "renumerar" é detectada pelo encadeamento
+    reordered.forEach((e, i) => { e.sequence = i; });
+    const r2 = verifyConsentChain('o', reordered);
+    expect(r2.valid).toBe(false);
+    expect(['PREVIOUS_HASH_MISMATCH', 'HASH_MISMATCH']).toContain(r2.reason);
+  });
+
+  it('Agente 15 (3): detecta remoção do gênese e gênese forjado no meio', async () => {
+    await auditChain.recordConsent({ organizationId: 'o', subjectRef: 'a', purpose: 'p', termsVersion: 'v' });
+    const raw = repo.rawChain('o');
+    raw.shift();
+    expect((await auditChain.verify('o')).valid).toBe(false);
+  });
+
+  it('Agente 15 (6): isolamento entre tenants — elo de outro tenant é rejeitado e cadeias não se cruzam', async () => {
+    await auditChain.recordConsent({ organizationId: 'A', subjectRef: 'a', purpose: 'p', termsVersion: 'v' });
+    await auditChain.recordConsent({ organizationId: 'B', subjectRef: 'b', purpose: 'p', termsVersion: 'v' });
+    const a = await auditChain.getChain('A');
+    expect(a.every((e) => e.organizationId === 'A')).toBe(true);
+    const b = await auditChain.getChain('B');
+    const r = verifyConsentChain('A', [a[0], b[1]]);
+    expect(r.valid).toBe(false);
+    expect(r.reason).toBe('TENANT_MISMATCH');
+    await expect(auditChain.getChain('')).rejects.toThrow(/Tenancy/);
+    expect((await auditChain.verify('B')).valid).toBe(true);
+  });
+
+  it('Agente 15 (4): evento de retração não carrega PII (titular pseudonimizado, só contagens)', async () => {
+    const e = await auditChain.recordRetraction({
+      organizationId: 'o', subjectRef: 'lead-joao@example.com', system: 'flywheel', purgedCounts: { fewShot: 2 },
+    });
+    expect(JSON.stringify(await auditChain.getChain('o'))).not.toContain('lead-joao@example.com');
+    expect(e.subjectRef).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(e.kind).toBe('RETRACTION');
+    expect((await auditChain.verify('o')).valid).toBe(true);
   });
 });

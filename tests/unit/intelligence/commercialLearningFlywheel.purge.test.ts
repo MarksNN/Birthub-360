@@ -52,4 +52,32 @@ describe('REMED-06 / Ajuste 1 — retração do Flywheel com expurgo real', () =
     await chain.revokeConsent('o1', 'L1', 'titular revogou');
     expect(await svc.getFewShotExamples('o1', 'EMAIL')).toHaveLength(0);
   });
+
+  it('Agente 15 (4): expurga do banco e a cadeia guarda só o evento de retração, sem PII', async () => {
+    const SECRET_TEXT = 'Olá Maria Souza, CPF 000.000.000-00';
+    const LEAD = 'lead-maria-souza';
+    const deleted: string[] = [];
+    const tx: FlywheelPurgeTx = {
+      flywheelFewShotExample: { deleteMany: async ({ where }) => (deleted.push(`fs:${where.leadId}`), { count: 1 }) },
+      flywheelApproachRecord: { deleteMany: async ({ where }) => (deleted.push(`ap:${where.leadId}`), { count: 1 }) },
+    };
+    const chain = new ConsentAuditChainService();
+    const svc = new CommercialLearningFlywheelService({ $transaction: (fn) => fn(tx) }, chain);
+    chain.onRevocation((o, s) => svc.purgeSubject(o, s));
+    await svc.recordApproachSent({ organizationId: 'o1', leadId: LEAD, channel: 'EMAIL', segment: 'agro', approachText: SECRET_TEXT });
+    await svc.evaluateCommercialOutcome({ organizationId: 'o1', leadId: LEAD, outcomeType: 'DEAL_WON' });
+
+    await chain.revokeConsent('o1', LEAD, 'pedido do titular');
+
+    expect(deleted).toEqual([`fs:${LEAD}`, `ap:${LEAD}`]);
+    expect(await svc.getFewShotExamples('o1', 'EMAIL')).toHaveLength(0);
+    const events = await chain.getChain('o1');
+    const retraction = events.filter((e) => e.kind === 'RETRACTION');
+    expect(retraction).toHaveLength(1);
+    const retractionJson = JSON.stringify(retraction);
+    expect(retractionJson).not.toContain(LEAD);
+    expect(JSON.stringify(events)).not.toContain(SECRET_TEXT);
+    expect(retraction[0].purpose).toBe('RETRACTION:commercial-learning-flywheel:{"approaches":2,"fewShot":2}');
+    expect((await chain.verify('o1')).valid).toBe(true);
+  });
 });

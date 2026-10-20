@@ -16,6 +16,7 @@ export interface ConsentAuditRow {
   id: string;
   organizationId: string;
   sequence: number;
+  kind: 'GENESIS' | 'CONSENT' | 'REVOCATION' | 'RETRACTION';
   subjectRef: string;
   purpose: string;
   termsVersion: string;
@@ -52,6 +53,7 @@ const toEvent = (r: ConsentAuditRow): StoredConsentAuditEvent => ({
   id: r.id,
   organizationId: r.organizationId,
   sequence: r.sequence,
+  kind: r.kind,
   subjectRef: r.subjectRef,
   purpose: r.purpose,
   termsVersion: r.termsVersion,
@@ -85,6 +87,7 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
               id: e.id,
               organizationId: e.organizationId,
               sequence: e.sequence,
+              kind: e.kind,
               subjectRef: e.subjectRef,
               purpose: e.purpose,
               termsVersion: e.termsVersion,

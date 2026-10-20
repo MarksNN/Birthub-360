@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { FewShotCopyItem } from '../../../shared/contracts/dataFlywheel.contract.js';
 import { logger } from '../../../lib/logger.js';
-import { consentAuditChain } from '../../../lib/security/consentAuditChain.service.js';
+import { type ConsentAuditChainService, consentAuditChain } from '../../../lib/security/consentAuditChain.service.js';
 
 /**
  * REMED-06 / Ajuste 1 — expurgo durável do Flywheel ao revogar consentimento.
@@ -47,7 +47,10 @@ export class CommercialLearningFlywheelService {
   private curatedFewShotLibrary: Map<string, FewShotCopyItem> = new Map();
   private static ATTRIBUTION_WINDOW_DAYS = 30;
 
-  constructor(private readonly persistence?: FlywheelPersistencePurger) {}
+  constructor(
+    private readonly persistence?: FlywheelPersistencePurger,
+    private readonly auditChain?: Pick<ConsentAuditChainService, 'recordRetraction'>,
+  ) {}
 
   /**
    * Retração com expurgo real (Ajuste 1): remove abordagens e exemplos few-shot do titular
@@ -84,6 +87,17 @@ export class CommercialLearningFlywheelService {
         fewShotPurged++;
       }
     }
+
+    // A cadeia guarda apenas o evento de retração (pseudônimo + contagens), nunca o conteúdo.
+    await this.auditChain?.recordRetraction({
+      organizationId,
+      subjectRef: leadId,
+      system: 'commercial-learning-flywheel',
+      purgedCounts: {
+        approaches: approachesPurged + persistedApproachesPurged,
+        fewShot: fewShotPurged + persistedFewShotPurged,
+      },
+    });
 
     logger.warn(
       {
@@ -247,7 +261,10 @@ export class CommercialLearningFlywheelService {
   }
 }
 
-export const commercialLearningFlywheel = new CommercialLearningFlywheelService();
+export const commercialLearningFlywheel = new CommercialLearningFlywheelService(
+  undefined,
+  consentAuditChain,
+);
 
 // Revogação de consentimento (subjectRef = leadId) dispara expurgo no Flywheel.
 consentAuditChain.onRevocation((organizationId, subjectRef) =>
