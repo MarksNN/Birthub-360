@@ -306,4 +306,7 @@ export function setupDI() {
       data: event.data,
     });
   });
+
+  // Conexão do DomainEventMesh com fluxos automáticos de CRM e mensageria no Bitrix24 e WhatsApp
+  bitrixEventMeshBridge.register();
 }
