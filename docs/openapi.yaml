@@ -6575,6 +6575,86 @@ paths:
               { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
           }
         '403': { $ref: '#/components/responses/Forbidden' }
+  # Revenue Oracle / rebalanceamento (REMED-03/04) — predictive.routes.ts (createPredictiveRoutes),
+  # montado em commercialIntelligence.routes.ts sob /predictive. Herda authenticateToken +
+  # requireTenant + requireRole(ADMIN, GESTOR). Métricas sem histórico suficiente vêm null com
+  # status insufficient_data (nunca valores fictícios).
+  /commercial-intelligence/predictive/cockpit:
+    get:
+      tags: [Comercial Inteligente]
+      summary: Cockpit do Revenue Oracle (forecast a partir dos deals ganhos do tenant) — somente ADMIN/GESTOR
+      responses:
+        '200':
+          {
+            description: OK,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
+          }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /commercial-intelligence/predictive/backtest:
+    get:
+      tags: [Comercial Inteligente]
+      summary: Métricas de backtest do forecast (null/insufficient_data abaixo do mínimo de histórico) — somente ADMIN/GESTOR
+      responses:
+        '200':
+          {
+            description: OK,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
+          }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /commercial-intelligence/predictive/rebalance/approvals:
+    post:
+      tags: [Comercial Inteligente]
+      summary: Registra aprovação/rejeição humana de recomendação de rebalanceamento (não altera o CRM) — somente ADMIN/GESTOR
+      description: |
+        Idempotente por (tenant, recommendationId): mesma decisão/payload → 200 com
+        `alreadyRecorded: true` sem nova escrita; decisão/payload divergente → 409 com
+        `data.existing`. A decisão é gravada no AuditLog; `appliedToCrm` é sempre false.
+        Schema Zod: `rebalanceApprovalRequestSchema` (strict; `toOwner` ≠ `fromOwner`).
+        Evite dados pessoais em `note` (texto livre, persistido no AuditLog).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [recommendationId, leadId, fromOwner, toOwner, decision]
+              properties:
+                recommendationId: { type: string, minLength: 1, maxLength: 128 }
+                leadId: { type: string, minLength: 1, maxLength: 64 }
+                fromOwner: { type: string, minLength: 1, maxLength: 200, nullable: true }
+                toOwner:
+                  { type: string, minLength: 1, maxLength: 200, description: 'Deve ser diferente de fromOwner' }
+                decision: { type: string, enum: [APPROVED, REJECTED] }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: Replay idempotente — mesma decisão já registrada (alreadyRecorded=true)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RebalanceApprovalEnvelope' }
+        '201':
+          description: Decisão registrada (alreadyRecorded=false)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RebalanceApprovalEnvelope' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Já existe decisão divergente para esta recommendationId (data.existing traz o registro)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: Payload inválido (Zod) — `details` traz fieldErrors
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
   /commercial-intelligence/deals:
     get:
       tags: [Comercial Inteligente]
@@ -10918,6 +10998,31 @@ components:
         timestamp: { type: string, format: date-time }
         organizationId: { type: string, nullable: true }
 
+    RebalanceApprovalEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, enum: [true] }
+        data:
+          type: object
+          required: [approval, alreadyRecorded]
+          properties:
+            alreadyRecorded: { type: boolean }
+            approval:
+              type: object
+              required: [approvalId, organizationId, decidedBy, decidedAt, appliedToCrm, recommendationId, leadId, fromOwner, toOwner, decision]
+              properties:
+                approvalId: { type: string }
+                organizationId: { type: string }
+                decidedBy: { type: string }
+                decidedAt: { type: string, format: date-time }
+                appliedToCrm: { type: boolean, enum: [false] }
+                recommendationId: { type: string }
+                leadId: { type: string }
+                fromOwner: { type: string, nullable: true }
+                toOwner: { type: string }
+                decision: { type: string, enum: [APPROVED, REJECTED] }
+                note: { type: string }
     DataEnvelope:
       type: object
       description: Envelope de resposta genérico usado pela maioria dos endpoints
