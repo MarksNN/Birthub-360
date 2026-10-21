@@ -350,4 +350,42 @@ describe.skipIf(!APP_URL)('REMED-05 adaptador Postgres (RLS estrita, #34)', () =
       }
     });
   });
+  it('U4: pool com 1 conexão — publish inline, consumo e relay concluem sem conexão aninhada (sem deadlock)', async () => {
+    const tiny = new pg.Pool({ connectionString: APP_URL, max: 1, connectionTimeoutMillis: 3000 });
+    const tinyRunner: TenantSqlRunner = {
+      listTenants: async () => [orgA],
+      runAsTenant: async (org, fn) => {
+        const c = await tiny.connect();
+        try {
+          await c.query('BEGIN');
+          await c.query("SELECT set_config('app.current_tenant_id', $1, true)", [org]);
+          const r = await fn(executor(c));
+          await c.query('COMMIT');
+          return r;
+        } catch (e) {
+          await c.query('ROLLBACK');
+          throw e;
+        } finally {
+          c.release();
+        }
+      },
+    };
+    try {
+      const repo = new PrismaOutboxRepository(tinyRunner);
+      const mesh = new DomainEventMeshService({ outbox: repo, consumptions: new PrismaConsumptionStore(tinyRunner) });
+      let calls = 0;
+      mesh.subscribe('DEAL_WON', async (e) => {
+          if (e.aggregateId === 'u4-agg') calls++;
+        }, 'u4');
+      for (let i = 0; i < 5; i++) await mesh.publish({ ...input(orgA), aggregateId: 'u4-agg' });
+      for (let i = 0; i < 3; i++) await mesh.publishInTransaction(repo, { ...input(orgA), aggregateId: 'u4-agg' });
+      const relay = mesh.createRelay({ workerId: 'u4', batchSize: 10 });
+      const [n1, n2] = await Promise.all([relay.tick(), relay.tick()]); // 2º tick concorrente é recusado
+      expect(n2).toBe(0);
+      expect(n1).toBeGreaterThanOrEqual(3);
+      expect(calls).toBe(8);
+    } finally {
+      await tiny.end();
+    }
+  }, 20_000);
 });

@@ -49,6 +49,15 @@ export function requireOutboxTenantContext(store: OutboxContextStore | undefined
 export function systemJobOutboxContext(store: OutboxContextStore | undefined): {
   tenantId: string;
   bypassRls: false;
+  outboxUnitOfWorkActive: true;
 } {
-  return { tenantId: requireOutboxTenantContext(store), bypassRls: false };
+  // `outboxUnitOfWorkActive` marca o contexto da UoW: dentro dela é PROIBIDO usar o client estendido
+  // (`prisma.*`) — ele abre outra conexão/transação e a escrita escapa do tx e do tenant (parecer 15,
+  // U1/U4). A checagem em runtime em src/lib/prisma.ts é do 01/15; aqui a regra é garantida pelo
+  // teste estático tests/unit/queue/outbox.remed05-no-extended-client.test.ts.
+  return {
+    tenantId: requireOutboxTenantContext(store),
+    bypassRls: false,
+    outboxUnitOfWorkActive: true,
+  };
 }

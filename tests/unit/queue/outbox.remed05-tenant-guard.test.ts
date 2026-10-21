@@ -26,6 +26,7 @@ describe('REMED-05 guarda de tenant da UoW', () => {
       expect(systemJobOutboxContext({ tenantId: 'org-1', bypassRls: true, outboxSystemJob: 'job-teste' })).toEqual({
         tenantId: 'org-1',
         bypassRls: false,
+        outboxUnitOfWorkActive: true,
       });
       expect(() => systemJobOutboxContext({ bypassRls: true, outboxSystemJob: 'job-teste' })).toThrow(/tenantId ausente/);
     } finally {

@@ -39,6 +39,7 @@ export class OutboxRelay {
   readonly workerId: string;
   private timer?: NodeJS.Timeout;
   private running = false;
+  private ticking = false;
 
   constructor(private readonly opts: OutboxRelayOptions) {
     this.workerId = opts.workerId ?? `relay-${randomUUID()}`;
@@ -86,7 +87,22 @@ export class OutboxRelay {
   }
 
   /** Processa um lote; retorna quantos registros foram reivindicados. */
+  /**
+   * Processa um lote por tenant. Concorrência limitada por desenho (parecer 15, U4): um relay nunca
+   * roda dois ticks ao mesmo tempo, percorre os tenants em série e cada operação usa UMA conexão
+   * por vez (claim, entrega e marcação em transações curtas e separadas, nenhuma aninhada).
+   */
   async tick(): Promise<number> {
+    if (this.ticking) return 0;
+    this.ticking = true;
+    try {
+      return await this.tickOnce();
+    } finally {
+      this.ticking = false;
+    }
+  }
+
+  private async tickOnce(): Promise<number> {
     const now = (this.opts.now ?? (() => new Date()))();
     const repo = this.opts.repository;
     // Com RLS estrita, o relay itera por tenant e cada claim roda com o contexto da organização.

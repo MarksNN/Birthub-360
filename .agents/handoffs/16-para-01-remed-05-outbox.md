@@ -142,3 +142,16 @@ transação do cliente estendido (ou cifrar explicitamente). Até lá, migrar ca
 `createPrismaOutboxAdapters().unitOfWork` é fail-closed (`src/lib/queue/outbox/tenantGuard.ts`): sem `tenantId` no requestContext → erro;
 com `bypassRls` → erro, salvo job de sistema com opt-in nomeado em `OUTBOX_SYSTEM_JOBS` (allowlist vazia por padrão, revisão do 24).
 Em todos os casos a transação é aberta com contexto recriado `{ tenantId, bypassRls: false }`, sem herdar `app.bypass_rls=on`.
+
+## Parecer 15 (UoW) — itens do 16
+- **U3:** UoW fail-closed sem tenant e sem herdar bypass (ver seção anterior).
+- **U4:** nenhum caminho do relay/UoW usa o client estendido dentro do tx: o adaptador usa só SQL cru no `tx` recebido;
+  claim, entrega e marcação rodam em transações curtas e separadas (nenhuma aninhada). O relay é não reentrante
+  (`tick()` concorrente devolve 0) e percorre os tenants em série. Teste de integração com **pool de 1 conexão**:
+  publish inline + consumo + relay concluem sem deadlock.
+- **U7:** o código do 16 não usa advisory lock nem `hashtext` (o achado é do #33, do 15).
+- **Regra (porta `OutboxUnitOfWork`):** dentro da UoW, só o `tx`; proibido `prisma.*`/AuditService/logInbound/withRlsContext.
+  O contexto da UoW carrega `outboxUnitOfWorkActive: true`, para o 01/15 poderem checar em runtime no `src/lib/prisma.ts`.
+  Garantia hoje: teste estático `tests/unit/queue/outbox.remed05-no-extended-client.test.ts`, que varre `src/`.
+- **U1/U2 (01, decisão do Marks):** UoW sobre o client estendido via AsyncLocalStorage. **Follow-up do 16:** depois do PR do 01,
+  trocar a compensação manual do bitrix.webhook (AuditLog/soft-delete/reindex) pelo client estendido dentro da UoW.

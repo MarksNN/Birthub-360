@@ -158,7 +158,15 @@ export interface ConsumptionStore {
   isCompleted(organizationId: string, eventId: string, consumer: string): Promise<boolean>;
 }
 
-/** Abstração de transação: o caso de uso escreve seus dados e a outbox no mesmo `tx`. */
+/**
+ * Abstração de transação: o caso de uso escreve seus dados e a outbox no mesmo `tx`.
+ *
+ * REGRA (parecer 15, U1/U2/U4): dentro de `run`/`withTransaction`/`runDomainTransaction` use SOMENTE
+ * o `tx` recebido. Nunca `prisma.*` nem helpers que usam o client estendido (AuditService, logInbound…):
+ * eles abrem outra conexão do pool (risco de esgotar/self-deadlock) e escapam da transação e do tenant.
+ * O `tx` é o client BASE (sem cifra de PII/AuditLog/soft-delete/reindex) — compense explicitamente.
+ * Garantido por tests/unit/queue/outbox.remed05-no-extended-client.test.ts.
+ */
 export interface OutboxUnitOfWork<TTx = unknown> {
   run<R>(fn: (ctx: { tx: TTx; outbox: OutboxRepository }) => Promise<R>): Promise<R>;
 }
