@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   CommercialLearningFlywheelService,
@@ -101,11 +102,19 @@ describe('REMED-06 / Ajuste 1 — retração do Flywheel com expurgo real', () =
     };
     commercialLearningFlywheel.clear();
     await seed(commercialLearningFlywheel, 'o9', 'L9');
-    await subscribeToPurgeBroadcasts(bus, 'instancia-B');
-    await makeBroadcaster(bus, 'instancia-A')('o9', 'L9');
+    expect(commercialLearningFlywheel.localSubjectRefs('o9')).toContain('L9');
+    const pseudonymize = async (o: string, r: string) =>
+      createHmac('sha256', `k-${o}`).update(r).digest('hex');
+    await subscribeToPurgeBroadcasts(bus, 'instancia-B', pseudonymize);
+    await makeBroadcaster(bus, 'instancia-A', pseudonymize)('o9', 'L9');
     await new Promise((r) => setTimeout(r, 10));
-    expect(JSON.parse(bus.published[0])).toMatchObject({ organizationId: 'o9', subjectRef: 'L9' });
+    // (c) mensagem só com o pseudônimo HMAC — nunca o subjectRef/leadId cru
+    expect(bus.published[0]).not.toContain('L9');
+    const msg = JSON.parse(bus.published[0]);
+    expect(msg).toEqual({ v: 2, organizationId: 'o9', subject: await pseudonymize('o9', 'L9'), from: 'instancia-A' });
+    expect(msg).not.toHaveProperty('subjectRef');
     expect(await commercialLearningFlywheel.getFewShotExamples('o9', 'EMAIL')).toHaveLength(0);
+    expect(commercialLearningFlywheel.localSubjectRefs('o9')).not.toContain('L9');
     expect(CONSENT_PURGE_CHANNEL).toBe('lgpd:consent-purge:v1');
   });
 });

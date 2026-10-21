@@ -59,6 +59,19 @@ export class CommercialLearningFlywheelService {
    * Retração com expurgo real (Ajuste 1): remove abordagens e exemplos few-shot do titular
    * na memória e, se houver persistência configurada, no PostgreSQL (mesma transação).
    */
+  /** leadIds com estado em memória no tenant (para casamento por pseudônimo no pub/sub). */
+  localSubjectRefs(organizationId: string): string[] {
+    const out = new Set<string>();
+    for (const a of this.approaches.values()) {
+      if (a.organizationId === organizationId && a.leadId) out.add(a.leadId);
+    }
+    for (const f of this.curatedFewShotLibrary.values()) {
+      const l = f.attributionEvidence?.leadId;
+      if (f.organizationId === organizationId && l) out.add(l);
+    }
+    return [...out];
+  }
+
   async purgeSubject(organizationId: string, leadId: string): Promise<FlywheelPurgeResult> {
     if (!organizationId || !leadId) {
       throw new Error('Tenancy violation: purgeSubject exige organizationId e leadId');

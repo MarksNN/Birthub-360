@@ -6,7 +6,7 @@ import { createHmac, randomBytes } from 'node:crypto';
  * token = "hs256:" + HMAC-SHA256(chaveDoTitular, subjectRef NFC)
  * - chaveDoTitular: 32 bytes aleatórios por (tenant, titular), guardados em store expurgável;
  * - a linha da chave é endereçada por lookupId = HMAC-SHA256(pepperDoTenant, subjectRef NFC);
- * - pepperDoTenant vem de um provedor abstrato (env ou KMS) — nunca do git.
+ * - pepperDoTenant vem de um TenantKeyProvider (KMS envelope em produção; env só teste/dev).
  * Esquecimento (art. 18, VI): destruir a chave do titular torna os tokens já gravados na cadeia
  * impossíveis de religar ao titular (crypto-shredding), sem quebrar o encadeamento de hashes.
  */
@@ -14,15 +14,19 @@ export interface TenantPepperProvider {
   getPepper(organizationId: string): Promise<Buffer>;
 }
 
-/** Abstração mínima de KMS: deriva material de chave por contexto (ex.: AWS KMS GenerateMac). */
-export interface KmsMacClient {
-  generateMac(input: { keyId: string; message: Buffer }): Promise<Buffer>;
-}
-
 export class MissingPepperError extends Error {}
 
-/** Pepper por tenant derivado de um segredo de ambiente (`LGPD_SUBJECT_PEPPER_SECRET`). */
-export class EnvTenantPepperProvider implements TenantPepperProvider {
+/**
+ * SOMENTE teste/dev: pepper derivado de segredo de ambiente. Proibido em produção (a fábrica
+ * recusa); a destruição por tenant é simulada em memória.
+ */
+export class EnvTenantPepperProvider implements TenantKeyProvider {
+  private destroyed = new Set<string>();
+
+  async destroyTenantKey(organizationId: string): Promise<void> {
+    this.destroyed.add(organizationId);
+  }
+
   constructor(
     private readonly secret: string | undefined = process.env.LGPD_SUBJECT_PEPPER_SECRET,
   ) {}
@@ -37,6 +41,9 @@ export class EnvTenantPepperProvider implements TenantPepperProvider {
   }
 
   async getPepper(organizationId: string): Promise<Buffer> {
+    if (this.destroyed.has(organizationId)) {
+      throw new TenantKeyDestroyedError('Chave do tenant destruída (offboarding)');
+    }
     if (!this.secret || this.secret.length < 32) {
       throw new MissingPepperError(
         'LGPD_SUBJECT_PEPPER_SECRET ausente ou curto (>= 32 caracteres) — pseudonimização indisponível',
@@ -46,27 +53,121 @@ export class EnvTenantPepperProvider implements TenantPepperProvider {
   }
 }
 
-/** Pepper por tenant derivado no KMS; o segredo nunca sai do KMS. */
-export class KmsTenantPepperProvider implements TenantPepperProvider {
-  private cache = new Map<string, Buffer>();
+/**
+ * Segredo por tenant DESTRUTÍVEL (bloqueio do Agente 24): `destroyTenantKey(org)` no offboarding
+ * torna todos os lookupIds/tokens do tenant irreligáveis (crypto-shredding do tenant inteiro).
+ */
+export interface TenantKeyProvider extends TenantPepperProvider {
+  destroyTenantKey(organizationId: string): Promise<void>;
+}
+
+export class TenantKeyDestroyedError extends MissingPepperError {}
+
+/** Cliente KMS mínimo para envelope encryption (ex.: AWS KMS GenerateDataKey/Decrypt). */
+export interface KmsEnvelopeClient {
+  generateDataKey(input: {
+    keyId: string;
+    encryptionContext: Record<string, string>;
+  }): Promise<{ plaintext: Buffer; ciphertext: Buffer }>;
+  decrypt(input: {
+    keyId: string;
+    ciphertext: Buffer;
+    encryptionContext: Record<string, string>;
+  }): Promise<Buffer>;
+}
+
+export type WrappedTenantKeyState =
+  | { status: 'ACTIVE'; ciphertext: Buffer }
+  | { status: 'DESTROYED' }
+  | { status: 'ABSENT' };
+
+/** Persistência da DEK CIFRADA por tenant (nunca o plaintext). Tabela a cargo do Agente 01. */
+export interface WrappedTenantKeyStore {
+  get(organizationId: string): Promise<WrappedTenantKeyState>;
+  /** Insere se ausente; devolve o ciphertext vencedor em caso de corrida. */
+  putIfAbsent(organizationId: string, ciphertext: Buffer, cmkId: string): Promise<Buffer>;
+  /** Apaga o ciphertext e grava tombstone (impede recriação). */
+  destroy(organizationId: string): Promise<void>;
+}
+
+export class InMemoryWrappedTenantKeyStore implements WrappedTenantKeyStore {
+  private rows = new Map<string, Buffer | null>();
+  async get(o: string): Promise<WrappedTenantKeyState> {
+    if (!this.rows.has(o)) return { status: 'ABSENT' };
+    const c = this.rows.get(o);
+    return c ? { status: 'ACTIVE', ciphertext: c } : { status: 'DESTROYED' };
+  }
+  async putIfAbsent(o: string, ciphertext: Buffer): Promise<Buffer> {
+    if (this.rows.has(o)) {
+      const c = this.rows.get(o);
+      if (!c) throw new TenantKeyDestroyedError('Chave do tenant destruída');
+      return c;
+    }
+    this.rows.set(o, ciphertext);
+    return ciphertext;
+  }
+  async destroy(o: string): Promise<void> {
+    this.rows.set(o, null);
+  }
+}
+
+/**
+ * Envelope KMS: DEK aleatória por tenant, cifrada pela CMK (encryptionContext = organizationId),
+ * guardada cifrada no store. Plaintext só em memória com TTL curto.
+ */
+export class KmsEnvelopeTenantKeyProvider implements TenantKeyProvider {
+  private cache = new Map<string, { key: Buffer; exp: number }>();
   constructor(
-    private readonly kms: KmsMacClient,
-    private readonly keyId: string,
+    private readonly kms: KmsEnvelopeClient,
+    private readonly store: WrappedTenantKeyStore,
+    private readonly cmkId: string,
+    private readonly cacheTtlMs = 60_000,
   ) {}
 
   async getPepper(organizationId: string): Promise<Buffer> {
     const hit = this.cache.get(organizationId);
-    if (hit) return hit;
-    const pepper = await this.kms.generateMac({
-      keyId: this.keyId,
-      message: Buffer.from(`tenant-pepper:v1:${organizationId}`, 'utf8'),
-    });
-    this.cache.set(organizationId, pepper);
-    return pepper;
+    if (hit && hit.exp > Date.now()) return hit.key;
+    const ctx = { organizationId, purpose: 'lgpd-subject-pepper:v1' };
+    const state = await this.store.get(organizationId);
+    if (state.status === 'DESTROYED') {
+      throw new TenantKeyDestroyedError('Chave do tenant destruída (offboarding)');
+    }
+    let key: Buffer;
+    if (state.status === 'ACTIVE') {
+      key = await this.kms.decrypt({
+        keyId: this.cmkId,
+        ciphertext: state.ciphertext,
+        encryptionContext: ctx,
+      });
+    } else {
+      const dk = await this.kms.generateDataKey({ keyId: this.cmkId, encryptionContext: ctx });
+      const winner = await this.store.putIfAbsent(organizationId, dk.ciphertext, this.cmkId);
+      key = winner.equals(dk.ciphertext)
+        ? dk.plaintext
+        : await this.kms.decrypt({ keyId: this.cmkId, ciphertext: winner, encryptionContext: ctx });
+    }
+    this.cache.set(organizationId, { key, exp: Date.now() + this.cacheTtlMs });
+    return key;
+  }
+
+  async destroyTenantKey(organizationId: string): Promise<void> {
+    await this.store.destroy(organizationId);
+    this.cache.get(organizationId)?.key.fill(0);
+    this.cache.delete(organizationId);
   }
 }
 
-/** Titular esquecido: a chave foi destruída e NUNCA é recriada (falha fechada). */
+/** Fail-closed: usado em produção quando o KMS não está configurado. */
+export class UnavailableTenantKeyProvider implements TenantKeyProvider {
+  constructor(private readonly reason: string) {}
+  async getPepper(): Promise<Buffer> {
+    throw new MissingPepperError(this.reason);
+  }
+  async destroyTenantKey(): Promise<void> {
+    throw new MissingPepperError(this.reason);
+  }
+}
+
 export class SubjectShreddedError extends Error {}
 
 export type SubjectKeyState =
@@ -127,6 +228,15 @@ export class SubjectTokenizer {
     private readonly pepper: TenantPepperProvider,
     private readonly keys: SubjectKeyStore,
   ) {}
+
+  /** Offboarding: destrói o segredo do tenant (todos os lookupIds ficam irreligáveis). */
+  async destroyTenantKey(organizationId: string): Promise<void> {
+    const p = this.pepper as Partial<TenantKeyProvider>;
+    if (typeof p.destroyTenantKey !== 'function') {
+      throw new MissingPepperError('Provedor de segredo do tenant não suporta destruição');
+    }
+    await p.destroyTenantKey.call(this.pepper, organizationId);
+  }
 
   async lookupId(organizationId: string, subjectRef: string): Promise<string> {
     if (!subjectRef || subjectRef.trim() === '') throw new Error('subjectRef obrigatório');

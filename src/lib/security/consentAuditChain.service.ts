@@ -528,6 +528,17 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
   }
 
   /** Define o publicador de invalidação entre instâncias (wiring do bootstrap). */
+  /** Pseudônimo estável do titular (HMAC com o segredo do tenant) — para mensagens entre instâncias. */
+  async subjectPseudonym(organizationId: string, subjectRef: string): Promise<string> {
+    return this.opts.tokenizer.lookupId(organizationId, subjectRef);
+  }
+
+  /** Offboarding do tenant: destrói o segredo do tenant (crypto-shredding de todos os titulares). */
+  async destroyTenantKey(organizationId: string): Promise<void> {
+    await this.opts.tokenizer.destroyTenantKey(organizationId);
+    logger.warn({ organizationId }, 'ConsentAuditChain: segredo do tenant destruído (offboarding)');
+  }
+
   setPurgeBroadcaster(fn: ConsentAuditChainOptions['broadcastPurge']): void {
     this.opts.broadcastPurge = fn;
   }

@@ -17,7 +17,7 @@ Dono: Agente 21 — Privacidade e LGPD. Código: `src/lib/security/consentAuditC
 ## O que vai e o que NÃO vai para a cadeia
 - `subjectRef` gravado = `hs256:` + HMAC-SHA256(chave aleatória do titular, subjectRef NFC). Não é
   hash simples nem reversível. A chave do titular é endereçada por HMAC(pepper do tenant, subjectRef);
-  o pepper vem de `LGPD_SUBJECT_PEPPER_SECRET` (env) ou do KMS (`KmsTenantPepperProvider`), nunca do git.
+  o segredo por tenant vem do `TenantKeyProvider`: em produção `KmsEnvelopeTenantKeyProvider` (DEK por tenant cifrada pela CMK `LGPD_KMS_KEY_ID`, destrutível via `destroyTenantKey(org)` no offboarding; sem KMS a cadeia falha fechada). `LGPD_SUBJECT_PEPPER_SECRET` só vale em teste/dev. O pub/sub de invalidação leva só o pseudônimo HMAC do titular.
 - Motivo da revogação: somente `REVOCATION_REASON_CODES`
   (`TITULAR_REQUEST`, `ERASURE_REQUEST`, `PURPOSE_FULFILLED`, `LEGAL_OBLIGATION`, `OPERATOR_CORRECTION`).
   Texto livre vai para `ConsentEventDetail`, fora da cadeia.

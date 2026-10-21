@@ -40,27 +40,65 @@ export interface PubSubLike {
   on(event: 'message', cb: (channel: string, message: string) => void): unknown;
 }
 
-/** Publica pedido de invalidação (só ids internos: organizationId + subjectRef/leadId). */
-export function makeBroadcaster(publisher: PubSubLike | undefined, instanceId: string) {
+export type Pseudonymize = (organizationId: string, subjectRef: string) => Promise<string>;
+
+/**
+ * Publica pedido de invalidação. A mensagem leva SÓ o pseudônimo HMAC do titular (nunca o
+ * subjectRef/leadId cru): `{ organizationId, subject: <hmac>, from }`.
+ */
+export function makeBroadcaster(
+  publisher: PubSubLike | undefined,
+  instanceId: string,
+  pseudonymize: Pseudonymize,
+) {
   return async (organizationId: string, subjectRef: string) => {
     if (!publisher) return;
+    const subject = await pseudonymize(organizationId, subjectRef);
     await publisher.publish(
       CONSENT_PURGE_CHANNEL,
-      JSON.stringify({ organizationId, subjectRef, from: instanceId }),
+      JSON.stringify({ v: 2, organizationId, subject, from: instanceId }),
     );
   };
+}
+
+/** Titulares presentes no estado em memória desta instância (candidatos ao casamento HMAC). */
+export function localSubjectRefs(organizationId: string): string[] {
+  return [
+    ...new Set([
+      ...commercialLearningFlywheel.localSubjectRefs(organizationId),
+      ...winLossAutopsyService.localSubjectRefs(organizationId),
+    ]),
+  ];
+}
+
+/** Recebe pseudônimo, recalcula HMAC dos titulares locais e expurga só os que casam. */
+export async function purgeLocalByPseudonym(
+  organizationId: string,
+  subject: string,
+  pseudonymize: Pseudonymize,
+  purge: (o: string, s: string) => Promise<unknown> = purgeLocalSubjectState,
+): Promise<number> {
+  let n = 0;
+  for (const ref of localSubjectRefs(organizationId)) {
+    if ((await pseudonymize(organizationId, ref)) === subject) {
+      await purge(organizationId, ref);
+      n++;
+    }
+  }
+  return n;
 }
 
 export async function subscribeToPurgeBroadcasts(
   subscriber: PubSubLike,
   instanceId: string,
+  pseudonymize: Pseudonymize,
 ): Promise<void> {
   subscriber.on('message', (channel, message) => {
     if (channel !== CONSENT_PURGE_CHANNEL) return;
     try {
-      const { organizationId, subjectRef, from } = JSON.parse(message) as Record<string, string>;
-      if (from === instanceId || !organizationId || !subjectRef) return;
-      purgeLocalSubjectState(organizationId, subjectRef).catch((err) =>
+      const { organizationId, subject, from } = JSON.parse(message) as Record<string, string>;
+      if (from === instanceId || !organizationId || !subject) return;
+      purgeLocalByPseudonym(organizationId, subject, pseudonymize).catch((err) =>
         logger.error({ err, organizationId }, 'LGPD: invalidação remota falhou'),
       );
     } catch {
@@ -92,9 +130,10 @@ export async function startConsentPurgeRuntime(
     subscriberQuit = () => {
       subscriber.disconnect();
     };
-    await subscribeToPurgeBroadcasts(subscriber as unknown as PubSubLike, instanceId);
+    const pseudonymize: Pseudonymize = (o, r) => chain.subjectPseudonym(o, r);
+    await subscribeToPurgeBroadcasts(subscriber as unknown as PubSubLike, instanceId, pseudonymize);
     chain.setPurgeBroadcaster(
-      makeBroadcaster(cacheConnection as unknown as PubSubLike, instanceId),
+      makeBroadcaster(cacheConnection as unknown as PubSubLike, instanceId, pseudonymize),
     );
   } else {
     logger.warn('LGPD: Redis não configurado — invalidação entre instâncias desativada');

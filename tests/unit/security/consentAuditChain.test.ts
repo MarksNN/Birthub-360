@@ -19,7 +19,9 @@ import {
 import {
   EnvTenantPepperProvider,
   InMemorySubjectKeyStore,
-  KmsTenantPepperProvider,
+  KmsEnvelopeTenantKeyProvider,
+  InMemoryWrappedTenantKeyStore,
+  TenantKeyDestroyedError,
   MissingPepperError,
   SubjectShreddedError,
   SubjectTokenizer,
@@ -200,22 +202,44 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
       expect((await chain.verifyChainIntegrity('o')).valid).toBe(true);
     });
 
-    it('pepper ausente/curto falha fechado; KMS provider deriva por tenant', async () => {
+    it('pepper ausente/curto falha fechado; KMS envelope: DEK por tenant, cifrada, destrutível', async () => {
       await expect(new EnvTenantPepperProvider(undefined).getPepper('o')).rejects.toBeInstanceOf(MissingPepperError);
       const calls: string[] = [];
-      const kms = new KmsTenantPepperProvider(
-        {
-          generateMac: async ({ message }) => {
-            calls.push(message.toString());
-            return createHash('sha256').update(message).digest();
-          },
+      const wrap = (k: Buffer, o: string) => Buffer.concat([Buffer.from(`wrapped:${o}:`), k]);
+      const kms = {
+        generateDataKey: async ({ encryptionContext }: { encryptionContext: Record<string, string> }) => {
+          calls.push(`gen:${encryptionContext.organizationId}`);
+          const plaintext = createHash('sha256').update(`dek-${encryptionContext.organizationId}`).digest();
+          return { plaintext, ciphertext: wrap(plaintext, encryptionContext.organizationId) };
         },
-        'alias/lgpd',
-      );
-      const t = new SubjectTokenizer(kms, new InMemorySubjectKeyStore());
-      expect(await t.lookupId('A', 's')).not.toBe(await t.lookupId('B', 's'));
-      await t.lookupId('A', 's');
-      expect(calls).toEqual(['tenant-pepper:v1:A', 'tenant-pepper:v1:B']);
+        decrypt: async ({ ciphertext, encryptionContext }: { ciphertext: Buffer; encryptionContext: Record<string, string> }) => {
+          calls.push(`dec:${encryptionContext.organizationId}`);
+          const prefix = `wrapped:${encryptionContext.organizationId}:`;
+          if (!ciphertext.subarray(0, prefix.length).equals(Buffer.from(prefix))) throw new Error('contexto inválido');
+          return ciphertext.subarray(prefix.length);
+        },
+      };
+      const store = new InMemoryWrappedTenantKeyStore();
+      const provider = new KmsEnvelopeTenantKeyProvider(kms, store, 'alias/lgpd', 0);
+      const t = new SubjectTokenizer(provider, new InMemorySubjectKeyStore());
+      const a1 = await t.lookupId('A', 's');
+      expect(a1).not.toBe(await t.lookupId('B', 's'));
+      expect(await t.lookupId('A', 's')).toBe(a1); // DEK persistida cifrada e reaberta via decrypt
+      expect(calls).toEqual(['gen:A', 'gen:B', 'dec:A']);
+      const st = await store.get('A');
+      expect(st.status).toBe('ACTIVE');
+      await t.destroyTenantKey('A');
+      await expect(t.lookupId('A', 's')).rejects.toBeInstanceOf(TenantKeyDestroyedError);
+      expect(calls.filter((c) => c === 'gen:A')).toHaveLength(1); // não recria após destruir
+      expect(await t.lookupId('B', 's')).toBeTruthy();
+    });
+
+    it('produção sem KMS: fail-closed, mesmo com segredo global presente', async () => {
+      const chain = createConsentAuditChain({
+        env: { NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
+        prisma: {},
+      });
+      await expect(chain.subjectPseudonym('o', 's')).rejects.toBeInstanceOf(MissingPepperError);
     });
   });
 
@@ -290,6 +314,7 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
     it('fora de teste, sem models do Agente 01, falha fechado (nunca memória)', async () => {
       const svc = createConsentAuditChain({
         env: { NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
+        pepperProvider: new EnvTenantPepperProvider(PEPPER),
         prisma: {},
       });
       await expect(rec(svc, 'o', 'a')).rejects.toBeInstanceOf(ConsentChainUnavailableError);
@@ -350,6 +375,7 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
       const prisma = { ...tx, $transaction: (fn: (t: typeof tx) => Promise<unknown>) => fn(tx) };
       const svc = createConsentAuditChain({
         env: { NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
+        pepperProvider: new EnvTenantPepperProvider(PEPPER),
         prisma,
       });
       await rec(svc, 'o', 'a');
@@ -477,13 +503,13 @@ describe('Ressalvas do Agente 15 @43922b4e', () => {
     expect(keys.size()).toBe(0);
   });
 
-  it('baixa: pepper validado no boot em produção (falha fechada)', () => {
+  it('baixa: boot em produção exige KMS; segredo global não basta (falha fechada)', () => {
     expect(() => assertConsentChainBootConfig({ NODE_ENV: 'production' })).toThrow(MissingPepperError);
     expect(() =>
-      assertConsentChainBootConfig({ NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: 'curto' }),
+      assertConsentChainBootConfig({ NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER }),
     ).toThrow(MissingPepperError);
     expect(() =>
-      assertConsentChainBootConfig({ NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER }),
+      assertConsentChainBootConfig({ NODE_ENV: 'production', LGPD_KMS_KEY_ID: 'alias/lgpd' }),
     ).not.toThrow();
     expect(() => assertConsentChainBootConfig({ NODE_ENV: 'development' })).not.toThrow();
   });

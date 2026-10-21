@@ -26,6 +26,11 @@ import {
 import {
   EnvTenantPepperProvider,
   InMemorySubjectKeyStore,
+  MissingPepperError,
+  KmsEnvelopeTenantKeyProvider,
+  type KmsEnvelopeClient,
+  type WrappedTenantKeyStore,
+  UnavailableTenantKeyProvider,
   type SubjectKeyStore,
   SubjectTokenizer,
   type TenantPepperProvider,
@@ -42,14 +47,20 @@ export function looksLikeProduction(env: NodeJS.ProcessEnv): boolean {
   ].some((v) => (v ?? '').toLowerCase() === 'production');
 }
 
+const isProd = (env: NodeJS.ProcessEnv) =>
+  env.NODE_ENV === 'production' || looksLikeProduction(env);
+
 /**
- * Validação de boot (produção): pepper presente e forte. Lança — o bootstrap registra o erro e
- * a cadeia segue falhando fechada (MissingPepperError → 503) até o segredo ser provisionado.
+ * Validação de boot (produção): exige KMS (LGPD_KMS_KEY_ID). Segredo global de ambiente NÃO é
+ * aceito em produção. Lança — o bootstrap registra e a cadeia falha fechada (503).
  */
 export function assertConsentChainBootConfig(env: NodeJS.ProcessEnv = process.env): void {
-  if (env.NODE_ENV !== 'production' && !looksLikeProduction(env)) return;
-  if (env.LGPD_KMS_KEY_ID) return; // provedor KMS: validado na primeira derivação
-  new EnvTenantPepperProvider(env.LGPD_SUBJECT_PEPPER_SECRET).assertConfigured();
+  if (!isProd(env)) return;
+  if (!env.LGPD_KMS_KEY_ID) {
+    throw new MissingPepperError(
+      'LGPD_KMS_KEY_ID ausente: produção exige segredo por tenant via KMS (envelope)',
+    );
+  }
 }
 
 export function hasConsentChainDelegates(client: unknown): boolean {
@@ -96,6 +107,8 @@ export interface ConsentChainFactoryOptions {
   prisma?: unknown;
   loadPrisma?: ClientLoader;
   pepperProvider?: TenantPepperProvider;
+  /** Produção: cliente KMS + store da DEK cifrada por tenant (envelope). */
+  kms?: { client: KmsEnvelopeClient; store: WrappedTenantKeyStore };
   broadcastPurge?: (organizationId: string, subjectRef: string) => Promise<void>;
   /**
    * Descoberta de organizações para o worker. Padrão: `organization.findMany` sob
@@ -113,6 +126,25 @@ async function defaultListTenants(client: unknown): Promise<string[]> {
   );
 }
 
+function resolveTenantKeyProvider(
+  env: NodeJS.ProcessEnv,
+  opts: ConsentChainFactoryOptions,
+  isTest: boolean,
+): TenantPepperProvider {
+  if (env.LGPD_KMS_KEY_ID && opts.kms) {
+    return new KmsEnvelopeTenantKeyProvider(opts.kms.client, opts.kms.store, env.LGPD_KMS_KEY_ID);
+  }
+  if (isProd(env)) {
+    // Fail-closed: nada de derivar de variável global em produção.
+    return new UnavailableTenantKeyProvider(
+      'KMS não configurado (LGPD_KMS_KEY_ID + cliente/store): pseudonimização indisponível',
+    );
+  }
+  return new EnvTenantPepperProvider(
+    env.LGPD_SUBJECT_PEPPER_SECRET ?? (isTest ? randomBytes(32).toString('hex') : undefined),
+  );
+}
+
 export function createConsentAuditChain(
   opts: ConsentChainFactoryOptions = {},
 ): ConsentAuditChainService {
@@ -121,11 +153,7 @@ export function createConsentAuditChain(
   if (isTest && looksLikeProduction(env)) {
     throw new Error('NODE_ENV=test recusado em ambiente de produção (cadeia de consentimento)');
   }
-  const pepper =
-    opts.pepperProvider ??
-    new EnvTenantPepperProvider(
-      env.LGPD_SUBJECT_PEPPER_SECRET ?? (isTest ? randomBytes(32).toString('hex') : undefined),
-    );
+  const pepper = opts.pepperProvider ?? resolveTenantKeyProvider(env, opts, isTest);
 
   if (isTest && !opts.prisma && env.CONSENT_CHAIN_USE_PRISMA !== '1') {
     return new ConsentAuditChainService({
