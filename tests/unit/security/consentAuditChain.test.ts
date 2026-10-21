@@ -11,12 +11,17 @@ import {
   type StoredConsentAuditEvent,
   verifyConsentChain,
 } from '../../../src/lib/security/consentAuditChain.service.js';
-import { createConsentAuditChain, hasConsentChainDelegates } from '../../../src/lib/security/consentChainFactory.js';
+import {
+  assertConsentChainBootConfig,
+  createConsentAuditChain,
+  hasConsentChainDelegates,
+} from '../../../src/lib/security/consentChainFactory.js';
 import {
   EnvTenantPepperProvider,
   InMemorySubjectKeyStore,
   KmsTenantPepperProvider,
   MissingPepperError,
+  SubjectShreddedError,
   SubjectTokenizer,
 } from '../../../src/lib/security/subjectTokenizer.js';
 
@@ -189,9 +194,9 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
       await chain.revokeConsent('o', 'lead-1', 'ERASURE_REQUEST', 'u1', { detail: 'x' });
       expect(keys.size()).toBe(0);
       expect(repo.details.size).toBe(0);
-      // novo token após shred não religa aos eventos antigos
-      const after = await rec(chain, 'o', 'lead-1');
-      expect(after.subjectRef).not.toBe(before.subjectRef);
+      // tombstone: a chave nunca é recriada — novo consentimento do titular esquecido falha fechado
+      await expect(rec(chain, 'o', 'lead-1')).rejects.toBeInstanceOf(SubjectShreddedError);
+      expect(before.subjectRef).toMatch(/^hs256:/);
       expect((await chain.verifyChainIntegrity('o')).valid).toBe(true);
     });
 
@@ -357,5 +362,141 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
       rows.rec[1].termsVersion = 'adulterado';
       expect((await svc.verifyChainIntegrity('o')).valid).toBe(false);
     });
+  });
+});
+
+describe('Ressalvas do Agente 15 @43922b4e', () => {
+  const mk = () => {
+    const repo = new InMemoryConsentAuditChainRepository();
+    const keys = new InMemorySubjectKeyStore();
+    const tokenizer = new SubjectTokenizer(new EnvTenantPepperProvider(PEPPER), keys);
+    return { repo, keys, tokenizer };
+  };
+
+  it('(2) claim atômico: dois workers simultâneos não processam a mesma tarefa', async () => {
+    const { repo, tokenizer } = mk();
+    const calls: string[] = [];
+    const slowPurger = async (o: string, s: string) => {
+      calls.push(`${o}:${s}`);
+      await new Promise((r) => setTimeout(r, 5));
+      return { rows: 1 };
+    };
+    const a = new ConsentAuditChainService({ repo, tokenizer });
+    const b = new ConsentAuditChainService({ repo, tokenizer });
+    a.registerPurger('x', slowPurger);
+    b.registerPurger('x', slowPurger);
+    for (const s of ['l1', 'l2', 'l3', 'l4']) {
+      await a.revokeConsent('o', s, 'TITULAR_REQUEST', undefined, { processNow: false });
+    }
+    const [ra, rb] = await Promise.all([
+      a.processPendingPurges(50, new Date(), 'worker-A'),
+      b.processPendingPurges(50, new Date(), 'worker-B'),
+    ]);
+    expect(ra.done + rb.done).toBe(4);
+    expect(calls.sort()).toEqual(['o:l1', 'o:l2', 'o:l3', 'o:l4']);
+    const events = await a.getChain('o');
+    expect(events.filter((e) => e.kind === 'RETRACTION')).toHaveLength(4);
+    expect((await a.verifyChainIntegrity('o')).valid).toBe(true);
+  });
+
+  it('(2) lease expirado é reassumido; lease vigente não', async () => {
+    const { repo } = mk();
+    repo.purges.set('t1', {
+      id: 't1',
+      organizationId: 'o',
+      revocationEventId: 'r',
+      subjectRef: 's',
+      shredSubjectKey: false,
+      status: 'PENDING',
+      attempts: 0,
+      nextAttemptAt: new Date(0).toISOString(),
+    });
+    const now = new Date();
+    expect(await repo.claimDuePurges(now, 10, 'A', 60_000)).toHaveLength(1);
+    expect(await repo.claimDuePurges(now, 10, 'B', 60_000)).toHaveLength(0);
+    const later = new Date(now.getTime() + 61_000);
+    const reclaimed = await repo.claimDuePurges(later, 10, 'B', 60_000);
+    expect(reclaimed[0].leaseOwner).toBe('B');
+  });
+
+  it('(3) crash entre o shred e concluir a tarefa: retry não recria a chave nem duplica RETRACTION', async () => {
+    const { repo, keys, tokenizer } = mk();
+    let crash = true;
+    const svc = new ConsentAuditChainService({
+      repo,
+      tokenizer,
+      hooks: {
+        afterShred: async () => {
+          if (crash) throw new Error('processo caiu');
+        },
+      },
+    });
+    const purged: string[] = [];
+    svc.registerPurger('x', async (o, s) => {
+      purged.push(s);
+      return {};
+    });
+    await rec(svc, 'o', 'lead-x');
+    await svc.revokeConsent('o', 'lead-x', 'ERASURE_REQUEST');
+    const [task] = [...repo.purges.values()];
+    expect(task.status).toBe('PENDING');
+    expect(keys.size()).toBe(0); // shred aconteceu antes do crash
+    expect(await tokenizer.isShredded('o', 'lead-x')).toBe(true);
+
+    crash = false;
+    const r = await svc.processPendingPurges(50, new Date(Date.now() + 3_600_000));
+    expect(r).toEqual({ done: 1, failed: 0 });
+    expect(keys.size()).toBe(0); // nunca recriada
+    expect(purged).toEqual(['lead-x', 'lead-x']); // purgers idempotentes reexecutados
+    const events = await svc.getChain('o');
+    expect(events.filter((e) => e.kind === 'RETRACTION')).toHaveLength(1);
+    expect(repo.purges.get(task.id)).toMatchObject({ status: 'DONE', subjectRef: null });
+    await expect(tokenizer.tokenFor('o', 'lead-x')).rejects.toBeInstanceOf(SubjectShreddedError);
+    expect((await svc.verifyChainIntegrity('o')).valid).toBe(true);
+  });
+
+  it('(3) crash entre RETRACTION e shred: retry não duplica RETRACTION e conclui o shred', async () => {
+    const { repo, keys, tokenizer } = mk();
+    const svc = new ConsentAuditChainService({ repo, tokenizer });
+    await svc.revokeConsent('o', 'lead-y', 'ERASURE_REQUEST', undefined, { processNow: false });
+    const realShred = tokenizer.shred.bind(tokenizer);
+    tokenizer.shred = async () => {
+      throw new Error('crash antes do shred');
+    };
+    expect(await svc.processPendingPurges(50, new Date())).toEqual({ done: 0, failed: 1 });
+    tokenizer.shred = realShred;
+    expect(await svc.processPendingPurges(50, new Date(Date.now() + 3_600_000))).toEqual({ done: 1, failed: 0 });
+    expect((await svc.getChain('o')).filter((e) => e.kind === 'RETRACTION')).toHaveLength(1);
+    expect(keys.size()).toBe(0);
+  });
+
+  it('baixa: pepper validado no boot em produção (falha fechada)', () => {
+    expect(() => assertConsentChainBootConfig({ NODE_ENV: 'production' })).toThrow(MissingPepperError);
+    expect(() =>
+      assertConsentChainBootConfig({ NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: 'curto' }),
+    ).toThrow(MissingPepperError);
+    expect(() =>
+      assertConsentChainBootConfig({ NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER }),
+    ).not.toThrow();
+    expect(() => assertConsentChainBootConfig({ NODE_ENV: 'development' })).not.toThrow();
+  });
+
+  it('baixa: NODE_ENV=test é recusado quando o ambiente é produção', () => {
+    expect(() => createConsentAuditChain({ env: { NODE_ENV: 'test', APP_ENV: 'production' } })).toThrow(
+      /recusado/,
+    );
+  });
+
+  it('baixa: purpose e termsVersion com formato validado (sem texto livre)', async () => {
+    const { repo, tokenizer } = mk();
+    const svc = new ConsentAuditChainService({ repo, tokenizer });
+    const base = { organizationId: 'o', subjectRef: 's', purpose: 'COMMERCIAL_CONTACT', termsVersion: 'v2026.1' };
+    await expect(svc.recordConsent({ ...base, purpose: 'Contato com João' })).rejects.toThrow(/purpose/);
+    await expect(svc.recordConsent({ ...base, termsVersion: 'versão do João 1' })).rejects.toThrow(/termsVersion/);
+    await expect(svc.recordConsent(base)).resolves.toBeDefined();
+  });
+
+  it('baixa: colisão de chaves após NFC é erro', () => {
+    expect(() => canonicalJson({ 'Jos\u00e9': 1, 'Jose\u0301': 2 })).toThrow(CanonicalJsonError);
   });
 });

@@ -31,6 +31,27 @@ import {
   type TenantPepperProvider,
 } from './subjectTokenizer.js';
 
+/** Sinais de ambiente produtivo independentes de NODE_ENV. */
+export function looksLikeProduction(env: NodeJS.ProcessEnv): boolean {
+  return [
+    env.APP_ENV,
+    env.DEPLOY_ENV,
+    env.ENVIRONMENT,
+    env.RAILWAY_ENVIRONMENT,
+    env.VERCEL_ENV,
+  ].some((v) => (v ?? '').toLowerCase() === 'production');
+}
+
+/**
+ * Validação de boot (produção): pepper presente e forte. Lança — o bootstrap registra o erro e
+ * a cadeia segue falhando fechada (MissingPepperError → 503) até o segredo ser provisionado.
+ */
+export function assertConsentChainBootConfig(env: NodeJS.ProcessEnv = process.env): void {
+  if (env.NODE_ENV !== 'production' && !looksLikeProduction(env)) return;
+  if (env.LGPD_KMS_KEY_ID) return; // provedor KMS: validado na primeira derivação
+  new EnvTenantPepperProvider(env.LGPD_SUBJECT_PEPPER_SECRET).assertConfigured();
+}
+
 export function hasConsentChainDelegates(client: unknown): boolean {
   if (!client || typeof client !== 'object') return false;
   const c = client as Record<string, unknown>;
@@ -51,8 +72,8 @@ class LazyRepo implements ConsentAuditChainRepository {
   async getHead(o: string) {
     return (await this.get()).repo.getHead(o);
   }
-  async claimDuePurges(n: Date, l: number) {
-    return (await this.get()).repo.claimDuePurges(n, l);
+  async claimDuePurges(n: Date, l: number, owner: string, leaseMs: number) {
+    return (await this.get()).repo.claimDuePurges(n, l, owner, leaseMs);
   }
   async updatePurge(t: Parameters<ConsentAuditChainRepository['updatePurge']>[0]) {
     return (await this.get()).repo.updatePurge(t);
@@ -79,6 +100,9 @@ export function createConsentAuditChain(
 ): ConsentAuditChainService {
   const env = opts.env ?? process.env;
   const isTest = env.NODE_ENV === 'test';
+  if (isTest && looksLikeProduction(env)) {
+    throw new Error('NODE_ENV=test recusado em ambiente de produção (cadeia de consentimento)');
+  }
   const pepper =
     opts.pepperProvider ??
     new EnvTenantPepperProvider(

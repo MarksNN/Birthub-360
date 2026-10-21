@@ -41,5 +41,10 @@ export function canonicalJson(value: unknown): string {
     .filter((k) => obj[k] !== undefined)
     .map((k) => [k.normalize('NFC'), k] as const)
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  for (let i = 1; i < keys.length; i++) {
+    if (keys[i][0] === keys[i - 1][0]) {
+      throw new CanonicalJsonError('Colisão de chaves após normalização NFC');
+    }
+  }
   return `{${keys.map(([nk, k]) => `${JSON.stringify(nk)}:${canonicalJson(obj[k])}`).join(',')}}`;
 }

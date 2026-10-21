@@ -2,10 +2,13 @@ import { type NextFunction, type Request, type Response, Router } from 'express'
 import { z } from 'zod';
 import { AuditService } from '../../lib/audit/audit.service.js';
 import {
+  CONSENT_PURPOSE_PATTERN,
   ConsentChainUnavailableError,
   REVOCATION_REASON_CODES,
+  TERMS_VERSION_PATTERN,
 } from '../../lib/security/consentAuditChain.service.js';
 import { consentAuditChain } from '../../lib/security/consentChainFactory.js';
+import { MissingPepperError, SubjectShreddedError } from '../../lib/security/subjectTokenizer.js';
 import { routeParam } from '../../shared/http/routeParams.js';
 import type { AuthRequest } from '../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../shared/middlewares/requireRole.js';
@@ -173,13 +176,8 @@ lgpdRouter.post(
 // fechada e as rotas respondem 503 (nunca gravam em memória em produção).
 const consentBodySchema = z.object({
   subjectRef: z.string().trim().min(1).max(128),
-  purpose: z
-    .string()
-    .trim()
-    .min(1)
-    .max(64)
-    .regex(/^[A-Z0-9_]+$/),
-  termsVersion: z.string().trim().min(1).max(32),
+  purpose: z.string().regex(CONSENT_PURPOSE_PATTERN),
+  termsVersion: z.string().regex(TERMS_VERSION_PATTERN),
   retentionDays: z.number().int().positive().max(3650).optional(),
 });
 const revokeBodySchema = z.object({
@@ -189,7 +187,11 @@ const revokeBodySchema = z.object({
 });
 
 function consentError(err: unknown, res: Response, next: NextFunction): void {
-  if (err instanceof ConsentChainUnavailableError) {
+  if (err instanceof SubjectShreddedError) {
+    res.status(409).json({ success: false, error: 'Titular esquecido: operação recusada.' });
+    return;
+  }
+  if (err instanceof ConsentChainUnavailableError || err instanceof MissingPepperError) {
     res.status(503).json({ success: false, error: 'Cadeia de consentimento indisponível.' });
     return;
   }

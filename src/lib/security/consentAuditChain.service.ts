@@ -13,6 +13,10 @@ export const GENESIS_HASH = '0'.repeat(64);
 /** Versão do formato canônico/hash (F6). Mudanças exigem nova versão, nunca reescrita. */
 export const CONSENT_CHAIN_FORMAT_VERSION = 3;
 
+/** Formatos aceitos (sem texto livre na cadeia): finalidade em CAIXA_ALTA e versão curta. */
+export const CONSENT_PURPOSE_PATTERN = /^[A-Z][A-Z0-9_]{1,63}$/;
+export const TERMS_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
+
 export type ConsentChainEventKind = 'GENESIS' | 'CONSENT' | 'REVOCATION' | 'RETRACTION';
 
 /** Motivo de revogação — enum fechado; texto livre nunca entra na cadeia (F3 / P3-1). */
@@ -56,6 +60,9 @@ export interface ConsentPurgeTask {
   status: 'PENDING' | 'DONE' | 'DEAD';
   attempts: number;
   nextAttemptAt: string;
+  /** Lease do worker (claim atômico): dono e validade. */
+  leaseOwner?: string | null;
+  leasedUntil?: string | null;
   lastError?: string;
   completedAt?: string;
   /** Retenção do registro da tarefa (prova do atendimento), após a qual é excluído. */
@@ -84,7 +91,16 @@ export interface ConsentAuditChainRepository {
   withTenantLock<T>(organizationId: string, fn: (ctx: ChainLockContext) => Promise<T>): Promise<T>;
   listChain(organizationId: string): Promise<StoredConsentAuditEvent[]>;
   getHead(organizationId: string): Promise<ConsentChainHead | null>;
-  claimDuePurges(now: Date, limit: number): Promise<ConsentPurgeTask[]>;
+  /**
+   * Claim ATÔMICO: só devolve tarefas PENDING vencidas cujo lease esteja livre/expirado e grava
+   * `leaseOwner`/`leasedUntil` na mesma operação (Postgres: UPDATE … FOR UPDATE SKIP LOCKED).
+   */
+  claimDuePurges(
+    now: Date,
+    limit: number,
+    owner: string,
+    leaseMs: number,
+  ): Promise<ConsentPurgeTask[]>;
   updatePurge(task: ConsentPurgeTask): Promise<void>;
   deleteExpiredPurges(now: Date): Promise<number>;
   deleteDetailsForSubject(organizationId: string, subjectLookupId: string): Promise<number>;
@@ -150,11 +166,24 @@ export class InMemoryConsentAuditChainRepository implements ConsentAuditChainRep
     return h ? { ...h } : null;
   }
 
-  async claimDuePurges(now: Date, limit: number): Promise<ConsentPurgeTask[]> {
-    return [...this.purges.values()]
-      .filter((t) => t.status === 'PENDING' && new Date(t.nextAttemptAt) <= now)
-      .slice(0, limit)
-      .map((t) => ({ ...t }));
+  async claimDuePurges(
+    now: Date,
+    limit: number,
+    owner: string,
+    leaseMs: number,
+  ): Promise<ConsentPurgeTask[]> {
+    // Síncrono entre filtro e marcação: equivalente in-memory de FOR UPDATE SKIP LOCKED.
+    const out: ConsentPurgeTask[] = [];
+    for (const t of this.purges.values()) {
+      if (out.length >= limit) break;
+      const leaseFree = !t.leasedUntil || new Date(t.leasedUntil) <= now;
+      if (t.status === 'PENDING' && new Date(t.nextAttemptAt) <= now && leaseFree) {
+        t.leaseOwner = owner;
+        t.leasedUntil = new Date(now.getTime() + leaseMs).toISOString();
+        out.push({ ...t });
+      }
+    }
+    return out;
   }
 
   async updatePurge(task: ConsentPurgeTask): Promise<void> {
@@ -285,6 +314,10 @@ export interface ConsentAuditChainOptions {
   /** Retenção do registro da tarefa de expurgo após conclusão (dias). */
   purgeTaskRetentionDays?: number;
   maxPurgeAttempts?: number;
+  /** Duração do lease do worker sobre uma tarefa (ms). */
+  purgeLeaseMs?: number;
+  /** Somente testes: ponto de injeção de falhas. */
+  hooks?: { afterShred?: (task: ConsentPurgeTask) => Promise<void> };
   /** Notifica outras instâncias para invalidar caches em memória (pub/sub). */
   broadcastPurge?: (organizationId: string, subjectRef: string) => Promise<void>;
 }
@@ -378,6 +411,9 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
     retentionDays?: number;
   }): Promise<ConsentAuditEvent> {
     this.assertTenant(input.organizationId);
+    if (!CONSENT_PURPOSE_PATTERN.test(input.purpose))
+      throw new Error('purpose inválido (CAIXA_ALTA_COM_UNDERSCORE)');
+    if (!TERMS_VERSION_PATTERN.test(input.termsVersion)) throw new Error('termsVersion inválido');
     const token = await this.opts.tokenizer.tokenFor(input.organizationId, input.subjectRef);
     const event = await this.append(input.organizationId, (sequence, previousHash) => ({
       ...this.base('CONSENT', input.organizationId, token),
@@ -485,8 +521,10 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
   async processPendingPurges(
     limit = 50,
     now = new Date(),
+    workerId = `w-${randomUUID()}`,
   ): Promise<{ done: number; failed: number }> {
-    const tasks = await this.opts.repo.claimDuePurges(now, limit);
+    const leaseMs = this.opts.purgeLeaseMs ?? 5 * 60_000;
+    const tasks = await this.opts.repo.claimDuePurges(now, limit, workerId, leaseMs);
     let done = 0;
     let failed = 0;
     for (const task of tasks) {
@@ -499,20 +537,30 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
           for (const [k, v] of Object.entries(res)) counts[`${name}.${k}`] = v;
         }
         await this.opts.broadcastPurge?.(task.organizationId, subjectRef);
-        const token = await this.opts.tokenizer.tokenFor(task.organizationId, subjectRef);
-        await this.append(task.organizationId, (sequence, previousHash) => ({
-          ...this.base('RETRACTION', task.organizationId, token),
-          id: `ret-${randomUUID()}`,
-          sequence,
-          previousHash,
-          purpose: `RETRACTION:${canonicalJson({ revocationEventId: task.revocationEventId, counts })}`,
-          termsVersion: 'RETRACTED',
-          status: 'REVOKED',
-        }));
+
+        // Idempotência: RETRACTION é gravado ANTES do shred. Se a chave já está em tombstone,
+        // um processamento anterior gravou o RETRACTION e caiu antes de concluir a tarefa —
+        // não recria a chave (tokenFor falharia fechado) nem duplica o evento.
+        const shredded = await this.opts.tokenizer.isShredded(task.organizationId, subjectRef);
+        const alreadyRetracted =
+          shredded || (await this.hasRetractionFor(task.organizationId, task.revocationEventId));
+        if (!alreadyRetracted) {
+          const token = await this.opts.tokenizer.tokenFor(task.organizationId, subjectRef);
+          await this.append(task.organizationId, (sequence, previousHash) => ({
+            ...this.base('RETRACTION', task.organizationId, token),
+            id: `ret-${randomUUID()}`,
+            sequence,
+            previousHash,
+            purpose: `RETRACTION:${canonicalJson({ revocationEventId: task.revocationEventId, counts })}`,
+            termsVersion: 'RETRACTED',
+            status: 'REVOKED',
+          }));
+        }
         if (task.shredSubjectKey) {
           const { lookupId } = await this.opts.tokenizer.shred(task.organizationId, subjectRef);
           await this.opts.repo.deleteDetailsForSubject(task.organizationId, lookupId);
         }
+        await this.opts.hooks?.afterShred?.(task);
         const retentionDays = this.opts.purgeTaskRetentionDays ?? 1825;
         await this.opts.repo.updatePurge({
           ...task,
@@ -522,26 +570,46 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
           completedAt: now.toISOString(),
           retainUntil: new Date(now.getTime() + retentionDays * 86_400_000).toISOString(),
           lastError: undefined,
+          leaseOwner: null,
+          leasedUntil: null,
         });
         done++;
       } catch (err) {
         failed++;
         const attempts = task.attempts + 1;
         const dead = attempts >= (this.opts.maxPurgeAttempts ?? 10);
-        await this.opts.repo.updatePurge({
-          ...task,
-          attempts,
-          status: dead ? 'DEAD' : 'PENDING',
-          nextAttemptAt: new Date(
-            now.getTime() + Math.min(2 ** attempts, 3600) * 1000,
-          ).toISOString(),
-          lastError: err instanceof Error ? err.message.slice(0, 200) : 'erro',
-        });
+        await this.opts.repo
+          .updatePurge({
+            ...task,
+            attempts,
+            status: dead ? 'DEAD' : 'PENDING',
+            nextAttemptAt: new Date(
+              now.getTime() + Math.min(2 ** attempts, 3600) * 1000,
+            ).toISOString(),
+            lastError: err instanceof Error ? err.message.slice(0, 200) : 'erro',
+            leaseOwner: null,
+            leasedUntil: null,
+          })
+          .catch((e) =>
+            logger.error({ err: e, taskId: task.id }, 'ConsentAuditChain: falha ao liberar lease'),
+          );
         logger.error({ taskId: task.id, attempts, dead }, 'ConsentAuditChain: expurgo falhou');
       }
     }
     await this.opts.repo.deleteExpiredPurges(now);
     return { done, failed };
+  }
+
+  private async hasRetractionFor(
+    organizationId: string,
+    revocationEventId: string,
+  ): Promise<boolean> {
+    const chain = await this.opts.repo.listChain(organizationId);
+    return chain.some(
+      (e) =>
+        e.kind === 'RETRACTION' &&
+        e.purpose.includes(`"revocationEventId":${JSON.stringify(revocationEventId)}`),
+    );
   }
 
   async verifyChainIntegrity(organizationId: string): Promise<ChainVerificationResult> {

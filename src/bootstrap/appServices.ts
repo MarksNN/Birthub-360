@@ -1,7 +1,10 @@
 import type { FeatureFlagsUseCases } from '../features/feature-flags/application/FeatureFlagsUseCases.js';
 import { requestContext } from '../lib/async-context.js';
 import { logger } from '../lib/logger.js';
-import { consentAuditChain } from '../lib/security/consentChainFactory.js';
+import {
+  assertConsentChainBootConfig,
+  consentAuditChain,
+} from '../lib/security/consentChainFactory.js';
 import { startConsentPurgeRuntime } from './consentPurgeWiring.js';
 import { container } from '../shared/di/container.js';
 import { setupDI } from '../shared/di/setup.js';
@@ -34,6 +37,12 @@ export function bootstrapApplicationServices(): void {
   // instâncias. Falha aqui não derruba o servidor; a cadeia em si falha fechada (503).
   // Em teste não sobe worker/pub-sub (handles abertos travariam o runner de integração).
   if (process.env.NODE_ENV === 'test') return;
+  try {
+    assertConsentChainBootConfig();
+  } catch (err) {
+    // Falha fechada: a cadeia recusa operar (503) até o pepper ser provisionado.
+    logger.error({ err }, 'LGPD: configuração da cadeia de consentimento inválida no boot');
+  }
   startConsentPurgeRuntime(consentAuditChain).catch((err) =>
     logger.error({ err }, 'LGPD: falha ao iniciar runtime de expurgo de consentimento'),
   );

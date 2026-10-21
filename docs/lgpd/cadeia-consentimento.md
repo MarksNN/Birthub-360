@@ -27,6 +27,10 @@ Dono: Agente 21 — Privacidade e LGPD. Código: `src/lib/security/consentAuditC
 `ERASURE_REQUEST` agenda, na mesma transação da revogação, uma tarefa que: executa os expurgos,
 grava RETRACTION, destrói a `ConsentSubjectKey` do titular e apaga seus `ConsentEventDetail`.
 Os eventos antigos continuam íntegros (hash não muda), mas deixam de ser religáveis ao titular.
+A destruição é um **tombstone** (`keyMaterial = NULL`, `shreddedAt`): a chave nunca é recriada —
+retries da outbox e novos consentimentos do mesmo titular falham fechado (`SubjectShreddedError`, HTTP 409).
+O RETRACTION é gravado antes do shred; o retry detecta tombstone/RETRACTION existente e não duplica.
+A outbox usa claim atômico com lease (`leaseOwner`, `leasedUntil`, `FOR UPDATE SKIP LOCKED`).
 
 ## Retenção
 | Dado | Retenção |

@@ -27,6 +27,15 @@ export class EnvTenantPepperProvider implements TenantPepperProvider {
     private readonly secret: string | undefined = process.env.LGPD_SUBJECT_PEPPER_SECRET,
   ) {}
 
+  /** Validação de boot: falha se o segredo estiver ausente/curto. */
+  assertConfigured(): void {
+    if (!this.secret || this.secret.length < 32) {
+      throw new MissingPepperError(
+        'LGPD_SUBJECT_PEPPER_SECRET ausente ou curto (>= 32 caracteres)',
+      );
+    }
+  }
+
   async getPepper(organizationId: string): Promise<Buffer> {
     if (!this.secret || this.secret.length < 32) {
       throw new MissingPepperError(
@@ -57,37 +66,57 @@ export class KmsTenantPepperProvider implements TenantPepperProvider {
   }
 }
 
-/** Store expurgável das chaves por titular (model `ConsentSubjectKey` — handoff ao Agente 01). */
+/** Titular esquecido: a chave foi destruída e NUNCA é recriada (falha fechada). */
+export class SubjectShreddedError extends Error {}
+
+export type SubjectKeyState =
+  | { status: 'ACTIVE'; key: Buffer }
+  | { status: 'SHREDDED' }
+  | { status: 'ABSENT' };
+
+/**
+ * Store das chaves por titular (model `ConsentSubjectKey` — handoff ao Agente 01).
+ * Esquecimento = tombstone: `keyMaterial` anulado + `shreddedAt`; a linha permanece para impedir
+ * recriação da chave (retry, corrida ou novo consentimento do mesmo titular).
+ */
 export interface SubjectKeyStore {
-  get(organizationId: string, lookupId: string): Promise<Buffer | null>;
-  /** Cria se não existir; em corrida, devolve a chave já gravada. */
+  get(organizationId: string, lookupId: string): Promise<SubjectKeyState>;
+  /** Cria se ABSENT; devolve a existente se ACTIVE; lança SubjectShreddedError se SHREDDED. */
   getOrCreate(organizationId: string, lookupId: string, candidate: Buffer): Promise<Buffer>;
-  /** Exclusão física. Retorna true se havia chave. */
+  /** Tombstone idempotente. Retorna true se havia chave ativa. */
   destroy(organizationId: string, lookupId: string): Promise<boolean>;
 }
 
 export class InMemorySubjectKeyStore implements SubjectKeyStore {
-  private keys = new Map<string, Buffer>();
+  private keys = new Map<string, { key: Buffer | null; shreddedAt?: string }>();
   private k = (o: string, l: string) => `${o}\u0000${l}`;
 
-  async get(organizationId: string, lookupId: string): Promise<Buffer | null> {
-    return this.keys.get(this.k(organizationId, lookupId)) ?? null;
+  async get(organizationId: string, lookupId: string): Promise<SubjectKeyState> {
+    const row = this.keys.get(this.k(organizationId, lookupId));
+    if (!row) return { status: 'ABSENT' };
+    return row.key ? { status: 'ACTIVE', key: row.key } : { status: 'SHREDDED' };
   }
 
   async getOrCreate(organizationId: string, lookupId: string, candidate: Buffer): Promise<Buffer> {
     const key = this.k(organizationId, lookupId);
-    const existing = this.keys.get(key);
-    if (existing) return existing;
-    this.keys.set(key, candidate);
+    const row = this.keys.get(key);
+    if (row && !row.key) throw new SubjectShreddedError('Titular esquecido: chave destruída');
+    if (row?.key) return row.key;
+    this.keys.set(key, { key: candidate });
     return candidate;
   }
 
   async destroy(organizationId: string, lookupId: string): Promise<boolean> {
-    return this.keys.delete(this.k(organizationId, lookupId));
+    const key = this.k(organizationId, lookupId);
+    const row = this.keys.get(key);
+    const hadKey = !!row?.key;
+    this.keys.set(key, { key: null, shreddedAt: row?.shreddedAt ?? new Date().toISOString() });
+    return hadKey;
   }
 
+  /** Chaves ativas (testes). */
   size(): number {
-    return this.keys.size;
+    return [...this.keys.values()].filter((r) => r.key).length;
   }
 }
 
@@ -111,7 +140,12 @@ export class SubjectTokenizer {
     return `hs256:${createHmac('sha256', key).update(subjectRef.normalize('NFC')).digest('hex')}`;
   }
 
-  /** Crypto-shredding: destrói a chave do titular. Retorna o lookupId para expurgos auxiliares. */
+  async isShredded(organizationId: string, subjectRef: string): Promise<boolean> {
+    const lookupId = await this.lookupId(organizationId, subjectRef);
+    return (await this.keys.get(organizationId, lookupId)).status === 'SHREDDED';
+  }
+
+  /** Crypto-shredding: tombstone da chave do titular. Retorna o lookupId para expurgos auxiliares. */
   async shred(
     organizationId: string,
     subjectRef: string,

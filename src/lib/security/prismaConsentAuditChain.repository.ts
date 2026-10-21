@@ -16,7 +16,11 @@ import type {
   RevocationReasonCode,
   StoredConsentAuditEvent,
 } from './consentAuditChain.service.js';
-import type { SubjectKeyStore } from './subjectTokenizer.js';
+import {
+  type SubjectKeyState,
+  type SubjectKeyStore,
+  SubjectShreddedError,
+} from './subjectTokenizer.js';
 
 export interface ConsentAuditRow {
   id: string;
@@ -45,6 +49,8 @@ export interface ConsentPurgeTaskRow {
   status: 'PENDING' | 'DONE' | 'DEAD';
   attempts: number;
   nextAttemptAt: Date;
+  leaseOwner: string | null;
+  leasedUntil: Date | null;
   lastError: string | null;
   completedAt: Date | null;
   retainUntil: Date | null;
@@ -77,7 +83,8 @@ interface DetailRow {
 interface KeyRow {
   organizationId: string;
   lookupId: string;
-  keyMaterial: Uint8Array;
+  keyMaterial: Uint8Array | null;
+  shreddedAt: Date | null;
 }
 
 export interface ConsentChainTx {
@@ -90,6 +97,7 @@ export interface ConsentChainTx {
   };
   consentEventDetail: Delegate<DetailRow>;
   $executeRaw(query: TemplateStringsArray, ...values: unknown[]): Promise<number>;
+  $queryRaw<R = unknown>(query: TemplateStringsArray, ...values: unknown[]): Promise<R>;
 }
 
 export interface ConsentChainPrismaLike extends ConsentChainTx {
@@ -97,7 +105,9 @@ export interface ConsentChainPrismaLike extends ConsentChainTx {
 }
 
 export interface SubjectKeyPrismaLike {
-  consentSubjectKey: Delegate<KeyRow>;
+  consentSubjectKey: Delegate<KeyRow> & {
+    updateMany(args: { where: Where; data: Partial<KeyRow> }): Promise<{ count: number }>;
+  };
 }
 
 export const CONSENT_CHAIN_PRISMA_DELEGATES = [
@@ -153,6 +163,8 @@ const toTask = (r: ConsentPurgeTaskRow): ConsentPurgeTask => ({
   status: r.status,
   attempts: r.attempts,
   nextAttemptAt: r.nextAttemptAt.toISOString(),
+  leaseOwner: r.leaseOwner,
+  leasedUntil: r.leasedUntil?.toISOString() ?? null,
   lastError: r.lastError ?? undefined,
   completedAt: r.completedAt?.toISOString(),
   retainUntil: r.retainUntil?.toISOString(),
@@ -167,6 +179,8 @@ const taskRow = (t: ConsentPurgeTask): ConsentPurgeTaskRow => ({
   status: t.status,
   attempts: t.attempts,
   nextAttemptAt: new Date(t.nextAttemptAt),
+  leaseOwner: t.leaseOwner ?? null,
+  leasedUntil: t.leasedUntil ? new Date(t.leasedUntil) : null,
   lastError: t.lastError ?? null,
   completedAt: t.completedAt ? new Date(t.completedAt) : null,
   retainUntil: t.retainUntil ? new Date(t.retainUntil) : null,
@@ -234,11 +248,27 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
     return h ? { ...h } : null;
   }
 
-  async claimDuePurges(now: Date, limit: number): Promise<ConsentPurgeTask[]> {
-    const rows = await this.db.consentPurgeTask.findMany({
-      where: { status: 'PENDING', nextAttemptAt: { lte: now } },
-      orderBy: { nextAttemptAt: 'asc' },
-      take: limit,
+  async claimDuePurges(
+    now: Date,
+    limit: number,
+    owner: string,
+    leaseMs: number,
+  ): Promise<ConsentPurgeTask[]> {
+    const until = new Date(now.getTime() + leaseMs);
+    // Worker cross-tenant: exige policy que aceite app.bypass_rls (pedido ao Agente 01).
+    const rows = await this.db.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT set_config('app.bypass_rls', 'on', TRUE)`;
+      return tx.$queryRaw<ConsentPurgeTaskRow[]>`
+        UPDATE "ConsentPurgeTask" t
+           SET "leaseOwner" = ${owner}, "leasedUntil" = ${until}
+         WHERE t.id IN (
+           SELECT id FROM "ConsentPurgeTask"
+            WHERE status = 'PENDING' AND "nextAttemptAt" <= ${now}
+              AND ("leasedUntil" IS NULL OR "leasedUntil" <= ${now})
+            ORDER BY "nextAttemptAt"
+            LIMIT ${limit}
+            FOR UPDATE SKIP LOCKED)
+        RETURNING t.*`;
     });
     return rows.map(toTask);
   }
@@ -266,28 +296,46 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
 export class PrismaSubjectKeyStore implements SubjectKeyStore {
   constructor(private readonly db: SubjectKeyPrismaLike) {}
 
-  async get(organizationId: string, lookupId: string): Promise<Buffer | null> {
+  async get(organizationId: string, lookupId: string): Promise<SubjectKeyState> {
     const r = await this.db.consentSubjectKey.findFirst({ where: { organizationId, lookupId } });
-    return r ? Buffer.from(r.keyMaterial) : null;
+    if (!r) return { status: 'ABSENT' };
+    return r.keyMaterial && !r.shreddedAt
+      ? { status: 'ACTIVE', key: Buffer.from(r.keyMaterial) }
+      : { status: 'SHREDDED' };
   }
 
   async getOrCreate(organizationId: string, lookupId: string, candidate: Buffer): Promise<Buffer> {
     const existing = await this.get(organizationId, lookupId);
-    if (existing) return existing;
+    if (existing.status === 'SHREDDED')
+      throw new SubjectShreddedError('Titular esquecido: chave destruída');
+    if (existing.status === 'ACTIVE') return existing.key;
     try {
       await this.db.consentSubjectKey.create({
-        data: { organizationId, lookupId, keyMaterial: candidate },
+        data: { organizationId, lookupId, keyMaterial: candidate, shreddedAt: null },
       });
       return candidate;
     } catch (err) {
       const raced = await this.get(organizationId, lookupId);
-      if (raced) return raced;
+      if (raced.status === 'ACTIVE') return raced.key;
+      if (raced.status === 'SHREDDED')
+        throw new SubjectShreddedError('Titular esquecido: chave destruída');
       throw err;
     }
   }
 
   async destroy(organizationId: string, lookupId: string): Promise<boolean> {
-    const r = await this.db.consentSubjectKey.deleteMany({ where: { organizationId, lookupId } });
-    return r.count > 0;
+    const r = await this.db.consentSubjectKey.updateMany({
+      where: { organizationId, lookupId, shreddedAt: null },
+      data: { keyMaterial: null, shreddedAt: new Date() },
+    });
+    if (r.count > 0) return true;
+    // Sem linha: grava tombstone mesmo assim (impede recriação futura).
+    const state = await this.get(organizationId, lookupId);
+    if (state.status === 'ABSENT') {
+      await this.db.consentSubjectKey
+        .create({ data: { organizationId, lookupId, keyMaterial: null, shreddedAt: new Date() } })
+        .catch(() => undefined);
+    }
+    return false;
   }
 }

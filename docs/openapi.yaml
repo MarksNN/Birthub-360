@@ -7313,8 +7313,10 @@ paths:
           description: Payload inválido
         '403':
           $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Titular esquecido (crypto-shredding) — operação recusada
         '503':
-          description: Cadeia indisponível (migração pendente) — falha fechada
+          description: Cadeia indisponível (migração pendente ou pepper ausente) — falha fechada
 
   /lgpd/consentimentos/{subjectRef}/revogacao:
     parameters:
@@ -7349,8 +7351,10 @@ paths:
           description: reasonCode inválido
         '403':
           $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Titular esquecido (crypto-shredding) — operação recusada
         '503':
-          description: Cadeia indisponível (migração pendente) — falha fechada
+          description: Cadeia indisponível (migração pendente ou pepper ausente) — falha fechada
 
   /lgpd/consentimentos/verificacao:
     get:
