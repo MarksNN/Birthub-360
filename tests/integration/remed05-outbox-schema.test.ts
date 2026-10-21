@@ -184,7 +184,24 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
         data: { ...row(ORG_A, 'pending-old'), status: 'PENDING', createdAt: old },
       });
       await prisma.domainEventConsumption.create({
-        data: { organizationId: ORG_A, eventId: 'd-old', consumer: 'c', processedAt: old },
+        data: {
+          organizationId: ORG_A,
+          eventId: 'd-old',
+          consumer: 'c',
+          reservedBy: 'w',
+          reservedUntil: old,
+          completedAt: old,
+        },
+      });
+      // reserva antiga NÃO concluída: nunca é purgada (precisa ser retomada)
+      await prisma.domainEventConsumption.create({
+        data: {
+          organizationId: ORG_A,
+          eventId: 'd-open',
+          consumer: 'c',
+          reservedBy: 'w',
+          reservedUntil: old,
+        },
       });
     });
     await asOrg(ORG_B, () =>
@@ -225,5 +242,99 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
     );
     expect(left.map((r) => r.eventId)).toEqual(['d-new', 'pending-old']);
     expect(await asOrg(ORG_B, () => prisma.domainEventOutbox.count())).toBe(1);
+  });
+
+  it('lease de consumo: reserva, expira e é retomada; concluído nunca é retomado', async () => {
+    const tx = <T>(fn: (t: typeof prisma) => Promise<T>) =>
+      asOrg(ORG_A, () =>
+        prisma.$transaction(async (t) => {
+          await t.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, ORG_A);
+          return fn(t as unknown as typeof prisma);
+        }),
+      );
+    // SQL de reserva do handoff 16 (ON CONFLICT ... DO UPDATE ... WHERE não concluído e vencido)
+    const reserve = (eventId: string, worker: string, leaseSeconds: number) =>
+      tx((t) =>
+        t.$queryRawUnsafe<Array<{ id: string }>>(
+          `INSERT INTO "DomainEventConsumption" ("organizationId","eventId","consumer","reservedBy","reservedUntil")
+           VALUES ($1,$2,'c1',$3, now() + make_interval(secs => $4))
+           ON CONFLICT ("organizationId","eventId","consumer") DO UPDATE
+             SET "reservedBy" = EXCLUDED."reservedBy", "reservedUntil" = EXCLUDED."reservedUntil"
+           WHERE "DomainEventConsumption"."completedAt" IS NULL
+             AND "DomainEventConsumption"."reservedUntil" < now()
+           RETURNING id`,
+          ORG_A,
+          eventId,
+          worker,
+          leaseSeconds,
+        ),
+      );
+    const complete = (eventId: string, worker: string) =>
+      tx((t) =>
+        t.$executeRawUnsafe(
+          `UPDATE "DomainEventConsumption" SET "completedAt" = now()
+           WHERE "organizationId"=$1 AND "eventId"=$2 AND consumer='c1' AND "reservedBy"=$3`,
+          ORG_A,
+          eventId,
+          worker,
+        ),
+      );
+
+    // reserva válida bloqueia outro worker
+    expect(await reserve('e-lease', 'w1', 60)).toHaveLength(1);
+    expect(await reserve('e-lease', 'w2', 60)).toHaveLength(0);
+
+    // simula crash: lease expira → outro worker retoma
+    await tx((t) =>
+      t.$executeRawUnsafe(
+        `UPDATE "DomainEventConsumption" SET "reservedUntil" = now() - interval '1 second'
+         WHERE "organizationId"=$1 AND "eventId"='e-lease'`,
+        ORG_A,
+      ),
+    );
+    expect(await reserve('e-lease', 'w2', 60)).toHaveLength(1);
+    // dono antigo não consegue mais concluir; o novo sim
+    expect(await complete('e-lease', 'w1')).toBe(0);
+    expect(await complete('e-lease', 'w2')).toBe(1);
+
+    // concluído + lease vencida: NÃO é retomado
+    await tx((t) =>
+      t.$executeRawUnsafe(
+        `UPDATE "DomainEventConsumption" SET "reservedUntil" = now() - interval '1 hour'
+         WHERE "organizationId"=$1 AND "eventId"='e-lease'`,
+        ORG_A,
+      ),
+    );
+    expect(await reserve('e-lease', 'w3', 60)).toHaveLength(0);
+
+    // CHECK: lease sem dono é rejeitada pelo banco
+    const err = await asOrg(ORG_A, () =>
+      prisma.domainEventConsumption.create({
+        data: {
+          organizationId: ORG_A,
+          eventId: 'e-noowner',
+          consumer: 'c1',
+          reservedUntil: new Date(),
+        },
+      }),
+    ).then(
+      () => null,
+      (e: unknown) => e,
+    );
+    expect(JSON.stringify(err, Object.getOwnPropertyNames(err as object)) + String(err)).toContain(
+      'DomainEventConsumption_lease_owner_check',
+    );
+
+    // reclaim por tenant usa o índice parcial
+    const plan = await tx(async (t) => {
+      await t.$executeRawUnsafe(`SET LOCAL enable_seqscan = off`);
+      return t.$queryRawUnsafe<Array<{ 'QUERY PLAN': string }>>(
+        `EXPLAIN SELECT id FROM "DomainEventConsumption"
+         WHERE "organizationId" = '${ORG_A}' AND "completedAt" IS NULL AND "reservedUntil" < now()`,
+      );
+    });
+    expect(plan.map((r) => r['QUERY PLAN']).join('\n')).toContain(
+      'DomainEventConsumption_lease_reclaim_idx',
+    );
   });
 });

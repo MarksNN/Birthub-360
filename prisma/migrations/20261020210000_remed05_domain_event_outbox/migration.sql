@@ -40,6 +40,9 @@ CREATE TABLE "DomainEventConsumption" (
     "eventId" TEXT NOT NULL,
     "consumer" TEXT NOT NULL,
     "processedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "reservedBy" TEXT NOT NULL DEFAULT '',
+    "reservedUntil" TIMESTAMPTZ(3),
+    "completedAt" TIMESTAMPTZ(3),
 
     CONSTRAINT "DomainEventConsumption_pkey" PRIMARY KEY ("id")
 );
@@ -52,7 +55,7 @@ CREATE INDEX "DomainEventOutbox_organizationId_status_createdAt_idx" ON "DomainE
 -- CreateIndex
 CREATE UNIQUE INDEX "DomainEventOutbox_organizationId_eventId_key" ON "DomainEventOutbox"("organizationId", "eventId");
 -- CreateIndex
-CREATE INDEX "DomainEventConsumption_organizationId_processedAt_idx" ON "DomainEventConsumption"("organizationId", "processedAt");
+CREATE INDEX "DomainEventConsumption_organizationId_completedAt_idx" ON "DomainEventConsumption"("organizationId", "completedAt");
 -- CreateIndex
 CREATE UNIQUE INDEX "DomainEventConsumption_organizationId_eventId_consumer_key" ON "DomainEventConsumption"("organizationId", "eventId", "consumer");
 -- AddForeignKey
@@ -70,12 +73,20 @@ CREATE INDEX "DomainEventOutbox_relay_due_idx"
 CREATE INDEX "DomainEventOutbox_lease_recovery_idx"
     ON "DomainEventOutbox"("organizationId", "status", "lockedUntil") WHERE "status" = 'PROCESSING';
 
+-- Reclaim de reserva vencida (lease) por tenant: só linhas ainda não concluídas.
+CREATE INDEX "DomainEventConsumption_lease_reclaim_idx"
+    ON "DomainEventConsumption"("organizationId", "reservedUntil") WHERE "completedAt" IS NULL;
+
 -- Invariantes (também ignorados pelo diff do Prisma).
 ALTER TABLE "DomainEventOutbox"
     ADD CONSTRAINT "DomainEventOutbox_retryCount_check" CHECK ("retryCount" >= 0),
     ADD CONSTRAINT "DomainEventOutbox_maxAttempts_check" CHECK ("maxAttempts" >= 1),
     ADD CONSTRAINT "DomainEventOutbox_retry_le_max_check" CHECK ("retryCount" <= "maxAttempts"),
     ADD CONSTRAINT "DomainEventOutbox_lastError_len_check" CHECK ("lastError" IS NULL OR char_length("lastError") <= 2000);
+
+-- Uma reserva com prazo precisa de dono.
+ALTER TABLE "DomainEventConsumption"
+    ADD CONSTRAINT "DomainEventConsumption_lease_owner_check" CHECK ("reservedUntil" IS NULL OR "reservedBy" <> '');
 
 -- RLS: tenant_isolation estrito, FORCE, sem cláusula de bypass (padrão 01A pós-20260825120000).
 
@@ -95,7 +106,7 @@ CREATE POLICY "tenant_isolation" ON "DomainEventConsumption" AS PERMISSIVE FOR A
 
 -- Retenção/purge por tenant (LGPD: envelope carrega payload). SECURITY INVOKER: roda sob a RLS de
 -- quem chama, e exige que p_org seja o tenant da sessão. Prazos default PROVISÓRIOS (01A/21
--- confirmam): DISPATCHED 30d (por dispatchedAt), DEAD_LETTER 90d (por createdAt), consumo 30d.
+-- confirmam): DISPATCHED 30d (por dispatchedAt), DEAD_LETTER 90d (por createdAt), consumo concluído 30d (por completedAt).
 -- PENDING/PROCESSING/FAILED nunca são purgados.
 CREATE OR REPLACE FUNCTION domain_event_outbox_purge(
     p_org text,
@@ -125,9 +136,11 @@ BEGIN
        AND "createdAt" < now() - make_interval(days => p_dead_letter_days);
     GET DIAGNOSTICS dead_letter_deleted = ROW_COUNT;
 
+    -- Só consumos CONCLUÍDOS; reservas pendentes/vencidas nunca são purgadas (seriam reexecutadas).
     DELETE FROM "DomainEventConsumption"
      WHERE "organizationId" = p_org
-       AND "processedAt" < now() - make_interval(days => p_consumption_days);
+       AND "completedAt" IS NOT NULL
+       AND "completedAt" < now() - make_interval(days => p_consumption_days);
     GET DIAGNOSTICS consumption_deleted = ROW_COUNT;
 
     RETURN NEXT;

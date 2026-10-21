@@ -5598,8 +5598,15 @@ model DomainEventConsumption {
   eventId        String
   consumer       String
   processedAt    DateTime     @default(now()) @db.Timestamptz(3)
+  /// Lease de reserva (handoff 16, revisão pós-parecer 24 do #32): dono e validade da reserva.
+  /// Reserva expirada sem completedAt pode ser retomada por outro worker.
+  reservedBy     String       @default("")
+  reservedUntil  DateTime?    @db.Timestamptz(3)
+  /// Preenchido só quando o consumidor concluiu; linhas concluídas nunca são retomadas.
+  completedAt    DateTime?    @db.Timestamptz(3)
 
   @@unique([organizationId, eventId, consumer])
-  /// Purge de retenção por tenant.
-  @@index([organizationId, processedAt])
+  /// Purge de retenção por tenant (só linhas concluídas). Reclaim de lease vencida usa o índice
+  /// parcial (organizationId, reservedUntil) WHERE completedAt IS NULL, só na migration.
+  @@index([organizationId, completedAt])
 }
