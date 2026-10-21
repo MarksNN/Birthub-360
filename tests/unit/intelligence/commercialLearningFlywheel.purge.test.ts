@@ -109,3 +109,18 @@ describe('REMED-06 / Ajuste 1 — retração do Flywheel com expurgo real', () =
     expect(CONSENT_PURGE_CHANNEL).toBe('lgpd:consent-purge:v1');
   });
 });
+
+describe('Flywheel — RLS do PR #35', () => {
+  it('seta app.current_tenant_id na transação antes do deleteMany', async () => {
+    const calls: string[] = [];
+    const tx: FlywheelPurgeTx = {
+      $executeRaw: async (q, ...v) => (calls.push(`${q.join('?')}|${v.join(',')}`), 1),
+      flywheelFewShotExample: { deleteMany: async () => (calls.push('fs'), { count: 0 }) },
+      flywheelApproachRecord: { deleteMany: async () => (calls.push('ap'), { count: 0 }) },
+    };
+    await new CommercialLearningFlywheelService({ $transaction: (fn) => fn(tx) }).purgeSubject('o1', 'L1');
+    expect(calls[0]).toContain("set_config('app.current_tenant_id'");
+    expect(calls[0]).toContain('|o1');
+    expect(calls.slice(1)).toEqual(['fs', 'ap']);
+  });
+});

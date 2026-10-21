@@ -12,6 +12,8 @@ export interface FlywheelPersistencePurger {
   $transaction<T>(fn: (tx: FlywheelPurgeTx) => Promise<T>): Promise<T>;
 }
 export interface FlywheelPurgeTx {
+  /** Opcional: seta app.current_tenant_id (RLS tenant_isolation do PR #35) na transação. */
+  $executeRaw?(query: TemplateStringsArray, ...values: unknown[]): Promise<number>;
   flywheelFewShotExample: {
     deleteMany(args: {
       where: { organizationId: string; leadId: string };
@@ -66,6 +68,9 @@ export class CommercialLearningFlywheelService {
     if (this.persistence) {
       const where = { organizationId, leadId };
       const res = await this.persistence.$transaction(async (tx) => {
+        if (tx.$executeRaw) {
+          await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
+        }
         const fs = await tx.flywheelFewShotExample.deleteMany({ where });
         const ap = await tx.flywheelApproachRecord.deleteMany({ where });
         return { fs: fs.count, ap: ap.count };
