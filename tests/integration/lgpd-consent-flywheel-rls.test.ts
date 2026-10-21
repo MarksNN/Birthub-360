@@ -268,7 +268,7 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
       c1.release();
       c2.release();
     }
-    await tx(pool, null, (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true);
+    // org de teste fica no banco (v5: o app não apaga Organization).
   });
 
   it('ConsentAuditRecord: CHECK de subjectRef (hs256 obrigatório fora de GENESIS) e reasonCode enum', async () => {
@@ -439,14 +439,14 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
     });
   });
 
-  it('head: cascata de Organization (offboarding sem cadeia) remove head; DELETE direto não', async () => {
+  it('v5: app NÃO apaga Organization (permission denied); head não sai por DELETE direto', async () => {
     const org = `test-lgpd-off-${RUN}`;
     await tx(pool, null, (c) => c.query(`INSERT INTO "Organization" (id,name,"updatedAt") VALUES ($1,$1,now())`, [org]), true);
     await tx(pool, org, (c) =>
       c.query(`INSERT INTO "ConsentAuditChainHead" ("organizationId","genesisId","genesisHash","lastSequence","lastHash") VALUES ($1,'g',repeat('a',64),0,repeat('a',64))`, [org]),
     );
-    await expect(tx(pool, org, (c) => c.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [org]))).rejects.toThrow();
-    const del = await tx(pool, null, (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true);
-    expect(del.rowCount).toBe(1);
+    await expect(tx(pool, org, (c) => c.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [org]))).rejects.toThrow(/permission denied|DELETE bloqueado/);
+    await expect(tx(pool, null, (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true)).rejects.toThrow(/permission denied for table Organization/);
   });
+
 });

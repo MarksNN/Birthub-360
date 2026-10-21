@@ -4,9 +4,8 @@ import { afterAll, describe, expect, it } from 'vitest';
 
 /**
  * REMED-06 v4 (#35) — prova no Postgres real, como papel de app (NOSUPERUSER, não-dono):
- * - Cascata de Organization alcança TODA a cadeia LGPD (inclusive ConsentAuditRecord) sem o app ter
- *   DELETE nela; DML direto segue bloqueado. (Antes: FK Restrict + trigger => "permission denied"/
- *   bloqueio no cleanup que apaga Organization.)
+ * - v5: app sem DELETE/TRUNCATE em Organization; cadeia/head com FK RESTRICT (só o passo explícito de
+ *   retenção do runbook remove a cadeia); demais tabelas LGPD seguem CASCADE.
  * - A2 (parecer 15 do #39): DELETE disparado por trigger (pg_trigger_depth() > 1) SEM a org ter sido
  *   apagada não pula o tombstone nem libera DELETE em tabela append-only.
  * - B/B1: funções LGPD — DEFINER só com search_path fixo e tenant guard; nenhuma com EXECUTE p/ app/PUBLIC.
@@ -66,8 +65,10 @@ const LGPD_TABLES = [
   'TenantKeyEnvelope',
 ];
 
-async function seedFullChain(org: string) {
-  await tx(org, async (c) => {
+/** Semeia a cadeia completa no client dado (o chamador decide commit/rollback). */
+async function seedFullChain(org: string, client?: PoolClient) {
+  const run = (fn: (c: PoolClient) => Promise<void>) => (client ? fn(client) : tx(org, fn));
+  await run(async (c) => {
     await c.query(
       `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
        VALUES ($1,$2,3,0,'GENESIS','genesis','marketing','v1','GRANTED',$3,$4,now()),
@@ -108,50 +109,74 @@ describe('REMED-06 v4 — cascata de Organization, A2, inventário de funções,
     await pool.end();
   });
 
-  it('cascata de Organization apaga toda a cadeia LGPD (inclusive registros commitados) sem DELETE do app; DML direto continua bloqueado', async () => {
+  it('v5: Organization com cadeia não sai — app sem DELETE/TRUNCATE em Organization; FKs da cadeia/head RESTRICT; demais LGPD CASCADE', async () => {
+    // Cadeia nunca é commitada (com FK RESTRICT ela prenderia a org de teste para sempre).
     const org = `test-lgpd-casc-${RUN}`;
     await mkOrg(org);
-    await seedFullChain(org);
-    // app não tem DELETE na cadeia, no head, no tombstone nem no envelope
-    for (const t of [
-      'ConsentAuditRecord',
-      'ConsentAuditChainHead',
-      'ConsentSubjectKeyTombstone',
-      'TenantKeyEnvelope',
-    ]) {
-      await expect(
-        tx(org, (c) => c.query(`DELETE FROM "${t}" WHERE "organizationId"=$1`, [org])),
-        t,
-      ).rejects.toThrow(/permission denied|bloqueado|append-only/);
+    const c = await pool.connect();
+    const expectFail = async (sql: string, params: unknown[], re: RegExp) => {
+      await c.query('SAVEPOINT s');
+      await expect(c.query(sql, params), sql).rejects.toThrow(re);
+      await c.query('ROLLBACK TO SAVEPOINT s');
+    };
+    try {
+      await c.query('BEGIN');
+      await c.query(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, [org]);
+      await seedFullChain(org, c);
+      for (const t of [
+        'ConsentAuditRecord',
+        'ConsentAuditChainHead',
+        'ConsentSubjectKeyTombstone',
+        'TenantKeyEnvelope',
+      ]) {
+        await expectFail(
+          `DELETE FROM "${t}" WHERE "organizationId"=$1`,
+          [org],
+          /permission denied|bloqueado|append-only/,
+        );
+      }
+      await c.query(`SELECT set_config('app.bypass_rls', 'on', TRUE)`);
+      await expectFail(
+        `DELETE FROM "Organization" WHERE id=$1`,
+        [org],
+        /permission denied for table Organization/,
+      );
+      await expectFail(`TRUNCATE "Organization" CASCADE`, [], /permission denied/);
+      await c.query(`SELECT set_config('app.bypass_rls', 'off', TRUE)`);
+      // O marcador do passo de retenção não vale para o app (e ele nem tem DELETE na cadeia).
+      await c.query(`SELECT set_config('app.lgpd_chain_retention_org', $1, TRUE)`, [org]);
+      await expectFail(
+        `DELETE FROM "ConsentAuditRecord" WHERE "organizationId"=$1`,
+        [org],
+        /permission denied|append-only/,
+      );
+    } finally {
+      await c.query('ROLLBACK').catch(() => {});
+      c.release();
     }
-    const before = await tx(org, async (c) =>
-      Object.fromEntries(
-        await Promise.all(LGPD_TABLES.map(async (t) => [t, await count(c, t, org)])),
-      ),
+    const priv = await pool.query(
+      `SELECT has_table_privilege(current_user, 'public."Organization"', 'DELETE') d,
+              has_table_privilege(current_user, 'public."Organization"', 'TRUNCATE') t`,
     );
-    expect(before).toMatchObject({
-      ConsentAuditRecord: 2,
-      ConsentAuditChainHead: 1,
-      ConsentSubjectKeyTombstone: 1,
-      TenantKeyEnvelope: 1,
-      ConsentEventDetail: 1,
+    expect(priv.rows[0]).toEqual({ d: false, t: false });
+    // Para QUALQUER papel (migrator/superuser inclusive), apagar org com cadeia falha por FK RESTRICT
+    // (provado ao vivo como superuser no PR; aqui, o catálogo). Demais filhos LGPD seguem CASCADE.
+    const { rows } = await pool.query(
+      `SELECT c.relname AS t, k.confdeltype FROM pg_constraint k JOIN pg_class c ON c.oid = k.conrelid
+        WHERE k.contype = 'f' AND k.confrelid = 'public."Organization"'::regclass AND c.relname = ANY($1::text[])`,
+      [LGPD_TABLES],
+    );
+    expect(Object.fromEntries(rows.map((r) => [r.t, r.confdeltype]))).toEqual({
+      ConsentAuditRecord: 'r',
+      ConsentAuditChainHead: 'r',
+      ConsentSubjectKey: 'c',
+      ConsentSubjectKeyTombstone: 'c',
+      ConsentEventDetail: 'c',
+      ConsentPurgeTask: 'c',
+      FlywheelApproachRecord: 'c',
+      FlywheelFewShotExample: 'c',
+      TenantKeyEnvelope: 'c',
     });
-    // offboarding/cleanup: apagar a Organization funciona (era o 'permission denied for table ConsentAuditRecord')
-    const del = await tx(
-      null,
-      (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]),
-      true,
-    );
-    expect(del.rowCount).toBe(1);
-    const after = await tx(org, async (c) =>
-      Object.fromEntries(
-        await Promise.all(LGPD_TABLES.map(async (t) => [t, await count(c, t, org)])),
-      ),
-    );
-    expect(
-      Object.values(after).every((n) => n === 0),
-      JSON.stringify(after),
-    ).toBe(true);
   });
 
   it('A2: DELETE em ConsentSubjectKey disparado por trigger (depth > 1) com a org viva grava tombstone; tombstone/cadeia não liberam DELETE', async () => {
@@ -207,7 +232,6 @@ describe('REMED-06 v4 — cascata de Organization, A2, inventário de funções,
     } finally {
       await c.query('ROLLBACK').catch(() => {});
       c.release();
-      await tx(null, (k) => k.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true);
     }
   });
 
@@ -348,11 +372,7 @@ describe('REMED-06 v4 — cascata de Organization, A2, inventário de funções,
       expect(row.rows[0].ciphertext).toBeNull();
       expect(row.rows[0].destroyedAt).not.toBeNull();
     } finally {
-      await tx(
-        null,
-        (c) => c.query(`DELETE FROM "Organization" WHERE id = ANY($1)`, [[a, b]]),
-        true,
-      );
+      // orgs de teste ficam no banco (v5: o app não apaga Organization)
     }
   });
 
@@ -388,7 +408,7 @@ describe('REMED-06 v4 — cascata de Organization, A2, inventário de funções,
       );
       expect(n).toBe(0);
     } finally {
-      await tx(null, (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true);
+      // orgs de teste ficam no banco (v5: o app não apaga Organization)
     }
   });
 });

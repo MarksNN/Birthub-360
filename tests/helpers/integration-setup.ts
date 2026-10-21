@@ -109,7 +109,14 @@ afterAll(async () => {
     } catch (error) {
       void error;
     }
-    await prisma.organization.deleteMany();
+    // REMED-06 v5 (#35): prospector_app não tem mais DELETE em Organization (offboarding só como
+    // migrator — ADR-006). As orgs de teste ficam no banco descartável de teste; o cleanDatabase()
+    // acima já limpou os dados de negócio por tenant. Qualquer outro erro continua quebrando.
+    try {
+      await prisma.organization.deleteMany();
+    } catch (error) {
+      if (!/permission denied for table Organization|42501/.test(String((error as Error)?.message ?? error))) throw error;
+    }
   });
   await prisma.$disconnect();
 });

@@ -5583,7 +5583,7 @@ enum ConsentChainEventKind {
 model ConsentAuditRecord {
   id             String                   @id
   organizationId String
-  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   /// Versão do formato canônico do hash (F6 do #33; hoje 3).
   formatVersion  Int
   sequence       Int
@@ -5610,10 +5610,10 @@ model ConsentAuditRecord {
 
 /// Âncora de cabeça da cadeia por organização (detecta truncamento de cauda / recriação de gênese).
 /// Trigger: genesis* imutáveis, lastSequence estritamente crescente, DELETE/TRUNCATE bloqueados
-/// (exceto DELETE em cascata a partir de Organization).
+/// (sem exceção de cascata: FK Restrict; só o passo explícito de retenção apaga — ADR-006).
 model ConsentAuditChainHead {
   organizationId String       @id
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   genesisId      String
   genesisHash    String       @db.Char(64)
   lastSequence   Int
