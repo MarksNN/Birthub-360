@@ -15,10 +15,10 @@ test.describe('Onboarding de Módulos da Organização', () => {
 
     // 3. Escolhe módulos
     // Por padrão CRM Comercial está ativo (graças ao useState default). Vamos clicar nele para desativar.
-    const crmCard = page.locator('text=CRM Comercial').locator('..');
+    const crmCard = page.getByText('CRM Comercial', { exact: true });
     await crmCard.click(); // desativa CRM
 
-    const prospectCard = page.locator('text=Prospecção Inteligente').locator('..');
+    const prospectCard = page.getByText('Prospecção Inteligente', { exact: true });
     await prospectCard.click(); // ativa Prospecção
 
     // 4. Continua o fluxo
