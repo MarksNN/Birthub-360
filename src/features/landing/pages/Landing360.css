@@ -1134,3 +1134,30 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
 .btn-floating-top:active {
   transform: translateY(-1px) scale(0.98);
 }
+
+/* Login no tema claro: neon #00D4FF/#FF2D9B/#F59E0B sobre #F8FAFC fica abaixo de 4.5:1
+   (axe serious). O dark mantém o neon. Escopo só da antessala, não da landing. */
+html.light .login-antessala-backdrop .text-\[\#00D4FF\],
+[data-theme='light'] .login-antessala-backdrop .text-\[\#00D4FF\] {
+  color: #0369a1;
+}
+html.light .login-antessala-backdrop .text-\[\#FF2D9B\],
+[data-theme='light'] .login-antessala-backdrop .text-\[\#FF2D9B\] {
+  color: #be185d;
+}
+html.light .login-antessala-backdrop .text-\[\#F59E0B\],
+[data-theme='light'] .login-antessala-backdrop .text-\[\#F59E0B\] {
+  color: #b45309;
+}
+html.light .login-antessala-backdrop .text-\[\#8B7DFF\],
+[data-theme='light'] .login-antessala-backdrop .text-\[\#8B7DFF\] {
+  color: #6d28d9;
+}
+html.light .login-antessala-backdrop .text-\[\#10B981\],
+[data-theme='light'] .login-antessala-backdrop .text-\[\#10B981\] {
+  color: #047857;
+}
+html.light .login-antessala-backdrop .border-\[\#00D4FF\],
+[data-theme='light'] .login-antessala-backdrop .border-\[\#00D4FF\] {
+  border-color: #0369a1;
+}
