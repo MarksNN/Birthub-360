@@ -59,6 +59,20 @@ export interface FailureUpdate {
   deadLetter: boolean;
 }
 
+export interface RetentionPolicy {
+  dispatchedDays: number;
+  deadLetterDays: number;
+  consumptionDays: number;
+  /** Relógio de referência só para a implementação em memória. */
+  now: Date;
+}
+
+export const DEFAULT_RETENTION = {
+  dispatchedDays: 30,
+  deadLetterDays: 90,
+  consumptionDays: 30,
+} as const;
+
 export interface AppendOptions {
   /**
    * Grava já reivindicado (status PROCESSING, lockedBy/lockedUntil) — usado pelo publish inline
@@ -97,14 +111,11 @@ export interface OutboxRepository {
     now: Date;
   }): Promise<number>;
   /**
-   * Retenção/LGPD: remove registros DISPATCHED/DEAD_LETTER anteriores a `olderThan`.
-   * Retorna quantos foram removidos.
+   * Retenção/LGPD (função SQL `domain_event_outbox_purge` do 01): DISPATCHED por dispatchedAt,
+   * DEAD_LETTER por createdAt, consumo por processedAt. PENDING/PROCESSING/FAILED nunca são purgados.
+   * Retorna o total removido.
    */
-  purge(params: {
-    retentionMs: number;
-    now: Date;
-    statuses: Array<'DISPATCHED' | 'DEAD_LETTER'>;
-  }): Promise<number>;
+  purge(policy: RetentionPolicy): Promise<number>;
 }
 
 /**

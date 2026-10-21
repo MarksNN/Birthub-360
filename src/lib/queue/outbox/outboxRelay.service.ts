@@ -8,7 +8,12 @@ import {
   outboxRequeuedTotal,
   sanitizeError,
 } from './metrics.js';
-import type { OutboxRecord, OutboxRepository } from './outbox.ports.js';
+import {
+  DEFAULT_RETENTION,
+  type OutboxRecord,
+  type OutboxRepository,
+  type RetentionPolicy,
+} from './outbox.ports.js';
 
 export type OutboxDispatcher = (
   envelope: DomainEventEnvelope,
@@ -49,8 +54,9 @@ export class OutboxRelay {
       await this.opts.repository.markDispatched(record, this.workerId, now);
       return 'DISPATCHED';
     } catch (err) {
-      const retryCount = record.retryCount + 1;
       const maxAttempts = record.maxAttempts || policy.maxAttempts;
+      // CHECK do #34: retryCount <= maxAttempts — nunca incrementa além do limite.
+      const retryCount = Math.min(record.retryCount + 1, maxAttempts);
       const deadLetter = retryCount >= maxAttempts;
       const delay = computeBackoffMs(retryCount, policy, this.opts.random);
       const lastError = sanitizeError(err);
@@ -120,19 +126,12 @@ export class OutboxRelay {
   }
 
   /**
-   * Retenção/LGPD: remove envelopes (com payload) já entregues ou em DLQ há mais de `retentionDays`.
-   * O prazo final deve ser definido com o 01A; default 30 dias.
+   * Retenção/LGPD: delega à função SQL `domain_event_outbox_purge` (por tenant). Prazos provisórios
+   * do 01 (DISPATCHED 30d, DLQ 90d, consumo 30d) até confirmação do 01A.
    */
-  async purgeExpired(
-    retentionDays = 30,
-    statuses: Array<'DISPATCHED' | 'DEAD_LETTER'> = ['DISPATCHED', 'DEAD_LETTER'],
-  ): Promise<number> {
+  async purgeExpired(policy: Partial<Omit<RetentionPolicy, 'now'>> = {}): Promise<number> {
     const now = (this.opts.now ?? (() => new Date()))();
-    const n = await this.opts.repository.purge({
-      retentionMs: retentionDays * 86_400_000,
-      now,
-      statuses,
-    });
+    const n = await this.opts.repository.purge({ ...DEFAULT_RETENTION, ...policy, now });
     if (n > 0) outboxPurgedTotal.inc({ organization: 'all' }, n);
     return n;
   }

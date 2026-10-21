@@ -22,6 +22,7 @@ import type {
   OutboxRepository,
   OutboxStatus,
   OutboxUnitOfWork,
+  RetentionPolicy,
 } from './outbox.ports.js';
 
 /** Subconjunto do `Prisma.TransactionClient` usado aqui (facilita testes com `pg`). */
@@ -95,7 +96,8 @@ async function appendSql(tx: SqlExecutor, rec: NewOutboxRecord, opts: AppendOpti
        (CASE WHEN $13::int IS NULL THEN 'PENDING' ELSE 'PROCESSING' END)::"DomainEventOutboxStatus",
        0,$12::int, now(), $14,
        CASE WHEN $13::int IS NULL THEN NULL ELSE now() + ($13::int * interval '1 millisecond') END, now())
-     ON CONFLICT ("organizationId","idempotencyKey") WHERE "idempotencyKey" IS NOT NULL DO NOTHING
+     -- Cobre os dois únicos do #34 @671d8d31: (organizationId, eventId) e o parcial (organizationId, idempotencyKey).
+     ON CONFLICT DO NOTHING
      RETURNING *`,
     rec.id,
     rec.organizationId,
@@ -113,11 +115,21 @@ async function appendSql(tx: SqlExecutor, rec: NewOutboxRecord, opts: AppendOpti
     opts.claimFor?.workerId ?? null,
   );
   if (rows.length > 0) return { record: toRecord(rows[0]), created: true };
-  const existing = await tx.$queryRawUnsafe<OutboxRow[]>(
-    `SELECT * FROM ${T} WHERE "organizationId"=$1 AND "idempotencyKey"=$2`,
-    rec.organizationId,
-    rec.idempotencyKey,
-  );
+  // Conflito: devolve o registro existente do MESMO tenant (eventId é único por organização).
+  const existing = rec.idempotencyKey
+    ? await tx.$queryRawUnsafe<OutboxRow[]>(
+        `SELECT * FROM ${T} WHERE "organizationId"=$1 AND ("idempotencyKey"=$2 OR "eventId"=$3)
+          ORDER BY ("idempotencyKey"=$2) DESC LIMIT 1`,
+        rec.organizationId,
+        rec.idempotencyKey,
+        rec.eventId,
+      )
+    : await tx.$queryRawUnsafe<OutboxRow[]>(
+        `SELECT * FROM ${T} WHERE "organizationId"=$1 AND "eventId"=$2 LIMIT 1`,
+        rec.organizationId,
+        rec.eventId,
+      );
+  if (!existing[0]) throw new Error('DomainEventOutbox: conflito sem registro visível no tenant');
   return { record: toRecord(existing[0]), created: false };
 }
 
@@ -166,7 +178,7 @@ export class PrismaOutboxRepository implements OutboxRepository {
             WHERE "organizationId" = $1
               AND (("status" IN ('PENDING','FAILED') AND "nextAttemptAt" <= now())
                 OR ("status" = 'PROCESSING' AND "lockedUntil" <= now()))
-            ORDER BY "createdAt"
+            ORDER BY "nextAttemptAt"
             LIMIT $2::int
             FOR UPDATE SKIP LOCKED)
          UPDATE ${T} t
@@ -234,19 +246,29 @@ export class PrismaOutboxRepository implements OutboxRepository {
     return n;
   }
 
-  async purge(p: { retentionMs: number; statuses: Array<'DISPATCHED' | 'DEAD_LETTER'> }) {
+  /** Retenção via função SQL do 01 (`domain_event_outbox_purge`), por tenant e com o tenant setado. */
+  async purge(p: RetentionPolicy) {
     let n = 0;
     for (const org of await this.runner.listTenants()) {
-      n += await this.runner.runAsTenant(org, (tx) =>
-        tx.$executeRawUnsafe(
-          `DELETE FROM ${T}
-            WHERE "organizationId"=$1 AND "status"::text = ANY($2::text[])
-              AND COALESCE("dispatchedAt","createdAt") < now() - ($3::bigint * interval '1 millisecond')`,
+      const [r] = await this.runner.runAsTenant(org, (tx) =>
+        tx.$queryRawUnsafe<
+          Array<{
+            dispatched_deleted: string | number;
+            dead_letter_deleted: string | number;
+            consumption_deleted: string | number;
+          }>
+        >(
+          'SELECT * FROM domain_event_outbox_purge($1, $2::int, $3::int, $4::int)',
           org,
-          p.statuses,
-          Math.floor(p.retentionMs),
+          p.dispatchedDays,
+          p.deadLetterDays,
+          p.consumptionDays,
         ),
       );
+      n +=
+        Number(r?.dispatched_deleted ?? 0) +
+        Number(r?.dead_letter_deleted ?? 0) +
+        Number(r?.consumption_deleted ?? 0);
     }
     return n;
   }

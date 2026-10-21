@@ -175,15 +175,63 @@ describe.skipIf(!APP_URL)('REMED-05 adaptador Postgres (RLS estrita, #34)', () =
     expect(b.eventId).toBe(a.eventId);
   });
 
-  it('purge remove só finalizados além da retenção (now() do SQL)', async () => {
+  it('purge usa domain_event_outbox_purge: só DISPATCHED além da retenção, por tenant', async () => {
     const repo = new PrismaOutboxRepository(runner);
-    const before = await countOutbox(orgB);
-    expect(await repo.purge({ retentionMs: 0, now: new Date(), statuses: ['DISPATCHED'] })).toBeGreaterThan(0);
-    const after = await countOutbox(orgB);
-    expect(after).toBeLessThan(before);
-    const pending = await inTenant(orgB, (tx) =>
-      tx.$queryRawUnsafe<unknown[]>(`SELECT 1 FROM "DomainEventOutbox" WHERE status <> 'DISPATCHED'`),
+    const countDispatched = async () =>
+      Number(
+        (
+          await inTenant(orgB, (tx) =>
+            tx.$queryRawUnsafe<Array<{ n: string }>>(`SELECT count(*) n FROM "DomainEventOutbox" WHERE status='DISPATCHED'`),
+          )
+        )[0].n,
+      );
+    const before = await countDispatched();
+    expect(before).toBeGreaterThan(2);
+    await admin.query(
+      `UPDATE "DomainEventOutbox" SET "dispatchedAt" = now() - interval '40 days'
+        WHERE id IN (SELECT id FROM "DomainEventOutbox" WHERE "organizationId"=$1 AND status='DISPATCHED' LIMIT 2)`,
+      [orgB],
     );
-    expect(pending.length).toBe(after);
+    expect(await repo.purge({ dispatchedDays: 30, deadLetterDays: 90, consumptionDays: 30, now: new Date() })).toBe(2);
+    expect(await countDispatched()).toBe(before - 2);
+  });
+
+  it('eventId é único por organização (mesmo eventId em dois tenants é aceito; repetido no tenant não duplica)', async () => {
+    const repo = new PrismaOutboxRepository(runner);
+    const base = (org: string) => ({
+      id: randomUUID(),
+      eventId: 'evt-compartilhado',
+      eventType: 'DEAL_WON' as const,
+      organizationId: org,
+      envelope: { ...input(org), eventId: 'evt-compartilhado', occurredAt: new Date().toISOString() },
+      payload: {},
+      maxAttempts: 3,
+      createdAt: new Date().toISOString(),
+    });
+    expect((await repo.append(base(orgA))).created).toBe(true);
+    expect((await repo.append(base(orgB))).created).toBe(true);
+    const again = await repo.append(base(orgA));
+    expect(again.created).toBe(false);
+    expect(again.record.organizationId).toBe(orgA);
+  });
+
+  it('claim ordena por nextAttemptAt', async () => {
+    const orgC = `org-remed05-c-${randomUUID()}`;
+    await admin.query('INSERT INTO "Organization"(id, name, "updatedAt") VALUES ($1,$1, now())', [orgC]);
+    try {
+      const repo = new PrismaOutboxRepository({ ...runner, listTenants: async () => [orgC] });
+      const mesh = new DomainEventMeshService({ outbox: repo });
+      const first = await mesh.publishInTransaction(repo, input(orgC));
+      const second = await mesh.publishInTransaction(repo, input(orgC));
+      // o segundo (criado depois) fica com nextAttemptAt mais antigo
+      await admin.query(`UPDATE "DomainEventOutbox" SET "nextAttemptAt" = now() - interval '1 hour' WHERE "eventId"=$1`, [
+        second.eventId,
+      ]);
+      const [claimed] = await repo.claimBatch({ workerId: 'o', limit: 1, now: new Date(), leaseMs: 1000, organizationId: orgC });
+      expect(claimed.eventId).toBe(second.eventId);
+      expect(claimed.eventId).not.toBe(first.eventId);
+    } finally {
+      await admin.query('DELETE FROM "Organization" WHERE id=$1', [orgC]);
+    }
   });
 });

@@ -153,7 +153,7 @@ describe('PR#32 review (4): DLQ requeue, métrica e retenção', () => {
     const [old] = [...repo.records.values()];
     old.dispatchedAt = new Date(Date.now() - 40 * 86_400_000).toISOString();
     const relay = new OutboxRelay({ repository: repo, dispatcher: async () => {} });
-    expect(await relay.purgeExpired(30)).toBe(1);
+    expect(await relay.purgeExpired({ dispatchedDays: 30 })).toBe(1);
     expect(repo.records.size).toBe(2);
     expect([...repo.records.values()].some((r) => r.status === 'PENDING')).toBe(true);
   });

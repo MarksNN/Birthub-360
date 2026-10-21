@@ -7,6 +7,7 @@ import type {
   OutboxRef,
   OutboxRepository,
   OutboxUnitOfWork,
+  RetentionPolicy,
 } from './outbox.ports.js';
 
 /** Implementação em memória (dev/testes). NÃO é durável — produção deve usar a implementação Prisma. */
@@ -53,7 +54,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   }) {
     const out: OutboxRecord[] = [];
     const sorted = [...this.records.values()].sort((a, b) =>
-      a.createdAt.localeCompare(b.createdAt),
+      a.nextAttemptAt.localeCompare(b.nextAttemptAt),
     );
     for (const r of sorted) {
       if (out.length >= limit) break;
@@ -127,21 +128,17 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     return n;
   }
 
-  async purge({
-    retentionMs,
-    now,
-    statuses,
-  }: {
-    retentionMs: number;
-    now: Date;
-    statuses: Array<'DISPATCHED' | 'DEAD_LETTER'>;
-  }) {
-    const olderThan = new Date(now.getTime() - retentionMs);
+  async purge({ dispatchedDays, deadLetterDays, now }: RetentionPolicy) {
+    const day = 86_400_000;
     let n = 0;
     for (const [id, r] of this.records) {
-      if (!(statuses as string[]).includes(r.status)) continue;
-      const ref = r.dispatchedAt ?? r.createdAt;
-      if (new Date(ref) < olderThan) {
+      const expired =
+        (r.status === 'DISPATCHED' &&
+          r.dispatchedAt &&
+          now.getTime() - new Date(r.dispatchedAt).getTime() > dispatchedDays * day) ||
+        (r.status === 'DEAD_LETTER' &&
+          now.getTime() - new Date(r.createdAt).getTime() > deadLetterDays * day);
+      if (expired) {
         this.records.delete(id);
         n++;
       }

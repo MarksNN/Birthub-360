@@ -89,3 +89,11 @@ Os demais 16 produtores não escrevem no banco no mesmo fluxo e podem continuar 
   um crash entre reserva e conclusão deixa a linha e aquele consumidor não reexecuta (at-most-once nesse caso).
   Pedido: adicionar `reservedBy text NOT NULL DEFAULT ''`, `reservedUntil timestamptz(3) NULL`, `completedAt timestamptz(3) NULL`
   e `INDEX (status, dispatchedAt)` na outbox para o purge (`DELETE ... COALESCE("dispatchedAt","createdAt") < now() - retenção`).
+
+## Ajustes ao #34 @671d8d31 (handoff 01-para-16-remed-05-outbox-schema-relay.md)
+- eventId único por (organizationId, eventId): append com `ON CONFLICT DO NOTHING` (cobre os dois únicos) e lookup do existente sempre filtrado pelo tenant.
+- Claim: `ORDER BY "nextAttemptAt"` (casa com o índice parcial `(organizationId, status, nextAttemptAt)`).
+- Purge: `relay.purgeExpired()` chama `SELECT * FROM domain_event_outbox_purge($org, 30, 90, 30)` por tenant (prazos provisórios).
+- CHECK `retryCount <= maxAttempts`: o relay limita `retryCount` a `maxAttempts` ao ir para DEAD_LETTER.
+- **Ainda pendente no 01:** `DomainEventConsumption` continua sem `reservedBy`/`reservedUntil`/`completedAt` em 671d8d31,
+  então o adaptador mantém `ON CONFLICT DO NOTHING` + DELETE em falha (crash entre reserva e conclusão = consumidor não reexecuta).
