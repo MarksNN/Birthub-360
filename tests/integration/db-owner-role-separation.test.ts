@@ -10,6 +10,11 @@ import { afterAll, describe, expect, it } from 'vitest';
  */
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const TABLE = 'ForecastSnapshot'; // tabela tenant-scoped com FORCE RLS
+/** Schemas não-sistema (parecer 15 v2: o inventário não pode olhar só `public`). */
+const USER_SCHEMAS_SQL = `SELECT oid FROM pg_namespace
+  WHERE nspname NOT IN ('pg_catalog','information_schema') AND nspname !~ '^pg_(toast|temp_|toast_temp_)'`;
+const NOT_EXTENSION = (cls: string, alias: string) =>
+  `NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = '${cls}'::regclass AND d.objid = ${alias}.oid AND d.deptype = 'e')`;
 
 afterAll(async () => {
   await pool.end();
@@ -224,7 +229,7 @@ describe('separação de papéis: prospector_app só DML, prospector_migrator do
   it('B: inventário de SECURITY DEFINER — search_path fixo e tenant guard (ou allowlist revisada)', async () => {
     const { rows } = await pool.query(
       `SELECT p.oid::regprocedure::text AS sig, p.proconfig, p.prosrc FROM pg_proc p
-        WHERE p.pronamespace = 'public'::regnamespace AND p.prosecdef`,
+        WHERE p.pronamespace IN (${USER_SCHEMAS_SQL}) AND p.prosecdef AND ${NOT_EXTENSION('pg_proc', 'p')}`,
     );
     for (const r of rows) {
       expect(r.proconfig ?? [], `${r.sig} sem search_path fixo`).toEqual(
@@ -241,13 +246,78 @@ describe('separação de papéis: prospector_app só DML, prospector_migrator do
   it('B1: o app só executa funções próprias da allowlist (nada por GRANT ON ALL / default)', async () => {
     const { rows } = await pool.query(
       `SELECT p.oid::regprocedure::text AS sig FROM pg_proc p
-        WHERE p.pronamespace = 'public'::regnamespace
-          AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_proc'::regclass AND d.objid = p.oid AND d.deptype = 'e')
+        WHERE p.pronamespace IN (${USER_SCHEMAS_SQL}) AND ${NOT_EXTENSION('pg_proc', 'p')}
           AND has_function_privilege(current_user, p.oid, 'EXECUTE') ORDER BY 1`,
     );
     expect(rows.map((r) => r.sig).filter((sig) => !APP_EXECUTE_ALLOWLIST.includes(sig))).toEqual(
       [],
     );
+  });
+
+  /**
+   * Triggers não internos permitidos, em QUALQUER schema não-sistema (parecer 15 v2, Q1/O3).
+   * Chave `schema.tabela:trigger` → função executada. Os do #35 (LGPD) já estão listados; trigger
+   * novo exige entrada aqui com revisão (inclusive resíduos criados pelo app antes do rollout,
+   * que o loop de posse só transfere para o migrator).
+   */
+  const TRIGGER_ALLOWLIST: Record<string, string> = {
+    'public.ConsentAuditRecord:consent_audit_no_mutation': 'consent_audit_immutable',
+    'public.ConsentAuditRecord:consent_audit_no_truncate': 'consent_audit_immutable',
+    'public.ConsentAuditRecord:consent_audit_advance_head': 'consent_audit_advance_head',
+    'public.ConsentAuditChainHead:consent_chain_head_guard_row': 'consent_chain_head_guard',
+    'public.ConsentAuditChainHead:consent_chain_head_no_truncate': 'consent_chain_head_guard',
+    'public.ConsentSubjectKey:consent_subject_key_shred_tombstone': 'consent_subject_key_tombstone',
+    'public.ConsentSubjectKeyTombstone:consent_tombstone_no_mutation':
+      'consent_tombstone_immutable',
+    'public.ConsentSubjectKeyTombstone:consent_tombstone_no_truncate':
+      'consent_tombstone_immutable',
+    'public.TenantKeyEnvelope:tenant_key_envelope_guard_row': 'tenant_key_envelope_guard',
+    'public.TenantKeyEnvelope:tenant_key_envelope_no_truncate': 'tenant_key_envelope_guard',
+  };
+
+  it('P1: search_path do migrator é só public (pg_catalog implícito, buscado antes)', async () => {
+    const { rows } = await pool.query(
+      `SELECT rolconfig FROM pg_roles WHERE rolname = 'prospector_migrator'`,
+    );
+    expect(rows[0].rolconfig).toEqual(['search_path=public']);
+  });
+
+  it('P1: nenhuma função ou operador em public (fora de extensão) sombreia o pg_catalog', async () => {
+    const { rows } = await pool.query(
+      `SELECT 'func ' || p.oid::regprocedure::text AS obj FROM pg_proc p
+        WHERE p.pronamespace = 'public'::regnamespace AND ${NOT_EXTENSION('pg_proc', 'p')}
+          AND EXISTS (SELECT 1 FROM pg_proc c WHERE c.pronamespace = 'pg_catalog'::regnamespace
+                       AND c.proname = p.proname AND c.proargtypes = p.proargtypes)
+       UNION ALL
+       SELECT 'op ' || o.oid::regoperator::text FROM pg_operator o
+        WHERE o.oprnamespace = 'public'::regnamespace AND ${NOT_EXTENSION('pg_operator', 'o')}
+          AND EXISTS (SELECT 1 FROM pg_operator c WHERE c.oprnamespace = 'pg_catalog'::regnamespace
+                       AND c.oprname = o.oprname AND c.oprleft = o.oprleft AND c.oprright = o.oprright)`,
+    );
+    expect(rows).toEqual([]);
+  });
+
+  it('inventário de triggers: todo trigger não interno de schema não-sistema está na allowlist', async () => {
+    const { rows } = await pool.query(
+      `SELECT n.nspname || '.' || c.relname || ':' || t.tgname AS k, f.proname AS fn
+         FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace JOIN pg_proc f ON f.oid = t.tgfoid
+        WHERE NOT t.tgisinternal AND c.relnamespace IN (${USER_SCHEMAS_SQL}) ORDER BY 1`,
+    );
+    const unexpected = rows.filter((r) => TRIGGER_ALLOWLIST[r.k] !== r.fn);
+    expect(unexpected).toEqual([]);
+  });
+
+  it('Q2: o app não tem CREATE em nenhum schema e não é membro de nenhum papel', async () => {
+    const { rows } = await pool.query(
+      `SELECT nspname FROM pg_namespace WHERE has_schema_privilege(current_user, oid, 'CREATE')`,
+    );
+    expect(rows).toEqual([]);
+    const m = await pool.query(
+      `SELECT r.rolname FROM pg_auth_members am JOIN pg_roles r ON r.oid = am.roleid
+        WHERE am.member = (SELECT oid FROM pg_roles WHERE rolname = current_user)`,
+    );
+    expect(m.rows).toEqual([]);
   });
 
   it('C: inventário de grants a PUBLIC — banco sem CREATE/TEMP, schema public sem nada, funções próprias sem EXECUTE, default de funções sem PUBLIC', async () => {

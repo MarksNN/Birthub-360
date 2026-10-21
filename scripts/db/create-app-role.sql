@@ -48,7 +48,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 --     Sem CREATE no banco/schema e sem TEMP (parecer 15 do PR #39: A1/A2/C3). NOSUPERUSER,
 --     NOBYPASSRLS. As tabelas do LangGraph (`checkpoint*`) nascem por migration
 --     (20261021010000_langgraph_checkpoint_tables), do migrator, como qualquer outra.
---   * search_path fixado: app `pg_catalog, public`; migrator `public, pg_catalog` (ver abaixo).
+--   * search_path fixado: app `pg_catalog, public`; migrator só `public` (pg_catalog implícito antes; ver abaixo).
 -- Idempotente e re-executável: re-rodar devolve ao migrator qualquer objeto que tenha ficado com
 -- outro dono e re-aplica os grants mínimos. Ver docs/deploy/db-owner-role-separation.md.
 
@@ -88,12 +88,14 @@ SELECT format('REVOKE TEMPORARY ON DATABASE %I FROM prospector_migrator', curren
 
 -- search_path fixo (A1/A4): sem "$user", um schema homônimo do papel não sombreia public.
 -- App: pg_catalog primeiro (nada em public sombreia built-ins; o app não cria nada, então não
--- importa que o 1º schema do path seja o alvo de CREATE). Migrator: public primeiro, porque o
--- Prisma faz `CREATE TABLE "_prisma_migrations"` sem qualificar e o alvo de CREATE é o 1º schema
--- do path (com pg_catalog primeiro: "permission denied for schema pg_catalog", testado). Como o
--- migrator é o dono de public, ninguém além dele põe objetos ali para sombrear.
+-- importa que o 1º schema do path seja o alvo de CREATE).
+-- Migrator (parecer 15 v2, P1): só `public`. Com pg_catalog AUSENTE do path, o Postgres o busca
+-- implicitamente ANTES de public, então nenhuma função/operador em public (inclusive de extensão
+-- ou resíduo do app de antes do rollout) sombreia built-ins para o dono/BYPASSRLS. E o alvo de
+-- CREATE continua sendo public, que é onde o Prisma cria `_prisma_migrations` sem qualificar
+-- (com pg_catalog explícito em 1º: "permission denied for schema pg_catalog", testado).
 ALTER ROLE prospector_app SET search_path = pg_catalog, public;
-ALTER ROLE prospector_migrator SET search_path = public, pg_catalog;
+ALTER ROLE prospector_migrator SET search_path = public;
 
 ALTER SCHEMA public OWNER TO prospector_migrator;
 
