@@ -1,21 +1,21 @@
 # MANIFESTO DE BACKUP COMPLETO — BIRTH HUB 360°
 
-- **Data de Geração do Backup:** 21 de outubro de 2026, 18:11 (Horário de Brasília)
-- **Data de Auditoria e Validação Forense:** 21 de outubro de 2026, 18:11 (Horário de Brasília)
+- **Data de Geração do Backup:** 21 de outubro de 2026, 19:02 (Horário de Brasília)
+- **Data de Auditoria e Validação Forense:** 21 de outubro de 2026, 19:02 (Horário de Brasília)
 - **Origem:** `C:\Github\Birthub-360`
 - **Destino do Backup:** `G:\Meu Drive\Birthub 360`
-- **Commit HEAD em main no bundle e no GitHub:** `fa29ab576` (`fix(security,ci): atualizar storybook para 10.6.3 sanando GHSA-f2ph-cmg5-wxc8, alinhar manifestos e adicionar auditoria criptografica`)
-- **Checksum SHA-256 do Bundle Atual:** `b352835c87fcb338089721ca8e1e61cf93ec58480603fa6077565c7d338839e5`
-- **Checksum SHA-256 do Bundle Antecessor (Commit 5a2971b3c):** `953fc2b88fa4de264c75dd2b05c6be0a41efcfc68ac7545961221eacb920abbb`
+- **Commit HEAD em main no bundle e no GitHub:** `34717c176` (`fix(sec): redigir logs de smtp e verificacao de email em auth.ts conforme debt-wave-01`)
+- **Checksum SHA-256 do Bundle Atual:** `58f56097606253439c2df87c7c72acdc0c232591b1c3d58e9673c19ad5e2ddae`
+- **Checksum SHA-256 do Bundle Antecessor (Commit fa29ab576):** `b352835c87fcb338089721ca8e1e61cf93ec58480603fa6077565c7d338839e5`
 - **Checksum SHA-256 do Bundle Base (Commit b4ad0669d):** `7b7215b7be18bc01fc44cacbebb32b49643bef02601d453a8b322ff441afb86a`
-- **Tamanho do Bundle:** `422.136.983 bytes` (~422 MB)
+- **Tamanho do Bundle:** `422.143.846 bytes` (~422 MB)
 - **Status da Working Tree no Host:** 100% limpa, zero arquivos pendentes ou untracked no momento da geração.
 
 ---
 
 ## 1. Conteúdo Preservado no Backup
 
-1. **`Birthub-360-full-history.bundle` (422.136.983 bytes):**
+1. **`Birthub-360-full-history.bundle` (422.143.846 bytes):**
    - Bundle Git completo contendo **todas as 305 entradas do repositório** (298 referências nomeadas + 7 apontadores HEAD de worktree).
    - Preserva o histórico completo de branches locais, tags, referências remotas (`refs/remotes/*`), stashes (`refs/stash`), checkpoints e branches de trabalho de todos os agentes.
 
@@ -91,13 +91,13 @@ Censo auditado dos 17 PRs abertos no repositório GitHub ([`MarksNN/Birthub-360`
 
 ## 4. Verificação de Integridade
 
-- **Checksum SHA-256 do Bundle Atual (Commit fa29ab576):**
+- **Checksum SHA-256 do Bundle Atual (Commit 34717c176):**
+  ```text
+  58f56097606253439c2df87c7c72acdc0c232591b1c3d58e9673c19ad5e2ddae
+  ```
+- **Checksum SHA-256 do Bundle Antecessor (Commit fa29ab576):**
   ```text
   b352835c87fcb338089721ca8e1e61cf93ec58480603fa6077565c7d338839e5
-  ```
-- **Checksum SHA-256 do Bundle Antecessor (Commit 5a2971b3c):**
-  ```text
-  953fc2b88fa4de264c75dd2b05c6be0a41efcfc68ac7545961221eacb920abbb
   ```
 - **Checksum SHA-256 do Bundle Base (Commit b4ad0669d):**
   ```text
