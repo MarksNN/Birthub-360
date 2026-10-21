@@ -74,7 +74,9 @@ export const options = {
     measure: {
       executor: 'constant-vus',
       vus: 5,
-      duration: '45s',
+      # 45s com 5 VUs dá ~100 amostras. Um pico de fila vira o p99 e fura 800ms
+      # mesmo com p95 ~50ms. 3 min deixa o percentil 99 descrever o regime, não o outlier.
+      duration: '3m',
       startTime: '20s',
       exec: 'default',
       tags: { phase: 'measure' },
