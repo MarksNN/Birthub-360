@@ -33,25 +33,6 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
 
 ## Waivers ativos
 
-### `GHSA-CH52-4W7C-C8XP` — `http-cache-semantics` via gerador SBOM
-
-- **Advisory:** https://github.com/advisories/GHSA-CH52-4W7C-C8XP
-- **Severidade reportada pelo `npm audit`:** high
-- **Cadeia:** `@cyclonedx/cyclonedx-npm` (devDependency) → `libxmljs2` (dependência opcional) →
-  `node-gyp` → `make-fetch-happen` → `http-cache-semantics@4.2.0`.
-- **Motivo:** O advisory afeta `http-cache-semantics` até `4.2.0` e não lista versão corrigida
-  (verificado em 2026-10-03). O único fix automático reportado pelo npm rebaixa
-  `@cyclonedx/cyclonedx-npm` para `4.0.1`, uma mudança major do gerador usado para publicar o SBOM
-  CycloneDX 1.6; esse downgrade pode alterar o formato/contrato do artefato de release. A cadeia só
-  é alcançada pelo gerador de SBOM de desenvolvimento, não por dependência de runtime da aplicação.
-  Risco residual permanece no ambiente de build; remover o waiver assim que uma versão corrigida
-  existir e após validar que o gerador continua produzindo o SBOM requerido.
-- **Dono:** Agente 00 / dono do repositório.
-- **Data de registro:** 2026-10-03. **Reavaliar em:** 2026-10-10, ou quando o advisory publicar
-  uma versão corrigida, o que ocorrer primeiro.
-- **Escopo do waiver:** somente `GHSA-CH52-4W7C-C8XP`; os cinco achados HIGH propagados pela mesma
-  cadeia no `npm audit`. Não cobre outros advisories nem outras cadeias.
-
 ### `GHSA-Q2HR-2G5M-VWHR`, `GHSA-QHR7-859C-M2P7`, `GHSA-6J4F-FJ2G-MC7P` - `brace-expansion`
 
 - **Advisory:** https://github.com/advisories/GHSA-Q2HR-2G5M-VWHR
