@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { MODELS_WITH_ORGANIZATION_ID, TENANT_INJECTED_MODELS } from '@/lib/tenant-scoping-registry';
+import {
+  MODELS_WITH_ORGANIZATION_ID,
+  TENANT_INJECTED_MODELS,
+} from '@/lib/tenant-scoping-registry';
 
 /**
  * TENANT-007 (docs/audits/repository-debt-audit/agents/TENANT.md) e Onda 1 — Segurança & Tenancy,

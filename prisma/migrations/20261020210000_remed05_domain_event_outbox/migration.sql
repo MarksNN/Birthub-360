@@ -1,6 +1,10 @@
 -- REMED-05 (handoff 16→01: .agents/handoffs/16-para-01-remed-05-outbox.md, PR #32): tabelas da
 -- outbox transacional e da idempotência durável do DomainEventMesh. Só schema; adaptador = Agente 16.
 -- Ordem: depois de 20261020190000 (REMED-02, #18) e 20261020200000 (drift-fix, #28).
+-- Decisões (relay por organização, retenção) em docs/ADR/ADR-006-Outbox-Relay-Tenant-Loop-e-Retencao.md.
+-- Rollback (sem down-migration no Prisma): DROP FUNCTION domain_event_outbox_purge(text,integer,integer,integer);
+--   DROP TABLE "DomainEventConsumption"; DROP TABLE "DomainEventOutbox"; DROP TYPE "DomainEventOutboxStatus";
+--   e remover a linha de _prisma_migrations.
 
 -- CreateEnum
 CREATE TYPE "DomainEventOutboxStatus" AS ENUM ('PENDING', 'PROCESSING', 'DISPATCHED', 'FAILED', 'DEAD_LETTER');
@@ -40,11 +44,15 @@ CREATE TABLE "DomainEventConsumption" (
     CONSTRAINT "DomainEventConsumption_pkey" PRIMARY KEY ("id")
 );
 -- CreateIndex
-CREATE UNIQUE INDEX "DomainEventOutbox_eventId_key" ON "DomainEventOutbox"("eventId");
--- CreateIndex
 CREATE INDEX "DomainEventOutbox_organizationId_createdAt_idx" ON "DomainEventOutbox"("organizationId", "createdAt");
 -- CreateIndex
-CREATE INDEX "DomainEventConsumption_processedAt_idx" ON "DomainEventConsumption"("processedAt");
+CREATE INDEX "DomainEventOutbox_organizationId_status_dispatchedAt_idx" ON "DomainEventOutbox"("organizationId", "status", "dispatchedAt");
+-- CreateIndex
+CREATE INDEX "DomainEventOutbox_organizationId_status_createdAt_idx" ON "DomainEventOutbox"("organizationId", "status", "createdAt");
+-- CreateIndex
+CREATE UNIQUE INDEX "DomainEventOutbox_organizationId_eventId_key" ON "DomainEventOutbox"("organizationId", "eventId");
+-- CreateIndex
+CREATE INDEX "DomainEventConsumption_organizationId_processedAt_idx" ON "DomainEventConsumption"("organizationId", "processedAt");
 -- CreateIndex
 CREATE UNIQUE INDEX "DomainEventConsumption_organizationId_eventId_consumer_key" ON "DomainEventConsumption"("organizationId", "eventId", "consumer");
 -- AddForeignKey
@@ -55,12 +63,19 @@ ALTER TABLE "DomainEventConsumption" ADD CONSTRAINT "DomainEventConsumption_orga
 -- Índices PARCIAIS (não representáveis no schema.prisma; Prisma os ignora no diff).
 CREATE UNIQUE INDEX "DomainEventOutbox_organizationId_idempotencyKey_key"
     ON "DomainEventOutbox"("organizationId", "idempotencyKey") WHERE "idempotencyKey" IS NOT NULL;
--- Varredura do relay (claim FOR UPDATE SKIP LOCKED de PENDING/FAILED vencidos).
+-- Relay por organização: claim de PENDING/FAILED vencidos ordenado por nextAttemptAt.
 CREATE INDEX "DomainEventOutbox_relay_due_idx"
-    ON "DomainEventOutbox"("status", "nextAttemptAt") WHERE "status" IN ('PENDING', 'FAILED');
+    ON "DomainEventOutbox"("organizationId", "status", "nextAttemptAt") WHERE "status" IN ('PENDING', 'FAILED');
 -- Recuperação de lease expirada.
 CREATE INDEX "DomainEventOutbox_lease_recovery_idx"
-    ON "DomainEventOutbox"("status", "lockedUntil") WHERE "status" = 'PROCESSING';
+    ON "DomainEventOutbox"("organizationId", "status", "lockedUntil") WHERE "status" = 'PROCESSING';
+
+-- Invariantes (também ignorados pelo diff do Prisma).
+ALTER TABLE "DomainEventOutbox"
+    ADD CONSTRAINT "DomainEventOutbox_retryCount_check" CHECK ("retryCount" >= 0),
+    ADD CONSTRAINT "DomainEventOutbox_maxAttempts_check" CHECK ("maxAttempts" >= 1),
+    ADD CONSTRAINT "DomainEventOutbox_retry_le_max_check" CHECK ("retryCount" <= "maxAttempts"),
+    ADD CONSTRAINT "DomainEventOutbox_lastError_len_check" CHECK ("lastError" IS NULL OR char_length("lastError") <= 2000);
 
 -- RLS: tenant_isolation estrito, FORCE, sem cláusula de bypass (padrão 01A pós-20260825120000).
 
@@ -77,3 +92,41 @@ DROP POLICY IF EXISTS "tenant_isolation" ON "DomainEventConsumption";
 CREATE POLICY "tenant_isolation" ON "DomainEventConsumption" AS PERMISSIVE FOR ALL TO public
     USING ("organizationId" = current_setting('app.current_tenant_id', true))
     WITH CHECK ("organizationId" = current_setting('app.current_tenant_id', true));
+
+-- Retenção/purge por tenant (LGPD: envelope carrega payload). SECURITY INVOKER: roda sob a RLS de
+-- quem chama, e exige que p_org seja o tenant da sessão. Prazos default PROVISÓRIOS (01A/21
+-- confirmam): DISPATCHED 30d (por dispatchedAt), DEAD_LETTER 90d (por createdAt), consumo 30d.
+-- PENDING/PROCESSING/FAILED nunca são purgados.
+CREATE OR REPLACE FUNCTION domain_event_outbox_purge(
+    p_org text,
+    p_dispatched_days integer DEFAULT 30,
+    p_dead_letter_days integer DEFAULT 90,
+    p_consumption_days integer DEFAULT 30
+) RETURNS TABLE (dispatched_deleted bigint, dead_letter_deleted bigint, consumption_deleted bigint)
+LANGUAGE plpgsql SECURITY INVOKER AS $$
+BEGIN
+    IF p_org IS NULL OR p_org <> current_setting('app.current_tenant_id', true) THEN
+        RAISE EXCEPTION 'domain_event_outbox_purge: p_org deve ser o tenant da sessão';
+    END IF;
+    IF p_dispatched_days < 1 OR p_dead_letter_days < 1 OR p_consumption_days < 1 THEN
+        RAISE EXCEPTION 'domain_event_outbox_purge: prazos devem ser >= 1 dia';
+    END IF;
+
+    DELETE FROM "DomainEventOutbox"
+     WHERE "organizationId" = p_org AND "status" = 'DISPATCHED'
+       AND "dispatchedAt" < now() - make_interval(days => p_dispatched_days);
+    GET DIAGNOSTICS dispatched_deleted = ROW_COUNT;
+
+    DELETE FROM "DomainEventOutbox"
+     WHERE "organizationId" = p_org AND "status" = 'DEAD_LETTER'
+       AND "createdAt" < now() - make_interval(days => p_dead_letter_days);
+    GET DIAGNOSTICS dead_letter_deleted = ROW_COUNT;
+
+    DELETE FROM "DomainEventConsumption"
+     WHERE "organizationId" = p_org
+       AND "processedAt" < now() - make_interval(days => p_consumption_days);
+    GET DIAGNOSTICS consumption_deleted = ROW_COUNT;
+
+    RETURN NEXT;
+END;
+$$;

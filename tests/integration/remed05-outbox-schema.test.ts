@@ -77,14 +77,15 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
         const rows = await tx.$queryRawUnsafe<Array<{ eventId: string }>>(
           `WITH due AS (
              SELECT id FROM "DomainEventOutbox"
-             WHERE (status IN ('PENDING','FAILED') AND "nextAttemptAt" <= now())
-                OR (status='PROCESSING' AND "lockedUntil" <= now())
-             ORDER BY "createdAt" LIMIT 3 FOR UPDATE SKIP LOCKED)
+             WHERE "organizationId" = $2
+               AND status IN ('PENDING','FAILED') AND "nextAttemptAt" <= now()
+             ORDER BY "nextAttemptAt" LIMIT 3 FOR UPDATE SKIP LOCKED)
            UPDATE "DomainEventOutbox" o SET status='PROCESSING', "lockedBy"=$1,
              "lockedUntil"=now() + interval '30 seconds'
            FROM due WHERE o.id = due.id
            RETURNING o."eventId"`,
           worker,
+          ORG_A,
         );
         await new Promise((r) => setTimeout(r, 200)); // segura o lock enquanto o outro worker roda
         return rows.map((r) => r.eventId);
@@ -110,5 +111,92 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
       });
     expect(await asOrg(ORG_A, insert)).toBe(1);
     expect(await asOrg(ORG_A, insert)).toBe(0);
+  });
+
+  it('eventId é único por tenant (não global) e CHECKs de retry/maxAttempts/lastError valem', async () => {
+    await asOrg(ORG_A, () => prisma.domainEventOutbox.create({ data: row(ORG_A, 'evt-same') }));
+    await asOrg(ORG_B, () => prisma.domainEventOutbox.create({ data: row(ORG_B, 'evt-same') }));
+    await expect(
+      asOrg(ORG_A, () => prisma.domainEventOutbox.create({ data: row(ORG_A, 'evt-same') })),
+    ).rejects.toThrow();
+    for (const bad of [
+      { retryCount: -1 },
+      { maxAttempts: 0, retryCount: 0 },
+      { retryCount: 9, maxAttempts: 8 },
+      { lastError: 'x'.repeat(2001) },
+    ]) {
+      await expect(
+        asOrg(ORG_A, () =>
+          prisma.domainEventOutbox.create({
+            data: { ...row(ORG_A, `evt-bad-${JSON.stringify(bad).length}`), ...bad },
+          }),
+        ),
+      ).rejects.toThrow();
+    }
+  });
+
+  it('plano de relay por organização usa o índice parcial relay_due', async () => {
+    const plan = await asOrg(ORG_A, () =>
+      prisma.$transaction(async (tx) => {
+        await tx.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, ORG_A);
+        await tx.$executeRawUnsafe(`SET LOCAL enable_seqscan = off`);
+        return tx.$queryRawUnsafe<Array<{ 'QUERY PLAN': string }>>(
+          `EXPLAIN SELECT id FROM "DomainEventOutbox"
+           WHERE "organizationId" = '${ORG_A}' AND status IN ('PENDING','FAILED')
+             AND "nextAttemptAt" <= now()
+           ORDER BY "nextAttemptAt" LIMIT 3 FOR UPDATE SKIP LOCKED`,
+        );
+      }),
+    );
+    expect(plan.map((r) => r['QUERY PLAN']).join('\n')).toContain('DomainEventOutbox_relay_due_idx');
+  });
+
+  it('purge por tenant remove só DISPATCHED/DEAD_LETTER/consumo vencidos do próprio tenant', async () => {
+    const old = new Date(Date.now() - 100 * 24 * 3600 * 1000);
+    await asOrg(ORG_A, async () => {
+      await prisma.domainEventOutbox.create({
+        data: { ...row(ORG_A, 'd-old'), status: 'DISPATCHED', dispatchedAt: old },
+      });
+      await prisma.domainEventOutbox.create({
+        data: { ...row(ORG_A, 'd-new'), status: 'DISPATCHED', dispatchedAt: new Date() },
+      });
+      await prisma.domainEventOutbox.create({
+        data: { ...row(ORG_A, 'dlq-old'), status: 'DEAD_LETTER', createdAt: old },
+      });
+      await prisma.domainEventOutbox.create({
+        data: { ...row(ORG_A, 'pending-old'), status: 'PENDING', createdAt: old },
+      });
+      await prisma.domainEventConsumption.create({
+        data: { organizationId: ORG_A, eventId: 'd-old', consumer: 'c', processedAt: old },
+      });
+    });
+    await asOrg(ORG_B, () =>
+      prisma.domainEventOutbox.create({
+        data: { ...row(ORG_B, 'b-old'), status: 'DISPATCHED', dispatchedAt: old },
+      }),
+    );
+
+    const purge = (org: string, target: string) =>
+      asOrg(org, () =>
+        prisma.$transaction(async (tx) => {
+          await tx.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, org);
+          return tx.$queryRawUnsafe<
+            Array<{ dispatched_deleted: bigint; dead_letter_deleted: bigint; consumption_deleted: bigint }>
+          >(`SELECT * FROM domain_event_outbox_purge($1)`, target);
+        }),
+      );
+
+    // não pode purgar outro tenant
+    await expect(purge(ORG_A, ORG_B)).rejects.toThrow();
+
+    const [res] = await purge(ORG_A, ORG_A);
+    expect(Number(res.dispatched_deleted)).toBe(1);
+    expect(Number(res.dead_letter_deleted)).toBe(1);
+    expect(Number(res.consumption_deleted)).toBe(1);
+    const left = await asOrg(ORG_A, () =>
+      prisma.domainEventOutbox.findMany({ select: { eventId: true }, orderBy: { eventId: 'asc' } }),
+    );
+    expect(left.map((r) => r.eventId)).toEqual(['d-new', 'pending-old']);
+    expect(await asOrg(ORG_B, () => prisma.domainEventOutbox.count())).toBe(1);
   });
 });

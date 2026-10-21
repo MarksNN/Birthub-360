@@ -5555,13 +5555,15 @@ enum DomainEventOutboxStatus {
 /// REMED-05: outbox transacional (linha gravada na mesma transação da mudança de domínio).
 /// Índices PARCIAIS só existem na migration (Prisma não os representa; declará-los aqui geraria
 /// drift): UNIQUE (organizationId, idempotencyKey) WHERE idempotencyKey IS NOT NULL;
-/// (status, nextAttemptAt) WHERE status IN (PENDING, FAILED); (status, lockedUntil) WHERE
-/// status = PROCESSING. Claim do relay via UPDATE ... FOR UPDATE SKIP LOCKED (adaptador do 16).
+/// (organizationId, status, nextAttemptAt) WHERE status IN (PENDING, FAILED);
+/// (organizationId, status, lockedUntil) WHERE status = PROCESSING. CHECKs (retryCount,
+/// maxAttempts, lastError) e a função domain_event_outbox_purge() também só na migration.
+/// Relay: loop por organização, sem BYPASSRLS — docs/ADR/ADR-006-Outbox-Relay-Tenant-Loop-e-Retencao.md.
 model DomainEventOutbox {
   id             String                  @id @default(dbgenerated("gen_random_uuid()"))
   organizationId String
   organization   Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  eventId        String                  @unique
+  eventId        String
   eventType      String
   eventVersion   String                  @default("1.0.0")
   aggregateId    String
@@ -5581,7 +5583,11 @@ model DomainEventOutbox {
   createdAt      DateTime                @default(now()) @db.Timestamptz(3)
   dispatchedAt   DateTime?               @db.Timestamptz(3)
 
+  @@unique([organizationId, eventId])
   @@index([organizationId, createdAt])
+  /// Purge de retenção (DISPATCHED por dispatchedAt; DEAD_LETTER por createdAt).
+  @@index([organizationId, status, dispatchedAt])
+  @@index([organizationId, status, createdAt])
 }
 
 /// REMED-05: idempotência durável por consumidor (INSERT ... ON CONFLICT DO NOTHING).
@@ -5594,5 +5600,6 @@ model DomainEventConsumption {
   processedAt    DateTime     @default(now()) @db.Timestamptz(3)
 
   @@unique([organizationId, eventId, consumer])
-  @@index([processedAt])
+  /// Purge de retenção por tenant.
+  @@index([organizationId, processedAt])
 }
