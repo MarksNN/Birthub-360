@@ -1,4 +1,5 @@
 import type {
+  AppendOptions,
   ConsumptionStore,
   NewOutboxRecord,
   OutboxRecord,
@@ -10,25 +11,27 @@ import type {
 export class InMemoryOutboxRepository implements OutboxRepository {
   readonly records = new Map<string, OutboxRecord>();
 
-  async append(input: NewOutboxRecord) {
+  async append(input: NewOutboxRecord, opts: AppendOptions = {}) {
     if (input.idempotencyKey) {
       for (const r of this.records.values()) {
         if (
           r.organizationId === input.organizationId &&
           r.idempotencyKey === input.idempotencyKey
         ) {
-          return { record: r, created: false };
+          return { record: { ...r }, created: false };
         }
       }
     }
     const record: OutboxRecord = {
       ...input,
-      status: 'PENDING',
+      status: opts.claimFor ? 'PROCESSING' : 'PENDING',
       retryCount: 0,
       nextAttemptAt: input.createdAt,
+      lockedBy: opts.claimFor?.workerId,
+      lockedUntil: opts.claimFor?.leaseUntil.toISOString(),
     };
     this.records.set(record.id, record);
-    return { record, created: true };
+    return { record: { ...record }, created: true };
   }
 
   async claimBatch({
@@ -62,9 +65,15 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     return out;
   }
 
-  async markDispatched(id: string, workerId: string, at: Date) {
+  /** Só quem detém o lock pode finalizar (equivale a `WHERE id=$id AND lockedBy=$worker`). */
+  private owned(id: string, workerId: string) {
     const r = this.records.get(id);
-    if (!r || (r.lockedBy !== undefined && r.lockedBy !== workerId)) return;
+    return r && r.status === 'PROCESSING' && r.lockedBy === workerId ? r : undefined;
+  }
+
+  async markDispatched(id: string, workerId: string, at: Date) {
+    const r = this.owned(id, workerId);
+    if (!r) return;
     Object.assign(r, {
       status: 'DISPATCHED',
       dispatchedAt: at.toISOString(),
@@ -78,8 +87,8 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     workerId: string,
     u: { retryCount: number; nextAttemptAt: Date; lastError: string; deadLetter: boolean },
   ) {
-    const r = this.records.get(id);
-    if (!r || (r.lockedBy !== undefined && r.lockedBy !== workerId)) return;
+    const r = this.owned(id, workerId);
+    if (!r) return;
     Object.assign(r, {
       status: u.deadLetter ? 'DEAD_LETTER' : 'FAILED',
       retryCount: u.retryCount,
@@ -95,36 +104,116 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     return r ? { ...r } : null;
   }
 
+  async requeueDeadLetters({
+    organizationId,
+    ids,
+    now,
+  }: {
+    organizationId?: string;
+    ids?: string[];
+    now: Date;
+  }) {
+    let n = 0;
+    for (const r of this.records.values()) {
+      if (r.status !== 'DEAD_LETTER') continue;
+      if (organizationId && r.organizationId !== organizationId) continue;
+      if (ids && !ids.includes(r.id)) continue;
+      Object.assign(r, { status: 'PENDING', retryCount: 0, nextAttemptAt: now.toISOString() });
+      n++;
+    }
+    return n;
+  }
+
+  async purge({
+    olderThan,
+    statuses,
+  }: {
+    olderThan: Date;
+    statuses: Array<'DISPATCHED' | 'DEAD_LETTER'>;
+  }) {
+    let n = 0;
+    for (const [id, r] of this.records) {
+      if (!(statuses as string[]).includes(r.status)) continue;
+      const ref = r.dispatchedAt ?? r.createdAt;
+      if (new Date(ref) < olderThan) {
+        this.records.delete(id);
+        n++;
+      }
+    }
+    return n;
+  }
+
   clear() {
     this.records.clear();
   }
 }
 
+interface Reservation {
+  owner: string;
+  reservedUntil: number;
+  completedAt?: number;
+}
+
 export class InMemoryConsumptionStore implements ConsumptionStore {
-  private keys = new Set<string>();
-  async has(org: string, eventId: string, consumer: string) {
-    return this.keys.has(`${org}:${eventId}:${consumer}`);
+  private rows = new Map<string, Reservation>();
+  private key(o: string, e: string, c: string) {
+    return `${o}:${e}:${c}`;
   }
-  async record(org: string, eventId: string, consumer: string) {
-    this.keys.add(`${org}:${eventId}:${consumer}`);
+
+  async reserve(p: {
+    organizationId: string;
+    eventId: string;
+    consumer: string;
+    owner: string;
+    now: Date;
+    leaseMs: number;
+  }) {
+    const k = this.key(p.organizationId, p.eventId, p.consumer);
+    const row = this.rows.get(k);
+    if (row && (row.completedAt !== undefined || row.reservedUntil > p.now.getTime())) return false;
+    this.rows.set(k, { owner: p.owner, reservedUntil: p.now.getTime() + p.leaseMs });
+    return true;
   }
+
+  async complete(p: {
+    organizationId: string;
+    eventId: string;
+    consumer: string;
+    owner: string;
+    now: Date;
+  }) {
+    const row = this.rows.get(this.key(p.organizationId, p.eventId, p.consumer));
+    if (row && row.owner === p.owner) row.completedAt = p.now.getTime();
+  }
+
+  async release(p: { organizationId: string; eventId: string; consumer: string; owner: string }) {
+    const k = this.key(p.organizationId, p.eventId, p.consumer);
+    const row = this.rows.get(k);
+    if (row && row.owner === p.owner && row.completedAt === undefined) this.rows.delete(k);
+  }
+
+  async isCompleted(o: string, e: string, c: string) {
+    return this.rows.get(this.key(o, e, c))?.completedAt !== undefined;
+  }
+
   clear() {
-    this.keys.clear();
+    this.rows.clear();
   }
 }
 
 /**
  * Unidade de trabalho em memória com semântica de rollback: as escritas na outbox só são
- * aplicadas se `fn` concluir sem erro (espelha `prisma.$transaction`).
+ * aplicadas se `fn` concluir sem erro (espelha `prisma.$transaction`). Apenas dev/teste:
+ * aplica só os registros novos/alterados dentro da UoW, sem sobrescrever o restante.
  */
 export class InMemoryUnitOfWork implements OutboxUnitOfWork<null> {
   constructor(private readonly target: InMemoryOutboxRepository) {}
   async run<R>(fn: (ctx: { tx: null; outbox: OutboxRepository }) => Promise<R>): Promise<R> {
     const staged = new InMemoryOutboxRepository();
     for (const [k, v] of this.target.records) staged.records.set(k, { ...v });
+    const before = new Set(this.target.records.keys());
     const result = await fn({ tx: null, outbox: staged });
-    this.target.records.clear();
-    for (const [k, v] of staged.records) this.target.records.set(k, v);
+    for (const [k, v] of staged.records) if (!before.has(k)) this.target.records.set(k, v);
     return result;
   }
 }

@@ -42,14 +42,40 @@ Claim esperado (o 16 implementa no adaptador): `UPDATE ... SET status='PROCESSIN
 WHERE id IN (SELECT id ... WHERE (status IN ('PENDING','FAILED') AND nextAttemptAt<=now()) OR (status='PROCESSING' AND lockedUntil<=now())
 ORDER BY createdAt LIMIT $n FOR UPDATE SKIP LOCKED) RETURNING *`.
 
-## Tabela `DomainEventConsumption`
+## Tabela `DomainEventConsumption` (revisada após parecer 24 do PR #32 — reserva atômica)
 | coluna | tipo | nulo | default |
 |---|---|---|---|
 | id | text (uuid) PK | não | gen_random_uuid() |
 | organizationId | text FK → Organization(id) ON DELETE CASCADE | não | |
 | eventId | text | não | |
 | consumer | text | não | |
-| processedAt | timestamptz(3) | não | now() |
+| reservedBy | text | não | |
+| reservedUntil | timestamptz(3) | não | |
+| completedAt | timestamptz(3) | sim | |
+| createdAt | timestamptz(3) | não | now() |
 
-- `UNIQUE (organizationId, eventId, consumer)` — inserção com `ON CONFLICT DO NOTHING`
-- `INDEX (processedAt)` para retenção (sugestão: purga após 30 dias de DISPATCHED/consumo; política com 01A).
+- `UNIQUE (organizationId, eventId, consumer)`.
+- reserva: `INSERT ... ON CONFLICT (organizationId, eventId, consumer) DO UPDATE SET reservedBy=EXCLUDED.reservedBy,
+  reservedUntil=EXCLUDED.reservedUntil WHERE "DomainEventConsumption"."completedAt" IS NULL AND "DomainEventConsumption"."reservedUntil" < now() RETURNING id`
+  (sem linha retornada = já concluído ou reservado por outro).
+- `complete`: `UPDATE SET completedAt=now() WHERE (org,event,consumer) AND reservedBy=$owner`.
+- `release`: `DELETE WHERE (org,event,consumer) AND reservedBy=$owner AND completedAt IS NULL`.
+- `INDEX (completedAt)` para retenção.
+
+## Retenção / DLQ (adicionado)
+- `purge`: `DELETE FROM "DomainEventOutbox" WHERE status IN ('DISPATCHED','DEAD_LETTER') AND COALESCE(dispatchedAt, createdAt) < $olderThan`
+  → pede `INDEX (status, dispatchedAt)`. Prazo default 30 dias no código; prazo final a definir com o 01A (LGPD, envelope contém payload).
+- `requeueDeadLetters`: `UPDATE SET status='PENDING', retryCount=0, nextAttemptAt=now() WHERE status='DEAD_LETTER' [AND organizationId=$org] [AND id = ANY($ids)]`.
+- `lastError` já chega mascarado (e-mail/números) e truncado em 2000 chars.
+
+## Produtores atuais e migração para `publishInTransaction`
+Nenhum produtor atual usa `prisma.$transaction` hoje, então não há migração "óbvia" possível sem um
+`PrismaOutboxUnitOfWork` (que depende destas tabelas). Além disso, os arquivos pertencem a outros agentes.
+Candidatos (escrevem no banco e publicam em seguida — dual-write), por dono a confirmar:
+- `src/features/integrations/bitrix/bitrix.webhook.ts` (06/06A)
+- `src/features/integrations/whatsapp/whatsappMessage.service.ts` (06)
+- `src/features/knowledge/services/accountKnowledgeGraph.service.ts` (07)
+- `src/features/proposals/services/proposalAutomation.service.ts` (17/04)
+- `src/features/market-intelligence/server/marketSensing.service.ts` (07)
+- `src/lib/security/services/continuousSecurityAudit.service.ts` (15)
+Os demais 16 produtores não escrevem no banco no mesmo fluxo e podem continuar em `publish()` (inline com lock + relay).

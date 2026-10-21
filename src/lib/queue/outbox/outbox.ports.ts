@@ -44,9 +44,20 @@ export type NewOutboxRecord = Omit<
 >;
 
 /** Repositório da outbox. `append` deve rodar no cliente transacional do caso de uso. */
+export interface AppendOptions {
+  /**
+   * Grava já reivindicado (status PROCESSING, lockedBy/lockedUntil) — usado pelo publish inline
+   * para que um relay concorrente não entregue o mesmo registro durante a entrega inline.
+   */
+  claimFor?: { workerId: string; leaseUntil: Date };
+}
+
 export interface OutboxRepository {
   /** Insere; se já houver (organizationId, idempotencyKey), devolve o registro existente. */
-  append(record: NewOutboxRecord): Promise<{ record: OutboxRecord; created: boolean }>;
+  append(
+    record: NewOutboxRecord,
+    opts?: AppendOptions,
+  ): Promise<{ record: OutboxRecord; created: boolean }>;
   /** Reivindica até `limit` registros elegíveis (PENDING/FAILED com nextAttemptAt <= now ou lock expirado). */
   claimBatch(params: {
     workerId: string;
@@ -61,14 +72,60 @@ export interface OutboxRepository {
     update: { retryCount: number; nextAttemptAt: Date; lastError: string; deadLetter: boolean },
   ): Promise<void>;
   findById(id: string): Promise<OutboxRecord | null>;
+  /** Devolve registros DEAD_LETTER para PENDING (retryCount=0). Retorna quantos foram reenfileirados. */
+  requeueDeadLetters(filter: {
+    organizationId?: string;
+    ids?: string[];
+    now: Date;
+  }): Promise<number>;
+  /**
+   * Retenção/LGPD: remove registros DISPATCHED/DEAD_LETTER anteriores a `olderThan`.
+   * Retorna quantos foram removidos.
+   */
+  purge(params: {
+    olderThan: Date;
+    statuses: Array<'DISPATCHED' | 'DEAD_LETTER'>;
+  }): Promise<number>;
 }
 
-/** Registro durável de consumo: garante exactly-once efetivo por (org, evento, consumidor). */
+/**
+ * Registro durável de consumo por (org, evento, consumidor), com reserva atômica.
+ *
+ * Semântica Prisma esperada:
+ * - `reserve`: `INSERT ... ON CONFLICT (organizationId, eventId, consumer) DO UPDATE SET reservedBy=$owner,
+ *   reservedUntil=$until WHERE completedAt IS NULL AND reservedUntil < now()` → true se inseriu/assumiu;
+ *   false se já concluído ou reservado por outro dentro do lease (equivale a ON CONFLICT DO NOTHING).
+ * - `complete`: `UPDATE SET completedAt=now() WHERE ... AND reservedBy=$owner`.
+ * - `release`: `DELETE WHERE ... AND reservedBy=$owner AND completedAt IS NULL`.
+ *
+ * Garantia: no máximo um handler em execução por (org, evento, consumidor) a cada lease; após
+ * `complete`, nunca reexecuta. Se o processo morrer entre o efeito do handler e `complete`, o lease
+ * expira e o handler roda de novo → para esse caso extremo a entrega é at-least-once, e handlers com
+ * efeito externo devem ser idempotentes (ou gravar o efeito e o `complete` na mesma transação).
+ */
 export interface ConsumptionStore {
-  /** Retorna true se já consumido com sucesso. */
-  has(organizationId: string, eventId: string, consumer: string): Promise<boolean>;
-  /** Registra consumo; deve ser idempotente (unique). */
-  record(organizationId: string, eventId: string, consumer: string, at: Date): Promise<void>;
+  reserve(p: {
+    organizationId: string;
+    eventId: string;
+    consumer: string;
+    owner: string;
+    now: Date;
+    leaseMs: number;
+  }): Promise<boolean>;
+  complete(p: {
+    organizationId: string;
+    eventId: string;
+    consumer: string;
+    owner: string;
+    now: Date;
+  }): Promise<void>;
+  release(p: {
+    organizationId: string;
+    eventId: string;
+    consumer: string;
+    owner: string;
+  }): Promise<void>;
+  isCompleted(organizationId: string, eventId: string, consumer: string): Promise<boolean>;
 }
 
 /** Abstração de transação: o caso de uso escreve seus dados e a outbox no mesmo `tx`. */

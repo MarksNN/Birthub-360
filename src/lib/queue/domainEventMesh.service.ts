@@ -7,6 +7,7 @@ import type {
 import { logger } from '../logger.js';
 import { type BackoffPolicy, computeBackoffMs, DEFAULT_BACKOFF } from './outbox/backoff.js';
 import { InMemoryConsumptionStore, InMemoryOutboxRepository } from './outbox/inMemory.js';
+import { sanitizeError } from './outbox/metrics.js';
 import type {
   ConsumptionStore,
   OutboxRecord,
@@ -38,7 +39,8 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
   private consumptions: ConsumptionStore;
   private backoff: BackoffPolicy;
   private static MAX_CAUSATION_DEPTH = 5;
-  private static INLINE_WORKER = 'inline';
+  private static INLINE_LEASE_MS = 30_000;
+  private static CONSUMER_LEASE_MS = 60_000;
 
   constructor(deps: DomainEventMeshDeps = {}) {
     this.outbox = deps.outbox ?? new InMemoryOutboxRepository();
@@ -87,18 +89,22 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
     repo: OutboxRepository,
     envelope: DomainEventEnvelope<T>,
     opts: PublishOptions,
+    claimFor?: { workerId: string; leaseUntil: Date },
   ) {
-    return repo.append({
-      id: `outbox-${randomUUID()}`,
-      eventId: envelope.eventId,
-      eventType: envelope.eventType,
-      organizationId: envelope.organizationId,
-      idempotencyKey: opts.idempotencyKey,
-      envelope: envelope as unknown as DomainEventEnvelope,
-      payload: envelope.payload as Record<string, unknown>,
-      maxAttempts: opts.maxAttempts ?? this.backoff.maxAttempts,
-      createdAt: envelope.occurredAt,
-    });
+    return repo.append(
+      {
+        id: `outbox-${randomUUID()}`,
+        eventId: envelope.eventId,
+        eventType: envelope.eventType,
+        organizationId: envelope.organizationId,
+        idempotencyKey: opts.idempotencyKey,
+        envelope: envelope as unknown as DomainEventEnvelope,
+        payload: envelope.payload as Record<string, unknown>,
+        maxAttempts: opts.maxAttempts ?? this.backoff.maxAttempts,
+        createdAt: envelope.occurredAt,
+      },
+      claimFor ? { claimFor } : undefined,
+    );
   }
 
   /**
@@ -137,7 +143,12 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
     opts: PublishOptions = {},
   ): Promise<DomainEventEnvelope<T>> {
     const envelope = this.buildEnvelope(eventInput);
-    const { record, created } = await this.appendTo(this.outbox, envelope, opts);
+    // Grava já reivindicado: um relay concorrente não pega o registro durante a entrega inline.
+    const inlineWorker = `inline-${randomUUID()}`;
+    const { record, created } = await this.appendTo(this.outbox, envelope, opts, {
+      workerId: inlineWorker,
+      leaseUntil: new Date(Date.now() + DomainEventMeshService.INLINE_LEASE_MS),
+    });
     if (!created) return record.envelope as unknown as DomainEventEnvelope<T>;
 
     logger.info(
@@ -152,13 +163,13 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
 
     try {
       await this.deliver(record.envelope);
-      await this.outbox.markDispatched(record.id, DomainEventMeshService.INLINE_WORKER, new Date());
+      await this.outbox.markDispatched(record.id, inlineWorker, new Date());
     } catch (err) {
       const retryCount = 1;
-      await this.outbox.markFailed(record.id, DomainEventMeshService.INLINE_WORKER, {
+      await this.outbox.markFailed(record.id, inlineWorker, {
         retryCount,
         nextAttemptAt: new Date(Date.now() + computeBackoffMs(retryCount, this.backoff)),
-        lastError: (err instanceof Error ? err.message : String(err)).slice(0, 2000),
+        lastError: sanitizeError(err),
         deadLetter: retryCount >= record.maxAttempts,
       });
       throw err;
@@ -174,15 +185,31 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
   }
 
   /**
-   * Entrega a todos os consumidores com idempotência durável por (org, eventId, consumer):
-   * em reentrega, consumidores que já concluíram são pulados.
+   * Entrega a todos os consumidores com reserva atômica por (org, eventId, consumer):
+   * reserva (insert-if-absent) → handler → complete; em falha, libera a reserva para retry.
+   * Consumidores já concluídos ou reservados por outra instância são pulados.
+   * Ver garantias e o caso at-least-once residual em `ConsumptionStore` (outbox.ports.ts).
    */
   async deliver(event: DomainEventEnvelope): Promise<void> {
+    const owner = `deliver-${randomUUID()}`;
+    const key = { organizationId: event.organizationId, eventId: event.eventId };
     for (const { consumer, handler } of this.handlers.get(event.eventType) || []) {
-      if (await this.consumptions.has(event.organizationId, event.eventId, consumer)) continue;
+      const reserved = await this.consumptions.reserve({
+        ...key,
+        consumer,
+        owner,
+        now: new Date(),
+        leaseMs: DomainEventMeshService.CONSUMER_LEASE_MS,
+      });
+      if (!reserved) {
+        if (await this.consumptions.isCompleted(event.organizationId, event.eventId, consumer))
+          continue;
+        throw new Error(`DomainEventMesh: consumidor ${consumer} em execução por outra instância`);
+      }
       try {
         await handler(event);
       } catch (err) {
+        await this.consumptions.release({ ...key, consumer, owner });
         logger.error(
           {
             err,
@@ -195,7 +222,7 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
         );
         throw err;
       }
-      await this.consumptions.record(event.organizationId, event.eventId, consumer, new Date());
+      await this.consumptions.complete({ ...key, consumer, owner, now: new Date() });
     }
   }
 

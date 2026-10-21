@@ -2,6 +2,12 @@ import { randomUUID } from 'node:crypto';
 import type { DomainEventEnvelope } from '../../../shared/contracts/domainEventMesh.contract.js';
 import { logger } from '../../logger.js';
 import { type BackoffPolicy, computeBackoffMs, DEFAULT_BACKOFF } from './backoff.js';
+import {
+  outboxDeadLetterTotal,
+  outboxPurgedTotal,
+  outboxRequeuedTotal,
+  sanitizeError,
+} from './metrics.js';
 import type { OutboxRecord, OutboxRepository } from './outbox.ports.js';
 
 export type OutboxDispatcher = (
@@ -47,13 +53,14 @@ export class OutboxRelay {
       const maxAttempts = record.maxAttempts || policy.maxAttempts;
       const deadLetter = retryCount >= maxAttempts;
       const delay = computeBackoffMs(retryCount, policy, this.opts.random);
-      const lastError = (err instanceof Error ? err.message : String(err)).slice(0, 2000);
+      const lastError = sanitizeError(err);
       await this.opts.repository.markFailed(record.id, this.workerId, {
         retryCount,
         nextAttemptAt: new Date(now.getTime() + delay),
         lastError,
         deadLetter,
       });
+      if (deadLetter) outboxDeadLetterTotal.inc({ organization: record.organizationId });
       logger[deadLetter ? 'error' : 'warn'](
         {
           outboxId: record.id,
@@ -82,6 +89,36 @@ export class OutboxRelay {
     });
     for (const record of batch) await this.processRecord(record, now);
     return batch.length;
+  }
+
+  /** Reprocessamento da DLQ (operação administrativa). */
+  async requeueDeadLetters(
+    filter: { organizationId?: string; ids?: string[] } = {},
+  ): Promise<number> {
+    const n = await this.opts.repository.requeueDeadLetters({
+      ...filter,
+      now: (this.opts.now ?? (() => new Date()))(),
+    });
+    if (n > 0) outboxRequeuedTotal.inc({ organization: filter.organizationId ?? 'all' }, n);
+    logger.info({ ...filter, requeued: n }, 'OutboxRelay: DLQ reenfileirada');
+    return n;
+  }
+
+  /**
+   * Retenção/LGPD: remove envelopes (com payload) já entregues ou em DLQ há mais de `retentionDays`.
+   * O prazo final deve ser definido com o 01A; default 30 dias.
+   */
+  async purgeExpired(
+    retentionDays = 30,
+    statuses: Array<'DISPATCHED' | 'DEAD_LETTER'> = ['DISPATCHED', 'DEAD_LETTER'],
+  ): Promise<number> {
+    const now = (this.opts.now ?? (() => new Date()))();
+    const n = await this.opts.repository.purge({
+      olderThan: new Date(now.getTime() - retentionDays * 86_400_000),
+      statuses,
+    });
+    if (n > 0) outboxPurgedTotal.inc({ organization: 'all' }, n);
+    return n;
   }
 
   start(intervalMs = 1_000): void {
