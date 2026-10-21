@@ -1024,22 +1024,25 @@ model Organization {
   /// acumulado do mês corrente (Redis, ver providerBudget.ts) por assertProspectingBudgetNotExceeded.
   monthlyProspectingBudgetUsd Float?
 
-  workflows              Workflow[]
-  callLogs               CallLog[]
-  metrics                Metric[]
-  agentSessions          AgentSession[]
-  agents                 Agent[]
-  settings               Setting[]
-  aiConsent              OrganizationAiConsent?
-  birthhub360CallResults Birthub360CallResult[]
-  wallet                 Wallet?
-  transactions           Transaction[]
-  apiKeys                APIKey[]
-  webhookEndpoints       OrganizationWebhookEndpoint[]
-  campaigns              Campaign[]
-  dncLists               DncList[]
-  customAiTools          CustomAiTool[]
-  leadTouchpoints        LeadTouchpoint[]
+  workflows               Workflow[]
+  callLogs                CallLog[]
+  metrics                 Metric[]
+  agentSessions           AgentSession[]
+  agents                  Agent[]
+  settings                Setting[]
+  aiConsent               OrganizationAiConsent?
+  birthhub360CallResults  Birthub360CallResult[]
+  wallet                  Wallet?
+  transactions            Transaction[]
+  apiKeys                 APIKey[]
+  webhookEndpoints        OrganizationWebhookEndpoint[]
+  campaigns               Campaign[]
+  dncLists                DncList[]
+  customAiTools           CustomAiTool[]
+  leadTouchpoints         LeadTouchpoint[]
+  consentAuditRecords     ConsentAuditRecord[]
+  flywheelApproachRecords FlywheelApproachRecord[]
+  flywheelFewShotExamples FlywheelFewShotExample[]
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -5538,4 +5541,72 @@ model LeadTouchpoint {
   @@index([leadId])
   @@index([campaign])
   @@index([occurredAt])
+}
+
+// REMED-06 (handoff 21→01, PR #33): cadeia de consentimento append-only + Flywheel durável.
+enum ConsentAuditStatus {
+  GRANTED
+  REVOKED
+  EXPIRED
+}
+
+enum ConsentChainEventKind {
+  GENESIS
+  CONSENT
+  REVOCATION
+  RETRACTION
+}
+
+model ConsentAuditRecord {
+  id             String                @id
+  organizationId String
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  sequence       Int
+  kind           ConsentChainEventKind
+  subjectRef     String
+  purpose        String
+  termsVersion   String
+  status         ConsentAuditStatus
+  previousHash   String                @db.Char(64)
+  currentHash    String                @db.Char(64)
+  occurredAt     DateTime              @db.Timestamptz(3)
+  operatorUserId String?
+  retentionUntil DateTime?             @db.Timestamptz(3)
+  createdAt      DateTime              @default(now())
+
+  @@unique([organizationId, sequence])
+  @@unique([currentHash])
+  @@index([organizationId, subjectRef])
+}
+
+model FlywheelApproachRecord {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leadId         String
+  channel        String
+  segment        String
+  approachText   String       @db.Text
+  sentAt         DateTime     @db.Timestamptz(3)
+
+  @@index([organizationId, leadId])
+}
+
+model FlywheelFewShotExample {
+  id                  String       @id
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leadId              String
+  dealId              String?
+  channel             String
+  segment             String
+  approachText        String       @db.Text
+  outcomeStatus       String
+  attributionEvidence Json
+  confidence          Float
+  isActive            Boolean      @default(true)
+  promotedAt          DateTime     @db.Timestamptz(3)
+
+  @@index([organizationId, leadId])
+  @@index([organizationId, channel, isActive])
 }
