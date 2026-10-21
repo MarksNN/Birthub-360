@@ -1,0 +1,1765 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2026-10-21T15:19:31.794Z",
+  "governance": "AGENTS.md (Revisão 2026-10-09)",
+  "repository": "MarksNN/Birthub-360",
+  "baseBranch": "main",
+  "statistics": {
+    "total": 100,
+    "p0": 40,
+    "p1": 38,
+    "p2": 22,
+    "waves": 9
+  },
+  "steps": [
+    {
+      "id": 1,
+      "wave": 0,
+      "title": "Auditar e reconciliar branch do PR #18 (Persistência Grafo e Win-Loss) sem force-push",
+      "agent": "00 — Coordenador",
+      "agentNum": "00",
+      "agentSlug": "00-coordenador",
+      "priority": "P0",
+      "status": "PR ABERTO (#18) — CONFLITO RESOLVÍVEL",
+      "githubPr": 18,
+      "commitSha": "8dff1dde",
+      "verified": false,
+      "filesOwned": [
+        ".agents/runs/00-reconciliacao-pr18.md"
+      ],
+      "criteria": "Branch integracao/onda-0 compilando com os modelos AccountKnowledgeNode e WinLossAutopsyRecord preservados e zero force-pushes."
+    },
+    {
+      "id": 2,
+      "wave": 0,
+      "title": "Integrar PR #28 (Zerar drift schema x migrations DATA-007) sobre integracao/onda-0",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PR ABERTO (#28) — AGUARDANDO ENCADEMENTO",
+      "githubPr": 28,
+      "commitSha": "c18a992",
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/20261020200000_fix_schema_migration_drift/migration.sql"
+      ],
+      "criteria": "npm run verify:migration-drift com exit code 0 comprovando zero drift entre schema.prisma e histórico PostgreSQL."
+    },
+    {
+      "id": 3,
+      "wave": 0,
+      "title": "Integrar PR #34 (Modelos canônicos DomainEventOutbox e DomainEventConsumption)",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PR ABERTO (#34) — EM REVISÃO",
+      "githubPr": 34,
+      "commitSha": "e441bc2",
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/*_outbox_schema/migration.sql"
+      ],
+      "criteria": "npx prisma validate retorna verde e teste outboxSchema.test.ts valida a criação e constraints das tabelas de outbox."
+    },
+    {
+      "id": 4,
+      "wave": 0,
+      "title": "Integrar PR #35 (Tabela ConsentAuditRecord append-only e schema de expurgo)",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PR ABERTO (#35) — EM REVISÃO",
+      "githubPr": 35,
+      "commitSha": "f7192aa",
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/*_consent_audit_schema/migration.sql"
+      ],
+      "criteria": "Tentativa de UPDATE na tabela ConsentAuditRecord bloqueada por trigger e npx prisma validate verde."
+    },
+    {
+      "id": 5,
+      "wave": 0,
+      "title": "Emitir diretriz formal LGPD sobre campo note no RebalanceApproval (PR #37)",
+      "agent": "21 — Privacidade e LGPD",
+      "agentNum": "21",
+      "agentSlug": "21-privacidade-lgpd",
+      "priority": "P0",
+      "status": "PARECER ARQUITETURAL PENDENTE",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/lgpd/DECISAO-REBALANCE-APPROVAL-NOTE.md"
+      ],
+      "criteria": "Documento DECISAO-REBALANCE-APPROVAL-NOTE.md publicado com status APROVADO e assinado digitalmente pelo Agente 21."
+    },
+    {
+      "id": 6,
+      "wave": 0,
+      "title": "Integrar PR #37 (RebalanceApproval) com RLS dinâmico e zero tabelas desprotegidas",
+      "agent": "01A — Confiabilidade de Dados, RLS e Retenção",
+      "agentNum": "01A",
+      "agentSlug": "01A-dados-rls-retencao",
+      "priority": "P0",
+      "status": "PR ABERTO (#37) — REQUISITA DESBLOQUEIO",
+      "githubPr": 37,
+      "commitSha": "8a12e34",
+      "verified": false,
+      "filesOwned": [
+        "tests/integration/rls-coverage.test.ts",
+        "prisma/migrations/*_rebalance_approval/migration.sql"
+      ],
+      "criteria": "npm run test:integration -- tests/integration/rls-coverage.test.ts passa 100% verde comprovando zero tabelas sem proteção RLS."
+    },
+    {
+      "id": 7,
+      "wave": 0,
+      "title": "Integrar PR #39 (Separação prospector_migrator DDL vs prospector_app DML NOBYPASSRLS)",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P0",
+      "status": "PR ABERTO (#39) — EM REVISÃO",
+      "githubPr": 39,
+      "commitSha": "b33910c",
+      "verified": false,
+      "filesOwned": [
+        "scripts/db/create-app-role.sql",
+        "docs/development/LOCAL_FIRST.md"
+      ],
+      "criteria": "Execução do script create-app-role.sql em container de teste com sucesso e validação de NOBYPASSRLS ativo."
+    },
+    {
+      "id": 8,
+      "wave": 0,
+      "title": "Integrar PR #40 (runInTransaction e propagação durável de current_tenant_id)",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PR ABERTO (#40) — EM REVISÃO",
+      "githubPr": 40,
+      "commitSha": "d9910f1",
+      "verified": false,
+      "filesOwned": [
+        "src/lib/prisma.ts",
+        "src/lib/db/transactionContext.ts"
+      ],
+      "criteria": "npm run test:unit -- tests/unit/security/prismaTxPropagation.test.ts executado com 100% de sucesso."
+    },
+    {
+      "id": 9,
+      "wave": 0,
+      "title": "Integrar PR #41 (Verificação fatal fail-fast de papel de banco no boot de server.ts)",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P0",
+      "status": "PR ABERTO (#41) — EM REVISÃO",
+      "githubPr": 41,
+      "commitSha": "a4421b8",
+      "verified": false,
+      "filesOwned": [
+        "src/lib/db/bootRoleCheck.ts"
+      ],
+      "criteria": "Simulação de boot com usuário com BYPASSRLS lança erro fatal com código de saída 1 e teste automatizado aprovado."
+    },
+    {
+      "id": 10,
+      "wave": 0,
+      "title": "Parecer formal consolidado do Agente 24 sobre a Onda 0 liberando merge na main",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "GATE DA ONDA 0",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-00-reconciliacao-prs.md"
+      ],
+      "criteria": "Parecer formal publicado contendo o commit SHA exato, lista de evidências de testes executados e status PARECER: APROVADO."
+    },
+    {
+      "id": 11,
+      "wave": 1,
+      "title": "Consolidar árvore de migrações Prisma em histórico sequencial imutável",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/**"
+      ],
+      "criteria": "npx prisma migrate deploy executa do zero em container limpo com código 0."
+    },
+    {
+      "id": 12,
+      "wave": 1,
+      "title": "Auditoria dinâmica de RLS: comprovar 100% de tabelas públicas com FORCE RLS",
+      "agent": "01A — Confiabilidade de Dados, RLS e Retenção",
+      "agentNum": "01A",
+      "agentSlug": "01A-dados-rls-retencao",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/integration/rls-coverage.test.ts"
+      ],
+      "criteria": "Suíte tests/integration/rls-coverage.test.ts aprovada comprovando zero tabelas vulneráveis."
+    },
+    {
+      "id": 13,
+      "wave": 1,
+      "title": "Criar índices B-Tree compostos para otimização de consultas multi-tenant (tenant_id + status)",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/*_multitenant_indexes/migration.sql"
+      ],
+      "criteria": "Índices gerados e EXPLAIN ANALYZE demonstrando Index Scan em buscas por tenantId e status."
+    },
+    {
+      "id": 14,
+      "wave": 1,
+      "title": "Adicionar constraints de integridade referencial ON DELETE RESTRICT em entidades financeiras",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/*_referential_integrity/migration.sql"
+      ],
+      "criteria": "Teste referentialIntegrity.test.ts confirma bloqueio estrito de deleção acidental."
+    },
+    {
+      "id": 15,
+      "wave": 1,
+      "title": "Implementar trigger de expurgo de dados para conformidade com retenção LGPD",
+      "agent": "01A — Confiabilidade de Dados, RLS e Retenção",
+      "agentNum": "01A",
+      "agentSlug": "01A-dados-rls-retencao",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "prisma/migrations/*_retention_triggers/migration.sql",
+        "scripts/db/purge-expired-data.sql"
+      ],
+      "criteria": "Procedimento purge-expired-data.sql testado com remoção confirmada e zero deleções indevidas."
+    },
+    {
+      "id": 16,
+      "wave": 1,
+      "title": "Adicionar trilha de auditoria append-only para mutações em organizações e planos",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "prisma/schema.prisma",
+        "prisma/migrations/*_organization_audit/migration.sql"
+      ],
+      "criteria": "npx prisma validate verde e teste de auditoria confirmando geração automática do log."
+    },
+    {
+      "id": 17,
+      "wave": 1,
+      "title": "Validar isolamento estrito de dados entre tenants concorrentes via testes adversariais",
+      "agent": "01A — Confiabilidade de Dados, RLS e Retenção",
+      "agentNum": "01A",
+      "agentSlug": "01A-dados-rls-retencao",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/security/crossTenantIsolation.test.ts"
+      ],
+      "criteria": "npm run test:integration -- tests/security/crossTenantIsolation.test.ts passa com zero vazamentos."
+    },
+    {
+      "id": 18,
+      "wave": 1,
+      "title": "Gerar Prisma Client tipado e validar schemas com verificação estrita de nillability",
+      "agent": "01 — Plataforma, Segurança e Dados",
+      "agentNum": "01",
+      "agentSlug": "01-plataforma-dados",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/prisma.ts",
+        "prisma/schema.prisma"
+      ],
+      "criteria": "npx tsc --noEmit com código de saída 0."
+    },
+    {
+      "id": 19,
+      "wave": 1,
+      "title": "Suíte de testes automatizados de regressão de banco de dados e migrações limpas",
+      "agent": "14 — Ambiente de Execução e Test Harness",
+      "agentNum": "14",
+      "agentSlug": "14-ambiente-execucao-harness",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/integration/databaseMigrationRegression.test.ts"
+      ],
+      "criteria": "databaseMigrationRegression.test.ts passa 100% verde em menos de 30 segundos."
+    },
+    {
+      "id": 20,
+      "wave": 1,
+      "title": "Parecer formal independente do Agente 24 aprovando a Onda 1 de Dados",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-01-dados-unificados.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 21,
+      "wave": 2,
+      "title": "Rebasear e integrar PR #32 (Outbox Relay com backoff exponencial e dead-letter)",
+      "agent": "16 — Runtime, Workers e Escala",
+      "agentNum": "16",
+      "agentSlug": "16-runtime-workers-escala",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/queue/outboxRelay.worker.ts",
+        "src/lib/queue/outboxDispatcher.service.ts"
+      ],
+      "criteria": "Testes de outboxRelay aprovados com simulação de 50 eventos concorrentes e zero duplicidades."
+    },
+    {
+      "id": 22,
+      "wave": 2,
+      "title": "Integrar PR #38 (Canal global de auditoria de segurança isolado de outbox de tenant)",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/security/globalSecurityAuditChannel.ts"
+      ],
+      "criteria": "globalSecurityAuditChannel.test.ts passa 100% verde com redação comprovada de tokens."
+    },
+    {
+      "id": 23,
+      "wave": 2,
+      "title": "Implementar barramento de idempotência durável sobre DomainEventConsumption",
+      "agent": "16 — Runtime, Workers e Escala",
+      "agentNum": "16",
+      "agentSlug": "16-runtime-workers-escala",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/queue/idempotencyManager.ts"
+      ],
+      "criteria": "Teste de concorrência confirma que 10 requisições com a mesma chave executam a ação exatamente uma vez."
+    },
+    {
+      "id": 24,
+      "wave": 2,
+      "title": "Rebasear e integrar PR #33 (Cadeia de consentimento LGPD e filtro k-anonymity k=5)",
+      "agent": "21 — Privacidade e LGPD",
+      "agentNum": "21",
+      "agentSlug": "21-privacidade-lgpd",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/shared/services/consentAuditChain.service.ts"
+      ],
+      "criteria": "consentAuditChain.test.ts aprova verificação da cadeia criptográfica e bloqueio de k < 5."
+    },
+    {
+      "id": 25,
+      "wave": 2,
+      "title": "Implementar sanitização e restrição de permissão de ferramentas no Gateway IA",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/ai/gateway/untrustedContentGuard.ts",
+        "src/lib/ai/gateway/toolPermissionPolicy.ts"
+      ],
+      "criteria": "Testes adversariais de injeção comprovam que tentativas de invocar tools não permitidas são bloqueadas."
+    },
+    {
+      "id": 26,
+      "wave": 2,
+      "title": "Configurar cabeçalhos de segurança HTTP (CSP, HSTS, X-Frame-Options) no server.ts",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/middleware/securityHeaders.ts"
+      ],
+      "criteria": "securityHeaders.test.ts confirma presença de CSP, HSTS max-age=31536000 e X-Frame-Options DENY."
+    },
+    {
+      "id": 27,
+      "wave": 2,
+      "title": "Configurar PgBouncer e calibrar pool de conexões para concorrência de 100 clientes",
+      "agent": "16 — Runtime, Workers e Escala",
+      "agentNum": "16",
+      "agentSlug": "16-runtime-workers-escala",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docker/pgbouncer/pgbouncer.ini",
+        "src/lib/prisma.ts"
+      ],
+      "criteria": "pgBouncerConfig.test.ts aprova a integridade das diretivas de pooling e descarte de sessão."
+    },
+    {
+      "id": 28,
+      "wave": 2,
+      "title": "Suíte de testes de penetração simulando bypass de RLS e tentativa de injeção de tenant",
+      "agent": "14 — Ambiente de Execução e Test Harness",
+      "agentNum": "14",
+      "agentSlug": "14-ambiente-execucao-harness",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/security/rlsPenetration.test.ts"
+      ],
+      "criteria": "rlsPenetration.test.ts passa 100% verde com todos os 20 vetores de ataque bloqueados."
+    },
+    {
+      "id": 29,
+      "wave": 2,
+      "title": "Rotação de segredos e integração com cofre seguro (AWS Secrets Manager / Docker Secrets)",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "scripts/security/rotate-secrets.sh",
+        "docs/security/ROTACAO_SEGREDOS.md"
+      ],
+      "criteria": "Script rotate-secrets.sh --dry-run retorna código 0 com validação de formato de segredos."
+    },
+    {
+      "id": 30,
+      "wave": 2,
+      "title": "Parecer formal independente do Agente 24 aprovando a Onda 2 de Segurança",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-02-transacoes-seguranca.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 31,
+      "wave": 3,
+      "title": "Conectar accountKnowledgeGraph.service.ts ao repositório Prisma real (PR #18)",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/knowledge/services/accountKnowledgeGraph.service.ts",
+        "src/features/knowledge/infra/accountGraphRepository.ts"
+      ],
+      "criteria": "accountKnowledgeGraph.service.test.ts passa 100% verde persistindo nós no PostgreSQL."
+    },
+    {
+      "id": 32,
+      "wave": 3,
+      "title": "Conectar winLossAutopsy.service.ts ao repositório Prisma real com RLS (PR #18)",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/intelligence/services/winLossAutopsy.service.ts",
+        "src/features/intelligence/infra/winLossAutopsyRepository.ts"
+      ],
+      "criteria": "winLossAutopsy.service.test.ts aprovado com persistência real em banco relacional."
+    },
+    {
+      "id": 33,
+      "wave": 3,
+      "title": "Implementar PrismaBehavioralEngineRepository para gamificação comercial",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/gamification/behavioralEngine.service.ts",
+        "src/features/gamification/infra/PrismaBehavioralEngineRepository.ts"
+      ],
+      "criteria": "behavioralEngine.service.test.ts aprova pontuação e recuperação persistida em banco."
+    },
+    {
+      "id": 34,
+      "wave": 3,
+      "title": "Garantir idempotência na atribuição de pontos de gamificação por deal ganho",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/gamification/services/gamificationAward.service.ts"
+      ],
+      "criteria": "gamificationAward.test.ts confirma que reenvios idênticos não duplicam pontos do vendedor."
+    },
+    {
+      "id": 35,
+      "wave": 3,
+      "title": "Criar PrismaSelfDrivingCrmRepository para cadências multicanal persistentes",
+      "agent": "17 — Cadência Multicanal e Ciclo de Receita",
+      "agentNum": "17",
+      "agentSlug": "17-cadencia-ciclo-receita",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/cadence/selfDrivingCrm.service.ts",
+        "src/features/cadence/infra/PrismaSelfDrivingCrmRepository.ts"
+      ],
+      "criteria": "selfDrivingCrm.service.test.ts passa 100% verde com persistência comprovada de etapas."
+    },
+    {
+      "id": 36,
+      "wave": 3,
+      "title": "Conectar PrismaRebalanceApprovalStore ao rebalanceApproval.service.ts (PR #37)",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/services/rebalanceApproval.service.ts",
+        "src/features/commercial-intelligence/infra/PrismaRebalanceApprovalStore.ts"
+      ],
+      "criteria": "rebalanceApproval.routes.test.ts confirma persistência e transição de status (PENDING -> APPROVED)."
+    },
+    {
+      "id": 37,
+      "wave": 3,
+      "title": "Persistir rascunhos de abordagem do Social Selling com expiração e tenant isolado",
+      "agent": "05 — Prospecção",
+      "agentNum": "05",
+      "agentSlug": "05-prospeccao",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/social-selling/services/socialSellingApproach.service.ts",
+        "src/features/social-selling/infra/PrismaSocialSellingRepository.ts"
+      ],
+      "criteria": "socialSelling.service.test.ts passa 100% verde com persistência no banco."
+    },
+    {
+      "id": 38,
+      "wave": 3,
+      "title": "Persistir sessões de Roleplay comercial com transcrição sanitizada e notas",
+      "agent": "07 — IA e Automações",
+      "agentNum": "07",
+      "agentSlug": "07-ia-automacoes",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/roleplay/services/roleplaySession.service.ts",
+        "src/features/roleplay/infra/PrismaRoleplayRepository.ts"
+      ],
+      "criteria": "multimodalRoleplaySimulator.service.test.ts confirma gravação durável da sessão com feedback."
+    },
+    {
+      "id": 39,
+      "wave": 3,
+      "title": "Persistir telemetria de chamadas de voz com redação de dados sensíveis (PII)",
+      "agent": "12 — Voz e Telefonia",
+      "agentNum": "12",
+      "agentSlug": "12-voz-telefonia",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/voice-hub/services/callRecord.service.ts",
+        "src/features/voice-hub/infra/PrismaCallRecordRepository.ts"
+      ],
+      "criteria": "conversationalIntelligence.service.test.ts aprova gravação de métricas com redação comprovada."
+    },
+    {
+      "id": 40,
+      "wave": 3,
+      "title": "Implementar fila de sincronização offline no aplicativo Mobile Capacitor (SQLite)",
+      "agent": "09 — Mobile",
+      "agentNum": "09",
+      "agentSlug": "09-mobile",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/mobile/services/offlineSyncQueue.service.ts"
+      ],
+      "criteria": "mobileEdgeAi.service.test.ts passa 100% verde validando fila offline e replay."
+    },
+    {
+      "id": 41,
+      "wave": 3,
+      "title": "Executar Reboot Test comprovando persistência de dados após reinício forçado do Node",
+      "agent": "22 — Verificação de Realidade",
+      "agentNum": "22",
+      "agentSlug": "22-verificacao-realidade",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/integration/persistenceReboot.integration.test.ts"
+      ],
+      "criteria": "persistenceReboot.integration.test.ts passa 100% verde com confirmação matemática de 100/100 registros recuperados."
+    },
+    {
+      "id": 42,
+      "wave": 3,
+      "title": "Parecer formal independente do Agente 24 sobre a eliminação de estados voláteis (Onda 3)",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-03-persistencia-real.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 43,
+      "wave": 4,
+      "title": "Ratificar integração do PR #15 (Revenue Oracle baseado em pipeline real)",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": 15,
+      "commitSha": "0753f6685",
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/services/predictiveRevenueOracle.service.ts"
+      ],
+      "criteria": "predictiveRevenueOracle.service.test.ts passa 100% verde sem dependência de fixtures mockadas."
+    },
+    {
+      "id": 44,
+      "wave": 4,
+      "title": "Ratificar contrato IPredictiveRevenueOraclePort V2 e rotas no OpenAPI (PRs #17, #19)",
+      "agent": "18 — Contratos, API e Documentação Viva",
+      "agentNum": "18",
+      "agentSlug": "18-contratos-api-docs",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": 19,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/openapi.yaml",
+        "src/shared/contracts/predictiveRevenueOraclePorts.contract.ts"
+      ],
+      "criteria": "npm run verify:openapi-drift passa com 0 drift e especificação OpenAPI 3.1 válida."
+    },
+    {
+      "id": 45,
+      "wave": 4,
+      "title": "Implementar cálculo dinâmico de MAPE (Mean Absolute Percentage Error) com base histórica",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/services/mapeCalculator.service.ts"
+      ],
+      "criteria": "mapeCalculator.test.ts aprova precisão matemática e tratamento honesto de borda."
+    },
+    {
+      "id": 46,
+      "wave": 4,
+      "title": "Implementar simulação What-If baseada na dispersão padrão dos fechamentos reais",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/services/whatIfSimulator.service.ts"
+      ],
+      "criteria": "whatIfSimulator.test.ts aprova consistência das curvas de probabilidade P10/P50/P90."
+    },
+    {
+      "id": 47,
+      "wave": 4,
+      "title": "Implementar algoritmo de balanceamento de carteiras considerando capacidade e histórico",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/services/portfolioRebalancer.service.ts"
+      ],
+      "criteria": "portfolioRebalancer.test.ts valida distribuição equilibrada e criação de proposta de rebalanceamento."
+    },
+    {
+      "id": 48,
+      "wave": 4,
+      "title": "Implementar endpoint /commercial-intelligence/predictive/backtest para validação retrospectiva",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/routes/predictive.routes.ts"
+      ],
+      "criteria": "predictiveBacktest.routes.test.ts passa 100% verde com resposta HTTP 200 tipada."
+    },
+    {
+      "id": 49,
+      "wave": 4,
+      "title": "Implementar endpoint consolidado /commercial-intelligence/predictive/cockpit para o frontend",
+      "agent": "04 — CRM e BI",
+      "agentNum": "04",
+      "agentSlug": "04-crm-bi",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/routes/predictive.routes.ts"
+      ],
+      "criteria": "predictiveCockpit.routes.test.ts valida entrega de payload completo e tempo de resposta < 100ms."
+    },
+    {
+      "id": 50,
+      "wave": 4,
+      "title": "Conectar PredictiveRevenueCockpit.tsx aos endpoints reais com tratamento honesto de base vazia",
+      "agent": "02 — Produto e UX",
+      "agentNum": "02",
+      "agentSlug": "02-produto-ux",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/commercial-intelligence/components/PredictiveRevenueCockpit.tsx"
+      ],
+      "criteria": "cockpitsAndPanels.unit.test.tsx aprova estados de loading, empty e dados consolidados."
+    },
+    {
+      "id": 51,
+      "wave": 4,
+      "title": "Adicionar telemetria FinOps nas inferências preditivas do Oráculo (latência e custo de tokens)",
+      "agent": "23 — Custo, Performance e Limites de IA",
+      "agentNum": "23",
+      "agentSlug": "23-custo-performance-ia",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/ai/gateway/pricing.ts",
+        "src/lib/ai/gateway/finopsTelemetry.ts"
+      ],
+      "criteria": "finopsTelemetry.test.ts confirma cálculo de custo e exportação de métricas com 100% de precisão."
+    },
+    {
+      "id": 52,
+      "wave": 4,
+      "title": "Parecer formal independente do Agente 24 para a Onda 4 (Revenue Oracle Real)",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-04-revenue-oracle.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 53,
+      "wave": 5,
+      "title": "Implementar cliente Bitrix24 com rate limiting inteligente (500ms) e retry exponencial",
+      "agent": "06 — Integrações e Bitrix",
+      "agentNum": "06",
+      "agentSlug": "06-integracoes-bitrix",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/integrations/bitrix/client.ts"
+      ],
+      "criteria": "client.timeout.test.ts confirma respeito ao intervalo de 500ms e recuperação de 429."
+    },
+    {
+      "id": 54,
+      "wave": 5,
+      "title": "Implementar sincronização bidirecional de Leads e Negócios com Bitrix24 e detecção de conflitos",
+      "agent": "06 — Integrações e Bitrix",
+      "agentNum": "06",
+      "agentSlug": "06-integracoes-bitrix",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/integrations/bitrix/syncActivityToBitrix.ts",
+        "src/features/integrations/bitrix/syncLeadFromBitrix.ts"
+      ],
+      "criteria": "syncActivityToBitrix.test.ts aprova sincronização sem sobrescrita acidental de dados."
+    },
+    {
+      "id": 55,
+      "wave": 5,
+      "title": "Implementar extrações paginadas duráveis de histórico Bitrix24 com checkpoint persistido",
+      "agent": "06A — Extrações Bitrix",
+      "agentNum": "06A",
+      "agentSlug": "06A-extracoes-bitrix",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/integrations/bitrix/paginatedExtractor.ts"
+      ],
+      "criteria": "paginatedExtractor.test.ts aprova extração paginada e retomada perfeita via checkpoint."
+    },
+    {
+      "id": 56,
+      "wave": 5,
+      "title": "Decisão Arquitetural: 3CX SIP/WebRTC vs Twilio Voice (ADR-007)",
+      "agent": "12 — Voz e Telefonia",
+      "agentNum": "12",
+      "agentSlug": "12-voz-telefonia",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/architecture/ADR-007-TELEFONIA-3CX-TWILIO.md"
+      ],
+      "criteria": "ADR-007 publicado com status ACCEPTED e critérios claros de ativação dos provedores."
+    },
+    {
+      "id": 57,
+      "wave": 5,
+      "title": "Conectar conector de telefonia primário aprovado ao VoiceHub com eventos de tarifação",
+      "agent": "12 — Voz e Telefonia",
+      "agentNum": "12",
+      "agentSlug": "12-voz-telefonia",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/voice-hub/services/telephonyProvider.service.ts"
+      ],
+      "criteria": "autonomousSdr.service.test.ts confirma ciclo de vida completo de chamada com tarifação."
+    },
+    {
+      "id": 58,
+      "wave": 5,
+      "title": "Implementar detecção de voz ativa (VAD) e barge-in para interrupção de SDR autônomo",
+      "agent": "12 — Voz e Telefonia",
+      "agentNum": "12",
+      "agentSlug": "12-voz-telefonia",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/voice-hub/services/vadBargeIn.service.ts"
+      ],
+      "criteria": "bimodalLiveVoice.service.test.ts aprova interrupção imediata de fala e retorno ao estado de escuta."
+    },
+    {
+      "id": 59,
+      "wave": 5,
+      "title": "Implementar pipeline de transcrição de áudio com mascaramento de PII em voo",
+      "agent": "12 — Voz e Telefonia",
+      "agentNum": "12",
+      "agentSlug": "12-voz-telefonia",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/voice-hub/services/realtimeTranscription.service.ts"
+      ],
+      "criteria": "piiTokenizer.service.test.ts confirma redação em voo de CPFs, cartões e telefones."
+    },
+    {
+      "id": 60,
+      "wave": 5,
+      "title": "Decisão e conector WhatsApp: Baileys (Sessão Postgres) vs API Oficial Cloud (ADR-008)",
+      "agent": "06 — Integrações e Bitrix",
+      "agentNum": "06",
+      "agentSlug": "06-integracoes-bitrix",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/architecture/ADR-008-WHATSAPP-CONECTOR.md",
+        "src/features/integrations/whatsapp/conectorManager.ts"
+      ],
+      "criteria": "ADR-008 publicado com status ACCEPTED e testes de mensageria aprovados sem falhas."
+    },
+    {
+      "id": 61,
+      "wave": 5,
+      "title": "Implementar disparador de cadência multicanal com bloqueio prévio de opt-out LGPD",
+      "agent": "17 — Cadência Multicanal e Ciclo de Receita",
+      "agentNum": "17",
+      "agentSlug": "17-cadencia-ciclo-receita",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/cadence/services/multichannelDispatcher.service.ts"
+      ],
+      "criteria": "adaptiveMultichannelCadence.service.test.ts aprova cancelamento obrigatório para contatos em opt-out."
+    },
+    {
+      "id": 62,
+      "wave": 5,
+      "title": "Integrar conector Apollo.io e BrasilAPI com cache relacional de 30 dias",
+      "agent": "05 — Prospecção",
+      "agentNum": "05",
+      "agentSlug": "05-prospeccao",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/prospecting/services/companyEnrichment.service.ts",
+        "src/features/prospecting/infra/PrismaCompanyCacheRepository.ts"
+      ],
+      "criteria": "PrismaCompanyRepository.search.test.ts confirma recuperação do cache relacional sem bater na API externa."
+    },
+    {
+      "id": 63,
+      "wave": 5,
+      "title": "Implementar gerador e verificador de propostas em PDF com hash SHA-256",
+      "agent": "17 — Cadência Multicanal e Ciclo de Receita",
+      "agentNum": "17",
+      "agentSlug": "17-cadencia-ciclo-receita",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/proposals/services/proposalDocument.service.ts"
+      ],
+      "criteria": "proposalAutomation.service.test.ts valida geração de PDF e verificação positiva do hash."
+    },
+    {
+      "id": 64,
+      "wave": 5,
+      "title": "Configurar roteamento dinâmico e fallback automático de provedores de LLM",
+      "agent": "07 — IA e Automações",
+      "agentNum": "07",
+      "agentSlug": "07-ia-automacoes",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/ai/gateway/model-routing.ts",
+        "src/lib/ai/gateway/modelCascade.ts"
+      ],
+      "criteria": "modelCascade.test.ts confirma chaveamento automático para provedor de backup em caso de erro 500."
+    },
+    {
+      "id": 65,
+      "wave": 5,
+      "title": "Exportar métricas de saúde e latência de integrações para o Prometheus",
+      "agent": "10 — Infraestrutura, Observabilidade e SRE",
+      "agentNum": "10",
+      "agentSlug": "10-infraestrutura-sre",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/metrics/prometheusExporter.ts"
+      ],
+      "criteria": "prometheusExporter.test.ts aprova formatação de métricas e incremento de contadores."
+    },
+    {
+      "id": 66,
+      "wave": 5,
+      "title": "Parecer formal independente do Agente 24 para a Onda 5 (Conectores e Gateways)",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-05-conectores-gateways.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 67,
+      "wave": 6,
+      "title": "Auditar e calibrar contraste de cores nos modos Claro e Escuro (WCAG 2.2 AA)",
+      "agent": "03 — Design e Acessibilidade",
+      "agentNum": "03",
+      "agentSlug": "03-design-a11y",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/index.css",
+        "src/contexts/ThemeContext.tsx"
+      ],
+      "criteria": "accessibility.spec.ts confirma zero violações de contraste WCAG AA no Playwright."
+    },
+    {
+      "id": 68,
+      "wave": 6,
+      "title": "Implementar anéis de foco visíveis universais (focus-visible:ring-2) na UI inteira",
+      "agent": "03 — Design e Acessibilidade",
+      "agentNum": "03",
+      "agentSlug": "03-design-a11y",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/index.css",
+        "src/components/ui/*.tsx"
+      ],
+      "criteria": "Card.test.tsx e testes de componentes aprovam presença de classes de foco acessível."
+    },
+    {
+      "id": 69,
+      "wave": 6,
+      "title": "Corrigir hierarquia de cabeçalhos semânticos e marcos ARIA em todas as telas",
+      "agent": "03 — Design e Acessibilidade",
+      "agentNum": "03",
+      "agentSlug": "03-design-a11y",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/components/layout/AppLayout.tsx",
+        "src/App.tsx"
+      ],
+      "criteria": "accessibility.spec.ts confirma estrutura hierárquica de cabeçalhos 100% válida."
+    },
+    {
+      "id": 70,
+      "wave": 6,
+      "title": "Alinhar tokens semânticos na Sidebar e AppBreadcrumbs eliminando cores fixas",
+      "agent": "02 — Produto e UX",
+      "agentNum": "02",
+      "agentSlug": "02-produto-ux",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/components/layout/Sidebar.tsx",
+        "src/components/layout/AppBreadcrumbs.tsx"
+      ],
+      "criteria": "npm run build aprovado sem avisos de estilos quebrados ou cores órfãs."
+    },
+    {
+      "id": 71,
+      "wave": 6,
+      "title": "Implementar navegação por teclado acessível no Kanban de Negócios (Espaço/Enter e Setas)",
+      "agent": "03 — Design e Acessibilidade",
+      "agentNum": "03",
+      "agentSlug": "03-design-a11y",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/features/crm/components/KanbanBoard.tsx",
+        "src/features/crm/components/KanbanCard.tsx"
+      ],
+      "criteria": "crm-kanban.spec.ts confirma movimentação de cards via teclado com feedback ARIA."
+    },
+    {
+      "id": 72,
+      "wave": 6,
+      "title": "Adicionar atributos aria-expanded e aria-controls em menus dropdown e modais",
+      "agent": "03 — Design e Acessibilidade",
+      "agentNum": "03",
+      "agentSlug": "03-design-a11y",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/components/ui/DropdownMenu.tsx",
+        "src/components/ui/Modal.tsx"
+      ],
+      "criteria": "cockpitsAndPanels.unit.test.tsx aprova alternância de estados ARIA e foco no modal."
+    },
+    {
+      "id": 73,
+      "wave": 6,
+      "title": "Padronizar estados de Empty State, Loading Skeleton e Error em todos os módulos",
+      "agent": "02 — Produto e UX",
+      "agentNum": "02",
+      "agentSlug": "02-produto-ux",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/components/ui/EmptyState.tsx",
+        "src/components/ui/Skeleton.tsx",
+        "src/components/ui/ErrorBoundary.tsx"
+      ],
+      "criteria": "cockpitsAndPanels.unit.test.tsx aprova exibição consistente dos 4 estados em todos os cockpits."
+    },
+    {
+      "id": 74,
+      "wave": 6,
+      "title": "Aplicar respeito à diretiva prefers-reduced-motion nas animações do Framer Motion",
+      "agent": "03 — Design e Acessibilidade",
+      "agentNum": "03",
+      "agentSlug": "03-design-a11y",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/motion.ts"
+      ],
+      "criteria": "Card.test.tsx confirma respeito à diretiva de preferência de redução de movimento."
+    },
+    {
+      "id": 75,
+      "wave": 6,
+      "title": "Garantir layout responsivo fluido em dispositivos móveis (360px a 1920px) no AppLayout",
+      "agent": "09 — Mobile",
+      "agentNum": "09",
+      "agentSlug": "09-mobile",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/components/layout/AppLayout.tsx",
+        "src/components/layout/MobileNav.tsx"
+      ],
+      "criteria": "responsive.spec.ts passa 100% verde validando viewport móvel sem overflow horizontal."
+    },
+    {
+      "id": 76,
+      "wave": 6,
+      "title": "Executar varredura completa axe-core em todas as rotas da aplicação web (0 violações)",
+      "agent": "08 — QA e Release",
+      "agentNum": "08",
+      "agentSlug": "08-qa-release",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/e2e/accessibility.spec.ts"
+      ],
+      "criteria": "accessibility.spec.ts passa com ZERO violações críticas ou sérias reportadas pelo axe-core."
+    },
+    {
+      "id": 77,
+      "wave": 6,
+      "title": "Parecer formal independente do Agente 24 para a Onda 6 (Design e Acessibilidade)",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-06-design-acessibilidade.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 78,
+      "wave": 7,
+      "title": "Sanear testes E2E Playwright herdados (accessibility.spec.ts e cadence.spec.ts)",
+      "agent": "08 — QA e Release",
+      "agentNum": "08",
+      "agentSlug": "08-qa-release",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/e2e/accessibility.spec.ts",
+        "tests/e2e/cadence.spec.ts",
+        "playwright.config.ts"
+      ],
+      "criteria": "npx playwright test nos dois arquivos executa com 100% de aprovação e zero timeouts."
+    },
+    {
+      "id": 79,
+      "wave": 7,
+      "title": "Implementar retries determinísticos e isolamento de banco para testes de CI",
+      "agent": "08 — QA e Release",
+      "agentNum": "08",
+      "agentSlug": "08-qa-release",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "vitest.integration.config.ts",
+        "playwright.config.ts"
+      ],
+      "criteria": "npm run test:integration completa com zero flakiness em execução paralela."
+    },
+    {
+      "id": 80,
+      "wave": 7,
+      "title": "Otimizar code-splitting no Vite mantendo bundle compactado abaixo de 2.5 MB",
+      "agent": "16 — Runtime, Workers e Escala",
+      "agentNum": "16",
+      "agentSlug": "16-runtime-workers-escala",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "vite.config.ts",
+        "scripts/check-bundle-budget.mjs"
+      ],
+      "criteria": "npm run check:bundle-budget passa com código 0 confirmando bundle < 2.5 MB."
+    },
+    {
+      "id": 81,
+      "wave": 7,
+      "title": "Configurar compressão Brotli e políticas granulares de cache no Nginx",
+      "agent": "10 — Infraestrutura, Observabilidade e SRE",
+      "agentNum": "10",
+      "agentSlug": "10-infraestrutura-sre",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "nginx/nginx.conf"
+      ],
+      "criteria": "Configuração do Nginx válida com compressão Brotli e cache estático configurados."
+    },
+    {
+      "id": 82,
+      "wave": 7,
+      "title": "Executar teste de carga k6 garantindo latência p95 < 200ms em pico (500 requisições simultâneas)",
+      "agent": "10 — Infraestrutura, Observabilidade e SRE",
+      "agentNum": "10",
+      "agentSlug": "10-infraestrutura-sre",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/load/k6-ai-voice-stress.js"
+      ],
+      "criteria": "npm run load:k6:ai-voice passa com taxa de sucesso > 99.9% e p95 < 200ms."
+    },
+    {
+      "id": 83,
+      "wave": 7,
+      "title": "Validar workflow Central Birth Hub 360 Release (.github/workflows/production.yaml)",
+      "agent": "08 — QA e Release",
+      "agentNum": "08",
+      "agentSlug": "08-qa-release",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".github/workflows/production.yaml"
+      ],
+      "criteria": "production.yaml auditado e validado com dependências estritas e zero jobs ignorados."
+    },
+    {
+      "id": 84,
+      "wave": 7,
+      "title": "Parecer formal do Agente 24 liberando o Quality Gate Central 100% verde",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-parecer-onda-07-gates-performance.md"
+      ],
+      "criteria": "Parecer formal publicado com status PARECER: APROVADO e commit SHA verificado."
+    },
+    {
+      "id": 85,
+      "wave": 8,
+      "title": "Concluir inventário ROPA e fluxo automatizado de direitos do titular (DSR LGPD)",
+      "agent": "21 — Privacidade e LGPD",
+      "agentNum": "21",
+      "agentSlug": "21-privacidade-lgpd",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/lgpd/INVENTARIO_TRATAMENTO_ROPA.md",
+        "src/shared/services/dataSubjectErasure.service.ts"
+      ],
+      "criteria": "dataSubjectErasure.unit.test.ts confirma esquecimento irreversível de PII com integridade referencial."
+    },
+    {
+      "id": 86,
+      "wave": 8,
+      "title": "Validar jornada de ponta a ponta com o End-to-End Flow Validator (Lead -> Deal -> Faturamento)",
+      "agent": "22 — Verificação de Realidade",
+      "agentNum": "22",
+      "agentSlug": "22-verificacao-realidade",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "tests/e2e/completeCustomerJourney.e2e.test.ts"
+      ],
+      "criteria": "completeCustomerJourney.e2e.test.ts passa 100% verde com persistência em banco comprovada."
+    },
+    {
+      "id": 87,
+      "wave": 8,
+      "title": "Decisão Arquitetural Formal: Manter LOCAL-FIRST vs Migrar para AWS (ADR-009)",
+      "agent": "00 — Coordenador",
+      "agentNum": "00",
+      "agentSlug": "00-coordenador",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md"
+      ],
+      "criteria": "ADR-009 publicado com status ACCEPTED e decisão executiva registrada."
+    },
+    {
+      "id": 88,
+      "wave": 8,
+      "title": "Configurar e provisionar infraestrutura de produção aprovada com TLS e alta disponibilidade",
+      "agent": "10 — Infraestrutura, Observabilidade e SRE",
+      "agentNum": "10",
+      "agentSlug": "10-infraestrutura-sre",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docker-compose.yml",
+        "infrastructure/**"
+      ],
+      "criteria": "docker compose config retorna saída válida com zero erros de sintaxe ou variáveis ausentes."
+    },
+    {
+      "id": 89,
+      "wave": 8,
+      "title": "Configurar monitoramento de erros em tempo real e tracing distribuído (Sentry / OpenTelemetry)",
+      "agent": "10 — Infraestrutura, Observabilidade e SRE",
+      "agentNum": "10",
+      "agentSlug": "10-infraestrutura-sre",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "src/lib/observability/telemetry.ts"
+      ],
+      "criteria": "telemetry.test.ts aprova inicialização da telemetria e sanitização comprovada de payloads."
+    },
+    {
+      "id": 90,
+      "wave": 8,
+      "title": "Implementar rotina diária de backup criptografado do PostgreSQL com AES-256 e teste de restauração",
+      "agent": "01A — Confiabilidade de Dados, RLS e Retenção",
+      "agentNum": "01A",
+      "agentSlug": "01A-dados-rls-retencao",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "scripts/db/backup-encrypted.sh",
+        "scripts/db/restore-test.sh"
+      ],
+      "criteria": "backup-encrypted.sh --dry-run executa com código 0 comprovando geração de arquivo criptografado."
+    },
+    {
+      "id": 91,
+      "wave": 8,
+      "title": "Executar simulação de Disaster Recovery e restauração de dados a quente (RTO < 15 min, RPO < 1 min)",
+      "agent": "10 — Infraestrutura, Observabilidade e SRE",
+      "agentNum": "10",
+      "agentSlug": "10-infraestrutura-sre",
+      "priority": "P1",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/ops/DISASTER_RECOVERY_PLAYBOOK.md",
+        "scripts/ops/dr-simulation.sh"
+      ],
+      "criteria": "dr-simulation.sh retorna código 0 com medição de RTO < 15 minutos comprovada."
+    },
+    {
+      "id": 92,
+      "wave": 8,
+      "title": "Executar varredura final de segredos no diff acumulado da branch main (Gitleaks, 0 findings)",
+      "agent": "15 — Segurança Aplicada e Rotação de Segredos",
+      "agentNum": "15",
+      "agentSlug": "15-seguranca-aplicada",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "scripts/security/secret-scan-diff.sh"
+      ],
+      "criteria": "secret-scan-diff.sh retorna código 0 com zero segredos ou tokens encontrados."
+    },
+    {
+      "id": 93,
+      "wave": 8,
+      "title": "Auditoria FinOps e limites de quotas dos provedores de IA (orçamento de tokens por organização)",
+      "agent": "23 — Custo, Performance e Limites de IA",
+      "agentNum": "23",
+      "agentSlug": "23-custo-performance-ia",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/finops/RELATORIO_FINOPS_LANCAMENTO.md",
+        "src/lib/ai/gateway/tenantQuotaLimiter.ts"
+      ],
+      "criteria": "tenantQuotaLimiter.test.ts aprova bloqueio em 100% da cota e notificação em 80%."
+    },
+    {
+      "id": 94,
+      "wave": 8,
+      "title": "Executar ensaio de deploy (deploy rehearsal) em ambiente espelho com migrações reais",
+      "agent": "08A — Operações Git e Deploy AWS",
+      "agentNum": "08A",
+      "agentSlug": "08A-git-deploy-aws",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "scripts/deploy/staging-rehearsal.sh"
+      ],
+      "criteria": "staging-rehearsal.sh --dry-run executa com código 0 com validação de saúde aprovada."
+    },
+    {
+      "id": 95,
+      "wave": 8,
+      "title": "Verificação de realidade final em staging comprovando persistência de UI e ausência de simulações",
+      "agent": "22 — Verificação de Realidade",
+      "agentNum": "22",
+      "agentSlug": "22-verificacao-realidade",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/22-verificacao-realidade-final.md"
+      ],
+      "criteria": "Relatório de verificação de realidade publicado com status VERIFICAÇÃO: APROVADO."
+    },
+    {
+      "id": 96,
+      "wave": 8,
+      "title": "Quality Gate Central completo 100% verde no commit candidato a release",
+      "agent": "08 — QA e Release",
+      "agentNum": "08",
+      "agentSlug": "08-qa-release",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/runs/08-quality-gate-central.md"
+      ],
+      "criteria": "Todos os quality gates executados com código de saída 0 e relatório registrado."
+    },
+    {
+      "id": 97,
+      "wave": 8,
+      "title": "Homologar manuais operacionais, termos de uso e política de IA responsável da plataforma",
+      "agent": "11 — Marca e Ativos Institucionais",
+      "agentNum": "11",
+      "agentSlug": "11-marca-institucional",
+      "priority": "P2",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/manual/MANUAL_OPERACIONAL_2026.md",
+        "docs/legal/TERMOS_DE_USO_IA.md"
+      ],
+      "criteria": "Manuais e termos de uso publicados e estruturados sem pendências."
+    },
+    {
+      "id": 98,
+      "wave": 8,
+      "title": "Certificado de Auditoria e Emissão do Selo de Prontidão Go-Live pelo Agente 24",
+      "agent": "24 — Revisão Independente",
+      "agentNum": "24",
+      "agentSlug": "24-revisao-independente",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md"
+      ],
+      "criteria": "Certificado publicado com STATUS_GO_LIVE: LIBERADO e commit SHA exato da release."
+    },
+    {
+      "id": 99,
+      "wave": 8,
+      "title": "Autorização Executiva Humana e Assinatura do Termo de Liberação para Clientes Piloto",
+      "agent": "00 — Coordenador",
+      "agentNum": "00",
+      "agentSlug": "00-coordenador",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        "docs/ops/TERMO_AUTORIZACAO_EXECUTIVA_GO_LIVE.md"
+      ],
+      "criteria": "Termo de autorização executiva publicado com AUTORIZACAO_HUMANA: CONCEDIDA."
+    },
+    {
+      "id": 100,
+      "wave": 8,
+      "title": "Corte oficial da tag v1.0.0, push da release e chaveamento de tráfego de produção",
+      "agent": "08A — Operações Git e Deploy AWS",
+      "agentNum": "08A",
+      "agentSlug": "08A-git-deploy-aws",
+      "priority": "P0",
+      "status": "PLANEJADO",
+      "githubPr": null,
+      "commitSha": null,
+      "verified": false,
+      "filesOwned": [
+        ".agents/runs/08A-registro-go-live-v1.0.0.md"
+      ],
+      "criteria": "Tag v1.0.0-release publicada no GitHub e tráfego de produção ativo com sucesso."
+    }
+  ]
+}
