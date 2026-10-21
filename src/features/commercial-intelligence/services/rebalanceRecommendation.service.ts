@@ -227,7 +227,10 @@ export class RebalanceRecommendationService {
       : [];
     const byId = new Map(
       decisions
-        .filter((d) => d.organizationId === organizationId)
+        // Regra: decisão (inclusive REJECTED) só vale enquanto o owner atual do lead for o mesmo
+        // fromOwner do momento da decisão (já embutido no recommendationId) e por até
+        // REBALANCE_DECISION_TTL_DAYS; depois disso a recomendação volta a PENDING_HUMAN_REVIEW.
+        .filter((d) => d.organizationId === organizationId && isDecisionActive(d, now))
         .map((d) => [d.recommendationId, d]),
     );
     return {
@@ -236,7 +239,8 @@ export class RebalanceRecommendationService {
       insufficientDataReason: null,
       teamMedianBacklogDays: r1(med),
       recommendations: drafts.map((d) => {
-        const decision = byId.get(d.recommendationId) ?? null;
+        const found = byId.get(d.recommendationId) ?? null;
+        const decision = found && found.fromOwner === d.fromOwner.id ? found : null;
         return {
           ...d,
           approvalStatus: decision ? decision.decision : 'PENDING_HUMAN_REVIEW',
