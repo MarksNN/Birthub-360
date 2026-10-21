@@ -171,7 +171,7 @@ export function WinLossAnalysis() {
                 <TrendingUp className="w-12 h-12 text-[#22c55e]" />
                 <TrendingDown className="w-12 h-12 text-[#EF4444]" />
               </div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-ink">
                 Análise Inteligente de Ciclos Comerciais
               </h3>
               <p className="text-sm text-slate-600 max-w-lg">

@@ -76,8 +76,8 @@ test.describe('Meu Workspace (PROMPT 6)', () => {
     await waitForAppReady(page);
 
     await expect(page.getByRole('heading', { name: 'Closer' })).toBeVisible();
-    await expect(page.getByText('Indicadores do cargo')).toBeVisible();
-    await expect(page.getByText('Navegação do cargo')).toBeVisible();
+    await expect(page.getByText('Indicadores Chave')).toBeVisible();
+    await expect(page.getByText('Ações Rápidas')).toBeVisible();
     // Módulo real da jornada do Closer (role-workspace-definitions.ts) — prova que a navegação
     // veio do backend, não foi hardcoded na tela.
     await expect(page.getByRole('button', { name: 'Pipeline', exact: true })).toBeVisible();
