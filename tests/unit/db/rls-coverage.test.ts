@@ -175,7 +175,8 @@ describe('Row Level Security (RLS) - Cobertura e Isolamento Semântico no Banco 
     // onda-16: +ExternalEntityLink, +ExternalCrmStageMapping (127 -> 129)
     // REMED-06: +ConsentAuditRecord, +ConsentAuditChainHead, +ConsentSubjectKey, +ConsentEventDetail,
     // +ConsentPurgeTask, +ConsentSubjectKeyTombstone, +FlywheelApproachRecord, +FlywheelFewShotExample (129 -> 137)
-    expect(tenantScopedCount).toBe(137);
+    // REMED-06 v4: +TenantKeyEnvelope (137 -> 138)
+    expect(tenantScopedCount).toBe(138);
     expect(globalCatalogCount).toBe(14);
     expect(systemInternalCount).toBe(1);
   });

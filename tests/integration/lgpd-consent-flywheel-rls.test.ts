@@ -19,6 +19,14 @@ const RUN = randomUUID().slice(0, 8);
 const ORG_A = `test-lgpd-a-${RUN}`;
 const ORG_B = `test-lgpd-b-${RUN}`;
 const hash = (c: string) => c.repeat(64).slice(0, 64);
+/** Flywheel.leadId tem FK para Lead (ON DELETE CASCADE): cada org de teste ganha um Lead. */
+const leadOf = (org: string) => `lead-${org}`;
+const createOrgWithLead = (c: PoolClient, org: string) =>
+  c
+    .query(`INSERT INTO "Organization" (id,name,"updatedAt") VALUES ($1,$1,now()) ON CONFLICT (id) DO NOTHING`, [org])
+    .then(() =>
+      c.query(`INSERT INTO "Lead" (id,"organizationId","updatedAt") VALUES ($1,$2,now()) ON CONFLICT (id) DO NOTHING`, [leadOf(org), org]),
+    );
 
 async function tx<T>(p: Pool, tenant: string | null, fn: (c: PoolClient) => Promise<T>, bypass = false): Promise<T> {
   const client = await p.connect();
@@ -47,14 +55,14 @@ const insertConsent = (c: PoolClient, id: string, org: string, seq: number, h: s
 const insertApproach = (c: PoolClient, id: string, org: string) =>
   c.query(
     `INSERT INTO "FlywheelApproachRecord" (id,"organizationId","leadId",channel,segment,"approachText","sentAt")
-     VALUES ($1,$2,'lead-1','email','smb','oi',now())`,
-    [id, org],
+     VALUES ($1,$2,$3,'email','smb','oi',now())`,
+    [id, org, leadOf(org)],
   );
 const insertFewShot = (c: PoolClient, id: string, org: string) =>
   c.query(
     `INSERT INTO "FlywheelFewShotExample" (id,"organizationId","leadId",channel,segment,"approachText","outcomeStatus","attributionEvidence",confidence,"promotedAt")
-     VALUES ($1,$2,'lead-1','email','smb','oi','WON','{}'::jsonb,0.9,now())`,
-    [id, org],
+     VALUES ($1,$2,$3,'email','smb','oi','WON','{}'::jsonb,0.9,now())`,
+    [id, org, leadOf(org)],
   );
 
 const ids = { approachA: `fa-${RUN}`, fewA: `fs-${RUN}` };
@@ -62,9 +70,7 @@ const ids = { approachA: `fa-${RUN}`, fewA: `fs-${RUN}` };
 describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () => {
   beforeAll(async () => {
     await tx(pool, null, async (c) => {
-      for (const id of [ORG_A, ORG_B]) {
-        await c.query(`INSERT INTO "Organization" (id,name,"updatedAt") VALUES ($1,$1,now()) ON CONFLICT (id) DO NOTHING`, [id]);
-      }
+      for (const id of [ORG_A, ORG_B]) await createOrgWithLead(c, id);
     }, true);
     await tx(pool, ORG_A, async (c) => {
       await insertApproach(c, ids.approachA, ORG_A);
@@ -311,14 +317,26 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
       { tgname: 'consent_chain_head_guard_row', tgenabled: 'O' },
       { tgname: 'consent_chain_head_no_truncate', tgenabled: 'O' },
     ]);
-    // Prova comportamental sem conexão de owner: tabela TEMP de propriedade do próprio app (dono +
-    // todos os privilégios) com a MESMA função de trigger — o dono continua bloqueado.
+    // Prova comportamental sem conexão de owner: tabela TEMP do próprio app (dono + todos os
+    // privilégios) com trigger cujo corpo é COPIADO de public.consent_audit_immutable (pg_proc.prosrc).
+    // O app não tem EXECUTE na função original (parecer 15 do #39, B1), então não pode anexá-la.
+    // Se o banco já tiver o #39 (sem TEMP para o app), prova a negação de TEMP no lugar.
     await inRollback(pool, async (c, _as, expectFail) => {
-      await c.query(`CREATE TEMP TABLE consent_probe (id int) ON COMMIT DROP`);
-      await c.query(`CREATE TRIGGER p BEFORE UPDATE OR DELETE ON consent_probe FOR EACH ROW EXECUTE FUNCTION public.consent_audit_immutable()`);
-      await c.query(`CREATE TRIGGER pt BEFORE TRUNCATE ON consent_probe FOR EACH STATEMENT EXECUTE FUNCTION public.consent_audit_immutable()`);
-      await c.query(`INSERT INTO consent_probe VALUES (1)`);
+      const canTemp = (await c.query(`SELECT has_database_privilege(current_database(), 'TEMP') ok`)).rows[0].ok as boolean;
+      if (!canTemp) {
+        await expectFail(`CREATE TEMP TABLE consent_probe (id int)`, [], /permission denied/);
+        return;
+      }
+      await c.query(`CREATE TEMP TABLE consent_probe0 (id int) ON COMMIT DROP`);
+      await expectFail(`CREATE TRIGGER p0 BEFORE DELETE ON consent_probe0 FOR EACH ROW EXECUTE FUNCTION public.consent_audit_immutable()`, [], /permission denied/);
+      const src = (await c.query(`SELECT prosrc FROM pg_proc WHERE oid = 'public.consent_audit_immutable()'::regprocedure`)).rows[0].prosrc as string;
+      await c.query(`CREATE TEMP TABLE consent_probe (id int, "organizationId" text) ON COMMIT DROP`);
+      await c.query(`CREATE FUNCTION pg_temp.consent_probe_fn() RETURNS trigger LANGUAGE plpgsql AS $probe$${src}$probe$`);
+      await c.query(`CREATE TRIGGER p BEFORE UPDATE OR DELETE ON consent_probe FOR EACH ROW EXECUTE FUNCTION pg_temp.consent_probe_fn()`);
+      await c.query(`CREATE TRIGGER pt BEFORE TRUNCATE ON consent_probe FOR EACH STATEMENT EXECUTE FUNCTION pg_temp.consent_probe_fn()`);
+      await c.query(`INSERT INTO consent_probe VALUES (1, 'org-inexistente')`);
       await expectFail(`UPDATE consent_probe SET id = 2`, [], /append-only \(UPDATE/);
+      // DELETE direto (depth 1) é bloqueado mesmo com a org inexistente: a exceção exige cascata RI.
       await expectFail(`DELETE FROM consent_probe`, [], /append-only \(DELETE/);
       await expectFail(`TRUNCATE consent_probe`, [], /append-only \(TRUNCATE/);
     });
@@ -384,6 +402,7 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
       ConsentPurgeTask: 'DELETE,INSERT,SELECT,UPDATE',
       FlywheelApproachRecord: 'DELETE,INSERT,SELECT,UPDATE',
       FlywheelFewShotExample: 'DELETE,INSERT,SELECT,UPDATE',
+      TenantKeyEnvelope: 'INSERT,SELECT,UPDATE',
     };
     const { rows } = await pool.query(
       `SELECT t,

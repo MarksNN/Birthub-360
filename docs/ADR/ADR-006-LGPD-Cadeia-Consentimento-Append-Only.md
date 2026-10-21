@@ -21,7 +21,7 @@ Há uma tensão nisso: append-only conflita com eliminação.
    - o papel de app **não é dono** da tabela. `scripts/db/create-app-role.sql` exclui as tabelas LGPD da transferência de posse e reaplica os grants mínimos com `lgpd_apply_consent_privileges()`.
    - `UNIQUE (organizationId, sequence)` e `UNIQUE (organizationId, currentHash)`. Não há unique global, então não existe oráculo de existência entre tenants.
    - `CHECK (kind = 'GENESIS' OR subjectRef ~ '^hs256:[a-f0-9]{64}$')`. Isso impede que entre e-mail, telefone ou hash sem chave.
-2. **Âncora de cabeça (`ConsentAuditChainHead`)**, atualizada na mesma transação do append. O trigger garante que `genesisId/genesisHash` são imutáveis, que `lastSequence` é estritamente crescente e que DELETE/TRUNCATE ficam bloqueados. O app só tem `SELECT, INSERT, UPDATE`. A única exceção é o DELETE em cascata a partir de `Organization` (`pg_trigger_depth() > 1`), e ele só é possível quando a organização não tem mais registros na cadeia (FK `Restrict`). Com isso, o `verify()` do #33 detecta truncamento de cauda e recriação da gênese.
+2. **Âncora de cabeça (`ConsentAuditChainHead`)**, atualizada na mesma transação do append. O trigger garante que `genesisId/genesisHash` são imutáveis, que `lastSequence` é estritamente crescente e que DELETE/TRUNCATE ficam bloqueados. O app só tem `SELECT, INSERT, UPDATE`. A única exceção é o DELETE em cascata a partir de `Organization` (v4, migration `20261020240000`): o trigger exige `pg_trigger_depth() > 1` **e** que a linha da `Organization` já não exista. Só a ação RI `ON DELETE CASCADE` produz esse estado; um DELETE disparado por qualquer outro trigger, com a org viva, continua bloqueado (A2 do parecer 15 do #39). Com isso, o `verify()` do #33 detecta truncamento de cauda e recriação da gênese.
 3. **Pseudonimização + crypto-shredding.** `subjectRef = hs256:HMAC-SHA256(chave do titular, ref)`.
    - A chave aleatória por titular fica em `ConsentSubjectKey` (o app tem `SELECT, INSERT, DELETE`). O endereço é `lookupId = HMAC(pepper do tenant, ref)`, e o pepper fica fora do banco (KMS ou segredo).
    - Destruir a chave torna o `subjectRef` da cadeia irreversível. É assim que o direito de eliminação é atendido sem quebrar a cadeia.
@@ -76,17 +76,20 @@ Até isso entrar, o offboarding atende a eliminação **por titular** (shredding
 1. **Destruir o pepper do tenant** no KMS ou segredo. Com isso, todo `lookupId` fica impossível de recalcular a partir do titular.
 2. `DELETE FROM "ConsentSubjectKey"` para a organização, dentro do contexto do tenant. Isso gera os tombstones. Os `subjectRef` da cadeia ficam órfãos e irreversíveis.
 3. Expurgar `ConsentEventDetail`, `ConsentPurgeTask` e as tabelas Flywheel (no contexto do tenant).
-4. **A cadeia (`ConsentAuditRecord`) e o head são mantidos** até o fim do prazo legal (art. 16, I). Por causa da FK `Restrict`, a `Organization` não pode ser apagada até lá. Ela fica como tombstone (desativada).
+4. **A cadeia (`ConsentAuditRecord`) e o head são mantidos** até o fim do prazo legal (art. 16, I). A `Organization` **não deve** ser apagada até lá, porque a FK agora é `Cascade` (v4) e levaria a cadeia junto. Ela fica como tombstone (desativada). Marque `TenantKeyEnvelope.destroyedAt` (zera o `ciphertext`).
 5. **Fim do prazo legal (procedimento 01A, break-glass):** uma janela aprovada pelo DPO e pelo Agente 15, executada pelo dono ou migrador, nunca pelo app. Numa transação única:
    - `SET LOCAL lock_timeout`;
    - registrar o evento de auditoria externo (ticket, hash do `lastHash` final);
-   - `ALTER TABLE "ConsentAuditRecord" DISABLE TRIGGER consent_audit_no_mutation`;
-   - `DELETE ... WHERE "organizationId" = $org`;
-   - `ENABLE TRIGGER`;
-   - `DELETE FROM "Organization"`, que leva o head, a chave e o tombstone em cascata.
+   - `DELETE FROM "Organization" WHERE id = $org`, que leva em cascata a cadeia, o head, as chaves, os tombstones, os detalhes, o envelope e o Flywheel (v4: sem DISABLE TRIGGER).
 
-   A transação é atômica, então ninguém vê a tabela com o trigger desligado depois do COMMIT. A conferência posterior é `SELECT tgenabled FROM pg_trigger WHERE tgname LIKE 'consent_%'`, que deve retornar `O`.
+## v4 (migration 20261020240000): cascata de Organization, TenantKeyEnvelope, Flywheel → Lead
+
+- **Cascata real.** `ConsentAuditRecord → Organization` e `ConsentEventDetail → ConsentAuditRecord` passam de `Restrict` para `Cascade`. A ação RI roda como dono da tabela filha, então o app continua **sem DELETE** na cadeia, no head, no tombstone e no envelope. Os triggers deixam passar só o DELETE de cascata (org inexistente + depth > 1; no tombstone, que é AFTER e roda com depth 1, só a ausência da org). Isso resolve o `permission denied for table ConsentAuditRecord` / bloqueio do cleanup que apaga `Organization`. A origem do `permission denied` era a versão antiga, em que o app era dono das tabelas LGPD e `lgpd_apply_consent_privileges()` revogava privilégios do próprio dono, que é o papel com que a ação RI roda.
+- **Risco aceito, a decidir por 24/15/Marks.** Quem pode apagar `Organization` agora apaga a cadeia junto. Hoje o app tem DELETE em `Organization`. A recomendação é tirar esse DELETE do app (escopo #39/08A) e tratar o offboarding só como break-glass do migrator.
+- **`consent_subject_key_tombstone()`.** Continua SECURITY DEFINER, porque o app só tem SELECT no tombstone e, como INVOKER, poderia forjar provas. Ganhou tenant guard explícito (`current_setting('app.current_tenant_id')`) e `search_path = pg_catalog, public, pg_temp`. Nenhuma função LGPD fica com EXECUTE para PUBLIC ou para o app (triggers não exigem EXECUTE de quem dispara), compatível com o inventário B/B1/C do #39.
+- **`TenantKeyEnvelope` (Agente 21).** DEK do tenant cifrada pela CMK. O app tem `SELECT, INSERT, UPDATE` e não tem DELETE. O UPDATE só aceita a destruição (`destroyedAt` preenchido + `ciphertext` NULL, demais colunas iguais). Depois de destruído, o envelope fica imutável. Há um CHECK de coerência entre destroyedAt e ciphertext. É o crypto-shredding por tenant que o passo 1 do runbook pede.
+- **Flywheel → Lead `ON DELETE CASCADE`.** Expurgar o lead expurga a abordagem e o few-shot (P2-6). A FK é simples (`leadId → Lead.id`); a coerência de tenant entre o Flywheel e o Lead fica pela RLS das duas tabelas.
 
 ## Fora deste ADR
 
-A FK de Flywheel para `Lead` e o expurgo por titular dos derivados (autópsia, `attributionEvidence`, caches de IA e logs) pertencem ao #33 (Agente 21). O schema já tem os índices `(organizationId, leadId)` para isso.
+O expurgo por titular dos demais derivados (autópsia, caches de IA e logs) pertence ao #33 (Agente 21).

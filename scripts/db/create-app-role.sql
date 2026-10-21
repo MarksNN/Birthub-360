@@ -56,12 +56,12 @@ BEGIN
     -- execucao anterior deste script ja tinha transferido a posse, ela e devolvida aqui.
     FOR r IN SELECT tablename FROM pg_tables WHERE schemaname = 'public'
              AND tablename NOT IN ('ConsentAuditRecord', 'ConsentAuditChainHead', 'ConsentSubjectKey', 'ConsentSubjectKeyTombstone',
-                               'ConsentEventDetail', 'ConsentPurgeTask', 'FlywheelApproachRecord', 'FlywheelFewShotExample') LOOP
+                               'ConsentEventDetail', 'ConsentPurgeTask', 'FlywheelApproachRecord', 'FlywheelFewShotExample', 'TenantKeyEnvelope') LOOP
         EXECUTE format('ALTER TABLE public.%I OWNER TO prospector_app', r.tablename);
     END LOOP;
     FOR r IN SELECT tablename FROM pg_tables WHERE schemaname = 'public'
              AND tablename IN ('ConsentAuditRecord', 'ConsentAuditChainHead', 'ConsentSubjectKey', 'ConsentSubjectKeyTombstone',
-                               'ConsentEventDetail', 'ConsentPurgeTask', 'FlywheelApproachRecord', 'FlywheelFewShotExample')
+                               'ConsentEventDetail', 'ConsentPurgeTask', 'FlywheelApproachRecord', 'FlywheelFewShotExample', 'TenantKeyEnvelope')
              AND tableowner = 'prospector_app' LOOP
         EXECUTE format('ALTER TABLE public.%I OWNER TO %I', r.tablename, current_user);
     END LOOP;

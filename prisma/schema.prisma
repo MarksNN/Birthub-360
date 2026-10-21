@@ -703,6 +703,9 @@ model Lead {
   // dois Leads locais (o segundo INSERT falha com violação de unique, tratada como "já
   // importado"/"já sincronizado" pelo chamador). NULL não colide com NULL em unique index do
   // Postgres — leads sem vínculo Bitrix continuam livres para existir aos milhares sem restrição.
+  flywheelApproachRecords FlywheelApproachRecord[]
+  flywheelFewShotExamples FlywheelFewShotExample[]
+
   @@unique([organizationId, bitrixLeadId])
   @@unique([organizationId, bitrixDealId])
   @@index([organizationId])
@@ -1048,6 +1051,7 @@ model Organization {
   consentPurgeTasks           ConsentPurgeTask[]
   flywheelApproachRecords     FlywheelApproachRecord[]
   flywheelFewShotExamples     FlywheelFewShotExample[]
+  tenantKeyEnvelope           TenantKeyEnvelope?
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -5579,7 +5583,7 @@ enum ConsentChainEventKind {
 model ConsentAuditRecord {
   id             String                   @id
   organizationId String
-  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   /// Versão do formato canônico do hash (F6 do #33; hoje 3).
   formatVersion  Int
   sequence       Int
@@ -5645,7 +5649,7 @@ model ConsentSubjectKeyTombstone {
 /// Texto livre do evento (fora da cadeia, expurgável). Retenção vive aqui.
 model ConsentEventDetail {
   eventId         String             @id
-  event           ConsentAuditRecord @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  event           ConsentAuditRecord @relation(fields: [eventId], references: [id], onDelete: Cascade)
   organizationId  String
   organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   subjectLookupId String             @db.Char(64)
@@ -5684,6 +5688,7 @@ model FlywheelApproachRecord {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   leadId         String
+  lead           Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
   channel        String
   segment        String
   approachText   String       @db.Text
@@ -5697,6 +5702,7 @@ model FlywheelFewShotExample {
   organizationId      String
   organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   leadId              String
+  lead                Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
   dealId              String?
   channel             String
   segment             String
@@ -5709,4 +5715,16 @@ model FlywheelFewShotExample {
 
   @@index([organizationId, leadId])
   @@index([organizationId, channel, isActive])
+}
+
+/// REMED-06 (Agente 21, #33): DEK por tenant cifrada por KMS (envelope). Tombstone = destroyedAt com
+/// ciphertext NULL (crypto-shredding do tenant). App: SELECT/INSERT/UPDATE, sem DELETE; UPDATE só a
+/// transição de destruição (trigger tenant_key_envelope_guard).
+model TenantKeyEnvelope {
+  organizationId String       @id
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ciphertext     Bytes?
+  cmkId          String
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  destroyedAt    DateTime?    @db.Timestamptz(3)
 }
