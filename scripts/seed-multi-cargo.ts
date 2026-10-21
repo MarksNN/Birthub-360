@@ -41,6 +41,10 @@ export const AGENT_ID_TO_JOB_ROLE_CODE: Record<CommercialAgentId, JobRoleCode> =
   'contract-signature': 'CONTRATOS_ASSINATURA',
   'bitrix-guardian': 'BITRIX_GUARDIAN',
   'revenue-intelligence': 'REVENUE_INTELLIGENCE',
+  // Agentes táticos (tactical/*.agent.ts) sem cargo próprio: concedidos ao cargo que consome a saída.
+  'account-detective': 'LDR',
+  'promise-guardian': 'CLOSER',
+  'devils-advocate': 'GERENTE_COMERCIAL',
 };
 
 // CommercialAgentStatus (commercialAgentTypes.ts) -> AgentDefinitionStatus (schema Prisma novo).

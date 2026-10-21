@@ -65,23 +65,37 @@ export async function signUp(
       select: { organizationId: true },
     });
     if (user?.organizationId) {
-      await prisma.setting.updateMany({
+      // A policy de Setting exige app.current_tenant_id = organizationId. bypassRls sozinho
+      // não passa: a policy não tem cláusula de bypass. Sem o tenant, updateMany altera 0
+      // linhas, o onboarding continua pendente e o OnboardingGate manda o teste para /setup
+      // depois que o helper já achou que estava em /app.
+      requestContext.enterWith({ bypassRls: true, tenantId: user.organizationId });
+      const value = {
+        enabledModules: [
+          'crm-comercial',
+          'prospect-inteligente',
+          'inteligencia-mercado',
+          'hub',
+          'automacoes',
+          'performance',
+        ],
+        onboardingCompletedAt: new Date().toISOString(),
+        updatedByUserId: null,
+      };
+      const updated = await prisma.setting.updateMany({
         where: { organizationId: user.organizationId, key: 'organization.modules' },
-        data: {
-          value: {
-            enabledModules: [
-              'crm-comercial',
-              'prospect-inteligente',
-              'inteligencia-mercado',
-              'hub',
-              'automacoes',
-              'performance',
-            ],
-            onboardingCompletedAt: new Date().toISOString(),
-            updatedByUserId: null,
-          },
-        },
+        data: { value },
       });
+      if (updated.count === 0) {
+        await prisma.setting.create({
+          data: {
+            organizationId: user.organizationId,
+            userId: null,
+            key: 'organization.modules',
+            value,
+          },
+        });
+      }
     }
   }
 
@@ -108,7 +122,16 @@ export async function signUp(
     await page.getByRole('button', { name: /Continuar/i }).click();
     await page.getByRole('button', { name: /(Salvar e )?ir para o Dashboard/i }).click();
   }
-  await expect(page).toHaveURL(completeOnboarding ? /\/app(?:[/?#]|$)/ : /\/setup(?:[/?#]|$)/, { timeout: 15_000 });
+  await expect(page).toHaveURL(completeOnboarding ? /\/app(?:[/?#]|$)/ : /\/setup(?:[/?#]|$)/, {
+    timeout: 15_000,
+  });
+  if (completeOnboarding) {
+    // O gate busca os módulos depois do primeiro paint. Se o save não pegou, ele troca /app por
+    // /setup alguns segundos depois — o expect acima passaria no instante errado.
+    await expect
+      .poll(async () => new URL(page.url()).pathname, { timeout: 15_000 })
+      .toMatch(/^\/app(?:\/|$)/);
+  }
 
   // URL sozinha não comprova sessão: consulta o backend com os cookies do navegador.
   const sessionResponse = await page.request.get('/api/auth/get-session');
