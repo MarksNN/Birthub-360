@@ -144,8 +144,33 @@ interface ActiveTransaction {
   tenantId: string;
   /** Efeitos colaterais externos (ex.: fila de busca) adiados para depois do COMMIT. */
   afterCommit: Array<() => void>;
+  /**
+   * X2 (parecer 15 #40): true depois que a transação terminou (COMMIT ou ROLLBACK). Promessas não
+   * aguardadas criadas dentro do `fn` herdam o ALS; se rodarem depois do fim, lançam
+   * `TransactionClosedError` (fail-closed, mensagem clara) em vez de usar um tx encerrado.
+   */
+  closed: boolean;
 }
 const activeTransaction = new AsyncLocalStorage<ActiveTransaction>();
+
+/** Operação disparada (sem await) dentro de `runInTransaction` executou depois do fim do tx. */
+export class TransactionClosedError extends Error {
+  constructor(what: string) {
+    super(
+      `runInTransaction: ${what} executado depois do fim da transação (promessa não aguardada dentro do fn?). Aguarde todas as operações antes de retornar.`,
+    );
+    this.name = 'TransactionClosedError';
+  }
+}
+
+/**
+ * true se o código corrente roda dentro de um `runInTransaction` ainda aberto. Usado pelo
+ * AuditService (X1): dentro do tx, falha de audit precisa propagar (o tx já está abortado).
+ */
+export function isInActiveTransaction(): boolean {
+  const a = activeTransaction.getStore();
+  return a !== undefined && !a.closed;
+}
 
 export class TransactionTenantMismatchError extends Error {
   constructor(active: string, requested: string) {
@@ -469,6 +494,7 @@ const extendedPrisma = basePrisma.$extends({
           // set_config local). Nunca abre transação nova nem aceita outro tenant/bypass ali dentro.
           const active = activeTransaction.getStore();
           if (active) {
+            if (active.closed) throw new TransactionClosedError(`${model}.${operation}`);
             if (rawBypassRls) {
               throw new Error(
                 'runInTransaction: bypassRls não é permitido dentro de uma transação de tenant',
@@ -763,14 +789,36 @@ export async function withRlsContext<T>(
  */
 export type TransactionalClient = PrismaClient;
 
-const RAW_METHODS = new Set(['$queryRaw', '$executeRaw', '$queryRawUnsafe', '$executeRawUnsafe']);
+const RAW_METHODS = new Set([
+  '$queryRaw',
+  '$executeRaw',
+  '$queryRawUnsafe',
+  '$executeRawUnsafe',
+  '$queryRawTyped',
+]);
 
 function makeTransactionalClient(active: ActiveTransaction): TransactionalClient {
   return new Proxy({} as TransactionalClient, {
     get(_target, prop) {
       if (typeof prop === 'string' && RAW_METHODS.has(prop)) {
-        const fn = (active.tx as unknown as Record<string, (...a: unknown[]) => unknown>)[prop];
-        return fn.bind(active.tx);
+        // X3: `$queryRawTyped` também vai para o tx real. Se o client não tiver o método (typedSql
+        // desligado), lança em vez de cair no client global fora do tx.
+        const fn = (
+          active.tx as unknown as Record<string, ((...a: unknown[]) => unknown) | undefined>
+        )[prop];
+        return (...args: unknown[]) => {
+          if (active.closed) throw new TransactionClosedError(`tx.${prop}`);
+          if (typeof fn !== 'function') {
+            throw new Error(`runInTransaction: tx.${prop} não disponível neste client`);
+          }
+          return fn.apply(active.tx, args);
+        };
+      }
+      if (prop === '$runCommandRaw') {
+        // X3: só MongoDB; nunca deve cair no client global a partir do tx.
+        return () => {
+          throw new Error('runInTransaction: $runCommandRaw não é suportado dentro do tx');
+        };
       }
       if (prop === '$transaction') {
         // Aninhado: reusa a mesma transação (forma função). Forma array não é suportada aqui.
@@ -837,12 +885,18 @@ export async function runInTransaction<R>(
             `SELECT set_config('app.bypass_rls', 'off', TRUE), set_config('app.current_tenant_id', $1, TRUE);`,
             tenantId,
           );
-          const active: ActiveTransaction = { tx, tenantId, afterCommit };
+          const active: ActiveTransaction = { tx, tenantId, afterCommit, closed: false };
           // `async/await` dentro do run: ancora a store mesmo se `fn` devolver PrismaPromise lazy.
-          return activeTransaction.run(
-            active,
-            async () => await fn(makeTransactionalClient(active)),
-          );
+          try {
+            return await activeTransaction.run(
+              active,
+              async () => await fn(makeTransactionalClient(active)),
+            );
+          } finally {
+            // X2: a partir daqui (COMMIT/ROLLBACK em seguida) qualquer op tardia lança
+            // TransactionClosedError em vez de usar o tx encerrado.
+            active.closed = true;
+          }
         },
         {
           maxWait: opts.maxWaitMs ?? (process.env.NODE_ENV === 'test' ? 30000 : 15000),

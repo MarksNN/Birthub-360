@@ -1,6 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Pool } from 'pg';
-import { prisma, runInTransaction, TransactionTenantMismatchError } from '../../src/lib/prisma';
+import {
+  prisma,
+  runInTransaction,
+  TransactionClosedError,
+  TransactionTenantMismatchError,
+} from '../../src/lib/prisma';
+import { AuditService } from '../../src/lib/audit/audit.service';
 import { requestContext } from '../../src/lib/async-context';
 
 /**
@@ -279,5 +285,101 @@ describe('G1 — escape do tx pelo client global (parecer 15)', () => {
         }),
     );
     expect(org?.id).toBe(ORG_A);
+  });
+});
+
+describe('ressalvas do parecer 15 no #40 (X1/X2/X3)', () => {
+  it('X1: audit que falha dentro do tx faz runInTransaction rejeitar e nada é commitado', async () => {
+    const tag = 'x1-audit-fail';
+    let companyId = '';
+    await expect(
+      rit(
+        async (tx) => {
+          const c = await tx.company.create({ data: { legalName: tag, tradeName: tag } as never });
+          companyId = c.id;
+          await outboxAppend(tx, ORG_A, tag);
+          // tenantId de OUTRO tenant: o WITH CHECK do RLS de AuditLog recusa o INSERT dentro do tx.
+          await AuditService.log({
+            action: 'CREATE',
+            entity: 'X1Probe',
+            entityId: tag,
+            tenantId: ORG_B,
+          });
+          return 'não deveria chegar aqui';
+        },
+        { organizationId: ORG_A },
+      ),
+    ).rejects.toThrow();
+    expect(companyId).not.toBe('');
+    expect(await asTenant(ORG_A, `SELECT 1 FROM "Company" WHERE id=$1`, [companyId])).toHaveLength(
+      0,
+    );
+    expect(
+      await asTenant(ORG_A, `SELECT 1 FROM "AuditLog" WHERE "entityId" IN ($1,$2)`, [
+        companyId,
+        tag,
+      ]),
+    ).toHaveLength(0);
+    expect(
+      await asTenant(ORG_B, `SELECT 1 FROM "AuditLog" WHERE "entityId"=$1`, [tag]),
+    ).toHaveLength(0);
+  });
+
+  it('X1: fora de tx, audit que falha continua best-effort (não lança)', async () => {
+    await expect(
+      requestContext.run({ tenantId: ORG_A }, () =>
+        AuditService.log({
+          action: 'CREATE',
+          entity: 'X1Probe',
+          entityId: 'x1-out',
+          tenantId: ORG_B,
+        }),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  it('X2: promessa não aguardada que roda após o commit lança TransactionClosedError e não grava', async () => {
+    const tag = 'x2-late';
+    let late: Promise<unknown> | undefined;
+    let lateTx: Promise<unknown> | undefined;
+    await rit(
+      async (tx) => {
+        late = new Promise((r) => setTimeout(r, 50)).then(() =>
+          prisma.company.create({ data: { legalName: tag, tradeName: tag } as never }),
+        );
+        lateTx = new Promise((r) => setTimeout(r, 50)).then(() => outboxAppend(tx, ORG_A, tag));
+        late.catch(() => undefined);
+        lateTx.catch(() => undefined);
+      },
+      { organizationId: ORG_A },
+    );
+    await expect(late).rejects.toBeInstanceOf(TransactionClosedError);
+    await expect(lateTx).rejects.toBeInstanceOf(TransactionClosedError);
+    expect(
+      await asTenant(ORG_A, `SELECT 1 FROM "Company" WHERE "legalName"=$1`, [tag]),
+    ).toHaveLength(0);
+    expect(
+      await asTenant(ORG_A, `SELECT 1 FROM "AuditLog" WHERE "entityId"=$1`, [tag]),
+    ).toHaveLength(0);
+  });
+
+  it('X3: $runCommandRaw no tx e $queryRawTyped/$runCommandRaw no client global dentro do tx lançam', async () => {
+    const { TransactionEscapeError } = await import('../../src/lib/txEscapeGuard');
+    await rit(
+      async (tx) => {
+        expect(() => (tx as unknown as { $runCommandRaw: () => unknown }).$runCommandRaw()).toThrow(
+          /não é suportado dentro do tx/,
+        );
+        for (const m of ['$queryRawTyped', '$runCommandRaw']) {
+          const f = (prisma as unknown as Record<string, unknown>)[m];
+          if (typeof f === 'function') {
+            await expect((async () => (f as () => unknown)())()).rejects.toBeInstanceOf(
+              TransactionEscapeError,
+            );
+          }
+        }
+      },
+      { organizationId: ORG_A },
+    );
   });
 });

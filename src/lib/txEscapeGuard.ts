@@ -17,6 +17,9 @@ export const GUARDED_RAW_METHODS: ReadonlySet<string> = new Set([
   '$executeRaw',
   '$queryRawUnsafe',
   '$executeRawUnsafe',
+  // X3 (parecer 15 #40): também saem do tx se chamados no client global.
+  '$queryRawTyped',
+  '$runCommandRaw',
 ]);
 
 export interface TxEscapeState {
