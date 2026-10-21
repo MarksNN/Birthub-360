@@ -1134,3 +1134,10 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
 .btn-floating-top:active {
   transform: translateY(-1px) scale(0.98);
 }
+
+/* Light mode: ciano #00D4FF no fundo claro da antessala fica abaixo de 4.5:1.
+   O dark mantém o neon. Cobre texto e ícones que usam a classe arbitrária. */
+html.light .login-antessala-backdrop [class*="text-[#00D4FF]"],
+[data-theme="light"] .login-antessala-backdrop [class*="text-[#00D4FF]"] {
+  color: #0369a1 !important;
+}

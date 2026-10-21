@@ -1899,6 +1899,7 @@ export function Landing360({
               <div
                 className="grid grid-cols-2 gap-1 mb-5 p-1 bg-slate-100 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 rounded-xl"
                 role="tablist"
+                aria-label="Método de acesso"
               >
                 <button
                   type="button"
