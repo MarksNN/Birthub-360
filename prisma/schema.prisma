@@ -5579,7 +5579,7 @@ enum ConsentChainEventKind {
 model ConsentAuditRecord {
   id             String                   @id
   organizationId String
-  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   /// Versão do formato canônico do hash (F6 do #33; hoje 3).
   formatVersion  Int
   sequence       Int
@@ -5645,7 +5645,7 @@ model ConsentSubjectKeyTombstone {
 /// Texto livre do evento (fora da cadeia, expurgável). Retenção vive aqui.
 model ConsentEventDetail {
   eventId         String             @id
-  event           ConsentAuditRecord @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  event           ConsentAuditRecord @relation(fields: [eventId], references: [id], onDelete: Cascade)
   organizationId  String
   organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   subjectLookupId String             @db.Char(64)

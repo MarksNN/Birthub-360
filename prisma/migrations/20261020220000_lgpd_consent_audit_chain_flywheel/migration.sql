@@ -155,7 +155,7 @@ CREATE INDEX "FlywheelFewShotExample_organizationId_leadId_idx" ON "FlywheelFewS
 CREATE INDEX "FlywheelFewShotExample_organizationId_channel_isActive_idx" ON "FlywheelFewShotExample"("organizationId", "channel", "isActive");
 
 -- AddForeignKey
-ALTER TABLE "ConsentAuditRecord" ADD CONSTRAINT "ConsentAuditRecord_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ConsentAuditRecord" ADD CONSTRAINT "ConsentAuditRecord_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ConsentAuditChainHead" ADD CONSTRAINT "ConsentAuditChainHead_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -164,7 +164,7 @@ ALTER TABLE "ConsentAuditChainHead" ADD CONSTRAINT "ConsentAuditChainHead_organi
 ALTER TABLE "ConsentSubjectKey" ADD CONSTRAINT "ConsentSubjectKey_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ConsentEventDetail" ADD CONSTRAINT "ConsentEventDetail_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "ConsentAuditRecord"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ConsentEventDetail" ADD CONSTRAINT "ConsentEventDetail_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "ConsentAuditRecord"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ConsentEventDetail" ADD CONSTRAINT "ConsentEventDetail_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -230,6 +230,11 @@ WITH CHECK ("organizationId" = current_setting('app.current_tenant_id', true));
 CREATE OR REPLACE FUNCTION consent_audit_immutable() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
+  -- Offboarding: DELETE em cascata vindo de Organization (pg_trigger_depth() > 1).
+  -- DML direto continua bloqueado.
+  IF TG_OP = 'DELETE' AND pg_trigger_depth() > 1 THEN
+    RETURN OLD;
+  END IF;
   RAISE EXCEPTION 'ConsentAuditRecord é append-only (% bloqueado)', TG_OP
     USING ERRCODE = 'insufficient_privilege';
 END
@@ -245,8 +250,8 @@ FOR EACH STATEMENT EXECUTE FUNCTION consent_audit_immutable();
 
 -- ─── Âncora de cabeça: gênese imutável, lastSequence estritamente crescente, sem DELETE/TRUNCATE.
 -- Única exceção: DELETE em cascata vindo de Organization (pg_trigger_depth() > 1 = disparado pela
--- ação RI ON DELETE CASCADE). Isso só ocorre se a org não tiver mais ConsentAuditRecord (FK
--- Restrict), i.e. no offboarding (ver runbook) — nunca por DML direto da aplicação.
+-- ação RI ON DELETE CASCADE). O app não recebe DELETE: a ação RI corre como dono da tabela filha.
+-- DML direto continua bloqueado (profundidade 1).
 CREATE OR REPLACE FUNCTION consent_chain_head_guard() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
