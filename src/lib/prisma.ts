@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
@@ -26,9 +27,10 @@ const connectionString = env.DATABASE_URL || process.env.DATABASE_URL || '';
 // todo o resto do código (services continuam lendo texto puro em memória; só o valor persistido
 // no Postgres é cifrado). Config e helpers em src/lib/crypto/piiFields.ts (ver ali o mapa completo
 // de models/campos) — mantido apenas o mesmo nome local `ENCRYPTED_FIELDS` abaixo para não alterar
-// o resto deste arquivo. `Contact` NÃO está neste mapa (chegou a entrar e foi revertido na onda 39
-// — quebrava busca/leitura por e-mail/telefone contra Postgres real; ver
-// .agents/handoffs/onda-39/01-para-00-pii-contact-revertida-quebra-integration.md).
+// o resto deste arquivo. `Contact` (email/phone/whatsapp) ESTÁ neste mapa: entrou, foi revertido na
+// onda 39 (ver .agents/handoffs/onda-39/01-para-00-pii-contact-revertida-quebra-integration.md) e
+// voltou com o índice cego (piiIndex.ts) e a decifragem aninhada (decryptNestedContactPii abaixo).
+// Fonte da verdade: ENCRYPTED_MODEL_FIELDS em piiFields.ts.
 
 // Production-ready connection pool configuration.
 // `max` precisa ficar abaixo do pool_size do pooler do Supabase em modo "Session" (hoje 15) —
@@ -125,6 +127,29 @@ function decryptNestedContactPii(value: unknown, depth = 0): unknown {
 }
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+/**
+ * Transação interativa ativa (propagação de tx — parecer 15 U1/U2). Enquanto `runInTransaction`
+ * estiver executando, TODA operação de model do client estendido (`prisma`) roda nesta mesma
+ * transação/conexão em vez de abrir uma nova — mantendo cifragem, índice cego, injeção de tenant,
+ * soft delete e auditoria, e tornando-as atômicas com SQL cru (outbox, advisory lock) do mesmo tx.
+ */
+interface ActiveTransaction {
+  tx: Prisma.TransactionClient;
+  tenantId: string;
+  /** Efeitos colaterais externos (ex.: fila de busca) adiados para depois do COMMIT. */
+  afterCommit: Array<() => void>;
+}
+const activeTransaction = new AsyncLocalStorage<ActiveTransaction>();
+
+export class TransactionTenantMismatchError extends Error {
+  constructor(active: string, requested: string) {
+    super(
+      `runInTransaction: tenant da operação (${requested || '<vazio>'}) difere do tenant da transação ativa (${active})`,
+    );
+    this.name = 'TransactionTenantMismatchError';
+  }
+}
 
 const basePrisma =
   globalForPrisma.prisma ||
@@ -425,6 +450,20 @@ export const prisma = basePrisma.$extends({
         const executeWithRls = async <T>(
           build: (client: PrismaClient) => Prisma.PrismaPromise<T>,
         ): Promise<T> => {
+          // Propagação de tx: dentro de runInTransaction, reusa a transação ativa (mesma conexão, mesmo
+          // set_config local). Nunca abre transação nova nem aceita outro tenant/bypass ali dentro.
+          const active = activeTransaction.getStore();
+          if (active) {
+            if (rawBypassRls) {
+              throw new Error(
+                'runInTransaction: bypassRls não é permitido dentro de uma transação de tenant',
+              );
+            }
+            if (tenantId !== active.tenantId) {
+              throw new TransactionTenantMismatchError(active.tenantId, tenantId ?? '');
+            }
+            return await build(active.tx as unknown as PrismaClient);
+          }
           if (!tenantId && !bypassRls) return await build(basePrisma);
           // Sem try/catch de propósito: um `catch { return await prismaPromise }` aqui existia antes
           // e mascarava o erro real de qualquer falha (ex.: violação de unique constraint) reexecutando
@@ -609,13 +648,20 @@ export const prisma = basePrisma.$extends({
             const indexName = model === 'Company' ? 'companies' : 'leads';
             const searchAction =
               operation === 'delete' ? 'delete' : operation === 'create' ? 'add' : 'update';
-            searchQueue
-              ?.add(searchAction, {
-                index: indexName,
-                action: searchAction,
-                data: operation === 'delete' ? [result.id] : [{ ...result }],
-              })
-              .catch((err) => logger.error(err, 'Failed to enqueue search index task'));
+            const payload = {
+              index: indexName,
+              action: searchAction,
+              data: operation === 'delete' ? [result.id] : [{ ...result }],
+            };
+            const enqueue = () => {
+              searchQueue
+                ?.add(searchAction, payload)
+                .catch((err) => logger.error(err, 'Failed to enqueue search index task'));
+            };
+            // Dentro de runInTransaction: só enfileira após COMMIT (rollback não reindexa).
+            const active = activeTransaction.getStore();
+            if (active) active.afterCommit.push(enqueue);
+            else enqueue();
           }
         }
 
@@ -673,6 +719,110 @@ export async function withRlsContext<T>(
       timeout: 30000,
     },
   );
+}
+
+/**
+ * Cliente entregue por `runInTransaction`: delegates de model do client ESTENDIDO (cifragem, índice
+ * cego, injeção de tenant, soft delete, auditoria — todos roteados para a transação ativa) + SQL cru
+ * (`$queryRaw*`/`$executeRaw*`) direto na transação real. Compatível com o `SqlExecutor` do #32.
+ */
+export type TransactionalClient = PrismaClient;
+
+const RAW_METHODS = new Set(['$queryRaw', '$executeRaw', '$queryRawUnsafe', '$executeRawUnsafe']);
+
+function makeTransactionalClient(active: ActiveTransaction): TransactionalClient {
+  return new Proxy({} as TransactionalClient, {
+    get(_target, prop) {
+      if (typeof prop === 'string' && RAW_METHODS.has(prop)) {
+        const fn = (active.tx as unknown as Record<string, (...a: unknown[]) => unknown>)[prop];
+        return fn.bind(active.tx);
+      }
+      if (prop === '$transaction') {
+        // Aninhado: reusa a mesma transação (forma função). Forma array não é suportada aqui.
+        return (arg: unknown) => {
+          if (typeof arg !== 'function') {
+            throw new Error(
+              'runInTransaction: $transaction([...]) não é suportado dentro do tx; use a forma função',
+            );
+          }
+          return (arg as (c: TransactionalClient) => Promise<unknown>)(
+            makeTransactionalClient(active),
+          );
+        };
+      }
+      if (prop === 'then') return undefined; // não é thenable
+      return (prisma as unknown as Record<string | symbol, unknown>)[prop];
+    },
+  });
+}
+
+/**
+ * Unidade de trabalho sobre o client ESTENDIDO (parecer 15 U1/U2/U3). Abre UMA transação interativa
+ * no client base, faz `set_config('app.bypass_rls','off',true)` + `set_config('app.current_tenant_id',
+ * tenant, true)` e executa `fn` com um client transacional: toda operação de model do `prisma`
+ * (inclusive chamada indireta, ex.: AuditService) e o SQL cru do client entregue rodam na mesma
+ * conexão/transação. Efeitos externos (fila de busca) só depois do COMMIT.
+ *
+ * - Tenant: `organizationId` explícito ou o do `requestContext`; sem tenant → erro (fail-closed).
+ *   Divergência entre os dois → `TransactionTenantMismatchError`. Nunca aceita bypassRls.
+ * - Aninhado: se já houver transação ativa do MESMO tenant, reusa (mesma conexão); outro tenant → erro.
+ * - Assinatura compatível com `PrismaOutboxUnitOfWork` (#32): `new PrismaOutboxUnitOfWork(
+ *   (fn) => runInTransaction(fn))`.
+ */
+export async function runInTransaction<R>(
+  fn: (tx: TransactionalClient) => Promise<R>,
+  opts: { organizationId?: string; maxWaitMs?: number; timeoutMs?: number } = {},
+): Promise<R> {
+  const store = requestContext.getStore() as Record<string, unknown> | undefined;
+  const ctxTenant = (store?.tenantId as string | undefined) ?? '';
+  const tenantId = opts.organizationId ?? ctxTenant;
+  if (!tenantId) {
+    throw new Error(
+      'runInTransaction: tenant obrigatório (requestContext.tenantId ou opts.organizationId)',
+    );
+  }
+  if (ctxTenant && ctxTenant !== tenantId) {
+    throw new TransactionTenantMismatchError(ctxTenant, tenantId);
+  }
+
+  const current = activeTransaction.getStore();
+  if (current) {
+    if (current.tenantId !== tenantId)
+      throw new TransactionTenantMismatchError(current.tenantId, tenantId);
+    return await fn(makeTransactionalClient(current));
+  }
+
+  const afterCommit: Array<() => void> = [];
+  const result = await requestContext.run(
+    { ...(store ?? {}), tenantId, bypassRls: false } as Parameters<typeof requestContext.run>[0],
+    () =>
+      basePrisma.$transaction(
+        async (tx) => {
+          await tx.$executeRawUnsafe(
+            `SELECT set_config('app.bypass_rls', 'off', TRUE), set_config('app.current_tenant_id', $1, TRUE);`,
+            tenantId,
+          );
+          const active: ActiveTransaction = { tx, tenantId, afterCommit };
+          // `async/await` dentro do run: ancora a store mesmo se `fn` devolver PrismaPromise lazy.
+          return activeTransaction.run(
+            active,
+            async () => await fn(makeTransactionalClient(active)),
+          );
+        },
+        {
+          maxWait: opts.maxWaitMs ?? (process.env.NODE_ENV === 'test' ? 30000 : 15000),
+          timeout: opts.timeoutMs ?? 45000,
+        },
+      ),
+  );
+  for (const cb of afterCommit) {
+    try {
+      cb();
+    } catch (err) {
+      logger.error({ err }, 'runInTransaction: falha em efeito pós-commit');
+    }
+  }
+  return result;
 }
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = basePrisma;
