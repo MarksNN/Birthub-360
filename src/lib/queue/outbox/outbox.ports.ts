@@ -44,12 +44,27 @@ export type NewOutboxRecord = Omit<
 >;
 
 /** Repositório da outbox. `append` deve rodar no cliente transacional do caso de uso. */
+export interface OutboxRef {
+  id: string;
+  organizationId: string;
+}
+
+export interface FailureUpdate {
+  retryCount: number;
+  /** Atraso até a próxima tentativa; a Prisma calcula `now() + delay` no SQL. */
+  delayMs: number;
+  /** Relógio de referência para a implementação em memória. */
+  now: Date;
+  lastError: string;
+  deadLetter: boolean;
+}
+
 export interface AppendOptions {
   /**
    * Grava já reivindicado (status PROCESSING, lockedBy/lockedUntil) — usado pelo publish inline
    * para que um relay concorrente não entregue o mesmo registro durante a entrega inline.
    */
-  claimFor?: { workerId: string; leaseUntil: Date };
+  claimFor?: { workerId: string; leaseMs: number };
 }
 
 export interface OutboxRepository {
@@ -58,20 +73,23 @@ export interface OutboxRepository {
     record: NewOutboxRecord,
     opts?: AppendOptions,
   ): Promise<{ record: OutboxRecord; created: boolean }>;
-  /** Reivindica até `limit` registros elegíveis (PENDING/FAILED com nextAttemptAt <= now ou lock expirado). */
+  /**
+   * Reivindica até `limit` registros elegíveis (PENDING/FAILED vencidos ou lease expirado).
+   * `now` só é usado pela implementação em memória; a Prisma usa now() do Postgres.
+   * `organizationId` é obrigatório em adaptadores com RLS (o relay itera por tenant).
+   */
   claimBatch(params: {
     workerId: string;
     limit: number;
     now: Date;
     leaseMs: number;
+    organizationId?: string;
   }): Promise<OutboxRecord[]>;
-  markDispatched(id: string, workerId: string, at: Date): Promise<void>;
-  markFailed(
-    id: string,
-    workerId: string,
-    update: { retryCount: number; nextAttemptAt: Date; lastError: string; deadLetter: boolean },
-  ): Promise<void>;
-  findById(id: string): Promise<OutboxRecord | null>;
+  /** Tenants a varrer (adaptadores com RLS). Ausente = varredura única sem tenant. */
+  listTenants?(): Promise<string[]>;
+  markDispatched(ref: OutboxRef, workerId: string, at: Date): Promise<void>;
+  markFailed(ref: OutboxRef, workerId: string, update: FailureUpdate): Promise<void>;
+  findById(ref: OutboxRef): Promise<OutboxRecord | null>;
   /** Devolve registros DEAD_LETTER para PENDING (retryCount=0). Retorna quantos foram reenfileirados. */
   requeueDeadLetters(filter: {
     organizationId?: string;
@@ -83,7 +101,8 @@ export interface OutboxRepository {
    * Retorna quantos foram removidos.
    */
   purge(params: {
-    olderThan: Date;
+    retentionMs: number;
+    now: Date;
     statuses: Array<'DISPATCHED' | 'DEAD_LETTER'>;
   }): Promise<number>;
 }

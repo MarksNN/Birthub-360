@@ -79,3 +79,13 @@ Candidatos (escrevem no banco e publicam em seguida — dual-write), por dono a 
 - `src/features/market-intelligence/server/marketSensing.service.ts` (07)
 - `src/lib/security/services/continuousSecurityAudit.service.ts` (15)
 Os demais 16 produtores não escrevem no banco no mesmo fluxo e podem continuar em `publish()` (inline com lock + relay).
+
+## Status após PR #34 (2c7ccb28) — adaptador do 16 implementado (`src/lib/queue/outbox/prismaOutbox.repository.ts`)
+- Claim com CTE `WITH due AS (... ORDER BY "createdAt" LIMIT n FOR UPDATE SKIP LOCKED) UPDATE ... FROM due` (regra do 01).
+- RLS: toda query roda com `app.current_tenant_id`; o relay itera por tenant (descoberta via `Organization`, já na allowlist de bypass). Sem BYPASSRLS.
+- Timestamps: só `now()` do Postgres (append, claim, lease, nextAttemptAt, dispatchedAt, requeue, purge).
+- **Pendência para o 01 (não bloqueia o merge do #34, mas limita a garantia):** `DomainEventConsumption` do #34 não tem
+  `reservedBy`, `reservedUntil`, `completedAt`. Sem elas, o adaptador usa `ON CONFLICT DO NOTHING` + DELETE em falha;
+  um crash entre reserva e conclusão deixa a linha e aquele consumidor não reexecuta (at-most-once nesse caso).
+  Pedido: adicionar `reservedBy text NOT NULL DEFAULT ''`, `reservedUntil timestamptz(3) NULL`, `completedAt timestamptz(3) NULL`
+  e `INDEX (status, dispatchedAt)` na outbox para o purge (`DELETE ... COALESCE("dispatchedAt","createdAt") < now() - retenção`).

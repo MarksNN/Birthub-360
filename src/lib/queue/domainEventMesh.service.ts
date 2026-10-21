@@ -89,7 +89,7 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
     repo: OutboxRepository,
     envelope: DomainEventEnvelope<T>,
     opts: PublishOptions,
-    claimFor?: { workerId: string; leaseUntil: Date },
+    claimFor?: { workerId: string; leaseMs: number },
   ) {
     return repo.append(
       {
@@ -147,7 +147,7 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
     const inlineWorker = `inline-${randomUUID()}`;
     const { record, created } = await this.appendTo(this.outbox, envelope, opts, {
       workerId: inlineWorker,
-      leaseUntil: new Date(Date.now() + DomainEventMeshService.INLINE_LEASE_MS),
+      leaseMs: DomainEventMeshService.INLINE_LEASE_MS,
     });
     if (!created) return record.envelope as unknown as DomainEventEnvelope<T>;
 
@@ -163,12 +163,13 @@ export class DomainEventMeshService implements IDomainEventMeshPort {
 
     try {
       await this.deliver(record.envelope);
-      await this.outbox.markDispatched(record.id, inlineWorker, new Date());
+      await this.outbox.markDispatched(record, inlineWorker, new Date());
     } catch (err) {
       const retryCount = 1;
-      await this.outbox.markFailed(record.id, inlineWorker, {
+      await this.outbox.markFailed(record, inlineWorker, {
         retryCount,
-        nextAttemptAt: new Date(Date.now() + computeBackoffMs(retryCount, this.backoff)),
+        delayMs: computeBackoffMs(retryCount, this.backoff),
+        now: new Date(),
         lastError: sanitizeError(err),
         deadLetter: retryCount >= record.maxAttempts,
       });

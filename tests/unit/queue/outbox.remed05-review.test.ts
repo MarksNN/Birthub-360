@@ -53,12 +53,12 @@ describe('PR#32 review (1): publish inline reivindica o lock', () => {
     const repo = new InMemoryOutboxRepository();
     const { record } = await repo.append(
       { id: 'o1', eventId: 'e1', eventType: 'DEAL_WON', organizationId: 'org-1', envelope: {} as never, payload: {}, maxAttempts: 3, createdAt: new Date().toISOString() },
-      { claimFor: { workerId: 'dono', leaseUntil: new Date(Date.now() + 1000) } },
+      { claimFor: { workerId: 'dono', leaseMs: 1000 } },
     );
-    await repo.markDispatched(record.id, 'intruso', new Date());
-    expect((await repo.findById('o1'))?.status).toBe('PROCESSING');
-    await repo.markDispatched(record.id, 'dono', new Date());
-    expect((await repo.findById('o1'))?.status).toBe('DISPATCHED');
+    await repo.markDispatched(record, 'intruso', new Date());
+    expect((await repo.findById({ id: 'o1', organizationId: 'org-1' }))?.status).toBe('PROCESSING');
+    await repo.markDispatched(record, 'dono', new Date());
+    expect((await repo.findById({ id: 'o1', organizationId: 'org-1' }))?.status).toBe('DISPATCHED');
   });
 });
 

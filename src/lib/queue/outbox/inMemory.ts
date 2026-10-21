@@ -1,8 +1,10 @@
 import type {
   AppendOptions,
   ConsumptionStore,
+  FailureUpdate,
   NewOutboxRecord,
   OutboxRecord,
+  OutboxRef,
   OutboxRepository,
   OutboxUnitOfWork,
 } from './outbox.ports.js';
@@ -28,7 +30,9 @@ export class InMemoryOutboxRepository implements OutboxRepository {
       retryCount: 0,
       nextAttemptAt: input.createdAt,
       lockedBy: opts.claimFor?.workerId,
-      lockedUntil: opts.claimFor?.leaseUntil.toISOString(),
+      lockedUntil: opts.claimFor
+        ? new Date(Date.now() + opts.claimFor.leaseMs).toISOString()
+        : undefined,
     };
     this.records.set(record.id, record);
     return { record: { ...record }, created: true };
@@ -39,11 +43,13 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     limit,
     now,
     leaseMs,
+    organizationId,
   }: {
     workerId: string;
     limit: number;
     now: Date;
     leaseMs: number;
+    organizationId?: string;
   }) {
     const out: OutboxRecord[] = [];
     const sorted = [...this.records.values()].sort((a, b) =>
@@ -51,6 +57,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     );
     for (const r of sorted) {
       if (out.length >= limit) break;
+      if (organizationId && r.organizationId !== organizationId) continue;
       const eligible =
         ((r.status === 'PENDING' || r.status === 'FAILED') && new Date(r.nextAttemptAt) <= now) ||
         (r.status === 'PROCESSING' &&
@@ -71,8 +78,8 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     return r && r.status === 'PROCESSING' && r.lockedBy === workerId ? r : undefined;
   }
 
-  async markDispatched(id: string, workerId: string, at: Date) {
-    const r = this.owned(id, workerId);
+  async markDispatched(ref: OutboxRef, workerId: string, at: Date) {
+    const r = this.owned(ref.id, workerId);
     if (!r) return;
     Object.assign(r, {
       status: 'DISPATCHED',
@@ -82,25 +89,21 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     });
   }
 
-  async markFailed(
-    id: string,
-    workerId: string,
-    u: { retryCount: number; nextAttemptAt: Date; lastError: string; deadLetter: boolean },
-  ) {
-    const r = this.owned(id, workerId);
+  async markFailed(ref: OutboxRef, workerId: string, u: FailureUpdate) {
+    const r = this.owned(ref.id, workerId);
     if (!r) return;
     Object.assign(r, {
       status: u.deadLetter ? 'DEAD_LETTER' : 'FAILED',
       retryCount: u.retryCount,
-      nextAttemptAt: u.nextAttemptAt.toISOString(),
+      nextAttemptAt: new Date(u.now.getTime() + u.delayMs).toISOString(),
       lastError: u.lastError,
       lockedBy: undefined,
       lockedUntil: undefined,
     });
   }
 
-  async findById(id: string) {
-    const r = this.records.get(id);
+  async findById(ref: OutboxRef) {
+    const r = this.records.get(ref.id);
     return r ? { ...r } : null;
   }
 
@@ -125,12 +128,15 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   }
 
   async purge({
-    olderThan,
+    retentionMs,
+    now,
     statuses,
   }: {
-    olderThan: Date;
+    retentionMs: number;
+    now: Date;
     statuses: Array<'DISPATCHED' | 'DEAD_LETTER'>;
   }) {
+    const olderThan = new Date(now.getTime() - retentionMs);
     let n = 0;
     for (const [id, r] of this.records) {
       if (!(statuses as string[]).includes(r.status)) continue;

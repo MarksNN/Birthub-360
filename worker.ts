@@ -7,6 +7,7 @@ registerProcessGuards();
 import { startWorkerServer } from './src/bootstrap/workerServer.js';
 import { logger } from './src/lib/logger.js';
 import { setWorkerProcessUp } from './src/lib/queue/metrics.js';
+import { startDomainEventOutboxRelay } from './src/lib/queue/outbox/prismaRuntime.js';
 import { env } from './src/config/env.js';
 
 import { createLeadsWorker } from './src/lib/queue/index.js';
@@ -173,6 +174,8 @@ async function start() {
   await startWorkerServer(
     workers,
     async () => {
+      // REMED-05: relay da outbox (só no worker; gate DOMAIN_EVENT_OUTBOX=prisma, depende do #34).
+      await startDomainEventOutboxRelay();
       await scheduleBitrixSync();
       await scheduleFollowUpJobs();
       await scheduleExecutiveSummaryJob();

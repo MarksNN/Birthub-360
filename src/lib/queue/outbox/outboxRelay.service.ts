@@ -46,7 +46,7 @@ export class OutboxRelay {
     const policy = this.opts.backoff ?? DEFAULT_BACKOFF;
     try {
       await this.opts.dispatcher(record.envelope, record);
-      await this.opts.repository.markDispatched(record.id, this.workerId, now);
+      await this.opts.repository.markDispatched(record, this.workerId, now);
       return 'DISPATCHED';
     } catch (err) {
       const retryCount = record.retryCount + 1;
@@ -54,9 +54,10 @@ export class OutboxRelay {
       const deadLetter = retryCount >= maxAttempts;
       const delay = computeBackoffMs(retryCount, policy, this.opts.random);
       const lastError = sanitizeError(err);
-      await this.opts.repository.markFailed(record.id, this.workerId, {
+      await this.opts.repository.markFailed(record, this.workerId, {
         retryCount,
-        nextAttemptAt: new Date(now.getTime() + delay),
+        delayMs: delay,
+        now,
         lastError,
         deadLetter,
       });
@@ -81,14 +82,28 @@ export class OutboxRelay {
   /** Processa um lote; retorna quantos registros foram reivindicados. */
   async tick(): Promise<number> {
     const now = (this.opts.now ?? (() => new Date()))();
-    const batch = await this.opts.repository.claimBatch({
-      workerId: this.workerId,
-      limit: this.opts.batchSize ?? 50,
-      now,
-      leaseMs: this.opts.leaseMs ?? 30_000,
-    });
-    for (const record of batch) await this.processRecord(record, now);
-    return batch.length;
+    const repo = this.opts.repository;
+    // Com RLS estrita, o relay itera por tenant e cada claim roda com o contexto da organização.
+    const tenants: Array<string | undefined> = repo.listTenants
+      ? await repo.listTenants()
+      : [undefined];
+    let total = 0;
+    for (const organizationId of tenants) {
+      try {
+        const batch = await repo.claimBatch({
+          workerId: this.workerId,
+          limit: this.opts.batchSize ?? 50,
+          now,
+          leaseMs: this.opts.leaseMs ?? 30_000,
+          organizationId,
+        });
+        for (const record of batch) await this.processRecord(record, now);
+        total += batch.length;
+      } catch (err) {
+        logger.error({ err, organizationId }, 'OutboxRelay: falha ao processar tenant');
+      }
+    }
+    return total;
   }
 
   /** Reprocessamento da DLQ (operação administrativa). */
@@ -114,7 +129,8 @@ export class OutboxRelay {
   ): Promise<number> {
     const now = (this.opts.now ?? (() => new Date()))();
     const n = await this.opts.repository.purge({
-      olderThan: new Date(now.getTime() - retentionDays * 86_400_000),
+      retentionMs: retentionDays * 86_400_000,
+      now,
       statuses,
     });
     if (n > 0) outboxPurgedTotal.inc({ organization: 'all' }, n);
