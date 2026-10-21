@@ -5,7 +5,13 @@ import type {
   RebalanceApprovalRequest,
   RebalanceApprovalResponse,
 } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
+import {
+  REBALANCE_APPROVAL_ACTION,
+  REBALANCE_APPROVAL_ENTITY,
+  type RebalanceApprovalStore,
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 
+export type { RebalanceApprovalStore };
 /**
  * REMED-04 — aprovação humana de rebalanceamento de carteira.
  *
@@ -15,8 +21,7 @@ import type {
  * payload/decisão divergente → 409. Limite conhecido: sem UNIQUE no banco, duas requisições
  * simultâneas podem gravar 2 linhas — ver handoff 04→01 (model dedicado com @@unique).
  */
-export const REBALANCE_APPROVAL_ENTITY = 'RebalanceApproval';
-export const REBALANCE_APPROVAL_ACTION = 'REBALANCE_DECISION';
+export { REBALANCE_APPROVAL_ACTION, REBALANCE_APPROVAL_ENTITY };
 
 export const rebalanceApprovalRequestSchema = z
   .object({
@@ -41,17 +46,6 @@ export class RebalanceApprovalError extends Error {
   ) {
     super(message);
   }
-}
-
-export interface RebalanceApprovalStore {
-  /** true se o lead existe no funil Negócio DESTE tenant. */
-  leadExists(organizationId: string, leadId: string): Promise<boolean>;
-  findByRecommendation(
-    organizationId: string,
-    recommendationId: string,
-  ): Promise<RebalanceApprovalRecord | null>;
-  /** Grava o registro + trilha de auditoria (mesma linha de AuditLog). */
-  save(record: RebalanceApprovalRecord, ipAddress?: string): Promise<void>;
 }
 
 function samePayload(a: RebalanceApprovalRequest, b: RebalanceApprovalRequest): boolean {
