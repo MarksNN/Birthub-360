@@ -154,6 +154,11 @@ export function createConsentAuditChain(
     throw new Error('NODE_ENV=test recusado em ambiente de produção (cadeia de consentimento)');
   }
   const pepper = opts.pepperProvider ?? resolveTenantKeyProvider(env, opts, isTest);
+  if (isProd(env) && pepper instanceof EnvTenantPepperProvider) {
+    throw new MissingPepperError(
+      'Produção exige KmsTenantPepperProvider; provider por env recusado',
+    );
+  }
 
   if (isTest && !opts.prisma && env.CONSENT_CHAIN_USE_PRISMA !== '1') {
     return new ConsentAuditChainService({

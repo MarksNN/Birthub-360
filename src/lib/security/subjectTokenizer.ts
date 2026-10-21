@@ -157,6 +157,10 @@ export class KmsEnvelopeTenantKeyProvider implements TenantKeyProvider {
   }
 }
 
+/** Nome canônico exigido em produção (alinhado ao #35/Agente 24). */
+export const KmsTenantPepperProvider = KmsEnvelopeTenantKeyProvider;
+export type KmsTenantPepperProvider = KmsEnvelopeTenantKeyProvider;
+
 /** Fail-closed: usado em produção quando o KMS não está configurado. */
 export class UnavailableTenantKeyProvider implements TenantKeyProvider {
   constructor(private readonly reason: string) {}

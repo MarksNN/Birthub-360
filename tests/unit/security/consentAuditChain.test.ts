@@ -234,6 +234,32 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
       expect(await t.lookupId('B', 's')).toBeTruthy();
     });
 
+    it('contrato HMAC: token ≠ sha256(subjectRef) e muda quando a chave muda', async () => {
+      const ks = new InMemorySubjectKeyStore();
+      const t = new SubjectTokenizer(new EnvTenantPepperProvider(PEPPER), ks);
+      const tok = await t.tokenFor('o', 'lead-1');
+      const sha = createHash('sha256').update('lead-1').digest('hex');
+      expect(tok).toMatch(/^hs256:/);
+      expect(tok).not.toContain(sha);
+      expect(tok.slice('hs256:'.length)).not.toBe(sha);
+      // outra chave de titular (store novo) → token diferente para o mesmo subjectRef
+      const t2 = new SubjectTokenizer(new EnvTenantPepperProvider(PEPPER), new InMemorySubjectKeyStore());
+      expect(await t2.tokenFor('o', 'lead-1')).not.toBe(tok);
+      // outro segredo de tenant → lookupId diferente
+      const t3 = new SubjectTokenizer(new EnvTenantPepperProvider(PEPPER.replace(/./, 'z')), ks);
+      expect(await t3.lookupId('o', 'lead-1')).not.toBe(await t.lookupId('o', 'lead-1'));
+    });
+
+    it('produção com provider por env: falha no boot da fábrica', () => {
+      expect(() =>
+        createConsentAuditChain({
+          env: { NODE_ENV: 'production', LGPD_KMS_KEY_ID: 'alias/x' },
+          pepperProvider: new EnvTenantPepperProvider(PEPPER),
+          prisma: {},
+        }),
+      ).toThrow(MissingPepperError);
+    });
+
     it('produção sem KMS: fail-closed, mesmo com segredo global presente', async () => {
       const chain = createConsentAuditChain({
         env: { NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
@@ -280,7 +306,7 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
         orig(o, async (ctx) => {
           const r = await fn({
             ...ctx,
-            setHead: async () => {
+            enqueuePurge: async () => {
               throw new Error('crash');
             },
           });
@@ -313,7 +339,7 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
   describe('factory de produção (F1/P1-2)', () => {
     it('fora de teste, sem models do Agente 01, falha fechado (nunca memória)', async () => {
       const svc = createConsentAuditChain({
-        env: { NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
+        env: { NODE_ENV: 'development', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
         pepperProvider: new EnvTenantPepperProvider(PEPPER),
         prisma: {},
       });
@@ -372,9 +398,20 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
           return 1;
         },
       };
+      // Emula o trigger BEFORE INSERT do #35 (cria/avança o head).
+      const recCreate = tx.consentAuditRecord.create;
+      tx.consentAuditRecord.create = async (a: { data: Record<string, unknown> }) => {
+        const d = a.data;
+        rows.headTrigger ??= [];
+        const h = rows.headTrigger[0];
+        if (!h) rows.headTrigger.push({ organizationId: d.organizationId, genesisId: d.id, genesisHash: d.currentHash, lastSequence: d.sequence, lastHash: d.currentHash });
+        else Object.assign(h, { lastSequence: d.sequence, lastHash: d.currentHash });
+        return recCreate(a);
+      };
+      tx.consentAuditChainHead.findFirst = async () => rows.headTrigger?.[0] ?? null;
       const prisma = { ...tx, $transaction: (fn: (t: typeof tx) => Promise<unknown>) => fn(tx) };
       const svc = createConsentAuditChain({
-        env: { NODE_ENV: 'production', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
+        env: { NODE_ENV: 'development', LGPD_SUBJECT_PEPPER_SECRET: PEPPER },
         pepperProvider: new EnvTenantPepperProvider(PEPPER),
         prisma,
       });
@@ -382,7 +419,9 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
       await svc.revokeConsent('o', 'a', 'TITULAR_REQUEST', undefined, { processNow: false });
       expect(rows.rec).toHaveLength(3);
       expect(rows.task).toHaveLength(1);
-      expect(rows.head[0]).toMatchObject({ lastSequence: 2 });
+      // head é mantido pelo trigger do #35: a aplicação nunca grava head
+      expect(rows.head ?? []).toHaveLength(0);
+      expect(rows.headTrigger[0]).toMatchObject({ lastSequence: 2 });
       expect(locks).toContainEqual(expect.stringContaining('pg_advisory_xact_lock'));
       expect(locks[0]).toContain("set_config('app.current_tenant_id'");
       expect(await svc.verifyChainIntegrity('o')).toEqual({ valid: true, totalRecords: 3 });

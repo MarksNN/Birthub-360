@@ -80,7 +80,6 @@ export interface ChainLockContext {
   head: ConsentChainHead | null;
   last: StoredConsentAuditEvent | null;
   append: (event: StoredConsentAuditEvent) => Promise<void>;
-  setHead: (head: ConsentChainHead) => Promise<void>;
   enqueuePurge: (task: ConsentPurgeTask) => Promise<void>;
   saveDetail: (detail: ConsentEventDetail) => Promise<void>;
 }
@@ -131,10 +130,27 @@ export class InMemoryConsentAuditChainRepository implements ConsentAuditChainRep
           : null,
         last: chain.at(-1) ? { ...(chain.at(-1) as StoredConsentAuditEvent) } : null,
         append: async (e) => {
+          // Emula o trigger BEFORE INSERT do #35: confere sequência/encadeamento e avança o head.
+          const tip = staged.at(-1) ?? chain.at(-1);
+          const h = stagedHead ?? this.heads.get(organizationId);
+          if (e.organizationId !== organizationId) throw new Error('tenant divergente');
+          if (
+            !tip
+              ? e.sequence !== 0 || e.previousHash !== GENESIS_HASH
+              : !h || e.sequence !== h.lastSequence + 1 || e.previousHash !== h.lastHash
+          ) {
+            throw new Error('trigger: sequence/previousHash fora de ordem');
+          }
+          stagedHead = tip
+            ? { ...(h as ConsentChainHead), lastSequence: e.sequence, lastHash: e.currentHash }
+            : {
+                organizationId,
+                genesisId: e.id,
+                genesisHash: e.currentHash,
+                lastSequence: 0,
+                lastHash: e.currentHash,
+              };
           staged.push({ ...e });
-        },
-        setHead: async (h) => {
-          stagedHead = { ...h };
         },
         enqueuePurge: async (t) => {
           stagedPurges.push({ ...t });
@@ -368,15 +384,11 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
           occurredAt: new Date().toISOString(),
         };
         tip = { ...g, currentHash: computeConsentEventHash(g) };
+        // O banco (trigger #35) cria o head na gênese; a aplicação não grava head.
         await ctx.append(tip);
-        head = {
-          organizationId,
-          genesisId: tip.id,
-          genesisHash: tip.currentHash,
-          lastSequence: 0,
-          lastHash: tip.currentHash,
-        };
+        head = null;
       }
+      // Head só é LIDO (checagem); o trigger do #35 o avança.
       if (head && (head.lastSequence !== tip.sequence || head.lastHash !== tip.currentHash)) {
         throw new ConsentChainUnavailableError('Head divergente do último elo — append recusado');
       }
@@ -386,13 +398,6 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
         currentHash: computeConsentEventHash(partial),
       };
       await ctx.append(event);
-      await ctx.setHead({
-        organizationId,
-        genesisId: head?.genesisId ?? tip.id,
-        genesisHash: head?.genesisHash ?? tip.currentHash,
-        lastSequence: event.sequence,
-        lastHash: event.currentHash,
-      });
       if (after) await after(event, ctx);
       return event;
     });

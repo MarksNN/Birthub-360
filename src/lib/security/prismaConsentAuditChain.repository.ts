@@ -221,13 +221,6 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
         append: async (e) => {
           await tx.consentAuditRecord.create({ data: toRow(e) });
         },
-        setHead: async (h: ConsentChainHead) => {
-          await tx.consentAuditChainHead.upsert({
-            where: { organizationId: h.organizationId },
-            create: { ...h },
-            update: { lastSequence: h.lastSequence, lastHash: h.lastHash },
-          });
-        },
         enqueuePurge: async (t) => {
           await tx.consentPurgeTask.create({ data: taskRow(t) });
         },
