@@ -5,7 +5,7 @@ import {
   REBALANCE_APPROVAL_ACTION,
   REBALANCE_APPROVAL_ENTITY,
   type RebalanceApprovalStore,
-} from '../services/rebalanceApproval.service.js';
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 
 /** Persistência via `AuditLog` (sem migration) — sempre filtrado por tenantId = organizationId. */
 export class PrismaRebalanceApprovalStore implements RebalanceApprovalStore {

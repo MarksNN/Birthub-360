@@ -5,7 +5,7 @@ import type {
   OracleForecastSnapshot,
   OracleHistoryReader,
   OracleOpenDeal,
-} from '../services/predictiveRevenueOracle.service.js';
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 
 // Mesma regra de ganho/perdido de PrismaCommercialIntelligenceRepository.findDeals:
 // `CrmPipelineStage.isWon/isLost` quando há etapa; senão o fallback por status.
