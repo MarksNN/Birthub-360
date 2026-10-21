@@ -32,6 +32,24 @@ Há uma tensão nisso: append-only conflita com eliminação.
    - Qualquer worker cross-tenant precisa iterar **por organização**: listar as organizações pelo caminho já permitido (Organization está no allowlist de bypass) e, para cada uma, abrir uma transação com `set_config('app.current_tenant_id', orgId, true)` antes de ler ou atualizar as tasks. O teste de integração prova que `app.bypass_rls = on` não abre nada nessas tabelas.
    - **Impacto no #33:** `processPendingPurges` e `deleteMany` de retenção hoje fazem `findMany` sem `organizationId`, e precisam passar a usar esse loop por organização.
 
+6. **O head avança no próprio banco.** O trigger `BEFORE INSERT` `consent_audit_advance_head` em `ConsentAuditRecord` é `SECURITY DEFINER` e roda o seguinte:
+   - recusa quando `organizationId` ≠ `app.current_tenant_id`, antes de ler o head. Assim não vaza sequence nem hash de outro tenant;
+   - `GENESIS` exige `sequence = 0` e `previousHash = 64 zeros`, e cria o head. Uma segunda gênese no mesmo tenant gera `GENESIS_REPLACED`;
+   - nos demais eventos, faz `SELECT … FOR UPDATE` no head, que serializa os appends concorrentes do tenant. Exige `sequence = lastSequence + 1` e `previousHash = lastHash`, e então avança `lastSequence/lastHash`.
+
+   Lacuna, reordenação e bifurcação são recusadas **no INSERT**. Somado ao guard de UPDATE do head (só cresce, gênese imutável), quem quiser esconder um truncamento de cauda precisa desligar os triggers como dono. Esse risco residual fica com a ancoragem externa (Agente 15).
+
+## Garantia de HMAC: é da aplicação, não do banco (parecer 24 @102cb08c, P2-1)
+
+O `CHECK (subjectRef ~ '^hs256:[a-f0-9]{64}$')` valida **apenas o formato**. O banco não consegue distinguir `hs256:HMAC(chave, ref)` de `hs256:` + `sha256(e-mail)` sem chave, que seria reversível por dicionário. A garantia de pseudonimização com chave é **da camada de aplicação** (`consentAuditChain.service.ts` do #33) e precisa ser coberta por um **teste de contrato no #33**: token ≠ `sha256(subjectRef)` e token muda quando a chave do titular muda.
+
+**Mitigação no banco avaliada e rejeitada:** amarrar cada registro não-gênese a uma linha de `ConsentSubjectKey` por FK `(organizationId, subjectLookupId)`.
+- (a) Uma FK impediria o DELETE da chave, que é justamente o crypto-shredding. As alternativas `ON DELETE SET NULL/CASCADE` exigiriam UPDATE ou DELETE na cadeia append-only.
+- (b) Gravar o `lookupId = HMAC(pepper do tenant, ref)` na cadeia **recriaria a vinculabilidade** que o shredding remove: enquanto o pepper existir, qualquer um com o `ref` recalcula o `lookupId` e acha os eventos do titular mesmo depois da eliminação.
+- (c) Mesmo com a FK, o banco continuaria sem verificar que o token foi derivado daquela chave, porque o HMAC é calculado fora do banco.
+
+O ganho seria marginal e o custo seria quebrar a eliminação, por isso a decisão foi apenas o CHECK de formato + teste de contrato no #33 + revisão do Agente 15.
+
 ## Base legal para manter a cadeia
 
 - **Art. 8º, §2º:** cabe ao controlador o ônus de provar que o consentimento foi obtido conforme a lei. A cadeia é essa prova e precisa sobreviver à revogação.
@@ -42,6 +60,16 @@ Há uma tensão nisso: append-only conflita com eliminação.
 
 - **Superuser ou dono.** Quem tem posse da tabela pode `DISABLE TRIGGER`, `DROP TRIGGER` ou usar `session_replication_role = replica`. A mitigação é dupla: o app nunca é dono e a âncora de cabeça existe. A ancoragem externa periódica do `lastHash`, ou HMAC com chave em KMS, fica com o Agente 15.
 - **Produção.** Falta evidência de que o runtime de produção usa `prospector_app` e não o dono. Isso é responsabilidade do 08A/15.
+
+## Dependência aberta: segredo por tenant destrutível (parecer 24 @102cb08c, P2-2)
+
+O passo 1 do runbook (destruir o pepper do tenant) **ainda não é possível** com o `EnvTenantPepperProvider` do #33. Ele deriva o pepper de um segredo global (`HMAC(LGPD_SUBJECT_PEPPER_SECRET, organizationId)`): destruir o segredo afetaria todos os tenants, e mantê-lo permite recalcular o pepper de qualquer tenant. Só o `KmsTenantPepperProvider`, com uma chave por tenant destrutível individualmente, cumpre o runbook.
+
+**Dependência para o 21 e o 15:**
+- exigir `KmsTenantPepperProvider` em produção, com falha no boot se `NODE_ENV=production` usar o provider de env;
+- definir a política de destruição e rotação das chaves no KMS (15).
+
+Até isso entrar, o offboarding atende a eliminação **por titular** (shredding de `ConsentSubjectKey`), mas **não** a desvinculação do tenant inteiro via pepper.
 
 ## Runbook — offboarding de tenant
 

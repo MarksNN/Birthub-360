@@ -281,6 +281,63 @@ CREATE TRIGGER consent_chain_head_no_truncate
 BEFORE TRUNCATE ON "ConsentAuditChainHead"
 FOR EACH STATEMENT EXECUTE FUNCTION consent_chain_head_guard();
 
+-- ─── Avanço do head NO BANCO (parecer 24 @102cb08c, P3): todo INSERT em ConsentAuditRecord
+-- passa por este trigger, que trava a linha do head (FOR UPDATE — serializa appends concorrentes
+-- do mesmo tenant), exige sequence = lastSequence + 1 e previousHash = lastHash, e avança o head.
+-- GENESIS: sequence 0, previousHash = 64 zeros (GENESIS_HASH do #33) e cria o head; um segundo
+-- GENESIS no mesmo tenant é recusado (recriação da cadeia). SECURITY DEFINER para que o avanço
+-- não dependa de privilégio do app no head (permite, no futuro, reduzir o app a SELECT no head).
+CREATE OR REPLACE FUNCTION consent_audit_advance_head() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
+DECLARE
+  h "ConsentAuditChainHead"%ROWTYPE;
+BEGIN
+  -- SECURITY DEFINER pode enxergar o head de outro tenant: recusa antes de ler qualquer coisa
+  -- (mesma semântica da policy tenant_isolation, sem vazar sequence/hash alheios em mensagem).
+  IF NEW."organizationId" IS DISTINCT FROM current_setting('app.current_tenant_id', true) THEN
+    RAISE EXCEPTION 'new row violates row-level security policy for table "ConsentAuditRecord"'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  IF NEW.kind = 'GENESIS' THEN
+    IF NEW.sequence <> 0 OR NEW."previousHash" <> repeat('0', 64) THEN
+      RAISE EXCEPTION 'ConsentAuditRecord: GENESIS exige sequence 0 e previousHash zero'
+        USING ERRCODE = 'check_violation';
+    END IF;
+    PERFORM 1 FROM "ConsentAuditChainHead" WHERE "organizationId" = NEW."organizationId" FOR UPDATE;
+    IF FOUND THEN
+      RAISE EXCEPTION 'ConsentAuditRecord: GENESIS_REPLACED (head já existe para a organização)'
+        USING ERRCODE = 'unique_violation';
+    END IF;
+    INSERT INTO "ConsentAuditChainHead" ("organizationId","genesisId","genesisHash","lastSequence","lastHash")
+    VALUES (NEW."organizationId", NEW.id, NEW."currentHash", 0, NEW."currentHash");
+    RETURN NEW;
+  END IF;
+
+  SELECT * INTO h FROM "ConsentAuditChainHead" WHERE "organizationId" = NEW."organizationId" FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'ConsentAuditRecord: cadeia sem GENESIS/head para a organização'
+      USING ERRCODE = 'foreign_key_violation';
+  END IF;
+  IF NEW.sequence <> h."lastSequence" + 1 THEN
+    RAISE EXCEPTION 'ConsentAuditRecord: sequence fora de ordem (esperado %, recebido %)', h."lastSequence" + 1, NEW.sequence
+      USING ERRCODE = 'check_violation';
+  END IF;
+  IF NEW."previousHash" <> h."lastHash" THEN
+    RAISE EXCEPTION 'ConsentAuditRecord: previousHash não confere com o head'
+      USING ERRCODE = 'check_violation';
+  END IF;
+  UPDATE "ConsentAuditChainHead"
+     SET "lastSequence" = NEW.sequence, "lastHash" = NEW."currentHash", "updatedAt" = CURRENT_TIMESTAMP
+   WHERE "organizationId" = NEW."organizationId";
+  RETURN NEW;
+END
+$$;
+REVOKE ALL ON FUNCTION consent_audit_advance_head() FROM PUBLIC;
+
+CREATE TRIGGER consent_audit_advance_head
+BEFORE INSERT ON "ConsentAuditRecord"
+FOR EACH ROW EXECUTE FUNCTION consent_audit_advance_head();
+
 -- ─── Tombstone de crypto-shredding: todo DELETE em ConsentSubjectKey deixa prova (sem material de
 -- chave) em ConsentSubjectKeyTombstone, que é append-only. O INSERT é feito por função SECURITY
 -- DEFINER, então o app só precisa de SELECT no tombstone. RLS (FORCE) continua valendo para o dono.

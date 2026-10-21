@@ -7,13 +7,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
  * - RLS tenant_isolation (ENABLE+FORCE) em ConsentAuditRecord, FlywheelApproachRecord e
  *   FlywheelFewShotExample: B não lê, não altera, não apaga linhas de A; insert cruzado recusado.
  * - ConsentAuditRecord é append-only: UPDATE/DELETE/TRUNCATE bloqueados para o papel de app
- *   (REVOKE + trigger) e também para o owner (trigger), quando OWNER_DATABASE_URL/DIRECT_URL existe.
+ *   (REVOKE + trigger). O comportamento do trigger para o DONO é provado sem conexão de owner
+ *   (tabela TEMP do próprio app com a mesma função) — nenhum teste é pulado no CI.
+ * - Head avançado pelo banco (trigger BEFORE INSERT): gênese, lacuna, bifurcação e concorrência.
  * Linhas de consentimento nunca são commitadas (ROLLBACK): append-only impede limpeza.
  */
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const ownerUrl = process.env.OWNER_DATABASE_URL ?? process.env.DIRECT_URL;
-const ownerPool = ownerUrl ? new Pool({ connectionString: ownerUrl }) : null;
 
 const RUN = randomUUID().slice(0, 8);
 const ORG_A = `test-lgpd-a-${RUN}`;
@@ -37,11 +37,12 @@ async function tx<T>(p: Pool, tenant: string | null, fn: (c: PoolClient) => Prom
   }
 }
 
-const insertConsent = (c: PoolClient, id: string, org: string, seq: number, h: string) =>
+/** seq 0 => GENESIS (previousHash = 64 zeros); demais => CONSENT encadeado em `prev`. */
+const insertConsent = (c: PoolClient, id: string, org: string, seq: number, h: string, prev: string = hash('0')) =>
   c.query(
     `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
-     VALUES ($1,$2,3,$3,'CONSENT','hs256:' || repeat('ab',32),'marketing','v1','GRANTED',$4,$5,now())`,
-    [id, org, seq, hash('0'), h],
+     VALUES ($1,$2,3,$3,$6::"ConsentChainEventKind",$7,'marketing','v1','GRANTED',$4,$5,now())`,
+    [id, org, seq, prev, h, seq === 0 ? 'GENESIS' : 'CONSENT', seq === 0 ? 'genesis' : `hs256:${'ab'.repeat(32)}`],
   );
 const insertApproach = (c: PoolClient, id: string, org: string) =>
   c.query(
@@ -77,7 +78,6 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
       await c.query(`DELETE FROM "FlywheelFewShotExample" WHERE "organizationId"=$1`, [ORG_A]);
     }).catch(() => {});
     await pool.end();
-    await ownerPool?.end();
   });
 
   it('papel de app não é superuser nem BYPASSRLS', async () => {
@@ -149,56 +149,137 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
     }
   }
 
-  const CONSENT_INSERT = `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
-     VALUES ($1,$2,3,$3,'CONSENT','hs256:' || repeat('ab',32),'marketing','v1','GRANTED',$4,$5,now())`;
-
-  it('ConsentAuditRecord (papel de app): RLS isola A/B, insert cruzado recusado, unicidade de sequence, UPDATE/DELETE/TRUNCATE bloqueados', async () => {
+  it('ConsentAuditRecord (papel de app): RLS isola A/B, insert cruzado recusado, UPDATE/DELETE/TRUNCATE bloqueados', async () => {
     await inRollback(pool, async (c, as, expectFail) => {
+      const g = `a${RUN}`.padEnd(64, '0');
       const id = `ca-${RUN}`;
       await as(ORG_A);
-      await insertConsent(c, id, ORG_A, 0, `a${RUN}`.padEnd(64, '0'));
+      await insertConsent(c, `ga-${RUN}`, ORG_A, 0, g);
+      await insertConsent(c, id, ORG_A, 1, `b${RUN}`.padEnd(64, '0'), g);
       expect((await c.query(`SELECT id FROM "ConsentAuditRecord" WHERE id=$1`, [id])).rowCount).toBe(1);
-      await expectFail(CONSENT_INSERT, [`dup-${RUN}`, ORG_A, 0, hash('0'), `d${RUN}`.padEnd(64, '0')], /unique|duplicate/i);
       await expectFail(`UPDATE "ConsentAuditRecord" SET purpose='x' WHERE id=$1`, [id], /permission denied|append-only/);
       await expectFail(`DELETE FROM "ConsentAuditRecord" WHERE id=$1`, [id], /permission denied|append-only/);
       await expectFail(`TRUNCATE "ConsentAuditRecord"`, [], /permission denied|append-only/);
 
       await as(ORG_B);
       expect((await c.query(`SELECT id FROM "ConsentAuditRecord" WHERE id=$1`, [id])).rowCount).toBe(0);
-      await expectFail(CONSENT_INSERT, [`x-${RUN}`, ORG_A, 1, hash('0'), `x${RUN}`.padEnd(64, '0')], /row-level security/);
+      await expectFail(
+        `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+         VALUES ($1,$2,3,2,'CONSENT','hs256:' || repeat('ab',32),'p','v1','GRANTED',$3,repeat('9',64),now())`,
+        [`x-${RUN}`, ORG_A, `b${RUN}`.padEnd(64, '0')],
+        /row-level security/,
+      );
 
       await as(null);
       expect((await c.query(`SELECT id FROM "ConsentAuditRecord" WHERE id=$1`, [id])).rowCount).toBe(0);
     });
   });
 
-  it.skipIf(!ownerPool)('ConsentAuditRecord: trigger bloqueia UPDATE/DELETE/TRUNCATE até para o owner/superuser', async () => {
-    await inRollback(ownerPool as Pool, async (c, as, expectFail) => {
-      const id = `co-${RUN}`;
+  it('head avançado pelo banco: GENESIS cria head; sequence/previousHash validados; lacuna, reordenação e 2º GENESIS recusados', async () => {
+    await inRollback(pool, async (c, as, expectFail) => {
       await as(ORG_A);
-      await insertConsent(c, id, ORG_A, 0, `o${RUN}`.padEnd(64, '0'));
-      await expectFail(`UPDATE "ConsentAuditRecord" SET purpose='x' WHERE id=$1`, [id], /append-only \(UPDATE/);
-      await expectFail(`DELETE FROM "ConsentAuditRecord" WHERE id=$1`, [id], /append-only \(DELETE/);
-      await expectFail(`TRUNCATE "ConsentAuditRecord" CASCADE`, [], /append-only \(TRUNCATE/);
-      const { rows } = await c.query(`SELECT purpose FROM "ConsentAuditRecord" WHERE id=$1`, [id]);
-      expect(rows[0]?.purpose).toBe('marketing');
+      const h0 = `0g${RUN}`.padEnd(64, '1');
+      const h1 = `1c${RUN}`.padEnd(64, '2');
+      const h2 = `2c${RUN}`.padEnd(64, '3');
+      // sem gênese não há cadeia
+      await expectFail(
+        `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+         VALUES ($1,$2,3,1,'CONSENT','hs256:' || repeat('ab',32),'p','v1','GRANTED',repeat('0',64),repeat('7',64),now())`,
+        [`nog-${RUN}`, ORG_A],
+        /sem GENESIS/,
+      );
+      // gênese inválida
+      await expectFail(
+        `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+         VALUES ($1,$2,3,0,'GENESIS','genesis','p','v1','GRANTED',repeat('5',64),repeat('7',64),now())`,
+        [`badg-${RUN}`, ORG_A],
+        /GENESIS exige/,
+      );
+      await insertConsent(c, `g0-${RUN}`, ORG_A, 0, h0);
+      let head = (await c.query(`SELECT "genesisId","genesisHash","lastSequence","lastHash" FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [ORG_A])).rows[0];
+      expect(head).toEqual({ genesisId: `g0-${RUN}`, genesisHash: h0, lastSequence: 0, lastHash: h0 });
+      await expectFail(`INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+         VALUES ($1,$2,3,0,'GENESIS','genesis','p','v1','GRANTED',repeat('0',64),repeat('8',64),now())`, [`g0b-${RUN}`, ORG_A], /GENESIS_REPLACED/);
+      await insertConsent(c, `c1-${RUN}`, ORG_A, 1, h1, h0);
+      // lacuna (pula 2)
+      await expectFail(`INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+         VALUES ($1,$2,3,3,'CONSENT','hs256:' || repeat('ab',32),'p','v1','GRANTED',$3,repeat('8',64),now())`, [`gap-${RUN}`, ORG_A, h1], /fora de ordem \(esperado 2, recebido 3\)/);
+      // previousHash errado (bifurcação)
+      await expectFail(`INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+         VALUES ($1,$2,3,2,'CONSENT','hs256:' || repeat('ab',32),'p','v1','GRANTED',$3,repeat('8',64),now())`, [`fork-${RUN}`, ORG_A, h0], /previousHash não confere/);
+      await insertConsent(c, `c2-${RUN}`, ORG_A, 2, h2, h1);
+      head = (await c.query(`SELECT "lastSequence","lastHash" FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [ORG_A])).rows[0];
+      expect(head).toEqual({ lastSequence: 2, lastHash: h2 });
+      // retroceder o head manualmente é recusado (truncamento de cauda não se esconde)
+      await expectFail(`UPDATE "ConsentAuditChainHead" SET "lastSequence"=1, "lastHash"=$2 WHERE "organizationId"=$1`, [ORG_A, h1], /só cresce/);
     });
+  });
+
+  it('head: appends concorrentes do mesmo tenant são serializados pelo lock do head (sem commit de cadeia)', async () => {
+    // Nada da cadeia é commitado (append-only + FK Restrict travariam o teardown global): duas
+    // conexões disputam a GÊNESE do mesmo tenant. c2 precisa ESPERAR c1 (lock na linha do head);
+    // se c1 confirma, c2 recebe GENESIS_REPLACED/unique; aqui c1 aborta e c2 segue como única gênese,
+    // e então o 2º append de c2 com a mesma sequence é recusado.
+    const org = `test-lgpd-conc-${RUN}`;
+    await tx(pool, null, (c) => c.query(`INSERT INTO "Organization" (id,name,"updatedAt") VALUES ($1,$1,now())`, [org]), true);
+    const c1 = await pool.connect();
+    const c2 = await pool.connect();
+    try {
+      for (const c of [c1, c2]) {
+        await c.query('BEGIN');
+        await c.query(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, [org]);
+      }
+      const g1 = `c1g${RUN}`.padEnd(64, '4');
+      const g2 = `c2g${RUN}`.padEnd(64, '5');
+      await insertConsent(c1, `cg1-${RUN}`, org, 0, g1);
+      await insertConsent(c1, `cc1-${RUN}`, org, 1, `c1a${RUN}`.padEnd(64, '6'), g1);
+      const started = Date.now();
+      let settled = false;
+      const p2 = insertConsent(c2, `cg2-${RUN}`, org, 0, g2).then(
+        () => {
+          settled = true;
+          return 'ok';
+        },
+        (e: Error) => {
+          settled = true;
+          return e.message;
+        },
+      );
+      await new Promise((r) => setTimeout(r, 400));
+      expect(settled, 'c2 deveria estar bloqueado pelo lock do head de c1').toBe(false);
+      await c1.query('ROLLBACK');
+      expect(await p2).toBe('ok');
+      expect(Date.now() - started).toBeGreaterThanOrEqual(400);
+      const head = await c2.query(`SELECT "genesisId","lastSequence" FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [org]);
+      expect(head.rows[0]).toEqual({ genesisId: `cg2-${RUN}`, lastSequence: 0 });
+      await insertConsent(c2, `cc2a-${RUN}`, org, 1, `c2a${RUN}`.padEnd(64, '7'), g2);
+      await c2.query('SAVEPOINT s');
+      await expect(insertConsent(c2, `cc2b-${RUN}`, org, 1, `c2b${RUN}`.padEnd(64, '8'), g2)).rejects.toThrow(/fora de ordem \(esperado 2, recebido 1\)/);
+      await c2.query('ROLLBACK TO SAVEPOINT s');
+    } finally {
+      await c1.query('ROLLBACK').catch(() => {});
+      await c2.query('ROLLBACK').catch(() => {});
+      c1.release();
+      c2.release();
+    }
+    await tx(pool, null, (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true);
   });
 
   it('ConsentAuditRecord: CHECK de subjectRef (hs256 obrigatório fora de GENESIS) e reasonCode enum', async () => {
     await inRollback(pool, async (c, as, expectFail) => {
       await as(ORG_A);
+      const g = `g${RUN}`.padEnd(64, '0');
       const base = `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"reasonCode","previousHash","currentHash","occurredAt")
-        VALUES ($1,$2,3,$3,$4,$5,'p','v1',$6,$7,repeat('0',64),$8,now())`;
-      await expectFail(base, [`k1-${RUN}`, ORG_A, 1, 'CONSENT', 'sha256:abc', 'GRANTED', null, `k1${RUN}`.padEnd(64, '0')], /subjectRef_hs256_check/);
-      await expectFail(base, [`k2-${RUN}`, ORG_A, 2, 'CONSENT', 'alice@example.com', 'GRANTED', null, `k2${RUN}`.padEnd(64, '0')], /subjectRef_hs256_check/);
-      await expectFail(base, [`k3-${RUN}`, ORG_A, 3, 'REVOCATION', `hs256:${'ab'.repeat(32)}`, 'REVOKED', 'texto livre', `k3${RUN}`.padEnd(64, '0')], /invalid input value for enum/);
-      // GENESIS sem titular é aceito; reasonCode válido é aceito
-      await c.query(base, [`g-${RUN}`, ORG_A, 0, 'GENESIS', 'genesis', 'GRANTED', null, `g${RUN}`.padEnd(64, '0')]);
-      await c.query(base, [`r-${RUN}`, ORG_A, 1, 'REVOCATION', `hs256:${'ab'.repeat(32)}`, 'REVOKED', 'ERASURE_REQUEST', `r${RUN}`.padEnd(64, '0')]);
+        VALUES ($1,$2,3,$3,$4,$5,'p','v1',$6,$7,$8,$9,now())`;
+      // GENESIS sem titular é aceito
+      await c.query(base, [`g-${RUN}`, ORG_A, 0, 'GENESIS', 'genesis', 'GRANTED', null, hash('0'), g]);
+      await expectFail(base, [`k1-${RUN}`, ORG_A, 1, 'CONSENT', 'sha256:abc', 'GRANTED', null, g, `k1${RUN}`.padEnd(64, '0')], /subjectRef_hs256_check/);
+      await expectFail(base, [`k2-${RUN}`, ORG_A, 1, 'CONSENT', 'alice@example.com', 'GRANTED', null, g, `k2${RUN}`.padEnd(64, '0')], /subjectRef_hs256_check/);
+      await expectFail(base, [`k3-${RUN}`, ORG_A, 1, 'REVOCATION', `hs256:${'ab'.repeat(32)}`, 'REVOKED', 'texto livre', g, `k3${RUN}`.padEnd(64, '0')], /invalid input value for enum/);
+      await c.query(base, [`r-${RUN}`, ORG_A, 1, 'REVOCATION', `hs256:${'ab'.repeat(32)}`, 'REVOKED', 'ERASURE_REQUEST', g, `r${RUN}`.padEnd(64, '0')]);
       // UNIQUE é por (organizationId, currentHash): mesmo hash em OUTRA org não colide (sem oráculo cross-tenant)
       await as(ORG_B);
-      await c.query(base, [`gb-${RUN}`, ORG_B, 0, 'GENESIS', 'genesis', 'GRANTED', null, `g${RUN}`.padEnd(64, '0')]);
+      await c.query(base, [`gb-${RUN}`, ORG_B, 0, 'GENESIS', 'genesis', 'GRANTED', null, hash('0'), g]);
     });
   });
 
@@ -224,6 +305,7 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
         WHERE tgrelid IN ('"ConsentAuditRecord"'::regclass, '"ConsentAuditChainHead"'::regclass) AND NOT tgisinternal ORDER BY tgname`,
     );
     expect(rows).toEqual([
+      { tgname: 'consent_audit_advance_head', tgenabled: 'O' },
       { tgname: 'consent_audit_no_mutation', tgenabled: 'O' },
       { tgname: 'consent_audit_no_truncate', tgenabled: 'O' },
       { tgname: 'consent_chain_head_guard_row', tgenabled: 'O' },
