@@ -202,6 +202,15 @@ export function Landing360({
   const [activeScreen, setActiveScreen] = useState<'intro' | 'login'>(initialScreen);
   const { currentUser, isPending: isAuthPending } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const tone = (color: string) =>
+    theme === 'dark'
+      ? color
+      : ({
+          '#00D4FF': '#0369a1',
+          '#FF2D9B': '#be185d',
+          '#F59E0B': '#92400e',
+          '#8B7DFF': '#6d28d9',
+        }[color] ?? color);
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
 
@@ -577,7 +586,7 @@ export function Landing360({
                     <span
                       className="font-mono text-xs font-bold uppercase tracking-wider mb-2.5 px-3 py-1 rounded-full"
                       style={{
-                        color: tag.color,
+                        color: tone(tag.color),
                         backgroundColor: `${tag.color}18`,
                         border: `1.5px solid ${tag.color}55`,
                       }}
@@ -586,7 +595,7 @@ export function Landing360({
                     </span>
                     <h4
                       className="font-display font-bold text-base sm:text-lg leading-snug text-center mb-2"
-                      style={{ color: tag.color }}
+                      style={{ color: tone(tag.color) }}
                     >
                       {tag.label}
                     </h4>
@@ -608,7 +617,7 @@ export function Landing360({
           <div className="max-w-7xl mx-auto">
             {/* Cabeçalho de Seção Centralizado */}
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#EF4444]/10 border border-[#EF4444]/40 text-[#EF4444] mb-3.5 mx-auto">
+              <div className="inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-widest bg-[#EF4444]/10 border border-[#EF4444]/40 text-[#b91c1c] mb-3.5 mx-auto">
                 <span>O Gargalo Estrutural das Empresas</span>
               </div>
               <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight mb-3 text-center landing-title-pink">
@@ -629,7 +638,7 @@ export function Landing360({
                 <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center mb-4 border border-[#FF2D9B]/30">
                   <SilosCardIcon size={24} color="#FF2D9B" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#be185d] dark:text-[#FF2D9B] mb-2 text-center">
                   Silos e Ferramentas Desconectadas
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -646,7 +655,7 @@ export function Landing360({
                 <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center mb-4 border border-[#F59E0B]/30">
                   <ReactiveCardIcon size={24} color="#F59E0B" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#92400e] dark:text-[#F59E0B] mb-2 text-center">
                   Gestão Reativa &amp; Decisões Tardias
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -725,7 +734,7 @@ export function Landing360({
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/35 px-3 py-1 rounded-full mb-2">
                   Camada 02
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#be185d] dark:text-[#FF2D9B] mb-2 text-center">
                   Motor de Diagnóstico &amp; IA
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -743,7 +752,7 @@ export function Landing360({
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/35 px-3 py-1 rounded-full mb-2">
                   Camada 03
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#92400e] dark:text-[#F59E0B] mb-2 text-center">
                   Execução &amp; Orquestração
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -817,7 +826,7 @@ export function Landing360({
                           className="font-mono text-xs font-bold px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: `${p.color}22`,
-                            color: p.color,
+                            color: tone(p.color),
                             border: `1.5px solid ${p.color}55`,
                           }}
                         >
@@ -827,7 +836,7 @@ export function Landing360({
                           className="font-mono text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: `${p.color}22`,
-                            color: p.color,
+                            color: tone(p.color),
                           }}
                         >
                           {p.slug}
@@ -838,7 +847,7 @@ export function Landing360({
                         className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg transition-transform duration-300 group-hover:scale-110"
                         style={{
                           backgroundColor: `${p.color}22`,
-                          color: p.color,
+                          color: tone(p.color),
                           border: `1.5px solid ${p.color}55`,
                         }}
                       >
@@ -850,7 +859,7 @@ export function Landing360({
                     <div className="flex-1 my-1">
                       <h3
                         className="font-display text-base sm:text-lg font-bold leading-tight mb-2 text-center"
-                        style={{ color: p.color }}
+                        style={{ color: tone(p.color) }}
                       >
                         {p.name}
                       </h3>
@@ -873,14 +882,14 @@ export function Landing360({
                         />
                         <span
                           className="font-mono text-[11px] font-bold uppercase tracking-wider"
-                          style={{ color: p.color }}
+                          style={{ color: tone(p.color) }}
                         >
                           {p.tag}
                         </span>
                       </div>
                       <span
                         className="font-mono text-[11px] opacity-0 group-hover:opacity-100 transition-opacity font-bold"
-                        style={{ color: p.color }}
+                        style={{ color: tone(p.color) }}
                       >
                         CONECTADO →
                       </span>
@@ -914,7 +923,7 @@ export function Landing360({
                           className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shadow-sm shrink-0"
                           style={{
                             backgroundColor: `${pilar.color}22`,
-                            color: pilar.color,
+                            color: tone(pilar.color),
                             border: `1.5px solid ${pilar.color}55`,
                           }}
                         >
@@ -926,7 +935,7 @@ export function Landing360({
                               className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full"
                               style={{
                                 backgroundColor: `${pilar.color}20`,
-                                color: pilar.color,
+                                color: tone(pilar.color),
                               }}
                             >
                               PILAR {pilar.id}
@@ -937,7 +946,7 @@ export function Landing360({
                           </div>
                           <h3
                             className="font-display text-xl sm:text-2xl font-extrabold mt-0.5"
-                            style={{ color: pilar.color }}
+                            style={{ color: tone(pilar.color) }}
                           >
                             {pilar.name}
                           </h3>
@@ -1027,11 +1036,11 @@ export function Landing360({
 
               <div className="flow-step-card card-semantic-pink p-5 sm:p-6 text-center flex flex-col items-center">
                 <div className="mb-3 text-center">
-                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#FF2D9B]/15 text-[#db2777] dark:text-[#FF2D9B] border border-[#FF2D9B]/35">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#FF2D9B]/15 text-[#be185d] dark:text-[#FF2D9B] border border-[#FF2D9B]/35">
                     ETAPA 02
                   </span>
                 </div>
-                <h4 className="font-display text-base sm:text-lg font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2.5 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#be185d] dark:text-[#FF2D9B] mb-2.5 text-center">
                   Enriquecimento B2B
                 </h4>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -1041,11 +1050,11 @@ export function Landing360({
 
               <div className="flow-step-card card-semantic-gold p-5 sm:p-6 text-center flex flex-col items-center">
                 <div className="mb-3 text-center">
-                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#F59E0B]/15 text-[#d97706] dark:text-[#F59E0B] border border-[#F59E0B]/35">
+                  <span className="inline-block px-3 py-1 rounded-full font-mono text-xs font-bold uppercase tracking-wider bg-[#F59E0B]/15 text-[#92400e] dark:text-[#F59E0B] border border-[#F59E0B]/35">
                     ETAPA 03
                   </span>
                 </div>
-                <h4 className="font-display text-base sm:text-lg font-bold text-[#d97706] dark:text-[#F59E0B] mb-2.5 text-center">
+                <h4 className="font-display text-base sm:text-lg font-bold text-[#92400e] dark:text-[#F59E0B] mb-2.5 text-center">
                   Cadência &amp; SLA
                 </h4>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -1183,7 +1192,7 @@ export function Landing360({
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-base text-[#db2777] dark:text-[#FF2D9B]">
+                    <h4 className="font-display font-bold text-base text-[#be185d] dark:text-[#FF2D9B]">
                       Próxima Melhor Ação
                     </h4>
                     <p className="landing-subtitle text-sm font-medium leading-relaxed mt-1">
@@ -1198,7 +1207,7 @@ export function Landing360({
                     <Check className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-base text-[#d97706] dark:text-[#F59E0B]">
+                    <h4 className="font-display font-bold text-base text-[#92400e] dark:text-[#F59E0B]">
                       Isolamento &amp; Segurança
                     </h4>
                     <p className="landing-subtitle text-sm font-medium leading-relaxed mt-1">
@@ -1273,7 +1282,7 @@ export function Landing360({
                 <div className="w-12 h-12 rounded-xl bg-[#FF2D9B]/15 text-[#FF2D9B] flex items-center justify-center font-bold mb-4 border border-[#FF2D9B]/35">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#be185d] dark:text-[#FF2D9B] mb-2 text-center">
                   Gatilhos de Comportamento
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -1286,7 +1295,7 @@ export function Landing360({
                 <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center font-bold mb-4 border border-[#F59E0B]/35">
                   <Target className="w-6 h-6" />
                 </div>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#92400e] dark:text-[#F59E0B] mb-2 text-center">
                   Distribuição Inteligente
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -1334,14 +1343,14 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-pink p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
-                <div className="font-mono text-xs text-[#db2777] dark:text-[#FF2D9B] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#FF2D9B]/10 border border-[#FF2D9B]/30">
+                <div className="font-mono text-xs text-[#be185d] dark:text-[#FF2D9B] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#FF2D9B]/10 border border-[#FF2D9B]/30">
                   Velocidade de Vendas
                 </div>
-                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#db2777] dark:text-[#FF2D9B] my-2 text-center">
+                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#be185d] dark:text-[#FF2D9B] my-2 text-center">
                   Ciclo Médio
                 </div>
                 <div className="mb-2.5">
-                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FF2D9B]/15 text-[#db2777] dark:text-[#FF2D9B] border border-[#FF2D9B]/30">
+                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FF2D9B]/15 text-[#be185d] dark:text-[#FF2D9B] border border-[#FF2D9B]/30">
                     -38% Duração
                   </span>
                 </div>
@@ -1351,14 +1360,14 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-gold p-6 text-center flex flex-col items-center rounded-2xl shadow-md">
-                <div className="font-mono text-xs text-[#d97706] dark:text-[#F59E0B] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30">
+                <div className="font-mono text-xs text-[#92400e] dark:text-[#F59E0B] uppercase font-bold tracking-wider mb-2 px-3 py-1 rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/30">
                   Gestão de Metas
                 </div>
-                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#d97706] dark:text-[#F59E0B] my-2 text-center">
+                <div className="font-display text-2xl sm:text-3xl font-extrabold text-[#92400e] dark:text-[#F59E0B] my-2 text-center">
                   Ritmo &amp; Pace
                 </div>
                 <div className="mb-2.5">
-                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#d97706] dark:text-[#F59E0B] border border-[#F59E0B]/30">
+                  <span className="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#92400e] dark:text-[#F59E0B] border border-[#F59E0B]/30">
                     Tempo Real
                   </span>
                 </div>
@@ -1412,7 +1421,7 @@ export function Landing360({
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/35 px-3 py-1 rounded-full mb-2">
                   Modelagem Probabilística
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#d97706] dark:text-[#F59E0B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#92400e] dark:text-[#F59E0B] mb-2 text-center">
                   Pipeline Ponderado
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -1444,7 +1453,7 @@ export function Landing360({
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/35 px-3 py-1 rounded-full mb-2">
                   Gestão de Risco
                 </span>
-                <h3 className="font-display text-lg sm:text-xl font-bold text-[#db2777] dark:text-[#FF2D9B] mb-2 text-center">
+                <h3 className="font-display text-lg sm:text-xl font-bold text-[#be185d] dark:text-[#FF2D9B] mb-2 text-center">
                   Cenários Conservador &amp; Otimista
                 </h3>
                 <p className="landing-subtitle text-sm font-medium leading-relaxed text-center">
@@ -1488,10 +1497,10 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-pink p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#db2777] dark:text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#be185d] dark:text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-2">
                   ● Bidirecional
                 </span>
-                <div className="font-display text-base sm:text-lg font-bold text-[#db2777] dark:text-[#FF2D9B]">
+                <div className="font-display text-base sm:text-lg font-bold text-[#be185d] dark:text-[#FF2D9B]">
                   HubSpot
                 </div>
                 <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
@@ -1500,10 +1509,10 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-gold p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#d97706] dark:text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#92400e] dark:text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-2">
                   ● Enterprise Sync
                 </span>
-                <div className="font-display text-base sm:text-lg font-bold text-[#d97706] dark:text-[#F59E0B]">
+                <div className="font-display text-base sm:text-lg font-bold text-[#92400e] dark:text-[#F59E0B]">
                   Salesforce
                 </div>
                 <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
@@ -1536,10 +1545,10 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-gold p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#d97706] dark:text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#92400e] dark:text-[#F59E0B] bg-[#F59E0B]/10 border border-[#F59E0B]/30 px-2.5 py-0.5 rounded-full mb-2">
                   ● Telefonia Cloud
                 </span>
-                <div className="font-display text-base sm:text-lg font-bold text-[#d97706] dark:text-[#F59E0B]">
+                <div className="font-display text-base sm:text-lg font-bold text-[#92400e] dark:text-[#F59E0B]">
                   Voz Integrada
                 </div>
                 <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
@@ -1560,10 +1569,10 @@ export function Landing360({
               </div>
 
               <div className="section-card card-semantic-pink p-5 sm:p-6 rounded-2xl text-center flex flex-col items-center shadow-md">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#db2777] dark:text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#be185d] dark:text-[#FF2D9B] bg-[#FF2D9B]/10 border border-[#FF2D9B]/30 px-2.5 py-0.5 rounded-full mb-2">
                   ● Rastreabilidade
                 </span>
-                <div className="font-display text-base sm:text-lg font-bold text-[#db2777] dark:text-[#FF2D9B]">
+                <div className="font-display text-base sm:text-lg font-bold text-[#be185d] dark:text-[#FF2D9B]">
                   E-mail Corporativo
                 </div>
                 <div className="landing-subtitle text-xs sm:text-sm font-medium mt-1">
@@ -1605,7 +1614,7 @@ export function Landing360({
                     </p>
                   </div>
                   <div className="section-card card-semantic-gold p-5 sm:p-6 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                    <span className="font-bold text-[#d97706] dark:text-[#F59E0B] block mb-2 text-base">
+                    <span className="font-bold text-[#92400e] dark:text-[#F59E0B] block mb-2 text-base">
                       Closers
                     </span>
                     <p className="landing-subtitle text-xs sm:text-sm font-medium leading-relaxed">
@@ -1616,7 +1625,7 @@ export function Landing360({
                 </div>
 
                 <div className="section-card card-semantic-pink p-5 sm:p-6 rounded-2xl text-slate-700 dark:text-slate-200 text-center shadow-md">
-                  <span className="font-bold text-[#db2777] dark:text-[#FF2D9B] block mb-2 text-base">
+                  <span className="font-bold text-[#be185d] dark:text-[#FF2D9B] block mb-2 text-base">
                     Diretoria &amp; Head de Vendas
                   </span>
                   <p className="landing-subtitle text-xs sm:text-sm font-medium leading-relaxed">
@@ -1659,7 +1668,7 @@ export function Landing360({
                         <span className="text-slate-600 dark:text-slate-300 font-medium">
                           Deals com Risco Identificado
                         </span>
-                        <span className="font-extrabold text-[#d97706] dark:text-[#F59E0B] text-sm sm:text-base">
+                        <span className="font-extrabold text-[#92400e] dark:text-[#F59E0B] text-sm sm:text-base">
                           3 oportunidades
                         </span>
                       </div>
@@ -1676,7 +1685,7 @@ export function Landing360({
                         <span className="text-slate-600 dark:text-slate-300 font-medium">
                           Cadências em Execução
                         </span>
-                        <span className="font-extrabold text-[#db2777] dark:text-[#FF2D9B] text-sm sm:text-base">
+                        <span className="font-extrabold text-[#be185d] dark:text-[#FF2D9B] text-sm sm:text-base">
                           12 ativas
                         </span>
                       </div>
@@ -1714,10 +1723,10 @@ export function Landing360({
               <span className="px-3 py-1 rounded-full bg-[#00D4FF]/10 text-[#0284c7] dark:text-[#00D4FF] border border-[#00D4FF]/30">
                 ✦ SLA 99.9%
               </span>
-              <span className="px-3 py-1 rounded-full bg-[#FF2D9B]/10 text-[#db2777] dark:text-[#FF2D9B] border border-[#FF2D9B]/30">
+              <span className="px-3 py-1 rounded-full bg-[#FF2D9B]/10 text-[#be185d] dark:text-[#FF2D9B] border border-[#FF2D9B]/30">
                 ✦ Isolamento Multi-Tenant
               </span>
-              <span className="px-3 py-1 rounded-full bg-[#F59E0B]/10 text-[#d97706] dark:text-[#F59E0B] border border-[#F59E0B]/30">
+              <span className="px-3 py-1 rounded-full bg-[#F59E0B]/10 text-[#92400e] dark:text-[#F59E0B] border border-[#F59E0B]/30">
                 ✦ Conexão Multi-CRM
               </span>
               <span className="px-3 py-1 rounded-full bg-[#10B981]/10 text-[#059669] dark:text-[#10B981] border border-[#10B981]/30">
