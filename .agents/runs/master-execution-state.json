@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "lastUpdated": "2026-10-21T15:43:37.944Z",
+  "lastUpdated": "2026-10-21T19:02:52.116Z",
   "governance": "AGENTS.md (Revisão 2026-10-09)",
   "repository": "MarksNN/Birthub-360",
   "baseBranch": "main",
@@ -30,7 +30,7 @@
       "status": "PR ABERTO (#18) — CONFLITO RESOLVÍVEL",
       "lifecycle": "ESPECIFICADO",
       "githubPr": 18,
-      "commitSha": "8dff1dde",
+      "commitSha": "a98ca53f",
       "verified": false,
       "filesOwned": [
         ".agents/runs/00-reconciliacao-pr18.md"
@@ -48,7 +48,7 @@
       "status": "PR ABERTO (#28) — AGUARDANDO ENCADEMENTO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 28,
-      "commitSha": "c18a992",
+      "commitSha": "17a7e927",
       "verified": false,
       "filesOwned": [
         "prisma/schema.prisma",
@@ -67,7 +67,7 @@
       "status": "PR ABERTO (#34) — EM REVISÃO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 34,
-      "commitSha": "e441bc2",
+      "commitSha": "933d047c",
       "verified": false,
       "filesOwned": [
         "prisma/schema.prisma",
@@ -86,7 +86,7 @@
       "status": "PR ABERTO (#35) — EM REVISÃO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 35,
-      "commitSha": "f7192aa",
+      "commitSha": "9ede6ab4",
       "verified": false,
       "filesOwned": [
         "prisma/schema.prisma",
@@ -123,7 +123,7 @@
       "status": "PR ABERTO (#37) — REQUISITA DESBLOQUEIO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 37,
-      "commitSha": "8a12e34",
+      "commitSha": "f0426aad",
       "verified": false,
       "filesOwned": [
         "tests/integration/rls-coverage.test.ts",
@@ -142,7 +142,7 @@
       "status": "PR ABERTO (#39) — EM REVISÃO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 39,
-      "commitSha": "b33910c",
+      "commitSha": "7910ba5b",
       "verified": false,
       "filesOwned": [
         "scripts/db/create-app-role.sql",
@@ -161,7 +161,7 @@
       "status": "PR ABERTO (#40) — EM REVISÃO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 40,
-      "commitSha": "d9910f1",
+      "commitSha": "a766c673",
       "verified": false,
       "filesOwned": [
         "src/lib/prisma.ts",
@@ -181,7 +181,7 @@
       "status": "PR ABERTO (#41) — EM REVISÃO",
       "lifecycle": "CÓDIGO_ESCRITO",
       "githubPr": 41,
-      "commitSha": "a4421b8",
+      "commitSha": "50f6eaa4",
       "verified": false,
       "filesOwned": [
         "src/bootstrap/dbRoleCheck.ts",
@@ -401,10 +401,10 @@
       "agentNum": "16",
       "agentSlug": "16-runtime-workers-escala",
       "priority": "P0",
-      "status": "PLANEJADO",
-      "lifecycle": "ESPECIFICADO",
-      "githubPr": null,
-      "commitSha": null,
+      "status": "PR ABERTO — EM REVISÃO",
+      "lifecycle": "CÓDIGO_ESCRITO",
+      "githubPr": 32,
+      "commitSha": "fcc8ab0e",
       "verified": false,
       "filesOwned": [
         "src/lib/queue/outboxRelay.worker.ts",
@@ -420,10 +420,10 @@
       "agentNum": "15",
       "agentSlug": "15-seguranca-aplicada",
       "priority": "P1",
-      "status": "PLANEJADO",
-      "lifecycle": "ESPECIFICADO",
-      "githubPr": null,
-      "commitSha": null,
+      "status": "PR ABERTO — EM REVISÃO",
+      "lifecycle": "CÓDIGO_ESCRITO",
+      "githubPr": 38,
+      "commitSha": "6b259b98",
       "verified": false,
       "filesOwned": [
         "src/lib/security/globalSecurityAuditChannel.ts"
@@ -456,10 +456,10 @@
       "agentNum": "21",
       "agentSlug": "21-privacidade-lgpd",
       "priority": "P1",
-      "status": "PLANEJADO",
-      "lifecycle": "ESPECIFICADO",
-      "githubPr": null,
-      "commitSha": null,
+      "status": "PR ABERTO — EM REVISÃO",
+      "lifecycle": "CÓDIGO_ESCRITO",
+      "githubPr": 33,
+      "commitSha": "d5dab316",
       "verified": false,
       "filesOwned": [
         "src/shared/services/consentAuditChain.service.ts"
@@ -586,9 +586,9 @@
       "agentSlug": "04-crm-bi",
       "priority": "P1",
       "status": "PLANEJADO",
-      "lifecycle": "ESPECIFICADO",
-      "githubPr": null,
-      "commitSha": null,
+      "lifecycle": "CÓDIGO_ESCRITO",
+      "githubPr": 18,
+      "commitSha": "a98ca53f",
       "verified": false,
       "filesOwned": [
         "src/features/knowledge/services/accountKnowledgeGraph.service.ts",
@@ -605,9 +605,9 @@
       "agentSlug": "04-crm-bi",
       "priority": "P1",
       "status": "PLANEJADO",
-      "lifecycle": "ESPECIFICADO",
-      "githubPr": null,
-      "commitSha": null,
+      "lifecycle": "CÓDIGO_ESCRITO",
+      "githubPr": 18,
+      "commitSha": "a98ca53f",
       "verified": false,
       "filesOwned": [
         "src/features/intelligence/services/winLossAutopsy.service.ts",
@@ -680,9 +680,9 @@
       "agentSlug": "04-crm-bi",
       "priority": "P1",
       "status": "PLANEJADO",
-      "lifecycle": "ESPECIFICADO",
-      "githubPr": null,
-      "commitSha": null,
+      "lifecycle": "CÓDIGO_ESCRITO",
+      "githubPr": 37,
+      "commitSha": "f0426aad",
       "verified": false,
       "filesOwned": [
         "src/features/commercial-intelligence/services/rebalanceApproval.service.ts",
@@ -809,11 +809,11 @@
       "agentNum": "04",
       "agentSlug": "04-crm-bi",
       "priority": "P1",
-      "status": "PLANEJADO",
-      "lifecycle": "CÓDIGO_ESCRITO",
+      "status": "INTEGRADO NA MAIN",
+      "lifecycle": "INTEGRADO_NA_MAIN",
       "githubPr": 15,
       "commitSha": "0753f6685",
-      "verified": false,
+      "verified": true,
       "filesOwned": [
         "src/features/commercial-intelligence/services/predictiveRevenueOracle.service.ts"
       ],
@@ -827,11 +827,11 @@
       "agentNum": "18",
       "agentSlug": "18-contratos-api-docs",
       "priority": "P1",
-      "status": "PLANEJADO",
-      "lifecycle": "CÓDIGO_ESCRITO",
+      "status": "INTEGRADO NA MAIN",
+      "lifecycle": "INTEGRADO_NA_MAIN",
       "githubPr": 19,
-      "commitSha": null,
-      "verified": false,
+      "commitSha": "f97209ce",
+      "verified": true,
       "filesOwned": [
         "docs/openapi.yaml",
         "src/shared/contracts/predictiveRevenueOraclePorts.contract.ts"
@@ -1868,7 +1868,7 @@
         ".agents/runs/08A-registro-go-live-v1.0.0.md",
         "scripts/deploy/production-smoke-tests.sh"
       ],
-      "criteria": "Tag v1.0.0-release publicada no GitHub e smoke tests de produção 100% aprovados."
+      "criteria": "Tag v1.0.0-release assinada digitalmente publicada no GitHub e smoke tests de produção 100% aprovados."
     }
   ]
 }

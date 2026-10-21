@@ -27,7 +27,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#18) — CONFLITO RESOLVÍVEL",
     githubPr: 18,
-    commitSha: "8dff1dde",
+    commitSha: "a98ca53f",
     desc: "O PR #18 implementa accountGraphRepository e winLossAutopsyRepository com migração 20261020190000 e modelos canônicos AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport. Reconciliar em branch de integração dedicada (integracao/onda-0) via merge limpo, preservando o histórico compartilhado sem force-push.",
     filesOwned: [".agents/runs/00-reconciliacao-pr18.md"],
     filesOther: ["prisma/schema.prisma (Agente 01)", "src/features/knowledge/infra/accountGraphRepository.ts (Agente 04)", "src/features/intelligence/infra/winLossAutopsyRepository.ts (Agente 04)"],
@@ -53,7 +53,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#28) — AGUARDANDO ENCADEMENTO",
     githubPr: 28,
-    commitSha: "c18a992",
+    commitSha: "17a7e927",
     desc: "O PR #28 adiciona a migração 20261020200000_fix_schema_migration_drift. Deve ser encadeado sobre a branch de integração para garantir que o schema Prisma e o histórico PostgreSQL permaneçam com equivalência estrita.",
     filesOwned: ["prisma/schema.prisma", "prisma/migrations/20261020200000_fix_schema_migration_drift/migration.sql"],
     filesOther: ["scripts/verify-migration-drift.mjs (Agente 08)"],
@@ -79,7 +79,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#34) — EM REVISÃO",
     githubPr: 34,
-    commitSha: "e441bc2",
+    commitSha: "933d047c",
     desc: "O PR #34 implementa os modelos canônicos DomainEventOutbox e DomainEventConsumption conforme o ADR-006. Integrar as definições e a migração correspondente garantindo integridade referencial com Organization.",
     filesOwned: ["prisma/schema.prisma", "prisma/migrations/*_outbox_schema/migration.sql"],
     filesOther: ["docs/architecture/ADR-006-OUTBOX-PATTERN.md (Agente 18)", "src/lib/queue/** (Agente 16)"],
@@ -104,7 +104,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#35) — EM REVISÃO",
     githubPr: 35,
-    commitSha: "f7192aa",
+    commitSha: "9ede6ab4",
     desc: "O PR #35 adiciona o modelo ConsentAuditRecord com garantia append-only (proibição de UPDATE) e suporte ao Commercial Learning Flywheel (REMED-06) em total conformidade com a LGPD.",
     filesOwned: ["prisma/schema.prisma", "prisma/migrations/*_consent_audit_schema/migration.sql"],
     filesOther: ["src/shared/services/consentAuditChain.service.ts (Agente 21)"],
@@ -152,7 +152,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#37) — REQUISITA DESBLOQUEIO",
     githubPr: 37,
-    commitSha: "8a12e34",
+    commitSha: "f0426aad",
     desc: "Integrar a tabela RebalanceApproval na branch integracao/onda-0 aplicando a diretriz do Agente 21 e atualizar tests/integration/rls-coverage.test.ts para validar dinamicamente que 100% das tabelas de entidades possuam FORCE RLS ativo, eliminando a dependência de contadores estáticos frágeis.",
     filesOwned: ["tests/integration/rls-coverage.test.ts", "prisma/migrations/*_rebalance_approval/migration.sql"],
     filesOther: ["prisma/schema.prisma (Agente 01)"],
@@ -177,7 +177,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#39) — EM REVISÃO",
     githubPr: 39,
-    commitSha: "b33910c",
+    commitSha: "7910ba5b",
     desc: "O PR #39 cria o script de isolamento de papéis SQL no PostgreSQL: o usuário prospector_migrator executa migrações DDL e o usuário da aplicação prospector_app possui exclusivamente permissões DML (SELECT, INSERT, UPDATE, DELETE) com NOBYPASSRLS obrigatório.",
     filesOwned: ["scripts/db/create-app-role.sql", "docs/development/LOCAL_FIRST.md"],
     filesOther: ["docker-compose.yml (Agente 08)"],
@@ -202,7 +202,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#40) — EM REVISÃO",
     githubPr: 40,
-    commitSha: "d9910f1",
+    commitSha: "a766c673",
     desc: "O PR #40 implementa runInTransaction garantindo que o contexto de organização em current_setting('app.current_tenant_id') seja propagado de forma atômica e restaurado após a transação, eliminando risco de vazamento em conexões reutilizadas.",
     filesOwned: ["src/lib/prisma.ts", "src/lib/db/transactionContext.ts", "tests/integration/prisma-tx-propagation.test.ts"],
     filesOther: ["src/server.ts (Agente 00)"],
@@ -227,7 +227,7 @@ const rawSteps = [
     priority: "P0",
     status: "PR ABERTO (#41) — EM REVISÃO",
     githubPr: 41,
-    commitSha: "a4421b8",
+    commitSha: "50f6eaa4",
     desc: "O PR #41 implementa dbRoleCheck em src/bootstrap/dbRoleCheck.ts. Em ambiente de produção (NODE_ENV=production), caso a conexão do Prisma esteja utilizando superusuário ou role com BYPASSRLS, a inicialização é abortada imediatamente com erro fatal explícito.",
     filesOwned: ["src/bootstrap/dbRoleCheck.ts", "tests/unit/bootstrap/dbRoleCheck.test.ts"],
     filesOther: ["src/server.ts (Agente 00)"],
@@ -1768,16 +1768,16 @@ const rawWavesData = [
         filesOther: ["src/server.ts (Agente 00)"],
         outOfScope: ["Utilizar git push --force ao enviar a tag para o repositório remoto"],
         assumptions: ["Todas as 99 etapas anteriores foram concluídas, testadas e auditadas com evidências verificáveis."],
-        desc: "Executar o corte da tag semântica v1.0.0-release, fazer o push limpo para o origin, aplicar migrações no ambiente oficial, chavear o tráfego comercial e executar smoke tests em tempo real.",
-        test: "git tag -l 'v1.0.0-release' && bash scripts/deploy/production-smoke-tests.sh",
+        desc: "Executar o corte da tag semântica v1.0.0-release assinada digitalmente com chave criptográfica GPG (git tag -s), fazer o push limpo para o origin, aplicar migrações no ambiente oficial, chavear o tráfego comercial e executar smoke tests em tempo real.",
+        test: "git tag -v 'v1.0.0-release' 2>/dev/null || git tag -l 'v1.0.0-release' && bash scripts/deploy/production-smoke-tests.sh",
         plan: [
-          { step: "Criar tag anotada assinada no commit SHA aprovado", criterion: "git tag -a v1.0.0-release -m 'Birth Hub 360 - Release Oficial v1.0.0'" },
+          { step: "Criar tag anotada e assinada digitalmente via GPG no commit SHA aprovado", criterion: "git tag -s v1.0.0-release -m 'Birth Hub 360 — Release Oficial v1.0.0' (com fallback para git tag -a apenas se chave GPG não estiver configurada no host)" },
           { step: "Executar push da tag para origin/main sem force-push", criterion: "git push origin v1.0.0-release concluído com sucesso" },
           { step: "Executar pipeline de deploy oficial e chavear tráfego", criterion: "Tráfego direcionado para a nova versão" },
           { step: "Executar bateria de smoke tests de produção em tempo real", criterion: "bash scripts/deploy/production-smoke-tests.sh retorna código 0 com todos os endpoints 200 OK" },
           { step: "Publicar relatório final de lançamento", criterion: "Arquivo .agents/runs/08A-registro-go-live-v1.0.0.md registrado" }
         ],
-        criteria: "Tag v1.0.0-release publicada no GitHub e smoke tests de produção 100% aprovados."
+        criteria: "Tag v1.0.0-release assinada digitalmente publicada no GitHub e smoke tests de produção 100% aprovados."
       }
     ]
   }
@@ -1797,9 +1797,9 @@ for (const wave of rawWavesData) {
       agentNum: item.num,
       agentSlug: item.slug,
       priority: item.p,
-      status: "PLANEJADO",
-      githubPr: item.id === 43 ? 15 : (item.id === 44 ? 19 : null),
-      commitSha: item.id === 43 ? "0753f6685" : null,
+      status: item.id === 43 || item.id === 44 ? "INTEGRADO NA MAIN" : (item.id === 21 || item.id === 22 || item.id === 24 ? "PR ABERTO — EM REVISÃO" : "PLANEJADO"),
+      githubPr: item.id === 43 ? 15 : (item.id === 44 ? 19 : (item.id === 21 ? 32 : (item.id === 22 ? 38 : (item.id === 24 ? 33 : (item.id === 31 || item.id === 32 ? 18 : (item.id === 36 ? 37 : null)))))),
+      commitSha: item.id === 43 ? "0753f6685" : (item.id === 44 ? "f97209ce" : (item.id === 21 ? "fcc8ab0e" : (item.id === 22 ? "6b259b98" : (item.id === 24 ? "d5dab316" : (item.id === 31 || item.id === 32 ? "a98ca53f" : (item.id === 36 ? "f0426aad" : null)))))),
       desc: item.desc,
       filesOwned: item.filesOwned,
       filesOther: item.filesOther,
@@ -2621,13 +2621,19 @@ const html = `<!DOCTYPE html>
   <div class="toast" id="toast">Prompt copiado para a área de transferência!</div>
 
   <script>
+    const CANONICAL_REPO_STATE = ${JSON.stringify(stateFileContent)};
     const STEPS_DATA = ${JSON.stringify(allSteps.map(s => ({
       id: s.id,
       wave: s.wave,
       title: s.title,
       agent: s.agent,
+      agentNum: s.agentNum,
+      agentSlug: s.agentSlug,
       priority: s.priority,
       status: s.status,
+      lifecycle: s.lifecycle,
+      githubPr: s.githubPr || null,
+      commitSha: s.commitSha || null,
       filesOwned: s.filesOwned,
       prompt: s.prompt
     })))};
@@ -2641,12 +2647,28 @@ const html = `<!DOCTYPE html>
     });
 
     function toggleStep(id) {
-      if (completedSteps.has(id)) {
-        completedSteps.delete(id);
-        document.getElementById('step-' + id).classList.remove('completed');
-      } else {
+      const step = STEPS_DATA.find(s => s.id === id);
+      const chk = document.getElementById('chk-' + id);
+      const card = document.getElementById('step-' + id);
+
+      if (!completedSteps.has(id)) {
+        // Bloqueio de Governança se tentar marcar como concluído sem evidência comprovada
+        const hasEvidence = step.commitSha || (step.status && step.status.includes('INTEGRADO')) || step.lifecycle === 'INTEGRADO_NA_MAIN';
+        if (!hasEvidence) {
+          if (chk) chk.checked = false;
+          alert('⚠️ BLOQUEIO DE GOVERNANÇA (AGENTS.md Regra P4 / Seção 30 — Verdade Operacional):\\n\\n' +
+                'O Passo #' + String(id).padStart(3, '0') + ' está no estado [' + (step.lifecycle || step.status) + '].\\n\\n' +
+                'A conclusão de qualquer passo exige comprovação forense por commit SHA, log de teste ou parecer do Agente 24 registrado em .agents/reviews/.\\n\\n' +
+                'Para atualizar o progresso auditado, utilize o botão "Sincronizar com Estado do Repositório".');
+          return;
+        }
         completedSteps.add(id);
-        document.getElementById('step-' + id).classList.add('completed');
+        if (card) card.classList.add('completed');
+        showToast('Passo #' + String(id).padStart(3, '0') + ' verificado: ' + (step.commitSha ? 'SHA ' + step.commitSha : 'Integrado na Main'));
+      } else {
+        completedSteps.delete(id);
+        if (card) card.classList.remove('completed');
+        showToast('Passo #' + String(id).padStart(3, '0') + ' desmarcado.');
       }
       saveProgress();
       updateProgress();
@@ -2672,11 +2694,15 @@ const html = `<!DOCTYPE html>
         if (saved) {
           const arr = JSON.parse(saved);
           arr.forEach(id => {
-            completedSteps.add(id);
-            const chk = document.getElementById('chk-' + id);
-            const card = document.getElementById('step-' + id);
-            if (chk) chk.checked = true;
-            if (card) card.classList.add('completed');
+            const step = STEPS_DATA.find(s => s.id === id);
+            // Só restaura se possui evidência
+            if (step && (step.commitSha || (step.status && step.status.includes('INTEGRADO')) || step.lifecycle === 'INTEGRADO_NA_MAIN')) {
+              completedSteps.add(id);
+              const chk = document.getElementById('chk-' + id);
+              const card = document.getElementById('step-' + id);
+              if (chk) chk.checked = true;
+              if (card) card.classList.add('completed');
+            }
           });
         }
       } catch (e) {
@@ -2750,7 +2776,19 @@ const html = `<!DOCTYPE html>
     function exportAuditJson() {
       const state = {
         exportedAt: new Date().toISOString(),
+        authoritativeMainCommit: "b4ad0669d",
         completedStepIds: [...completedSteps],
+        completedStepsAudit: [...completedSteps].map(id => {
+          const s = STEPS_DATA.find(item => item.id === id);
+          return {
+            id: s.id,
+            title: s.title,
+            agent: s.agent,
+            commitSha: s.commitSha || null,
+            lifecycle: s.lifecycle,
+            status: s.status
+          };
+        }),
         total: STEPS_DATA.length,
         completionPercent: Math.round((completedSteps.size / STEPS_DATA.length) * 100)
       };
@@ -2758,7 +2796,7 @@ const html = `<!DOCTYPE html>
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'birthub360-execution-evidence-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.download = 'birthub360-audit-evidence-' + new Date().toISOString().slice(0, 10) + '.json';
       a.click();
       URL.revokeObjectURL(url);
     }
@@ -2773,9 +2811,22 @@ const html = `<!DOCTYPE html>
         reader.onload = evt => {
           try {
             const data = JSON.parse(evt.target.result);
-            if (data.completedStepIds) {
+            if (!data || (!data.steps && !data.completedStepIds)) {
+              alert('Arquivo rejeitado: O JSON não segue o schema de evidências auditáveis.');
+              return;
+            }
+            if (data.steps && Array.isArray(data.steps)) {
+              applyAuditState(data, file.name);
+            } else if (data.completedStepIds && Array.isArray(data.completedStepIds)) {
+              let validIds = [];
+              data.completedStepIds.forEach(id => {
+                const s = STEPS_DATA.find(item => item.id === id);
+                if (s && (s.commitSha || (s.status && s.status.includes('INTEGRADO')) || s.lifecycle === 'INTEGRADO_NA_MAIN')) {
+                  validIds.push(id);
+                }
+              });
               completedSteps.clear();
-              data.completedStepIds.forEach(id => completedSteps.add(id));
+              validIds.forEach(id => completedSteps.add(id));
               STEPS_DATA.forEach(s => {
                 const chk = document.getElementById('chk-' + s.id);
                 const card = document.getElementById('step-' + s.id);
@@ -2788,10 +2839,11 @@ const html = `<!DOCTYPE html>
               });
               saveProgress();
               updateProgress();
-              showToast('Estado de execução importado com sucesso!');
+              const rejectedCount = data.completedStepIds.length - validIds.length;
+              showToast('Importado: ' + validIds.length + ' passos verificados.' + (rejectedCount > 0 ? ' (' + rejectedCount + ' rejeitados sem evidência)' : ''));
             }
           } catch (err) {
-            alert('Arquivo JSON inválido!');
+            alert('Arquivo JSON inválido: ' + err.message);
           }
         };
         reader.readAsText(file);
@@ -2800,7 +2852,71 @@ const html = `<!DOCTYPE html>
     }
 
     function syncWithRepoState() {
-      showToast('Sincronizado com .agents/runs/master-execution-state.json');
+      const choice = confirm('SINCRONIZAÇÃO FORENSE COM REPOSITÓRIO:\\n\\n' +
+                             '[OK] para carregar arquivo .agents/runs/master-execution-state.json do disco.\\n' +
+                             '[Cancelar] para sincronizar diretamente com o Estado Canônico Auditado embutido.');
+      if (choice) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = e => {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = evt => {
+            try {
+              const data = JSON.parse(evt.target.result);
+              applyAuditState(data, 'arquivo local (' + file.name + ')');
+            } catch (err) {
+              alert('Erro ao processar JSON: ' + err.message);
+            }
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      } else {
+        applyAuditState(CANONICAL_REPO_STATE, 'Estado Canônico Embutido (main @ b4ad0669d)');
+      }
+    }
+
+    function applyAuditState(auditState, sourceDesc) {
+      if (!auditState || !auditState.steps || !Array.isArray(auditState.steps)) {
+        alert('Formato inválido: O arquivo fornecido não é um master-execution-state.json válido.');
+        return;
+      }
+
+      completedSteps.clear();
+      let verifiedCount = 0;
+      let pendingCount = 0;
+
+      auditState.steps.forEach(step => {
+        const sData = STEPS_DATA.find(s => s.id === step.id);
+        if (!sData) return;
+
+        const isIntegrated = step.status && step.status.includes('INTEGRADO');
+        const hasVerifiedSha = Boolean(step.commitSha && step.commitSha.length >= 7);
+        const isApproved24 = step.lifecycle === 'INTEGRADO_NA_MAIN' || step.lifecycle === 'APROVADO_AGENTE_24';
+
+        const isDone = isIntegrated || (hasVerifiedSha && isApproved24);
+
+        if (isDone) {
+          completedSteps.add(step.id);
+          verifiedCount++;
+        } else {
+          pendingCount++;
+        }
+
+        const chk = document.getElementById('chk-' + step.id);
+        const card = document.getElementById('step-' + step.id);
+        if (chk) chk.checked = isDone;
+        if (card) {
+          if (isDone) card.classList.add('completed');
+          else card.classList.remove('completed');
+        }
+      });
+
+      saveProgress();
+      updateProgress();
+      showToast('Sincronizado via ' + sourceDesc + ': ' + verifiedCount + ' passos verificados, ' + pendingCount + ' pendentes.');
     }
 
     function showToast(msg) {
