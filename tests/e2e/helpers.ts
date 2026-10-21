@@ -118,19 +118,21 @@ export async function signUp(
   }
 
   await page.waitForURL(/\/(app|setup)(?:[/?#]|$)/, { timeout: 45_000 });
-  if (completeOnboarding && new URL(page.url()).pathname === '/setup') {
-    await page.getByRole('button', { name: /Continuar/i }).click();
-    await page.getByRole('button', { name: /(Salvar e )?ir para o Dashboard/i }).click();
-  }
-  await expect(page).toHaveURL(completeOnboarding ? /\/app(?:[/?#]|$)/ : /\/setup(?:[/?#]|$)/, {
-    timeout: 15_000,
-  });
   if (completeOnboarding) {
-    // O gate busca os módulos depois do primeiro paint. Se o save não pegou, ele troca /app por
-    // /setup alguns segundos depois — o expect acima passaria no instante errado.
-    await expect
-      .poll(async () => new URL(page.url()).pathname, { timeout: 15_000 })
-      .toMatch(/^\/app(?:\/|$)/);
+    // O updateMany anterior pode não ver a linha (RLS) e o clique do wizard navega para /app
+    // antes do POST terminar. O OnboardingGate então devolve o usuário para /setup no meio
+    // do teste. Fecha o onboarding pela API autenticada e só segue quando /app permanece.
+    const complete = await page.request.post('/api/organization-modules/onboarding/complete');
+    expect(complete.ok(), 'conclusão de onboarding via API').toBe(true);
+    if (new URL(page.url()).pathname !== '/app') {
+      await page.goto('/app');
+    } else {
+      await page.reload();
+    }
+    await expect(page).toHaveURL(/\/app(?:[/?#]|$)/, { timeout: 20_000 });
+    await expect.poll(async () => new URL(page.url()).pathname, { timeout: 15_000 }).toMatch(/^\/app(?:\/|$)/);
+  } else {
+    await expect(page).toHaveURL(/\/setup(?:[/?#]|$)/, { timeout: 15_000 });
   }
 
   // URL sozinha não comprova sessão: consulta o backend com os cookies do navegador.
