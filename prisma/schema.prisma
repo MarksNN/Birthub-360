@@ -1040,6 +1040,7 @@ model Organization {
   dncLists               DncList[]
   customAiTools          CustomAiTool[]
   leadTouchpoints        LeadTouchpoint[]
+  rebalanceApprovals     RebalanceApproval[]
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -5538,4 +5539,30 @@ model LeadTouchpoint {
   @@index([leadId])
   @@index([campaign])
   @@index([occurredAt])
+}
+
+/// REMED-04 (handoff 04→01, onda-forense-20261020): decisão de rebalanceamento de carteira com
+/// idempotência no banco. Uma linha por (organizationId, recommendationId); re-decisão após o TTL
+/// (REBALANCE_DECISION_TTL_DAYS) ATUALIZA a mesma linha — o histórico fica no AuditLog.
+/// `note` = texto JÁ REDIGIDO (piiRedaction), máx. 280 (VarChar + CHECK na migration).
+/// CHECKs, e as funções rebalance_approval_purge()/rebalance_approval_anonymize_lead_notes()
+/// (SECURITY INVOKER, tenant da sessão) só existem na migration.
+model RebalanceApproval {
+  id               String       @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  recommendationId String
+  leadId           String
+  fromOwner        String?
+  toOwner          String
+  /// APPROVED | REJECTED (CHECK na migration)
+  decision         String
+  note             String?      @db.VarChar(280)
+  decidedBy        String
+  decidedAt        DateTime     @default(now())
+
+  @@unique([organizationId, recommendationId])
+  @@index([organizationId, leadId])
+  /// Purge de retenção por tenant.
+  @@index([organizationId, decidedAt])
 }

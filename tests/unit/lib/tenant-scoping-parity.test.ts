@@ -145,6 +145,8 @@ const KNOWN_RLS_ONLY_MODELS = [
   'WorkspaceLayout',
   'WorkspaceSection',
   'WorkspaceWidget',
+  // REMED-04: store do 04 grava com organizationId explícito; RLS FORCE tenant_isolation.
+  'RebalanceApproval',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {
