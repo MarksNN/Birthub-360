@@ -17,8 +17,8 @@ UNIQUE no banco duas requisições SIMULTÂNEAS podem gravar 2 linhas.
 src/features/commercial-intelligence/infra/PrismaRebalanceApprovalStore.ts
 src/features/commercial-intelligence/services/rebalanceApproval.service.ts (interface `RebalanceApprovalStore`)
 
-## Alteração necessária (sugestão — decisão do 01)
-Model dedicado, p.ex.:
+## Alteração necessária (implementada pelo Agente 01 no PR #37)
+Model dedicado **sem nenhum texto livre** (decisão LGPD com o Agente 21):
 
 ```prisma
 model RebalanceApproval {
@@ -30,33 +30,34 @@ model RebalanceApproval {
   fromOwner        String?
   toOwner          String
   decision         String       // APPROVED | REJECTED
-  note             String?      @db.VarChar(280) // texto JÁ REDIGIDO (CPF/CNPJ/e-mail/telefone)
+  noteLength       Int?         // 0..280 (CHECK no banco), tamanho da nota JÁ REDIGIDA
+  noteHash         String?      @db.Char(64) // HMAC-SHA256 hex de `${organizationId}\u0000${notaRedigida}`
+  noteRef          String?      // reservado; sempre null (não existe texto armazenado)
   decidedBy        String
   decidedAt        DateTime     @default(now())
+  appliedToCrm     Boolean      @default(false)
+  updatedAt        DateTime?    @updatedAt // opcional
 
   @@unique([organizationId, recommendationId])
   @@index([organizationId, leadId])
 }
 ```
 
-Com o model, o 04 troca só a implementação de `RebalanceApprovalStore` (tratando P2002 como
-replay/409); a rota e o contrato para o 02 não mudam. O AuditLog continua como trilha.
-
-## Requisito LGPD da `note` (Agente 21, adicionado 2026-10-20)
-- Hoje o AuditLog guarda só `noteLength`, `noteHash` (HMAC-SHA256 do texto redigido, chave `PII_BLIND_INDEX_KEY`, domínio `rebalance-approval-note:v1`) e `noteRef: null`;
-  o texto redigido é descartado porque não existe entidade por tenant para ele.
-- Coluna `note`: texto redigido por `src/shared/security/piiRedaction.ts`, máx. 280 caracteres.
-- RLS por `organizationId` (mesma política dos demais models de tenant).
-- Retenção: a mesma do AuditLog/decisão; apagar/anonimizar `note` no purge do titular (LGPD art. 18)
-  e no purge da organização.
-- Com o model, o 04 passa a gravar `note` e preencher `noteRef` = `RebalanceApproval.id`.
+- **Nenhuma coluna `note`:** o texto da nota (mesmo redigido) não é armazenado em lugar nenhum; só
+  `noteLength`/`noteHash`. `noteRef` fica reservado e sempre null.
+- RLS por `organizationId` (mesma política `app.current_tenant_id` dos demais models de tenant).
+- Retenção: a mesma da decisão. Purge do titular, anonimização e purge da organização **zeram
+  `noteLength` e `noteHash`** (null).
+- Com o #37 na main, o 04 troca só a implementação de `RebalanceApprovalStore` num PR separado
+  (follow-up, fora do #23): P2002 tratado como replay/409 e atualização da linha quando a decisão
+  estiver expirada (TTL `REBALANCE_DECISION_TTL_DAYS` = 30, já que a unique é por org+recommendationId).
+  A rota e o contrato para o 02 não mudam. O AuditLog continua como trilha.
 
 ## Teste esperado
-Duas requisições concorrentes com o mesmo recommendationId → 1 linha; tenant cruzado sem colisão.
-Purge do titular remove/anonimiza `note`; leitura de outro tenant bloqueada pela RLS.
-Obs.: decisões expiram em 30 dias (REBALANCE_DECISION_TTL_DAYS) e podem ser re-decididas — a unique
-precisa acomodar isso (ex.: `@@unique([organizationId, recommendationId, decidedAt])` + índice, ou
-marcar a anterior como expirada).
+Duas requisições concorrentes com o mesmo recommendationId → 1 linha (a segunda vira replay/409);
+tenant cruzado sem colisão; leitura de outro tenant bloqueada pela RLS. `noteLength` fora de 0..280
+é rejeitado; purge do titular deixa `noteLength`/`noteHash` = null. Decisão expirada (> 30 dias) é
+re-decidida atualizando a mesma linha.
 
 ## Expurgo das notas legadas em texto claro no AuditLog (parecer 24 @041d134c P3-1; SQL revisado pelo 21 @4473646b)
 Antes do #23, o POST do #15 gravava `note` (até 1000 chars, **sem redação**) em texto claro em

@@ -11371,7 +11371,7 @@ components:
                 decision: { type: string, enum: [APPROVED, REJECTED] }
                 noteLength: { type: integer, nullable: true }
                 noteHash: { type: string, nullable: true, description: 'HMAC-SHA256 hex de organizationId + NUL + nota redigida (chave PII_BLIND_INDEX_KEY, domínio rebalance-approval-note:v1); não correlacionável entre tenants' }
-                noteRef: { type: string, nullable: true, description: Sempre null até o model RebalanceApproval }
+                noteRef: { type: string, nullable: true, description: Reservado; sempre null (nenhum texto é armazenado) }
     RebalanceOwnerStats:
       type: object
       required: [id, name, openDeals, closedInWindow, backlogDays]

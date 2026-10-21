@@ -36,7 +36,7 @@ export const REBALANCE_NOTE_HASH_DOMAIN = 'rebalance-approval-note:v1';
 
 /**
  * Redige PII (CPF/CNPJ/e-mail/telefone) e devolve só metadados. O texto redigido é descartado aqui
- * — não há entidade por tenant para guardá-lo ainda (handoff 04→01).
+ * — por decisão LGPD (21) nenhum texto é armazenado, nem no model RebalanceApproval (#37).
  * noteHash = HMAC(subchave do domínio, `${organizationId}\u0000${redigido}`): a mesma nota em orgs
  * diferentes gera hashes diferentes (não correlacionável entre tenants — Agente 21).
  */

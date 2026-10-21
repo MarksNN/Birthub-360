@@ -221,15 +221,15 @@ export interface RebalanceApprovalRequest {
 
 /**
  * LGPD (Agente 21): o texto da `note` nunca vai para o AuditLog/resposta. Persistem só metadados
- * do texto JÁ REDIGIDO. O texto redigido será guardado no model `RebalanceApproval` (handoff 04→01,
- * RLS por org, mesma retenção, apagável em purge do titular); até lá é descartado e `noteRef` = null.
+ * do texto JÁ REDIGIDO; o texto (mesmo redigido) não é armazenado em lugar nenhum, nem no model
+ * `RebalanceApproval` (PR #37, Agente 01). Purge do titular zera noteLength/noteHash.
  */
 export interface RebalanceApprovalRecord extends Omit<RebalanceApprovalRequest, 'note'> {
   /** Tamanho da nota redigida (null sem nota). */
   noteLength: number | null;
   /** HMAC-SHA256 hex (PII_BLIND_INDEX_KEY, domínio rebalance-approval-note:v1) de `${organizationId}\u0000${notaRedigida}` (null sem nota). */
   noteHash: string | null;
-  /** Referência ao texto no model dedicado — sempre null até o handoff 04→01. */
+  /** Reservado — sempre null (não existe texto armazenado). */
   noteRef: null;
   approvalId: string;
   organizationId: string;
