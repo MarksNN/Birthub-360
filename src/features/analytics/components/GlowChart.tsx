@@ -93,7 +93,7 @@ export function GlowChart({ data, error }: GlowChartProps) {
             <div className="mb-1 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#8B7DFF]">
               <CircleDot className="h-3.5 w-3.5" aria-hidden="true" /> Pulso comercial
             </div>
-            <h3 className="text-lg font-black text-white">Entrada, ganho e perda por mês</h3>
+            <h3 className="text-lg font-black !text-[#F8F9FF]">Entrada, ganho e perda por mês</h3>
             <p className="mt-1 text-sm text-slate-400">
               Explore as séries reais dos últimos {chartData.length} meses e isole o sinal que quer
               analisar.
