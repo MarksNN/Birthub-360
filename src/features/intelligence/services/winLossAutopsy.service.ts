@@ -446,6 +446,21 @@ export class WinLossAutopsyService implements IWinLossAutopsyPort {
     return this.reportsStore.get(`${organizationId}:${reportId}`);
   }
 
+  /**
+   * Expurgo LGPD (REMED-06/P2-5): remove relatórios de autópsia derivados do titular.
+   * Mapeamento documentado em docs/lgpd/cadeia-consentimento.md: subjectRef == leadId/dealId.
+   */
+  async purgeSubject(organizationId: string, subjectRef: string): Promise<{ reports: number }> {
+    let reports = 0;
+    for (const [key, report] of this.reportsStore) {
+      if (key.startsWith(`${organizationId}:`) && report.dealId === subjectRef) {
+        this.reportsStore.delete(key);
+        reports++;
+      }
+    }
+    return { reports };
+  }
+
   clear(): void {
     this.reportsStore.clear();
   }

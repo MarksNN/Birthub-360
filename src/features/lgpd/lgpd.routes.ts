@@ -1,5 +1,11 @@
 import { type NextFunction, type Request, type Response, Router } from 'express';
+import { z } from 'zod';
 import { AuditService } from '../../lib/audit/audit.service.js';
+import {
+  ConsentChainUnavailableError,
+  REVOCATION_REASON_CODES,
+} from '../../lib/security/consentAuditChain.service.js';
+import { consentAuditChain } from '../../lib/security/consentChainFactory.js';
 import { routeParam } from '../../shared/http/routeParams.js';
 import type { AuthRequest } from '../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../shared/middlewares/requireRole.js';
@@ -159,5 +165,97 @@ lgpdRouter.post(
         message: 'Opt-out registrado com sucesso.',
       });
     })().catch(next);
+  },
+);
+
+// ── Cadeia de consentimento (REMED-06 / P2-4) ────────────────────────────────
+// organizationId sempre da sessão. Se a migração do Agente 01 ainda não existir, a cadeia falha
+// fechada e as rotas respondem 503 (nunca gravam em memória em produção).
+const consentBodySchema = z.object({
+  subjectRef: z.string().trim().min(1).max(128),
+  purpose: z
+    .string()
+    .trim()
+    .min(1)
+    .max(64)
+    .regex(/^[A-Z0-9_]+$/),
+  termsVersion: z.string().trim().min(1).max(32),
+  retentionDays: z.number().int().positive().max(3650).optional(),
+});
+const revokeBodySchema = z.object({
+  reasonCode: z.enum(REVOCATION_REASON_CODES),
+  /** Detalhe livre opcional: NUNCA vai para a cadeia; fica em tabela expurgável. */
+  detail: z.string().trim().max(500).optional(),
+});
+
+function consentError(err: unknown, res: Response, next: NextFunction): void {
+  if (err instanceof ConsentChainUnavailableError) {
+    res.status(503).json({ success: false, error: 'Cadeia de consentimento indisponível.' });
+    return;
+  }
+  next(err);
+}
+
+lgpdRouter.post(
+  '/consentimentos',
+  requireRole(['ADMIN', 'GESTOR']),
+  (req: Request, res: Response, next: NextFunction): void => {
+    (async () => {
+      const parsed = consentBodySchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, error: 'Payload inválido.' });
+        return;
+      }
+      const { organizationId, id: actorId } = (req as AuthRequest).user;
+      const event = await consentAuditChain.recordConsent({
+        organizationId,
+        operatorUserId: actorId,
+        ...parsed.data,
+      });
+      res.status(201).json({ id: event.id, sequence: (event as { sequence?: number }).sequence });
+    })().catch((err) => consentError(err, res, next));
+  },
+);
+
+lgpdRouter.post(
+  '/consentimentos/:subjectRef/revogacao',
+  requireRole(['ADMIN', 'GESTOR']),
+  (req: Request, res: Response, next: NextFunction): void => {
+    (async () => {
+      const parsed = revokeBodySchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, error: 'reasonCode inválido.' });
+        return;
+      }
+      const { organizationId, id: actorId } = (req as AuthRequest).user;
+      const subjectRef = routeParam(req.params.subjectRef, 'subjectRef');
+      const event = await consentAuditChain.revokeConsent(
+        organizationId,
+        subjectRef,
+        parsed.data.reasonCode,
+        actorId,
+        { detail: parsed.data.detail },
+      );
+      await AuditService.log({
+        action: 'UPDATE',
+        entity: 'LGPD_CONSENT_REVOCATION',
+        entityId: event.id,
+        actorId,
+        tenantId: organizationId,
+        ipAddress: req.ip,
+      });
+      res.status(202).json({ id: event.id, purge: 'ENQUEUED' });
+    })().catch((err) => consentError(err, res, next));
+  },
+);
+
+lgpdRouter.get(
+  '/consentimentos/verificacao',
+  requireRole(['ADMIN', 'GESTOR']),
+  (req: Request, res: Response, next: NextFunction): void => {
+    (async () => {
+      const { organizationId } = (req as AuthRequest).user;
+      res.json(await consentAuditChain.verifyChainIntegrity(organizationId));
+    })().catch((err) => consentError(err, res, next));
   },
 );

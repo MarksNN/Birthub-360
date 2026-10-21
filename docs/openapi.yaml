@@ -6979,6 +6979,88 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /lgpd/consentimentos:
+    post:
+      tags: [LGPD]
+      summary: >-
+        Registra consentimento na cadeia criptográfica (LGPD art. 7º I e art. 8º). Somente
+        ADMIN/GESTOR; organizationId da sessão. subjectRef é pseudonimizado (HMAC) antes de gravar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectRef, purpose, termsVersion]
+              properties:
+                subjectRef: { type: string, maxLength: 128 }
+                purpose: { type: string, pattern: '^[A-Z0-9_]+$' }
+                termsVersion: { type: string }
+                retentionDays: { type: integer, minimum: 1, maximum: 3650 }
+      responses:
+        '201':
+          description: Evento registrado
+          content:
+            application/json:
+              schema: { type: object }
+        '400':
+          description: Payload inválido
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: Cadeia indisponível (migração pendente) — falha fechada
+
+  /lgpd/consentimentos/{subjectRef}/revogacao:
+    parameters:
+      - name: subjectRef
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [LGPD]
+      summary: >-
+        Revoga consentimento (LGPD art. 8º §5º, art. 18 IX). Grava REVOCATION e a tarefa de
+        expurgo na mesma transação; ERASURE_REQUEST aplica crypto-shredding da chave do titular.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reasonCode]
+              properties:
+                reasonCode:
+                  type: string
+                  enum: [TITULAR_REQUEST, ERASURE_REQUEST, PURPOSE_FULFILLED, LEGAL_OBLIGATION, OPERATOR_CORRECTION]
+                detail: { type: string, maxLength: 500, description: Fica fora da cadeia, em tabela expurgável }
+      responses:
+        '202':
+          description: Revogação registrada e expurgo enfileirado
+          content:
+            application/json:
+              schema: { type: object }
+        '400':
+          description: reasonCode inválido
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: Cadeia indisponível (migração pendente) — falha fechada
+
+  /lgpd/consentimentos/verificacao:
+    get:
+      tags: [LGPD]
+      summary: Verifica integridade da cadeia do tenant (adulteração, reordenação, lacunas, truncamento).
+      responses:
+        '200':
+          description: Resultado da verificação
+          content:
+            application/json:
+              schema: { type: object }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: Cadeia indisponível (migração pendente)
+
   /lgpd/audit-logs:
     get:
       tags: [LGPD]

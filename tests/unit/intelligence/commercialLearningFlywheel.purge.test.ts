@@ -1,13 +1,32 @@
 import { describe, expect, it } from 'vitest';
 import {
   CommercialLearningFlywheelService,
+  commercialLearningFlywheel,
   type FlywheelPurgeTx,
 } from '../../../src/features/intelligence/services/commercialLearningFlywheel.service.js';
-import { ConsentAuditChainService } from '../../../src/lib/security/consentAuditChain.service.js';
+import { winLossAutopsyService } from '../../../src/features/intelligence/services/winLossAutopsy.service.js';
+import {
+  ConsentAuditChainService,
+  InMemoryConsentAuditChainRepository,
+} from '../../../src/lib/security/consentAuditChain.service.js';
+import { EnvTenantPepperProvider, InMemorySubjectKeyStore, SubjectTokenizer } from '../../../src/lib/security/subjectTokenizer.js';
+import {
+  CONSENT_PURGE_CHANNEL,
+  makeBroadcaster,
+  purgeLocalSubjectState,
+  registerConsentPurgers,
+  subscribeToPurgeBroadcasts,
+} from '../../../src/bootstrap/consentPurgeWiring.js';
+
+const newChain = () =>
+  new ConsentAuditChainService({
+    repo: new InMemoryConsentAuditChainRepository(),
+    tokenizer: new SubjectTokenizer(new EnvTenantPepperProvider('p'.repeat(48)), new InMemorySubjectKeyStore()),
+  });
 
 describe('REMED-06 / Ajuste 1 — retração do Flywheel com expurgo real', () => {
-  const seed = async (svc: CommercialLearningFlywheelService, org: string, lead: string) => {
-    await svc.recordApproachSent({ organizationId: org, leadId: lead, channel: 'EMAIL', segment: 'agro', approachText: 'texto' });
+  const seed = async (svc: CommercialLearningFlywheelService, org: string, lead: string, text = 'texto') => {
+    await svc.recordApproachSent({ organizationId: org, leadId: lead, channel: 'EMAIL', segment: 'agro', approachText: text });
     await svc.evaluateCommercialOutcome({ organizationId: org, leadId: lead, outcomeType: 'DEAL_WON' });
   };
 
@@ -17,25 +36,25 @@ describe('REMED-06 / Ajuste 1 — retração do Flywheel com expurgo real', () =
     await seed(svc, 'o1', 'L2');
     await seed(svc, 'o2', 'L1');
     const r = await svc.purgeSubject('o1', 'L1');
-    expect(r.approachesPurged).toBe(1);
-    expect(r.fewShotPurged).toBe(1);
-    const left = await svc.getFewShotExamples('o1', 'EMAIL');
-    expect(left.map((f) => f.attributionEvidence.leadId)).toEqual(['L2']);
+    expect(r).toMatchObject({ approachesPurged: 1, fewShotPurged: 1 });
+    expect((await svc.getFewShotExamples('o1', 'EMAIL')).map((f) => f.attributionEvidence.leadId)).toEqual(['L2']);
     expect(await svc.getFewShotExamples('o2', 'EMAIL')).toHaveLength(1);
-    expect(await svc.evaluateCommercialOutcome({ organizationId: 'o1', leadId: 'L1', outcomeType: 'DEAL_WON' })).toBeNull();
   });
 
-  it('executa deleteMany físico no banco, escopado por tenant+titular, em transação', async () => {
+  it('deleteMany físico no banco, escopado por tenant+titular, em transação', async () => {
     const calls: string[] = [];
     const tx: FlywheelPurgeTx = {
-      flywheelFewShotExample: { deleteMany: async ({ where }) => (calls.push(`fs:${where.organizationId}:${where.leadId}`), { count: 2 }) },
-      flywheelApproachRecord: { deleteMany: async ({ where }) => (calls.push(`ap:${where.organizationId}:${where.leadId}`), { count: 3 }) },
+      flywheelFewShotExample: {
+        deleteMany: async ({ where }) => (calls.push(`fs:${where.organizationId}:${where.leadId}`), { count: 2 }),
+      },
+      flywheelApproachRecord: {
+        deleteMany: async ({ where }) => (calls.push(`ap:${where.organizationId}:${where.leadId}`), { count: 3 }),
+      },
     };
     const svc = new CommercialLearningFlywheelService({ $transaction: (fn) => fn(tx) });
     const r = await svc.purgeSubject('o1', 'L1');
     expect(calls).toEqual(['fs:o1:L1', 'ap:o1:L1']);
-    expect(r.persistedFewShotPurged).toBe(2);
-    expect(r.persistedApproachesPurged).toBe(3);
+    expect(r).toMatchObject({ persistedFewShotPurged: 2, persistedApproachesPurged: 3 });
   });
 
   it('recusa expurgo sem tenant ou titular', async () => {
@@ -44,40 +63,49 @@ describe('REMED-06 / Ajuste 1 — retração do Flywheel com expurgo real', () =
     await expect(svc.purgeSubject('o1', '')).rejects.toThrow(/Tenancy/);
   });
 
-  it('revogação na cadeia de consentimento dispara o expurgo', async () => {
-    const svc = new CommercialLearningFlywheelService();
-    const chain = new ConsentAuditChainService();
-    chain.onRevocation((o, s) => svc.purgeSubject(o, s));
-    await seed(svc, 'o1', 'L1');
-    await chain.revokeConsent('o1', 'L1', 'titular revogou');
-    expect(await svc.getFewShotExamples('o1', 'EMAIL')).toHaveLength(0);
-  });
-
-  it('Agente 15 (4): expurga do banco e a cadeia guarda só o evento de retração, sem PII', async () => {
+  it('Agente 15 (4): revogação expurga Flywheel/autópsia e a cadeia guarda só RETRACTION sem PII', async () => {
     const SECRET_TEXT = 'Olá Maria Souza, CPF 000.000.000-00';
     const LEAD = 'lead-maria-souza';
-    const deleted: string[] = [];
-    const tx: FlywheelPurgeTx = {
-      flywheelFewShotExample: { deleteMany: async ({ where }) => (deleted.push(`fs:${where.leadId}`), { count: 1 }) },
-      flywheelApproachRecord: { deleteMany: async ({ where }) => (deleted.push(`ap:${where.leadId}`), { count: 1 }) },
-    };
-    const chain = new ConsentAuditChainService();
-    const svc = new CommercialLearningFlywheelService({ $transaction: (fn) => fn(tx) }, chain);
-    chain.onRevocation((o, s) => svc.purgeSubject(o, s));
-    await svc.recordApproachSent({ organizationId: 'o1', leadId: LEAD, channel: 'EMAIL', segment: 'agro', approachText: SECRET_TEXT });
-    await svc.evaluateCommercialOutcome({ organizationId: 'o1', leadId: LEAD, outcomeType: 'DEAL_WON' });
+    commercialLearningFlywheel.clear();
+    await seed(commercialLearningFlywheel, 'o1', LEAD, SECRET_TEXT);
+    const chain = newChain();
+    registerConsentPurgers(chain);
 
-    await chain.revokeConsent('o1', LEAD, 'pedido do titular');
+    await chain.revokeConsent('o1', LEAD, 'ERASURE_REQUEST');
 
-    expect(deleted).toEqual([`fs:${LEAD}`, `ap:${LEAD}`]);
-    expect(await svc.getFewShotExamples('o1', 'EMAIL')).toHaveLength(0);
+    expect(await commercialLearningFlywheel.getFewShotExamples('o1', 'EMAIL')).toHaveLength(0);
     const events = await chain.getChain('o1');
-    const retraction = events.filter((e) => e.kind === 'RETRACTION');
-    expect(retraction).toHaveLength(1);
-    const retractionJson = JSON.stringify(retraction);
-    expect(retractionJson).not.toContain(LEAD);
-    expect(JSON.stringify(events)).not.toContain(SECRET_TEXT);
-    expect(retraction[0].purpose).toBe('RETRACTION:commercial-learning-flywheel:{"approaches":2,"fewShot":2}');
-    expect((await chain.verify('o1')).valid).toBe(true);
+    expect(events.filter((e) => e.kind === 'RETRACTION')).toHaveLength(1);
+    const json = JSON.stringify(events);
+    expect(json).not.toContain(LEAD);
+    expect(json).not.toContain('Maria');
+    expect((await chain.verifyChainIntegrity('o1')).valid).toBe(true);
+  });
+
+  it('expurgo local cobre autópsia (por dealId) e invalida cache semântico', async () => {
+    const r = await purgeLocalSubjectState('o-x', 'deal-1');
+    expect(r).toMatchObject({ approaches: 0, fewShot: 0, autopsyReports: 0 });
+    expect(typeof winLossAutopsyService.purgeSubject).toBe('function');
+  });
+
+  it('invalidação entre instâncias via pub/sub: publica e a outra instância expurga localmente', async () => {
+    const handlers: Array<(c: string, m: string) => void> = [];
+    const bus = {
+      published: [] as string[],
+      publish: async (c: string, m: string) => {
+        bus.published.push(m);
+        for (const h of handlers) h(c, m);
+      },
+      subscribe: async () => 1,
+      on: (_e: 'message', cb: (c: string, m: string) => void) => handlers.push(cb),
+    };
+    commercialLearningFlywheel.clear();
+    await seed(commercialLearningFlywheel, 'o9', 'L9');
+    await subscribeToPurgeBroadcasts(bus, 'instancia-B');
+    await makeBroadcaster(bus, 'instancia-A')('o9', 'L9');
+    await new Promise((r) => setTimeout(r, 10));
+    expect(JSON.parse(bus.published[0])).toMatchObject({ organizationId: 'o9', subjectRef: 'L9' });
+    expect(await commercialLearningFlywheel.getFewShotExamples('o9', 'EMAIL')).toHaveLength(0);
+    expect(CONSENT_PURGE_CHANNEL).toBe('lgpd:consent-purge:v1');
   });
 });

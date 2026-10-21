@@ -1,6 +1,8 @@
 import type { FeatureFlagsUseCases } from '../features/feature-flags/application/FeatureFlagsUseCases.js';
 import { requestContext } from '../lib/async-context.js';
 import { logger } from '../lib/logger.js';
+import { consentAuditChain } from '../lib/security/consentChainFactory.js';
+import { startConsentPurgeRuntime } from './consentPurgeWiring.js';
 import { container } from '../shared/di/container.js';
 import { setupDI } from '../shared/di/setup.js';
 
@@ -26,5 +28,11 @@ export function bootstrapApplicationServices(): void {
       .catch((err) =>
         logger.error({ err }, 'Falha ao sincronizar catálogo de feature flags no boot'),
       ),
+  );
+
+  // LGPD (REMED-06): consumidores de expurgo, reconciliação da outbox e invalidação entre
+  // instâncias. Falha aqui não derruba o servidor; a cadeia em si falha fechada (503).
+  startConsentPurgeRuntime(consentAuditChain).catch((err) =>
+    logger.error({ err }, 'LGPD: falha ao iniciar runtime de expurgo de consentimento'),
   );
 }

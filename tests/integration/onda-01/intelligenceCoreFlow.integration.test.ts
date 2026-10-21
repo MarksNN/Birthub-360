@@ -6,7 +6,7 @@ import { commercialLearningFlywheel } from '../../../src/features/intelligence/s
 import { semanticCache } from '../../../src/lib/ai/cache/semanticCache.service.js';
 import { modelCascadeRouter } from '../../../src/lib/ai/gateway/model-cascade.js';
 import { piiTokenizer } from '../../../src/lib/security/piiTokenizer.service.js';
-import { consentAuditChain } from '../../../src/lib/security/consentAuditChain.service.js';
+import { consentAuditChain } from '../../../src/lib/security/consentChainFactory.js';
 import { similarDealsService } from '../../../src/features/knowledge/similarDeals.service.js';
 
 describe('Onda 01 — Shared Intelligence Core End-to-End Integration Flow', () => {
@@ -194,7 +194,7 @@ describe('Onda 01 — Shared Intelligence Core End-to-End Integration Flow', () 
     await consentAuditChain.revokeConsent(
       tenantA,
       'lead-rev-test',
-      'Solicitação de exclusão do titular sob Artigo 18 da LGPD',
+      'ERASURE_REQUEST',
     );
 
     // 3. Retração da objeção
@@ -215,6 +215,7 @@ describe('Onda 01 — Shared Intelligence Core End-to-End Integration Flow', () 
     // 6. Integridade da cadeia criptográfica permanece válida e auditável
     const chainIntegrity = await consentAuditChain.verifyChainIntegrity(tenantA);
     expect(chainIntegrity.valid).toBe(true);
-    expect(chainIntegrity.totalRecords).toBe(2);
+    // gênese + consentimento + revogação + retração (outbox processada na hora)
+    expect(chainIntegrity.totalRecords).toBe(4);
   });
 });

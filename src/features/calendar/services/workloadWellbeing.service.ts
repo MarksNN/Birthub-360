@@ -30,12 +30,23 @@ export interface CalendarEventSummary {
 /** REMED-07: K mínimo de vendedores distintos para liberar agregado coletivo. */
 export const WORKLOAD_K_ANONYMITY_MIN = 5;
 
+/** Semana ISO (segunda..domingo, UTC) que contém `date` (YYYY-MM-DD). */
+export function isoWeekBounds(date: string): { start: string; end: string } {
+  const d = new Date(`${date}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) throw new Error('weekOf inválido (YYYY-MM-DD)');
+  const day = (d.getUTCDay() + 6) % 7;
+  const start = new Date(d.getTime() - day * 86_400_000);
+  const end = new Date(start.getTime() + 6 * 86_400_000);
+  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+}
+
 export class WorkloadWellbeingService {
   private preferences = new Map<string, WorkloadPreferences>();
   private recommendations = new Map<string, WorkloadRecommendation[]>();
   private microTrainings = new Map<string, MicroTrainingSession>();
 
   clear(): void {
+    this.tenantDailyMetrics.clear();
     this.preferences.clear();
     this.recommendations.clear();
     this.microTrainings.clear();
@@ -88,7 +99,40 @@ export class WorkloadWellbeingService {
   /**
    * Avalia a carga horária objetiva do dia (duração de reuniões, intervalos, acúmulo).
    */
+  /**
+   * Fonte de verdade server-side para agregados coletivos (REMED-07/P2-6): métricas diárias
+   * calculadas pelo próprio servidor, indexadas por tenant → vendedor+dia (recalcular o mesmo dia
+   * substitui, não duplica). Nunca recebidas de quem chama o agregado.
+   */
+  private tenantDailyMetrics = new Map<string, Map<string, WorkloadObjectiveMetrics>>();
+
   public calculateDailyWorkloadMetrics(
+    orgId: string,
+    sellerId: string,
+    date: string,
+    events: CalendarEventSummary[],
+    pendingTasksCount = 0,
+    urgentTasksCount = 0,
+  ): WorkloadObjectiveMetrics {
+    const metrics = this.computeDailyWorkloadMetrics(
+      orgId,
+      sellerId,
+      date,
+      events,
+      pendingTasksCount,
+      urgentTasksCount,
+    );
+    const seller = sellerId?.trim();
+    if (orgId && seller) {
+      const byTenant =
+        this.tenantDailyMetrics.get(orgId) ?? new Map<string, WorkloadObjectiveMetrics>();
+      byTenant.set(`${seller}\u0000${date}`, metrics);
+      this.tenantDailyMetrics.set(orgId, byTenant);
+    }
+    return metrics;
+  }
+
+  private computeDailyWorkloadMetrics(
     orgId: string,
     sellerId: string,
     date: string,
@@ -345,51 +389,56 @@ export class WorkloadWellbeingService {
   }
 
   /**
-   * Gera relatório agregado anônimo de carga operacional para gestores (Sem scores individuais de bem-estar).
+   * Relatório coletivo anônimo para gestores (REMED-07 / P2-6).
+   * - Universo FIXO no servidor: todos os vendedores do tenant com métricas na semana ISO
+   *   (segunda a domingo) que contém `weekOf`; o chamador não escolhe subconjuntos.
+   * - Granularidade fixa (semana) e saída arredondada (5 min / 0,5 / 10 p.p.) contra ataques de
+   *   diferença entre consultas.
+   * - K = 5 vendedores DISTINTOS; abaixo disso suprime e não revela o tamanho do grupo.
+   * - Cada vendedor pesa 1 (média por vendedor antes da média do grupo).
    */
   public getCollectiveAggregatedWorkload(
     orgId: string,
-    metricsList: WorkloadObjectiveMetrics[],
+    weekOf: string,
   ): CollectiveAggregatedWorkload {
-    // REMED-07 — k-anonymity estrita: mínimo de K vendedores DISTINTOS do próprio tenant.
-    // Métricas de outro tenant são descartadas; linhas duplicadas do mesmo vendedor não contam.
-    const tenantMetrics = metricsList.filter((m) => m.organizationId === orgId);
-    const distinctSellers = new Set(
-      tenantMetrics.map((m) => m.sellerId?.trim()).filter((id): id is string => !!id),
-    );
-    const sampleSize = tenantMetrics.length;
-    if (distinctSellers.size < WORKLOAD_K_ANONYMITY_MIN) {
+    const { start, end } = isoWeekBounds(weekOf);
+    const perSeller = new Map<string, WorkloadObjectiveMetrics[]>();
+    for (const m of this.tenantDailyMetrics.get(orgId)?.values() ?? []) {
+      const seller = m.sellerId?.trim();
+      if (m.organizationId !== orgId || !seller || m.date < start || m.date > end) continue;
+      const list = perSeller.get(seller) ?? [];
+      list.push(m);
+      perSeller.set(seller, list);
+    }
+    const suppressed: CollectiveAggregatedWorkload = {
+      organizationId: orgId,
+      periodStart: start,
+      periodEnd: end,
+      anonymizedSampleCount: 0,
+      averageDailyMeetingMinutes: 0,
+      averageBackToBackOccurrences: 0,
+      collectivePrepTimeAvailabilityPercent: 0,
+    };
+    if (perSeller.size < WORKLOAD_K_ANONYMITY_MIN) {
       logger.info(
-        { orgId, distinctSellers: distinctSellers.size, k: WORKLOAD_K_ANONYMITY_MIN },
+        { orgId, k: WORKLOAD_K_ANONYMITY_MIN },
         'WorkloadWellbeing: agregado suprimido por k-anonymity',
       );
-      return {
-        organizationId: orgId,
-        periodStart: new Date().toISOString().split('T')[0],
-        periodEnd: new Date().toISOString().split('T')[0],
-        // Não revela o tamanho exato de grupos abaixo de K (evita inferência por diferença).
-        anonymizedSampleCount: 0,
-        averageDailyMeetingMinutes: 0,
-        averageBackToBackOccurrences: 0,
-        collectivePrepTimeAvailabilityPercent: 0,
-      };
+      return suppressed;
     }
-
-    const totalMinutes = tenantMetrics.reduce((sum, m) => sum + m.totalMeetingMinutes, 0);
-    const totalBackToBack = tenantMetrics.reduce((sum, m) => sum + m.backToBackMeetingsCount, 0);
-    const prepAvail = tenantMetrics.filter(
-      (m) => m.availablePrepMinutesBeforeKeyMeetings > 10,
-    ).length;
-
+    const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+    const sellers = [...perSeller.values()];
+    const minutes = avg(sellers.map((d) => avg(d.map((m) => m.totalMeetingMinutes))));
+    const b2b = avg(sellers.map((d) => avg(d.map((m) => m.backToBackMeetingsCount))));
+    const prep = avg(
+      sellers.map((d) => avg(d.map((m) => (m.availablePrepMinutesBeforeKeyMeetings > 10 ? 1 : 0)))),
+    );
     return {
-      organizationId: orgId,
-      periodStart: tenantMetrics[0]?.date || new Date().toISOString().split('T')[0],
-      periodEnd:
-        tenantMetrics[tenantMetrics.length - 1]?.date || new Date().toISOString().split('T')[0],
-      anonymizedSampleCount: distinctSellers.size,
-      averageDailyMeetingMinutes: Math.round(totalMinutes / sampleSize),
-      averageBackToBackOccurrences: Number((totalBackToBack / sampleSize).toFixed(1)),
-      collectivePrepTimeAvailabilityPercent: Math.round((prepAvail / sampleSize) * 100),
+      ...suppressed,
+      anonymizedSampleCount: perSeller.size,
+      averageDailyMeetingMinutes: Math.round(minutes / 5) * 5,
+      averageBackToBackOccurrences: Math.round(b2b * 2) / 2,
+      collectivePrepTimeAvailabilityPercent: Math.round(prep * 10) * 10,
     };
   }
 }
