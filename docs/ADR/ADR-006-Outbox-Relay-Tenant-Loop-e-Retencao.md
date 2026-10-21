@@ -37,7 +37,7 @@ A função `domain_event_outbox_purge(p_org, p_dispatched_days=30, p_dead_letter
 - `eventId` é único **por tenant**, `(organizationId, eventId)`, para que não sirva de oráculo de existência entre tenants.
 
 ## Lease de consumo
-`DomainEventConsumption` tem as colunas `reservedBy` (NOT NULL DEFAULT ''), `reservedUntil` e `completedAt` (timestamptz(3), nulos), além de `CHECK (reservedUntil IS NULL OR reservedBy <> '')`.
+`DomainEventConsumption` tem as colunas `reservedBy` (NOT NULL DEFAULT ''), `reservedUntil` e `completedAt` (timestamptz(3), nulos), além de `CHECK (reservedUntil IS NULL OR reservedBy <> '')` e `CHECK (completedAt IS NOT NULL OR reservedUntil IS NOT NULL)`. Com isso, um consumo não concluído sem lease é impossível no banco (parecer 24, P3). O check é compatível com o adaptador do 16 @0c658192: o reserve grava `reservedUntil`, o complete grava `completedAt` e zera `reservedUntil` na mesma instrução, e o release apaga a linha.
 - Reserva e reclaim: `INSERT ... ON CONFLICT DO UPDATE ... WHERE completedAt IS NULL AND reservedUntil < now()`, conforme o handoff 16. Se um worker cair entre a reserva e a conclusão, a lease expira e outro worker retoma.
 - Uma linha concluída nunca é retomada.
 - Varredura de reservas vencidas por tenant: índice parcial `DomainEventConsumption_lease_reclaim_idx (organizationId, reservedUntil) WHERE completedAt IS NULL`.

@@ -84,9 +84,13 @@ ALTER TABLE "DomainEventOutbox"
     ADD CONSTRAINT "DomainEventOutbox_retry_le_max_check" CHECK ("retryCount" <= "maxAttempts"),
     ADD CONSTRAINT "DomainEventOutbox_lastError_len_check" CHECK ("lastError" IS NULL OR char_length("lastError") <= 2000);
 
--- Uma reserva com prazo precisa de dono.
+-- Uma reserva com prazo precisa de dono; e todo consumo não concluído precisa de prazo.
 ALTER TABLE "DomainEventConsumption"
-    ADD CONSTRAINT "DomainEventConsumption_lease_owner_check" CHECK ("reservedUntil" IS NULL OR "reservedBy" <> '');
+    ADD CONSTRAINT "DomainEventConsumption_lease_owner_check" CHECK ("reservedUntil" IS NULL OR "reservedBy" <> ''),
+    -- Consumo não concluído sempre tem lease (senão `reservedUntil < now()` nunca vale e a linha
+    -- jamais é retomada). Compatível com o adaptador do 16: reserve grava reservedUntil; complete
+    -- grava completedAt (e zera reservedUntil) na mesma instrução; release apaga a linha.
+    ADD CONSTRAINT "DomainEventConsumption_unfinished_has_lease_check" CHECK ("completedAt" IS NOT NULL OR "reservedUntil" IS NOT NULL);
 
 -- RLS: tenant_isolation estrito, FORCE, sem cláusula de bypass (padrão 01A pós-20260825120000).
 

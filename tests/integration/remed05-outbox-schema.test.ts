@@ -104,8 +104,8 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
       prisma.$transaction(async (tx) => {
         await tx.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, ORG_A);
         return tx.$executeRawUnsafe(
-          `INSERT INTO "DomainEventConsumption" ("organizationId","eventId","consumer")
-           VALUES ($1,'evt-1','c1') ON CONFLICT DO NOTHING`,
+          `INSERT INTO "DomainEventConsumption" ("organizationId","eventId","consumer","reservedBy","reservedUntil")
+           VALUES ($1,'evt-1','c1','w1', now() + interval '1 minute') ON CONFLICT DO NOTHING`,
           ORG_A,
         );
       });
@@ -324,6 +324,31 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
     expect(JSON.stringify(err, Object.getOwnPropertyNames(err as object)) + String(err)).toContain(
       'DomainEventConsumption_lease_owner_check',
     );
+
+    // CHECK: consumo não concluído sem lease é rejeitado (nunca seria retomado)
+    const noLease = await asOrg(ORG_A, () =>
+      prisma.domainEventConsumption.create({
+        data: { organizationId: ORG_A, eventId: 'e-nolease', consumer: 'c1', reservedBy: 'w1' },
+      }),
+    ).then(
+      () => null,
+      (e: unknown) => e,
+    );
+    expect(
+      JSON.stringify(noLease, Object.getOwnPropertyNames(noLease as object)) + String(noLease),
+    ).toContain('DomainEventConsumption_unfinished_has_lease_check');
+
+    // fluxo do adaptador do 16 (0c658192): complete grava completedAt e zera reservedUntil — permitido
+    expect(await reserve('e-adapter', 'w9', 60)).toHaveLength(1);
+    const completed = await tx((t) =>
+      t.$executeRawUnsafe(
+        `UPDATE "DomainEventConsumption" SET "completedAt"=now(), "processedAt"=now(), "reservedUntil"=NULL
+         WHERE "organizationId"=$1 AND "eventId"='e-adapter' AND consumer='c1' AND "reservedBy"='w9' AND "completedAt" IS NULL`,
+        ORG_A,
+      ),
+    );
+    expect(completed).toBe(1);
+    expect(await reserve('e-adapter', 'w10', 60)).toHaveLength(0);
 
     // reclaim por tenant usa o índice parcial
     const plan = await tx(async (t) => {
