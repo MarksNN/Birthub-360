@@ -10,6 +10,12 @@ import type {
   WhatIfSimulationInput,
   WhatIfSimulationResultV2 as WhatIfSimulationResult,
 } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
+import type {
+  OracleClosedWonDeal,
+  OracleForecastSnapshot,
+  OracleHistoryReader,
+  OracleOpenDeal,
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 
 /**
  * REMED-03 — Revenue Oracle calculado a partir do histórico REAL do tenant.
@@ -37,27 +43,7 @@ export const ORACLE_MIN_BACKTEST_PERIODS = 3;
 /** MAPE máximo (%) para declarar o modelo calibrado. */
 export const ORACLE_CALIBRATED_MAX_MAPE = 15;
 
-export interface OracleClosedWonDeal {
-  amount: number;
-  closedAt: Date;
-}
-export interface OracleOpenDeal {
-  amount: number;
-  probability: number | null;
-  expectedCloseAt: Date | null;
-}
-export interface OracleForecastSnapshot {
-  period: string; // YYYY-MM
-  snapshotAt: Date;
-  forecastAmount: number;
-}
-
-/** Porta de leitura — implementação Prisma em infra/PrismaOracleHistoryReader.ts. */
-export interface OracleHistoryReader {
-  listClosedWonDeals(organizationId: string, since: Date): Promise<OracleClosedWonDeal[]>;
-  listOpenDeals(organizationId: string): Promise<OracleOpenDeal[]>;
-  listForecastSnapshots(organizationId: string): Promise<OracleForecastSnapshot[]>;
-}
+export type { OracleClosedWonDeal, OracleForecastSnapshot, OracleHistoryReader, OracleOpenDeal };
 
 const HORIZON_MONTHS: Record<RevenueHorizonDays, number> = { 30: 1, 90: 3, 180: 6 };
 
