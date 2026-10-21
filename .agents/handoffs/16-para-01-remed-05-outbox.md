@@ -97,3 +97,8 @@ Os demais 16 produtores não escrevem no banco no mesmo fluxo e podem continuar 
 - CHECK `retryCount <= maxAttempts`: o relay limita `retryCount` a `maxAttempts` ao ir para DEAD_LETTER.
 - **Ainda pendente no 01:** `DomainEventConsumption` continua sem `reservedBy`/`reservedUntil`/`completedAt` em 671d8d31,
   então o adaptador mantém `ON CONFLICT DO NOTHING` + DELETE em falha (crash entre reserva e conclusão = consumidor não reexecuta).
+
+## #34 @eaf0d4e7 — lease de consumo adotado
+`PrismaConsumptionStore` usa reservedBy/reservedUntil/completedAt: reserva com `ON CONFLICT DO UPDATE ... WHERE completedAt IS NULL AND reservedUntil < now()`,
+complete grava `completedAt=now()` (só o dono), falha apaga a linha não concluída do dono, "processado" = `completedAt IS NOT NULL`.
+A limitação at-most-once em crash foi resolvida: após expirar o lease, outro worker retoma. Pendência do 01 sobre consumo: nenhuma.

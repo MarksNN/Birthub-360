@@ -156,9 +156,9 @@ describe.skipIf(!APP_URL)('REMED-05 adaptador Postgres (RLS estrita, #34)', () =
   it('unique de consumo: reserva concorrente só vence uma vez; release libera', async () => {
     const store = new PrismaConsumptionStore(runner);
     const k = { organizationId: orgA, eventId: `evt-${randomUUID()}`, consumer: 'crm', owner: 'x', now: new Date(), leaseMs: 1000 };
-    const results = await Promise.all(Array.from({ length: 5 }, () => store.reserve(k)));
+    const results = await Promise.all(Array.from({ length: 5 }, (_, i) => store.reserve({ ...k, owner: `o${i}` })));
     expect(results.filter(Boolean)).toHaveLength(1);
-    await store.release(k);
+    await store.release({ ...k, owner: `o${results.indexOf(true)}` });
     expect(await store.isCompleted(orgA, k.eventId, 'crm')).toBe(false);
     expect(await store.reserve(k)).toBe(true);
     await store.complete(k);
@@ -233,5 +233,78 @@ describe.skipIf(!APP_URL)('REMED-05 adaptador Postgres (RLS estrita, #34)', () =
     } finally {
       await admin.query('DELETE FROM "Organization" WHERE id=$1', [orgC]);
     }
+  });
+  describe('lease de consumo (#34 @eaf0d4e7)', () => {
+    const key = () => ({ organizationId: orgA, eventId: `evt-${randomUUID()}`, consumer: 'crm' });
+    const row = async (k: { eventId: string }) =>
+      (
+        await inTenant(orgA, (tx) =>
+          tx.$queryRawUnsafe<Array<{ reservedBy: string; active: boolean; completed: boolean }>>(
+            `SELECT "reservedBy", ("reservedUntil" > now()) active, ("completedAt" IS NOT NULL) completed
+               FROM "DomainEventConsumption" WHERE "eventId"=$1`,
+            k.eventId,
+          ),
+        )
+      )[0];
+
+    it('lease ativo bloqueia o segundo consumidor', async () => {
+      const store = new PrismaConsumptionStore(runner);
+      const k = key();
+      expect(await store.reserve({ ...k, owner: 'w1', now: new Date(), leaseMs: 60_000 })).toBe(true);
+      expect(await store.reserve({ ...k, owner: 'w2', now: new Date(), leaseMs: 60_000 })).toBe(false);
+      expect(await row(k)).toEqual({ reservedBy: 'w1', active: true, completed: false });
+      expect(await store.isCompleted(orgA, k.eventId, 'crm')).toBe(false);
+    });
+
+    it('crash após a reserva: outro worker retoma depois da expiração; dono antigo não conclui', async () => {
+      const store = new PrismaConsumptionStore(runner);
+      const k = key();
+      expect(await store.reserve({ ...k, owner: 'morto', now: new Date(), leaseMs: 50 })).toBe(true);
+      // "crash": nem complete nem release
+      expect(await store.reserve({ ...k, owner: 'vivo', now: new Date(), leaseMs: 60_000 })).toBe(false);
+      await new Promise((r) => setTimeout(r, 120));
+      expect(await store.reserve({ ...k, owner: 'vivo', now: new Date(), leaseMs: 60_000 })).toBe(true);
+      expect((await row(k)).reservedBy).toBe('vivo');
+      await store.complete({ ...k, owner: 'morto', now: new Date() });
+      expect(await store.isCompleted(orgA, k.eventId, 'crm')).toBe(false);
+      await store.complete({ ...k, owner: 'vivo', now: new Date() });
+      expect(await store.isCompleted(orgA, k.eventId, 'crm')).toBe(true);
+      // concluído nunca é retomado, mesmo com lease vencido
+      expect(await store.reserve({ ...k, owner: 'outro', now: new Date(), leaseMs: 1 })).toBe(false);
+    });
+
+    it('falha libera a reserva e permite retry imediato pelo mesh', async () => {
+      const store = new PrismaConsumptionStore(runner);
+      const mesh = new DomainEventMeshService({ consumptions: store });
+      let fail = true;
+      let calls = 0;
+      mesh.subscribe(
+        'DEAL_WON',
+        async () => {
+          calls++;
+          if (fail) throw new Error('x');
+        },
+        'crm-mesh',
+      );
+      const ev = { ...input(orgA), eventId: `evt-${randomUUID()}`, occurredAt: new Date().toISOString() };
+      await expect(mesh.deliver(ev)).rejects.toThrow('x');
+      fail = false;
+      await mesh.deliver(ev);
+      await mesh.deliver(ev);
+      expect(calls).toBe(2);
+      expect(await store.isCompleted(orgA, ev.eventId, 'crm-mesh')).toBe(true);
+    });
+
+    it('CHECK lease_owner: reservedUntil sem reservedBy é rejeitado pelo banco', async () => {
+      await expect(
+        inTenant(orgA, (tx) =>
+          tx.$executeRawUnsafe(
+            `INSERT INTO "DomainEventConsumption" ("organizationId","eventId","consumer","reservedUntil") VALUES ($1,$2,'c', now())`,
+            orgA,
+            `evt-${randomUUID()}`,
+          ),
+        ),
+      ).rejects.toThrow(/DomainEventConsumption_lease_owner_check/);
+    });
   });
 });

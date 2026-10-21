@@ -275,46 +275,65 @@ export class PrismaOutboxRepository implements OutboxRepository {
 }
 
 /**
- * Consumo durável sobre a tabela do #34 (`organizationId, eventId, consumer, processedAt`).
- * reserve = `INSERT ... ON CONFLICT DO NOTHING`; release = DELETE; complete = carimba `processedAt=now()`.
- * LIMITAÇÃO com o schema do #34: sem `reservedBy/reservedUntil/completedAt` não há lease nem como
- * distinguir "em execução" de "concluído". Se o processo morrer entre reserve e complete, a linha
- * fica e o consumidor não reexecuta (at-most-once nesse caso). Ver handoff 16→01 (colunas pedidas).
+ * Consumo durável com lease (#34 @eaf0d4e7: reservedBy/reservedUntil/completedAt).
+ * - reserve: INSERT ... ON CONFLICT DO UPDATE que só retoma o lease se a linha não foi concluída e o
+ *   lease expirou (`completedAt IS NULL AND reservedUntil < now()`); grava sempre reservedBy e
+ *   reservedUntil = now() + ttl.
+ * - complete: completedAt = now() (e processedAt), apenas pelo dono do lease.
+ * - release (falha): apaga a linha não concluída do dono → próxima entrega reserva de novo.
+ * - "já processado" = completedAt IS NOT NULL.
+ * Todos os horários vêm do now() do Postgres.
  */
 export class PrismaConsumptionStore implements ConsumptionStore {
   constructor(private readonly runner: TenantSqlRunner) {}
 
-  async reserve(p: { organizationId: string; eventId: string; consumer: string }) {
+  async reserve(p: {
+    organizationId: string;
+    eventId: string;
+    consumer: string;
+    owner: string;
+    leaseMs: number;
+  }) {
     const rows = await this.runner.runAsTenant(p.organizationId, (tx) =>
       tx.$queryRawUnsafe<Array<{ id: string }>>(
-        `INSERT INTO ${C} ("organizationId","eventId","consumer","processedAt") VALUES ($1,$2,$3, now())
-         ON CONFLICT ("organizationId","eventId","consumer") DO NOTHING RETURNING "id"`,
+        `INSERT INTO ${C} AS c ("organizationId","eventId","consumer","processedAt","reservedBy","reservedUntil")
+         VALUES ($1,$2,$3, now(), $4, now() + ($5::int * interval '1 millisecond'))
+         ON CONFLICT ("organizationId","eventId","consumer") DO UPDATE
+            SET "reservedBy" = EXCLUDED."reservedBy", "reservedUntil" = EXCLUDED."reservedUntil"
+          WHERE c."completedAt" IS NULL AND (c."reservedUntil" IS NULL OR c."reservedUntil" < now())
+         RETURNING c."id"`,
         p.organizationId,
         p.eventId,
         p.consumer,
+        p.owner,
+        Math.max(1, Math.floor(p.leaseMs)),
       ),
     );
     return rows.length > 0;
   }
 
-  async complete(p: { organizationId: string; eventId: string; consumer: string }) {
+  async complete(p: { organizationId: string; eventId: string; consumer: string; owner: string }) {
     await this.runner.runAsTenant(p.organizationId, (tx) =>
       tx.$executeRawUnsafe(
-        `UPDATE ${C} SET "processedAt"=now() WHERE "organizationId"=$1 AND "eventId"=$2 AND "consumer"=$3`,
+        `UPDATE ${C} SET "completedAt"=now(), "processedAt"=now(), "reservedUntil"=NULL
+          WHERE "organizationId"=$1 AND "eventId"=$2 AND "consumer"=$3 AND "reservedBy"=$4 AND "completedAt" IS NULL`,
         p.organizationId,
         p.eventId,
         p.consumer,
+        p.owner,
       ),
     );
   }
 
-  async release(p: { organizationId: string; eventId: string; consumer: string }) {
+  async release(p: { organizationId: string; eventId: string; consumer: string; owner: string }) {
     await this.runner.runAsTenant(p.organizationId, (tx) =>
       tx.$executeRawUnsafe(
-        `DELETE FROM ${C} WHERE "organizationId"=$1 AND "eventId"=$2 AND "consumer"=$3`,
+        `DELETE FROM ${C}
+          WHERE "organizationId"=$1 AND "eventId"=$2 AND "consumer"=$3 AND "reservedBy"=$4 AND "completedAt" IS NULL`,
         p.organizationId,
         p.eventId,
         p.consumer,
+        p.owner,
       ),
     );
   }
@@ -322,7 +341,7 @@ export class PrismaConsumptionStore implements ConsumptionStore {
   async isCompleted(organizationId: string, eventId: string, consumer: string) {
     const rows = await this.runner.runAsTenant(organizationId, (tx) =>
       tx.$queryRawUnsafe<unknown[]>(
-        `SELECT 1 FROM ${C} WHERE "organizationId"=$1 AND "eventId"=$2 AND "consumer"=$3`,
+        `SELECT 1 FROM ${C} WHERE "organizationId"=$1 AND "eventId"=$2 AND "consumer"=$3 AND "completedAt" IS NOT NULL`,
         organizationId,
         eventId,
         consumer,
