@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  MODELS_WITH_ORGANIZATION_ID,
-  TENANT_INJECTED_MODELS,
-} from '@/lib/tenant-scoping-registry';
+import { MODELS_WITH_ORGANIZATION_ID, TENANT_INJECTED_MODELS } from '@/lib/tenant-scoping-registry';
 
 /**
  * TENANT-007 (docs/audits/repository-debt-audit/agents/TENANT.md) e Onda 1 — Segurança & Tenancy,
@@ -145,6 +142,10 @@ const KNOWN_RLS_ONLY_MODELS = [
   'WorkspaceLayout',
   'WorkspaceSection',
   'WorkspaceWidget',
+  // REMED-05: outbox/consumo gravados pelo adaptador do 16 (SQL cru em transação com tenant
+  // setado); RLS FORCE tenant_isolation cobre isolamento.
+  'DomainEventConsumption',
+  'DomainEventOutbox',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {

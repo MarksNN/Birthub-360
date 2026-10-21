@@ -173,7 +173,8 @@ describe('Row Level Security (RLS) - Cobertura e Isolamento Semântico no Banco 
     const systemInternalCount = models.filter((m) => m.category === 'SYSTEM_INTERNAL').length;
 
     // onda-16: +ExternalEntityLink, +ExternalCrmStageMapping (127 -> 129)
-    expect(tenantScopedCount).toBe(129);
+    // +2 REMED-05 outbox (DomainEventOutbox, DomainEventConsumption)
+    expect(tenantScopedCount).toBe(131);
     expect(globalCatalogCount).toBe(14);
     expect(systemInternalCount).toBe(1);
   });

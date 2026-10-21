@@ -1024,22 +1024,24 @@ model Organization {
   /// acumulado do mês corrente (Redis, ver providerBudget.ts) por assertProspectingBudgetNotExceeded.
   monthlyProspectingBudgetUsd Float?
 
-  workflows              Workflow[]
-  callLogs               CallLog[]
-  metrics                Metric[]
-  agentSessions          AgentSession[]
-  agents                 Agent[]
-  settings               Setting[]
-  aiConsent              OrganizationAiConsent?
-  birthhub360CallResults Birthub360CallResult[]
-  wallet                 Wallet?
-  transactions           Transaction[]
-  apiKeys                APIKey[]
-  webhookEndpoints       OrganizationWebhookEndpoint[]
-  campaigns              Campaign[]
-  dncLists               DncList[]
-  customAiTools          CustomAiTool[]
-  leadTouchpoints        LeadTouchpoint[]
+  workflows               Workflow[]
+  callLogs                CallLog[]
+  metrics                 Metric[]
+  agentSessions           AgentSession[]
+  agents                  Agent[]
+  settings                Setting[]
+  aiConsent               OrganizationAiConsent?
+  birthhub360CallResults  Birthub360CallResult[]
+  wallet                  Wallet?
+  transactions            Transaction[]
+  apiKeys                 APIKey[]
+  webhookEndpoints        OrganizationWebhookEndpoint[]
+  campaigns               Campaign[]
+  dncLists                DncList[]
+  customAiTools           CustomAiTool[]
+  leadTouchpoints         LeadTouchpoint[]
+  domainEventOutbox       DomainEventOutbox[]
+  domainEventConsumptions DomainEventConsumption[]
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -5538,4 +5540,59 @@ model LeadTouchpoint {
   @@index([leadId])
   @@index([campaign])
   @@index([occurredAt])
+}
+
+/// REMED-05 (handoff 16→01, .agents/handoffs/16-para-01-remed-05-outbox.md): status da outbox
+/// transacional do DomainEventMesh.
+enum DomainEventOutboxStatus {
+  PENDING
+  PROCESSING
+  DISPATCHED
+  FAILED
+  DEAD_LETTER
+}
+
+/// REMED-05: outbox transacional (linha gravada na mesma transação da mudança de domínio).
+/// Índices PARCIAIS só existem na migration (Prisma não os representa; declará-los aqui geraria
+/// drift): UNIQUE (organizationId, idempotencyKey) WHERE idempotencyKey IS NOT NULL;
+/// (status, nextAttemptAt) WHERE status IN (PENDING, FAILED); (status, lockedUntil) WHERE
+/// status = PROCESSING. Claim do relay via UPDATE ... FOR UPDATE SKIP LOCKED (adaptador do 16).
+model DomainEventOutbox {
+  id             String                  @id @default(dbgenerated("gen_random_uuid()"))
+  organizationId String
+  organization   Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventId        String                  @unique
+  eventType      String
+  eventVersion   String                  @default("1.0.0")
+  aggregateId    String
+  correlationId  String
+  causationId    String?
+  producer       String
+  idempotencyKey String?
+  envelope       Json
+  status         DomainEventOutboxStatus @default(PENDING)
+  retryCount     Int                     @default(0)
+  maxAttempts    Int                     @default(8)
+  nextAttemptAt  DateTime                @default(now()) @db.Timestamptz(3)
+  lockedBy       String?
+  lockedUntil    DateTime?               @db.Timestamptz(3)
+  /// Truncado em 2000 caracteres pela aplicação.
+  lastError      String?
+  createdAt      DateTime                @default(now()) @db.Timestamptz(3)
+  dispatchedAt   DateTime?               @db.Timestamptz(3)
+
+  @@index([organizationId, createdAt])
+}
+
+/// REMED-05: idempotência durável por consumidor (INSERT ... ON CONFLICT DO NOTHING).
+model DomainEventConsumption {
+  id             String       @id @default(dbgenerated("gen_random_uuid()"))
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  eventId        String
+  consumer       String
+  processedAt    DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@unique([organizationId, eventId, consumer])
+  @@index([processedAt])
 }
