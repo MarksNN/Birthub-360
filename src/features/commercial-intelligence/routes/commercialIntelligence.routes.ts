@@ -6,6 +6,7 @@ import { container } from '../../../shared/di/container.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
 import type { CommercialIntelligenceController } from '../presentation/CommercialIntelligenceController.js';
+import { predictiveRoutes } from './predictive.routes.js';
 
 const router = Router();
 
@@ -111,5 +112,9 @@ router.post('/ai/mentor-playbook', aiLimiter, (req, res, next) =>
 router.post('/ai/deal-risk-scan', aiLimiter, (req, res, next) =>
   resolve().scanDealRisks(req, res, next),
 );
+
+// REMED-03/04: Revenue Oracle honesto (histórico real) + aprovação persistida de rebalanceamento.
+// Herda o requireRole(ADMIN/GESTOR) do router.use acima.
+router.use('/predictive', predictiveRoutes);
 
 export const commercialIntelligenceRoutes = router;

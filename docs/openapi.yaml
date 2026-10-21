@@ -421,7 +421,7 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          { description: Identificação, CNAE, endereço, contato público, ICP, RNTRC e proveniência }
+          { description: 'Identificação, CNAE, endereço, contato público, ICP, RNTRC e proveniência' }
         '400': { description: CNPJ inválido }
         '404': { description: CNPJ ausente no snapshot publicado }
   /market-intelligence/companies/{cnpj}/approve-to-pipeline:
@@ -461,6 +461,232 @@ paths:
         numérico é fabricado quando o dado não existe.
       responses:
         '200': { description: Relatório de qualidade de dados agregado do tenant autenticado }
+
+  # ─────────────── Account Intelligence (mount: /api/market-intelligence) ───────────────
+  # Fonte: src/features/market-intelligence/server/accountIntelligence.routes.ts (+ .schemas.ts,
+  # accountIntelligence.service.ts, actionExecutor.service.ts). Mount em src/bootstrap/routes.ts:
+  # `app.use('/api/market-intelligence', authenticateToken, requireTenant, accountIntelligenceRoutes)`.
+  # O router aplica ainda `requireRole(['VISUALIZADOR'])` (qualquer papel canônico lê; papel
+  # desconhecido → 403). `{id}` é o id de uma `Company` do CRM do tenant; o service filtra por
+  # `organizationId` da sessão e devolve 404 idêntico para conta inexistente ou de outro tenant.
+  /market-intelligence/accounts/{id}/intelligence:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    get:
+      tags: [Market Intelligence]
+      summary: Visão consolidada de inteligência da conta (snapshot FACT + score INFERENCE + contagens)
+      description: >-
+        Lê a conta (`Company` com `organizationId` da sessão e `deletedAt: null`), o
+        `AccountIntelligenceSnapshot` mais recente (maior `version`), o `AccountScore` mais
+        recente e as contagens de sinais, decisores, relações (como origem ou destino),
+        recomendações e evidências — tudo filtrado por `organizationId`. Sem snapshot,
+        `state` = `not_refreshed` e `facts` = null; nada é fabricado.
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200':
+          description: Inteligência da conta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      account: { type: object, description: Campos selecionados da Company do CRM }
+                      state: { type: string, enum: [available, not_refreshed] }
+                      facts:
+                        type: object
+                        nullable: true
+                        description: Snapshot mais recente com `knowledgeType` = FACT
+                      latestInference:
+                        type: object
+                        nullable: true
+                        description: AccountScore mais recente com `knowledgeType` = INFERENCE
+                      collections:
+                        type: object
+                        properties:
+                          signals: { type: integer }
+                          decisionMakers: { type: integer }
+                          relationships: { type: integer }
+                          recommendations: { type: integer }
+                          evidence: { type: integer }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Sem tenant resolvido ou papel não reconhecido }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+
+  /market-intelligence/accounts/{id}/refresh:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    post:
+      tags: [Market Intelligence]
+      summary: Gera nova versão do snapshot de inteligência a partir de dados reais da conta
+      description: >-
+        Papéis: ADMIN, GESTOR, CLOSER ou SDR (VISUALIZADOR → 403). Sem corpo. Exige identidade
+        rastreável (CNPJ, site, enriquecimento com fonte+data ou evidência FACT existente);
+        caso contrário 422. Monta fatos a partir dos campos do CRM/enriquecimento, calcula
+        `inputHash` e, em transação Serializable, reaproveita o snapshot se o hash não mudou
+        (200, `created: false`) ou cria nova versão + `IntelligenceEvidence` por campo
+        (201, `created: true`). Escritas carimbadas com o `organizationId` da sessão.
+        Conflito de concorrência persistente → 409.
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200':
+          description: Snapshot inalterado (mesmo inputHash)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountIntelligenceRefreshEnvelope' }
+        '201':
+          description: Nova versão de snapshot criada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountIntelligenceRefreshEnvelope' }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Papel sem permissão de escrita }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+        '409': { description: Conflito de concorrência ao versionar o snapshot }
+        '422': { description: Sem fonte real suficiente para atualizar a inteligência }
+
+  /market-intelligence/accounts/{id}/signals:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    get:
+      tags: [Market Intelligence]
+      summary: Lista paginada de AccountSignal da conta (FACT ou INFERENCE, nunca RECOMMENDATION)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/AccountIntelligencePage'
+        - $ref: '#/components/parameters/AccountIntelligenceLimit'
+        - { name: status, in: query, schema: { type: string, enum: [Active, Dismissed, Expired] } }
+        - { name: evidenceType, in: query, schema: { type: string, enum: [FACT, INFERENCE] } }
+        - { name: type, in: query, schema: { type: string, minLength: 1, maxLength: 100 } }
+      responses:
+        '200': { $ref: '#/components/responses/AccountIntelligencePage' }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Sem tenant resolvido ou papel não reconhecido }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+
+  /market-intelligence/accounts/{id}/decision-makers:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    get:
+      tags: [Market Intelligence]
+      summary: Lista paginada de DecisionMaker da conta (filtrado por organizationId)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/AccountIntelligencePage'
+        - $ref: '#/components/parameters/AccountIntelligenceLimit'
+        - { name: status, in: query, schema: { type: string, enum: [Active, Inactive, Unverified] } }
+        - { name: buyingRole, in: query, schema: { type: string, minLength: 1, maxLength: 100 } }
+      responses:
+        '200': { $ref: '#/components/responses/AccountIntelligencePage' }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Sem tenant resolvido ou papel não reconhecido }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+
+  /market-intelligence/accounts/{id}/relationships:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    get:
+      tags: [Market Intelligence]
+      summary: Lista paginada de EconomicRelationship em que a conta é origem ou destino
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/AccountIntelligencePage'
+        - $ref: '#/components/parameters/AccountIntelligenceLimit'
+        - { name: status, in: query, schema: { type: string, enum: [Verified, Inferred, Rejected, Inactive] } }
+        - { name: relationType, in: query, schema: { type: string, minLength: 1, maxLength: 100 } }
+      responses:
+        '200': { $ref: '#/components/responses/AccountIntelligencePage' }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Sem tenant resolvido ou papel não reconhecido }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+
+  /market-intelligence/accounts/{id}/recommendations:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    get:
+      tags: [Market Intelligence]
+      summary: Lista paginada de AccountRecommendation da conta (knowledgeType RECOMMENDATION)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/AccountIntelligencePage'
+        - $ref: '#/components/parameters/AccountIntelligenceLimit'
+        - name: status
+          in: query
+          schema: { type: string, enum: [Pending, Approved, Executed, Dismissed, Superseded, Failed] }
+      responses:
+        '200': { $ref: '#/components/responses/AccountIntelligencePage' }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Sem tenant resolvido ou papel não reconhecido }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+
+  /market-intelligence/accounts/{id}/evidence:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+    get:
+      tags: [Market Intelligence]
+      summary: Lista paginada de IntelligenceEvidence da conta (proveniência dos fatos/inferências)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: '#/components/parameters/AccountIntelligencePage'
+        - $ref: '#/components/parameters/AccountIntelligenceLimit'
+        - { name: evidenceType, in: query, schema: { type: string, enum: [FACT, INFERENCE, RECOMMENDATION] } }
+        - { name: subjectType, in: query, schema: { type: string, minLength: 1, maxLength: 100 } }
+      responses:
+        '200': { $ref: '#/components/responses/AccountIntelligencePage' }
+        '400': { $ref: '#/components/responses/AccountIntelligenceBadRequest' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Sem tenant resolvido ou papel não reconhecido }
+        '404': { description: Conta não encontrada (inexistente ou de outro tenant) }
+
+  /market-intelligence/accounts/{id}/recommendations/{recommendationId}/execute:
+    parameters:
+      - $ref: '#/components/parameters/AccountIntelligenceAccountId'
+      - name: recommendationId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 128 }
+    post:
+      tags: [Market Intelligence]
+      summary: Executa uma recomendação da conta (task Bitrix, cadência SDR ou marcação simples)
+      description: >-
+        Papéis: ADMIN, GESTOR, CLOSER ou SDR. Sem corpo. Isolamento de tenant via RLS
+        (`withRlsContext`), não por filtro explícito de `organizationId` no service; a
+        recomendação também precisa pertencer à conta `{id}` (senão 404). Já `Executed` → 400.
+        Por `actionType`: `CREATE_BITRIX_TASK` cria `tasks.task.add` no Bitrix do tenant
+        (sem conexão → 400) e grava `externalRef`; `START_SDR_CADENCE` inicia cadência no lead
+        mais recente da conta com a sequência ativa mais recente da organização (sem lead ou
+        sequência → 400; cadência já ativa → 409); outros tipos só marcam `Executed`.
+        Qualquer erro durante a execução marca a recomendação como `Failed` antes de propagar.
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200':
+          description: Ação executada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      success: { type: boolean }
+                      taskId: { description: Id da task Bitrix (só CREATE_BITRIX_TASK) }
+                      message: { type: string }
+        '400': { description: 'Parâmetros inválidos, já executada, Bitrix não conectado ou sem lead/sequência' }
+        '401': { description: Sem sessão válida }
+        '403': { description: Papel sem permissão de escrita }
+        '404': { description: Recomendação não encontrada (ou não pertence à conta) }
+        '409': { description: Lead já tem cadência ativa }
 
   # ───────────────────────────── Mesa de Tratamento ─────────────────────────────
   /mesa-tratamento/queue:
@@ -6575,6 +6801,86 @@ paths:
               { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
           }
         '403': { $ref: '#/components/responses/Forbidden' }
+  # Revenue Oracle / rebalanceamento (REMED-03/04) — predictive.routes.ts (createPredictiveRoutes),
+  # montado em commercialIntelligence.routes.ts sob /predictive. Herda authenticateToken +
+  # requireTenant + requireRole(ADMIN, GESTOR). Métricas sem histórico suficiente vêm null com
+  # status insufficient_data (nunca valores fictícios).
+  /commercial-intelligence/predictive/cockpit:
+    get:
+      tags: [Comercial Inteligente]
+      summary: Cockpit do Revenue Oracle (forecast a partir dos deals ganhos do tenant) — somente ADMIN/GESTOR
+      responses:
+        '200':
+          {
+            description: OK,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
+          }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /commercial-intelligence/predictive/backtest:
+    get:
+      tags: [Comercial Inteligente]
+      summary: Métricas de backtest do forecast (null/insufficient_data abaixo do mínimo de histórico) — somente ADMIN/GESTOR
+      responses:
+        '200':
+          {
+            description: OK,
+            content:
+              { application/json: { schema: { $ref: '#/components/schemas/DataEnvelope' } } },
+          }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /commercial-intelligence/predictive/rebalance/approvals:
+    post:
+      tags: [Comercial Inteligente]
+      summary: Registra aprovação/rejeição humana de recomendação de rebalanceamento (não altera o CRM) — somente ADMIN/GESTOR
+      description: |
+        Idempotente por (tenant, recommendationId): mesma decisão/payload → 200 com
+        `alreadyRecorded: true` sem nova escrita; decisão/payload divergente → 409 com
+        `data.existing`. A decisão é gravada no AuditLog; `appliedToCrm` é sempre false.
+        Schema Zod: `rebalanceApprovalRequestSchema` (strict; `toOwner` ≠ `fromOwner`).
+        Evite dados pessoais em `note` (texto livre, persistido no AuditLog).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [recommendationId, leadId, fromOwner, toOwner, decision]
+              properties:
+                recommendationId: { type: string, minLength: 1, maxLength: 128 }
+                leadId: { type: string, minLength: 1, maxLength: 64 }
+                fromOwner: { type: string, minLength: 1, maxLength: 200, nullable: true }
+                toOwner:
+                  { type: string, minLength: 1, maxLength: 200, description: 'Deve ser diferente de fromOwner' }
+                decision: { type: string, enum: [APPROVED, REJECTED] }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: Replay idempotente — mesma decisão já registrada (alreadyRecorded=true)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RebalanceApprovalEnvelope' }
+        '201':
+          description: Decisão registrada (alreadyRecorded=false)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RebalanceApprovalEnvelope' }
+        '401': { description: Não autenticado }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Já existe decisão divergente para esta recommendationId (data.existing traz o registro)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: Payload inválido (Zod) — `details` traz fieldErrors
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
   /commercial-intelligence/deals:
     get:
       tags: [Comercial Inteligente]
@@ -10797,6 +11103,20 @@ components:
         Endpoints marcados com roles (ex. `[ADMIN, GESTOR]`) também exigem `requireRole`.
 
   parameters:
+    AccountIntelligenceAccountId:
+      name: id
+      in: path
+      required: true
+      description: Id da Company do CRM do tenant (1–128 chars)
+      schema: { type: string, minLength: 1, maxLength: 128 }
+    AccountIntelligencePage:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    AccountIntelligenceLimit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
     IdParam:
       name: id
       in: path
@@ -10804,6 +11124,28 @@ components:
       schema: { type: string }
 
   responses:
+    AccountIntelligenceBadRequest:
+      description: Parâmetros inválidos (validação Zod; `details` traz as issues)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    AccountIntelligencePage:
+      description: Página de resultados do tenant (lista vazia quando não há dados reais)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success: { type: boolean, example: true }
+              data:
+                type: object
+                properties:
+                  items: { type: array, items: { type: object } }
+                  page: { type: integer }
+                  limit: { type: integer }
+                  total: { type: integer }
+                  totalPages: { type: integer }
+                  hasNextPage: { type: boolean }
     BadRequest:
       description: Corpo da requisição inválido (schema Zod rejeitou os dados)
       content:
@@ -10836,6 +11178,17 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
 
   schemas:
+    AccountIntelligenceRefreshEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data:
+          type: object
+          properties:
+            created: { type: boolean, description: true quando uma nova versão foi criada }
+            snapshot:
+              type: object
+              description: AccountIntelligenceSnapshot (version, summary, structuredFacts com inputHash, sourceStatus, status Partial|Complete) com knowledgeType FACT
     ErrorResponse:
       type: object
       description: |
@@ -11000,6 +11353,31 @@ components:
         timestamp: { type: string, format: date-time }
         organizationId: { type: string, nullable: true }
 
+    RebalanceApprovalEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success: { type: boolean, enum: [true] }
+        data:
+          type: object
+          required: [approval, alreadyRecorded]
+          properties:
+            alreadyRecorded: { type: boolean }
+            approval:
+              type: object
+              required: [approvalId, organizationId, decidedBy, decidedAt, appliedToCrm, recommendationId, leadId, fromOwner, toOwner, decision]
+              properties:
+                approvalId: { type: string }
+                organizationId: { type: string }
+                decidedBy: { type: string }
+                decidedAt: { type: string, format: date-time }
+                appliedToCrm: { type: boolean, enum: [false] }
+                recommendationId: { type: string }
+                leadId: { type: string }
+                fromOwner: { type: string, nullable: true }
+                toOwner: { type: string }
+                decision: { type: string, enum: [APPROVED, REJECTED] }
+                note: { type: string }
     DataEnvelope:
       type: object
       description: Envelope de resposta genérico usado pela maioria dos endpoints
