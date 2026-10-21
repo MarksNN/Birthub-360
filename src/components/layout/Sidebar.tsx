@@ -224,7 +224,7 @@ export function Sidebar({
               <div className="min-w-0">
                 <div className="truncate font-display text-[15px] font-extrabold leading-none tracking-[-0.02em] text-slate-900 dark:text-white">
                   Birth Hub{' '}
-                  <span className="text-[#00D4FF] drop-shadow-[0_0_8px_rgba(0,212,255,0.4)]">
+                  <span className="text-[#0369a1] dark:text-[#00D4FF] drop-shadow-[0_0_8px_rgba(0,212,255,0.4)]">
                     360°
                   </span>
                 </div>
