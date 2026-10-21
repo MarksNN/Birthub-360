@@ -1,21 +1,28 @@
 {
   "version": "2.0.0",
-  "lastUpdated": "2026-10-21T15:19:31.794Z",
+  "lastUpdated": "2026-10-21T15:33:10.510Z",
   "governance": "AGENTS.md (Revisão 2026-10-09)",
   "repository": "MarksNN/Birthub-360",
   "baseBranch": "main",
   "statistics": {
     "total": 100,
-    "p0": 40,
-    "p1": 38,
+    "p0": 41,
+    "p1": 37,
     "p2": 22,
     "waves": 9
+  },
+  "githubCensus": {
+    "totalPrs": 36,
+    "openPrs": 17,
+    "mergedPrs": 15,
+    "closedWithoutMergePrs": 4,
+    "auditDate": "2026-10-21"
   },
   "steps": [
     {
       "id": 1,
       "wave": 0,
-      "title": "Auditar e reconciliar branch do PR #18 (Persistência Grafo e Win-Loss) sem force-push",
+      "title": "Auditar e reconciliar branch do PR #18 (AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport) sem force-push",
       "agent": "00 — Coordenador",
       "agentNum": "00",
       "agentSlug": "00-coordenador",
@@ -27,7 +34,7 @@
       "filesOwned": [
         ".agents/runs/00-reconciliacao-pr18.md"
       ],
-      "criteria": "Branch integracao/onda-0 compilando com os modelos AccountKnowledgeNode e WinLossAutopsyRecord preservados e zero force-pushes."
+      "criteria": "Branch integracao/onda-0 compilando com os modelos AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport preservados e zero force-pushes."
     },
     {
       "id": 2,
@@ -150,9 +157,10 @@
       "verified": false,
       "filesOwned": [
         "src/lib/prisma.ts",
-        "src/lib/db/transactionContext.ts"
+        "src/lib/db/transactionContext.ts",
+        "tests/integration/prisma-tx-propagation.test.ts"
       ],
-      "criteria": "npm run test:unit -- tests/unit/security/prismaTxPropagation.test.ts executado com 100% de sucesso."
+      "criteria": "npm run test:integration -- tests/integration/prisma-tx-propagation.test.ts executado com 100% de sucesso."
     },
     {
       "id": 9,
@@ -167,9 +175,10 @@
       "commitSha": "a4421b8",
       "verified": false,
       "filesOwned": [
-        "src/lib/db/bootRoleCheck.ts"
+        "src/bootstrap/dbRoleCheck.ts",
+        "tests/unit/bootstrap/dbRoleCheck.test.ts"
       ],
-      "criteria": "Simulação de boot com usuário com BYPASSRLS lança erro fatal com código de saída 1 e teste automatizado aprovado."
+      "criteria": "npm run test:unit -- tests/unit/bootstrap/dbRoleCheck.test.ts com 100% de aprovação e abort fatal comprovado com superusuário."
     },
     {
       "id": 10,
@@ -280,20 +289,20 @@
     {
       "id": 16,
       "wave": 1,
-      "title": "Adicionar trilha de auditoria append-only para mutações em organizações e planos",
-      "agent": "01 — Plataforma, Segurança e Dados",
-      "agentNum": "01",
-      "agentSlug": "01-plataforma-dados",
-      "priority": "P1",
+      "title": "Calcular matriz dinâmica de RLS sobre o schema final consolidado (zero tabelas desprotegidas)",
+      "agent": "01A — Confiabilidade de Dados, RLS e Retenção",
+      "agentNum": "01A",
+      "agentSlug": "01A-dados-rls-retencao",
+      "priority": "P0",
       "status": "PLANEJADO",
       "githubPr": null,
       "commitSha": null,
       "verified": false,
       "filesOwned": [
-        "prisma/schema.prisma",
-        "prisma/migrations/*_organization_audit/migration.sql"
+        "tests/integration/rls-coverage.test.ts",
+        "docs/security/RLS_COVERAGE_MATRIX.md"
       ],
-      "criteria": "npx prisma validate verde e teste de auditoria confirmando geração automática do log."
+      "criteria": "rls-coverage.test.ts calcula dinamicamente a contagem a partir do schema consolidado e confirma que 100% das tabelas ativam FORCE RLS (zero desprotegidas)."
     },
     {
       "id": 17,
@@ -541,7 +550,7 @@
     {
       "id": 31,
       "wave": 3,
-      "title": "Conectar accountKnowledgeGraph.service.ts ao repositório Prisma real (PR #18)",
+      "title": "Conectar accountKnowledgeGraph.service.ts aos modelos AccountGraphNode e AccountGraphEdge (PR #18)",
       "agent": "04 — CRM e BI",
       "agentNum": "04",
       "agentSlug": "04-crm-bi",
@@ -554,12 +563,12 @@
         "src/features/knowledge/services/accountKnowledgeGraph.service.ts",
         "src/features/knowledge/infra/accountGraphRepository.ts"
       ],
-      "criteria": "accountKnowledgeGraph.service.test.ts passa 100% verde persistindo nós no PostgreSQL."
+      "criteria": "accountKnowledgeGraph.service.test.ts passa 100% verde persistindo nós e arestas no PostgreSQL."
     },
     {
       "id": 32,
       "wave": 3,
-      "title": "Conectar winLossAutopsy.service.ts ao repositório Prisma real com RLS (PR #18)",
+      "title": "Conectar winLossAutopsy.service.ts ao modelo WinLossAutopsyReport com RLS (PR #18)",
       "agent": "04 — CRM e BI",
       "agentNum": "04",
       "agentSlug": "04-crm-bi",
@@ -572,7 +581,7 @@
         "src/features/intelligence/services/winLossAutopsy.service.ts",
         "src/features/intelligence/infra/winLossAutopsyRepository.ts"
       ],
-      "criteria": "winLossAutopsy.service.test.ts aprovado com persistência real em banco relacional."
+      "criteria": "winLossAutopsy.service.test.ts aprovado com persistência real em banco relacional no modelo WinLossAutopsyReport."
     },
     {
       "id": 33,

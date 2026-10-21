@@ -20,7 +20,7 @@ const rawSteps = [
     id: 1,
     wave: 0,
     waveTitle: "Onda 0: Reconciliação Forense e Auditoria dos PRs Abertos",
-    title: "Auditar e reconciliar branch do PR #18 (Persistência Grafo e Win-Loss) sem force-push",
+    title: "Auditar e reconciliar branch do PR #18 (AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport) sem force-push",
     agent: "00 — Coordenador",
     agentNum: "00",
     agentSlug: "00-coordenador",
@@ -28,18 +28,18 @@ const rawSteps = [
     status: "PR ABERTO (#18) — CONFLITO RESOLVÍVEL",
     githubPr: 18,
     commitSha: "8dff1dde",
-    desc: "O PR #18 implementa accountGraphRepository e winLossAutopsyRepository com migração 20261020190000. Reconciliar em branch de integração dedicada (integracao/onda-0) via merge limpo, preservando o histórico compartilhado sem force-push.",
+    desc: "O PR #18 implementa accountGraphRepository e winLossAutopsyRepository com migração 20261020190000 e modelos canônicos AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport. Reconciliar em branch de integração dedicada (integracao/onda-0) via merge limpo, preservando o histórico compartilhado sem force-push.",
     filesOwned: [".agents/runs/00-reconciliacao-pr18.md"],
     filesOther: ["prisma/schema.prisma (Agente 01)", "src/features/knowledge/infra/accountGraphRepository.ts (Agente 04)", "src/features/intelligence/infra/winLossAutopsyRepository.ts (Agente 04)"],
     outOfScope: ["Alterar a assinatura pública dos métodos do Grafo", "Remover modelos existentes na main", "Reescrever histórico remoto compartilhado"],
-    assumptions: ["Os modelos AccountKnowledgeNode e WinLossAutopsyRecord foram homologados pelo Agente 24 no parecer prévio da Onda 0."],
+    assumptions: ["Os modelos AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport foram homologados pelo Agente 24 no parecer prévio da Onda 0."],
     plan: [
       { step: "Criar branch local integracao/onda-0 a partir de origin/main", criterion: "git branch confirma integracao/onda-0 alinhada com origin/main" },
       { step: "Fazer merge não destrutivo da branch do PR #18 (agente/01-remed-02-persist-graph-winloss) na branch de integração", criterion: "Conflitos em schema.prisma resolvidos manualmente preservando ambas as árvores" },
       { step: "Executar npx prisma validate e validação de tipagem", criterion: "npx prisma validate retorna zero erros e npx tsc --noEmit passa verde" },
       { step: "Registrar relatório de integração em .agents/runs/00-reconciliacao-pr18.md", criterion: "Arquivo gerado com log de commits combinados e diff auditado" }
     ],
-    finalSuccessCriteria: "Branch integracao/onda-0 compilando com os modelos AccountKnowledgeNode e WinLossAutopsyRecord preservados e zero force-pushes.",
+    finalSuccessCriteria: "Branch integracao/onda-0 compilando com os modelos AccountGraphNode, AccountGraphEdge e WinLossAutopsyReport preservados e zero force-pushes.",
     delivery: "Relatório de reconciliação em .agents/runs/00-reconciliacao-pr18.md com hash dos commits integrados."
   },
   {
@@ -204,17 +204,17 @@ const rawSteps = [
     githubPr: 40,
     commitSha: "d9910f1",
     desc: "O PR #40 implementa runInTransaction garantindo que o contexto de organização em current_setting('app.current_tenant_id') seja propagado de forma atômica e restaurado após a transação, eliminando risco de vazamento em conexões reutilizadas.",
-    filesOwned: ["src/lib/prisma.ts", "src/lib/db/transactionContext.ts"],
+    filesOwned: ["src/lib/prisma.ts", "src/lib/db/transactionContext.ts", "tests/integration/prisma-tx-propagation.test.ts"],
     filesOther: ["src/server.ts (Agente 00)"],
     outOfScope: ["Alterar rotas de aplicação diretamente"],
     assumptions: ["O pool de conexões reutiliza sockets TCP e exige reset estrito de settings de sessão após ROLLBACK ou COMMIT."],
     plan: [
       { step: "Incorporar transactionContext.ts na branch integracao/onda-0", criterion: "Função runInTransaction encapsulando $transaction do Prisma com SET LOCAL app.current_tenant_id" },
-      { step: "Executar testes de concorrência transacional", criterion: "npm run test:unit -- tests/unit/security/prismaTxPropagation.test.ts com zero falhas" },
+      { step: "Executar testes de concorrência transacional", criterion: "npm run test:integration -- tests/integration/prisma-tx-propagation.test.ts com zero falhas" },
       { step: "Comprovar que exceções na transação executam ROLLBACK completo sem reter tenantId", criterion: "Teste adversarial de vazamento de tenant aprovado" }
     ],
-    finalSuccessCriteria: "npm run test:unit -- tests/unit/security/prismaTxPropagation.test.ts executado com 100% de sucesso.",
-    delivery: "Utilitário transacional seguro integrado e testado na branch de integração."
+    finalSuccessCriteria: "npm run test:integration -- tests/integration/prisma-tx-propagation.test.ts executado com 100% de sucesso.",
+    delivery: "Utilitário transacional seguro e teste de integração prisma-tx-propagation.test.ts integrados na branch de integração."
   },
   {
     id: 9,
@@ -228,18 +228,18 @@ const rawSteps = [
     status: "PR ABERTO (#41) — EM REVISÃO",
     githubPr: 41,
     commitSha: "a4421b8",
-    desc: "O PR #41 implementa bootRoleCheck no server.ts. Em ambiente de produção (NODE_ENV=production), caso a conexão do Prisma esteja utilizando superusuário ou role com BYPASSRLS, a inicialização é abortada imediatamente com erro fatal explícito.",
-    filesOwned: ["src/lib/db/bootRoleCheck.ts"],
+    desc: "O PR #41 implementa dbRoleCheck em src/bootstrap/dbRoleCheck.ts. Em ambiente de produção (NODE_ENV=production), caso a conexão do Prisma esteja utilizando superusuário ou role com BYPASSRLS, a inicialização é abortada imediatamente com erro fatal explícito.",
+    filesOwned: ["src/bootstrap/dbRoleCheck.ts", "tests/unit/bootstrap/dbRoleCheck.test.ts"],
     filesOther: ["src/server.ts (Agente 00)"],
     outOfScope: ["Modificar lógica de rotas do Express"],
     assumptions: ["Ambientes de homologação e produção devem falhar fast caso a role do banco esteja mal configurada."],
     plan: [
-      { step: "Incorporar bootRoleCheck.ts na branch integracao/onda-0", criterion: "Módulo executa consulta SELECT rolsuper, rolbypassrls FROM pg_roles WHERE rolname = current_user" },
-      { step: "Adicionar chamada no server.ts com aprovação prévia do Agente 00", criterion: "server.ts aguarda bootRoleCheck() antes de abrir a porta do Express" },
-      { step: "Executar testes de validação de boot", criterion: "npm run test:unit -- tests/unit/security/bootRoleCheck.test.ts passa 100% verde" }
+      { step: "Incorporar dbRoleCheck.ts em src/bootstrap/ na branch integracao/onda-0", criterion: "Módulo executa consulta SELECT rolsuper, rolbypassrls FROM pg_roles WHERE rolname = current_user" },
+      { step: "Adicionar chamada no server.ts com aprovação prévia do Agente 00", criterion: "server.ts aguarda dbRoleCheck() antes de abrir a porta do Express" },
+      { step: "Executar testes de validação de boot", criterion: "npm run test:unit -- tests/unit/bootstrap/dbRoleCheck.test.ts passa 100% verde" }
     ],
-    finalSuccessCriteria: "Simulação de boot com usuário com BYPASSRLS lança erro fatal com código de saída 1 e teste automatizado aprovado.",
-    delivery: "Verificação de boot integrada e aprovada pelo Agente 00 no server.ts."
+    finalSuccessCriteria: "npm run test:unit -- tests/unit/bootstrap/dbRoleCheck.test.ts com 100% de aprovação e abort fatal comprovado com superusuário.",
+    delivery: "Verificação de boot em src/bootstrap/dbRoleCheck.ts integrada e aprovada pelo Agente 00 no server.ts."
   },
   {
     id: 10,
@@ -355,20 +355,20 @@ const rawWavesData = [
         criteria: "Procedimento purge-expired-data.sql testado com remoção confirmada e zero deleções indevidas."
       },
       {
-        id: 16, title: "Adicionar trilha de auditoria append-only para mutações em organizações e planos",
-        agent: "01 — Plataforma, Segurança e Dados", num: "01", slug: "01-plataforma-dados", p: "P1",
-        filesOwned: ["prisma/schema.prisma", "prisma/migrations/*_organization_audit/migration.sql"],
-        filesOther: ["src/lib/security/** (Agente 15)"],
-        outOfScope: ["Permitir edição ou exclusão de logs de auditoria"],
-        assumptions: ["Alterações de plano corporativo e permissões de tenant devem ser rastreáveis para fins fiscais e de segurança."],
-        desc: "Criar tabela OrganizationAuditLog gravando autor, payload anterior, novo payload e hash SHA-256 de integridade em toda mudança de plano.",
-        test: "npm run test:unit -- tests/unit/security/globalSecurityAuditChannel.test.ts",
+        id: 16, title: "Calcular matriz dinâmica de RLS sobre o schema final consolidado (zero tabelas desprotegidas)",
+        agent: "01A — Confiabilidade de Dados, RLS e Retenção", num: "01A", slug: "01A-dados-rls-retencao", p: "P0",
+        filesOwned: ["tests/integration/rls-coverage.test.ts", "docs/security/RLS_COVERAGE_MATRIX.md"],
+        filesOther: ["prisma/schema.prisma (Agente 01)"],
+        outOfScope: ["Fixar antecipadamente contagens estáticas rígidas (ex: 130 ou 134) no teste de cobertura"],
+        assumptions: ["A quantidade de tabelas com RLS deve ser calculada dinamicamente a partir do schema final consolidado em PostgreSQL."],
+        desc: "Auditar a matriz final de RLS calculando dinamicamente o número total de tabelas a partir do schema Prisma e do catálogo PostgreSQL (information_schema), eliminando contagens fixas como 134 e atestando que 100% das tabelas de entidades públicas possuem relrowsecurity = true e relforcerowsecurity = true.",
+        test: "npm run test:integration -- tests/integration/rls-coverage.test.ts",
         plan: [
-          { step: "Modelar OrganizationAuditLog no Prisma com trigger de INSERT-only", criterion: "Trigger bloqueia UPDATE e DELETE na tabela" },
-          { step: "Integrar gancho no serviço de atualização de planos", criterion: "Toda alteração de Organization gera registro com hash" },
-          { step: "Executar teste unitário de integridade", criterion: "npm run test:unit passa com sucesso" }
+          { step: "Consultar information_schema.tables e pg_class dinamicamente em rls-coverage.test.ts", criterion: "Contagem total de tabelas de entidades derivada em runtime sem números fixos" },
+          { step: "Verificar que relrowsecurity = true e relforcerowsecurity = true em 100% das tabelas públicas", criterion: "Query retorna 0 tabelas desprotegidas" },
+          { step: "Gerar matriz de cobertura atualizada em docs/security/RLS_COVERAGE_MATRIX.md", criterion: "Documento reflete a contagem real e exata do schema final" }
         ],
-        criteria: "npx prisma validate verde e teste de auditoria confirmando geração automática do log."
+        criteria: "rls-coverage.test.ts calcula dinamicamente a contagem a partir do schema consolidado e confirma que 100% das tabelas ativam FORCE RLS (zero desprotegidas)."
       },
       {
         id: 17, title: "Validar isolamento estrito de dados entre tenants concorrentes via testes adversariais",
@@ -611,36 +611,36 @@ const rawWavesData = [
     title: "Persistência Real de Domínio (Fim de Maps/Sets em Memória)",
     items: [
       {
-        id: 31, title: "Conectar accountKnowledgeGraph.service.ts ao repositório Prisma real (PR #18)",
+        id: 31, title: "Conectar accountKnowledgeGraph.service.ts aos modelos AccountGraphNode e AccountGraphEdge (PR #18)",
         agent: "04 — CRM e BI", num: "04", slug: "04-crm-bi", p: "P1",
         filesOwned: ["src/features/knowledge/services/accountKnowledgeGraph.service.ts", "src/features/knowledge/infra/accountGraphRepository.ts"],
         filesOther: ["prisma/schema.prisma (Agente 01)"],
         outOfScope: ["Manter qualquer Map ou Set em memória como fallback permanente"],
-        assumptions: ["Os modelos de Grafo foram integrados no schema na Onda 0/1."],
-        desc: "Substituir coleções Map<string, Node> voláteis por operações assíncronas no PostgreSQL via accountGraphRepository com isolamento por organização.",
+        assumptions: ["Os modelos AccountGraphNode e AccountGraphEdge foram integrados no schema na Onda 0/1."],
+        desc: "Substituir coleções Map<string, Node> voláteis por operações assíncronas no PostgreSQL via accountGraphRepository utilizando os modelos AccountGraphNode e AccountGraphEdge com isolamento por organização.",
         test: "npm run test:unit -- tests/unit/knowledge/accountKnowledgeGraph.service.test.ts",
         plan: [
-          { step: "Remover estruturas em memória de accountKnowledgeGraph.service.ts", criterion: "Zero instâncias de new Map() para dados de nós" },
-          { step: "Injetar accountGraphRepository persistido no banco", criterion: "Métodos findNode, upsertNode e getEdges realizam chamadas ao Prisma" },
+          { step: "Remover estruturas em memória de accountKnowledgeGraph.service.ts", criterion: "Zero instâncias de new Map() para nós ou arestas" },
+          { step: "Injetar accountGraphRepository persistido no banco com AccountGraphNode e AccountGraphEdge", criterion: "Métodos findNode, upsertNode e getEdges realizam chamadas ao Prisma" },
           { step: "Executar testes unitários com banco de teste", criterion: "npm run test:unit passa com sucesso" }
         ],
-        criteria: "accountKnowledgeGraph.service.test.ts passa 100% verde persistindo nós no PostgreSQL."
+        criteria: "accountKnowledgeGraph.service.test.ts passa 100% verde persistindo nós e arestas no PostgreSQL."
       },
       {
-        id: 32, title: "Conectar winLossAutopsy.service.ts ao repositório Prisma real com RLS (PR #18)",
+        id: 32, title: "Conectar winLossAutopsy.service.ts ao modelo WinLossAutopsyReport com RLS (PR #18)",
         agent: "04 — CRM e BI", num: "04", slug: "04-crm-bi", p: "P1",
         filesOwned: ["src/features/intelligence/services/winLossAutopsy.service.ts", "src/features/intelligence/infra/winLossAutopsyRepository.ts"],
         filesOther: ["prisma/schema.prisma (Agente 01)"],
         outOfScope: ["Gravar autópsias comerciais sem tenantId associado"],
-        assumptions: ["Toda autópsia comercial de negócio perdido ou ganho pertence estritamente a uma organização."],
-        desc: "Persistir diagnósticos de fechamento no modelo WinLossAutopsyRecord com filtros de tenant e auditoria de causas de perda.",
+        assumptions: ["Toda autópsia comercial de negócio perdido ou ganho pertence estritamente a uma organização via WinLossAutopsyReport."],
+        desc: "Persistir diagnósticos de fechamento no modelo WinLossAutopsyReport com filtros de tenant e auditoria de causas de perda via winLossAutopsyRepository.",
         test: "npm run test:unit -- tests/unit/intelligence/winLossAutopsy.service.test.ts",
         plan: [
-          { step: "Refatorar winLossAutopsy.service.ts para invocar winLossAutopsyRepository", criterion: "Operações assíncronas duráveis" },
+          { step: "Refatorar winLossAutopsy.service.ts para invocar winLossAutopsyRepository com WinLossAutopsyReport", criterion: "Operações assíncronas duráveis" },
           { step: "Validar que listagens de autópsias respeitam o contexto de tenant atual", criterion: "Zero vazamento entre organizações" },
           { step: "Executar testes unitários", criterion: "npm run test:unit passa verde" }
         ],
-        criteria: "winLossAutopsy.service.test.ts aprovado com persistência real em banco relacional."
+        criteria: "winLossAutopsy.service.test.ts aprovado com persistência real em banco relacional no modelo WinLossAutopsyReport."
       },
       {
         id: 33, title: "Implementar PrismaBehavioralEngineRepository para gamificação comercial",
@@ -1872,6 +1872,13 @@ const stateFileContent = {
     p2: countP2,
     waves: 9
   },
+  githubCensus: {
+    totalPrs: 36,
+    openPrs: 17,
+    mergedPrs: 15,
+    closedWithoutMergePrs: 4,
+    auditDate: "2026-10-21"
+  },
   steps: allSteps.map(s => ({
     id: s.id,
     wave: s.wave,
@@ -2399,6 +2406,23 @@ const html = `<!DOCTYPE html>
         </div>
         <div class="gov-actions">
           <button class="btn btn-secondary btn-sm" onclick="syncWithRepoState()">🔄 Sincronizar com Estado do Repositório</button>
+        </div>
+      </div>
+
+      <!-- Censo Auditado de PRs do Repositório GitHub -->
+      <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 14px 20px; margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">🐙</span>
+          <div>
+            <strong>Censo GitHub do Repositório: <a href='https://github.com/MarksNN/Birthub-360' target='_blank' style='color: var(--brand); text-decoration: none;'>MarksNN/Birthub-360</a></strong>
+            <span style="color: var(--text-muted); display: block; font-size: 12px;">Auditoria forense de 36 Pull Requests realizada em 21/10/2026</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; font-weight: 700;">
+          <span style="color: var(--blue); background: rgba(59, 130, 246, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.25);">17 PRs Abertos</span>
+          <span style="color: var(--emerald); background: rgba(16, 185, 129, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25);">15 PRs Integrados (Merged)</span>
+          <span style="color: var(--rose); background: rgba(244, 63, 94, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.25);">4 Fechados sem Merge</span>
+          <span style="color: var(--brand); background: rgba(0, 212, 255, 0.12); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0, 212, 255, 0.25);">Total: 36 PRs Mapeados</span>
         </div>
       </div>
     </header>
