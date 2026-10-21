@@ -1873,7 +1873,7 @@ export function Landing360({
             <span className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] animate-pulse" />
             <span>Revenue Command Center · Antessala</span>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-extrabold landing-title-gradient tracking-tight mb-1.5 leading-tight text-center">
+          <h2 className="font-display text-2xl sm:text-3xl font-extrabold landing-title-cyan tracking-tight mb-1.5 leading-tight text-center">
             <span>
               {authMode === 'signup'
                 ? 'Solicitar Acesso Corporativo'
@@ -1902,6 +1902,8 @@ export function Landing360({
               >
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={authMethod === 'email'}
                   onClick={() => setAuthMethod('email')}
                   className={`py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'email'
@@ -1914,6 +1916,8 @@ export function Landing360({
                 </button>
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={authMethod === 'sso'}
                   onClick={() => setAuthMethod('sso')}
                   className={`py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'sso'
