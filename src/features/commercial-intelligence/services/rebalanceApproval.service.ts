@@ -37,8 +37,13 @@ export const REBALANCE_NOTE_HASH_DOMAIN = 'rebalance-approval-note:v1';
 /**
  * Redige PII (CPF/CNPJ/e-mail/telefone) e devolve só metadados. O texto redigido é descartado aqui
  * — não há entidade por tenant para guardá-lo ainda (handoff 04→01).
+ * noteHash = HMAC(subchave do domínio, `${organizationId}\u0000${redigido}`): a mesma nota em orgs
+ * diferentes gera hashes diferentes (não correlacionável entre tenants — Agente 21).
  */
-export function noteMetadata(note: string | undefined): {
+export function noteMetadata(
+  organizationId: string,
+  note: string | undefined,
+): {
   noteLength: number | null;
   noteHash: string | null;
   noteRef: null;
@@ -47,7 +52,7 @@ export function noteMetadata(note: string | undefined): {
   const { redactedText } = redactPiiIncludingCnpj(note);
   return {
     noteLength: redactedText.length,
-    noteHash: keyedDigestHex(REBALANCE_NOTE_HASH_DOMAIN, redactedText),
+    noteHash: keyedDigestHex(REBALANCE_NOTE_HASH_DOMAIN, `${organizationId}\u0000${redactedText}`),
     noteRef: null,
   };
 }
@@ -168,7 +173,7 @@ export class RebalanceApprovalService {
       fromOwner: input.fromOwner,
       toOwner: input.toOwner,
       decision: input.decision,
-      ...noteMetadata(input.note),
+      ...noteMetadata(organizationId, input.note),
       decidedBy,
       decidedAt: now.toISOString(),
       appliedToCrm: false,

@@ -15,6 +15,7 @@ import { PredictiveRevenueOracleService } from '../../../src/features/commercial
 import {
   REBALANCE_NOTE_HASH_DOMAIN,
   RebalanceApprovalService,
+  noteMetadata,
 } from '../../../src/features/commercial-intelligence/services/rebalanceApproval.service.js';
 import {
   REBALANCE_DECISION_TTL_DAYS,
@@ -168,7 +169,7 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     expect(redacted).toContain('[TELEFONE REDIGIDO]');
     expect(res.body.data.approval).toMatchObject({
       noteLength: redacted.length,
-      noteHash: keyedDigestHex(REBALANCE_NOTE_HASH_DOMAIN, redacted),
+      noteHash: keyedDigestHex(REBALANCE_NOTE_HASH_DOMAIN, `org-a\u0000${redacted}`),
       noteRef: null,
     });
   });
@@ -204,6 +205,15 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     expect(res.status).toBe(201);
     expect(res.body.data.alreadyRecorded).toBe(false);
     expect(store.records).toHaveLength(2);
+  });
+
+  it('noteHash inclui organizationId: mesma nota em orgs diferentes → hashes diferentes', () => {
+    const a = noteMetadata('org-a', 'mesma nota');
+    const b = noteMetadata('org-b', 'mesma nota');
+    expect(a.noteHash).toMatch(/^[0-9a-f]{64}$/);
+    expect(b.noteHash).toMatch(/^[0-9a-f]{64}$/);
+    expect(a.noteHash).not.toBe(b.noteHash);
+    expect(noteMetadata('org-a', 'mesma nota').noteHash).toBe(a.noteHash);
   });
 
   it('noteHash é HMAC (não é sha256 puro do texto redigido)', async () => {

@@ -227,7 +227,7 @@ export interface RebalanceApprovalRequest {
 export interface RebalanceApprovalRecord extends Omit<RebalanceApprovalRequest, 'note'> {
   /** Tamanho da nota redigida (null sem nota). */
   noteLength: number | null;
-  /** HMAC-SHA256 hex (PII_BLIND_INDEX_KEY, domínio rebalance-approval-note:v1) da nota redigida (null sem nota). */
+  /** HMAC-SHA256 hex (PII_BLIND_INDEX_KEY, domínio rebalance-approval-note:v1) de `${organizationId}\u0000${notaRedigida}` (null sem nota). */
   noteHash: string | null;
   /** Referência ao texto no model dedicado — sempre null até o handoff 04→01. */
   noteRef: null;

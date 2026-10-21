@@ -6841,7 +6841,7 @@ paths:
         `data.existing`. A decisão é gravada no AuditLog; `appliedToCrm` é sempre false.
         Schema Zod: `rebalanceApprovalRequestSchema` (strict; `toOwner` ≠ `fromOwner`).
         LGPD: `note` (≤ 280) é redigida (CPF/CNPJ/e-mail/telefone) e o texto NÃO é persistido nem
-        devolvido — só `noteLength`, `noteHash` (HMAC-SHA256 do texto redigido, chave `PII_BLIND_INDEX_KEY`) e `noteRef: null`.
+        devolvido — só `noteLength`, `noteHash` (HMAC-SHA256 de `organizationId\0redigido`, chave `PII_BLIND_INDEX_KEY`) e `noteRef: null`.
         Anti-estado obsoleto/forjado: `recommendationId` precisa ser o hash de (org|leadId|fromOwner|toOwner)
         devolvido por GET /rebalance/recommendations (senão 422 `RECOMMENDATION_MISMATCH`); `fromOwner`
         precisa ser o owner atual do lead (senão 409 `STALE_OWNER`); `toOwner` precisa ser `User.id` do
@@ -11370,7 +11370,7 @@ components:
                 toOwner: { type: string }
                 decision: { type: string, enum: [APPROVED, REJECTED] }
                 noteLength: { type: integer, nullable: true }
-                noteHash: { type: string, nullable: true, description: HMAC-SHA256 hex da nota redigida (chave PII_BLIND_INDEX_KEY) }
+                noteHash: { type: string, nullable: true, description: 'HMAC-SHA256 hex de organizationId + NUL + nota redigida (chave PII_BLIND_INDEX_KEY, domínio rebalance-approval-note:v1); não correlacionável entre tenants' }
                 noteRef: { type: string, nullable: true, description: Sempre null até o model RebalanceApproval }
     RebalanceOwnerStats:
       type: object
