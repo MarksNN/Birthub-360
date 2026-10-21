@@ -43,11 +43,12 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 --     (backfills de migration em tabelas FORCE RLS não podem filtrar linhas em silêncio),
 --     NOCREATEDB, NOCREATEROLE. LOGIN só se a variável psql "migrator_password" vier não vazia;
 --     senão NOLOGIN (ambientes em que outro papel faz `SET ROLE prospector_migrator`).
---   * prospector_app — NÃO é dono de nada; só DML (SELECT/INSERT/UPDATE/DELETE), USAGE nas
---     sequences/schema e EXECUTE. NOSUPERUSER, NOBYPASSRLS.
---   * Exceção documentada: tabelas do LangGraph (`checkpoint*`), criadas em runtime por
---     `PostgresSaver.setup()` (src/lib/ai/checkpointer.ts), continuam do app — por isso o app mantém
---     CREATE no schema/banco. Ele pode criar/alterar SÓ as próprias tabelas, nunca as do migrator.
+--   * prospector_app — NÃO é dono de nada e NÃO cria nada: só DML (SELECT/INSERT/UPDATE/DELETE),
+--     USAGE/SELECT nas sequences, USAGE no schema e EXECUTE só por allowlist explícita (abaixo).
+--     Sem CREATE no banco/schema e sem TEMP (parecer 15 do PR #39: A1/A2/C3). NOSUPERUSER,
+--     NOBYPASSRLS. As tabelas do LangGraph (`checkpoint*`) nascem por migration
+--     (20261021010000_langgraph_checkpoint_tables), do migrator, como qualquer outra.
+--   * search_path fixado: app `pg_catalog, public`; migrator `public, pg_catalog` (ver abaixo).
 -- Idempotente e re-executável: re-rodar devolve ao migrator qualquer objeto que tenha ficado com
 -- outro dono e re-aplica os grants mínimos. Ver docs/deploy/db-owner-role-separation.md.
 
@@ -77,11 +78,26 @@ BEGIN
 END
 $$;
 
-SELECT format('GRANT CONNECT, TEMPORARY ON DATABASE %I TO prospector_migrator, prospector_app', current_database()) \gexec
+-- Banco: PUBLIC e o app perdem TEMP (tabela temporária sombreia relação não qualificada, pg_temp
+-- é buscado primeiro) e CREATE (CREATE SCHEMA "prospector_app"/qualquer nome). CONNECT de PUBLIC
+-- fica como está (outros papéis do provedor podem depender dele); app/migrator recebem explícito.
+SELECT format('REVOKE CREATE, TEMPORARY ON DATABASE %I FROM PUBLIC, prospector_app', current_database()) \gexec
+SELECT format('GRANT CONNECT ON DATABASE %I TO prospector_migrator, prospector_app', current_database()) \gexec
+-- O migrator também não precisa de TEMP; mantém CREATE só se já tiver (não criamos schemas).
+SELECT format('REVOKE TEMPORARY ON DATABASE %I FROM prospector_migrator', current_database()) \gexec
+
+-- search_path fixo (A1/A4): sem "$user", um schema homônimo do papel não sombreia public.
+-- App: pg_catalog primeiro (nada em public sombreia built-ins; o app não cria nada, então não
+-- importa que o 1º schema do path seja o alvo de CREATE). Migrator: public primeiro, porque o
+-- Prisma faz `CREATE TABLE "_prisma_migrations"` sem qualificar e o alvo de CREATE é o 1º schema
+-- do path (com pg_catalog primeiro: "permission denied for schema pg_catalog", testado). Como o
+-- migrator é o dono de public, ninguém além dele põe objetos ali para sombrear.
+ALTER ROLE prospector_app SET search_path = pg_catalog, public;
+ALTER ROLE prospector_migrator SET search_path = public, pg_catalog;
 
 ALTER SCHEMA public OWNER TO prospector_migrator;
 
--- Posse: tudo em public que não pertence a extensão nem ao LangGraph vai para o migrator.
+-- Posse: tudo em public que não pertence a extensão vai para o migrator (sem exceções).
 DO $$
 DECLARE
     r RECORD;
@@ -92,7 +108,6 @@ BEGIN
          WHERE c.relnamespace = 'public'::regnamespace
            AND c.relkind IN ('r', 'p', 'v', 'm', 'S', 'f')
            AND pg_get_userbyid(c.relowner) <> 'prospector_migrator'
-           AND c.relname NOT LIKE 'checkpoint%'
            AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_class'::regclass AND d.objid = c.oid AND d.deptype = 'e')
            -- sequences de identidade/serial seguem a tabela dona (ALTER TABLE OWNER as leva junto)
            AND NOT (c.relkind = 'S' AND EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_class'::regclass AND d.objid = c.oid AND d.deptype IN ('a', 'i')))
@@ -129,8 +144,10 @@ END
 $$;
 
 -- Privilégios do app: zera o que existia (inclusive o GRANT ALL legado) e concede só DML.
+-- C1: em bancos vindos de PG < 15 (ou gerenciados) PUBLIC ainda tem CREATE em public.
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM prospector_app;
-GRANT USAGE, CREATE ON SCHEMA public TO prospector_app;  -- CREATE: só pelo LangGraph (ver acima)
+GRANT USAGE ON SCHEMA public TO prospector_app;
 DO $$
 DECLARE
     r RECORD;
@@ -142,7 +159,8 @@ BEGIN
     LOOP
         IF r.relkind = 'S' THEN
             EXECUTE format('REVOKE ALL ON SEQUENCE public.%I FROM prospector_app', r.relname);
-            EXECUTE format('GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.%I TO prospector_app', r.relname);
+            -- USAGE basta para nextval(); sem UPDATE o app não faz setval() (parecer 15, BAIXA).
+            EXECUTE format('GRANT USAGE, SELECT ON SEQUENCE public.%I TO prospector_app', r.relname);
         ELSE
             EXECUTE format('REVOKE ALL ON TABLE public.%I FROM prospector_app', r.relname);
             EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.%I TO prospector_app', r.relname);
@@ -150,7 +168,30 @@ BEGIN
     END LOOP;
 END
 $$;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO prospector_app;
+
+-- Funções (B1/C2): nenhuma função própria do projeto (não-extensão) é executável por PUBLIC nem
+-- pelo app, a não ser as da allowlist abaixo. Funções de extensão (vector, pg_trgm) ficam como a
+-- extensão as criou (os operadores do pgvector dependem delas). Funções de trigger NÃO precisam
+-- de EXECUTE para disparar; SECURITY DEFINER nunca entra na allowlist sem revisão do Agente 15.
+DO $$
+DECLARE
+    r RECORD;
+    -- Allowlist revisada: assinaturas regprocedure que o app chama direto (hoje: nenhuma).
+    allowlist CONSTANT text[] := ARRAY[]::text[];
+BEGIN
+    FOR r IN
+        SELECT p.oid::regprocedure AS sig
+          FROM pg_proc p
+         WHERE p.pronamespace = 'public'::regnamespace
+           AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_proc'::regclass AND d.objid = p.oid AND d.deptype = 'e')
+    LOOP
+        EXECUTE format('REVOKE ALL ON ROUTINE %s FROM PUBLIC, prospector_app', r.sig);
+        IF r.sig::text = ANY (allowlist) THEN
+            EXECUTE format('GRANT EXECUTE ON ROUTINE %s TO prospector_app', r.sig);
+        END IF;
+    END LOOP;
+END
+$$;
 
 -- Objetos FUTUROS criados pelo migrator (migrations) já nascem com DML para o app.
 -- Tabelas com regime restrito (ex.: cadeia LGPD do PR #35) ajustam os próprios grants na
@@ -158,9 +199,15 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO prospector_app;
 ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
     GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO prospector_app;
 ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
-    GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO prospector_app;
+    REVOKE ALL ON SEQUENCES FROM prospector_app;
 ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
-    GRANT EXECUTE ON FUNCTIONS TO prospector_app;
+    GRANT USAGE, SELECT ON SEQUENCES TO prospector_app;
+-- Funções futuras: sem EXECUTE para PUBLIC (default global do papel; o default por schema só
+-- consegue ADICIONAR) e sem EXECUTE para o app — cada migration concede o que precisar, por função.
+ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
+    REVOKE EXECUTE ON FUNCTIONS FROM prospector_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator
+    REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
     GRANT USAGE ON TYPES TO prospector_app;
 
@@ -174,7 +221,6 @@ BEGIN
 END
 $$;
 
--- AI-002 (onda 32): `@langchain/langgraph-checkpoint-postgres` roda `CREATE SCHEMA IF NOT EXISTS
--- "public"` em `PostgresSaver.setup()`; o Postgres checa CREATE no banco antes de checar se o
--- schema existe. Sem este GRANT o setup falha com "permission denied for database".
-SELECT format('GRANT CREATE ON DATABASE %I TO prospector_app', current_database()) \gexec
+-- (PR #39) O antigo `GRANT CREATE ON DATABASE ... TO prospector_app` (AI-002, exigido pelo
+-- `PostgresSaver.setup()`) foi removido: as tabelas do LangGraph vêm da migration e o app só
+-- confere a versão (src/lib/ai/checkpointer.ts). O REVOKE lá em cima tira o grant de bancos antigos.

@@ -56,10 +56,20 @@ export default defineConfig({
     externalTables: true,
   },
   tables: {
-    external: ['public.MarketIntelligenceEconomicScenario'],
+    external: [
+      'public.MarketIntelligenceEconomicScenario',
+      // LangGraph checkpointer (@langchain/langgraph-checkpoint-postgres): DDL na migration
+      // 20261021010000_langgraph_checkpoint_tables, acesso por SQL cru (pg.Pool), sem model.
+      'public.checkpoint_migrations',
+      'public.checkpoints',
+      'public.checkpoint_blobs',
+      'public.checkpoint_writes',
+    ],
   },
   datasource: {
     url: resolvePrismaCliUrl(),
-    shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL ?? 'postgresql://prospector:prospector_pass@localhost:5434/shadowdb',
+    shadowDatabaseUrl:
+      process.env.SHADOW_DATABASE_URL ??
+      'postgresql://prospector:prospector_pass@localhost:5434/shadowdb',
   },
 });

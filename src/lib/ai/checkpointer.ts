@@ -12,9 +12,9 @@ import { logger } from '../logger.js';
  * estado.
  *
  * Tabelas próprias (`checkpoints`, `checkpoint_writes`, `checkpoint_blobs`,
- * `checkpoint_migrations`), criadas e migradas pelo próprio pacote
- * `@langchain/langgraph-checkpoint-postgres` via `setup()` — DELIBERADAMENTE fora do sistema de
- * migrations do Prisma (`prisma/migrations/`) e no schema `public` padrão (não um schema dedicado:
+ * `checkpoint_migrations`), criadas pela migration Prisma `20261021010000_langgraph_checkpoint_tables` (DDL idêntico ao
+ * `setup()` do pacote; PR #39 tirou o CREATE do papel do app) e declaradas como `tables.external`
+ * no prisma.config.ts (sem model no schema.prisma) e no schema `public` padrão (não um schema dedicado:
  * criar um schema novo exigiria confirmar `CREATE SCHEMA` no papel de produção, que não pôde ser
  * verificado neste ambiente; `public` já é onde o papel da aplicação comprovadamente tem DDL, é o
  * mesmo schema que Prisma já usa). Não colidem com nenhum model do schema.prisma (nomes conferidos).
@@ -62,12 +62,37 @@ let setupPromise: Promise<void> | null = null;
  * dois processos de entrada distintos (`server.ts` e `worker.ts`, ver `npm run build:worker`) e
  * inicialização preguiçosa evita depender de lembrar de conectar isso às duas sequências de boot.
  */
+/**
+ * Versão do schema do checkpointer que a migration `20261021010000_langgraph_checkpoint_tables`
+ * cria (índice da última entrada de `getMigrations()` de @langchain/langgraph-checkpoint-postgres
+ * 1.0.5). Ao atualizar o pacote, se ele trouxer migrations novas, crie uma migration Prisma com o
+ * DDL novo e suba este número.
+ */
+export const EXPECTED_CHECKPOINTER_SCHEMA_VERSION = 4;
+
+/**
+ * PR #39 / parecer 15 (A1): o app NÃO roda mais `PostgresSaver.setup()` — ele faz
+ * `CREATE SCHEMA IF NOT EXISTS` e DDL, e o papel `prospector_app` não tem (nem deve ter) CREATE no
+ * banco/schema. As tabelas nascem por migration (como `prospector_migrator`); aqui só conferimos
+ * que a versão aplicada é a esperada, falhando com mensagem clara se a migration não rodou.
+ */
 export async function ensureCheckpointerReady(): Promise<void> {
   if (!setupPromise) {
-    setupPromise = checkpointer.setup().catch((err) => {
-      setupPromise = null;
-      throw err;
-    });
+    setupPromise = pool
+      .query<{ v: number | null }>('SELECT max(v) AS v FROM public.checkpoint_migrations')
+      .then(({ rows }) => {
+        const v = rows[0]?.v ?? -1;
+        if (v < EXPECTED_CHECKPOINTER_SCHEMA_VERSION) {
+          throw new Error(
+            `Schema do checkpointer LangGraph na versão ${v}, esperado ${EXPECTED_CHECKPOINTER_SCHEMA_VERSION}: ` +
+              'rode `prisma migrate deploy` (como prospector_migrator).',
+          );
+        }
+      })
+      .catch((err) => {
+        setupPromise = null;
+        throw err;
+      });
   }
   return setupPromise;
 }
