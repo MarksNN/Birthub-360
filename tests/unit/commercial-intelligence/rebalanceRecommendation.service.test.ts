@@ -126,6 +126,11 @@ describe('RebalanceRecommendationService — dados reais, regra declarada', () =
     const a = (await svc(r).list('org-a')).recommendations[0];
     expect(a.approvalStatus).toBe('REJECTED');
     expect(a.decision?.approvalId).toBe('ap-1');
+    // TTL: a mesma decisão com 31 dias deixa de valer
+    r.decisions[0] = { ...r.decisions[0], decidedAt: new Date(ORACLE_FIXED_NOW.getTime() - 31 * DAY).toISOString() };
+    const expired = (await svc(r).list('org-a')).recommendations[0];
+    expect(expired.approvalStatus).toBe('PENDING_HUMAN_REVIEW');
+    expect(expired.decision).toBeNull();
     const b = (await svc(r).list('org-b')).recommendations;
     expect(b.every((x) => x.decision === null)).toBe(true);
     expect(b[0].recommendationId).not.toBe(first.recommendationId);

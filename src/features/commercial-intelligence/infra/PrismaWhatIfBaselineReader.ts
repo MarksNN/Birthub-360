@@ -3,7 +3,7 @@ import { prisma } from '../../../lib/prisma.js';
 import type {
   WhatIfBaselineReader,
   WhatIfClosedDeal,
-} from '../services/whatIfSimulation.service.js';
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 import { isLost, isWon } from './PrismaOracleHistoryReader.js';
 
 /** Encerrados (ganhos/perdidos) do funil Negócio, sempre filtrado por organizationId. */

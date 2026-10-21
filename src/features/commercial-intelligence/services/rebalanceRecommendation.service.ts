@@ -5,6 +5,19 @@ import type {
   RebalanceRecommendationsResponseV2,
   RebalanceRecommendationV2,
 } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
+import {
+  REBALANCE_DECISION_TTL_DAYS,
+  type RebalanceOpenDeal,
+  type RebalanceRecommendationReader,
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
+
+export type {
+  RebalanceClosedDeal,
+  RebalanceOpenDeal,
+  RebalanceOrgUser,
+  RebalanceRecommendationReader,
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
+export { REBALANCE_DECISION_TTL_DAYS };
 
 /**
  * Recomendações de rebalanceamento de carteira a partir de dados REAIS do tenant (funil Negócio).
@@ -33,43 +46,13 @@ export const REBALANCE_MAX_MOVES_PER_OWNER = 5;
 
 const DAY_MS = 86_400_000;
 
-export interface RebalanceOpenDeal {
-  leadId: string;
-  title: string | null;
-  owner: string | null;
-  companyId: string | null;
-  companyName: string | null;
-  amount: number | null;
-  createdAt: Date;
-}
-export interface RebalanceClosedDeal {
-  owner: string | null;
-  closedAt: Date;
-}
-export interface RebalanceOrgUser {
-  id: string;
-  name: string;
-}
-
-/** Porta de leitura tenant-scoped — implementação Prisma em infra/PrismaRebalanceRecommendationReader.ts. */
-export interface RebalanceRecommendationReader {
-  listOpenDeals(organizationId: string): Promise<RebalanceOpenDeal[]>;
-  /** Ganhos + perdidos com closedAt ≥ since. */
-  listClosedDeals(organizationId: string, since: Date): Promise<RebalanceClosedDeal[]>;
-  listOrgUsers(organizationId: string): Promise<RebalanceOrgUser[]>;
-  listDecisions(
-    organizationId: string,
-    recommendationIds: string[],
-  ): Promise<RebalanceApprovalRecord[]>;
-}
-
 export function rebalanceRecommendationId(
   organizationId: string,
   leadId: string,
-  fromOwner: string,
+  fromOwner: string | null,
   toOwner: string,
 ): string {
-  const h = createHash('sha256').update(`${organizationId}|${leadId}|${fromOwner}|${toOwner}`);
+  const h = createHash('sha256').update(`${organizationId}|${leadId}|${fromOwner ?? ''}|${toOwner}`);
   return `rb_${h.digest('hex').slice(0, 32)}`;
 }
 
@@ -77,6 +60,11 @@ function median(values: number[]): number {
   const s = [...values].sort((a, b) => a - b);
   const mid = Math.floor(s.length / 2);
   return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+/** Decisão vale por REBALANCE_DECISION_TTL_DAYS (o estado lead/owner já está no recommendationId). */
+export function isDecisionActive(d: Pick<RebalanceApprovalRecord, 'decidedAt'>, now: Date): boolean {
+  const at = Date.parse(d.decidedAt);
+  return Number.isFinite(at) && now.getTime() - at <= REBALANCE_DECISION_TTL_DAYS * DAY_MS;
 }
 const r1 = (n: number) => Math.round(n * 10) / 10;
 

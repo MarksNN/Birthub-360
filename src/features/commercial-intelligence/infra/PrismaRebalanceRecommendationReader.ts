@@ -1,16 +1,15 @@
 import { LeadFunnel } from '@prisma/client';
 import { prisma } from '../../../lib/prisma.js';
 import type { RebalanceApprovalRecord } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
+import { logger } from '../../../lib/logger.js';
 import {
   REBALANCE_APPROVAL_ACTION,
   REBALANCE_APPROVAL_ENTITY,
-} from '../services/rebalanceApproval.service.js';
-import type {
-  RebalanceClosedDeal,
-  RebalanceOpenDeal,
-  RebalanceOrgUser,
-  RebalanceRecommendationReader,
-} from '../services/rebalanceRecommendation.service.js';
+  type RebalanceClosedDeal,
+  type RebalanceOpenDeal,
+  type RebalanceOrgUser,
+  type RebalanceRecommendationReader,
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 import { isLost, isWon } from './PrismaOracleHistoryReader.js';
 
 /** Leitura tenant-scoped (sempre `organizationId`/`tenantId`) para o rebalanceamento. */
@@ -73,13 +72,35 @@ export class PrismaRebalanceRecommendationReader implements RebalanceRecommendat
         action: REBALANCE_APPROVAL_ACTION,
         entityId: { in: recommendationIds },
       },
-      orderBy: { timestamp: 'asc' },
+      orderBy: { timestamp: 'desc' },
     });
-    const first = new Map<string, RebalanceApprovalRecord>();
+    const latest = new Map<string, RebalanceApprovalRecord>();
     for (const r of rows) {
-      if (!r.details || !r.entityId || first.has(r.entityId)) continue;
-      first.set(r.entityId, JSON.parse(r.details) as RebalanceApprovalRecord);
+      if (!r.entityId || latest.has(r.entityId)) continue;
+      const rec = parseApprovalRecord(r.details);
+      if (!rec) {
+        logger.warn(
+          { auditLogId: r.id, entityId: r.entityId, organizationId },
+          'Rebalance: registro de decisão corrompido no AuditLog — ignorado',
+        );
+        continue;
+      }
+      latest.set(r.entityId, rec);
     }
-    return [...first.values()];
+    return [...latest.values()];
+  }
+}
+
+/** JSON.parse defensivo: null se vazio, inválido ou sem os campos mínimos. */
+export function parseApprovalRecord(details: string | null): RebalanceApprovalRecord | null {
+  if (!details) return null;
+  try {
+    const v = JSON.parse(details) as Partial<RebalanceApprovalRecord> | null;
+    if (!v || typeof v !== 'object' || typeof v.recommendationId !== 'string') return null;
+    if (v.decision !== 'APPROVED' && v.decision !== 'REJECTED') return null;
+    if (typeof v.decidedAt !== 'string') return null;
+    return v as RebalanceApprovalRecord;
+  } catch {
+    return null;
   }
 }

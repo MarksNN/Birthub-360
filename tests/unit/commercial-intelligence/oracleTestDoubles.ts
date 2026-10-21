@@ -49,7 +49,8 @@ export function seedRealHistory(reader: InMemoryOracleReader, org: string): void
 }
 
 export class InMemoryRebalanceApprovalStore implements RebalanceApprovalStore {
-  leads = new Map<string, Set<string>>();
+  /** org → (leadId → owner atual) */
+  leads = new Map<string, Map<string, string | null>>();
   users = new Map<string, Set<string>>();
   addUser(org: string, userId: string) {
     if (!this.users.has(org)) this.users.set(org, new Set());
@@ -59,19 +60,19 @@ export class InMemoryRebalanceApprovalStore implements RebalanceApprovalStore {
     return this.users.get(org)?.has(userId) ?? false;
   }
   records: Array<{ record: RebalanceApprovalRecord; ipAddress?: string }> = [];
-  addLead(org: string, leadId: string) {
-    if (!this.leads.has(org)) this.leads.set(org, new Set());
-    this.leads.get(org)!.add(leadId);
+  addLead(org: string, leadId: string, owner: string | null = null) {
+    if (!this.leads.has(org)) this.leads.set(org, new Map());
+    this.leads.get(org)!.set(leadId, owner);
   }
-  async leadExists(org: string, leadId: string) {
-    return this.leads.get(org)?.has(leadId) ?? false;
+  async findLead(org: string, leadId: string) {
+    const m = this.leads.get(org);
+    return m?.has(leadId) ? { owner: m.get(leadId) ?? null } : null;
   }
   async findByRecommendation(org: string, recommendationId: string) {
-    return (
-      this.records.find(
-        (r) => r.record.organizationId === org && r.record.recommendationId === recommendationId,
-      )?.record ?? null
+    const all = this.records.filter(
+      (r) => r.record.organizationId === org && r.record.recommendationId === recommendationId,
     );
+    return all.length ? all[all.length - 1].record : null;
   }
   async save(record: RebalanceApprovalRecord, ipAddress?: string) {
     this.records.push({ record, ipAddress });

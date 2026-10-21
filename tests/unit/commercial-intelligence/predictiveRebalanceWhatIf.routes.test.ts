@@ -27,7 +27,7 @@ function buildApp(user: { id: string; organizationId: string; role: string }) {
     ...Array.from({ length: 12 }, (_, i) => ({ leadId: `a-${i}`, owner: 'u-ana' })),
     ...Array.from({ length: 2 }, (_, i) => ({ leadId: `b-${i}`, owner: 'u-bia' })),
   ].map((d, i) => ({ ...d, title: null, companyId: null, companyName: null, amount: 1000, createdAt: new Date(ORACLE_FIXED_NOW.getTime() - (50 - i) * DAY) }));
-  for (const d of open) store.addLead('org-a', d.leadId);
+  for (const d of open) store.addLead('org-a', d.leadId, d.owner);
   store.addUser('org-a', 'u-ana');
   store.addUser('org-a', 'u-bia');
   const closed = [

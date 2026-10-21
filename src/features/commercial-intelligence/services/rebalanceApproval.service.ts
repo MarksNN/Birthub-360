@@ -10,6 +10,7 @@ import {
   REBALANCE_APPROVAL_ENTITY,
   type RebalanceApprovalStore,
 } from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
+import { isDecisionActive, rebalanceRecommendationId } from './rebalanceRecommendation.service.js';
 
 export type { RebalanceApprovalStore };
 /**
@@ -18,7 +19,10 @@ export type { RebalanceApprovalStore };
  * Persistência: `AuditLog` existente (entity `REBALANCE_APPROVAL_ENTITY`, entityId =
  * recommendationId, tenantId = organizationId, details = JSON do registro). Não exige migration.
  * Idempotência: (tenant, recommendationId). Mesma decisão/payload → replay 200 sem nova escrita;
- * payload/decisão divergente → 409. Limite conhecido: sem UNIQUE no banco, duas requisições
+ * payload/decisão divergente → 409. Antes disso: recommendationId precisa bater com o hash de
+ * (org|leadId|fromOwner|toOwner) → 422; fromOwner precisa ser o owner atual → 409 STALE_OWNER;
+ * toOwner precisa ser User do tenant → 422. Decisões expiram após REBALANCE_DECISION_TTL_DAYS.
+ * Limite conhecido: sem UNIQUE no banco, duas requisições
  * simultâneas podem gravar 2 linhas — ver handoff 04→01 (model dedicado com @@unique).
  */
 export { REBALANCE_APPROVAL_ACTION, REBALANCE_APPROVAL_ENTITY };
@@ -40,7 +44,12 @@ export const rebalanceApprovalRequestSchema = z
 
 export class RebalanceApprovalError extends Error {
   constructor(
-    public readonly code: 'NOT_FOUND' | 'CONFLICT' | 'INVALID_OWNER',
+    public readonly code:
+      | 'NOT_FOUND'
+      | 'CONFLICT'
+      | 'INVALID_OWNER'
+      | 'RECOMMENDATION_MISMATCH'
+      | 'STALE_OWNER',
     message: string,
     public readonly existing?: RebalanceApprovalRecord,
   ) {
@@ -81,7 +90,23 @@ export class RebalanceApprovalService {
     if (!organizationId) throw new Error('Tenancy violation: organizationId obrigatório');
     const store = await this.storeFactory();
 
-    const existing = await store.findByRecommendation(organizationId, input.recommendationId);
+    // 1) Anti-forja: o id precisa ser o hash de (org|leadId|fromOwner|toOwner) do GET.
+    const expectedId = rebalanceRecommendationId(
+      organizationId,
+      input.leadId,
+      input.fromOwner,
+      input.toOwner,
+    );
+    if (input.recommendationId !== expectedId) {
+      throw new RebalanceApprovalError(
+        'RECOMMENDATION_MISMATCH',
+        'recommendationId não corresponde a (leadId, fromOwner, toOwner) — use exatamente os ids devolvidos por GET /rebalance/recommendations.',
+      );
+    }
+    // 2) Idempotência (só decisões ainda válidas — TTL REBALANCE_DECISION_TTL_DAYS).
+    const now = this.now();
+    const found = await store.findByRecommendation(organizationId, input.recommendationId);
+    const existing = found && isDecisionActive(found, now) ? found : null;
     if (existing) {
       if (samePayload(existing, input)) return { approval: existing, alreadyRecorded: true };
       throw new RebalanceApprovalError(
@@ -90,8 +115,16 @@ export class RebalanceApprovalService {
         existing,
       );
     }
-    if (!(await store.leadExists(organizationId, input.leadId))) {
+    // 3) Estado atual do lead: existe no tenant e o owner ainda é fromOwner.
+    const lead = await store.findLead(organizationId, input.leadId);
+    if (!lead) {
       throw new RebalanceApprovalError('NOT_FOUND', 'Negócio não encontrado nesta organização.');
+    }
+    if ((lead.owner ?? null) !== input.fromOwner) {
+      throw new RebalanceApprovalError(
+        'STALE_OWNER',
+        'fromOwner não é mais o responsável atual do negócio — recarregue GET /rebalance/recommendations.',
+      );
     }
     if (!(await store.ownerIsOrgUser(organizationId, input.toOwner))) {
       throw new RebalanceApprovalError(
@@ -109,7 +142,7 @@ export class RebalanceApprovalService {
       decision: input.decision,
       ...(input.note ? { note: input.note } : {}),
       decidedBy,
-      decidedAt: this.now().toISOString(),
+      decidedAt: now.toISOString(),
       appliedToCrm: false,
     };
     await store.save(record, params.ipAddress);

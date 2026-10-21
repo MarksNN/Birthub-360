@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { rebalanceRecommendationId } from '../../src/features/commercial-intelligence/services/rebalanceRecommendation.service.js';
 import { behavioralEngineService } from '../../src/features/gamification/services/behavioralEngine.service.js';
 import { selfDrivingCrmService } from '../../src/features/cadence/services/selfDrivingCrm.service.js';
 import { roiSimulatorService } from '../../src/features/commercial-intelligence/services/roiSimulator.service.js';
@@ -270,11 +271,11 @@ describe('ONDA 03 — Fluxo Abrangente Integrado e Cinco Jornadas Comerciais E2E
 
     // 4. Aprovação formal do gestor (persistida + idempotente)
     const store = new InMemoryRebalanceApprovalStore();
-    store.addLead(tenantA, 'lead-alpha-1');
+    store.addLead(tenantA, 'lead-alpha-1', 'seller-a');
     store.addUser(tenantA, 'seller-b');
     const approvals = new RebalanceApprovalService({ store });
     const input = {
-      recommendationId: 'rec-alpha-1',
+      recommendationId: rebalanceRecommendationId(tenantA, 'lead-alpha-1', 'seller-a', 'seller-b'),
       leadId: 'lead-alpha-1',
       fromOwner: 'seller-a',
       toOwner: 'seller-b',

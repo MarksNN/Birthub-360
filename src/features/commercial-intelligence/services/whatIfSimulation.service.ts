@@ -7,6 +7,7 @@ import type {
   WhatIfRequestV2,
   WhatIfResultV2,
 } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
+import type { WhatIfBaselineReader } from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 import {
   ORACLE_LOOKBACK_MONTHS,
   ORACLE_MIN_CLOSED_WON_DEALS,
@@ -24,6 +25,11 @@ import {
  *   fTicket = 1 + avgTicketDeltaPercent/100
  * baseline.revenue = P50 do Oracle para o horizonte; winRate e ticket = lookback do Oracle.
  */
+export type {
+  WhatIfBaselineReader,
+  WhatIfClosedDeal,
+} from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
+
 export const WHATIF_MIN_CLOSED_DEALS = ORACLE_MIN_CLOSED_WON_DEALS;
 
 export const whatIfRequestSchema = z
@@ -40,16 +46,6 @@ export const whatIfRequestSchema = z
   })
   .strict();
 
-export interface WhatIfClosedDeal {
-  won: boolean;
-  amount: number;
-  closedAt: Date;
-}
-/** Porta de leitura — implementação Prisma em infra/PrismaWhatIfBaselineReader.ts. */
-export interface WhatIfBaselineReader {
-  /** Negócios encerrados (ganhos e perdidos) do funil Negócio com closedAt ≥ since. */
-  listClosedDeals(organizationId: string, since: Date): Promise<WhatIfClosedDeal[]>;
-}
 export interface RevenueBaselinePort {
   getRevenueBaseline(org: string, h: RevenueHorizonDays): Promise<ProjectedRevenueHorizonV2>;
 }

@@ -1,4 +1,5 @@
 import { LeadFunnel } from '@prisma/client';
+import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import type { RebalanceApprovalRecord } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
 import {
@@ -7,13 +8,15 @@ import {
   type RebalanceApprovalStore,
 } from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
 
+import { parseApprovalRecord } from './PrismaRebalanceRecommendationReader.js';
+
 /** Persistência via `AuditLog` (sem migration) — sempre filtrado por tenantId = organizationId. */
 export class PrismaRebalanceApprovalStore implements RebalanceApprovalStore {
-  async leadExists(organizationId: string, leadId: string): Promise<boolean> {
-    const n = await prisma.lead.count({
+  async findLead(organizationId: string, leadId: string): Promise<{ owner: string | null } | null> {
+    return prisma.lead.findFirst({
       where: { id: leadId, organizationId, funnel: LeadFunnel.Negocio },
+      select: { owner: true },
     });
-    return n > 0;
   }
 
   async ownerIsOrgUser(organizationId: string, userId: string): Promise<boolean> {
@@ -32,10 +35,17 @@ export class PrismaRebalanceApprovalStore implements RebalanceApprovalStore {
         action: REBALANCE_APPROVAL_ACTION,
         entityId: recommendationId,
       },
-      orderBy: { timestamp: 'asc' },
+      orderBy: { timestamp: 'desc' },
     });
-    if (!row?.details) return null;
-    return JSON.parse(row.details) as RebalanceApprovalRecord;
+    if (!row) return null;
+    const rec = parseApprovalRecord(row.details);
+    if (!rec) {
+      logger.warn(
+        { auditLogId: row.id, entityId: recommendationId, organizationId },
+        'Rebalance: registro de decisão corrompido no AuditLog — tratado como inexistente',
+      );
+    }
+    return rec;
   }
 
   async save(record: RebalanceApprovalRecord, ipAddress?: string): Promise<void> {

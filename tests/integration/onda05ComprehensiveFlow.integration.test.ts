@@ -1,4 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest';
+import { rebalanceRecommendationId } from '../../src/features/commercial-intelligence/services/rebalanceRecommendation.service.js';
 import { multimodalRoleplaySimulatorService } from '../../src/features/roleplay/services/multimodalRoleplaySimulator.service.js';
 import {
   PredictiveRevenueOracleService,
@@ -100,14 +101,14 @@ describe('Onda 05 — Teste Integrado E2E: Escala, Governança e Resiliência', 
 
     // Aprovação de rebalanceamento persistida/auditada (sem recomendação inventada)
     const approvalStore = new InMemoryRebalanceApprovalStore();
-    approvalStore.addLead(tenantA, 'lead-alpha-1');
+    approvalStore.addLead(tenantA, 'lead-alpha-1', 'seller-ocupado');
     approvalStore.addUser(tenantA, 'seller-lucas-01');
     const approvals = new RebalanceApprovalService({ store: approvalStore });
     const approvedAllocation = await approvals.decide({
       organizationId: tenantA,
       decidedBy: 'diretor-comercial',
       input: {
-        recommendationId: 'rec-alpha-1',
+        recommendationId: rebalanceRecommendationId(tenantA, 'lead-alpha-1', 'seller-ocupado', 'seller-lucas-01'),
         leadId: 'lead-alpha-1',
         fromOwner: 'seller-ocupado',
         toOwner: 'seller-lucas-01',

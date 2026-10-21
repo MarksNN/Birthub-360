@@ -121,10 +121,16 @@ export function createPredictiveRoutes(deps?: {
       res.status(result.alreadyRecorded ? 200 : 201).json({ success: true, data: result });
     } catch (err) {
       if (err instanceof RebalanceApprovalError) {
-        const status = err.code === 'NOT_FOUND' ? 404 : err.code === 'INVALID_OWNER' ? 422 : 409;
+        const status =
+          err.code === 'NOT_FOUND'
+            ? 404
+            : err.code === 'INVALID_OWNER' || err.code === 'RECOMMENDATION_MISMATCH'
+              ? 422
+              : 409;
         return res.status(status).json({
           success: false,
           error: err.message,
+          code: err.code,
           ...(err.existing ? { data: { existing: err.existing } } : {}),
         });
       }

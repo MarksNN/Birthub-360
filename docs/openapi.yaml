@@ -6841,6 +6841,11 @@ paths:
         `data.existing`. A decisão é gravada no AuditLog; `appliedToCrm` é sempre false.
         Schema Zod: `rebalanceApprovalRequestSchema` (strict; `toOwner` ≠ `fromOwner`).
         Evite dados pessoais em `note` (texto livre, persistido no AuditLog).
+        Anti-estado obsoleto/forjado: `recommendationId` precisa ser o hash de (org|leadId|fromOwner|toOwner)
+        devolvido por GET /rebalance/recommendations (senão 422 `RECOMMENDATION_MISMATCH`); `fromOwner`
+        precisa ser o owner atual do lead (senão 409 `STALE_OWNER`); `toOwner` precisa ser `User.id` do
+        tenant (senão 422 `INVALID_OWNER`). Decisões valem por 30 dias (REBALANCE_DECISION_TTL_DAYS):
+        depois disso a recomendação volta a pendente e um novo POST grava nova decisão (201).
       requestBody:
         required: true
         content:
@@ -6872,12 +6877,16 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
-          description: Já existe decisão divergente para esta recommendationId (data.existing traz o registro)
+          description: >-
+            `CONFLICT` — já existe decisão válida divergente para esta recommendationId (data.existing traz o
+            registro) — ou `STALE_OWNER` — fromOwner não é mais o owner atual do lead
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         '422':
-          description: Payload inválido (Zod) — `details` traz fieldErrors — ou `toOwner` não é `User.id` desta organização
+          description: >-
+            Payload inválido (Zod, `details` traz fieldErrors), `RECOMMENDATION_MISMATCH` (recommendationId não
+            é o hash de org|leadId|fromOwner|toOwner) ou `INVALID_OWNER` (toOwner não é User.id desta organização)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -6892,7 +6901,8 @@ paths:
         abertos mais antigos, até 5 por doador. Menos de 2 owners elegíveis → `status: insufficient_data`
         e `recommendations: []`. `recommendationId` é determinístico (hash de tenant, lead, from, to) e
         os ids devolvidos são exatamente os aceitos por POST /rebalance/approvals; decisões já gravadas
-        aparecem em `decision`/`approvalStatus`.
+        aparecem em `decision`/`approvalStatus` só enquanto válidas: mesmo recommendationId (lead/owners
+        inalterados) e decididas há ≤ 30 dias; registros corrompidos no AuditLog são ignorados (log).
       responses:
         '200':
           description: OK (inclusive insufficient_data)
