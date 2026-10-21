@@ -215,10 +215,22 @@ export interface RebalanceApprovalRequest {
   fromOwner: string | null;
   toOwner: string;
   decision: 'APPROVED' | 'REJECTED';
+  /** Texto livre (≤ 280). Redigido (CPF/CNPJ/e-mail/telefone) e NÃO persistido — só metadados. */
   note?: string;
 }
 
-export interface RebalanceApprovalRecord extends RebalanceApprovalRequest {
+/**
+ * LGPD (Agente 21): o texto da `note` nunca vai para o AuditLog/resposta. Persistem só metadados
+ * do texto JÁ REDIGIDO. O texto redigido será guardado no model `RebalanceApproval` (handoff 04→01,
+ * RLS por org, mesma retenção, apagável em purge do titular); até lá é descartado e `noteRef` = null.
+ */
+export interface RebalanceApprovalRecord extends Omit<RebalanceApprovalRequest, 'note'> {
+  /** Tamanho da nota redigida (null sem nota). */
+  noteLength: number | null;
+  /** sha256 hex da nota redigida (null sem nota). */
+  noteHash: string | null;
+  /** Referência ao texto no model dedicado — sempre null até o handoff 04→01. */
+  noteRef: null;
   approvalId: string;
   organizationId: string;
   decidedBy: string;

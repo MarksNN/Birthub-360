@@ -40,3 +40,21 @@ export function redactResidualPii(text: string): ResidualPiiCheckResult {
   }
   return { redactedText, detectedTypes };
 }
+
+/**
+ * Variante que também redige CNPJ (antes do CPF/telefone, que consumiriam parte dos 14 dígitos).
+ * Função separada para não alterar o tipo de `redactResidualPii` consumido pelo sanitizer LGPD.
+ * Uso: nota livre da aprovação de rebalanceamento (commercial-intelligence, recomendação do 21).
+ */
+export function redactPiiIncludingCnpj(text: string): {
+  redactedText: string;
+  detectedTypes: Array<'CNPJ' | 'CPF' | 'Email' | 'Telefone'>;
+} {
+  const cnpj = /\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g;
+  const hasCnpj = new RegExp(cnpj.source).test(text);
+  const base = redactResidualPii(text.replace(cnpj, '[CNPJ REDIGIDO]'));
+  return {
+    redactedText: base.redactedText,
+    detectedTypes: hasCnpj ? ['CNPJ', ...base.detectedTypes] : base.detectedTypes,
+  };
+}

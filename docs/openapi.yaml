@@ -6840,7 +6840,8 @@ paths:
         `alreadyRecorded: true` sem nova escrita; decisão/payload divergente → 409 com
         `data.existing`. A decisão é gravada no AuditLog; `appliedToCrm` é sempre false.
         Schema Zod: `rebalanceApprovalRequestSchema` (strict; `toOwner` ≠ `fromOwner`).
-        Evite dados pessoais em `note` (texto livre, persistido no AuditLog).
+        LGPD: `note` (≤ 280) é redigida (CPF/CNPJ/e-mail/telefone) e o texto NÃO é persistido nem
+        devolvido — só `noteLength`, `noteHash` (sha256 do texto redigido) e `noteRef: null`.
         Anti-estado obsoleto/forjado: `recommendationId` precisa ser o hash de (org|leadId|fromOwner|toOwner)
         devolvido por GET /rebalance/recommendations (senão 422 `RECOMMENDATION_MISMATCH`); `fromOwner`
         precisa ser o owner atual do lead (senão 409 `STALE_OWNER`); `toOwner` precisa ser `User.id` do
@@ -6861,7 +6862,8 @@ paths:
                 toOwner:
                   { type: string, minLength: 1, maxLength: 200, description: 'Deve ser diferente de fromOwner' }
                 decision: { type: string, enum: [APPROVED, REJECTED] }
-                note: { type: string, maxLength: 1000 }
+                note:
+                  { type: string, maxLength: 280, description: 'Redigida (CPF/CNPJ/e-mail/telefone) e não persistida; só noteLength/noteHash' }
       responses:
         '200':
           description: Replay idempotente — mesma decisão já registrada (alreadyRecorded=true)
@@ -11355,7 +11357,7 @@ components:
             alreadyRecorded: { type: boolean }
             approval:
               type: object
-              required: [approvalId, organizationId, decidedBy, decidedAt, appliedToCrm, recommendationId, leadId, fromOwner, toOwner, decision]
+              required: [approvalId, organizationId, decidedBy, decidedAt, appliedToCrm, recommendationId, leadId, fromOwner, toOwner, decision, noteLength, noteHash, noteRef]
               properties:
                 approvalId: { type: string }
                 organizationId: { type: string }
@@ -11367,7 +11369,9 @@ components:
                 fromOwner: { type: string, nullable: true }
                 toOwner: { type: string }
                 decision: { type: string, enum: [APPROVED, REJECTED] }
-                note: { type: string }
+                noteLength: { type: integer, nullable: true }
+                noteHash: { type: string, nullable: true, description: sha256 hex da nota redigida }
+                noteRef: { type: string, nullable: true, description: Sempre null até o model RebalanceApproval }
     RebalanceOwnerStats:
       type: object
       required: [id, name, openDeals, closedInWindow, backlogDays]

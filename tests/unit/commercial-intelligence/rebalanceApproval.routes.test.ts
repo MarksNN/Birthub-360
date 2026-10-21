@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import express from 'express';
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +8,7 @@ vi.mock('../../../src/lib/queue/domainEventMesh.service.js', () => ({
 }));
 
 import { COMMERCIAL_INTELLIGENCE_ROLES } from '../../../src/lib/auth/authorization.js';
+import { redactPiiIncludingCnpj } from '../../../src/shared/security/piiRedaction.js';
 import { requireRole } from '../../../src/shared/middlewares/requireRole.js';
 import { createPredictiveRoutes } from '../../../src/features/commercial-intelligence/routes/predictive.routes.js';
 import { PredictiveRevenueOracleService } from '../../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
@@ -143,6 +145,36 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     const res = await request(buildApp(store, gestorA)).post(URL).send(body);
     expect(res.status).toBe(201);
     expect(store.records).toHaveLength(2);
+  });
+
+  it('LGPD: note não vai para o AuditLog nem para a resposta; hash é do texto redigido', async () => {
+    const note = 'Cliente joao@x.com, tel (11) 98765-4321, CPF 123.456.789-09, CNPJ 12.345.678/0001-90';
+    const res = await request(buildApp(store, gestorA)).post(URL).send({ ...body, note });
+    expect(res.status).toBe(201);
+    const persisted = JSON.stringify(store.records[0].record);
+    const returned = JSON.stringify(res.body);
+    for (const leak of ['joao@x.com', '98765-4321', '123.456.789-09', '12.345.678/0001-90', 'Cliente']) {
+      expect(persisted).not.toContain(leak);
+      expect(returned).not.toContain(leak);
+    }
+    expect(store.records[0].record).not.toHaveProperty('note');
+    const redacted = redactPiiIncludingCnpj(note).redactedText;
+    expect(redacted).toContain('[EMAIL REDIGIDO]');
+    expect(redacted).toContain('[CNPJ REDIGIDO]');
+    expect(redacted).toContain('[CPF REDIGIDO]');
+    expect(redacted).toContain('[TELEFONE REDIGIDO]');
+    expect(res.body.data.approval).toMatchObject({
+      noteLength: redacted.length,
+      noteHash: createHash('sha256').update(redacted).digest('hex'),
+      noteRef: null,
+    });
+  });
+
+  it('LGPD: note > 280 → 422; sem note → metadados null', async () => {
+    const app = buildApp(store, gestorA);
+    expect((await request(app).post(URL).send({ ...body, note: 'x'.repeat(281) })).status).toBe(422);
+    const ok = await request(app).post(URL).send(body);
+    expect(ok.body.data.approval).toMatchObject({ noteLength: null, noteHash: null, noteRef: null });
   });
 
   it.each(['SDR', 'CLOSER', 'VISUALIZADOR'])('papel %s → 403 e nada gravado', async (role) => {

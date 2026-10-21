@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type {
   RebalanceApprovalRecord,
@@ -10,6 +10,7 @@ import {
   REBALANCE_APPROVAL_ENTITY,
   type RebalanceApprovalStore,
 } from '../../../shared/contracts/predictiveRevenueOraclePorts.contract.js';
+import { redactPiiIncludingCnpj } from '../../../shared/security/piiRedaction.js';
 import { isDecisionActive, rebalanceRecommendationId } from './rebalanceRecommendation.service.js';
 
 export type { RebalanceApprovalStore };
@@ -27,6 +28,27 @@ export type { RebalanceApprovalStore };
  */
 export { REBALANCE_APPROVAL_ACTION, REBALANCE_APPROVAL_ENTITY };
 
+/** LGPD (Agente 21): limite da nota livre. */
+export const REBALANCE_NOTE_MAX_LENGTH = 280;
+
+/**
+ * Redige PII (CPF/CNPJ/e-mail/telefone) e devolve só metadados. O texto redigido é descartado aqui
+ * — não há entidade por tenant para guardá-lo ainda (handoff 04→01).
+ */
+export function noteMetadata(note: string | undefined): {
+  noteLength: number | null;
+  noteHash: string | null;
+  noteRef: null;
+} {
+  if (!note) return { noteLength: null, noteHash: null, noteRef: null };
+  const { redactedText } = redactPiiIncludingCnpj(note);
+  return {
+    noteLength: redactedText.length,
+    noteHash: createHash('sha256').update(redactedText).digest('hex'),
+    noteRef: null,
+  };
+}
+
 export const rebalanceApprovalRequestSchema = z
   .object({
     recommendationId: z.string().trim().min(1).max(128),
@@ -34,7 +56,7 @@ export const rebalanceApprovalRequestSchema = z
     fromOwner: z.string().trim().min(1).max(200).nullable(),
     toOwner: z.string().trim().min(1).max(200),
     decision: z.enum(['APPROVED', 'REJECTED']),
-    note: z.string().trim().max(1000).optional(),
+    note: z.string().trim().max(REBALANCE_NOTE_MAX_LENGTH).optional(),
   })
   .strict()
   .refine((v) => v.fromOwner !== v.toOwner, {
@@ -57,7 +79,10 @@ export class RebalanceApprovalError extends Error {
   }
 }
 
-function samePayload(a: RebalanceApprovalRequest, b: RebalanceApprovalRequest): boolean {
+function samePayload(
+  a: Omit<RebalanceApprovalRequest, 'note'>,
+  b: Omit<RebalanceApprovalRequest, 'note'>,
+): boolean {
   return (
     a.leadId === b.leadId &&
     a.fromOwner === b.fromOwner &&
@@ -140,7 +165,7 @@ export class RebalanceApprovalService {
       fromOwner: input.fromOwner,
       toOwner: input.toOwner,
       decision: input.decision,
-      ...(input.note ? { note: input.note } : {}),
+      ...noteMetadata(input.note),
       decidedBy,
       decidedAt: now.toISOString(),
       appliedToCrm: false,

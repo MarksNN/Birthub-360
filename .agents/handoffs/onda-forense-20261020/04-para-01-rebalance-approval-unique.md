@@ -30,7 +30,7 @@ model RebalanceApproval {
   fromOwner        String?
   toOwner          String
   decision         String       // APPROVED | REJECTED
-  note             String?
+  note             String?      @db.VarChar(280) // texto JÁ REDIGIDO (CPF/CNPJ/e-mail/telefone)
   decidedBy        String
   decidedAt        DateTime     @default(now())
 
@@ -42,5 +42,18 @@ model RebalanceApproval {
 Com o model, o 04 troca só a implementação de `RebalanceApprovalStore` (tratando P2002 como
 replay/409); a rota e o contrato para o 02 não mudam. O AuditLog continua como trilha.
 
+## Requisito LGPD da `note` (Agente 21, adicionado 2026-10-20)
+- Hoje o AuditLog guarda só `noteLength`, `noteHash` (sha256 do texto redigido) e `noteRef: null`;
+  o texto redigido é descartado porque não existe entidade por tenant para ele.
+- Coluna `note`: texto redigido por `src/shared/security/piiRedaction.ts`, máx. 280 caracteres.
+- RLS por `organizationId` (mesma política dos demais models de tenant).
+- Retenção: a mesma do AuditLog/decisão; apagar/anonimizar `note` no purge do titular (LGPD art. 18)
+  e no purge da organização.
+- Com o model, o 04 passa a gravar `note` e preencher `noteRef` = `RebalanceApproval.id`.
+
 ## Teste esperado
 Duas requisições concorrentes com o mesmo recommendationId → 1 linha; tenant cruzado sem colisão.
+Purge do titular remove/anonimiza `note`; leitura de outro tenant bloqueada pela RLS.
+Obs.: decisões expiram em 30 dias (REBALANCE_DECISION_TTL_DAYS) e podem ser re-decididas — a unique
+precisa acomodar isso (ex.: `@@unique([organizationId, recommendationId, decidedAt])` + índice, ou
+marcar a anterior como expirada).
