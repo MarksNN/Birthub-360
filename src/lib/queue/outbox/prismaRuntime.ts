@@ -13,6 +13,7 @@ import {
   type SqlExecutor,
   type TenantSqlRunner,
 } from './prismaOutbox.repository.js';
+import { type OutboxContextStore, systemJobOutboxContext } from './tenantGuard.js';
 
 export const prismaTenantRunner: TenantSqlRunner = {
   // `async/await` dentro do run: evita a perda de contexto com PrismaPromise lazy (ver async-context.ts).
@@ -36,10 +37,19 @@ export function createPrismaOutboxAdapters(runner: TenantSqlRunner = prismaTenan
   return {
     outbox: new PrismaOutboxRepository(runner),
     consumptions: new PrismaConsumptionStore(runner),
-    /** UoW da requisição atual: usa o tenant do requestContext (withRlsContext). */
-    unitOfWork: new PrismaOutboxUnitOfWork((fn) =>
-      withRlsContext((tx) => fn(tx as unknown as SqlExecutor)),
-    ),
+    /**
+     * UoW da requisição atual. Fail-closed: exige tenantId explícito e nunca herda bypassRls
+     * (o contexto da transação é recriado com bypassRls=false). Ver tenantGuard.ts.
+     */
+    unitOfWork: new PrismaOutboxUnitOfWork((fn) => {
+      const ctx = systemJobOutboxContext(
+        requestContext.getStore() as OutboxContextStore | undefined,
+      );
+      return requestContext.run(
+        ctx,
+        async () => await withRlsContext((tx) => fn(tx as unknown as SqlExecutor)),
+      );
+    }),
   };
 }
 

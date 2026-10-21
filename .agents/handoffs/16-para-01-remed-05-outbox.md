@@ -137,3 +137,8 @@ transação do cliente estendido (ou cifrar explicitamente). Até lá, migrar ca
 | `proposals/services/proposalAutomation.service.ts` (17/04) | **nenhuma** (`Map` em memória) | idem. |
 | `market-intelligence/server/marketSensing.service.ts` (07) | **nenhuma** (`Map` em memória) | idem. |
 | `lib/security/services/continuousSecurityAudit.service.ts` (15) | **nenhuma** (`latestReport` em memória) | idem. **Risco:** publica com `organizationId: 'global-security-governance'`, que não é uma Organization real; em modo `prisma`, o insert na outbox viola a FK/RLS e o `publish()` lança. O 15 precisa usar uma org real ou outro canal antes de ligar `DOMAIN_EVENT_OUTBOX=prisma`. |
+
+## Guarda de tenant da UoW (retorno do 01 + decisão do Marks)
+`createPrismaOutboxAdapters().unitOfWork` é fail-closed (`src/lib/queue/outbox/tenantGuard.ts`): sem `tenantId` no requestContext → erro;
+com `bypassRls` → erro, salvo job de sistema com opt-in nomeado em `OUTBOX_SYSTEM_JOBS` (allowlist vazia por padrão, revisão do 24).
+Em todos os casos a transação é aberta com contexto recriado `{ tenantId, bypassRls: false }`, sem herdar `app.bypass_rls=on`.

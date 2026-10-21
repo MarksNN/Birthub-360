@@ -307,4 +307,47 @@ describe.skipIf(!APP_URL)('REMED-05 adaptador Postgres (RLS estrita, #34)', () =
       ).rejects.toThrow(/DomainEventConsumption_lease_owner_check/);
     });
   });
+  describe('UoW de produção (createPrismaOutboxAdapters): guarda de tenant', () => {
+    it('sem tenant ou com bypass herdado falha antes de abrir transação; com tenant grava com bypass off', async () => {
+      const { createPrismaOutboxAdapters } = await import('../../src/lib/queue/outbox/prismaRuntime.js');
+      const { requestContext } = await import('../../src/lib/async-context.js');
+      const { OUTBOX_SYSTEM_JOBS } = await import('../../src/lib/queue/outbox/tenantGuard.js');
+      const { unitOfWork } = createPrismaOutboxAdapters();
+      const mesh = new DomainEventMeshService();
+      const settings = async (tx: SqlExecutor) =>
+        (
+          await tx.$queryRawUnsafe<Array<{ t: string; b: string }>>(
+            "SELECT current_setting('app.current_tenant_id', true) t, current_setting('app.bypass_rls', true) b",
+          )
+        )[0];
+
+      // o setup de integração faz enterWith({ tenantId: 'test-org-id' }); zera o contexto explicitamente
+      await expect(requestContext.run({}, () => mesh.withTransaction(unitOfWork, async () => undefined))).rejects.toThrow(
+        /tenantId ausente/,
+      );
+      await expect(
+        requestContext.run({ tenantId: orgA, bypassRls: true }, () => mesh.withTransaction(unitOfWork, async () => undefined)),
+      ).rejects.toThrow(/bypassRls não é permitido/);
+
+      const env = await requestContext.run({ tenantId: orgA }, () =>
+        mesh.withTransaction(unitOfWork, async ({ tx, publish }) => {
+          expect(await settings(tx as SqlExecutor)).toEqual({ t: orgA, b: 'off' });
+          return publish(input(orgA));
+        }),
+      );
+      expect(await countOutbox(orgA)).toBeGreaterThan(0);
+      expect(env.organizationId).toBe(orgA);
+
+      (OUTBOX_SYSTEM_JOBS as Set<string>).add('it-system-job');
+      try {
+        await requestContext.run({ tenantId: orgA, bypassRls: true, outboxSystemJob: 'it-system-job' } as never, () =>
+          mesh.withTransaction(unitOfWork, async ({ tx }) => {
+            expect(await settings(tx as SqlExecutor)).toEqual({ t: orgA, b: 'off' });
+          }),
+        );
+      } finally {
+        (OUTBOX_SYSTEM_JOBS as Set<string>).delete('it-system-job');
+      }
+    });
+  });
 });
