@@ -119,19 +119,34 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
     await expect(
       asOrg(ORG_A, () => prisma.domainEventOutbox.create({ data: row(ORG_A, 'evt-same') })),
     ).rejects.toThrow();
-    for (const bad of [
-      { retryCount: -1 },
-      { maxAttempts: 0, retryCount: 0 },
-      { retryCount: 9, maxAttempts: 8 },
-      { lastError: 'x'.repeat(2001) },
-    ]) {
-      await expect(
-        asOrg(ORG_A, () =>
-          prisma.domainEventOutbox.create({
-            data: { ...row(ORG_A, `evt-bad-${JSON.stringify(bad).length}`), ...bad },
-          }),
-        ),
-      ).rejects.toThrow();
+    const cases: Array<[string, Record<string, unknown>, string]> = [
+      ['evt-bad-retry-neg', { retryCount: -1 }, 'DomainEventOutbox_retryCount_check'],
+      [
+        'evt-bad-max-zero',
+        { maxAttempts: 0, retryCount: 0 },
+        'DomainEventOutbox_maxAttempts_check',
+      ],
+      [
+        'evt-bad-retry-gt-max',
+        { retryCount: 9, maxAttempts: 8 },
+        'DomainEventOutbox_retry_le_max_check',
+      ],
+      [
+        'evt-bad-last-error',
+        { lastError: 'x'.repeat(2001) },
+        'DomainEventOutbox_lastError_len_check',
+      ],
+    ];
+    for (const [eventId, bad, constraint] of cases) {
+      const err = await asOrg(ORG_A, () =>
+        prisma.domainEventOutbox.create({ data: { ...row(ORG_A, eventId), ...bad } }),
+      ).then(
+        () => null,
+        (e: unknown) => e,
+      );
+      expect(err, `${eventId} deveria violar ${constraint}`).not.toBeNull();
+      const detail = JSON.stringify(err, Object.getOwnPropertyNames(err as object)) + String(err);
+      expect(detail, `${eventId} deveria violar ${constraint}`).toContain(constraint);
     }
   });
 
@@ -148,7 +163,9 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
         );
       }),
     );
-    expect(plan.map((r) => r['QUERY PLAN']).join('\n')).toContain('DomainEventOutbox_relay_due_idx');
+    expect(plan.map((r) => r['QUERY PLAN']).join('\n')).toContain(
+      'DomainEventOutbox_relay_due_idx',
+    );
   });
 
   it('purge por tenant remove só DISPATCHED/DEAD_LETTER/consumo vencidos do próprio tenant', async () => {
@@ -181,13 +198,23 @@ describe('REMED-05 outbox schema (Postgres real)', () => {
         prisma.$transaction(async (tx) => {
           await tx.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', $1, TRUE)`, org);
           return tx.$queryRawUnsafe<
-            Array<{ dispatched_deleted: bigint; dead_letter_deleted: bigint; consumption_deleted: bigint }>
+            Array<{
+              dispatched_deleted: bigint;
+              dead_letter_deleted: bigint;
+              consumption_deleted: bigint;
+            }>
           >(`SELECT * FROM domain_event_outbox_purge($1)`, target);
         }),
       );
 
     // não pode purgar outro tenant
-    await expect(purge(ORG_A, ORG_B)).rejects.toThrow();
+    await expect(purge(ORG_A, ORG_B)).rejects.toThrow(/tenant da sessão/);
+    // sessão sem tenant setado também falha (IS DISTINCT FROM, não passa com NULL)
+    await expect(
+      prisma.$transaction((tx) =>
+        tx.$queryRawUnsafe(`SELECT * FROM domain_event_outbox_purge($1)`, ORG_A),
+      ),
+    ).rejects.toThrow(/tenant da sessão/);
 
     const [res] = await purge(ORG_A, ORG_A);
     expect(Number(res.dispatched_deleted)).toBe(1);

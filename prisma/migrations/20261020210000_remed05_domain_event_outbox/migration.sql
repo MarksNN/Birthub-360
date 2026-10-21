@@ -103,9 +103,12 @@ CREATE OR REPLACE FUNCTION domain_event_outbox_purge(
     p_dead_letter_days integer DEFAULT 90,
     p_consumption_days integer DEFAULT 30
 ) RETURNS TABLE (dispatched_deleted bigint, dead_letter_deleted bigint, consumption_deleted bigint)
-LANGUAGE plpgsql SECURITY INVOKER AS $$
+LANGUAGE plpgsql SECURITY INVOKER
+SET search_path = pg_catalog, public
+AS $$
 BEGIN
-    IF p_org IS NULL OR p_org <> current_setting('app.current_tenant_id', true) THEN
+    -- IS DISTINCT FROM: tenant ausente (NULL/'') também falha, em vez de passar com NULL.
+    IF p_org IS NULL OR p_org = '' OR p_org IS DISTINCT FROM current_setting('app.current_tenant_id', true) THEN
         RAISE EXCEPTION 'domain_event_outbox_purge: p_org deve ser o tenant da sessão';
     END IF;
     IF p_dispatched_days < 1 OR p_dead_letter_days < 1 OR p_consumption_days < 1 THEN
