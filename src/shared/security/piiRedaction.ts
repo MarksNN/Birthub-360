@@ -52,9 +52,20 @@ export function redactPiiIncludingCnpj(text: string): {
 } {
   const cnpj = /\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g;
   const hasCnpj = new RegExp(cnpj.source).test(text);
-  const base = redactResidualPii(text.replace(cnpj, '[CNPJ REDIGIDO]'));
-  return {
-    redactedText: base.redactedText,
-    detectedTypes: hasCnpj ? ['CNPJ', ...base.detectedTypes] : base.detectedTypes,
-  };
+  const withoutCnpj = text.replace(cnpj, '[CNPJ REDIGIDO]');
+  // Telefone BR completo ANTES do CPF/telefone base: cobre `+55`, `(11)`, `11 9 8765 4321` e
+  // celular sem máscara (11912345678 / +5511912345678), sem deixar `+` ou `11 9` para trás.
+  const phone = brPhonePattern();
+  const hasPhone = new RegExp(phone.source).test(withoutCnpj);
+  const base = redactResidualPii(withoutCnpj.replace(phone, '[TELEFONE REDIGIDO]'));
+  const types: Array<'CNPJ' | 'CPF' | 'Email' | 'Telefone'> = [];
+  if (hasCnpj) types.push('CNPJ');
+  for (const t of base.detectedTypes) types.push(t);
+  if (hasPhone && !types.includes('Telefone')) types.push('Telefone');
+  return { redactedText: base.redactedText, detectedTypes: types };
+}
+
+/** Telefone BR com DDD: [+55] (DD)|DD [9] NNNN[-. ]NNNN, sem estar colado a outros dígitos/letras. */
+function brPhonePattern(): RegExp {
+  return /(?<![\w+])(?:\+\s?55[\s.-]?|55[\s.-]?(?=\(?\d{2}\)?[\s.-]?9?[\s.-]?\d{4}))?(?:\(\d{2}\)|\d{2})[\s.-]?(?:9[\s.-]?)?\d{4}[\s.-]?\d{4}(?![\w])/g;
 }

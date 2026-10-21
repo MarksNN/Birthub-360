@@ -1,5 +1,6 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { keyedDigestHex } from '../../../lib/crypto/piiIndex.js';
 import type {
   RebalanceApprovalRecord,
   RebalanceApprovalRequest,
@@ -30,6 +31,8 @@ export { REBALANCE_APPROVAL_ACTION, REBALANCE_APPROVAL_ENTITY };
 
 /** LGPD (Agente 21): limite da nota livre. */
 export const REBALANCE_NOTE_MAX_LENGTH = 280;
+/** Domínio do HMAC do noteHash (chave: PII_BLIND_INDEX_KEY via lib/crypto/piiIndex). */
+export const REBALANCE_NOTE_HASH_DOMAIN = 'rebalance-approval-note:v1';
 
 /**
  * Redige PII (CPF/CNPJ/e-mail/telefone) e devolve só metadados. O texto redigido é descartado aqui
@@ -44,7 +47,7 @@ export function noteMetadata(note: string | undefined): {
   const { redactedText } = redactPiiIncludingCnpj(note);
   return {
     noteLength: redactedText.length,
-    noteHash: createHash('sha256').update(redactedText).digest('hex'),
+    noteHash: keyedDigestHex(REBALANCE_NOTE_HASH_DOMAIN, redactedText),
     noteRef: null,
   };
 }

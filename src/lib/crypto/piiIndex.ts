@@ -227,3 +227,14 @@ export function computeContactPiiIndexes(fields: {
     whatsappLast9Index: contactWhatsappLast9Index(fields.whatsapp),
   };
 }
+
+/**
+ * HMAC-SHA256 hex com separação de domínio sobre a MESMA chave do índice cego
+ * (`PII_BLIND_INDEX_KEY`, fail-closed em produção): subchave = HMAC(chave, `domain`), então um
+ * digest de um domínio nunca é comparável com outro (nem com os índices de Contact).
+ * Uso: `noteHash` da aprovação de rebalanceamento (domínio `rebalance-approval-note:v1`).
+ */
+export function keyedDigestHex(domain: string, value: string): string {
+  const subKey = createHmac(ALGORITHM, getIndexKey()).update(`domain:${domain}`).digest();
+  return createHmac(ALGORITHM, subKey).update(value).digest('hex');
+}

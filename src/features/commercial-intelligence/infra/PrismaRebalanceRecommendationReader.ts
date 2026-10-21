@@ -91,16 +91,41 @@ export class PrismaRebalanceRecommendationReader implements RebalanceRecommendat
   }
 }
 
-/** JSON.parse defensivo: null se vazio, inválido ou sem os campos mínimos. */
+/**
+ * JSON.parse defensivo + allowlist (LGPD, parecer 24 P3-1): null se vazio, inválido ou sem os campos
+ * mínimos. O registro é MONTADO campo a campo — nunca espalha o JSON do AuditLog — para que campos
+ * legados (ex.: `note` em texto claro gravado pelo #15) não voltem no GET nem no replay do POST.
+ */
 export function parseApprovalRecord(details: string | null): RebalanceApprovalRecord | null {
   if (!details) return null;
+  let v: Record<string, unknown> | null;
   try {
-    const v = JSON.parse(details) as Partial<RebalanceApprovalRecord> | null;
-    if (!v || typeof v !== 'object' || typeof v.recommendationId !== 'string') return null;
-    if (v.decision !== 'APPROVED' && v.decision !== 'REJECTED') return null;
-    if (typeof v.decidedAt !== 'string') return null;
-    return v as RebalanceApprovalRecord;
+    v = JSON.parse(details) as Record<string, unknown> | null;
   } catch {
     return null;
   }
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const str = (k: string): string | null => (typeof v?.[k] === 'string' ? (v[k] as string) : null);
+  const recommendationId = str('recommendationId');
+  const decidedAt = str('decidedAt');
+  const decision = v.decision;
+  if (!recommendationId || !decidedAt) return null;
+  if (decision !== 'APPROVED' && decision !== 'REJECTED') return null;
+  const noteHash = str('noteHash');
+  return {
+    approvalId: str('approvalId') ?? '',
+    organizationId: str('organizationId') ?? '',
+    recommendationId,
+    leadId: str('leadId') ?? '',
+    fromOwner: str('fromOwner'),
+    toOwner: str('toOwner') ?? '',
+    decision,
+    decidedBy: str('decidedBy') ?? '',
+    decidedAt,
+    appliedToCrm: false,
+    noteLength:
+      typeof v.noteLength === 'number' && Number.isFinite(v.noteLength) ? v.noteLength : null,
+    noteHash: noteHash && /^[0-9a-f]{64}$/.test(noteHash) ? noteHash : null,
+    noteRef: null,
+  };
 }

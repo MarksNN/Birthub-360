@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import express from 'express';
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,11 +7,15 @@ vi.mock('../../../src/lib/queue/domainEventMesh.service.js', () => ({
 }));
 
 import { COMMERCIAL_INTELLIGENCE_ROLES } from '../../../src/lib/auth/authorization.js';
+import { keyedDigestHex } from '../../../src/lib/crypto/piiIndex.js';
 import { redactPiiIncludingCnpj } from '../../../src/shared/security/piiRedaction.js';
 import { requireRole } from '../../../src/shared/middlewares/requireRole.js';
 import { createPredictiveRoutes } from '../../../src/features/commercial-intelligence/routes/predictive.routes.js';
 import { PredictiveRevenueOracleService } from '../../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
-import { RebalanceApprovalService } from '../../../src/features/commercial-intelligence/services/rebalanceApproval.service.js';
+import {
+  REBALANCE_NOTE_HASH_DOMAIN,
+  RebalanceApprovalService,
+} from '../../../src/features/commercial-intelligence/services/rebalanceApproval.service.js';
 import {
   REBALANCE_DECISION_TTL_DAYS,
   rebalanceRecommendationId,
@@ -165,7 +168,7 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     expect(redacted).toContain('[TELEFONE REDIGIDO]');
     expect(res.body.data.approval).toMatchObject({
       noteLength: redacted.length,
-      noteHash: createHash('sha256').update(redacted).digest('hex'),
+      noteHash: keyedDigestHex(REBALANCE_NOTE_HASH_DOMAIN, redacted),
       noteRef: null,
     });
   });
@@ -175,6 +178,39 @@ describe('REMED-04 — POST /predictive/rebalance/approvals', () => {
     expect((await request(app).post(URL).send({ ...body, note: 'x'.repeat(281) })).status).toBe(422);
     const ok = await request(app).post(URL).send(body);
     expect(ok.body.data.approval).toMatchObject({ noteLength: null, noteHash: null, noteRef: null });
+  });
+
+  it('TTL no POST: decisão divergente expirada (> TTL) não bloqueia; dentro do TTL → 409', async () => {
+    const app = buildApp(store, gestorA);
+    const old = (days: number) => ({
+      record: {
+        ...body,
+        decision: 'REJECTED' as const,
+        approvalId: 'ap-old',
+        organizationId: 'org-a',
+        decidedBy: 'u-x',
+        decidedAt: new Date(ORACLE_FIXED_NOW.getTime() - days * 86_400_000).toISOString(),
+        appliedToCrm: false as const,
+        noteLength: null,
+        noteHash: null,
+        noteRef: null,
+      },
+    });
+    store.records.push(old(REBALANCE_DECISION_TTL_DAYS - 1));
+    expect((await request(app).post(URL).send(body)).status).toBe(409);
+    expect(store.records).toHaveLength(1);
+    store.records[0] = old(REBALANCE_DECISION_TTL_DAYS + 1);
+    const res = await request(app).post(URL).send(body);
+    expect(res.status).toBe(201);
+    expect(res.body.data.alreadyRecorded).toBe(false);
+    expect(store.records).toHaveLength(2);
+  });
+
+  it('noteHash é HMAC (não é sha256 puro do texto redigido)', async () => {
+    const res = await request(buildApp(store, gestorA)).post(URL).send({ ...body, note: 'ok' });
+    const { createHash } = await import('node:crypto');
+    expect(res.body.data.approval.noteHash).toMatch(/^[0-9a-f]{64}$/);
+    expect(res.body.data.approval.noteHash).not.toBe(createHash('sha256').update('ok').digest('hex'));
   });
 
   it.each(['SDR', 'CLOSER', 'VISUALIZADOR'])('papel %s → 403 e nada gravado', async (role) => {
