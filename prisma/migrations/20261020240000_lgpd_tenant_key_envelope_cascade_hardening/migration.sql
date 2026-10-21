@@ -93,6 +93,11 @@ $$;
 -- consent_audit_advance_head: mesmo corpo, só fixa search_path com pg_catalog primeiro.
 ALTER FUNCTION consent_audit_advance_head() SET search_path = pg_catalog, public, pg_temp;
 
+-- A migration anterior revoga REFERENCES do dono (prospector_app, no CI). Sem isso,
+-- a FK abaixo falha com 42501 mesmo sendo o dono da tabela. O SELECT final
+-- (lgpd_apply_consent_privileges) volta a deixar só SELECT, INSERT.
+GRANT REFERENCES ON TABLE "ConsentAuditRecord" TO CURRENT_USER;
+
 -- ─── FKs: cascata de Organization alcança a cadeia (offboarding) sem DELETE para o app.
 ALTER TABLE "ConsentAuditRecord" DROP CONSTRAINT "ConsentAuditRecord_organizationId_fkey";
 ALTER TABLE "ConsentAuditRecord" ADD CONSTRAINT "ConsentAuditRecord_organizationId_fkey"
