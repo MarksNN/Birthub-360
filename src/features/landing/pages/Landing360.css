@@ -471,9 +471,9 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   font-family: var(--font-interface, "Inter", sans-serif);
   font-weight: 700;
   font-size: 0.925rem;
-  color: #0284c7 !important;
+  color: #0369a1 !important;
   background: #f1f5f9 !important;
-  border: 1.5px solid #0284c7 !important;
+  border: 1.5px solid #0369a1 !important;
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15) !important;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;

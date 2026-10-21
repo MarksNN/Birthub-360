@@ -124,11 +124,11 @@ export async function signUp(
     // do teste. Fecha o onboarding pela API autenticada e só segue quando /app permanece.
     const complete = await page.request.post('/api/organization-modules/onboarding/complete');
     expect(complete.ok(), 'conclusão de onboarding via API').toBe(true);
-    if (new URL(page.url()).pathname !== '/app') {
-      await page.goto('/app');
-    } else {
-      await page.reload();
-    }
+    const alreadyOnApp = new URL(page.url()).pathname === '/app';
+    await (alreadyOnApp ? page.reload() : page.goto('/app')).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!message.includes('interrupted by another navigation')) throw error;
+    });
     await expect(page).toHaveURL(/\/app(?:[/?#]|$)/, { timeout: 20_000 });
     await expect
       .poll(async () => new URL(page.url()).pathname, { timeout: 15_000 })
