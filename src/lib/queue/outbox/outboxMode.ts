@@ -29,3 +29,22 @@ export function resolveDomainEventOutboxMode(
   }
   return raw === 'prisma' ? 'prisma' : 'memory';
 }
+
+/**
+ * Opções da transação curta da UoW/relay (decisão 01/15): só write de domínio + append, sem I/O externo.
+ * Padrões maxWaitMs=5000 e timeoutMs=10000, sobrescrevíveis por env. Ainda NÃO aplicadas: o `withRlsContext`
+ * atual não aceita opções (fixa 15000/30000) e prisma.ts é do 01; serão passadas ao `runInTransaction` do #40.
+ */
+export function outboxTransactionOptions(env: NodeJS.ProcessEnv = process.env): {
+  maxWaitMs: number;
+  timeoutMs: number;
+} {
+  const num = (v: string | undefined, d: number) => {
+    const n = Number(v);
+    return v !== undefined && v !== '' && Number.isInteger(n) && n > 0 ? n : d;
+  };
+  return {
+    maxWaitMs: num(env.DOMAIN_EVENT_OUTBOX_TX_MAX_WAIT_MS, 5000),
+    timeoutMs: num(env.DOMAIN_EVENT_OUTBOX_TX_TIMEOUT_MS, 10000),
+  };
+}

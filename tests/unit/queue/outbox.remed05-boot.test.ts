@@ -49,3 +49,12 @@ describe('REMED-05 registro síncrono no boot', () => {
     domainEventMesh.configure({ outbox: new InMemoryOutboxRepository(), consumptions: new InMemoryConsumptionStore() });
   });
 });
+
+describe('REMED-05 opções da transação curta (follow-up #40)', () => {
+  it('padrões 5000/10000, env válida sobrescreve, inválida cai no padrão', async () => {
+    const { outboxTransactionOptions } = await import('../../../src/lib/queue/outbox/outboxMode.js');
+    expect(outboxTransactionOptions({})).toEqual({ maxWaitMs: 5000, timeoutMs: 10000 });
+    expect(outboxTransactionOptions({ DOMAIN_EVENT_OUTBOX_TX_MAX_WAIT_MS: '2000', DOMAIN_EVENT_OUTBOX_TX_TIMEOUT_MS: '8000' })).toEqual({ maxWaitMs: 2000, timeoutMs: 8000 });
+    expect(outboxTransactionOptions({ DOMAIN_EVENT_OUTBOX_TX_MAX_WAIT_MS: 'x', DOMAIN_EVENT_OUTBOX_TX_TIMEOUT_MS: '-1' })).toEqual({ maxWaitMs: 5000, timeoutMs: 10000 });
+  });
+});

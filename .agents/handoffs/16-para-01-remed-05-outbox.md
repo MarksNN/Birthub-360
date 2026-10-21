@@ -171,3 +171,14 @@ que não segue chamadas indiretas para outros módulos.
 - `prismaRuntime.ts`: `new PrismaOutboxUnitOfWork((fn) => requestContext.run(ctx, () => runInTransaction(fn)))` no lugar de `withRlsContext`.
 - `appendSql` continua usando raw SQL no executor recebido (nunca no `prisma` global): compatível.
 - bitrix: remover `inboundTxCompensations.ts` (AuditLog manual, filtro `deletedAt`, reindex pós-commit) e voltar ao client estendido dentro da tx.
+
+## Decisões 01/15 (21/10, 00:31 BRT)
+**Timeouts da tx:** a UoW e as tx curtas do relay usam `maxWaitMs=5000` e `timeoutMs=10000` (env `DOMAIN_EVENT_OUTBOX_TX_MAX_WAIT_MS` / `DOMAIN_EVENT_OUTBOX_TX_TIMEOUT_MS`, helper `outboxTransactionOptions()` em `outboxMode.ts`). Ainda **não aplicado**: o `withRlsContext` atual não aceita opções (fixa 15000/30000) e não mexemos em prisma.ts. Follow-up do #40: `runInTransaction(fn, outboxTransactionOptions())` na UoW e no `runAsTenant` do relay. A tx contém só o write de domínio e o append; o bitrix foi conferido: sem I/O externo dentro da tx (só `tx.*`, savepoints e `publish` = append; o reindex já é pós-commit).
+
+**G1 decidido.** Ordem: (1) merge do #40 → (2) G1 → (3) só então ligar `DOMAIN_EVENT_OUTBOX=prisma`. O #32 pode entrar antes, com o modo prisma desligado. Após o #40, o `$allOperations` lança erro somente para:
+- `prisma.*` com `outboxUnitOfWorkActive` e **sem** tx no ALS;
+- raw no `prisma` global com tx ativa;
+- `$transaction` aninhado fora do helper.
+`prisma.*` com tx ativa no ALS passa.
+
+**Plano do follow-up (16):** trocar `withRlsContext` por `runInTransaction` (com as opções acima); afrouxar o teste estático para permitir `prisma.*` dentro da UoW, mantendo proibidos raw no `prisma` global (`prisma.$queryRaw*`/`$executeRaw*`), `prisma.$transaction`/`basePrisma`, `withRlsContext` aninhado e `uow.run` direto fora do mesh; remover a compensação manual do bitrix (`inboundTxCompensations.ts`).
