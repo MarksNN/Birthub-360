@@ -174,7 +174,7 @@ export function WinLossAnalysis() {
               <h3 className="text-lg font-bold text-white">
                 Análise Inteligente de Ciclos Comerciais
               </h3>
-              <p className="text-sm text-slate-400 max-w-lg">
+              <p className="text-sm text-slate-600 max-w-lg">
                 A IA examina as transcrições de WhatsApp, timelines e resultados dos leads fechados
                 nos últimos 7 dias. Ela identifica padrões de compra, objeções recorrentes e gera 3
                 recomendações práticas para o time comercial.
