@@ -6,7 +6,6 @@ import { commercialLearningFlywheel } from '../features/intelligence/services/co
 import type { FlywheelPersistencePurger } from '../features/intelligence/services/commercialLearningFlywheel.service.js';
 import { winLossAutopsyService } from '../features/intelligence/services/winLossAutopsy.service.js';
 import { semanticCache } from '../lib/ai/cache/semanticCache.service.js';
-import { requestContext } from '../lib/async-context.js';
 import { logger } from '../lib/logger.js';
 import type { ConsentAuditChainService } from '../lib/security/consentAuditChain.service.js';
 
@@ -103,8 +102,9 @@ export async function startConsentPurgeRuntime(
 
   const interval = Number(process.env.LGPD_PURGE_INTERVAL_MS ?? 60_000);
   const timer = setInterval(() => {
-    requestContext
-      .run({ bypassRls: true }, () => chain.processPendingPurges())
+    // Sem bypass de RLS: o serviço itera por organização e seta o tenant em cada transação.
+    chain
+      .processPendingPurges()
       .catch((err) => logger.error({ err }, 'LGPD: reconciliação da outbox de expurgo falhou'));
   }, interval);
   timer.unref();

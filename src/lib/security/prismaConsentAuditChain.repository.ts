@@ -49,8 +49,6 @@ export interface ConsentPurgeTaskRow {
   status: 'PENDING' | 'DONE' | 'DEAD';
   attempts: number;
   nextAttemptAt: Date;
-  leaseOwner: string | null;
-  leasedUntil: Date | null;
   lastError: string | null;
   completedAt: Date | null;
   retainUntil: Date | null;
@@ -79,12 +77,17 @@ interface DetailRow {
   organizationId: string;
   subjectLookupId: string;
   detail: string;
+  retentionUntil?: Date | null;
 }
 interface KeyRow {
   organizationId: string;
   lookupId: string;
-  keyMaterial: Uint8Array | null;
-  shreddedAt: Date | null;
+  keyMaterial: Uint8Array;
+}
+interface TombstoneRow {
+  organizationId: string;
+  lookupId: string;
+  shreddedAt: Date;
 }
 
 export interface ConsentChainTx {
@@ -101,13 +104,20 @@ export interface ConsentChainTx {
 }
 
 export interface ConsentChainPrismaLike extends ConsentChainTx {
-  $transaction<T>(fn: (tx: ConsentChainTx) => Promise<T>): Promise<T>;
+  $transaction<T>(
+    fn: (tx: ConsentChainTx) => Promise<T>,
+    options?: { maxWait?: number; timeout?: number },
+  ): Promise<T>;
 }
 
+/** Grants (#35): Key SELECT/INSERT/DELETE; Tombstone só SELECT (gerado por trigger no DELETE). */
+export interface SubjectKeyTx {
+  consentSubjectKey: Delegate<KeyRow>;
+  consentSubjectKeyTombstone: Pick<Delegate<TombstoneRow>, 'findFirst'>;
+  $executeRaw(query: TemplateStringsArray, ...values: unknown[]): Promise<number>;
+}
 export interface SubjectKeyPrismaLike {
-  consentSubjectKey: Delegate<KeyRow> & {
-    updateMany(args: { where: Where; data: Partial<KeyRow> }): Promise<{ count: number }>;
-  };
+  $transaction<T>(fn: (tx: SubjectKeyTx) => Promise<T>): Promise<T>;
 }
 
 export const CONSENT_CHAIN_PRISMA_DELEGATES = [
@@ -116,6 +126,7 @@ export const CONSENT_CHAIN_PRISMA_DELEGATES = [
   'consentPurgeTask',
   'consentEventDetail',
   'consentSubjectKey',
+  'consentSubjectKeyTombstone',
 ] as const;
 
 const toEvent = (r: ConsentAuditRow): StoredConsentAuditEvent => ({
@@ -163,8 +174,6 @@ const toTask = (r: ConsentPurgeTaskRow): ConsentPurgeTask => ({
   status: r.status,
   attempts: r.attempts,
   nextAttemptAt: r.nextAttemptAt.toISOString(),
-  leaseOwner: r.leaseOwner,
-  leasedUntil: r.leasedUntil?.toISOString() ?? null,
   lastError: r.lastError ?? undefined,
   completedAt: r.completedAt?.toISOString(),
   retainUntil: r.retainUntil?.toISOString(),
@@ -179,15 +188,17 @@ const taskRow = (t: ConsentPurgeTask): ConsentPurgeTaskRow => ({
   status: t.status,
   attempts: t.attempts,
   nextAttemptAt: new Date(t.nextAttemptAt),
-  leaseOwner: t.leaseOwner ?? null,
-  leasedUntil: t.leasedUntil ? new Date(t.leasedUntil) : null,
   lastError: t.lastError ?? null,
   completedAt: t.completedAt ? new Date(t.completedAt) : null,
   retainUntil: t.retainUntil ? new Date(t.retainUntil) : null,
 });
 
 export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepository {
-  constructor(private readonly db: ConsentChainPrismaLike) {}
+  constructor(
+    private readonly db: ConsentChainPrismaLike,
+    /** Descoberta de organizações (mesmo padrão da outbox REMED-05: Organization via allowlist). */
+    private readonly listTenantsFn: () => Promise<string[]>,
+  ) {}
 
   async withTenantLock<T>(
     organizationId: string,
@@ -221,7 +232,15 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
           await tx.consentPurgeTask.create({ data: taskRow(t) });
         },
         saveDetail: async (d) => {
-          await tx.consentEventDetail.create({ data: { ...d } });
+          await tx.consentEventDetail.create({
+            data: {
+              eventId: d.eventId,
+              organizationId: d.organizationId,
+              subjectLookupId: d.subjectLookupId,
+              detail: d.detail,
+              retentionUntil: d.retentionUntil ? new Date(d.retentionUntil) : null,
+            },
+          });
         },
       });
     });
@@ -248,40 +267,41 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
     return h ? { ...h } : null;
   }
 
-  async claimDuePurges(
+  async listTenants(): Promise<string[]> {
+    return this.listTenantsFn();
+  }
+
+  async withNextDuePurge(
+    organizationId: string,
     now: Date,
-    limit: number,
-    owner: string,
-    leaseMs: number,
-  ): Promise<ConsentPurgeTask[]> {
-    const until = new Date(now.getTime() + leaseMs);
-    // Worker cross-tenant: exige policy que aceite app.bypass_rls (pedido ao Agente 01).
-    const rows = await this.db.$transaction(async (tx) => {
-      await tx.$executeRaw`SELECT set_config('app.bypass_rls', 'on', TRUE)`;
-      return tx.$queryRaw<ConsentPurgeTaskRow[]>`
-        UPDATE "ConsentPurgeTask" t
-           SET "leaseOwner" = ${owner}, "leasedUntil" = ${until}
-         WHERE t.id IN (
-           SELECT id FROM "ConsentPurgeTask"
-            WHERE status = 'PENDING' AND "nextAttemptAt" <= ${now}
-              AND ("leasedUntil" IS NULL OR "leasedUntil" <= ${now})
-            ORDER BY "nextAttemptAt"
-            LIMIT ${limit}
-            FOR UPDATE SKIP LOCKED)
-        RETURNING t.*`;
-    });
-    return rows.map(toTask);
+    fn: (task: ConsentPurgeTask) => Promise<ConsentPurgeTask>,
+  ): Promise<boolean> {
+    // Sem bypass de RLS (#35): tenant setado na transação; lock da linha até o commit.
+    return this.db.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
+        const rows = await tx.$queryRaw<ConsentPurgeTaskRow[]>`
+          SELECT * FROM "ConsentPurgeTask"
+           WHERE "organizationId" = ${organizationId}
+             AND status = 'PENDING' AND "nextAttemptAt" <= ${now}
+           ORDER BY "nextAttemptAt"
+           LIMIT 1
+           FOR UPDATE SKIP LOCKED`;
+        if (rows.length === 0) return false;
+        const { id, ...data } = taskRow(await fn(toTask(rows[0])));
+        await tx.consentPurgeTask.update({ where: { id }, data });
+        return true;
+      },
+      { maxWait: 15_000, timeout: 120_000 },
+    );
   }
 
-  async updatePurge(task: ConsentPurgeTask): Promise<void> {
-    const { id, ...data } = taskRow(task);
-    await this.db.consentPurgeTask.update({ where: { id }, data });
-  }
-
-  async deleteExpiredPurges(now: Date): Promise<number> {
-    const r = await this.db.consentPurgeTask.deleteMany({
-      where: { status: { in: ['DONE', 'DEAD'] }, retainUntil: { lte: now } },
-    });
+  async deleteExpiredPurges(organizationId: string, now: Date): Promise<number> {
+    const r = await this.inTenant(organizationId, (tx) =>
+      tx.consentPurgeTask.deleteMany({
+        where: { organizationId, status: { in: ['DONE', 'DEAD'] }, retainUntil: { lte: now } },
+      }),
+    );
     return r.count;
   }
 
@@ -296,12 +316,22 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
 export class PrismaSubjectKeyStore implements SubjectKeyStore {
   constructor(private readonly db: SubjectKeyPrismaLike) {}
 
+  private inTenant<T>(organizationId: string, fn: (tx: SubjectKeyTx) => Promise<T>): Promise<T> {
+    return this.db.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
+      return fn(tx);
+    });
+  }
+
   async get(organizationId: string, lookupId: string): Promise<SubjectKeyState> {
-    const r = await this.db.consentSubjectKey.findFirst({ where: { organizationId, lookupId } });
-    if (!r) return { status: 'ABSENT' };
-    return r.keyMaterial && !r.shreddedAt
-      ? { status: 'ACTIVE', key: Buffer.from(r.keyMaterial) }
-      : { status: 'SHREDDED' };
+    return this.inTenant(organizationId, async (tx) => {
+      const k = await tx.consentSubjectKey.findFirst({ where: { organizationId, lookupId } });
+      if (k) return { status: 'ACTIVE', key: Buffer.from(k.keyMaterial) } as const;
+      const t = await tx.consentSubjectKeyTombstone.findFirst({
+        where: { organizationId, lookupId },
+      });
+      return t ? ({ status: 'SHREDDED' } as const) : ({ status: 'ABSENT' } as const);
+    });
   }
 
   async getOrCreate(organizationId: string, lookupId: string, candidate: Buffer): Promise<Buffer> {
@@ -310,9 +340,9 @@ export class PrismaSubjectKeyStore implements SubjectKeyStore {
       throw new SubjectShreddedError('Titular esquecido: chave destruída');
     if (existing.status === 'ACTIVE') return existing.key;
     try {
-      await this.db.consentSubjectKey.create({
-        data: { organizationId, lookupId, keyMaterial: candidate, shreddedAt: null },
-      });
+      await this.inTenant(organizationId, (tx) =>
+        tx.consentSubjectKey.create({ data: { organizationId, lookupId, keyMaterial: candidate } }),
+      );
       return candidate;
     } catch (err) {
       const raced = await this.get(organizationId, lookupId);
@@ -323,19 +353,11 @@ export class PrismaSubjectKeyStore implements SubjectKeyStore {
     }
   }
 
+  /** DELETE físico; o trigger do #35 grava ConsentSubjectKeyTombstone (sem material de chave). */
   async destroy(organizationId: string, lookupId: string): Promise<boolean> {
-    const r = await this.db.consentSubjectKey.updateMany({
-      where: { organizationId, lookupId, shreddedAt: null },
-      data: { keyMaterial: null, shreddedAt: new Date() },
-    });
-    if (r.count > 0) return true;
-    // Sem linha: grava tombstone mesmo assim (impede recriação futura).
-    const state = await this.get(organizationId, lookupId);
-    if (state.status === 'ABSENT') {
-      await this.db.consentSubjectKey
-        .create({ data: { organizationId, lookupId, keyMaterial: null, shreddedAt: new Date() } })
-        .catch(() => undefined);
-    }
-    return false;
+    const r = await this.inTenant(organizationId, (tx) =>
+      tx.consentSubjectKey.deleteMany({ where: { organizationId, lookupId } }),
+    );
+    return r.count > 0;
   }
 }

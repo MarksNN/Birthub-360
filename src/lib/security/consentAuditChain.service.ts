@@ -60,9 +60,6 @@ export interface ConsentPurgeTask {
   status: 'PENDING' | 'DONE' | 'DEAD';
   attempts: number;
   nextAttemptAt: string;
-  /** Lease do worker (claim atômico): dono e validade. */
-  leaseOwner?: string | null;
-  leasedUntil?: string | null;
   lastError?: string;
   completedAt?: string;
   /** Retenção do registro da tarefa (prova do atendimento), após a qual é excluído. */
@@ -75,6 +72,8 @@ export interface ConsentEventDetail {
   organizationId: string;
   subjectLookupId: string;
   detail: string;
+  /** Retenção (fora da cadeia; ConsentAuditRecord.retentionUntil está deprecated no #35). */
+  retentionUntil?: string;
 }
 
 export interface ChainLockContext {
@@ -91,18 +90,19 @@ export interface ConsentAuditChainRepository {
   withTenantLock<T>(organizationId: string, fn: (ctx: ChainLockContext) => Promise<T>): Promise<T>;
   listChain(organizationId: string): Promise<StoredConsentAuditEvent[]>;
   getHead(organizationId: string): Promise<ConsentChainHead | null>;
+  /** Organizações a varrer pelo worker (sem bypass de RLS nas tabelas LGPD). */
+  listTenants(): Promise<string[]>;
   /**
-   * Claim ATÔMICO: só devolve tarefas PENDING vencidas cujo lease esteja livre/expirado e grava
-   * `leaseOwner`/`leasedUntil` na mesma operação (Postgres: UPDATE … FOR UPDATE SKIP LOCKED).
+   * Claim ATÔMICO sem colunas de lease: trava UMA tarefa PENDING vencida do tenant com
+   * `FOR UPDATE SKIP LOCKED` e mantém o lock enquanto `fn` processa; o retorno de `fn` é gravado
+   * na mesma transação. Crash → rollback → a tarefa volta a ficar disponível.
    */
-  claimDuePurges(
+  withNextDuePurge(
+    organizationId: string,
     now: Date,
-    limit: number,
-    owner: string,
-    leaseMs: number,
-  ): Promise<ConsentPurgeTask[]>;
-  updatePurge(task: ConsentPurgeTask): Promise<void>;
-  deleteExpiredPurges(now: Date): Promise<number>;
+    fn: (task: ConsentPurgeTask) => Promise<ConsentPurgeTask>,
+  ): Promise<boolean>;
+  deleteExpiredPurges(organizationId: string, now: Date): Promise<number>;
   deleteDetailsForSubject(organizationId: string, subjectLookupId: string): Promise<number>;
 }
 
@@ -166,34 +166,42 @@ export class InMemoryConsentAuditChainRepository implements ConsentAuditChainRep
     return h ? { ...h } : null;
   }
 
-  async claimDuePurges(
+  private lockedTasks = new Set<string>();
+
+  async listTenants(): Promise<string[]> {
+    const orgs = [...this.chains.keys(), ...[...this.purges.values()].map((t) => t.organizationId)];
+    return [...new Set(orgs)];
+  }
+
+  async withNextDuePurge(
+    organizationId: string,
     now: Date,
-    limit: number,
-    owner: string,
-    leaseMs: number,
-  ): Promise<ConsentPurgeTask[]> {
-    // Síncrono entre filtro e marcação: equivalente in-memory de FOR UPDATE SKIP LOCKED.
-    const out: ConsentPurgeTask[] = [];
-    for (const t of this.purges.values()) {
-      if (out.length >= limit) break;
-      const leaseFree = !t.leasedUntil || new Date(t.leasedUntil) <= now;
-      if (t.status === 'PENDING' && new Date(t.nextAttemptAt) <= now && leaseFree) {
-        t.leaseOwner = owner;
-        t.leasedUntil = new Date(now.getTime() + leaseMs).toISOString();
-        out.push({ ...t });
-      }
+    fn: (task: ConsentPurgeTask) => Promise<ConsentPurgeTask>,
+  ): Promise<boolean> {
+    // Seleção + lock síncronos: equivalente in-memory de FOR UPDATE SKIP LOCKED.
+    const t = [...this.purges.values()].find(
+      (x) =>
+        x.organizationId === organizationId &&
+        x.status === 'PENDING' &&
+        new Date(x.nextAttemptAt) <= now &&
+        !this.lockedTasks.has(x.id),
+    );
+    if (!t) return false;
+    this.lockedTasks.add(t.id);
+    try {
+      const updated = await fn({ ...t });
+      this.purges.set(updated.id, { ...updated });
+      return true;
+    } finally {
+      this.lockedTasks.delete(t.id);
     }
-    return out;
   }
 
-  async updatePurge(task: ConsentPurgeTask): Promise<void> {
-    this.purges.set(task.id, { ...task });
-  }
-
-  async deleteExpiredPurges(now: Date): Promise<number> {
+  async deleteExpiredPurges(organizationId: string, now: Date): Promise<number> {
     let n = 0;
     for (const [id, t] of this.purges) {
-      if (t.status !== 'PENDING' && t.retainUntil && new Date(t.retainUntil) <= now) {
+      const expired = t.status !== 'PENDING' && t.retainUntil && new Date(t.retainUntil) <= now;
+      if (t.organizationId === organizationId && expired) {
         this.purges.delete(id);
         n++;
       }
@@ -314,8 +322,6 @@ export interface ConsentAuditChainOptions {
   /** Retenção do registro da tarefa de expurgo após conclusão (dias). */
   purgeTaskRetentionDays?: number;
   maxPurgeAttempts?: number;
-  /** Duração do lease do worker sobre uma tarefa (ms). */
-  purgeLeaseMs?: number;
   /** Somente testes: ponto de injeção de falhas. */
   hooks?: { afterShred?: (task: ConsentPurgeTask) => Promise<void> };
   /** Notifica outras instâncias para invalidar caches em memória (pub/sub). */
@@ -415,19 +421,37 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
       throw new Error('purpose inválido (CAIXA_ALTA_COM_UNDERSCORE)');
     if (!TERMS_VERSION_PATTERN.test(input.termsVersion)) throw new Error('termsVersion inválido');
     const token = await this.opts.tokenizer.tokenFor(input.organizationId, input.subjectRef);
-    const event = await this.append(input.organizationId, (sequence, previousHash) => ({
-      ...this.base('CONSENT', input.organizationId, token),
-      id: `cst-${randomUUID()}`,
-      sequence,
-      previousHash,
-      purpose: input.purpose,
-      termsVersion: input.termsVersion,
-      operatorUserId: input.operatorUserId,
-      status: 'GRANTED',
-      retentionUntil: input.retentionDays
-        ? new Date(Date.now() + input.retentionDays * 86_400_000).toISOString()
-        : undefined,
-    }));
+    const retentionUntil = input.retentionDays
+      ? new Date(Date.now() + input.retentionDays * 86_400_000).toISOString()
+      : undefined;
+    const lookupId = retentionUntil
+      ? await this.opts.tokenizer.lookupId(input.organizationId, input.subjectRef)
+      : undefined;
+    const event = await this.append(
+      input.organizationId,
+      (sequence, previousHash) => ({
+        ...this.base('CONSENT', input.organizationId, token),
+        id: `cst-${randomUUID()}`,
+        sequence,
+        previousHash,
+        purpose: input.purpose,
+        termsVersion: input.termsVersion,
+        operatorUserId: input.operatorUserId,
+        status: 'GRANTED',
+      }),
+      async (ev, ctx) => {
+        // Retenção fica FORA da cadeia (ConsentEventDetail), sem texto livre.
+        if (retentionUntil && lookupId) {
+          await ctx.saveDetail({
+            eventId: ev.id,
+            organizationId: input.organizationId,
+            subjectLookupId: lookupId,
+            detail: '',
+            retentionUntil,
+          });
+        }
+      },
+    );
     logger.info(
       { id: event.id, organizationId: event.organizationId, sequence: event.sequence },
       'ConsentAuditChain: consentimento registrado',
@@ -518,86 +542,90 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
    * Ao concluir: grava RETRACTION (token + contagens, sem PII), aplica crypto-shredding se
    * pedido, anula `subjectRef` da tarefa e define a retenção do registro.
    */
+  /**
+   * Worker da outbox: itera POR ORGANIZAÇÃO (RLS sem bypass), trava uma tarefa por vez com
+   * SKIP LOCKED e processa de forma idempotente. Ao concluir: RETRACTION (sem PII), shred se
+   * pedido, `subjectRef` anulado e retenção do registro da tarefa.
+   */
   async processPendingPurges(
     limit = 50,
     now = new Date(),
-    workerId = `w-${randomUUID()}`,
   ): Promise<{ done: number; failed: number }> {
-    const leaseMs = this.opts.purgeLeaseMs ?? 5 * 60_000;
-    const tasks = await this.opts.repo.claimDuePurges(now, limit, workerId, leaseMs);
     let done = 0;
     let failed = 0;
-    for (const task of tasks) {
-      try {
-        if (!task.subjectRef) throw new Error('Tarefa sem subjectRef');
-        const subjectRef = task.subjectRef;
-        const counts: Record<string, number> = {};
-        for (const [name, purger] of this.purgers) {
-          const res = await purger(task.organizationId, subjectRef);
-          for (const [k, v] of Object.entries(res)) counts[`${name}.${k}`] = v;
-        }
-        await this.opts.broadcastPurge?.(task.organizationId, subjectRef);
-
-        // Idempotência: RETRACTION é gravado ANTES do shred. Se a chave já está em tombstone,
-        // um processamento anterior gravou o RETRACTION e caiu antes de concluir a tarefa —
-        // não recria a chave (tokenFor falharia fechado) nem duplica o evento.
-        const shredded = await this.opts.tokenizer.isShredded(task.organizationId, subjectRef);
-        const alreadyRetracted =
-          shredded || (await this.hasRetractionFor(task.organizationId, task.revocationEventId));
-        if (!alreadyRetracted) {
-          const token = await this.opts.tokenizer.tokenFor(task.organizationId, subjectRef);
-          await this.append(task.organizationId, (sequence, previousHash) => ({
-            ...this.base('RETRACTION', task.organizationId, token),
-            id: `ret-${randomUUID()}`,
-            sequence,
-            previousHash,
-            purpose: `RETRACTION:${canonicalJson({ revocationEventId: task.revocationEventId, counts })}`,
-            termsVersion: 'RETRACTED',
-            status: 'REVOKED',
-          }));
-        }
-        if (task.shredSubjectKey) {
-          const { lookupId } = await this.opts.tokenizer.shred(task.organizationId, subjectRef);
-          await this.opts.repo.deleteDetailsForSubject(task.organizationId, lookupId);
-        }
-        await this.opts.hooks?.afterShred?.(task);
-        const retentionDays = this.opts.purgeTaskRetentionDays ?? 1825;
-        await this.opts.repo.updatePurge({
-          ...task,
-          subjectRef: null,
-          status: 'DONE',
-          attempts: task.attempts + 1,
-          completedAt: now.toISOString(),
-          retainUntil: new Date(now.getTime() + retentionDays * 86_400_000).toISOString(),
-          lastError: undefined,
-          leaseOwner: null,
-          leasedUntil: null,
+    for (const organizationId of await this.opts.repo.listTenants()) {
+      while (done + failed < limit) {
+        let ok = false;
+        const claimed = await this.opts.repo.withNextDuePurge(organizationId, now, async (task) => {
+          try {
+            const updated = await this.runPurgeTask(task, now);
+            ok = true;
+            return updated;
+          } catch (err) {
+            const attempts = task.attempts + 1;
+            const dead = attempts >= (this.opts.maxPurgeAttempts ?? 10);
+            logger.error({ taskId: task.id, attempts, dead }, 'ConsentAuditChain: expurgo falhou');
+            return {
+              ...task,
+              attempts,
+              status: dead ? 'DEAD' : 'PENDING',
+              nextAttemptAt: new Date(
+                now.getTime() + Math.min(2 ** attempts, 3600) * 1000,
+              ).toISOString(),
+              lastError: err instanceof Error ? err.message.slice(0, 200) : 'erro',
+            };
+          }
         });
-        done++;
-      } catch (err) {
-        failed++;
-        const attempts = task.attempts + 1;
-        const dead = attempts >= (this.opts.maxPurgeAttempts ?? 10);
-        await this.opts.repo
-          .updatePurge({
-            ...task,
-            attempts,
-            status: dead ? 'DEAD' : 'PENDING',
-            nextAttemptAt: new Date(
-              now.getTime() + Math.min(2 ** attempts, 3600) * 1000,
-            ).toISOString(),
-            lastError: err instanceof Error ? err.message.slice(0, 200) : 'erro',
-            leaseOwner: null,
-            leasedUntil: null,
-          })
-          .catch((e) =>
-            logger.error({ err: e, taskId: task.id }, 'ConsentAuditChain: falha ao liberar lease'),
-          );
-        logger.error({ taskId: task.id, attempts, dead }, 'ConsentAuditChain: expurgo falhou');
+        if (!claimed) break;
+        if (ok) done++;
+        else failed++;
       }
+      await this.opts.repo.deleteExpiredPurges(organizationId, now);
     }
-    await this.opts.repo.deleteExpiredPurges(now);
     return { done, failed };
+  }
+
+  private async runPurgeTask(task: ConsentPurgeTask, now: Date): Promise<ConsentPurgeTask> {
+    if (!task.subjectRef) throw new Error('Tarefa sem subjectRef');
+    const subjectRef = task.subjectRef;
+    const counts: Record<string, number> = {};
+    for (const [name, purger] of this.purgers) {
+      const res = await purger(task.organizationId, subjectRef);
+      for (const [k, v] of Object.entries(res)) counts[`${name}.${k}`] = v;
+    }
+    await this.opts.broadcastPurge?.(task.organizationId, subjectRef);
+    // Idempotência: RETRACTION é gravado ANTES do shred. Tombstone presente ⇒ processamento
+    // anterior já gravou o RETRACTION e caiu antes de concluir: não recria a chave nem duplica.
+    const shredded = await this.opts.tokenizer.isShredded(task.organizationId, subjectRef);
+    const alreadyRetracted =
+      shredded || (await this.hasRetractionFor(task.organizationId, task.revocationEventId));
+    if (!alreadyRetracted) {
+      const token = await this.opts.tokenizer.tokenFor(task.organizationId, subjectRef);
+      await this.append(task.organizationId, (sequence, previousHash) => ({
+        ...this.base('RETRACTION', task.organizationId, token),
+        id: `ret-${randomUUID()}`,
+        sequence,
+        previousHash,
+        purpose: `RETRACTION:${canonicalJson({ revocationEventId: task.revocationEventId, counts })}`,
+        termsVersion: 'RETRACTED',
+        status: 'REVOKED',
+      }));
+    }
+    if (task.shredSubjectKey) {
+      const { lookupId } = await this.opts.tokenizer.shred(task.organizationId, subjectRef);
+      await this.opts.repo.deleteDetailsForSubject(task.organizationId, lookupId);
+    }
+    await this.opts.hooks?.afterShred?.(task);
+    const retentionDays = this.opts.purgeTaskRetentionDays ?? 1825;
+    return {
+      ...task,
+      subjectRef: null,
+      status: 'DONE',
+      attempts: task.attempts + 1,
+      completedAt: now.toISOString(),
+      retainUntil: new Date(now.getTime() + retentionDays * 86_400_000).toISOString(),
+      lastError: undefined,
+    };
   }
 
   private async hasRetractionFor(

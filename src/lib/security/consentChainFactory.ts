@@ -72,14 +72,18 @@ class LazyRepo implements ConsentAuditChainRepository {
   async getHead(o: string) {
     return (await this.get()).repo.getHead(o);
   }
-  async claimDuePurges(n: Date, l: number, owner: string, leaseMs: number) {
-    return (await this.get()).repo.claimDuePurges(n, l, owner, leaseMs);
+  async listTenants() {
+    return (await this.get()).repo.listTenants();
   }
-  async updatePurge(t: Parameters<ConsentAuditChainRepository['updatePurge']>[0]) {
-    return (await this.get()).repo.updatePurge(t);
+  async withNextDuePurge(
+    o: string,
+    n: Date,
+    fn: Parameters<ConsentAuditChainRepository['withNextDuePurge']>[2],
+  ) {
+    return (await this.get()).repo.withNextDuePurge(o, n, fn);
   }
-  async deleteExpiredPurges(n: Date) {
-    return (await this.get()).repo.deleteExpiredPurges(n);
+  async deleteExpiredPurges(o: string, n: Date) {
+    return (await this.get()).repo.deleteExpiredPurges(o, n);
   }
   async deleteDetailsForSubject(o: string, l: string) {
     return (await this.get()).repo.deleteDetailsForSubject(o, l);
@@ -93,6 +97,20 @@ export interface ConsentChainFactoryOptions {
   loadPrisma?: ClientLoader;
   pepperProvider?: TenantPepperProvider;
   broadcastPurge?: (organizationId: string, subjectRef: string) => Promise<void>;
+  /**
+   * Descoberta de organizações para o worker. Padrão: `organization.findMany` sob
+   * `requestContext {bypassRls:true}` (mesmo padrão da outbox REMED-05/#32) — o bypass vale só
+   * para Organization; as tabelas LGPD são sempre acessadas com o tenant setado.
+   */
+  listTenants?: (client: unknown) => Promise<string[]>;
+}
+
+async function defaultListTenants(client: unknown): Promise<string[]> {
+  const { requestContext } = await import('../async-context.js');
+  const db = client as { organization: { findMany(a: unknown): Promise<Array<{ id: string }>> } };
+  return requestContext.run({ bypassRls: true }, async () =>
+    (await db.organization.findMany({ select: { id: true } })).map((o) => o.id),
+  );
 }
 
 export function createConsentAuditChain(
@@ -131,7 +149,9 @@ export function createConsentAuditChain(
         );
       }
       return {
-        repo: new PrismaConsentAuditChainRepository(client as ConsentChainPrismaLike),
+        repo: new PrismaConsentAuditChainRepository(client as ConsentChainPrismaLike, () =>
+          (opts.listTenants ?? defaultListTenants)(client),
+        ),
         keys: new PrismaSubjectKeyStore(client as SubjectKeyPrismaLike),
       };
     })();

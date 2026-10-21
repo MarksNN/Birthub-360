@@ -341,6 +341,7 @@ describe('ConsentAuditChain — REMED-06 / Agentes 15 e 24', () => {
         consentPurgeTask: delegate('task', ''),
         consentEventDetail: delegate('detail', ''),
         consentSubjectKey: delegate('key', 'lookupId'),
+        consentSubjectKeyTombstone: delegate('tomb', ''),
         $executeRaw: async (q: TemplateStringsArray) => {
           locks.push(q.join('?'));
           return 1;
@@ -399,7 +400,7 @@ describe('Ressalvas do Agente 15 @43922b4e', () => {
     expect((await a.verifyChainIntegrity('o')).valid).toBe(true);
   });
 
-  it('(2) lease expirado é reassumido; lease vigente não', async () => {
+  it('(2) SKIP LOCKED: tarefa travada por um worker é pulada por outro; liberada após rollback', async () => {
     const { repo } = mk();
     repo.purges.set('t1', {
       id: 't1',
@@ -412,11 +413,17 @@ describe('Ressalvas do Agente 15 @43922b4e', () => {
       nextAttemptAt: new Date(0).toISOString(),
     });
     const now = new Date();
-    expect(await repo.claimDuePurges(now, 10, 'A', 60_000)).toHaveLength(1);
-    expect(await repo.claimDuePurges(now, 10, 'B', 60_000)).toHaveLength(0);
-    const later = new Date(now.getTime() + 61_000);
-    const reclaimed = await repo.claimDuePurges(later, 10, 'B', 60_000);
-    expect(reclaimed[0].leaseOwner).toBe('B');
+    let inner: boolean | undefined;
+    await expect(
+      repo.withNextDuePurge('o', now, async () => {
+        inner = await repo.withNextDuePurge('o', now, async (t) => t);
+        throw new Error('crash');
+      }),
+    ).rejects.toThrow('crash');
+    expect(inner).toBe(false);
+    expect(await repo.withNextDuePurge('outra-org', now, async (t) => t)).toBe(false);
+    expect(await repo.withNextDuePurge('o', now, async (t) => ({ ...t, status: 'DONE' }))).toBe(true);
+    expect(repo.purges.get('t1')?.status).toBe('DONE');
   });
 
   it('(3) crash entre o shred e concluir a tarefa: retry não recria a chave nem duplica RETRACTION', async () => {

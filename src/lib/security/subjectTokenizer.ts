@@ -76,8 +76,8 @@ export type SubjectKeyState =
 
 /**
  * Store das chaves por titular (model `ConsentSubjectKey` — handoff ao Agente 01).
- * Esquecimento = tombstone: `keyMaterial` anulado + `shreddedAt`; a linha permanece para impedir
- * recriação da chave (retry, corrida ou novo consentimento do mesmo titular).
+ * Esquecimento = DELETE da chave; o Postgres (#35) grava ConsentSubjectKeyTombstone via trigger, o que
+ * impede recriação da chave (retry, corrida ou novo consentimento do mesmo titular): fail-closed.
  */
 export interface SubjectKeyStore {
   get(organizationId: string, lookupId: string): Promise<SubjectKeyState>;
