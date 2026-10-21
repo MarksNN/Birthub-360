@@ -39,8 +39,8 @@ async function tx<T>(p: Pool, tenant: string | null, fn: (c: PoolClient) => Prom
 
 const insertConsent = (c: PoolClient, id: string, org: string, seq: number, h: string) =>
   c.query(
-    `INSERT INTO "ConsentAuditRecord" (id,"organizationId",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
-     VALUES ($1,$2,$3,'CONSENT','sha256:abc','marketing','v1','GRANTED',$4,$5,now())`,
+    `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+     VALUES ($1,$2,3,$3,'CONSENT','hs256:' || repeat('ab',32),'marketing','v1','GRANTED',$4,$5,now())`,
     [id, org, seq, hash('0'), h],
   );
 const insertApproach = (c: PoolClient, id: string, org: string) =>
@@ -149,8 +149,8 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
     }
   }
 
-  const CONSENT_INSERT = `INSERT INTO "ConsentAuditRecord" (id,"organizationId",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
-     VALUES ($1,$2,$3,'CONSENT','sha256:abc','marketing','v1','GRANTED',$4,$5,now())`;
+  const CONSENT_INSERT = `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"previousHash","currentHash","occurredAt")
+     VALUES ($1,$2,3,$3,'CONSENT','hs256:' || repeat('ab',32),'marketing','v1','GRANTED',$4,$5,now())`;
 
   it('ConsentAuditRecord (papel de app): RLS isola A/B, insert cruzado recusado, unicidade de sequence, UPDATE/DELETE/TRUNCATE bloqueados', async () => {
     await inRollback(pool, async (c, as, expectFail) => {
@@ -179,9 +179,173 @@ describe('REMED-06 — RLS + append-only (ConsentAuditRecord / Flywheel)', () =>
       await insertConsent(c, id, ORG_A, 0, `o${RUN}`.padEnd(64, '0'));
       await expectFail(`UPDATE "ConsentAuditRecord" SET purpose='x' WHERE id=$1`, [id], /append-only \(UPDATE/);
       await expectFail(`DELETE FROM "ConsentAuditRecord" WHERE id=$1`, [id], /append-only \(DELETE/);
-      await expectFail(`TRUNCATE "ConsentAuditRecord"`, [], /append-only \(TRUNCATE/);
+      await expectFail(`TRUNCATE "ConsentAuditRecord" CASCADE`, [], /append-only \(TRUNCATE/);
       const { rows } = await c.query(`SELECT purpose FROM "ConsentAuditRecord" WHERE id=$1`, [id]);
       expect(rows[0]?.purpose).toBe('marketing');
     });
+  });
+
+  it('ConsentAuditRecord: CHECK de subjectRef (hs256 obrigatório fora de GENESIS) e reasonCode enum', async () => {
+    await inRollback(pool, async (c, as, expectFail) => {
+      await as(ORG_A);
+      const base = `INSERT INTO "ConsentAuditRecord" (id,"organizationId","formatVersion",sequence,kind,"subjectRef",purpose,"termsVersion",status,"reasonCode","previousHash","currentHash","occurredAt")
+        VALUES ($1,$2,3,$3,$4,$5,'p','v1',$6,$7,repeat('0',64),$8,now())`;
+      await expectFail(base, [`k1-${RUN}`, ORG_A, 1, 'CONSENT', 'sha256:abc', 'GRANTED', null, `k1${RUN}`.padEnd(64, '0')], /subjectRef_hs256_check/);
+      await expectFail(base, [`k2-${RUN}`, ORG_A, 2, 'CONSENT', 'alice@example.com', 'GRANTED', null, `k2${RUN}`.padEnd(64, '0')], /subjectRef_hs256_check/);
+      await expectFail(base, [`k3-${RUN}`, ORG_A, 3, 'REVOCATION', `hs256:${'ab'.repeat(32)}`, 'REVOKED', 'texto livre', `k3${RUN}`.padEnd(64, '0')], /invalid input value for enum/);
+      // GENESIS sem titular é aceito; reasonCode válido é aceito
+      await c.query(base, [`g-${RUN}`, ORG_A, 0, 'GENESIS', 'genesis', 'GRANTED', null, `g${RUN}`.padEnd(64, '0')]);
+      await c.query(base, [`r-${RUN}`, ORG_A, 1, 'REVOCATION', `hs256:${'ab'.repeat(32)}`, 'REVOKED', 'ERASURE_REQUEST', `r${RUN}`.padEnd(64, '0')]);
+      // UNIQUE é por (organizationId, currentHash): mesmo hash em OUTRA org não colide (sem oráculo cross-tenant)
+      await as(ORG_B);
+      await c.query(base, [`gb-${RUN}`, ORG_B, 0, 'GENESIS', 'genesis', 'GRANTED', null, `g${RUN}`.padEnd(64, '0')]);
+    });
+  });
+
+  it('privilégios (sem skip): papel de app NÃO é dono e NÃO tem UPDATE/DELETE/TRUNCATE na cadeia nem DELETE/TRUNCATE no head', async () => {
+    const { rows } = await pool.query(
+      `SELECT t,
+              pg_get_userbyid(c.relowner) = current_user AS is_owner,
+              has_table_privilege(current_user, format('%I', t), 'UPDATE') AS upd,
+              has_table_privilege(current_user, format('%I', t), 'DELETE') AS del,
+              has_table_privilege(current_user, format('%I', t), 'TRUNCATE') AS trn,
+              has_table_privilege(current_user, format('%I', t), 'INSERT') AS ins
+         FROM unnest(ARRAY['ConsentAuditRecord','ConsentAuditChainHead']) t
+         JOIN pg_class c ON c.relname = t AND c.relnamespace = 'public'::regnamespace ORDER BY t`,
+    );
+    const by = Object.fromEntries(rows.map((r) => [r.t, r]));
+    expect(by.ConsentAuditRecord).toMatchObject({ is_owner: false, upd: false, del: false, trn: false, ins: true });
+    expect(by.ConsentAuditChainHead).toMatchObject({ is_owner: false, upd: true, del: false, trn: false, ins: true });
+  });
+
+  it('triggers (sem skip): habilitados em modo ORIGIN e a função bloqueia DML independentemente de privilégio', async () => {
+    const { rows } = await pool.query(
+      `SELECT tgname, tgenabled FROM pg_trigger
+        WHERE tgrelid IN ('"ConsentAuditRecord"'::regclass, '"ConsentAuditChainHead"'::regclass) AND NOT tgisinternal ORDER BY tgname`,
+    );
+    expect(rows).toEqual([
+      { tgname: 'consent_audit_no_mutation', tgenabled: 'O' },
+      { tgname: 'consent_audit_no_truncate', tgenabled: 'O' },
+      { tgname: 'consent_chain_head_guard_row', tgenabled: 'O' },
+      { tgname: 'consent_chain_head_no_truncate', tgenabled: 'O' },
+    ]);
+    // Prova comportamental sem conexão de owner: tabela TEMP de propriedade do próprio app (dono +
+    // todos os privilégios) com a MESMA função de trigger — o dono continua bloqueado.
+    await inRollback(pool, async (c, _as, expectFail) => {
+      await c.query(`CREATE TEMP TABLE consent_probe (id int) ON COMMIT DROP`);
+      await c.query(`CREATE TRIGGER p BEFORE UPDATE OR DELETE ON consent_probe FOR EACH ROW EXECUTE FUNCTION public.consent_audit_immutable()`);
+      await c.query(`CREATE TRIGGER pt BEFORE TRUNCATE ON consent_probe FOR EACH STATEMENT EXECUTE FUNCTION public.consent_audit_immutable()`);
+      await c.query(`INSERT INTO consent_probe VALUES (1)`);
+      await expectFail(`UPDATE consent_probe SET id = 2`, [], /append-only \(UPDATE/);
+      await expectFail(`DELETE FROM consent_probe`, [], /append-only \(DELETE/);
+      await expectFail(`TRUNCATE consent_probe`, [], /append-only \(TRUNCATE/);
+    });
+  });
+
+  it('head: gênese imutável, lastSequence estritamente crescente, DELETE bloqueado; isolado por RLS', async () => {
+    await inRollback(pool, async (c, as, expectFail) => {
+      await as(ORG_A);
+      await c.query(
+        `INSERT INTO "ConsentAuditChainHead" ("organizationId","genesisId","genesisHash","lastSequence","lastHash") VALUES ($1,'g',repeat('a',64),1,repeat('b',64))`,
+        [ORG_A],
+      );
+      await c.query(`UPDATE "ConsentAuditChainHead" SET "lastSequence"=2, "lastHash"=repeat('c',64) WHERE "organizationId"=$1`, [ORG_A]);
+      await expectFail(`UPDATE "ConsentAuditChainHead" SET "lastSequence"=2 WHERE "organizationId"=$1`, [ORG_A], /só cresce/);
+      await expectFail(`UPDATE "ConsentAuditChainHead" SET "genesisHash"=repeat('f',64), "lastSequence"=9 WHERE "organizationId"=$1`, [ORG_A], /imutável/);
+      await expectFail(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [ORG_A], /permission denied|DELETE bloqueado/);
+      await as(ORG_B);
+      expect((await c.query(`SELECT 1 FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [ORG_A])).rowCount).toBe(0);
+    });
+  });
+
+  it('ConsentEventDetail / ConsentPurgeTask / ConsentSubjectKey: RLS A/B e DELETE do próprio tenant (expurgo/crypto-shredding)', async () => {
+    await inRollback(pool, async (c, as, expectFail) => {
+      await as(ORG_A);
+      const ev = `ev-${RUN}`;
+      await insertConsent(c, ev, ORG_A, 0, `e${RUN}`.padEnd(64, '0'));
+      await c.query(
+        `INSERT INTO "ConsentEventDetail" ("eventId","organizationId","subjectLookupId",detail,"retentionUntil") VALUES ($1,$2,repeat('1',64),'motivo livre',now() + interval '1 day')`,
+        [ev, ORG_A],
+      );
+      await c.query(`INSERT INTO "ConsentPurgeTask" (id,"organizationId","revocationEventId","subjectRef","nextAttemptAt") VALUES ($1,$2,$3,'hs256:x',now() - interval '1 second')`, [`pt-${RUN}`, ORG_A, ev]);
+      await expectFail(`INSERT INTO "ConsentPurgeTask" (id,"organizationId","revocationEventId") VALUES ($1,$2,$3)`, [`pt2-${RUN}`, ORG_A, ev], /unique|duplicate/i);
+      await c.query(`INSERT INTO "ConsentSubjectKey" ("organizationId","lookupId","keyMaterial") VALUES ($1,repeat('1',64),$2)`, [ORG_A, Buffer.alloc(32, 7)]);
+      const t = await c.query(`SELECT status, attempts FROM "ConsentPurgeTask" WHERE id=$1`, [`pt-${RUN}`]);
+      expect(t.rows[0]).toEqual({ status: 'PENDING', attempts: 0 });
+
+      await as(ORG_B);
+      for (const tbl of ['ConsentEventDetail', 'ConsentPurgeTask', 'ConsentSubjectKey']) {
+        expect((await c.query(`SELECT 1 FROM "${tbl}" WHERE "organizationId"=$1`, [ORG_A])).rowCount, tbl).toBe(0);
+        expect((await c.query(`DELETE FROM "${tbl}" WHERE "organizationId"=$1`, [ORG_A])).rowCount, tbl).toBe(0);
+      }
+      await expectFail(`INSERT INTO "ConsentSubjectKey" ("organizationId","lookupId","keyMaterial") VALUES ($1,repeat('2',64),'\\x00')`, [ORG_A], /row-level security/);
+
+      // Worker sem bypass: itera por organização com app.current_tenant_id
+      await as(ORG_A);
+      expect((await c.query(`UPDATE "ConsentPurgeTask" SET status='DONE', "subjectRef"=NULL, "completedAt"=now() WHERE status='PENDING' AND "nextAttemptAt" <= now()`)).rowCount).toBe(1);
+      expect((await c.query(`DELETE FROM "ConsentEventDetail" WHERE "organizationId"=$1`, [ORG_A])).rowCount).toBe(1);
+      expect((await c.query(`DELETE FROM "ConsentSubjectKey" WHERE "organizationId"=$1`, [ORG_A])).rowCount).toBe(1);
+      // bypass_rls = on NÃO abre nada (policies sem cláusula de bypass)
+      await as(null);
+      await c.query(`SELECT set_config('app.bypass_rls', 'on', TRUE)`);
+      expect((await c.query(`SELECT 1 FROM "ConsentPurgeTask" WHERE "organizationId"=$1`, [ORG_A])).rowCount).toBe(0);
+    });
+  });
+
+  it('grants mínimos (Agente 15, sem skip): app não é dono de nenhuma tabela LGPD e só tem os privilégios necessários', async () => {
+    const expected: Record<string, string> = {
+      ConsentAuditRecord: 'INSERT,SELECT',
+      ConsentAuditChainHead: 'INSERT,SELECT,UPDATE',
+      ConsentSubjectKey: 'DELETE,INSERT,SELECT',
+      ConsentSubjectKeyTombstone: 'SELECT',
+      ConsentEventDetail: 'DELETE,INSERT,SELECT',
+      ConsentPurgeTask: 'DELETE,INSERT,SELECT,UPDATE',
+      FlywheelApproachRecord: 'DELETE,INSERT,SELECT,UPDATE',
+      FlywheelFewShotExample: 'DELETE,INSERT,SELECT,UPDATE',
+    };
+    const { rows } = await pool.query(
+      `SELECT t,
+              pg_get_userbyid(c.relowner) = current_user AS is_owner,
+              array_to_string(ARRAY(SELECT p FROM unnest(ARRAY['DELETE','INSERT','REFERENCES','SELECT','TRIGGER','TRUNCATE','UPDATE']) p
+                                    WHERE has_table_privilege(current_user, format('public.%I', t), p) ORDER BY p), ',') AS privs
+         FROM unnest($1::text[]) t
+         JOIN pg_class c ON c.relname = t AND c.relnamespace = 'public'::regnamespace`,
+      [Object.keys(expected)],
+    );
+    expect(rows).toHaveLength(Object.keys(expected).length);
+    for (const r of rows) {
+      expect(r.is_owner, r.t).toBe(false);
+      expect(r.privs, r.t).toBe(expected[r.t]);
+    }
+  });
+
+  it('ConsentSubjectKey: DELETE (crypto-shredding) deixa tombstone sem material de chave; tombstone é append-only e isolado', async () => {
+    await inRollback(pool, async (c, as, expectFail) => {
+      await as(ORG_A);
+      const lookup = `${RUN}`.padEnd(64, 'f');
+      await c.query(`INSERT INTO "ConsentSubjectKey" ("organizationId","lookupId","keyMaterial") VALUES ($1,$2,$3)`, [ORG_A, lookup, Buffer.alloc(32, 9)]);
+      expect((await c.query(`DELETE FROM "ConsentSubjectKey" WHERE "lookupId"=$1`, [lookup])).rowCount).toBe(1);
+      const tomb = await c.query(`SELECT * FROM "ConsentSubjectKeyTombstone" WHERE "lookupId"=$1`, [lookup]);
+      expect(tomb.rowCount).toBe(1);
+      expect(tomb.rows[0]).toMatchObject({ organizationId: ORG_A, lookupId: lookup });
+      expect(Object.keys(tomb.rows[0]).sort()).toEqual(['keyCreatedAt', 'lookupId', 'organizationId', 'shreddedAt', 'shreddedBy']);
+      expect((await c.query(`SELECT 1 FROM "ConsentSubjectKey" WHERE "lookupId"=$1`, [lookup])).rowCount).toBe(0);
+      await expectFail(`INSERT INTO "ConsentSubjectKeyTombstone" ("organizationId","lookupId","keyCreatedAt") VALUES ($1,$2,now())`, [ORG_A, lookup], /permission denied/);
+      await expectFail(`UPDATE "ConsentSubjectKeyTombstone" SET "lookupId"=$1`, [lookup], /permission denied|append-only/);
+      await expectFail(`DELETE FROM "ConsentSubjectKeyTombstone"`, [], /permission denied|append-only/);
+      await as(ORG_B);
+      expect((await c.query(`SELECT 1 FROM "ConsentSubjectKeyTombstone" WHERE "lookupId"=$1`, [lookup])).rowCount).toBe(0);
+    });
+  });
+
+  it('head: cascata de Organization (offboarding sem cadeia) remove head; DELETE direto não', async () => {
+    const org = `test-lgpd-off-${RUN}`;
+    await tx(pool, null, (c) => c.query(`INSERT INTO "Organization" (id,name,"updatedAt") VALUES ($1,$1,now())`, [org]), true);
+    await tx(pool, org, (c) =>
+      c.query(`INSERT INTO "ConsentAuditChainHead" ("organizationId","genesisId","genesisHash","lastSequence","lastHash") VALUES ($1,'g',repeat('a',64),0,repeat('a',64))`, [org]),
+    );
+    await expect(tx(pool, org, (c) => c.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId"=$1`, [org]))).rejects.toThrow();
+    const del = await tx(pool, null, (c) => c.query(`DELETE FROM "Organization" WHERE id=$1`, [org]), true);
+    expect(del.rowCount).toBe(1);
   });
 });

@@ -1024,25 +1024,30 @@ model Organization {
   /// acumulado do mês corrente (Redis, ver providerBudget.ts) por assertProspectingBudgetNotExceeded.
   monthlyProspectingBudgetUsd Float?
 
-  workflows               Workflow[]
-  callLogs                CallLog[]
-  metrics                 Metric[]
-  agentSessions           AgentSession[]
-  agents                  Agent[]
-  settings                Setting[]
-  aiConsent               OrganizationAiConsent?
-  birthhub360CallResults  Birthub360CallResult[]
-  wallet                  Wallet?
-  transactions            Transaction[]
-  apiKeys                 APIKey[]
-  webhookEndpoints        OrganizationWebhookEndpoint[]
-  campaigns               Campaign[]
-  dncLists                DncList[]
-  customAiTools           CustomAiTool[]
-  leadTouchpoints         LeadTouchpoint[]
-  consentAuditRecords     ConsentAuditRecord[]
-  flywheelApproachRecords FlywheelApproachRecord[]
-  flywheelFewShotExamples FlywheelFewShotExample[]
+  workflows                   Workflow[]
+  callLogs                    CallLog[]
+  metrics                     Metric[]
+  agentSessions               AgentSession[]
+  agents                      Agent[]
+  settings                    Setting[]
+  aiConsent                   OrganizationAiConsent?
+  birthhub360CallResults      Birthub360CallResult[]
+  wallet                      Wallet?
+  transactions                Transaction[]
+  apiKeys                     APIKey[]
+  webhookEndpoints            OrganizationWebhookEndpoint[]
+  campaigns                   Campaign[]
+  dncLists                    DncList[]
+  customAiTools               CustomAiTool[]
+  leadTouchpoints             LeadTouchpoint[]
+  consentAuditRecords         ConsentAuditRecord[]
+  consentAuditChainHead       ConsentAuditChainHead?
+  consentSubjectKeys          ConsentSubjectKey[]
+  consentSubjectKeyTombstones ConsentSubjectKeyTombstone[]
+  consentEventDetails         ConsentEventDetail[]
+  consentPurgeTasks           ConsentPurgeTask[]
+  flywheelApproachRecords     FlywheelApproachRecord[]
+  flywheelFewShotExamples     FlywheelFewShotExample[]
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -5550,6 +5555,20 @@ enum ConsentAuditStatus {
   EXPIRED
 }
 
+enum ConsentRevocationReason {
+  TITULAR_REQUEST
+  ERASURE_REQUEST
+  PURPOSE_FULFILLED
+  LEGAL_OBLIGATION
+  OPERATOR_CORRECTION
+}
+
+enum ConsentPurgeTaskStatus {
+  PENDING
+  DONE
+  DEAD
+}
+
 enum ConsentChainEventKind {
   GENESIS
   CONSENT
@@ -5558,25 +5577,106 @@ enum ConsentChainEventKind {
 }
 
 model ConsentAuditRecord {
-  id             String                @id
+  id             String                   @id
   organizationId String
-  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  /// Versão do formato canônico do hash (F6 do #33; hoje 3).
+  formatVersion  Int
   sequence       Int
   kind           ConsentChainEventKind
+  /// `hs256:` + HMAC-SHA256(chave do titular em ConsentSubjectKey). CHECK no banco (exceto GENESIS).
   subjectRef     String
   purpose        String
   termsVersion   String
   status         ConsentAuditStatus
-  previousHash   String                @db.Char(64)
-  currentHash    String                @db.Char(64)
-  occurredAt     DateTime              @db.Timestamptz(3)
+  reasonCode     ConsentRevocationReason?
+  previousHash   String                   @db.Char(64)
+  currentHash    String                   @db.Char(64)
+  occurredAt     DateTime                 @db.Timestamptz(3)
   operatorUserId String?
-  retentionUntil DateTime?             @db.Timestamptz(3)
-  createdAt      DateTime              @default(now())
+  /// DEPRECATED (compat #33 @43922b4e): retenção vive em ConsentEventDetail.retentionUntil.
+  retentionUntil DateTime?                @db.Timestamptz(3)
+  createdAt      DateTime                 @default(now()) @db.Timestamptz(3)
+  details        ConsentEventDetail[]
 
   @@unique([organizationId, sequence])
-  @@unique([currentHash])
+  @@unique([organizationId, currentHash])
   @@index([organizationId, subjectRef])
+}
+
+/// Âncora de cabeça da cadeia por organização (detecta truncamento de cauda / recriação de gênese).
+/// Trigger: genesis* imutáveis, lastSequence estritamente crescente, DELETE/TRUNCATE bloqueados
+/// (exceto DELETE em cascata a partir de Organization).
+model ConsentAuditChainHead {
+  organizationId String       @id
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  genesisId      String
+  genesisHash    String       @db.Char(64)
+  lastSequence   Int
+  lastHash       String       @db.Char(64)
+  updatedAt      DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+/// Chave aleatória por titular (crypto-shredding: DELETE = eliminação efetiva do vínculo).
+model ConsentSubjectKey {
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// HMAC(pepper do tenant, subjectRef NFC) em hex.
+  lookupId       String       @db.Char(64)
+  keyMaterial    Bytes
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@id([organizationId, lookupId])
+}
+
+/// Prova de crypto-shredding: linha gravada por trigger (SECURITY DEFINER) a cada DELETE em
+/// ConsentSubjectKey, sem material de chave. Append-only (trigger); app só tem SELECT.
+model ConsentSubjectKeyTombstone {
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lookupId       String       @db.Char(64)
+  keyCreatedAt   DateTime     @db.Timestamptz(3)
+  shreddedAt     DateTime     @default(now()) @db.Timestamptz(3)
+  shreddedBy     String       @default(dbgenerated("CURRENT_USER"))
+
+  @@id([organizationId, lookupId, shreddedAt])
+}
+
+/// Texto livre do evento (fora da cadeia, expurgável). Retenção vive aqui.
+model ConsentEventDetail {
+  eventId         String             @id
+  event           ConsentAuditRecord @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subjectLookupId String             @db.Char(64)
+  detail          String             @db.Text
+  retentionUntil  DateTime?          @db.Timestamptz(3)
+  createdAt       DateTime           @default(now()) @db.Timestamptz(3)
+
+  @@index([organizationId, subjectLookupId])
+  @@index([retentionUntil])
+}
+
+/// Outbox de expurgo pós-revogação. Worker itera POR ORGANIZAÇÃO com app.current_tenant_id
+/// (sem bypass_rls e sem papel dedicado — decisão Marks, igual ao outbox REMED-05).
+model ConsentPurgeTask {
+  id                String                 @id
+  organizationId    String
+  organization      Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  revocationEventId String
+  subjectRef        String?
+  shredSubjectKey   Boolean                @default(false)
+  status            ConsentPurgeTaskStatus @default(PENDING)
+  attempts          Int                    @default(0)
+  nextAttemptAt     DateTime               @default(now()) @db.Timestamptz(3)
+  lastError         String?
+  completedAt       DateTime?              @db.Timestamptz(3)
+  retainUntil       DateTime?              @db.Timestamptz(3)
+  createdAt         DateTime               @default(now()) @db.Timestamptz(3)
+
+  @@unique([organizationId, revocationEventId])
+  @@index([status, nextAttemptAt])
+  @@index([organizationId, status, nextAttemptAt])
 }
 
 model FlywheelApproachRecord {

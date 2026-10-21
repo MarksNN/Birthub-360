@@ -145,6 +145,17 @@ const KNOWN_RLS_ONLY_MODELS = [
   'WorkspaceLayout',
   'WorkspaceSection',
   'WorkspaceWidget',
+  // REMED-06 (handoff 21→01): cadeia de consentimento LGPD + Flywheel. Escrita só pelos
+  // repositórios do #33 dentro de transação com app.current_tenant_id; RLS tenant_isolation FORCE
+  // sem bypass cobre o isolamento, e a cadeia ainda tem REVOKE + trigger append-only.
+  'ConsentAuditChainHead',
+  'ConsentAuditRecord',
+  'ConsentEventDetail',
+  'ConsentPurgeTask',
+  'ConsentSubjectKey',
+  'ConsentSubjectKeyTombstone',
+  'FlywheelApproachRecord',
+  'FlywheelFewShotExample',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {

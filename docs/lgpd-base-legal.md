@@ -32,3 +32,15 @@ A plataforma provê suporte técnico automatizado para atendimento aos direitos 
   (`src/lib/security/piiSanitizer.ts` existiu em paralelo, nunca foi integrado a nenhum caminho real e foi removido na Onda 7 — ver decisão registrada no handoff/relatório do Agente 13.)
 - **Base legal / consentimento antes do envio a provedor externo**: `guardrails.service.ts` (`hasPiiExternalConsent`/`assertPiiExternalConsent`) é o ponto único que verifica, antes de qualquer chamada com dado de um titular real, se a organização está autorizada (`AI_PII_EXTERNAL_CONSENT_ORGANIZATIONS`, fail-closed) — distinto da minimização acima: decide _se_ o dado pode ser tratado por IA externa, não apenas _o quê_ sai no texto.
 - **Trilha de Auditoria**: Registro de ações no modelo `AuditLog` com IP, usuário, ação e data/hora.
+
+---
+
+## Cadeia de consentimento (REMED-06)
+
+| Registro | Base legal para conservar | Eliminação |
+| --- | --- | --- |
+| `ConsentAuditRecord` / `ConsentAuditChainHead` (pseudônimo `hs256:`, finalidade, versão dos termos, datas) | Art. 8º, §2º (ônus da prova do consentimento) + Art. 16, I (obrigação legal) | Crypto-shredding da chave do titular (`ConsentSubjectKey`, com tombstone). As linhas só saem no fim do prazo legal, pelo runbook 01A |
+| `ConsentEventDetail` (texto livre) | Nenhuma além da finalidade original | `retentionUntil` + expurgo na revogação ou eliminação |
+| Flywheel (abordagens e few-shot) | Legítimo interesse, condicionado ao consentimento | Expurgo físico na revogação (#33) |
+
+Detalhes e runbook de offboarding: `docs/ADR/ADR-006-LGPD-Cadeia-Consentimento-Append-Only.md`.
