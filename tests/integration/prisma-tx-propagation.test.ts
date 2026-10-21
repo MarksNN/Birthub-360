@@ -228,3 +228,56 @@ describe('runInTransaction — client estendido reusa a transação ativa', () =
     expect(events).toEqual(['A-locked', 'A-commit', 'B-locked']);
   });
 });
+
+describe('G1 — escape do tx pelo client global (parecer 15)', () => {
+  it('prisma.$executeRawUnsafe global dentro de runInTransaction lança e não grava; tx.$executeRawUnsafe grava', async () => {
+    const { TransactionEscapeError } = await import('../../src/lib/txEscapeGuard');
+    await rit(
+      async (tx) => {
+        await expect((async () => prisma.$executeRawUnsafe('SELECT 1'))()).rejects.toBeInstanceOf(
+          TransactionEscapeError,
+        );
+        await expect((async () => prisma.$transaction(async () => 1))()).rejects.toBeInstanceOf(
+          TransactionEscapeError,
+        );
+        await outboxAppend(tx, ORG_A, 'g1-ok');
+      },
+      { organizationId: ORG_A },
+    );
+    const rows = await asTenant<{ id: string }>(ORG_A, `SELECT id FROM "AuditLog" WHERE id = $1`, [
+      `ob-g1-ok-${STAMP}`,
+    ]);
+    expect(rows).toHaveLength(1);
+  });
+
+  it('fora de tx o raw global segue funcionando', async () => {
+    await expect(prisma.$queryRawUnsafe('SELECT 1 AS one')).resolves.toEqual([{ one: 1 }]);
+  });
+
+  it('flag outboxUnitOfWorkActive (UoW do #32) bloqueia raw global', async () => {
+    await expect(
+      requestContext.run({ tenantId: ORG_A, outboxUnitOfWorkActive: true } as never, async () =>
+        prisma.$queryRawUnsafe('SELECT 1'),
+      ),
+    ).rejects.toThrow(/proibido dentro de UoW da outbox/);
+  });
+
+  it('caso (a): flag da UoW sem runInTransaction — prisma.model lança e não executa', async () => {
+    await expect(
+      requestContext.run({ tenantId: ORG_A, outboxUnitOfWorkActive: true } as never, async () =>
+        prisma.organization.findFirst({ where: { id: ORG_A } }),
+      ),
+    ).rejects.toThrow(/prisma\.\* proibido dentro da UoW; use o tx/);
+  });
+
+  it('caminho permitido: flag + runInTransaction — prisma.model reusa o tx e passa', async () => {
+    const org = await requestContext.run(
+      { tenantId: ORG_A, outboxUnitOfWorkActive: true } as never,
+      () =>
+        runInTransaction(async () => prisma.organization.findFirst({ where: { id: ORG_A } }), {
+          organizationId: ORG_A,
+        }),
+    );
+    expect(org?.id).toBe(ORG_A);
+  });
+});
