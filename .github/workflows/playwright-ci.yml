@@ -41,6 +41,7 @@ jobs:
       NODE_ENV: test
       PORT: 3000
       DATABASE_URL: postgresql://prospector_app:ci_app_test_pass@localhost:5434/prospectordb_test?schema=public
+      DIRECT_URL: postgresql://prospector_migrator:ci_migrator_test_pass@localhost:5434/prospectordb_test?schema=public
       REDIS_URL: redis://localhost:6379
       MEILI_HOST: http://localhost:7700
       MEILI_MASTER_KEY: ci-test-meili-key
@@ -67,6 +68,7 @@ jobs:
       env:
         PGPASSWORD: prospector_test_pass
         APP_DB_PASSWORD: ci_app_test_pass
+        MIGRATOR_DB_PASSWORD: ci_migrator_test_pass
       run: bash scripts/db/bootstrap-app-role.sh localhost 5434 prospector prospectordb_test
 
     - name: Generate Prisma Client
@@ -81,6 +83,7 @@ jobs:
         NODE_ENV=$NODE_ENV
         PORT=$PORT
         DATABASE_URL=$DATABASE_URL
+        DIRECT_URL=$DIRECT_URL
         REDIS_URL=$REDIS_URL
         MEILI_HOST=$MEILI_HOST
         MEILI_MASTER_KEY=$MEILI_MASTER_KEY
