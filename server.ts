@@ -51,6 +51,7 @@ import { mountFrontend } from './src/bootstrap/frontend.js';
 import { startEmbeddedWorkers } from './src/bootstrap/workers.js';
 import { createGracefulShutdown, registerShutdownSignals } from './src/bootstrap/shutdown.js';
 import { bootstrapApplicationServices } from './src/bootstrap/appServices.js';
+import { assertDbRoleIsLeastPrivilege } from './src/bootstrap/dbRoleCheck.js';
 
 // Falha rápido no boot, antes de qualquer outra etapa, se a aplicação subiria "saudável" em
 // produção mas rejeitando todo tráfego real por CORS — ver src/bootstrap/security.ts.
@@ -61,6 +62,8 @@ assertAllowedOriginsConfigured();
 warnUnconfiguredSecondaryIntegrations();
 
 async function startServer() {
+  // Papel do banco com menor privilégio (sem superuser/BYPASSRLS/posse) — fatal em produção.
+  await assertDbRoleIsLeastPrivilege(prisma, { logger });
   const app = express();
   const PORT = parseInt(env.PORT, 10);
 
