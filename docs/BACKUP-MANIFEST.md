@@ -14,7 +14,7 @@
 
 ## 1. Conteúdo Preservado no Backup
 
-1. **`Birthub-360-full-history.bundle` (422.105.336 bytes):**
+1. **`Birthub-360-full-history.bundle` (422.130.681 bytes):**
    - Bundle Git completo contendo **todas as 305 entradas do repositório** (298 referências nomeadas + 7 apontadores HEAD de worktree).
    - Preserva o histórico completo de branches locais, tags, referências remotas (`refs/remotes/*`), stashes (`refs/stash`), checkpoints e branches de trabalho de todos os agentes.
 
@@ -90,7 +90,11 @@ Censo auditado dos 17 PRs abertos no repositório GitHub ([`MarksNN/Birthub-360`
 
 ## 4. Verificação de Integridade
 
-- **Checksum SHA-256 Verificado:**
+- **Checksum SHA-256 do Bundle Atual (Commit 5a2971b3c):**
+  ```text
+  953fc2b88fa4de264c75dd2b05c6be0a41efcfc68ac7545961221eacb920abbb
+  ```
+- **Checksum SHA-256 do Bundle Antecessor (Commit b4ad0669d):**
   ```text
   7b7215b7be18bc01fc44cacbebb32b49643bef02601d453a8b322ff441afb86a
   ```

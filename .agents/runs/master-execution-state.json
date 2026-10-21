@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "lastUpdated": "2026-10-21T19:02:52.116Z",
+  "lastUpdated": "2026-10-21T21:09:37.372Z",
   "governance": "AGENTS.md (Revisão 2026-10-09)",
   "repository": "MarksNN/Birthub-360",
   "baseBranch": "main",
@@ -1868,7 +1868,7 @@
         ".agents/runs/08A-registro-go-live-v1.0.0.md",
         "scripts/deploy/production-smoke-tests.sh"
       ],
-      "criteria": "Tag v1.0.0-release assinada digitalmente publicada no GitHub e smoke tests de produção 100% aprovados."
+      "criteria": "Tag v1.0.0-release assinada digitalmente via GPG (verificada por git tag -v) publicada no GitHub e smoke tests de produção 100% aprovados."
     }
   ]
 }
