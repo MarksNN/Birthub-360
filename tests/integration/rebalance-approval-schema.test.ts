@@ -12,13 +12,16 @@ const ORG_B = 'rebalance-org-b';
 const bypass = <T>(fn: () => Promise<T>) => requestContext.run({ bypassRls: true }, fn);
 const asOrg = <T>(org: string, fn: () => Promise<T>) => requestContext.run({ tenantId: org }, fn);
 
+const HASH = 'a'.repeat(64);
+
 const row = (org: string, recommendationId: string, extra: Record<string, unknown> = {}) => ({
   organizationId: org,
   recommendationId,
   leadId: 'lead-1',
   toOwner: 'user-2',
   decision: 'APPROVED',
-  note: 'nota redigida',
+  noteLength: 13,
+  noteHash: HASH,
   decidedBy: 'user-1',
   ...extra,
 });
@@ -73,32 +76,30 @@ describe('REMED-04 RebalanceApproval schema (Postgres real)', () => {
     ).rejects.toThrow();
   });
 
-  it('CHECKs: decision fora do enum e note > 280 são rejeitados pelo banco', async () => {
-    const bad = await asOrg(ORG_A, () =>
-      prisma.rebalanceApproval.create({
-        data: row(ORG_A, 'rec-bad-decision', { decision: 'MAYBE' }),
-      }),
-    ).then(
-      () => null,
-      (e: unknown) => e,
-    );
-    expect(errorText(bad)).toContain('RebalanceApproval_decision_check');
-
-    // VarChar(280) + CHECK: SQL cru (sem validação do client) também é barrado
-    const long = await inTenantTx(
-      ORG_A,
-      `INSERT INTO "RebalanceApproval" (id,"organizationId","recommendationId","leadId","toOwner",decision,note,"decidedBy")
-       VALUES ('rb-long',$1,'rec-long','lead-1','u2','APPROVED',$2,'u1')`,
-      ORG_A,
-      'x'.repeat(281),
-    ).then(
-      () => null,
-      (e: unknown) => e,
-    );
-    expect(long).not.toBeNull();
-    await asOrg(ORG_A, () =>
-      prisma.rebalanceApproval.create({ data: row(ORG_A, 'rec-280', { note: 'y'.repeat(280) }) }),
-    );
+  it('CHECKs: decision, noteLength 0..280 e noteHash hex(64) são impostos pelo banco', async () => {
+    const cases: Array<[string, Record<string, unknown>, string]> = [
+      ['rec-bad-decision', { decision: 'MAYBE' }, 'RebalanceApproval_decision_check'],
+      ['rec-bad-len-neg', { noteLength: -1 }, 'RebalanceApproval_noteLength_check'],
+      ['rec-bad-len-281', { noteLength: 281 }, 'RebalanceApproval_noteLength_check'],
+      ['rec-bad-hash-upper', { noteHash: 'A'.repeat(64) }, 'RebalanceApproval_noteHash_check'],
+      ['rec-bad-hash-chars', { noteHash: 'z'.repeat(64) }, 'RebalanceApproval_noteHash_check'],
+    ];
+    for (const [rec, extra, constraint] of cases) {
+      const err = await asOrg(ORG_A, () =>
+        prisma.rebalanceApproval.create({ data: row(ORG_A, rec, extra) }),
+      ).then(
+        () => null,
+        (e: unknown) => e,
+      );
+      expect(errorText(err), `${rec} deveria violar ${constraint}`).toContain(constraint);
+    }
+    // limites válidos e sem nota
+    await asOrg(ORG_A, async () => {
+      await prisma.rebalanceApproval.create({ data: row(ORG_A, 'rec-280', { noteLength: 280 }) });
+      await prisma.rebalanceApproval.create({
+        data: row(ORG_A, 'rec-no-note', { noteLength: null, noteHash: null }),
+      });
+    });
   });
 
   it('purge e anonimização: só no tenant da sessão; tenant ausente ou diferente falha', async () => {
@@ -142,13 +143,13 @@ describe('REMED-04 RebalanceApproval schema (Postgres real)', () => {
 
     const left = await asOrg(ORG_A, () =>
       prisma.rebalanceApproval.findMany({
-        select: { recommendationId: true, note: true },
+        select: { recommendationId: true, noteLength: true, noteHash: true, noteRef: true },
         orderBy: { recommendationId: 'asc' },
       }),
     );
     expect(left).toEqual([
-      { recommendationId: 'rec-new', note: null },
-      { recommendationId: 'rec-other-lead', note: 'nota redigida' },
+      { recommendationId: 'rec-new', noteLength: null, noteHash: null, noteRef: null },
+      { recommendationId: 'rec-other-lead', noteLength: 13, noteHash: HASH, noteRef: null },
     ]);
     expect(await asOrg(ORG_B, () => prisma.rebalanceApproval.count())).toBe(1);
   });

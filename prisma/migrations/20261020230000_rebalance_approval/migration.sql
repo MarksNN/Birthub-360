@@ -1,6 +1,9 @@
 -- REMED-04 (handoff 04→01: .agents/handoffs/onda-forense-20261020/04-para-01-rebalance-approval-unique.md,
 -- PR #23): decisão de rebalanceamento com UNIQUE (organizationId, recommendationId) no banco — fecha a
 -- corrida de findFirst+create concorrentes. Só schema; o store Prisma é do Agente 04.
+-- LGPD (alinhado ao #23 @60a96134): NÃO há texto de nota — só noteLength + noteHash (HMAC por org).
+-- O #23 já parou de gravar nota em claro no AuditLog; as linhas legadas do #15 são limpas pelo SQL
+-- de expurgo do 04 (executor 08A, OK do 21) — fora desta migration.
 -- Rollback: DROP FUNCTION rebalance_approval_purge(text,integer);
 --   DROP FUNCTION rebalance_approval_anonymize_lead_notes(text,text); DROP TABLE "RebalanceApproval";
 --   e remover a linha de _prisma_migrations. Tabela nova: sem impacto em dados existentes.
@@ -14,9 +17,13 @@ CREATE TABLE "RebalanceApproval" (
     "fromOwner" TEXT,
     "toOwner" TEXT NOT NULL,
     "decision" TEXT NOT NULL,
-    "note" VARCHAR(280),
     "decidedBy" TEXT NOT NULL,
-    "decidedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "decidedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "noteLength" INTEGER,
+    "noteHash" CHAR(64),
+    "noteRef" TEXT,
+    "appliedToCrm" BOOLEAN NOT NULL DEFAULT false,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "RebalanceApproval_pkey" PRIMARY KEY ("id")
 );
@@ -31,8 +38,9 @@ ALTER TABLE "RebalanceApproval" ADD CONSTRAINT "RebalanceApproval_organizationId
 
 -- Invariantes (ignorados pelo diff do Prisma).
 ALTER TABLE "RebalanceApproval"
-    ADD CONSTRAINT "RebalanceApproval_note_len_check" CHECK ("note" IS NULL OR char_length("note") <= 280),
-    ADD CONSTRAINT "RebalanceApproval_decision_check" CHECK ("decision" IN ('APPROVED', 'REJECTED'));
+    ADD CONSTRAINT "RebalanceApproval_decision_check" CHECK ("decision" IN ('APPROVED', 'REJECTED')),
+    ADD CONSTRAINT "RebalanceApproval_noteLength_check" CHECK ("noteLength" IS NULL OR ("noteLength" >= 0 AND "noteLength" <= 280)),
+    ADD CONSTRAINT "RebalanceApproval_noteHash_check" CHECK ("noteHash" IS NULL OR "noteHash" ~ '^[a-f0-9]{64}$');
 
 -- RLS: tenant_isolation estrito, FORCE, sem cláusula de bypass (padrão 01A pós-20260825120000).
 ALTER TABLE "RebalanceApproval" ENABLE ROW LEVEL SECURITY;
@@ -67,7 +75,8 @@ BEGIN
 END;
 $$;
 
--- Purge do titular (LGPD art. 18): anonimiza `note` das decisões ligadas ao lead, mantendo a decisão.
+-- Purge do titular (LGPD art. 18): zera os metadados da nota (noteLength/noteHash/noteRef) das
+-- decisões do lead, mantendo a decisão. (Não há texto de nota nesta tabela.)
 CREATE OR REPLACE FUNCTION rebalance_approval_anonymize_lead_notes(p_org text, p_lead_id text)
 RETURNS bigint
 LANGUAGE plpgsql SECURITY INVOKER
@@ -82,8 +91,10 @@ BEGIN
     IF p_lead_id IS NULL OR p_lead_id = '' THEN
         RAISE EXCEPTION 'rebalance_approval_anonymize_lead_notes: p_lead_id obrigatório';
     END IF;
-    UPDATE "RebalanceApproval" SET "note" = NULL
-     WHERE "organizationId" = p_org AND "leadId" = p_lead_id AND "note" IS NOT NULL;
+    UPDATE "RebalanceApproval"
+       SET "noteLength" = NULL, "noteHash" = NULL, "noteRef" = NULL
+     WHERE "organizationId" = p_org AND "leadId" = p_lead_id
+       AND ("noteLength" IS NOT NULL OR "noteHash" IS NOT NULL OR "noteRef" IS NOT NULL);
     GET DIAGNOSTICS n = ROW_COUNT;
     RETURN n;
 END;

@@ -5542,11 +5542,12 @@ model LeadTouchpoint {
 }
 
 /// REMED-04 (handoff 04→01, onda-forense-20261020): decisão de rebalanceamento de carteira com
-/// idempotência no banco. Uma linha por (organizationId, recommendationId); re-decisão após o TTL
-/// (REBALANCE_DECISION_TTL_DAYS) ATUALIZA a mesma linha — o histórico fica no AuditLog.
-/// `note` = texto JÁ REDIGIDO (piiRedaction), máx. 280 (VarChar + CHECK na migration).
-/// CHECKs, e as funções rebalance_approval_purge()/rebalance_approval_anonymize_lead_notes()
-/// (SECURITY INVOKER, tenant da sessão) só existem na migration.
+/// idempotência no banco. Campos = RebalanceApprovalRecord do #23. Uma linha por
+/// (organizationId, recommendationId); re-decisão após o TTL (REBALANCE_DECISION_TTL_DAYS) ATUALIZA
+/// a mesma linha (o histórico fica no AuditLog). SEM texto da nota (política LGPD do #23/21): só
+/// `noteLength` (0..280) e `noteHash` = HMAC-SHA256 hex por org (domínio rebalance-approval-note:v1).
+/// ip/userAgent ficam no AuditLog. CHECKs e as funções rebalance_approval_purge() /
+/// rebalance_approval_anonymize_lead_notes() (SECURITY INVOKER, tenant da sessão) só na migration.
 model RebalanceApproval {
   id               String       @id @default(cuid())
   organizationId   String
@@ -5557,9 +5558,16 @@ model RebalanceApproval {
   toOwner          String
   /// APPROVED | REJECTED (CHECK na migration)
   decision         String
-  note             String?      @db.VarChar(280)
   decidedBy        String
-  decidedAt        DateTime     @default(now())
+  decidedAt        DateTime     @default(now()) @db.Timestamptz(3)
+  /// Tamanho da nota redigida (0..280, CHECK); null sem nota.
+  noteLength       Int?
+  /// HMAC-SHA256 hex (64, CHECK ^[a-f0-9]{64}$) de `${organizationId}\0${notaRedigida}`; null sem nota.
+  noteHash         String?      @db.Char(64)
+  /// Reservado (o #23 grava null).
+  noteRef          String?
+  appliedToCrm     Boolean      @default(false)
+  updatedAt        DateTime     @updatedAt @db.Timestamptz(3)
 
   @@unique([organizationId, recommendationId])
   @@index([organizationId, leadId])
