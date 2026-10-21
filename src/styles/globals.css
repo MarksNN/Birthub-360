@@ -737,7 +737,7 @@
      escuro: #0f9d64 cru + texto branco mede só 3.48:1 (achado real do axe-core,
      tests/e2e/accessibility.spec.ts, botão "Conectar WhatsApp" de Integrações). Mesma fórmula
      que --ok-active já usa no claro (70% preto), só que fixa nos dois temas. */
-  --color-ok-solid: color-mix(in srgb, var(--color-ok) 70%, black);
+  --color-ok-solid: color-mix(in srgb, var(--color-ok) 55%, black);
   --color-info-active: var(--info-active);
   --color-success-active: var(--success-active);
   --color-warning-active: var(--warning-active);
