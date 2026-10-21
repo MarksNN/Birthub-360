@@ -52,7 +52,9 @@ export function rebalanceRecommendationId(
   fromOwner: string | null,
   toOwner: string,
 ): string {
-  const h = createHash('sha256').update(`${organizationId}|${leadId}|${fromOwner ?? ''}|${toOwner}`);
+  const h = createHash('sha256').update(
+    `${organizationId}|${leadId}|${fromOwner ?? ''}|${toOwner}`,
+  );
   return `rb_${h.digest('hex').slice(0, 32)}`;
 }
 
@@ -62,7 +64,10 @@ function median(values: number[]): number {
   return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 /** Decisão vale por REBALANCE_DECISION_TTL_DAYS (o estado lead/owner já está no recommendationId). */
-export function isDecisionActive(d: Pick<RebalanceApprovalRecord, 'decidedAt'>, now: Date): boolean {
+export function isDecisionActive(
+  d: Pick<RebalanceApprovalRecord, 'decidedAt'>,
+  now: Date,
+): boolean {
   const at = Date.parse(d.decidedAt);
   return Number.isFinite(at) && now.getTime() - at <= REBALANCE_DECISION_TTL_DAYS * DAY_MS;
 }

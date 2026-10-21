@@ -1,7 +1,7 @@
 import { LeadFunnel } from '@prisma/client';
+import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import type { RebalanceApprovalRecord } from '../../../shared/contracts/predictiveRevenueOracle.contract.js';
-import { logger } from '../../../lib/logger.js';
 import {
   REBALANCE_APPROVAL_ACTION,
   REBALANCE_APPROVAL_ENTITY,

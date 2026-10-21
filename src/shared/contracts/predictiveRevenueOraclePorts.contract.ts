@@ -80,7 +80,10 @@ export interface RebalanceRecommendationReader {
   listClosedDeals(organizationId: string, since: Date): Promise<RebalanceClosedDeal[]>;
   listOrgUsers(organizationId: string): Promise<RebalanceOrgUser[]>;
   /** Decisão MAIS RECENTE por recommendationId (registros corrompidos são ignorados). */
-  listDecisions(organizationId: string, recommendationIds: string[]): Promise<RebalanceApprovalRecord[]>;
+  listDecisions(
+    organizationId: string,
+    recommendationIds: string[],
+  ): Promise<RebalanceApprovalRecord[]>;
 }
 
 // --- What-If V2 (whatIfSimulation.service.ts) --------------------------------------------------
