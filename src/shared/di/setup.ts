@@ -118,6 +118,9 @@ import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { container } from './container.js';
 
 export function setupDI() {
+  // REMED-05: outbox do DomainEventMesh, configurada de forma SÍNCRONA antes de qualquer registro.
+  // Fail-closed: em produção sem DOMAIN_EVENT_OUTBOX=prisma lança e derruba o boot com erro claro.
+  registerDomainEventOutbox();
   // 1. Shared
   const eventBus = new InMemoryEventBus();
   container.register('EventBus', eventBus);
@@ -310,8 +313,12 @@ export function setupDI() {
 
   // Conexão do DomainEventMesh com fluxos automáticos de CRM e mensageria no Bitrix24 e WhatsApp
   bitrixEventMeshBridge.register();
-  // REMED-05: outbox durável (Prisma) atrás de DOMAIN_EVENT_OUTBOX=prisma — depende da migração do #34.
-  void configureDomainEventOutboxFromEnv().then((adapters) => {
-    if (adapters) container.register('DomainEventOutboxUnitOfWork', adapters.unitOfWork);
-  });
+}
+
+/** Registra a UoW transacional da outbox no container (síncrono). Exportado para teste. */
+export function registerDomainEventOutbox(env: NodeJS.ProcessEnv = process.env): boolean {
+  const adapters = configureDomainEventOutboxFromEnv(env);
+  if (!adapters) return false;
+  container.register('DomainEventOutboxUnitOfWork', adapters.unitOfWork);
+  return true;
 }

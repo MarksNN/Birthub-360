@@ -102,3 +102,38 @@ Os demais 16 produtores não escrevem no banco no mesmo fluxo e podem continuar 
 `PrismaConsumptionStore` usa reservedBy/reservedUntil/completedAt: reserva com `ON CONFLICT DO UPDATE ... WHERE completedAt IS NULL AND reservedUntil < now()`,
 complete grava `completedAt=now()` (só o dono), falha apaga a linha não concluída do dono, "processado" = `completedAt IS NOT NULL`.
 A limitação at-most-once em crash foi resolvida: após expirar o lease, outro worker retoma. Pendência do 01 sobre consumo: nenhuma.
+
+## Parecer 24 @1377da4 — fail-closed, registro síncrono e guia dos produtores
+
+### Fail-closed (P1)
+`resolveDomainEventOutboxMode()` (`src/lib/queue/outbox/outboxMode.ts`): com `NODE_ENV=production`, o boot do app
+(`setupDI` → `registerDomainEventOutbox`) e do worker (`worker.ts start()`) lança `DomainEventOutboxConfigError` se
+`DOMAIN_EVENT_OUTBOX` não for `prisma`. Em dev/test, o padrão continua `memory`. Valor desconhecido → erro.
+
+**Impacto em CI/deploy (verificado):**
+- CI (`ci.yml`, `playwright-ci.yml`, `visual-regression.yml`, `sonarqube.yml`, `endpoint-latency-budget.yml`, `onda-2.5-validation.yml`) roda com `NODE_ENV=test`,
+  inclusive o smoke test do build (`node dist/server.cjs` com `NODE_ENV: test`) → não quebra.
+- **Quebra se não configurado:** `Dockerfile` (`ENV NODE_ENV=production`), `fly.toml` (`NODE_ENV = "production"`) e
+  `docker-compose.services.yml` (serviço com `NODE_ENV: production`). Esses deploys precisam de `DOMAIN_EVENT_OUTBOX=prisma`
+  **e** da migração do #34 aplicada antes de subir a versão com o #32. Handoff para o 08/10 (donos desses arquivos): adicionar a variável.
+
+### Registro síncrono (P3)
+`configureDomainEventOutboxFromEnv` agora é síncrona (sem `import()` dinâmico); `setupDI()` chama `registerDomainEventOutbox()`
+na primeira linha, e `DomainEventOutboxUnitOfWork` existe no container antes de `setupDI` retornar.
+
+### Guia de migração dos 6 produtores (padrão `publishInTransaction`)
+Padrão: `await domainEventMesh.withTransaction(uow, async ({ tx, publish }) => { await tx.<model>.<write>(...); await publish({...}); })`,
+com `uow = container.resolve('DomainEventOutboxUnitOfWork')`. A gravação e o evento são confirmados ou desfeitos juntos.
+
+**Bloqueio comum (16):** a UoW atual usa a transação BASE (`withRlsContext`), que não passa pela extensão do `prisma`
+(criptografia de PII de Contact/Lead, injeção de tenant). Antes de migrar quem grava `Lead`/`Contact`, a UoW precisa expor uma
+transação do cliente estendido (ou cifrar explicitamente). Até lá, migrar causaria gravação de PII em claro.
+
+| Produtor (dono) | Escrita no banco antes do publish | Guia |
+|---|---|---|
+| `integrations/bitrix/bitrix.webhook.ts` (06) | `prisma.lead.update` (+ `contact.update`, `bitrixSyncLog`) e 2 publishes (`BITRIX_WEBHOOK_RECEIVED`, `ENGAGEMENT_SIGNAL_RECEIVED`) | colocar `lead.update` e os 2 `publish` na mesma UoW; manter `contact.update`/log fora. Bloqueado pela UoW estendida (Lead tem PII cifrada). Hoje o `.catch` engole a falha do publish; na UoW, a falha da outbox desfaz o update (comportamento desejado). |
+| `integrations/whatsapp/whatsappMessage.service.ts` (06) | `whatsAppMessage.create` (início), `lead.update` (opt-out), `timelineEvent.create`; publish no fim, só se inbound e com lead | o publish depende do lead encontrado depois do create; migrar exige reordenar para `create` + `publish` na mesma UoW, o que é mudança de fluxo e precisa de decisão do 06. Mesmo bloqueio de PII se envolver Lead. |
+| `knowledge/services/accountKnowledgeGraph.service.ts` (07) | **nenhuma** (`Map` em memória) | sem dual-write com banco: manter `publish()`. Migrar quando o grafo for persistido. |
+| `proposals/services/proposalAutomation.service.ts` (17/04) | **nenhuma** (`Map` em memória) | idem. |
+| `market-intelligence/server/marketSensing.service.ts` (07) | **nenhuma** (`Map` em memória) | idem. |
+| `lib/security/services/continuousSecurityAudit.service.ts` (15) | **nenhuma** (`latestReport` em memória) | idem. **Risco:** publica com `organizationId: 'global-security-governance'`, que não é uma Organization real; em modo `prisma`, o insert na outbox viola a FK/RLS e o `publish()` lança. O 15 precisa usar uma org real ou outro canal antes de ligar `DOMAIN_EVENT_OUTBOX=prisma`. |

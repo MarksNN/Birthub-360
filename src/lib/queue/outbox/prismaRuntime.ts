@@ -4,6 +4,8 @@
  */
 import { requestContext } from '../../async-context.js';
 import { prisma, withRlsContext } from '../../prisma.js';
+import { domainEventMesh } from '../domainEventMesh.service.js';
+import { resolveDomainEventOutboxMode } from './outboxMode.js';
 import {
   PrismaConsumptionStore,
   PrismaOutboxRepository,
@@ -42,20 +44,21 @@ export function createPrismaOutboxAdapters(runner: TenantSqlRunner = prismaTenan
 }
 
 /**
- * Liga os adaptadores Prisma no `domainEventMesh` quando `DOMAIN_EVENT_OUTBOX=prisma`.
- * Sem a flag (ou antes do merge do #34), o mesh segue com a implementação em memória.
+ * Configura o `domainEventMesh` de forma SÍNCRONA no boot (app e worker).
+ * - production sem `DOMAIN_EVENT_OUTBOX=prisma` → lança `DomainEventOutboxConfigError` (fail-closed);
+ * - `prisma` → adaptadores Prisma no mesh e UoW devolvida para registro imediato no DI;
+ * - dev/test sem flag → memória (retorna `null`).
  */
-export async function configureDomainEventOutboxFromEnv(env: NodeJS.ProcessEnv = process.env) {
-  if (env.DOMAIN_EVENT_OUTBOX !== 'prisma') return null;
-  const { domainEventMesh } = await import('../domainEventMesh.service.js');
+export function configureDomainEventOutboxFromEnv(env: NodeJS.ProcessEnv = process.env) {
+  if (resolveDomainEventOutboxMode(env) !== 'prisma') return null;
   const adapters = createPrismaOutboxAdapters();
   domainEventMesh.configure({ outbox: adapters.outbox, consumptions: adapters.consumptions });
   return { ...adapters, mesh: domainEventMesh };
 }
 
-/** Sobe o relay (somente no processo worker). Retorna o relay ou null quando desativado. */
-export async function startDomainEventOutboxRelay(env: NodeJS.ProcessEnv = process.env) {
-  const configured = await configureDomainEventOutboxFromEnv(env);
+/** Sobe o relay (somente no processo worker). Retorna o relay ou null quando em memória. */
+export function startDomainEventOutboxRelay(env: NodeJS.ProcessEnv = process.env) {
+  const configured = configureDomainEventOutboxFromEnv(env);
   if (!configured) return null;
   const relay = configured.mesh.createRelay();
   relay.start(Number(env.DOMAIN_EVENT_OUTBOX_RELAY_INTERVAL_MS ?? 1000));

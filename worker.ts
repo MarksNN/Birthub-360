@@ -7,6 +7,7 @@ registerProcessGuards();
 import { startWorkerServer } from './src/bootstrap/workerServer.js';
 import { logger } from './src/lib/logger.js';
 import { setWorkerProcessUp } from './src/lib/queue/metrics.js';
+import { resolveDomainEventOutboxMode } from './src/lib/queue/outbox/outboxMode.js';
 import { startDomainEventOutboxRelay } from './src/lib/queue/outbox/prismaRuntime.js';
 import { env } from './src/config/env.js';
 
@@ -95,6 +96,8 @@ import { createCopilotoTranscriptionWorker } from './src/features/copiloto-ia/jo
 import { MeetingSynthesisService } from './src/features/chatbook/services/meeting-synthesis.service.js';
 
 async function start() {
+  // REMED-05 fail-closed: em produção, sem DOMAIN_EVENT_OUTBOX=prisma o worker não sobe.
+  resolveDomainEventOutboxMode();
   const leadsWorker = createLeadsWorker();
   const agentWorker = createAgentWorker();
   const enrichmentWorker = createEnrichmentWorker();
@@ -175,7 +178,7 @@ async function start() {
     workers,
     async () => {
       // REMED-05: relay da outbox (só no worker; gate DOMAIN_EVENT_OUTBOX=prisma, depende do #34).
-      await startDomainEventOutboxRelay();
+      startDomainEventOutboxRelay();
       await scheduleBitrixSync();
       await scheduleFollowUpJobs();
       await scheduleExecutiveSummaryJob();
