@@ -72,7 +72,7 @@ html.light,
   --color-brand-active: #075985;
   --on-brand: #f8fafc;
   --color-on-brand: #f8fafc;
-  --color-heading-gold: #b45309;
+  --color-heading-gold: #92400e;
   --color-heading-cyan: #0369a1;
   --color-text-secondary: #475569;
   --palette-muted: #475569;
@@ -219,10 +219,16 @@ html.dark,
   --danger-active: var(--color-heading-danger);
 }
 
-/* Domain accent is supplied by the application shell; body text stays neutral. */
+/* Domain accent is supplied by the application shell; body text stays neutral.
+   Um heading com text-white foi posto de propósito sobre superfície escura
+   (gráfico, card). Esta regra não pode apagá-lo: senão o texto vira --ink
+   (#0f172a) em cima de #1C1D24. */
 [data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
   color: var(--ink);
   text-shadow: none;
+}
+[data-page-accent] :is(h1, h2, h3, h4, h5, h6).text-white {
+  color: #f8f9ff;
 }
 .bh-platform-card .bh-label {
   color: var(--card-accent);
@@ -250,6 +256,39 @@ html.dark,
   --glow-brand: var(--glow-cyan);
   --glow-iris: var(--glow-pink);
   --grad-titles: var(--grad-brand);
+}
+
+/* Tema claro: neon e sky-600 em texto ficam abaixo de 4.5:1 no fundo da app.
+   O tema escuro mantém o neon. !important ganha do utility do Tailwind. */
+html.light .text-\[\#00D4FF\],
+html.light .text-\[\#00d4ff\],
+[data-theme="light"] .text-\[\#00D4FF\],
+[data-theme="light"] .text-\[\#00d4ff\],
+html.light .text-\[\#0284c7\],
+html.light .text-\[\#0284C7\],
+[data-theme="light"] .text-\[\#0284c7\],
+[data-theme="light"] .text-\[\#0284C7\] {
+  color: #0369a1 !important;
+}
+html.light .text-\[\#FF2D9B\],
+html.light .text-\[\#ff2d9b\],
+[data-theme="light"] .text-\[\#FF2D9B\],
+[data-theme="light"] .text-\[\#ff2d9b\] {
+  color: #be185d !important;
+}
+html.light .text-\[\#F59E0B\],
+html.light .text-\[\#f59e0b\],
+html.light .text-\[\#b45309\],
+[data-theme="light"] .text-\[\#F59E0B\],
+[data-theme="light"] .text-\[\#f59e0b\],
+[data-theme="light"] .text-\[\#b45309\] {
+  color: #92400e !important;
+}
+html.light .text-\[\#8B7DFF\],
+html.light .text-\[\#8b7dff\],
+[data-theme="light"] .text-\[\#8B7DFF\],
+[data-theme="light"] .text-\[\#8b7dff\] {
+  color: #6d28d9 !important;
 }
 /* Existing neutral utility surfaces follow theme inside the product shell. */
 [data-page-accent] .bg-white {
