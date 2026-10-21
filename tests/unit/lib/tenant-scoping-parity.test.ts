@@ -37,6 +37,12 @@ import {
 // com uma linha explicando por que RLS sozinha é suficiente para o caso dele — mesmo padrão de
 // justificativa já usado em `BYPASS_RLS_ALLOWED_MODELS` (src/lib/prisma.ts).
 const KNOWN_RLS_ONLY_MODELS = [
+  // REMED-06 (PR #35/#33): RLS tenant_isolation FORCE; os repositórios setam
+  // app.current_tenant_id explicitamente na própria transação (consentAuditChain/Flywheel) e
+  // ConsentAuditRecord é append-only por trigger — injeção automática de tenant não acrescenta.
+  'ConsentAuditRecord',
+  'FlywheelApproachRecord',
+  'FlywheelFewShotExample',
   'AccessRequest',
   'AccountIntelligenceSnapshot',
   'AccountRecommendation',
