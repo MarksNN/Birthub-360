@@ -7,6 +7,29 @@
 --    (session_user <> prospector_app). O app também não tem DELETE nessas tabelas (REVOKE).
 -- 3) prospector_app perde DELETE/TRUNCATE em Organization (também em scripts/db/create-app-role.sql).
 
+-- A migration anterior revoga EXECUTE destas funções no dono. No CI o migrate roda como
+-- prospector_app: ALTER TABLE revalida o trigger e falha com 42501 se o EXECUTE não voltar.
+-- O bloco do fim revoga de novo.
+DO $$
+DECLARE f text;
+BEGIN
+  FOREACH f IN ARRAY ARRAY[
+    'consent_audit_immutable()',
+    'consent_chain_head_guard()',
+    'consent_audit_advance_head()',
+    'consent_subject_key_tombstone()',
+    'consent_tombstone_immutable()',
+    'tenant_key_envelope_guard()',
+    'lgpd_apply_consent_privileges()'
+  ]
+  LOOP
+    IF to_regprocedure('public.' || f) IS NOT NULL THEN
+      EXECUTE format('GRANT ALL ON FUNCTION public.%s TO CURRENT_USER', f);
+    END IF;
+  END LOOP;
+END
+$$;
+
 ALTER TABLE "ConsentAuditRecord" DROP CONSTRAINT "ConsentAuditRecord_organizationId_fkey";
 ALTER TABLE "ConsentAuditRecord" ADD CONSTRAINT "ConsentAuditRecord_organizationId_fkey"
   FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -64,6 +87,11 @@ BEGIN
     REVOKE DELETE, TRUNCATE ON TABLE "Organization" FROM prospector_app;
     REVOKE ALL ON FUNCTION consent_audit_immutable() FROM prospector_app;
     REVOKE ALL ON FUNCTION consent_chain_head_guard() FROM prospector_app;
+    REVOKE ALL ON FUNCTION consent_audit_advance_head() FROM prospector_app;
+    REVOKE ALL ON FUNCTION consent_subject_key_tombstone() FROM prospector_app;
+    REVOKE ALL ON FUNCTION consent_tombstone_immutable() FROM prospector_app;
+    REVOKE ALL ON FUNCTION tenant_key_envelope_guard() FROM prospector_app;
+    REVOKE ALL ON FUNCTION lgpd_apply_consent_privileges() FROM prospector_app;
   END IF;
 END
 $$;
