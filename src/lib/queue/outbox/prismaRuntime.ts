@@ -13,13 +13,14 @@ import {
   type SqlExecutor,
   type TenantSqlRunner,
 } from './prismaOutbox.repository.js';
-import { type OutboxContextStore, systemJobOutboxContext } from './tenantGuard.js';
+import { type OutboxContextStore, outboxUnitOfWorkContext } from './tenantGuard.js';
 
 export const prismaTenantRunner: TenantSqlRunner = {
   // `async/await` dentro do run: evita a perda de contexto com PrismaPromise lazy (ver async-context.ts).
   runAsTenant: (organizationId, fn) =>
     requestContext.run(
-      { tenantId: organizationId },
+      // G3: preserva o store atual; troca só tenantId e bypassRls (relay/consumo por tenant).
+      { ...(requestContext.getStore() ?? {}), tenantId: organizationId, bypassRls: false },
       async () => await withRlsContext((tx) => fn(tx as unknown as SqlExecutor)),
     ),
   // Descoberta via allowlist de bypass já existente para `Organization` (BYPASS_RLS_ALLOWED_MODELS);
@@ -42,7 +43,8 @@ export function createPrismaOutboxAdapters(runner: TenantSqlRunner = prismaTenan
      * (o contexto da transação é recriado com bypassRls=false). Ver tenantGuard.ts.
      */
     unitOfWork: new PrismaOutboxUnitOfWork((fn) => {
-      const ctx = systemJobOutboxContext(
+      // G3: merge do store atual (preserva userId etc.), trocando só tenantId/bypassRls.
+      const ctx = outboxUnitOfWorkContext(
         requestContext.getStore() as OutboxContextStore | undefined,
       );
       return requestContext.run(

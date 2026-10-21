@@ -155,3 +155,19 @@ Em todos os casos a transação é aberta com contexto recriado `{ tenantId, byp
   Garantia hoje: teste estático `tests/unit/queue/outbox.remed05-no-extended-client.test.ts`, que varre `src/`.
 - **U1/U2 (01, decisão do Marks):** UoW sobre o client estendido via AsyncLocalStorage. **Follow-up do 16:** depois do PR do 01,
   trocar a compensação manual do bitrix.webhook (AuditLog/soft-delete/reindex) pelo client estendido dentro da UoW.
+
+## G1 — BLOQUEANTE para ligar `DOMAIN_EVENT_OUTBOX=prisma` (responsável: 01/15)
+
+O modo `prisma` **não pode ser ligado** em nenhum ambiente antes de o 01 entregar a barreira de runtime em
+`src/lib/prisma.ts`: no `$allOperations` do client estendido, lançar erro se `requestContext.getStore()?.outboxUnitOfWorkActive === true`
+(a UoW já liga essa flag). Hoje a única proteção é o teste estático `tests/unit/queue/outbox.remed05-no-extended-client.test.ts`
+(G2: `prisma.*`, `this.prisma`/`deps.prisma`, aliases e imports renomeados, `basePrisma`, helpers e `uow.run` direto fora do mesh),
+que não segue chamadas indiretas para outros módulos.
+
+- G3: a UoW faz merge do contexto atual (preserva userId, requestId, role…), trocando só `tenantId`/`bypassRls` (=false) e ligando `outboxUnitOfWorkActive`.
+- G4: `OUTBOX_SYSTEM_JOBS` é `Object.freeze([])`; para incluir um job de sistema é preciso PR com revisão, sem mutação em runtime.
+
+### Follow-up após o merge do PR #40 (runInTransaction, do 01)
+- `prismaRuntime.ts`: `new PrismaOutboxUnitOfWork((fn) => requestContext.run(ctx, () => runInTransaction(fn)))` no lugar de `withRlsContext`.
+- `appendSql` continua usando raw SQL no executor recebido (nunca no `prisma` global): compatível.
+- bitrix: remover `inboundTxCompensations.ts` (AuditLog manual, filtro `deletedAt`, reindex pós-commit) e voltar ao client estendido dentro da tx.
