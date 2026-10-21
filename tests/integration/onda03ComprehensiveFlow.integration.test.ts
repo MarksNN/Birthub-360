@@ -3,7 +3,17 @@ import { behavioralEngineService } from '../../src/features/gamification/service
 import { selfDrivingCrmService } from '../../src/features/cadence/services/selfDrivingCrm.service.js';
 import { roiSimulatorService } from '../../src/features/commercial-intelligence/services/roiSimulator.service.js';
 import { valueRealizationService } from '../../src/features/commercial-intelligence/services/valueRealization.service.js';
-import { predictiveRevenueOracleService } from '../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
+import {
+  PredictiveRevenueOracleService,
+  predictiveRevenueOracleService,
+} from '../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
+import { RebalanceApprovalService } from '../../src/features/commercial-intelligence/services/rebalanceApproval.service.js';
+import {
+  InMemoryOracleReader,
+  InMemoryRebalanceApprovalStore,
+  ORACLE_FIXED_NOW,
+  seedRealHistory,
+} from '../unit/commercial-intelligence/oracleTestDoubles.js';
 import { adaptiveMultichannelCadenceService } from '../../src/features/cadence/services/adaptiveMultichannelCadence.service.js';
 import { recordOptOut } from '../../src/features/cadence/application/optOutService.js';
 
@@ -227,49 +237,51 @@ describe('ONDA 03 — Fluxo Abrangente Integrado e Cinco Jornadas Comerciais E2E
   // CRM → Forecast → Revenue Oracle → What-If → Recomendação → Revisão Humana → Plano Comercial
   // ──────────────────────────────────────────────────────────────────────────
   it('Jornada D: deve prover Cockpit Executivo, simulação What-If e alocação supervisionada de contas', async () => {
-    // 1. Cockpit Executivo de Receita com 3 horizontes
-    const cockpit = await predictiveRevenueOracleService.getCockpitData(tenantA);
+    // REMED-03/04: Oracle lê histórico real (reader em memória por tenant) e a aprovação
+    // de rebalanceamento é persistida/auditada pelo RebalanceApprovalService.
+    const reader = new InMemoryOracleReader();
+    seedRealHistory(reader, tenantA);
+    const oracle = new PredictiveRevenueOracleService({ reader, now: () => ORACLE_FIXED_NOW });
 
-    expect(cockpit.projections.days30.expectedRevenue).toBe(145000);
-    expect(cockpit.projections.days90.expectedRevenue).toBe(485000);
-    expect(cockpit.projections.days180.expectedRevenue).toBe(980000);
-    expect(cockpit.dealsAtRisk.length).toBeGreaterThan(0);
-    expect(cockpit.mainFunnelBottlenecks.length).toBeGreaterThan(0);
+    // 1. Cockpit Executivo de Receita com 3 horizontes derivados do histórico real
+    const cockpit = await oracle.getCockpitData(tenantA);
+    expect(cockpit.status).toBe('ok');
+    expect(cockpit.projections.days30.expectedRevenue).toBe(20500);
+    expect(cockpit.projections.days90.expectedRevenue).toBe(61500);
+    expect(cockpit.projections.days180.expectedRevenue).toBe(123000);
+    expect((await oracle.getCockpitData(tenantB)).status).toBe('insufficient_data');
 
-    // 2. Simulação What-If de aceleração comercial
-    const whatIf = await predictiveRevenueOracleService.runWhatIfSimulation({
+    // 2. Simulação What-If de aceleração comercial sobre a linha de base real
+    const whatIf = await oracle.runWhatIfSimulation({
       organizationId: tenantA,
       name: 'Simulação Aceleração 90 Dias',
       horizonDays: 90,
       prospectingVolumeDeltaPercent: 15,
       conversionRateDeltaPercent: 5,
     });
-
-    expect(whatIf.simulatedRevenue).toBeGreaterThan(whatIf.baselineRevenue);
+    expect(whatIf.simulatedRevenue).toBeGreaterThan(whatIf.baselineRevenue ?? Infinity);
     expect(whatIf.netRevenueDelta).toBeGreaterThan(0);
-    expect(whatIf.impactBreakdown.prospectingImpact).toBeGreaterThan(0);
+    expect(whatIf.impactBreakdown?.prospectingImpact).toBeGreaterThan(0);
 
-    // 3. Recomendação supervisionada de redistribuição de conta
-    const allocations =
-      await predictiveRevenueOracleService.generateAccountAllocationRecommendations({
-        organizationId: tenantA,
-        limit: 1,
-      });
+    // 3. Sem motor real de recomendação: nada inventado
+    expect(
+      await oracle.generateAccountAllocationRecommendations({ organizationId: tenantA, limit: 1 }),
+    ).toEqual([]);
 
-    expect(allocations.length).toBe(1);
-    const recommendation = allocations[0];
-    expect(recommendation.matchScore).toBeGreaterThanOrEqual(85);
-    expect(recommendation.approvalStatus).toBe('PENDING_HUMAN_REVIEW');
-
-    // 4. Aprovação formal do gestor
-    const approved = await predictiveRevenueOracleService.approveAccountAllocation({
-      organizationId: tenantA,
-      recommendationId: recommendation.recommendationId,
-      approvedBy: 'diretor-comercial-cro',
-    });
-
-    expect(approved.success).toBe(true);
-    expect(approved.executedAllocation.approvalStatus).toBe('APPROVED');
+    // 4. Aprovação formal do gestor (persistida + idempotente)
+    const store = new InMemoryRebalanceApprovalStore();
+    store.addLead(tenantA, 'lead-alpha-1');
+    const approvals = new RebalanceApprovalService({ store });
+    const input = {
+      recommendationId: 'rec-alpha-1',
+      leadId: 'lead-alpha-1',
+      fromOwner: 'seller-a',
+      toOwner: 'seller-b',
+      decision: 'APPROVED' as const,
+    };
+    const approved = await approvals.decide({ organizationId: tenantA, decidedBy: 'gestor-1', input });
+    expect(approved.approval.decision).toBe('APPROVED');
+    expect((await approvals.decide({ organizationId: tenantA, decidedBy: 'gestor-1', input })).alreadyRecorded).toBe(true);
   });
 
   // ──────────────────────────────────────────────────────────────────────────

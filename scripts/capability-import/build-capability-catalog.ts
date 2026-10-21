@@ -112,6 +112,11 @@ const COMMERCIAL_CELL_DOMAIN_CAPABILITIES: Record<string, string[]> = {
     'forecast.read',
     'forecast.explain',
   ],
+  // Agentes táticos: só leitura/análise do que cada implementação de fato consome (dados passados
+  // pelo chamador). Sem capability de escrita — promise-guardian só cria tarefa via aprovação humana.
+  'account-detective': ['company.read', 'lead.read'],
+  'promise-guardian': ['meeting.read', 'meeting.analyze', 'deal.read'],
+  'devils-advocate': ['deal.read', 'deal.analyze', 'forecast.read', 'pipeline.analyze'],
 };
 
 interface AgentCapabilityEntry {

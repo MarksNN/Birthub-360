@@ -1,6 +1,16 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { multimodalRoleplaySimulatorService } from '../../src/features/roleplay/services/multimodalRoleplaySimulator.service.js';
-import { predictiveRevenueOracleService } from '../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
+import {
+  PredictiveRevenueOracleService,
+  predictiveRevenueOracleService,
+} from '../../src/features/commercial-intelligence/services/predictiveRevenueOracle.service.js';
+import { RebalanceApprovalService } from '../../src/features/commercial-intelligence/services/rebalanceApproval.service.js';
+import {
+  InMemoryOracleReader,
+  InMemoryRebalanceApprovalStore,
+  ORACLE_FIXED_NOW,
+  seedRealHistory,
+} from '../unit/commercial-intelligence/oracleTestDoubles.js';
 import { multiRegionResilienceService } from '../../src/lib/runtime/services/multiRegionResilience.service.js';
 import { continuousSecurityAuditService } from '../../src/lib/security/services/continuousSecurityAudit.service.js';
 
@@ -61,66 +71,49 @@ describe('Onda 05 — Teste Integrado E2E: Escala, Governança e Resiliência', 
     // ─────────────────────────────────────────────────────────────────────────
     // 2. Evolução 18: Forecast Preditivo, Simulação What-If e Rebalanceamento
     // ─────────────────────────────────────────────────────────────────────────
-    const cockpit = await predictiveRevenueOracleService.getCockpitData(tenantA);
+    // REMED-03/04: histórico real por tenant (reader em memória) + aprovação persistida.
+    const oracleReader = new InMemoryOracleReader();
+    seedRealHistory(oracleReader, tenantA);
+    const oracle = new PredictiveRevenueOracleService({ reader: oracleReader, now: () => ORACLE_FIXED_NOW });
+    const cockpit = await oracle.getCockpitData(tenantA);
     expect(cockpit.projections.days30.expectedRevenue).toBeGreaterThan(0);
-    expect(cockpit.projections.days90.confidenceInterval.p10).toBeLessThan(
-      cockpit.projections.days90.confidenceInterval.p90,
+    expect(cockpit.projections.days90.confidenceInterval?.p10).toBeLessThan(
+      cockpit.projections.days90.confidenceInterval?.p90 ?? 0,
     );
 
-    // Simulação What-If: Aumento de 20% no volume de prospecção e 10% no ticket médio
-    const whatIf = await predictiveRevenueOracleService.runWhatIfSimulation({
+    const whatIf = await oracle.runWhatIfSimulation({
       organizationId: tenantA,
       name: 'Simulação Expansão Estratégica 2027',
       horizonDays: 90,
       prospectingVolumeDeltaPercent: 20,
       avgTicketDeltaPercent: 10,
     });
-
-    expect(whatIf.simulatedRevenue).toBeGreaterThan(whatIf.baselineRevenue);
+    expect(whatIf.simulatedRevenue).toBeGreaterThan(whatIf.baselineRevenue ?? Infinity);
     expect(whatIf.netRevenueDelta).toBeGreaterThan(0);
-    expect(whatIf.impactBreakdown.prospectingImpact).toBeGreaterThan(0);
+    expect(whatIf.impactBreakdown?.prospectingImpact).toBeGreaterThan(0);
 
-    // Verificação de calibração via Backtest
-    const backtest = await predictiveRevenueOracleService.getBacktestMetrics(tenantA);
+    // Backtest real a partir de ForecastSnapshot
+    const backtest = await oracle.getBacktestMetrics(tenantA);
     expect(backtest.isModelCalibrated).toBe(true);
     expect(backtest.meanAbsolutePercentageError).toBeLessThan(15);
+    expect((await oracle.getBacktestMetrics(tenantB)).status).toBe('INSUFFICIENT_DATA');
 
-    // Geração e aprovação de recomendação de realocação de carteira
-    const allocations = await predictiveRevenueOracleService.generateAccountAllocationRecommendations({
+    // Aprovação de rebalanceamento persistida/auditada (sem recomendação inventada)
+    const approvalStore = new InMemoryRebalanceApprovalStore();
+    approvalStore.addLead(tenantA, 'lead-alpha-1');
+    const approvals = new RebalanceApprovalService({ store: approvalStore });
+    const approvedAllocation = await approvals.decide({
       organizationId: tenantA,
-      accounts: [
-        {
-          accountId: 'acc-quente-01',
-          accountName: 'Transportes Brasil S.A.',
-          currentOwnerId: 'seller-ocupado',
-          currentOwnerName: 'Rodrigo',
-          currentOwnerWorkload: 14,
-          industry: 'Logística',
-          estimatedPotential: 80000,
-        },
-      ],
-      sellers: [
-        {
-          sellerId: 'seller-lucas-01',
-          sellerName: 'Lucas Especialista',
-          activeDealsCount: 4,
-          maxCapacity: 10,
-          specialtyIndustries: ['Logística', 'Agronegócio'],
-          winRateInIndustry: 0.38,
-        },
-      ],
+      decidedBy: 'diretor-comercial',
+      input: {
+        recommendationId: 'rec-alpha-1',
+        leadId: 'lead-alpha-1',
+        fromOwner: 'seller-ocupado',
+        toOwner: 'seller-lucas-01',
+        decision: 'APPROVED',
+      },
     });
-
-    expect(allocations.length).toBeGreaterThanOrEqual(1);
-    expect(allocations[0].suggestedOwnerName).toBeDefined();
-
-    const approvedAllocation = await predictiveRevenueOracleService.approveAccountAllocation({
-      organizationId: tenantA,
-      recommendationId: allocations[0].recommendationId,
-      approvedBy: 'diretor-comercial',
-    });
-
-    expect(approvedAllocation.executedAllocation.approvalStatus).toBe('APPROVED');
+    expect(approvedAllocation.approval.decision).toBe('APPROVED');
 
     // ─────────────────────────────────────────────────────────────────────────
     // 3. Evolução 19: Arquitetura Multi-Região e Failover de Workers
