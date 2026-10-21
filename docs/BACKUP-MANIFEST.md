@@ -1,12 +1,13 @@
 # MANIFESTO DE BACKUP COMPLETO — BIRTH HUB 360°
 
-- **Data de Geração do Backup:** 21 de outubro de 2026, 12:44 (Horário de Brasília)
-- **Data de Auditoria e Validação Forense:** 21 de outubro de 2026, 15:55 (Horário de Brasília)
+- **Data de Geração do Backup:** 21 de outubro de 2026, 16:05 (Horário de Brasília)
+- **Data de Auditoria e Validação Forense:** 21 de outubro de 2026, 16:05 (Horário de Brasília)
 - **Origem:** `C:\Github\Birthub-360`
 - **Destino do Backup:** `G:\Meu Drive\Birthub 360`
-- **Commit HEAD em main no bundle e no GitHub:** `b4ad0669d` (`fix(gov): alinhar sequencia estrita de go-live onda 8, criterios operacionais e ciclo de vida auditavel`)
-- **Checksum SHA-256 do Bundle:** `7b7215b7be18bc01fc44cacbebb32b49643bef02601d453a8b322ff441afb86a`
-- **Tamanho do Bundle:** `422.105.336 bytes` (~422 MB)
+- **Commit HEAD em main no bundle e no GitHub:** `5a2971b3c` (`fix(gov): sanear manifestos forenses, regularizar prompts 21-23 e blindar sincronizacao auditavel do plano`)
+- **Checksum SHA-256 do Bundle Atual:** `953fc2b88fa4de264c75dd2b05c6be0a41efcfc68ac7545961221eacb920abbb`
+- **Checksum SHA-256 do Bundle Anterior (Commit b4ad0669d):** `7b7215b7be18bc01fc44cacbebb32b49643bef02601d453a8b322ff441afb86a`
+- **Tamanho do Bundle:** `422.130.681 bytes` (~422 MB)
 - **Status da Working Tree no Host:** 100% limpa, zero arquivos pendentes ou untracked no momento da geração.
 
 ---
