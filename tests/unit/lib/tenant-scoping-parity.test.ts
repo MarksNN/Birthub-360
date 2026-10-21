@@ -156,6 +156,9 @@ const KNOWN_RLS_ONLY_MODELS = [
   'ConsentSubjectKeyTombstone',
   'FlywheelApproachRecord',
   'FlywheelFewShotExample',
+  // Envelope da DEK do tenant: sem escrita pelo client global. App só SELECT/INSERT/UPDATE
+  // (destruição via trigger). RLS + REVOKE de DELETE bastam; não entra na injeção automática.
+  'TenantKeyEnvelope',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {

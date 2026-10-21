@@ -78,7 +78,14 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO prospector_app;
 -- REMED-06 v5 (parecer 15): o app NAO apaga Organization. Offboarding/retencao rodam como migrator
 -- (ou papel de offboarding com grant minimo) — ver docs/ADR/ADR-006 "Runbook". O GRANT ALL acima
 -- reconcede DELETE/TRUNCATE; retira aqui (idempotente). A migration 20261021000000 faz o mesmo.
-REVOKE DELETE, TRUNCATE ON TABLE public."Organization" FROM prospector_app;
+-- Este script roda no CI ANTES do migrate deploy, quando a tabela ainda não existe.
+DO $$
+BEGIN
+  IF to_regclass('public."Organization"') IS NOT NULL THEN
+    EXECUTE 'REVOKE DELETE, TRUNCATE ON TABLE public."Organization" FROM prospector_app';
+  END IF;
+END
+$$;
 
 -- REMED-06: o GRANT ALL acima reconcede tudo nas tabelas LGPD. Re-aplica os grants minimos (idempotente; no-op antes da migration 20261020220000 existir).
 DO $$
