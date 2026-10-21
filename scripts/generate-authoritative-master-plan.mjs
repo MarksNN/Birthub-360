@@ -1509,13 +1509,20 @@ const rawWavesData = [
     ]
   },
 
-  // --- ONDA 8: Homologação Operacional, Controles Críticos de Produção e Go-Live ---
+  // --- ONDA 8: Homologação Operacional, Controles Críticos e Go-Live ---
+  // Sequência canônica rigorosa em 6 fases:
+  // 1. Concluir segurança, backups e observabilidade (85 a 89)
+  // 2. Comprovar recuperação e rollback (90 a 92)
+  // 3. Executar testes reais em staging (93 a 96)
+  // 4. Obter parecer APROVADO do Agente 24 (97)
+  // 5. Obter autorização executiva humana para produção (98 e 99)
+  // 6. Criar a tag, publicar e executar smoke tests (100)
   {
     wave: 8,
     title: "Homologação Operacional, Controles Críticos e Go-Live",
     items: [
       {
-        id: 85, title: "Concluir inventário ROPA e fluxo automatizado de direitos do titular (DSR LGPD)",
+        id: 85, title: "Concluir inventário ROPA e fluxo DSR automatizado de esquecimento LGPD",
         agent: "21 — Privacidade e LGPD", num: "21", slug: "21-privacidade-lgpd", p: "P0",
         filesOwned: ["docs/lgpd/INVENTARIO_TRATAMENTO_ROPA.md", "src/shared/services/dataSubjectErasure.service.ts"],
         filesOther: ["prisma/schema.prisma (Agente 01)"],
@@ -1525,13 +1532,141 @@ const rawWavesData = [
         test: "npm run test:unit -- tests/unit/security/dataSubjectErasure.unit.test.ts",
         plan: [
           { step: "Finalizar INVENTARIO_TRATAMENTO_ROPA.md cobrindo 100% das entidades com PII", criterion: "Bases legais, prazos e finalidades mapeadas" },
-          { step: "Implementar rotina transacional de anonimização e esquecimento em dataSubjectErasure.service.ts", criterion: "Substituição de nomes, e-mails e fones por hashes" },
+          { step: "Implementar rotina transacional de anonimização e esquecimento em dataSubjectErasure.service.ts", criterion: "Substituição de nomes, e-mails e fones por hashes irreversíveis" },
           { step: "Executar testes automatizados de exclusão de dados do titular", criterion: "npm run test:unit passa verde" }
         ],
         criteria: "dataSubjectErasure.unit.test.ts confirma esquecimento irreversível de PII com integridade referencial."
       },
       {
-        id: 86, title: "Validar jornada de ponta a ponta com o End-to-End Flow Validator (Lead -> Deal -> Faturamento)",
+        id: 86, title: "Decisão Arquitetural Formal: Manter LOCAL-FIRST vs Migrar para AWS (ADR-009)",
+        agent: "00 — Coordenador", num: "00", slug: "00-coordenador", p: "P0",
+        filesOwned: ["docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md"],
+        filesOther: [".github/workflows/production.yaml (Agente 08)"],
+        outOfScope: ["Provisionar nuvem pública sem aprovação executiva formal de orçamento e conformidade"],
+        assumptions: ["A estratégia LOCAL-FIRST consolidada em production.yaml é autossuficiente e mais segura para a fase inicial."],
+        desc: "Arbitrar formalmente entre operação em infraestrutura local controlada (Docker/Host dedicado) e deploy em AWS ECS/RDS, definindo os requisitos de liberação.",
+        test: "grep -q 'Status: ACCEPTED' docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md && grep -q 'DECISAO_INFRA:' docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md",
+        plan: [
+          { step: "Analisar custos operacionais, soberania de dados LGPD e complexidade de manutenção", criterion: "Análise quantitativa de TCO registrada" },
+          { step: "Registrar a decisão executiva consensual no ADR-009", criterion: "Diretriz clara para o pipeline de release" },
+          { step: "Submeter para revisão formal do Agente 24", criterion: "Status ACCEPTED no documento" }
+        ],
+        criteria: "ADR-009 publicado com status ACCEPTED e decisão executiva registrada comprovando diretriz clara."
+      },
+      {
+        id: 87, title: "Configurar e provisionar infraestrutura de produção com TLS e alta disponibilidade",
+        agent: "10 — Infraestrutura, Observabilidade e SRE", num: "10", slug: "10-infraestrutura-sre", p: "P1",
+        filesOwned: ["docker-compose.yml", "infrastructure/**"],
+        filesOther: ["nginx/nginx.conf (Agente 10)"],
+        outOfScope: ["Expor portas de banco de dados diretamente para a internet pública"],
+        assumptions: ["A infraestrutura deve atender estritamente ao ambiente decidido no ADR-009."],
+        desc: "Configurar containers de produção, certificados SSL/TLS com renovação automática, rede isolada e limites de memória/CPU por container.",
+        test: "docker compose config --quiet && test -s docker-compose.yml",
+        plan: [
+          { step: "Revisar docker-compose.yml ou manifestos de infraestrutura", criterion: "Limites de recursos e redes isoladas configuradas" },
+          { step: "Configurar certificados Let's Encrypt / TLS 1.3 com renovação automática", criterion: "Criptografia de ponta a ponta" },
+          { step: "Validar sintaxe e integridade das definições", criterion: "Configuração aprovada sem avisos críticos" }
+        ],
+        criteria: "docker compose config --quiet retorna código 0 com zero erros de sintaxe ou variáveis ausentes."
+      },
+      {
+        id: 88, title: "Configurar observabilidade, telemetria de erros em tempo real e tracing distribuído (Sentry / OpenTelemetry)",
+        agent: "10 — Infraestrutura, Observabilidade e SRE", num: "10", slug: "10-infraestrutura-sre", p: "P1",
+        filesOwned: ["src/lib/observability/telemetry.ts"],
+        filesOther: ["src/server.ts (Agente 00)"],
+        outOfScope: ["Enviar tokens, senhas ou dados de clientes nos eventos de erro para o Sentry"],
+        assumptions: ["Erros em produção devem ser notificados imediatamente à equipe de SRE via alertas."],
+        desc: "Inicializar SDK de telemetria com amostragem inteligente, rastreamento de transações de API e sanitização estrita de payloads de erro.",
+        test: "npm run test:unit -- tests/unit/observability/telemetry.test.ts",
+        plan: [
+          { step: "Configurar interceptadores de erro e spans OpenTelemetry em telemetry.ts", criterion: "Captura de contexto de tenant sanitizado" },
+          { step: "Adicionar filtro beforeSend redigindo qualquer variável que contenha token ou senha", criterion: "Zero vazamento de PII nos relatórios de erro" },
+          { step: "Executar testes de telemetria", criterion: "npm run test:unit passa com sucesso" }
+        ],
+        criteria: "telemetry.test.ts aprova inicialização da telemetria e sanitização comprovada de payloads de erro."
+      },
+      {
+        id: 89, title: "Implementar rotina diária de backup criptografado do PostgreSQL com AES-256 e teste de restauração",
+        agent: "01A — Confiabilidade de Dados, RLS e Retenção", num: "01A", slug: "01A-dados-rls-retencao", p: "P0",
+        filesOwned: ["scripts/db/backup-encrypted.sh", "scripts/db/restore-test.sh"],
+        filesOther: ["infrastructure/** (Agente 10)"],
+        outOfScope: ["Armazenar backups não criptografados ou deixar a senha de criptografia em texto puro no script"],
+        assumptions: ["Backups sem teste de restauração periódico não são backups confiáveis."],
+        desc: "Script automatizado que gera pg_dump em formato custom, comprime com gzip, criptografa com OpenSSL AES-256-CBC e valida restauração em banco temporário.",
+        test: "bash scripts/db/backup-encrypted.sh --verify-crypto",
+        plan: [
+          { step: "Criar script backup-encrypted.sh com chave simétrica via variável de ambiente", criterion: "Arquivo .sql.gz.enc gerado" },
+          { step: "Criar script restore-test.sh que descriptografa e restaura em banco efêmero", criterion: "Restauração bem-sucedida sem erros de dados" },
+          { step: "Executar ensaio de verificação criptográfica", criterion: "Script passa com sucesso e valida integridade" }
+        ],
+        criteria: "backup-encrypted.sh --verify-crypto executa com código 0 comprovando geração e descriptografia válida."
+      },
+      {
+        id: 90, title: "Executar varredura profunda de segredos no diff acumulado da release (Gitleaks, 0 findings)",
+        agent: "15 — Segurança Aplicada e Rotação de Segredos", num: "15", slug: "15-seguranca-aplicada", p: "P0",
+        filesOwned: ["scripts/security/secret-scan-diff.sh"],
+        filesOther: [".github/workflows/** (Agente 08)"],
+        outOfScope: ["Ignorar segredos com comentários de 'false positive' sem auditoria detalhada"],
+        assumptions: ["Qualquer token ou chave real commitada no histórico é um bloqueador fatal de release."],
+        desc: "Varredura automatizada com Gitleaks em todo o histórico de commits da versão candidata a lançamento, certificando ZERO credenciais expostas.",
+        test: "bash scripts/security/secret-scan-diff.sh origin/main",
+        plan: [
+          { step: "Configurar regras estritas do Gitleaks no script secret-scan-diff.sh", criterion: "Detecção de chaves de API, senhas, tokens JWT e certificados" },
+          { step: "Executar varredura profunda no diff acumulado de todas as ondas", criterion: "Análise de 100% dos commits da release" },
+          { step: "Certificar código de saída zero", criterion: "Zero findings reportados pelo Gitleaks" }
+        ],
+        criteria: "secret-scan-diff.sh retorna código 0 com zero segredos ou tokens encontrados no diff acumulado."
+      },
+      {
+        id: 91, title: "Executar simulação de Disaster Recovery e restauração de dados a quente (RTO < 15 min, RPO < 1 min)",
+        agent: "10 — Infraestrutura, Observabilidade e SRE", num: "10", slug: "10-infraestrutura-sre", p: "P1",
+        filesOwned: ["docs/ops/DISASTER_RECOVERY_PLAYBOOK.md", "scripts/ops/dr-simulation.sh"],
+        filesOther: ["scripts/db/restore-test.sh (Agente 01A)"],
+        outOfScope: ["Executar simulação sem plano documentado de reversão"],
+        assumptions: ["Em caso de perda total de storage, a plataforma deve se recuperar em menos de 15 minutos."],
+        desc: "Simular corrupção proposital do banco secundário, executar recuperação a partir do último backup e comprovar RTO < 15 minutos e integridade de dados.",
+        test: "bash scripts/ops/dr-simulation.sh --verify-rto-rpo",
+        plan: [
+          { step: "Documentar procedimentos de DR passo a passo no DISASTER_RECOVERY_PLAYBOOK.md", criterion: "Instruções claras de failover e restauração" },
+          { step: "Executar simulação automatizada de recuperação de desastre", criterion: "Tempo de recuperação cronometrado < 15 minutos" },
+          { step: "Validar integridade dos dados recuperados", criterion: "Zero discrepâncias em relação ao estado pré-desastre" }
+        ],
+        criteria: "dr-simulation.sh --verify-rto-rpo retorna código 0 comprovando RTO < 15 minutos e RPO < 1 minuto."
+      },
+      {
+        id: 92, title: "Validar procedimento de rollback automático de deploy e reversão de migrações em caso de falha",
+        agent: "08A — Operações Git e Deploy AWS", num: "08A", slug: "08A-git-deploy-aws", p: "P0",
+        filesOwned: ["scripts/deploy/rollback-drill.sh"],
+        filesOther: ["prisma/migrations/** (Agente 01)"],
+        outOfScope: ["Executar rollback manual desordenado que deixe o banco em estado inconsistente"],
+        assumptions: ["Se o healthcheck falhar após o deploy, o tráfego deve retornar à versão estável imediatamente."],
+        desc: "Script de ensaio de rollback que simula falha em contêiner recém-implantado, revertendo a versão da imagem e o tráfego em menos de 30 segundos com zero perda de dados.",
+        test: "bash scripts/deploy/rollback-drill.sh --verify",
+        plan: [
+          { step: "Criar script rollback-drill.sh simulando falha de inicialização pós-deploy", criterion: "Detecção automática de erro no healthcheck" },
+          { step: "Executar reversão imediata de imagem e redirecionamento de tráfego", criterion: "Rollback concluído em menos de 30 segundos" },
+          { step: "Validar recuperação de serviço com retorno HTTP 200", criterion: "Ambiente estável reestabelecido com sucesso" }
+        ],
+        criteria: "rollback-drill.sh --verify retorna código 0 com reversão automática concluída em menos de 30 segundos."
+      },
+      {
+        id: 93, title: "Executar ensaio de deploy (deploy rehearsal) em ambiente staging espelho com migrações reais e healthcheck",
+        agent: "08A — Operações Git e Deploy AWS", num: "08A", slug: "08A-git-deploy-aws", p: "P0",
+        filesOwned: ["scripts/deploy/staging-rehearsal.sh"],
+        filesOther: ["prisma/migrations/** (Agente 01)"],
+        outOfScope: ["Executar o deploy definitivo de produção nesta etapa"],
+        assumptions: ["O ensaio de deploy deve simular 100% das etapas do lançamento em ambiente idêntico ao de produção."],
+        desc: "Executar script de deploy em staging espelho com aplicação de migrações, subida de containers, checagem de saúde e validação de tráfego.",
+        test: "bash scripts/deploy/staging-rehearsal.sh --verify-traffic",
+        plan: [
+          { step: "Preparar script staging-rehearsal.sh contendo o pipeline exato de produção", criterion: "Ordem: migrate -> healthcheck -> switch traffic" },
+          { step: "Executar ensaio em staging espelho validando cada transição", criterion: "Todas as etapas concluídas com sucesso" },
+          { step: "Testar estabilidade com tráfego sintético", criterion: "Zero erros HTTP 5xx nas rotas críticas" }
+        ],
+        criteria: "staging-rehearsal.sh --verify-traffic executa com código 0 com validação de saúde e tráfego aprovada."
+      },
+      {
+        id: 94, title: "Validar jornada comercial de ponta a ponta com o End-to-End Flow Validator (Lead -> Deal -> Faturamento)",
         agent: "22 — Verificação de Realidade", num: "22", slug: "22-verificacao-realidade", p: "P0",
         filesOwned: ["tests/e2e/completeCustomerJourney.e2e.test.ts"],
         filesOther: ["src/** (Agentes 02, 04, 17)"],
@@ -1547,134 +1682,6 @@ const rawWavesData = [
         criteria: "completeCustomerJourney.e2e.test.ts passa 100% verde com persistência em banco comprovada."
       },
       {
-        id: 87, title: "Decisão Arquitetural Formal: Manter LOCAL-FIRST vs Migrar para AWS (ADR-009)",
-        agent: "00 — Coordenador", num: "00", slug: "00-coordenador", p: "P0",
-        filesOwned: ["docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md"],
-        filesOther: [".github/workflows/production.yaml (Agente 08)"],
-        outOfScope: ["Provisionar nuvem pública sem aprovação executiva formal de orçamento e conformidade"],
-        assumptions: ["A estratégia LOCAL-FIRST consolidada em production.yaml é autossuficiente e mais segura para a fase inicial."],
-        desc: "Arbitrar formalmente entre operação em infraestrutura local controlada (Docker/Host dedicado) e deploy em AWS ECS/RDS, definindo os requisitos de liberação.",
-        test: "test -s docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md && grep -q 'Status: ACCEPTED' docs/architecture/ADR-009-LOCAL-FIRST-OU-AWS.md",
-        plan: [
-          { step: "Analisar custos operacionais, soberania de dados LGPD e complexidade de manutenção", criterion: "Análise quantitativa de TCO registrada" },
-          { step: "Registrar a decisão executiva consensual no ADR-009", criterion: "Diretriz clara para o pipeline de release" },
-          { step: "Submeter para revisão formal do Agente 24", criterion: "Status ACCEPTED no documento" }
-        ],
-        criteria: "ADR-009 publicado com status ACCEPTED e decisão executiva registrada."
-      },
-      {
-        id: 88, title: "Configurar e provisionar infraestrutura de produção aprovada com TLS e alta disponibilidade",
-        agent: "10 — Infraestrutura, Observabilidade e SRE", num: "10", slug: "10-infraestrutura-sre", p: "P1",
-        filesOwned: ["docker-compose.yml", "infrastructure/**"],
-        filesOther: ["nginx/nginx.conf (Agente 10)"],
-        outOfScope: ["Expor portas de banco de dados diretamente para a internet pública"],
-        assumptions: ["A infraestrutura deve atender estritamente ao ambiente decidido no ADR-009."],
-        desc: "Configurar containers de produção, certificados SSL/TLS com renovação automática, rede isolada e limites de memória/CPU por container.",
-        test: "docker compose config || test -s docker-compose.yml",
-        plan: [
-          { step: "Revisar docker-compose.yml ou manifestos de infraestrutura", criterion: "Limites de recursos e redes isoladas configuradas" },
-          { step: "Configurar certificados Let's Encrypt / TLS 1.3 com renovação automática", criterion: "Criptografia de ponta a ponta" },
-          { step: "Validar sintaxe e integridade das definições", criterion: "Configuração aprovada sem avisos críticos" }
-        ],
-        criteria: "docker compose config retorna saída válida com zero erros de sintaxe ou variáveis ausentes."
-      },
-      {
-        id: 89, title: "Configurar monitoramento de erros em tempo real e tracing distribuído (Sentry / OpenTelemetry)",
-        agent: "10 — Infraestrutura, Observabilidade e SRE", num: "10", slug: "10-infraestrutura-sre", p: "P1",
-        filesOwned: ["src/lib/observability/telemetry.ts"],
-        filesOther: ["src/server.ts (Agente 00)"],
-        outOfScope: ["Enviar tokens, senhas ou dados de clientes nos eventos de erro para o Sentry"],
-        assumptions: ["Erros em produção devem ser notificados imediatamente à equipe de SRE via alertas."],
-        desc: "Inicializar SDK de telemetria com amostragem inteligente, rastreamento de transações de API e sanitização estrita de payloads de erro.",
-        test: "npm run test:unit -- tests/unit/observability/telemetry.test.ts",
-        plan: [
-          { step: "Configurar interceptadores de erro e spans OpenTelemetry em telemetry.ts", criterion: "Captura de contexto de tenant sanitizado" },
-          { step: "Adicionar filtro beforeSend redigindo qualquer variável que contenha token ou senha", criterion: "Zero vazamento de PII nos relatórios de erro" },
-          { step: "Executar testes de telemetria", criterion: "npm run test:unit passa com sucesso" }
-        ],
-        criteria: "telemetry.test.ts aprova inicialização da telemetria e sanitização comprovada de payloads."
-      },
-      {
-        id: 90, title: "Implementar rotina diária de backup criptografado do PostgreSQL com AES-256 e teste de restauração",
-        agent: "01A — Confiabilidade de Dados, RLS e Retenção", num: "01A", slug: "01A-dados-rls-retencao", p: "P0",
-        filesOwned: ["scripts/db/backup-encrypted.sh", "scripts/db/restore-test.sh"],
-        filesOther: ["infrastructure/** (Agente 10)"],
-        outOfScope: ["Armazenar backups não criptografados ou deixar a senha de criptografia em texto puro no script"],
-        assumptions: ["Backups sem teste de restauração periódico não são backups confiáveis."],
-        desc: "Script automatizado que gera pg_dump em formato custom, comprime com gzip, criptografa com OpenSSL AES-256-CBC e valida restauração em banco temporário.",
-        test: "bash scripts/db/backup-encrypted.sh --dry-run",
-        plan: [
-          { step: "Criar script backup-encrypted.sh com chave simétrica via variável de ambiente", criterion: "Arquivo .sql.gz.enc gerado" },
-          { step: "Criar script restore-test.sh que descriptografa e restaura em banco efêmero", criterion: "Restauração bem-sucedida sem erros de dados" },
-          { step: "Executar ensaio dry-run", criterion: "Script passa com sucesso e valida integridade" }
-        ],
-        criteria: "backup-encrypted.sh --dry-run executa com código 0 comprovando geração de arquivo criptografado."
-      },
-      {
-        id: 91, title: "Executar simulação de Disaster Recovery e restauração de dados a quente (RTO < 15 min, RPO < 1 min)",
-        agent: "10 — Infraestrutura, Observabilidade e SRE", num: "10", slug: "10-infraestrutura-sre", p: "P1",
-        filesOwned: ["docs/ops/DISASTER_RECOVERY_PLAYBOOK.md", "scripts/ops/dr-simulation.sh"],
-        filesOther: ["scripts/db/restore-test.sh (Agente 01A)"],
-        outOfScope: ["Executar simulação sem plano documentado de reversão"],
-        assumptions: ["Em caso de perda total de storage, a plataforma deve se recuperar em menos de 15 minutos."],
-        desc: "Simular corrupção proposital do banco secundário, executar recuperação a partir do último backup e comprovar RTO < 15 minutos e integridade de dados.",
-        test: "test -s docs/ops/DISASTER_RECOVERY_PLAYBOOK.md && bash scripts/ops/dr-simulation.sh --dry-run",
-        plan: [
-          { step: "Documentar procedimentos de DR passo a passo no DISASTER_RECOVERY_PLAYBOOK.md", criterion: "Instruções claras de failover e restauração" },
-          { step: "Executar simulação automatizada de recuperação de desastre", criterion: "Tempo de recuperação cronometrado < 15 minutos" },
-          { step: "Validar integridade dos dados recuperados", criterion: "Zero discrepâncias em relação ao estado pré-desastre" }
-        ],
-        criteria: "dr-simulation.sh retorna código 0 com medição de RTO < 15 minutos comprovada."
-      },
-      {
-        id: 92, title: "Executar varredura final de segredos no diff acumulado da branch main (Gitleaks, 0 findings)",
-        agent: "15 — Segurança Aplicada e Rotação de Segredos", num: "15", slug: "15-seguranca-aplicada", p: "P0",
-        filesOwned: ["scripts/security/secret-scan-diff.sh"],
-        filesOther: [".github/workflows/** (Agente 08)"],
-        outOfScope: ["Ignorar segredos com comentários de 'false positive' sem auditoria detalhada"],
-        assumptions: ["Qualquer token ou chave real commitada no histórico é um bloqueador fatal de release."],
-        desc: "Varredura automatizada com Gitleaks em todo o histórico de commits da versão candidata a lançamento, certificando ZERO credenciais expostas.",
-        test: "bash scripts/security/secret-scan-diff.sh origin/main",
-        plan: [
-          { step: "Configurar regras estritas do Gitleaks no script secret-scan-diff.sh", criterion: "Detecção de chaves de API, senhas, tokens JWT e certificados" },
-          { step: "Executar varredura profunda no diff acumulado de todas as ondas", criterion: "Análise de 100% dos commits da release" },
-          { step: "Certificar código de saída zero", criterion: "Zero findings reportados pelo Gitleaks" }
-        ],
-        criteria: "secret-scan-diff.sh retorna código 0 com zero segredos ou tokens encontrados."
-      },
-      {
-        id: 93, title: "Auditoria FinOps e limites de quotas dos provedores de IA (orçamento de tokens por organização)",
-        agent: "23 — Custo, Performance e Limites de IA", num: "23", slug: "23-custo-performance-ia", p: "P2",
-        filesOwned: ["docs/finops/RELATORIO_FINOPS_LANCAMENTO.md", "src/lib/ai/gateway/tenantQuotaLimiter.ts"],
-        filesOther: ["src/lib/ai/gateway/** (Agente 07)"],
-        outOfScope: ["Permitir que um único tenant consuma todo o orçamento de IA da plataforma"],
-        assumptions: ["Cada plano comercial possui uma cota mensal de tokens de inferência que deve ser respeitada."],
-        desc: "Implementar limitador de cota de tokens por organização com alertas ao atingir 80% do limite e bloqueio seguro em 100%.",
-        test: "npm run test:unit -- tests/unit/ai/tenantQuotaLimiter.test.ts",
-        plan: [
-          { step: "Implementar tenantQuotaLimiter.ts verificando consumo acumulado no Redis/Postgres", criterion: "Controle de saldo em tempo real" },
-          { step: "Elaborar RELATORIO_FINOPS_LANCAMENTO.md com modelo de custo por usuário ativo", criterion: "Projeção de margem bruta > 75%" },
-          { step: "Executar testes de bloqueio de cota", criterion: "npm run test:unit passa verde" }
-        ],
-        criteria: "tenantQuotaLimiter.test.ts aprova bloqueio em 100% da cota e notificação em 80%."
-      },
-      {
-        id: 94, title: "Executar ensaio de deploy (deploy rehearsal) em ambiente espelho com migrações reais",
-        agent: "08A — Operações Git e Deploy AWS", num: "08A", slug: "08A-git-deploy-aws", p: "P0",
-        filesOwned: ["scripts/deploy/staging-rehearsal.sh"],
-        filesOther: ["prisma/migrations/** (Agente 01)"],
-        outOfScope: ["Executar o deploy definitivo de produção nesta etapa"],
-        assumptions: ["O ensaio de deploy deve simular 100% das etapas do lançamento em ambiente idêntico ao de produção."],
-        desc: "Executar script de deploy em staging espelho com aplicação de migrações, subida de containers, checagem de saúde e validação de rollback.",
-        test: "bash scripts/deploy/staging-rehearsal.sh --dry-run",
-        plan: [
-          { step: "Preparar script staging-rehearsal.sh contendo o pipeline exato de produção", criterion: "Ordem: migrate -> healthcheck -> switch traffic" },
-          { step: "Executar ensaio em modo dry-run validando cada transição", criterion: "Todas as etapas concluídas com sucesso" },
-          { step: "Testar procedimento de rollback automático em caso de falha de migração", criterion: "Reversão para versão anterior em < 30 segundos" }
-        ],
-        criteria: "staging-rehearsal.sh --dry-run executa com código 0 com validação de saúde aprovada."
-      },
-      {
         id: 95, title: "Verificação de realidade final em staging comprovando persistência de UI e ausência de simulações",
         agent: "22 — Verificação de Realidade", num: "22", slug: "22-verificacao-realidade", p: "P0",
         filesOwned: [".agents/reviews/22-verificacao-realidade-final.md"],
@@ -1682,13 +1689,13 @@ const rawWavesData = [
         outOfScope: ["Aprovar qualquer funcionalidade que dependa de mocks ou que não persista no PostgreSQL"],
         assumptions: ["O Agente 22 é a autoridade máxima em atestar que o produto opera de forma real e transparente."],
         desc: "Auditoria prática de cada tela do sistema em staging espelho, atestando que todas as ações persistem, dados sobrevivem a reload e não há dados falsos.",
-        test: "test -s .agents/reviews/22-verificacao-realidade-final.md && grep -q 'VERIFICAÇÃO: APROVADO' .agents/reviews/22-verificacao-realidade-final.md",
+        test: "grep -q 'VERIFICACAO_STAGING: APROVADO' .agents/reviews/22-verificacao-realidade-final.md && grep -q 'ZERO_MOCKS_CONFIRMADO: true' .agents/reviews/22-verificacao-realidade-final.md",
         plan: [
           { step: "Auditar cockpits de CRM, Oráculo, Voz, Mobile e Configurações", criterion: "Ações de criação e edição verificadas diretamente no banco" },
           { step: "Certificar que dados demonstrativos estão devidamente sinalizados", criterion: "Zero métricas inventadas sem base histórica" },
-          { step: "Emitir relatório conclusivo com veredicto", criterion: "Arquivo .agents/reviews/22-verificacao-realidade-final.md publicado com status VERIFICAÇÃO: APROVADO" }
+          { step: "Emitir relatório conclusivo com veredicto", criterion: "Arquivo .agents/reviews/22-verificacao-realidade-final.md publicado com status VERIFICACAO_STAGING: APROVADO" }
         ],
-        criteria: "Relatório de verificação de realidade publicado com status VERIFICAÇÃO: APROVADO."
+        criteria: "Relatório de verificação de realidade publicado confirmando VERIFICACAO_STAGING: APROVADO e ZERO_MOCKS_CONFIRMADO."
       },
       {
         id: 96, title: "Quality Gate Central completo 100% verde no commit candidato a release",
@@ -1698,45 +1705,45 @@ const rawWavesData = [
         outOfScope: ["Aceitar qualquer quality gate com avisos de bypass ou falhas parciais"],
         assumptions: ["O commit candidato a lançamento deve passar por todos os 10 quality gates automatizados com zero erros."],
         desc: "Executar o gate de release obrigatório: typecheck, lint, test:architecture, test:unit, test:integration, test:e2e, build e secret-scan.",
-        test: "npm run test:architecture && npm run test:unit && npm run build",
+        test: "npm run test:architecture && npm run test:unit && npm run test:integration && npm run build",
         plan: [
           { step: "Executar suíte arquitetural e testes unitários", criterion: "100% de aprovação" },
           { step: "Executar suíte de integração e testes de ponta a ponta", criterion: "100% de aprovação" },
           { step: "Executar build de produção e varredura de segurança", criterion: "Código de retorno zero em todas as etapas" }
         ],
-        criteria: "Todos os quality gates executados com código de saída 0 e relatório registrado."
+        criteria: "Todos os 10 quality gates executados com código de saída 0 no commit exato candidato à release."
       },
       {
-        id: 97, title: "Homologar manuais operacionais, termos de uso e política de IA responsável da plataforma",
+        id: 97, title: "Certificado de Auditoria e Emissão do Selo de Prontidão Go-Live pelo Agente 24 vinculado ao commit SHA",
+        agent: "24 — Revisão Independente", num: "24", slug: "24-revisao-independente", p: "P0",
+        filesOwned: [".agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md"],
+        filesOther: [".agents/reviews/** (Agente 24)"],
+        outOfScope: ["Alterar qualquer arquivo de produto"],
+        assumptions: ["O Agente 24 é o auditor soberano e obrigatório de toda a release."],
+        desc: "Consolidar os pareceres de todas as 8 ondas anteriores, auditar o diff total acumulado e emitir o Certificado de Auditoria Irrevogável com SHA exato liberando o Go-Live.",
+        test: "grep -q 'PARECER: APROVADO' .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md && grep -q 'STATUS_GO_LIVE: LIBERADO' .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md && git log -1 --format='%H' | xargs -I {} grep -q {} .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md",
+        plan: [
+          { step: "Verificar a existência e status APROVADO dos pareceres das ondas anteriores", criterion: "Ondas 0 a 7 com aprovação formal confirmada" },
+          { step: "Auditar evidências de Disaster Recovery, Secret Scan, Rollback e Staging Reality", criterion: "Zero bloqueadores remanescentes" },
+          { step: "Emitir o Certificado de Auditoria Go-Live com o commit SHA exato da release", criterion: "Arquivo .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md publicado com STATUS_GO_LIVE: LIBERADO" }
+        ],
+        criteria: "Certificado publicado com STATUS_GO_LIVE: LIBERADO contendo o commit SHA exato de HEAD."
+      },
+      {
+        id: 98, title: "Homologar manuais operacionais, termos de uso e política de IA responsável da plataforma",
         agent: "11 — Marca e Ativos Institucionais", num: "11", slug: "11-marca-institucional", p: "P2",
         filesOwned: ["docs/manual/MANUAL_OPERACIONAL_2026.md", "docs/legal/TERMOS_DE_USO_IA.md"],
         filesOther: ["docs/lgpd/** (Agente 21)"],
         outOfScope: ["Deixar usuários corporativos sem orientação clara sobre limitações e ética no uso de IA"],
         assumptions: ["A conformidade institucional e jurídica exige transparência no uso de modelos generativos."],
         desc: "Publicar documentação oficial para clientes e equipe interna com boas práticas, termos de privacidade e responsabilidade civil de agentes autônomos.",
-        test: "test -s docs/manual/MANUAL_OPERACIONAL_2026.md && test -s docs/legal/TERMOS_DE_USO_IA.md",
+        test: "test -s docs/manual/MANUAL_OPERACIONAL_2026.md && grep -q 'HOMOLOGACAO_MARCA: APROVADO' docs/manual/MANUAL_OPERACIONAL_2026.md",
         plan: [
           { step: "Redigir MANUAL_OPERACIONAL_2026.md com guias de uso de todos os módulos", criterion: "Manual completo e ilustrado" },
           { step: "Elaborar TERMOS_DE_USO_IA.md em conformidade com o Marco Civil e LGPD", criterion: "Termos revisados e validados juridicamente" },
-          { step: "Publicar documentação na pasta oficial", criterion: "Arquivos presentes e formatados em Markdown" }
+          { step: "Registrar homologação de marca institucional", criterion: "Status HOMOLOGACAO_MARCA: APROVADO registrado" }
         ],
-        criteria: "Manuais e termos de uso publicados e estruturados sem pendências."
-      },
-      {
-        id: 98, title: "Certificado de Auditoria e Emissão do Selo de Prontidão Go-Live pelo Agente 24",
-        agent: "24 — Revisão Independente", num: "24", slug: "24-revisao-independente", p: "P0",
-        filesOwned: [".agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md"],
-        filesOther: [".agents/reviews/** (Agente 24)"],
-        outOfScope: ["Alterar qualquer arquivo de produto"],
-        assumptions: ["O Agente 24 é o auditor soberano e obrigatório de toda a release."],
-        desc: "Consolidar os pareceres de todas as 8 ondas anteriores, auditar o diff total acumulado e emitir o Certificado de Auditoria Irrevogável liberando o Go-Live.",
-        test: "grep -q 'PARECER: APROVADO' .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md && grep -q 'STATUS_GO_LIVE: LIBERADO' .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md",
-        plan: [
-          { step: "Verificar a existência e status APROVADO dos 8 pareceres de onda", criterion: "Ondas 0 a 7 com aprovação formal confirmada" },
-          { step: "Auditar evidências de Disaster Recovery, Secret Scan e Realidade em Staging", criterion: "Zero bloqueadores remanescentes" },
-          { step: "Emitir o Certificado de Auditoria Go-Live com assinatura digital", criterion: "Arquivo .agents/reviews/24-CERTIFICADO-GO-LIVE-PRODUCAO.md publicado com STATUS_GO_LIVE: LIBERADO" }
-        ],
-        criteria: "Certificado publicado com STATUS_GO_LIVE: LIBERADO e commit SHA exato da release."
+        criteria: "Manuais e termos de uso publicados e estruturados com homologação institucional aprovada."
       },
       {
         id: 99, title: "Autorização Executiva Humana e Assinatura do Termo de Liberação para Clientes Piloto",
@@ -1746,30 +1753,31 @@ const rawWavesData = [
         outOfScope: ["Executar o corte da tag sem assinatura executiva formal"],
         assumptions: ["O lançamento de software comercial exige aprovação executiva formal de negócio e risco."],
         desc: "Coletar o Certificado do Agente 24, homologar junto aos stakeholders humanos e registrar o termo executivo autorizando o deploy de produção.",
-        test: "test -s docs/ops/TERMO_AUTORIZACAO_EXECUTIVA_GO_LIVE.md && grep -q 'AUTORIZACAO_HUMANA: CONCEDIDA' docs/ops/TERMO_AUTORIZACAO_EXECUTIVA_GO_LIVE.md",
+        test: "grep -q 'AUTORIZACAO_HUMANA: CONCEDIDA' docs/ops/TERMO_AUTORIZACAO_EXECUTIVA_GO_LIVE.md && grep -q 'ASSINATURA_DIGITAL:' docs/ops/TERMO_AUTORIZACAO_EXECUTIVA_GO_LIVE.md",
         plan: [
           { step: "Apresentar dossiê de prontidão com relatórios técnicos e parecer do Agente 24", criterion: "Dossiê aprovado pelos líderes técnicos e humanos" },
           { step: "Formalizar o documento TERMO_AUTORIZACAO_EXECUTIVA_GO_LIVE.md", criterion: "Assinatura registrada com data e escopo autorizado" },
           { step: "Emitir ordem de lançamento para o Agente 08A", criterion: "Ordem de corte de tag emitida" }
         ],
-        criteria: "Termo de autorização executiva publicado com AUTORIZACAO_HUMANA: CONCEDIDA."
+        criteria: "Termo de autorização executiva publicado com AUTORIZACAO_HUMANA: CONCEDIDA e assinatura digital."
       },
       {
-        id: 100, title: "Corte oficial da tag v1.0.0, push da release e chaveamento de tráfego de produção",
+        id: 100, title: "Corte oficial da tag v1.0.0, push da release, ativação de tráfego e smoke tests em produção",
         agent: "08A — Operações Git e Deploy AWS", num: "08A", slug: "08A-git-deploy-aws", p: "P0",
-        filesOwned: [".agents/runs/08A-registro-go-live-v1.0.0.md"],
+        filesOwned: [".agents/runs/08A-registro-go-live-v1.0.0.md", "scripts/deploy/production-smoke-tests.sh"],
         filesOther: ["src/server.ts (Agente 00)"],
         outOfScope: ["Utilizar git push --force ao enviar a tag para o repositório remoto"],
         assumptions: ["Todas as 99 etapas anteriores foram concluídas, testadas e auditadas com evidências verificáveis."],
-        desc: "Executar o corte da tag semântica v1.0.0-release, fazer o push limpo para o origin, aplicar migrações no ambiente oficial e chavear o tráfego comercial com monitoramento ativo.",
-        test: "git tag -l 'v1.0.0-release' && test -s .agents/runs/08A-registro-go-live-v1.0.0.md",
+        desc: "Executar o corte da tag semântica v1.0.0-release, fazer o push limpo para o origin, aplicar migrações no ambiente oficial, chavear o tráfego comercial e executar smoke tests em tempo real.",
+        test: "git tag -l 'v1.0.0-release' && bash scripts/deploy/production-smoke-tests.sh",
         plan: [
           { step: "Criar tag anotada assinada no commit SHA aprovado", criterion: "git tag -a v1.0.0-release -m 'Birth Hub 360 - Release Oficial v1.0.0'" },
           { step: "Executar push da tag para origin/main sem force-push", criterion: "git push origin v1.0.0-release concluído com sucesso" },
-          { step: "Executar pipeline de deploy oficial e verificar telemetria de produção", criterion: "Aplicação respondendo 200 OK com zero erros no Sentry" },
-          { step: "Publicar relatório de conclusão do Go-Live", criterion: "Arquivo .agents/runs/08A-registro-go-live-v1.0.0.md registrado" }
+          { step: "Executar pipeline de deploy oficial e chavear tráfego", criterion: "Tráfego direcionado para a nova versão" },
+          { step: "Executar bateria de smoke tests de produção em tempo real", criterion: "bash scripts/deploy/production-smoke-tests.sh retorna código 0 com todos os endpoints 200 OK" },
+          { step: "Publicar relatório final de lançamento", criterion: "Arquivo .agents/runs/08A-registro-go-live-v1.0.0.md registrado" }
         ],
-        criteria: "Tag v1.0.0-release publicada no GitHub e tráfego de produção ativo com sucesso."
+        criteria: "Tag v1.0.0-release publicada no GitHub e smoke tests de produção 100% aprovados."
       }
     ]
   }
@@ -1806,6 +1814,16 @@ for (const wave of rawWavesData) {
 
 // Generate canonical Section 11 prompt for each step
 for (const s of allSteps) {
+  let lifecycle = "ESPECIFICADO";
+  if (s.status.includes('INTEGRADO')) {
+    lifecycle = "INTEGRADO_NA_MAIN";
+  } else if (s.githubPr && !s.status.includes('CONFLITO')) {
+    lifecycle = "CÓDIGO_ESCRITO";
+  } else if (s.status.includes('EM REVISÃO')) {
+    lifecycle = "TESTADO_LOCALMENTE";
+  }
+  s.lifecycle = lifecycle;
+
   const planLines = s.plan.map((p, idx) => `${idx + 1}. ${p.step} → verificar: ${p.criterion}`).join('\n');
   const filesOwnedLines = s.filesOwned.map(f => `- ${f}`).join('\n');
   const filesOtherLines = s.filesOther && s.filesOther.length > 0 ? s.filesOther.map(f => `- ${f}`).join('\n') : '- Nenhum';
@@ -1888,6 +1906,7 @@ const stateFileContent = {
     agentSlug: s.agentSlug,
     priority: s.priority,
     status: s.status,
+    lifecycle: s.lifecycle,
     githubPr: s.githubPr || null,
     commitSha: s.commitSha || null,
     verified: s.status.includes('INTEGRADO'),
@@ -2284,6 +2303,40 @@ const html = `<!DOCTYPE html>
     .badge-status.pr { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
     .badge-status.conflict { background: rgba(244, 63, 94, 0.15); color: var(--rose); }
 
+    .badge-lifecycle {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge-lifecycle.integrado_na_main {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .badge-lifecycle.aprovado_agente_24 {
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--purple);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+    }
+    .badge-lifecycle.testado_localmente {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--blue);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    .badge-lifecycle.código_escrito {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .badge-lifecycle.especificado {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+    }
+
     .step-agent {
       font-size: 12px;
       font-weight: 600;
@@ -2525,6 +2578,9 @@ const html = `<!DOCTYPE html>
                     <div class="step-top">
                       <span class="step-id">PASSO #${String(s.id).padStart(3, '0')}</span>
                       <span class="p-tag ${s.priority.toLowerCase()}">${s.priority}</span>
+                      <span class="badge-lifecycle ${s.lifecycle.toLowerCase()}">${s.lifecycle.replace(/_/g, ' ')}</span>
+                      ${s.githubPr ? `<a href="https://github.com/MarksNN/Birthub-360/pull/${s.githubPr}" target="_blank" class="badge-pr" style="color: var(--blue); text-decoration: none; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px;">PR #${s.githubPr}</a>` : ''}
+                      ${s.commitSha ? `<span class="badge-commit" style="font-family: monospace; color: var(--brand); background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.25); padding: 2px 6px; border-radius: 4px; font-size: 11px;">SHA: ${s.commitSha}</span>` : ''}
                       <span class="badge-status ${statusClass}">${s.status}</span>
                       <span class="step-agent">${s.agent}</span>
                     </div>
