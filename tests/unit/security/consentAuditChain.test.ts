@@ -572,3 +572,39 @@ describe('Ressalvas do Agente 15 @43922b4e', () => {
     expect(() => canonicalJson({ 'Jos\u00e9': 1, 'Jose\u0301': 2 })).toThrow(CanonicalJsonError);
   });
 });
+
+describe('#40 runInTransaction + lock 64 bits (U7)', () => {
+  it('chave do advisory lock é bigint de 64 bits, determinística e distinta por tenant', async () => {
+    const { consentChainLockKey } = await import('@/lib/security/prismaConsentAuditChain.repository');
+    const a = consentChainLockKey('org-a');
+    expect(a).toBe(consentChainLockKey('org-a'));
+    expect(a).not.toBe(consentChainLockKey('org-b'));
+    const n = BigInt(a);
+    expect(n >= -(2n ** 63n) && n < 2n ** 63n).toBe(true);
+  });
+
+  it('repositório usa o runner injetado (mesma conexão) com organizationId, nunca db.$transaction', async () => {
+    const { PrismaConsentAuditChainRepository } = await import('@/lib/security/prismaConsentAuditChain.repository');
+    const raw: string[] = [];
+    const tx = {
+      $executeRaw: async (q: TemplateStringsArray) => (raw.push(q.join('?')), 1),
+      consentPurgeTask: { deleteMany: async () => ({ count: 0 }) },
+    };
+    const orgs: string[] = [];
+    const db = {
+      $transaction: async () => {
+        throw new Error('não deveria usar db.$transaction');
+      },
+    };
+    const repo = new PrismaConsentAuditChainRepository(db as never, async () => [], (async (
+      fn: (t: never) => Promise<unknown>,
+      o: { organizationId: string },
+    ) => {
+      orgs.push(o.organizationId);
+      return fn(tx as never);
+    }) as never);
+    await repo.deleteExpiredPurges('org-x', new Date());
+    expect(orgs).toEqual(['org-x']);
+    expect(raw[0]).toContain("set_config('app.current_tenant_id'");
+  });
+});

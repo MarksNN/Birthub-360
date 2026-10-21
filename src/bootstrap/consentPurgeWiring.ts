@@ -119,8 +119,11 @@ export async function startConsentPurgeRuntime(
   chain: ConsentAuditChainService,
 ): Promise<() => void> {
   registerConsentPurgers(chain);
-  const { prisma } = await import('../lib/prisma.js');
-  commercialLearningFlywheel.setPersistence(hasFlywheelDelegates(prisma) ? prisma : undefined);
+  const { prisma, runInTransaction } = await import('../lib/prisma.js');
+  commercialLearningFlywheel.setPersistence(
+    hasFlywheelDelegates(prisma) ? prisma : undefined,
+    runInTransaction as never,
+  );
 
   const { redisConfigured, cacheConnection } = await import('../lib/queue/redis.js');
   let subscriberQuit: (() => void) | undefined;

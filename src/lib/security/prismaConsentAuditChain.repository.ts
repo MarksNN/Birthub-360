@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 /**
  * REMED-06 — Persistência PostgreSQL da cadeia de consentimento, da outbox de expurgo, dos
  * detalhes expurgáveis e das chaves por titular.
@@ -120,6 +121,29 @@ export interface SubjectKeyPrismaLike {
   $transaction<T>(fn: (tx: SubjectKeyTx) => Promise<T>): Promise<T>;
 }
 
+/**
+ * Unidade de trabalho (#40 `runInTransaction`): lock, leitura do head, inserts, outbox e purge na
+ * MESMA conexão/transação, com tenant setado. Sem runner injetado (testes/client base) usa
+ * `db.$transaction` direto.
+ */
+export type RunInTransaction = <T>(
+  fn: (tx: never) => Promise<T>,
+  opts: { organizationId: string; maxWaitMs?: number; timeoutMs?: number },
+) => Promise<T>;
+
+/**
+ * Chave do advisory lock: bigint (64 bits) derivado de sha256('consent-chain:' + orgId) — evita a
+ * colisão de 32 bits do `hashtext` (U7). Uma colisão só serializaria tenants a mais, nunca quebraria
+ * a corretude: o trigger BEFORE INSERT do #35 é quem garante sequence/previousHash.
+ */
+export function consentChainLockKey(organizationId: string): string {
+  return createHash('sha256')
+    .update(`consent-chain:${organizationId}`)
+    .digest()
+    .readBigInt64BE(0)
+    .toString();
+}
+
 export const CONSENT_CHAIN_PRISMA_DELEGATES = [
   'consentAuditRecord',
   'consentAuditChainHead',
@@ -198,16 +222,26 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
     private readonly db: ConsentChainPrismaLike,
     /** Descoberta de organizações (mesmo padrão da outbox REMED-05: Organization via allowlist). */
     private readonly listTenantsFn: () => Promise<string[]>,
+    private readonly run?: RunInTransaction,
   ) {}
+
+  private tx<T>(
+    organizationId: string,
+    fn: (tx: ConsentChainTx) => Promise<T>,
+    o: { maxWaitMs?: number; timeoutMs?: number } = {},
+  ): Promise<T> {
+    if (this.run) return this.run(fn as (tx: never) => Promise<T>, { organizationId, ...o });
+    return this.db.$transaction(fn, { maxWait: o.maxWaitMs, timeout: o.timeoutMs });
+  }
 
   async withTenantLock<T>(
     organizationId: string,
     fn: (ctx: ChainLockContext) => Promise<T>,
   ): Promise<T> {
-    return this.db.$transaction(async (tx) => {
+    return this.tx(organizationId, async (tx) => {
       // RLS do PR #35: policy tenant_isolation lê app.current_tenant_id (escopo da transação).
       await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('consent-chain:' || ${organizationId}))`;
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(${consentChainLockKey(organizationId)}::bigint)`;
       const [lastRow, headRow] = await Promise.all([
         tx.consentAuditRecord.findFirst({
           where: { organizationId },
@@ -240,7 +274,7 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
   }
 
   private inTenant<T>(organizationId: string, fn: (tx: ConsentChainTx) => Promise<T>): Promise<T> {
-    return this.db.$transaction(async (tx) => {
+    return this.tx(organizationId, async (tx) => {
       await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
       return fn(tx);
     });
@@ -270,7 +304,8 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
     fn: (task: ConsentPurgeTask) => Promise<ConsentPurgeTask>,
   ): Promise<boolean> {
     // Sem bypass de RLS (#35): tenant setado na transação; lock da linha até o commit.
-    return this.db.$transaction(
+    return this.tx(
+      organizationId,
       async (tx) => {
         await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
         const rows = await tx.$queryRaw<ConsentPurgeTaskRow[]>`
@@ -285,7 +320,7 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
         await tx.consentPurgeTask.update({ where: { id }, data });
         return true;
       },
-      { maxWait: 15_000, timeout: 120_000 },
+      { maxWaitMs: 15_000, timeoutMs: 120_000 },
     );
   }
 
@@ -307,13 +342,18 @@ export class PrismaConsentAuditChainRepository implements ConsentAuditChainRepos
 }
 
 export class PrismaSubjectKeyStore implements SubjectKeyStore {
-  constructor(private readonly db: SubjectKeyPrismaLike) {}
+  constructor(
+    private readonly db: SubjectKeyPrismaLike,
+    private readonly run?: RunInTransaction,
+  ) {}
 
   private inTenant<T>(organizationId: string, fn: (tx: SubjectKeyTx) => Promise<T>): Promise<T> {
-    return this.db.$transaction(async (tx) => {
+    const body = async (tx: SubjectKeyTx) => {
       await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
       return fn(tx);
-    });
+    };
+    if (this.run) return this.run(body as (tx: never) => Promise<T>, { organizationId });
+    return this.db.$transaction(body);
   }
 
   async get(organizationId: string, lookupId: string): Promise<SubjectKeyState> {

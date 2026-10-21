@@ -21,6 +21,7 @@ import {
   type ConsentChainPrismaLike,
   PrismaConsentAuditChainRepository,
   PrismaSubjectKeyStore,
+  type RunInTransaction,
   type SubjectKeyPrismaLike,
 } from './prismaConsentAuditChain.repository.js';
 import {
@@ -106,6 +107,9 @@ export interface ConsentChainFactoryOptions {
   /** Client Prisma (ou carregador). Ausente em teste → memória. */
   prisma?: unknown;
   loadPrisma?: ClientLoader;
+  /** #40: unidade de trabalho do client estendido (lock/head/insert/outbox na mesma conexão). */
+  runInTransaction?: RunInTransaction;
+  loadRunInTransaction?: () => Promise<RunInTransaction | undefined>;
   pepperProvider?: TenantPepperProvider;
   /** Produção: cliente KMS + store da DEK cifrada por tenant (envelope). */
   kms?: { client: KmsEnvelopeClient; store: WrappedTenantKeyStore };
@@ -181,11 +185,14 @@ export function createConsentAuditChain(
           'Cadeia de consentimento indisponível: migração ConsentAuditRecord pendente',
         );
       }
+      const run = opts.runInTransaction ?? (await opts.loadRunInTransaction?.());
       return {
-        repo: new PrismaConsentAuditChainRepository(client as ConsentChainPrismaLike, () =>
-          (opts.listTenants ?? defaultListTenants)(client),
+        repo: new PrismaConsentAuditChainRepository(
+          client as ConsentChainPrismaLike,
+          () => (opts.listTenants ?? defaultListTenants)(client),
+          run,
         ),
-        keys: new PrismaSubjectKeyStore(client as SubjectKeyPrismaLike),
+        keys: new PrismaSubjectKeyStore(client as SubjectKeyPrismaLike, run),
       };
     })();
     // Não memoriza falha: permite recuperar após deploy da migração sem restart.
@@ -211,4 +218,6 @@ export function createConsentAuditChain(
 /** Singleton de produção: Prisma real carregado sob demanda (evita ciclo de import). */
 export const consentAuditChain = createConsentAuditChain({
   loadPrisma: async () => (await import('../prisma.js')).prisma,
+  loadRunInTransaction: async () =>
+    (await import('../prisma.js')).runInTransaction as unknown as RunInTransaction,
 });

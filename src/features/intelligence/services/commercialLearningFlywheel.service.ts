@@ -51,8 +51,17 @@ export class CommercialLearningFlywheelService {
   constructor(private persistence?: FlywheelPersistencePurger) {}
 
   /** Wiring de produção: liga o expurgo durável quando os models do Agente 01 existirem. */
-  setPersistence(persistence: FlywheelPersistencePurger | undefined): void {
+  private runTx?: <T>(
+    fn: (tx: never) => Promise<T>,
+    opts: { organizationId: string },
+  ) => Promise<T>;
+
+  setPersistence(
+    persistence: FlywheelPersistencePurger | undefined,
+    runTx?: <T>(fn: (tx: never) => Promise<T>, opts: { organizationId: string }) => Promise<T>,
+  ): void {
     this.persistence = persistence;
+    this.runTx = runTx;
   }
 
   /**
@@ -80,14 +89,20 @@ export class CommercialLearningFlywheelService {
     let persistedFewShotPurged = 0;
     if (this.persistence) {
       const where = { organizationId, leadId };
-      const res = await this.persistence.$transaction(async (tx) => {
+      const body = async (tx: FlywheelPurgeTx) => {
         if (tx.$executeRaw) {
           await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
         }
         const fs = await tx.flywheelFewShotExample.deleteMany({ where });
         const ap = await tx.flywheelApproachRecord.deleteMany({ where });
         return { fs: fs.count, ap: ap.count };
-      });
+      };
+      // #40: runInTransaction mantém set_config e deleteMany na MESMA conexão do client estendido.
+      const res = this.runTx
+        ? await this.runTx(body as (tx: never) => Promise<{ fs: number; ap: number }>, {
+            organizationId,
+          })
+        : await this.persistence.$transaction(body);
       persistedApproachesPurged = res.ap;
       persistedFewShotPurged = res.fs;
     }
