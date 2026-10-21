@@ -2,16 +2,16 @@
   "summary": {
     "totalCapabilities": 30,
     "totalToolBindings": 30,
-    "verifiedBindings": 24,
-    "unverifiedBindings": 6,
+    "verifiedBindings": 25,
+    "unverifiedBindings": 5,
     "byReason": {
-      "AVAILABLE": 24,
+      "AVAILABLE": 25,
       "SOURCE_REQUIRED": 2,
-      "FUTURE_TOOL": 3,
+      "FUTURE_TOOL": 2,
       "TOOL_UNAVAILABLE": 1
     },
-    "totalAgentsWithCapabilityGrants": 391,
-    "agentsWithDomainCapability": 40,
+    "totalAgentsWithCapabilityGrants": 394,
+    "agentsWithDomainCapability": 43,
     "agentsUniversalOnly": 351,
     "totalRoleCapabilityGrants": 113
   },
@@ -167,6 +167,42 @@
         "pipeline.analyze",
         "forecast.read",
         "forecast.explain",
+        "agent.discover",
+        "agent.execute",
+        "agent.request_cross_role"
+      ],
+      "source": "COMMERCIAL_CELL"
+    },
+    {
+      "agentCode": "account-detective",
+      "capabilityCodes": [
+        "company.read",
+        "lead.read",
+        "agent.discover",
+        "agent.execute",
+        "agent.request_cross_role"
+      ],
+      "source": "COMMERCIAL_CELL"
+    },
+    {
+      "agentCode": "promise-guardian",
+      "capabilityCodes": [
+        "meeting.read",
+        "meeting.analyze",
+        "deal.read",
+        "agent.discover",
+        "agent.execute",
+        "agent.request_cross_role"
+      ],
+      "source": "COMMERCIAL_CELL"
+    },
+    {
+      "agentCode": "devils-advocate",
+      "capabilityCodes": [
+        "deal.read",
+        "deal.analyze",
+        "forecast.read",
+        "pipeline.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
