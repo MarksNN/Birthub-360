@@ -38,7 +38,14 @@ O `docker-compose.yml` é a base da infraestrutura local de apoio (Redis, Meilis
 ## Subida local
 
 1. Copie `.env.example` para `.env`.
-2. Configure `DATABASE_URL` para `localhost:5434`, banco `prospectordb`, usando o papel `prospector_app` e a senha definida em `APP_DB_PASSWORD`. Esse papel é `NOSUPERUSER` e preserva RLS; o papel `prospector` é reservado ao bootstrap. Configure `DIRECT_URL` com a conexão de migração autorizada, separada do papel usado pela aplicação (o Prisma CLI prioriza essa variável).
+2. A aplicação em runtime usa o papel `prospector_app` (`NOSUPERUSER`, `NOBYPASSRLS`), criado por `scripts/db/create-app-role.sql`. O usuário `prospector` é só o superusuário de bootstrap do container e não deve ser a `DATABASE_URL` da aplicação, porque o PostgreSQL não aplica RLS a superusuário.
+
+```env
+DATABASE_URL=postgresql://prospector_app:prospector_app_pass@localhost:5434/prospectordb
+DIRECT_URL=postgresql://prospector:prospector_pass@localhost:5434/prospectordb
+```
+
+`DIRECT_URL` fica restrita a migrations e bootstrap. As senhas acima são o fallback local de `docker-compose.postgres-local.yml`; qualquer outro ambiente define `APP_DB_PASSWORD` e `POSTGRES_PASSWORD` fora do Git.
 3. Para storage local, configure:
 
 ```env

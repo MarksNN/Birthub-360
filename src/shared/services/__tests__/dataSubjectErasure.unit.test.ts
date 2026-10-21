@@ -40,6 +40,7 @@ vi.mock('@/lib/prisma', () => ({
     agentMemory: {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
+
     conversationSignal: {
       updateMany: (...args: unknown[]) => conversationSignalUpdateManyMock(...args),
     },

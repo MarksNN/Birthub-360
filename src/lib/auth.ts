@@ -124,7 +124,7 @@ export const auth = betterAuth({
       } catch (error: any) {
         if (error instanceof MailerNotConfiguredError) {
           logger.warn(
-            { userId: user.id, code: 'SMTP_NOT_CONFIGURED' },
+{ userId: user.id, code: 'SMTP_NOT_CONFIGURED', reason: 'MAILER_NOT_CONFIGURED' },
             'Reset de senha solicitado, mas SMTP não está configurado.',
           );
           throw new APIError('INTERNAL_SERVER_ERROR', {
@@ -133,55 +133,13 @@ export const auth = betterAuth({
           });
         }
         logger.error(
-          { err: error, userId: user.id },
-          'Falha ao enviar e-mail de redefinição de senha.',
-        );
-        throw new APIError('INTERNAL_SERVER_ERROR', {
-          message: 'Falha ao enviar e-mail de redefinição.',
-        });
-      }
-    },
-  },
-  emailVerification: {
-    // Reenvia automaticamente ao tentar logar sem ter verificado ainda — evita que a pessoa
-    // fique travada só porque perdeu/apagou o primeiro e-mail (sign-in.mjs do better-auth já
-    // bloqueia a sessão com EMAIL_NOT_VERIFIED nesse caso; isto só cobre o reenvio).
-    sendOnSignIn: true,
-    // Sem isto, clicar no link de verificação confirmava o e-mail mas não abria sessão — a
-    // pessoa precisaria digitar a senha de novo por nenhum motivo real.
-    autoSignInAfterVerification: true,
-    sendVerificationEmail: async ({ user, url }) => {
-      try {
-        await sendEmail({
-          to: user.email,
-          subject: 'Confirme seu e-mail — Birth Hub 360',
-          text: [
-            `Olá${user.name ? `, ${user.name}` : ''},`,
-            '',
-            'Recebemos um cadastro no Birth Hub 360 com este e-mail.',
-            '',
-            `Clique no link abaixo para confirmar que este e-mail é seu e ativar a conta:`,
-            url,
-            '',
-            'Se você não fez esse cadastro, ignore este e-mail — nenhuma conta será ativada.',
-          ].join('\n'),
-        });
-      } catch (error: any) {
-        // Diferente de sendResetPassword (abaixo): a conta JÁ foi criada em banco neste ponto do
-        // fluxo de sign-up (ver sign-up.mjs do better-auth), então relançar aqui faria o cliente
-        // ver "cadastro falhou" para uma conta que na verdade existe (só não verificada) — a
-        // pessoa ficaria sem saber que já tem conta pendente. Loga e segue: o botão "reenviar
-        // e-mail de verificação" (POST /api/auth/send-verification-email) continua disponível
-        // depois, e `sendOnSignIn` acima tenta de novo na primeira tentativa de login.
-        if (error instanceof MailerNotConfiguredError) {
-          logger.warn(
-            { userId: user.id, code: 'SMTP_NOT_CONFIGURED' },
+{ userId: user.id, code: 'SMTP_NOT_CONFIGURED', reason: 'MAILER_NOT_CONFIGURED' },
             'Verificação de e-mail solicitada, mas SMTP não está configurado.',
           );
           return;
         }
         logger.error(
-          { err: error, userId: user.id },
+{ userId: user.id, reason: 'VERIFICATION_EMAIL_FAILED' },
           'Falha ao enviar e-mail de verificação de cadastro.',
         );
       }
