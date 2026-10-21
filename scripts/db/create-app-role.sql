@@ -50,8 +50,20 @@ DO $$
 DECLARE
     r RECORD;
 BEGIN
-    FOR r IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
+    -- REMED-06: as tabelas da cadeia LGPD NAO passam para prospector_app (privilegio minimo). O dono pode
+    -- DISABLE/DROP TRIGGER e reconceder UPDATE/DELETE a si mesmo; mantendo o dono = papel de
+    -- bootstrap/migracao, a aplicacao fica sujeita a RLS (nao-dono) + REVOKE + trigger. Se uma
+    -- execucao anterior deste script ja tinha transferido a posse, ela e devolvida aqui.
+    FOR r IN SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+             AND tablename NOT IN ('ConsentAuditRecord', 'ConsentAuditChainHead', 'ConsentSubjectKey', 'ConsentSubjectKeyTombstone',
+                               'ConsentEventDetail', 'ConsentPurgeTask', 'FlywheelApproachRecord', 'FlywheelFewShotExample') LOOP
         EXECUTE format('ALTER TABLE public.%I OWNER TO prospector_app', r.tablename);
+    END LOOP;
+    FOR r IN SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+             AND tablename IN ('ConsentAuditRecord', 'ConsentAuditChainHead', 'ConsentSubjectKey', 'ConsentSubjectKeyTombstone',
+                               'ConsentEventDetail', 'ConsentPurgeTask', 'FlywheelApproachRecord', 'FlywheelFewShotExample')
+             AND tableowner = 'prospector_app' LOOP
+        EXECUTE format('ALTER TABLE public.%I OWNER TO %I', r.tablename, current_user);
     END LOOP;
     FOR r IN SELECT sequencename FROM pg_sequences WHERE schemaname = 'public' LOOP
         EXECUTE format('ALTER SEQUENCE public.%I OWNER TO prospector_app', r.sequencename);
@@ -62,6 +74,15 @@ $$;
 GRANT ALL PRIVILEGES ON SCHEMA public TO prospector_app;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO prospector_app;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO prospector_app;
+
+-- REMED-06: o GRANT ALL acima reconcede tudo nas tabelas LGPD. Re-aplica os grants minimos (idempotente; no-op antes da migration 20261020220000 existir).
+DO $$
+BEGIN
+    IF to_regprocedure('public.lgpd_apply_consent_privileges()') IS NOT NULL THEN
+        PERFORM public.lgpd_apply_consent_privileges();
+    END IF;
+END
+$$;
 
 -- AI-002 (onda 32): ser DONO do schema public (acima) da CREATE dentro dele, mas NAO da CREATE
 -- SCHEMA — essa e uma permissao de nivel de BANCO, separada. `@langchain/langgraph-checkpoint-postgres`
