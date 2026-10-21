@@ -1135,8 +1135,8 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   transform: translateY(-1px) scale(0.98);
 }
 
-/* Login no tema claro: neon #00D4FF/#FF2D9B/#F59E0B sobre #F8FAFC fica abaixo de 4.5:1
-   (axe serious). O dark mantém o neon. Escopo só da antessala, não da landing. */
+/* Login no tema claro: neon sobre #F8FAFC fica abaixo de 4.5:1 (axe serious).
+   O dark mantém o neon. Escopo só da antessala, não da landing. */
 html.light .login-antessala-backdrop .text-\[\#00D4FF\],
 [data-theme='light'] .login-antessala-backdrop .text-\[\#00D4FF\] {
   color: #0369a1;
