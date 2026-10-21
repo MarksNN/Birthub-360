@@ -449,9 +449,9 @@ export class AccountIntelligenceService implements AccountIntelligenceServiceCon
     });
     const hasTraceableIdentity = Boolean(
       company.cnpj ||
-        company.website ||
-        (company.enrichmentSource && company.enrichedAt) ||
-        existingFacts.length > 0,
+      company.website ||
+      (company.enrichmentSource && company.enrichedAt) ||
+      existingFacts.length > 0,
     );
     if (!hasTraceableIdentity) {
       throw new AppError(

@@ -14,11 +14,17 @@ import { callBitrix } from '../../integrations/bitrix/service/client.js';
  * ativa) devolvem o erro SEM alterar o status da recomendação. Só falha da execução em si (chamada
  * ao Bitrix, persistência da cadência) marca `Failed`.
  */
+type ExecOutcome =
+  { ok: { success: true; taskId?: string | number; message?: string } } | { failed: unknown };
+
 export const actionExecutorService = {
   async executeAction(recommendationId: string, expectedCompanyId: string, organizationId: string) {
     if (!organizationId) throw new AppError('Organização autenticada não informada.', 403);
 
-    return withRlsContext(async (prisma) => {
+    // Falha real da execução não pode marcar Failed dentro da mesma transação: o throw faz
+    // rollback e o status nunca persistiria. A transação devolve a falha e o Failed é gravado
+    // numa transação própria, escopada pelo tenant, antes de relançar o erro.
+    const outcome = await withRlsContext(async (prisma): Promise<ExecOutcome> => {
       const recommendation = await prisma.accountRecommendation.findFirst({
         where: { id: recommendationId, organizationId, companyId: expectedCompanyId },
         include: {
@@ -31,12 +37,6 @@ export const actionExecutorService = {
         throw new AppError('Recomendação já executada', 400);
 
       const company = recommendation.company;
-
-      const markFailed = () =>
-        prisma.accountRecommendation.update({
-          where: { id: recommendationId },
-          data: { status: 'Failed' },
-        });
 
       if (recommendation.actionType === 'CREATE_BITRIX_TASK') {
         const webhookUrl = company?.organization?.bitrixConnections?.[0]?.webhookUrl;
@@ -59,8 +59,7 @@ export const actionExecutorService = {
             },
           );
         } catch (error: unknown) {
-          await markFailed();
-          throw error;
+          return { failed: error };
         }
 
         await prisma.accountRecommendation.update({
@@ -71,7 +70,7 @@ export const actionExecutorService = {
             externalRef: response?.result?.task?.id?.toString(),
           },
         });
-        return { success: true, taskId: response?.result?.task?.id };
+        return { ok: { success: true, taskId: response?.result?.task?.id } };
       }
 
       if (recommendation.actionType === 'START_SDR_CADENCE') {
@@ -91,9 +90,8 @@ export const actionExecutorService = {
 
         const userId = getUserId();
         const { startCadenceRun } = await import('../../cadence/domain/cadence.js');
-        const { prismaCadenceRunRepository } = await import(
-          '../../cadence/infra/PrismaCadenceRunRepository.js'
-        );
+        const { prismaCadenceRunRepository } =
+          await import('../../cadence/infra/PrismaCadenceRunRepository.js');
         const { randomUUID } = await import('node:crypto');
 
         const run = startCadenceRun({
@@ -112,22 +110,31 @@ export const actionExecutorService = {
             // Pré-condição (cadência já ativa): não é falha da recomendação.
             throw new AppError('Este lead já tem uma cadência ativa em andamento.', 409);
           }
-          await markFailed();
-          throw error;
+          return { failed: error };
         }
 
         await prisma.accountRecommendation.update({
           where: { id: recommendationId },
           data: { status: 'Executed', executedAt: new Date() },
         });
-        return { success: true, message: 'Cadência iniciada.' };
+        return { ok: { success: true, message: 'Cadência iniciada.' } };
       }
 
       await prisma.accountRecommendation.update({
         where: { id: recommendationId },
         data: { status: 'Executed', executedAt: new Date() },
       });
-      return { success: true, message: 'Ação executada.' };
+      return { ok: { success: true, message: 'Ação executada.' } };
     });
+
+    if ('ok' in outcome) return outcome.ok;
+
+    await withRlsContext((prisma) =>
+      prisma.accountRecommendation.updateMany({
+        where: { id: recommendationId, organizationId, companyId: expectedCompanyId },
+        data: { status: 'Failed' },
+      }),
+    );
+    throw outcome.failed;
   },
 };
