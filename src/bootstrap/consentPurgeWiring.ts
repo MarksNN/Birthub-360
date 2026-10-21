@@ -86,9 +86,13 @@ export async function startConsentPurgeRuntime(
   commercialLearningFlywheel.setPersistence(hasFlywheelDelegates(prisma) ? prisma : undefined);
 
   const { redisConfigured, cacheConnection } = await import('../lib/queue/redis.js');
+  let subscriberQuit: (() => void) | undefined;
   if (redisConfigured) {
     const instanceId = `${process.pid}-${Math.random().toString(36).slice(2, 10)}`;
     const subscriber = cacheConnection.duplicate();
+    subscriberQuit = () => {
+      subscriber.disconnect();
+    };
     await subscribeToPurgeBroadcasts(subscriber as unknown as PubSubLike, instanceId);
     chain.setPurgeBroadcaster(
       makeBroadcaster(cacheConnection as unknown as PubSubLike, instanceId),
@@ -104,5 +108,8 @@ export async function startConsentPurgeRuntime(
       .catch((err) => logger.error({ err }, 'LGPD: reconciliação da outbox de expurgo falhou'));
   }, interval);
   timer.unref();
-  return () => clearInterval(timer);
+  return () => {
+    clearInterval(timer);
+    subscriberQuit?.();
+  };
 }

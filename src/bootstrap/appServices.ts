@@ -32,6 +32,8 @@ export function bootstrapApplicationServices(): void {
 
   // LGPD (REMED-06): consumidores de expurgo, reconciliação da outbox e invalidação entre
   // instâncias. Falha aqui não derruba o servidor; a cadeia em si falha fechada (503).
+  // Em teste não sobe worker/pub-sub (handles abertos travariam o runner de integração).
+  if (process.env.NODE_ENV === 'test') return;
   startConsentPurgeRuntime(consentAuditChain).catch((err) =>
     logger.error({ err }, 'LGPD: falha ao iniciar runtime de expurgo de consentimento'),
   );
