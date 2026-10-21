@@ -5,7 +5,8 @@ import type {
   SecuritySweepReport,
   SecurityVulnerability,
 } from '../../../shared/contracts/continuousSecurityAudit.contract.js';
-import { domainEventMesh } from '../../queue/domainEventMesh.service.js';
+import type { IGlobalSecurityEventSink } from '../events/globalSecurityEvent.port.js';
+import { LoggerGlobalSecurityEventSink } from '../events/loggerGlobalSecurityEventSink.js';
 import { logger } from '../../logger.js';
 
 export class ContinuousSecurityAuditService implements IContinuousSecurityAuditPort {
@@ -13,7 +14,9 @@ export class ContinuousSecurityAuditService implements IContinuousSecurityAuditP
 
   private knownWaivers = new Map<string, { expiresAt: string; reason: string }>();
 
-  constructor() {
+  constructor(
+    private readonly securityEvents: IGlobalSecurityEventSink = new LoggerGlobalSecurityEventSink(),
+  ) {
     this.seedKnownWaivers();
   }
 
@@ -97,10 +100,13 @@ export class ContinuousSecurityAuditService implements IContinuousSecurityAuditP
 
     this.latestReport = report;
 
-    await domainEventMesh.publish({
+    // Evento de plataforma (sem tenant): vai pelo canal global de segurança, nunca pela
+    // outbox por tenant (FK organizationId -> Organization). Ver globalSecurityEvent.port.ts.
+    await this.securityEvents.emit({
+      eventId: randomUUID(),
       eventType: 'SECURITY_AUDIT_SWEEP_COMPLETED',
       eventVersion: '1.0.0',
-      organizationId: 'global-security-governance',
+      occurredAt: new Date().toISOString(),
       correlationId: `audit-${sweepId}`,
       producer: 'continuous-security-audit-engine',
       aggregateId: sweepId,
