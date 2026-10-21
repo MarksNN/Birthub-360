@@ -1,6 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { prisma } from '../../src/lib/prisma';
-import { JOB_ROLE_CATALOG } from '../../src/config/job-role-catalog';
 import { listJobRoles } from '../../src/features/job-roles/services/jobRole.service';
 import {
   listAgentsForJobRole,
@@ -31,12 +30,14 @@ describe('scripts/seed-multi-cargo.ts', () => {
     await prisma.userJobRole.deleteMany();
   });
 
-  it('semeia os cargos canônicos e todos os agentes da Célula Comercial, concedendo cada um ao seu cargo principal', async () => {
+  it('semeia os 12 cargos e os 15 agentes da Célula Comercial, concedendo cada um ao seu cargo principal', async () => {
     await runMultiCargoSeed();
 
     const jobRoles = await listJobRoles({ activeOnly: false });
-    expect(jobRoles).toHaveLength(JOB_ROLE_CATALOG.length);
+    expect(jobRoles).toHaveLength(12);
 
+    // 12 originais + 3 agentes táticos (account-detective, promise-guardian, devils-advocate).
+    expect(COMMERCIAL_AGENT_REGISTRY).toHaveLength(15);
     for (const agent of COMMERCIAL_AGENT_REGISTRY) {
       const jobRoleCode = AGENT_ID_TO_JOB_ROLE_CODE[agent.id];
       const jobRole = jobRoles.find((r) => r.code === jobRoleCode);
@@ -57,12 +58,12 @@ describe('scripts/seed-multi-cargo.ts', () => {
     await runMultiCargoSeed();
 
     const jobRoles = await listJobRoles({ activeOnly: false });
-    expect(jobRoles).toHaveLength(JOB_ROLE_CATALOG.length);
+    expect(jobRoles).toHaveLength(12);
 
     const agentDefinitions = await prisma.agentDefinition.findMany({
       where: { code: { in: COMMERCIAL_AGENT_REGISTRY.map((a) => a.id) } },
     });
-    expect(agentDefinitions).toHaveLength(COMMERCIAL_AGENT_REGISTRY.length);
+    expect(agentDefinitions).toHaveLength(15);
 
     for (const agent of agentDefinitions) {
       const grants = await prisma.roleAgentGrant.findMany({

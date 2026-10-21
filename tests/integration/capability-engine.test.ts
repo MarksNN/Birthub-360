@@ -117,23 +117,22 @@ describe('Capability & Permission Engine (PROMPT 3 + hardening PROMPT 3B)', () =
     });
   });
 
-  describe('reconciliação 379 (Birth Hub) + Célula Comercial (COMMERCIAL_AGENT_REGISTRY) = total (PROMPT 3B item 1)', () => {
+  describe('reconciliação 379 (Birth Hub) + 15 (Célula Comercial) = 394 (PROMPT 3B item 1)', () => {
     it('não há sobreposição de code entre o catálogo Birth Hub e a Célula Comercial', () => {
       const birthHubCodes = new Set(sourceAgentCodes);
       const commercialCellCodes = COMMERCIAL_AGENT_REGISTRY.map((a) => a.id);
       const overlap = commercialCellCodes.filter((code) => birthHubCodes.has(code));
       expect(overlap).toEqual([]);
       expect(sourceAgentCodes.length).toBe(379);
-      expect(commercialCellCodes.length).toBe(new Set(commercialCellCodes).size);
-      expect(sourceAgentCodes.length + commercialCellCodes.length).toBe(
-        379 + COMMERCIAL_AGENT_REGISTRY.length,
-      );
+      // 12 originais + 3 agentes táticos (account-detective, promise-guardian, devils-advocate).
+      expect(commercialCellCodes.length).toBe(15);
+      expect(sourceAgentCodes.length + commercialCellCodes.length).toBe(394);
     });
 
-    it('o total real de AgentDefinition no banco é Birth Hub + Célula Comercial', async () => {
+    it('o total real de AgentDefinition no banco (Birth Hub + Célula Comercial) é 394', async () => {
       const allCodes = [...sourceAgentCodes, ...COMMERCIAL_AGENT_REGISTRY.map((a) => a.id)];
       const rows = await prisma.agentDefinition.findMany({ where: { code: { in: allCodes } } });
-      expect(rows).toHaveLength(allCodes.length);
+      expect(rows).toHaveLength(394);
     });
 
     it('todo agente (Birth Hub + Célula Comercial) tem ao menos um AgentCapabilityGrant real', async () => {
