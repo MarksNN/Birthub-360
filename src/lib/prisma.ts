@@ -17,6 +17,11 @@ import { logger } from './logger.js';
 import { queuesEnabled } from './queue/redis.js';
 import { searchQueue } from './queue/search.queue.js';
 import { TENANT_INJECTED_MODELS } from './tenant-scoping-registry.js';
+import {
+  assertModelOperationAllowed,
+  guardGlobalClientEscapes,
+  TransactionEscapeError,
+} from './txEscapeGuard.js';
 
 export { TENANT_INJECTED_MODELS };
 
@@ -157,7 +162,7 @@ const basePrisma =
     adapter,
   });
 
-export const prisma = basePrisma.$extends({
+const extendedPrisma = basePrisma.$extends({
   query: {
     $allModels: {
       // `query` (a próxima operação na cadeia de extensão, ligada ao client base) não é mais usada
@@ -166,6 +171,16 @@ export const prisma = basePrisma.$extends({
       // passado explicitamente para cada `executeWithRls`.
       async $allOperations({ model, operation, args }) {
         const store = requestContext.getStore();
+        // G1 caso (a): flag da UoW da outbox sem runInTransaction ativo → recusa antes de executar.
+        assertModelOperationAllowed(
+          {
+            activeTransaction: activeTransaction.getStore() !== undefined,
+            outboxUnitOfWorkActive:
+              (store as Record<string, unknown> | undefined)?.outboxUnitOfWorkActive === true,
+          },
+          model as string,
+          operation,
+        );
         const tenantId = store?.tenantId;
         const userId = store?.userId;
         // bypassRls em produção só existe pra as rotas do Better Auth (login/signup/sessão, ver
@@ -692,6 +707,19 @@ export const prisma = basePrisma.$extends({
 }) as unknown as PrismaClient; // Cast needed due to complex extension types
 
 /**
+ * Client exportado: o estendido envolto pelo guard G1 (ver txEscapeGuard.ts). Dentro de
+ * runInTransaction ou da UoW da outbox, `prisma.$queryRaw*`/`$executeRaw*` e `prisma.$transaction`
+ * lançam TransactionEscapeError em vez de escapar do tx. Operações de model passam com tx ativo
+ * (reusam o tx); com outboxUnitOfWorkActive SEM tx ativo, o $allOperations recusa (caso a).
+ */
+export const prisma = guardGlobalClientEscapes(extendedPrisma, () => ({
+  activeTransaction: activeTransaction.getStore() !== undefined,
+  outboxUnitOfWorkActive:
+    (requestContext.getStore() as Record<string, unknown> | undefined)?.outboxUnitOfWorkActive ===
+    true,
+}));
+
+/**
  * Executa `fn` dentro de uma transação com `app.current_tenant_id`/`app.bypass_rls` já setados.
  *
  * Necessário para SQL cru (`$executeRaw`/`$queryRaw`): esses métodos não passam pela extensão
@@ -702,6 +730,13 @@ export const prisma = basePrisma.$extends({
 export async function withRlsContext<T>(
   fn: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> {
+  // G1: withRlsContext abre OUTRA transação; dentro de runInTransaction isso escaparia do tx ativo.
+  if (activeTransaction.getStore()) {
+    throw new TransactionEscapeError('$transaction', {
+      activeTransaction: true,
+      outboxUnitOfWorkActive: false,
+    });
+  }
   const store = requestContext.getStore();
   const tenantId = store?.tenantId ?? '';
   const bypassRls = Boolean((store as Record<string, unknown>)?.bypassRls);
