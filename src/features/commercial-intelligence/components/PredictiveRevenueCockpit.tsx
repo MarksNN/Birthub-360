@@ -52,7 +52,10 @@ export const PredictiveRevenueCockpit: React.FC<PredictiveRevenueCockpitProps> =
 
   if (error) {
     return (
-      <div data-testid="predictive-error" className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
+      <div
+        data-testid="predictive-error"
+        className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive"
+      >
         <h3 className="font-semibold text-lg">Erro ao carregar projeções</h3>
         <p className="text-sm">{error}</p>
       </div>
@@ -61,10 +64,16 @@ export const PredictiveRevenueCockpit: React.FC<PredictiveRevenueCockpitProps> =
 
   if (!data || data.status === 'insufficient_data' || !data.projections) {
     return (
-      <div data-testid="predictive-empty" className="p-8 text-center border border-dashed rounded-lg bg-card/50 space-y-3">
-        <h3 className="text-lg font-semibold text-foreground">Histórico Insuficiente para Projeção Confiável</h3>
+      <div
+        data-testid="predictive-empty"
+        className="p-8 text-center border border-dashed rounded-lg bg-card/50 space-y-3"
+      >
+        <h3 className="text-lg font-semibold text-foreground">
+          Histórico Insuficiente para Projeção Confiável
+        </h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          Para garantir rigor estatístico e evitar falsas previsões, o Oráculo de Receita exige um histórico mínimo de 10 negócios ganhos nos últimos 24 meses.
+          Para garantir rigor estatístico e evitar falsas previsões, o Oráculo de Receita exige um
+          histórico mínimo de 10 negócios ganhos nos últimos 24 meses.
         </p>
         <span className="inline-block px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-xs font-medium">
           Status: INSUFFICIENT_DATA
@@ -76,11 +85,18 @@ export const PredictiveRevenueCockpit: React.FC<PredictiveRevenueCockpitProps> =
   const { days30, days90, days180 } = data.projections;
 
   return (
-    <div data-testid="predictive-ready" className="p-6 space-y-6 bg-card rounded-xl border shadow-sm">
+    <div
+      data-testid="predictive-ready"
+      className="p-6 space-y-6 bg-card rounded-xl border shadow-sm"
+    >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-4">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Oráculo de Receita Preditiva</h2>
-          <p className="text-xs text-muted-foreground">Projeções empíricas baseadas em dispersão histórica real (P10 / P50 / P90)</p>
+          <h2 className="text-xl font-bold tracking-tight text-foreground">
+            Oráculo de Receita Preditiva
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Projeções empíricas baseadas em dispersão histórica real (P10 / P50 / P90)
+          </p>
         </div>
         <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 font-semibold text-xs rounded-full">
           Modelo: {data.modelConfidence}
@@ -90,7 +106,9 @@ export const PredictiveRevenueCockpit: React.FC<PredictiveRevenueCockpitProps> =
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* 30 Dias */}
         <div className="p-4 rounded-lg border bg-background/50 space-y-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Horizonte 30 Dias</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Horizonte 30 Dias
+          </span>
           <div className="text-2xl font-bold text-foreground">
             R$ {(days30.expectedRevenue ?? 0).toLocaleString('pt-BR')}
           </div>
@@ -104,7 +122,9 @@ export const PredictiveRevenueCockpit: React.FC<PredictiveRevenueCockpitProps> =
 
         {/* 90 Dias */}
         <div className="p-4 rounded-lg border bg-background/50 space-y-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Horizonte 90 Dias</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Horizonte 90 Dias
+          </span>
           <div className="text-2xl font-bold text-foreground">
             R$ {(days90.expectedRevenue ?? 0).toLocaleString('pt-BR')}
           </div>
@@ -118,7 +138,9 @@ export const PredictiveRevenueCockpit: React.FC<PredictiveRevenueCockpitProps> =
 
         {/* 180 Dias */}
         <div className="p-4 rounded-lg border bg-background/50 space-y-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Horizonte 180 Dias</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Horizonte 180 Dias
+          </span>
           <div className="text-2xl font-bold text-foreground">
             R$ {(days180.expectedRevenue ?? 0).toLocaleString('pt-BR')}
           </div>

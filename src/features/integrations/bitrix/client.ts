@@ -84,7 +84,9 @@ export class BitrixClient {
             '[BitrixClient] HTTP 429 Too Many Requests detectado. Executando backoff exponencial.',
           );
           if (attempt > this.maxRetries) {
-            throw new Error(`Bitrix rate limit excedido após ${this.maxRetries} tentativas (HTTP 429)`);
+            throw new Error(
+              `Bitrix rate limit excedido após ${this.maxRetries} tentativas (HTTP 429)`,
+            );
           }
           await new Promise((resolve) => setTimeout(resolve, delay));
           delay *= 2;

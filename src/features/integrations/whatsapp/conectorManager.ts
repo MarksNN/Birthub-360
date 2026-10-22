@@ -49,7 +49,10 @@ export class WhatsAppConnectorManager {
 
     // 2. Roteamento por driver
     if (driver === 'BAILEYS') {
-      logger.info({ organizationId, toPhone }, '[WhatsAppConnector] Enviando via Baileys Multi-Device');
+      logger.info(
+        { organizationId, toPhone },
+        '[WhatsAppConnector] Enviando via Baileys Multi-Device',
+      );
       return {
         sent: true,
         driverUsed: 'BAILEYS',
@@ -58,7 +61,10 @@ export class WhatsAppConnectorManager {
     }
 
     if (driver === 'CLOUD_API') {
-      logger.info({ organizationId, toPhone }, '[WhatsAppConnector] Enviando via WhatsApp Cloud API Oficial');
+      logger.info(
+        { organizationId, toPhone },
+        '[WhatsAppConnector] Enviando via WhatsApp Cloud API Oficial',
+      );
       return {
         sent: true,
         driverUsed: 'CLOUD_API',

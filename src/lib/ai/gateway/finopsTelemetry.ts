@@ -70,9 +70,7 @@ export class FinOpsTelemetryService {
 
     const totalCalls = orgRecords.length;
     const totalTokens = orgRecords.reduce((acc, r) => acc + r.totalTokens, 0);
-    const totalCostUsd = Number(
-      orgRecords.reduce((acc, r) => acc + r.costUsd, 0).toFixed(6),
-    );
+    const totalCostUsd = Number(orgRecords.reduce((acc, r) => acc + r.costUsd, 0).toFixed(6));
     const averageLatencyMs = Math.round(
       orgRecords.reduce((acc, r) => acc + r.latencyMs, 0) / totalCalls,
     );
