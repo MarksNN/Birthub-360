@@ -7,20 +7,22 @@ vi.mock('../../../../src/lib/logger.js', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
+// PR #39: ensureCheckpointerReady() não chama mais setup(); confere a versão em
+// checkpoint_migrations (pool.query). `setupMock` agora é o mock dessa query.
 const { poolEndMock, setupMock } = vi.hoisted(() => ({
   poolEndMock: vi.fn().mockResolvedValue(undefined),
-  setupMock: vi.fn().mockResolvedValue(undefined),
+  setupMock: vi.fn().mockResolvedValue({ rows: [{ v: 4 }] }),
 }));
 
 vi.mock('pg', () => ({
   Pool: vi.fn().mockImplementation(function FakePool() {
-    return { on: vi.fn(), end: poolEndMock };
+    return { on: vi.fn(), end: poolEndMock, query: setupMock };
   }),
 }));
 
 vi.mock('@langchain/langgraph-checkpoint-postgres', () => ({
   PostgresSaver: vi.fn().mockImplementation(function FakePostgresSaver() {
-    return { setup: setupMock };
+    return { setup: vi.fn() };
   }),
 }));
 
@@ -45,7 +47,7 @@ describe('src/lib/ai/checkpointer.ts (AI-002)', () => {
 
   afterEach(() => {
     setupMock.mockReset();
-    setupMock.mockResolvedValue(undefined);
+    setupMock.mockResolvedValue({ rows: [{ v: 4 }] });
   });
 
   it('chama setup() apenas uma vez, mesmo com chamadas concorrentes', async () => {
@@ -79,6 +81,11 @@ describe('src/lib/ai/checkpointer.ts (AI-002)', () => {
     await ensureCheckpointerReady();
 
     expect(setupMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('falha com mensagem clara se a migration do checkpointer não rodou (versão < esperada)', async () => {
+    setupMock.mockResolvedValueOnce({ rows: [{ v: 2 }] });
+    await expect(ensureCheckpointerReady()).rejects.toThrow(/versão 2, esperado 4/);
   });
 
   it('closeCheckpointerPool fecha o pool dedicado do checkpointer', async () => {

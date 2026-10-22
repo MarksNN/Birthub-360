@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  extensions = [vector]
+  extensions = [vector, pg_trgm]
 }
 
 enum CompanyStatus {
@@ -305,6 +305,7 @@ model Company {
   @@index([cnpj])
   @@index([legalName])
   @@index([tradeName])
+  @@index([tradeName(ops: raw("gin_trgm_ops"))], type: Gin, map: "Company_tradeName_trgm_idx")
   @@index([bitrixCompanyId])
 }
 
@@ -421,6 +422,9 @@ model MarketIntelligenceCompany {
   @@index([datasetId, icpScore])
   @@index([datasetId, capitalSocial])
   @@index([competencia])
+  @@index([razaoSocialSearch(ops: raw("gin_trgm_ops"))], type: Gin, map: "MarketIntelligenceCompany_razaoSocialSearch_trgm_idx")
+  @@index([nomeFantasiaSearch(ops: raw("gin_trgm_ops"))], type: Gin, map: "MarketIntelligenceCompany_nomeFantasiaSearch_trgm_idx")
+  @@index([cnaesSecundarios(ops: JsonbPathOps)], type: Gin, map: "MarketIntelligenceCompany_cnaesSecundarios_gin_idx")
 }
 
 /// Crosswalk persistido Receita -> IBGE; a API não associa município por texto em runtime.
@@ -546,6 +550,8 @@ model Contact {
   @@index([companyId])
   @@index([name])
   @@index([role])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Contact_name_trgm_idx")
+  @@index([role(ops: raw("gin_trgm_ops"))], type: Gin, map: "Contact_role_trgm_idx")
   @@index([bitrixContactId])
   // Substituem os antigos @@index([email])/@@index([phone])/@@index([whatsapp]) — inúteis contra
   // ciphertext (IV aleatório nunca repete), ver comentário nos campos acima. Também substituem
@@ -703,6 +709,9 @@ model Lead {
   // dois Leads locais (o segundo INSERT falha com violação de unique, tratada como "já
   // importado"/"já sincronizado" pelo chamador). NULL não colide com NULL em unique index do
   // Postgres — leads sem vínculo Bitrix continuam livres para existir aos milhares sem restrição.
+  flywheelApproachRecords FlywheelApproachRecord[]
+  flywheelFewShotExamples FlywheelFewShotExample[]
+
   @@unique([organizationId, bitrixLeadId])
   @@unique([organizationId, bitrixDealId])
   @@index([organizationId])
@@ -818,7 +827,7 @@ model Attachment {
   uploadedBy String?
 
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   createdAt    DateTime  @default(now())
   deletedAt    DateTime?
@@ -1024,22 +1033,32 @@ model Organization {
   /// acumulado do mês corrente (Redis, ver providerBudget.ts) por assertProspectingBudgetNotExceeded.
   monthlyProspectingBudgetUsd Float?
 
-  workflows              Workflow[]
-  callLogs               CallLog[]
-  metrics                Metric[]
-  agentSessions          AgentSession[]
-  agents                 Agent[]
-  settings               Setting[]
-  aiConsent              OrganizationAiConsent?
-  birthhub360CallResults Birthub360CallResult[]
-  wallet                 Wallet?
-  transactions           Transaction[]
-  apiKeys                APIKey[]
-  webhookEndpoints       OrganizationWebhookEndpoint[]
-  campaigns              Campaign[]
-  dncLists               DncList[]
-  customAiTools          CustomAiTool[]
-  leadTouchpoints        LeadTouchpoint[]
+  workflows                   Workflow[]
+  callLogs                    CallLog[]
+  metrics                     Metric[]
+  agentSessions               AgentSession[]
+  agents                      Agent[]
+  settings                    Setting[]
+  aiConsent                   OrganizationAiConsent?
+  birthhub360CallResults      Birthub360CallResult[]
+  wallet                      Wallet?
+  transactions                Transaction[]
+  apiKeys                     APIKey[]
+  webhookEndpoints            OrganizationWebhookEndpoint[]
+  campaigns                   Campaign[]
+  dncLists                    DncList[]
+  customAiTools               CustomAiTool[]
+  leadTouchpoints             LeadTouchpoint[]
+  consentAuditRecords         ConsentAuditRecord[]
+  consentAuditChainHead       ConsentAuditChainHead?
+  consentSubjectKeys          ConsentSubjectKey[]
+  consentSubjectKeyTombstones ConsentSubjectKeyTombstone[]
+  consentEventDetails         ConsentEventDetail[]
+  consentPurgeTasks           ConsentPurgeTask[]
+  flywheelApproachRecords     FlywheelApproachRecord[]
+  flywheelFewShotExamples     FlywheelFewShotExample[]
+  tenantKeyEnvelope           TenantKeyEnvelope?
+  knowledgeChunks             KnowledgeChunk[]              @ignore
 }
 
 // ─── Comercial Inteligente (Revenue Command Center) ────────────────────────
@@ -1414,10 +1433,8 @@ model AccountRecommendation {
   // confiar neste nome para qualquer operacao (o Prisma CLI tambem rejeita `map` acima de 63
   // bytes, o que confirma o limite). A sintaxe do Prisma schema tambem nao expressa a condicao
   // WHERE parcial, entao o @@index abaixo e propositalmente NAO unico: ele so documenta/mapeia o
-  // nome (truncado) real do indice para que `prisma migrate dev`/`migrate diff` nao o tratem como
-  // drift nao gerenciado. NAO rode `prisma db push` contra um banco novo sem antes aplicar as
-  // migrations — sem elas, essa constraint de unicidade nao vai existir de forma alguma.
-  @@index([organizationId, companyId, idempotencyKey], map: "AccountRecommendation_organizationId_companyId_idempotencyKey_u")
+  // Único parcial "..._idempotencyKey_u" vive só na migration (ver acima); removido daqui porque
+  // Prisma ignora índices parciais e o @@index gerava drift permanente (drift-fix 2026-10-20).
   @@index([organizationId, companyId, status, generatedAt(sort: Desc)])
   @@index([organizationId, status, priority])
   @@index([snapshotId])
@@ -3586,7 +3603,7 @@ model CadenceRun {
   /// `prisma migrate dev`/`migrate diff` não o tratem como drift não gerenciado) e também serve à
   /// consulta comum por `leadId`. NÃO rode `prisma db push` contra um banco novo sem antes aplicar
   /// as migrations — sem elas, essa constraint de unicidade não vai existir.
-  @@index([leadId], map: "CadenceRun_leadId_active_unique")
+  @@index([leadId]) // plain "CadenceRun_leadId_idx"; o único parcial vive só na migration (drift-fix 2026-10-20)
 }
 
 /// Uma tentativa real de disparo de um toque de cadência — nunca `Sent` sem confirmação real do
@@ -4079,7 +4096,7 @@ model UserJobRole {
   /// `prisma migrate dev`/`migrate diff` não o tratem como drift não gerenciado) e também serve à
   /// consulta comum por `userId`. NÃO rode `prisma db push` contra um banco novo sem antes aplicar
   /// as migrations — sem elas, essa constraint de unicidade não vai existir.
-  @@index([userId], map: "UserJobRole_one_active_primary_per_user")
+  @@index([userId]) // plain "UserJobRole_userId_idx"; o único parcial vive só na migration (drift-fix 2026-10-20)
 }
 
 /// Catálogo de agentes — IDENTIDADE e estado administrativo, nunca a implementação em si (código
@@ -4142,9 +4159,6 @@ model AgentVersion {
   deprecatedAt      DateTime?
 
   executions AgentExecution[]
-
-  @@unique([agentDefinitionId, version])
-  @@index([agentDefinitionId, status])
   /// PARTIAL unique index — a condição `WHERE "status" = 'ACTIVE'` vive só na migration SQL
   /// (`prisma/migrations/20260908020000_multi_cargo_agent_governance_foundation/migration.sql`);
   /// a sintaxe do Prisma schema não consegue expressar a condição WHERE parcial, então este
@@ -4152,7 +4166,11 @@ model AgentVersion {
   /// que `prisma migrate dev`/`migrate diff` não o tratem como drift não gerenciado). NÃO rode
   /// `prisma db push` contra um banco novo sem antes aplicar as migrations — sem elas, essa
   /// constraint de unicidade não vai existir.
-  @@index([agentDefinitionId], map: "AgentVersion_one_active_per_agent")
+  // "AgentVersion_one_active_per_agent" (único parcial) vive só na migration; Prisma ignora índices
+  // parciais na introspecção, então declará-lo aqui gerava drift permanente (drift-fix 2026-10-20).
+
+  @@unique([agentDefinitionId, version])
+  @@index([agentDefinitionId, status])
 }
 
 /// Responde "quais agentes este cargo pode usar?" — um mesmo `AgentDefinition` pode ser
@@ -4663,7 +4681,7 @@ model DocumentEmbedding {
   /// Metadados adicionais (tipo de documento, chunk index, etc.)
   metadata   Json?
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime @default(now()) @updatedAt
 
   @@index([tenantId, documentId])
   @@index([vectorId])
@@ -5538,4 +5556,199 @@ model LeadTouchpoint {
   @@index([leadId])
   @@index([campaign])
   @@index([occurredAt])
+}
+
+// REMED-06 (handoff 21→01, PR #33): cadeia de consentimento append-only + Flywheel durável.
+enum ConsentAuditStatus {
+  GRANTED
+  REVOKED
+  EXPIRED
+}
+
+enum ConsentRevocationReason {
+  TITULAR_REQUEST
+  ERASURE_REQUEST
+  PURPOSE_FULFILLED
+  LEGAL_OBLIGATION
+  OPERATOR_CORRECTION
+}
+
+enum ConsentPurgeTaskStatus {
+  PENDING
+  DONE
+  DEAD
+}
+
+enum ConsentChainEventKind {
+  GENESIS
+  CONSENT
+  REVOCATION
+  RETRACTION
+}
+
+model ConsentAuditRecord {
+  id             String                   @id
+  organizationId String
+  organization   Organization             @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  /// Versão do formato canônico do hash (F6 do #33; hoje 3).
+  formatVersion  Int
+  sequence       Int
+  kind           ConsentChainEventKind
+  /// `hs256:` + HMAC-SHA256(chave do titular em ConsentSubjectKey). CHECK no banco (exceto GENESIS).
+  subjectRef     String
+  purpose        String
+  termsVersion   String
+  status         ConsentAuditStatus
+  reasonCode     ConsentRevocationReason?
+  previousHash   String                   @db.Char(64)
+  currentHash    String                   @db.Char(64)
+  occurredAt     DateTime                 @db.Timestamptz(3)
+  operatorUserId String?
+  /// DEPRECATED (compat #33 @43922b4e): retenção vive em ConsentEventDetail.retentionUntil.
+  retentionUntil DateTime?                @db.Timestamptz(3)
+  createdAt      DateTime                 @default(now()) @db.Timestamptz(3)
+  details        ConsentEventDetail[]
+
+  @@unique([organizationId, sequence])
+  @@unique([organizationId, currentHash])
+  @@index([organizationId, subjectRef])
+}
+
+/// Âncora de cabeça da cadeia por organização (detecta truncamento de cauda / recriação de gênese).
+/// Trigger: genesis* imutáveis, lastSequence estritamente crescente, DELETE/TRUNCATE bloqueados
+/// (sem exceção de cascata: FK Restrict; só o passo explícito de retenção apaga — ADR-006).
+model ConsentAuditChainHead {
+  organizationId String       @id
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  genesisId      String
+  genesisHash    String       @db.Char(64)
+  lastSequence   Int
+  lastHash       String       @db.Char(64)
+  updatedAt      DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
+}
+
+/// Chave aleatória por titular (crypto-shredding: DELETE = eliminação efetiva do vínculo).
+model ConsentSubjectKey {
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// HMAC(pepper do tenant, subjectRef NFC) em hex.
+  lookupId       String       @db.Char(64)
+  keyMaterial    Bytes
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@id([organizationId, lookupId])
+}
+
+/// Prova de crypto-shredding: linha gravada por trigger (SECURITY DEFINER) a cada DELETE em
+/// ConsentSubjectKey, sem material de chave. Append-only (trigger); app só tem SELECT.
+model ConsentSubjectKeyTombstone {
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lookupId       String       @db.Char(64)
+  keyCreatedAt   DateTime     @db.Timestamptz(3)
+  shreddedAt     DateTime     @default(now()) @db.Timestamptz(3)
+  shreddedBy     String       @default(dbgenerated("CURRENT_USER"))
+
+  @@id([organizationId, lookupId, shreddedAt])
+}
+
+/// Texto livre do evento (fora da cadeia, expurgável). Retenção vive aqui.
+model ConsentEventDetail {
+  eventId         String             @id
+  event           ConsentAuditRecord @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subjectLookupId String             @db.Char(64)
+  detail          String             @db.Text
+  retentionUntil  DateTime?          @db.Timestamptz(3)
+  createdAt       DateTime           @default(now()) @db.Timestamptz(3)
+
+  @@index([organizationId, subjectLookupId])
+  @@index([retentionUntil])
+}
+
+/// Outbox de expurgo pós-revogação. Worker itera POR ORGANIZAÇÃO com app.current_tenant_id
+/// (sem bypass_rls e sem papel dedicado — decisão Marks, igual ao outbox REMED-05).
+model ConsentPurgeTask {
+  id                String                 @id
+  organizationId    String
+  organization      Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  revocationEventId String
+  subjectRef        String?
+  shredSubjectKey   Boolean                @default(false)
+  status            ConsentPurgeTaskStatus @default(PENDING)
+  attempts          Int                    @default(0)
+  nextAttemptAt     DateTime               @default(now()) @db.Timestamptz(3)
+  lastError         String?
+  completedAt       DateTime?              @db.Timestamptz(3)
+  retainUntil       DateTime?              @db.Timestamptz(3)
+  createdAt         DateTime               @default(now()) @db.Timestamptz(3)
+
+  @@unique([organizationId, revocationEventId])
+  @@index([status, nextAttemptAt])
+  @@index([organizationId, status, nextAttemptAt])
+}
+
+model FlywheelApproachRecord {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leadId         String
+  lead           Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  channel        String
+  segment        String
+  approachText   String       @db.Text
+  sentAt         DateTime     @db.Timestamptz(3)
+
+  @@index([organizationId, leadId])
+}
+
+model FlywheelFewShotExample {
+  id                  String       @id
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leadId              String
+  lead                Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  dealId              String?
+  channel             String
+  segment             String
+  approachText        String       @db.Text
+  outcomeStatus       String
+  attributionEvidence Json
+  confidence          Float
+  isActive            Boolean      @default(true)
+  promotedAt          DateTime     @db.Timestamptz(3)
+
+  @@index([organizationId, leadId])
+  @@index([organizationId, channel, isActive])
+}
+
+/// REMED-06 (Agente 21, #33): DEK por tenant cifrada por KMS (envelope). Tombstone = destroyedAt com
+/// ciphertext NULL (crypto-shredding do tenant). App: SELECT/INSERT/UPDATE, sem DELETE; UPDATE só a
+/// transição de destruição (trigger tenant_key_envelope_guard).
+model TenantKeyEnvelope {
+  organizationId String       @id
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ciphertext     Bytes?
+  cmkId          String
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  destroyedAt    DateTime?    @db.Timestamptz(3)
+}
+
+/// Legado (RAG-001): tabela ainda existe no banco (criada por migrations antigas, com RLS), mas nada
+/// no app lê/grava nela. Declarada com @@ignore só para o schema refletir o banco sem DROP de dados
+/// (drift-fix 2026-10-20); não gera API no Prisma Client. Remoção real = migration própria e decisão
+/// de retenção.
+model KnowledgeChunk {
+  id             String                      @id
+  content        String
+  metadata       Json?
+  embedding      Unsupported("vector(768)")?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+  organizationId String?
+  organization   Organization?               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@ignore
 }

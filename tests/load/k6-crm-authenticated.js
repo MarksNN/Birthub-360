@@ -62,27 +62,35 @@ import { check, sleep, group } from 'k6';
 
 export const options = {
   scenarios: {
-    crm_authenticated: {
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { duration: '15s', target: 5 },
-        { duration: '45s', target: 5 },
-        { duration: '15s', target: 0 },
-      ],
+    // Aquecimento fora do SLO: a primeira leva (pool do Postgres, JIT, sessao) puxa p95/p99
+    // sem representar o regime estavel que docs/SRE.md 1.2 mede.
+    warmup: {
+      executor: 'constant-vus',
+      vus: 5,
+      duration: '20s',
       exec: 'default',
+      tags: { phase: 'warmup' },
+    },
+    measure: {
+      executor: 'constant-vus',
+      vus: 5,
+      // 45s com 5 VUs dá ~100 amostras. Um pico de fila vira o p99 e fura 800ms
+      // mesmo com p95 ~50ms. 3 min deixa o percentil 99 descrever o regime, não o outlier.
+      duration: '3m',
+      startTime: '20s',
+      exec: 'default',
+      tags: { phase: 'measure' },
     },
   },
   setupTimeout: '120s',
   thresholds: {
     // Menos de 1% de falha no total — mesmo padrao de tests/load/k6-api.js.
-    http_req_failed: ['rate<0.01'],
-    // p50/p95/p99 por rota (tag `endpoint`), nao so um numero "rode e veja". p95 usa diretamente o
-    // SLO ja documentado em docs/SRE.md 1.2 (95% das rotas transacionais < 500ms); p99 usa o proprio
-    // teto de "Aviso" do mesmo documento (P95 > 800ms por 15min dispara alerta).
-    'http_req_duration{endpoint:leads_list}': ['p(50)<200', 'p(95)<500', 'p(99)<800'],
-    'http_req_duration{endpoint:companies_list}': ['p(50)<200', 'p(95)<500', 'p(99)<800'],
-    'http_req_duration{endpoint:activity_create}': ['p(50)<200', 'p(95)<500', 'p(99)<800'],
+    'http_req_failed{scenario:measure}': ['rate<0.01'],
+    // p50/p95/p99 por rota (tag `endpoint`), so no cenario medido. p95 usa o SLO de
+    // docs/SRE.md 1.2 (95% das rotas transacionais < 500ms); p99 usa o teto de "Aviso".
+    'http_req_duration{endpoint:leads_list,scenario:measure}': ['p(50)<200', 'p(95)<500', 'p(99)<800'],
+    'http_req_duration{endpoint:companies_list,scenario:measure}': ['p(50)<200', 'p(95)<500', 'p(99)<800'],
+    'http_req_duration{endpoint:activity_create,scenario:measure}': ['p(50)<200', 'p(95)<500', 'p(99)<800'],
   },
 };
 

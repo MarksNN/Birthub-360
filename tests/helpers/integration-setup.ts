@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import path from 'path';
+import { Client } from 'pg';
 
 // Load test environment variables before Prisma initializes
 config({ path: path.resolve(process.cwd(), '.env.test') });
@@ -37,6 +38,81 @@ vi.mock('../../src/lib/search/index.js', () => ({
 
 import { prisma } from '../../src/lib/prisma';
 import { requestContext } from '../../src/lib/async-context';
+
+// REMED-06 v5: prospector_app não tem DELETE em Organization. Os testes limpam org por
+// id fixo antes de recriar; sem o DELETE a suíte quebra no primeiro deleteMany. O fallback
+// usa o owner do cluster de teste (o mesmo papel do bootstrap), só quando o app recebe 42501.
+// Testes que provam o REVOKE usam SQL cru, não este método.
+const originalOrgDeleteMany = prisma.organization.deleteMany.bind(prisma.organization);
+
+function testOwnerDatabaseUrl(appUrl: string): string | null {
+  if (process.env.MIGRATOR_DATABASE_URL) return process.env.MIGRATOR_DATABASE_URL;
+  const replacements: Array<[string, string]> = [
+    ['prospector_app:ci_app_test_pass', 'prospector:prospector_test_pass'],
+    ['prospector_app:prospector_app_pass', 'prospector:prospector_test_pass'],
+  ];
+  for (const [from, to] of replacements) {
+    if (appUrl.includes(from)) return appUrl.replace(from, to);
+  }
+  return null;
+}
+
+function isOrgDeleteDenied(error: unknown): boolean {
+  return /permission denied for table "?Organization"?|42501/.test(String((error as Error)?.message ?? error));
+}
+
+async function deleteOrganizationsAsOwner(args?: {
+  where?: { id?: string | { in?: string[] } };
+}): Promise<{ count: number }> {
+  const url = testOwnerDatabaseUrl(databaseUrl);
+  if (!url) {
+    throw new Error('prospector_app sem DELETE em Organization e sem URL de owner para limpar o banco de teste');
+  }
+  const where = args?.where;
+  let orgFilter = '';
+  let childFilter = '';
+  const params: unknown[] = [];
+  if (typeof where?.id === 'string') {
+    orgFilter = ' WHERE id = $1';
+    childFilter = ' WHERE "organizationId" = $1';
+    params.push(where.id);
+  } else if (where?.id && Array.isArray(where.id.in)) {
+    orgFilter = ' WHERE id = ANY($1::text[])';
+    childFilter = ' WHERE "organizationId" = ANY($1::text[])';
+    params.push(where.id.in);
+  } else if (where && Object.keys(where).length > 0) {
+    throw new Error('organization.deleteMany: filtro não suportado no fallback de owner');
+  }
+  const client = new Client({ connectionString: url });
+  await client.connect();
+  try {
+    await client.query('BEGIN');
+    // Replica pula os triggers append-only. As FKs RESTRICT da cadeia continuam valendo,
+    // então a cadeia sai antes da Organization. Só roda no banco de teste.
+    await client.query(`SET LOCAL session_replication_role = 'replica'`);
+    await client.query(`DELETE FROM "ConsentEventDetail"${childFilter}`, params);
+    await client.query(`DELETE FROM "ConsentAuditRecord"${childFilter}`, params);
+    await client.query(`DELETE FROM "ConsentAuditChainHead"${childFilter}`, params);
+    await client.query(`DELETE FROM "ConsentSubjectKeyTombstone"${childFilter}`, params);
+    const deleted = await client.query(`DELETE FROM "Organization"${orgFilter}`, params);
+    await client.query('COMMIT');
+    return { count: deleted.rowCount ?? 0 };
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    await client.end();
+  }
+}
+
+prisma.organization.deleteMany = (async (args?: { where?: { id?: string | { in?: string[] } } }) => {
+  try {
+    return await originalOrgDeleteMany(args as never);
+  } catch (error) {
+    if (!isOrgDeleteDenied(error)) throw error;
+    return deleteOrganizationsAsOwner(args);
+  }
+}) as typeof prisma.organization.deleteMany;
 
 // Roda fora de qualquer request HTTP, então não há tenantId nem sessão do Better Auth por trás
 // dessas queries — sem bypassRls elas seriam bloqueadas pelas mesmas policies de FORCE ROW LEVEL
@@ -109,7 +185,14 @@ afterAll(async () => {
     } catch (error) {
       void error;
     }
-    await prisma.organization.deleteMany();
+    // REMED-06 v5 (#35): prospector_app não tem mais DELETE em Organization (offboarding só como
+    // migrator — ADR-006). As orgs de teste ficam no banco descartável de teste; o cleanDatabase()
+    // acima já limpou os dados de negócio por tenant. Qualquer outro erro continua quebrando.
+    try {
+      await prisma.organization.deleteMany();
+    } catch (error) {
+      if (!/permission denied for table Organization|42501/.test(String((error as Error)?.message ?? error))) throw error;
+    }
   });
   await prisma.$disconnect();
 });

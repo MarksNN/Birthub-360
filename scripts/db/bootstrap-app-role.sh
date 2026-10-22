@@ -2,11 +2,16 @@
 set -e
 
 # Cria (ou atualiza a senha d)o papel de aplicacao NOSUPERUSER `prospector_app` num banco ja
-# existente, e transfere a posse dos objetos existentes pra ele. Corrige N1 do
+# existente, o papel dono `prospector_migrator`, que recebe a posse dos objetos. Corrige N1 do
 # docs/auditoria-divida-tecnica/08-PLANO-DE-SEGURANCA.md.
 #
+# Também cria/atualiza o papel DONO `prospector_migrator` (LOGIN se MIGRATOR_DB_PASSWORD vier
+# definida; NOLOGIN caso contrário) e transfere para ele a posse de schema/tabelas/sequences/
+# funções/tipos. Migrations devem rodar como prospector_migrator (DIRECT_URL); a app, como
+# prospector_app (DATABASE_URL). Ver docs/deploy/db-owner-role-separation.md.
+#
 # Uso:
-#   APP_DB_PASSWORD=<senha-do-papel-app> ./scripts/db/bootstrap-app-role.sh <host> <port> <superuser> <database>
+#   APP_DB_PASSWORD=<senha-do-papel-app> [MIGRATOR_DB_PASSWORD=<senha-do-migrator>] ./scripts/db/bootstrap-app-role.sh <host> <port> <superuser> <database>
 #
 # O superusuario informado precisa da senha disponivel via ~/.pgpass ou PGPASSWORD no ambiente
 # (nao passamos senha de superusuario por argumento aqui de proposito).
@@ -32,6 +37,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 psql -v ON_ERROR_STOP=1 -h "$HOST" -p "$PORT" -U "$SUPERUSER" -d "$DATABASE" \
   -v app_password="$APP_DB_PASSWORD" \
+  -v migrator_password="${MIGRATOR_DB_PASSWORD:-}" \
   -f "$SCRIPT_DIR/create-app-role.sql"
 
-echo "Papel prospector_app pronto em $DATABASE. Atualize DATABASE_URL para usar esse papel (nunca o superusuario)."
+echo "Papeis prospector_migrator (dono) e prospector_app (DML) prontos em $DATABASE. Migrations: DIRECT_URL=prospector_migrator; app: DATABASE_URL=prospector_app (nunca o superusuario)."

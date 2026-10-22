@@ -35,6 +35,7 @@ services:
       # Senha do papel NOSUPERUSER que os testes usam. Dev-only — troque em qualquer ambiente que
       # não seja a sua máquina local.
       APP_DB_PASSWORD: ${APP_DB_PASSWORD:-prospector_app_pass}
+      MIGRATOR_DB_PASSWORD: ${MIGRATOR_DB_PASSWORD:-prospector_migrator_pass}
     ports:
       - '5434:5432'
     # Padrão do Docker (64MB) é insuficiente para VACUUM/hash join paralelos em tabelas

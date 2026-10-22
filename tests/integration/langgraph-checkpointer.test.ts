@@ -49,9 +49,10 @@ describe('AI-002: checkpointer de LangGraph persiste em Postgres real, não em R
     await secondPool?.end();
   });
 
-  it('setup() é idempotente — chamar de novo não falha nem duplica tabelas', async () => {
-    await expect(checkpointer.setup()).resolves.toBeUndefined();
-    await expect(secondSaver.setup()).resolves.toBeUndefined();
+  it('PR #39: tabelas vêm da migration (versão 4) e o app NÃO consegue rodar setup() (sem CREATE)', async () => {
+    const { rows } = await secondPool!.query('SELECT max(v) AS v FROM checkpoint_migrations');
+    expect(rows[0].v).toBe(4);
+    await expect(secondSaver.setup()).rejects.toThrow(/permission denied/);
   });
 
   it('estado gravado por uma instância é lido de volta por uma instância independente (simula restart)', async () => {

@@ -1,0 +1,9 @@
+// Parecer 15 (#40): SQL cru e $transaction no client GLOBAL escapam do tx do runInTransaction
+// (outra conexão, sem app.current_tenant_id). Defesa estática complementar ao G1 (runtime,
+// src/lib/txEscapeGuard.ts). "warn" enquanto houver usos legados (~51); subir para "error" após
+// migrá-los para runInTransaction. Não pega aliases (const db = prisma).
+`$obj.$prop` where {
+  $obj <: `prisma`,
+  $prop <: r"^[^a-zA-Z_](queryRaw|executeRaw|queryRawUnsafe|executeRawUnsafe|queryRawTyped|runCommandRaw|transaction)$"($method),
+  register_diagnostic(span=$prop, message="parecer 15 (#40): SQL cru ou transaction no client global escapa do tx; use runInTransaction e o tx recebido.", severity="warn")
+}

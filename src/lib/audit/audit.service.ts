@@ -1,5 +1,5 @@
 import { logger } from '../logger.js';
-import { prisma } from '../prisma.js';
+import { isInActiveTransaction, prisma } from '../prisma.js';
 
 export type AuditAction =
   | 'LOGIN'
@@ -52,6 +52,10 @@ export const AuditService = {
       });
     } catch (error: any) {
       logger.error({ err: error, auditParams: params }, 'Failed to save audit log');
+      // X1 (parecer 15 #40): dentro de runInTransaction a falha já abortou o tx no Postgres.
+      // Engolir esconderia a causa (25P02 depois) ou viraria COMMIT→ROLLBACK silencioso. Relança:
+      // não existe escrita sem trilha. Fora do tx mantém o comportamento best-effort.
+      if (isInActiveTransaction()) throw error;
     }
   },
 };

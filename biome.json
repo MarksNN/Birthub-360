@@ -6,11 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "src/**",
-      "server/**",
-      "scripts/**"
-    ]
+    "includes": ["src/**", "server/**", "scripts/**"]
   },
   "formatter": {
     "enabled": true,
@@ -112,9 +108,7 @@
       }
     },
     {
-      "includes": [
-        "src/hooks/use3CXIntegration.ts"
-      ],
+      "includes": ["src/hooks/use3CXIntegration.ts"],
       "linter": {
         "rules": {
           "correctness": {
@@ -122,6 +116,24 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/**", "!src/lib/prisma.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@prisma/adapter-pg": "Parecer 15 (#40): só src/lib/prisma.ts instancia o adapter/PrismaClient."
+                }
+              }
+            }
+          }
+        }
+      }
     }
-  ]
+  ],
+  "plugins": ["./biome-plugins/no-prisma-tx-escape.grit"]
 }

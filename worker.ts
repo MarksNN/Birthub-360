@@ -6,6 +6,8 @@ registerProcessGuards();
 
 import { startWorkerServer } from './src/bootstrap/workerServer.js';
 import { logger } from './src/lib/logger.js';
+import { prisma } from './src/lib/prisma.js';
+import { assertDbRoleIsLeastPrivilege } from './src/bootstrap/dbRoleCheck.js';
 import { setWorkerProcessUp } from './src/lib/queue/metrics.js';
 import { env } from './src/config/env.js';
 
@@ -94,6 +96,8 @@ import { createCopilotoTranscriptionWorker } from './src/features/copiloto-ia/jo
 import { MeetingSynthesisService } from './src/features/chatbook/services/meeting-synthesis.service.js';
 
 async function start() {
+  // Papel do banco com menor privilégio (sem superuser/BYPASSRLS/posse) — fatal em produção.
+  await assertDbRoleIsLeastPrivilege(prisma, { logger });
   const leadsWorker = createLeadsWorker();
   const agentWorker = createAgentWorker();
   const enrichmentWorker = createEnrichmentWorker();
