@@ -251,6 +251,58 @@ html.dark,
   --glow-iris: var(--glow-pink);
   --grad-titles: var(--grad-brand);
 }
+
+/* Tema claro: neon e sky-600 em texto ficam abaixo de 4.5:1 no fundo da app.
+   O tema escuro mantém o neon. !important ganha do utility do Tailwind. */
+html.light .text-\[\#00D4FF\],
+html.light .text-\[\#00d4ff\],
+[data-theme="light"] .text-\[\#00D4FF\],
+[data-theme="light"] .text-\[\#00d4ff\],
+html:not(.dark) .text-\[\#00D4FF\],
+html:not(.dark) .text-\[\#00d4ff\],
+html.light .text-\[\#0284c7\],
+html.light .text-\[\#0284C7\],
+[data-theme="light"] .text-\[\#0284c7\],
+[data-theme="light"] .text-\[\#0284C7\],
+html:not(.dark) .text-\[\#0284c7\],
+html:not(.dark) .text-\[\#0284C7\] {
+  color: #0369a1 !important;
+}
+html.light .text-\[\#FF2D9B\],
+html.light .text-\[\#ff2d9b\],
+[data-theme="light"] .text-\[\#FF2D9B\],
+[data-theme="light"] .text-\[\#ff2d9b\],
+html:not(.dark) .text-\[\#FF2D9B\],
+html:not(.dark) .text-\[\#ff2d9b\] {
+  color: #be185d !important;
+}
+html.light .text-\[\#F59E0B\],
+html.light .text-\[\#f59e0b\],
+html.light .text-\[\#b45309\],
+[data-theme="light"] .text-\[\#F59E0B\],
+[data-theme="light"] .text-\[\#f59e0b\],
+[data-theme="light"] .text-\[\#b45309\],
+html:not(.dark) .text-\[\#F59E0B\],
+html:not(.dark) .text-\[\#f59e0b\],
+html:not(.dark) .text-\[\#b45309\] {
+  color: #92400e !important;
+}
+html.light .text-\[\#8B7DFF\],
+html.light .text-\[\#8b7dff\],
+[data-theme="light"] .text-\[\#8B7DFF\],
+[data-theme="light"] .text-\[\#8b7dff\],
+html:not(.dark) .text-\[\#8B7DFF\],
+html:not(.dark) .text-\[\#8b7dff\] {
+  color: #6d28d9 !important;
+}
+html.light .text-\[\#EF4444\],
+html.light .text-\[\#ef4444\],
+[data-theme="light"] .text-\[\#EF4444\],
+[data-theme="light"] .text-\[\#ef4444\],
+html:not(.dark) .text-\[\#EF4444\],
+html:not(.dark) .text-\[\#ef4444\] {
+  color: #b91c1c !important;
+}
 /* Existing neutral utility surfaces follow theme inside the product shell. */
 [data-page-accent] .bg-white {
   background-color: var(--color-surface);

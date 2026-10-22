@@ -2177,7 +2177,7 @@ export function Landing360({
                   className="font-sans text-xs text-slate-600 dark:text-slate-300 hover:text-[#00D4FF] transition-colors cursor-pointer"
                 >
                   Voltar para{' '}
-                  <span className="font-bold text-[#00D4FF] hover:underline">
+                  <span className="font-bold text-[#0369a1] dark:text-[#00D4FF] hover:underline">
                     Login Corporativo
                   </span>
                 </button>
@@ -2188,7 +2188,7 @@ export function Landing360({
             <div className="mt-5 p-3 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#0284c7] dark:text-[#00D4FF]">
+                  <span className="font-mono text-[10px] font-bold text-[#0369a1] dark:text-[#00D4FF]">
                     TLS 1.3
                   </span>
                   <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">
@@ -2196,7 +2196,7 @@ export function Landing360({
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#0284c7] dark:text-[#00D4FF]">
+                  <span className="font-mono text-[10px] font-bold text-[#0369a1] dark:text-[#00D4FF]">
                     AES-256-GCM
                   </span>
                   <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">
@@ -2204,7 +2204,7 @@ export function Landing360({
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#b45309] dark:text-[#F59E0B]">
+                  <span className="font-mono text-[10px] font-bold text-[#92400e] dark:text-[#F59E0B]">
                     LGPD / Art. 18
                   </span>
                   <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">

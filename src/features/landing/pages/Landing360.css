@@ -1145,14 +1145,32 @@ html.light .login-antessala-backdrop [class*="text-[#00D4FF]"],
 /* WCAG AA em fundo claro: texto neon puro mantém a cor somente no tema dark.
    As versões de leitura abaixo preservam o matiz da marca com contraste >= 4.5:1
    para badges e textos pequenos da landing (axe-core, E2E de acessibilidade). */
-html:not(.dark) .landing-neon-root [class~="text-[#00D4FF]"] {
-  color: #075985;
+html:not(.dark) .landing-neon-root [class*="text-[#00D4FF]"],
+html:not(.dark) .landing-neon-root [class*="text-[#00d4ff]"],
+html:not(.dark) .landing-neon-root .text-\[\#00D4FF\],
+html:not(.dark) .landing-neon-root .text-\[\#00d4ff\] {
+  color: #0369a1 !important;
 }
 
-html:not(.dark) .landing-neon-root [class~="text-[#F59E0B]"] {
-  color: #92400e;
+html:not(.dark) .landing-neon-root [class*="text-[#F59E0B]"],
+html:not(.dark) .landing-neon-root [class*="text-[#f59e0b]"],
+html:not(.dark) .landing-neon-root [class*="text-[#b45309]"],
+html:not(.dark) .landing-neon-root .text-\[\#F59E0B\],
+html:not(.dark) .landing-neon-root .text-\[\#f59e0b\],
+html:not(.dark) .landing-neon-root .text-\[\#b45309\] {
+  color: #92400e !important;
 }
 
-html:not(.dark) .landing-neon-root [class~="text-[#FF2D9B]"] {
-  color: #9d174d;
+html:not(.dark) .landing-neon-root [class*="text-[#FF2D9B]"],
+html:not(.dark) .landing-neon-root [class*="text-[#ff2d9b]"],
+html:not(.dark) .landing-neon-root .text-\[\#FF2D9B\],
+html:not(.dark) .landing-neon-root .text-\[\#ff2d9b\] {
+  color: #be185d !important;
+}
+
+html:not(.dark) .landing-neon-root [class*="text-[#EF4444]"],
+html:not(.dark) .landing-neon-root [class*="text-[#ef4444]"],
+html:not(.dark) .landing-neon-root .text-\[\#EF4444\],
+html:not(.dark) .landing-neon-root .text-\[\#ef4444\] {
+  color: #b91c1c !important;
 }

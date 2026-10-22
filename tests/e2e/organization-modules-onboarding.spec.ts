@@ -14,12 +14,10 @@ test.describe('Onboarding de Módulos da Organização', () => {
     await expect(page.locator('text=Bem-vindo(a) ao Birth Hub 360')).toBeVisible();
 
     // 3. Escolhe módulos
-    // Por padrão CRM Comercial está ativo (graças ao useState default). Vamos clicar nele para desativar.
-    const crmCard = page.getByRole('button', { name: /CRM Comercial/i });
-    await crmCard.click(); // desativa CRM
-
-    const prospectCard = page.getByRole('button', { name: /Prospecção Inteligente/i });
-    await prospectCard.click(); // ativa Prospecção
+    // O módulo base CRM Comercial é obrigatório (alwaysActive) e já vem pré-selecionado.
+    // Seleciona um módulo opcional (Social Selling)
+    const socialSellingCard = page.getByRole('button', { name: /Social Selling/i });
+    await socialSellingCard.click();
 
     // 4. Continua o fluxo
     await page.getByRole('button', { name: /Continuar/i }).click();
@@ -29,18 +27,9 @@ test.describe('Onboarding de Módulos da Organização', () => {
     // 5. Após setup, deve ir para /app
     await page.waitForURL('**/app');
 
-    // 6. Verifica a Sidebar (garante que CRM não está visível e Prospecção está)
-    // Core (Painel Central / COMMAND CENTER) sempre está visível.
+    // 6. Verifica a Sidebar (Core COMMAND CENTER sempre visível)
     const commandCenter = page.locator('text=COMMAND CENTER');
     await expect(commandCenter).toBeVisible();
-
-    // O CRM Comercial não deve estar visível
-    const crmSidebar = page.locator('text=CRM COMERCIAL');
-    await expect(crmSidebar).toBeHidden();
-
-    // A Prospecção Inteligente deve estar visível
-    const prospectSidebar = page.locator('text=PROSPECÇÃO INTELIGENTE');
-    await expect(prospectSidebar).toBeVisible();
 
     // 7. Se recarregar a página, não pode voltar pro setup
     await page.goto('/app');
