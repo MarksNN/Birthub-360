@@ -161,6 +161,10 @@ const KNOWN_RLS_ONLY_MODELS = [
   // Envelope da DEK do tenant: sem escrita pelo client global. App só SELECT/INSERT/UPDATE
   // (destruição via trigger). RLS + REVOKE de DELETE bastam; não entra na injeção automática.
   'TenantKeyEnvelope',
+  // REMED-05: outbox/consumo gravados pelo adaptador do 16 (SQL cru em transação com tenant
+  // setado); RLS FORCE tenant_isolation cobre isolamento.
+  'DomainEventConsumption',
+  'DomainEventOutbox',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {

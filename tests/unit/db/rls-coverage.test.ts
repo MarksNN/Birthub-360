@@ -178,7 +178,8 @@ describe('Row Level Security (RLS) - Cobertura e Isolamento Semântico no Banco 
     // +ConsentPurgeTask, +ConsentSubjectKeyTombstone, +FlywheelApproachRecord, +FlywheelFewShotExample (130 -> 138)
     // REMED-06 v4: +TenantKeyEnvelope (138 -> 139)
     // REMED-02: +AccountGraphNode, +AccountGraphEdge, +WinLossAutopsyReport (139 -> 142)
-    expect(tenantScopedCount).toBe(142);
+    // REMED-05: +DomainEventOutbox, +DomainEventConsumption (142 -> 144)
+    expect(tenantScopedCount).toBe(144);
     expect(globalCatalogCount).toBe(14);
     expect(systemInternalCount).toBe(1);
   });
