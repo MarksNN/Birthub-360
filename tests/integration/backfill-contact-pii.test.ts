@@ -39,7 +39,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await requestContext.run({ bypassRls: true }, async () => {
+  // Contact e Company exigem tenantId real sob FORCE RLS; bypass sozinho não remove
+  // os dados de teste e poderia deixar PII residual sem percebermos.
+  await requestContext.run({ tenantId: ORG }, async () => {
     await prisma.contact.deleteMany({ where: { organizationId: ORG } });
     await prisma.company.deleteMany({ where: { organizationId: ORG } });
     // Organization permanece como fixture no banco exclusivamente de teste: o app não tem DELETE
