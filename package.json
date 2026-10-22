@@ -152,6 +152,7 @@
     "cors": "^2.8.6",
     "date-fns": "^4.4.0",
     "disposable-email-domains": "^1.0.62",
+    "dompurify": "^3.4.17",
     "dotenv": "^17.4.2",
     "echarts": "^6.1.0",
     "elevenlabs": "^1.59.0",
