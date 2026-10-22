@@ -32,6 +32,7 @@ export class UntrustedContentGuard {
     }
 
     // Sanitiza tags e caracteres de controle perigosos
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: sanitização de segurança intencional de caracteres de controle ASCII
     const sanitized = content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').trim();
 
     return {
