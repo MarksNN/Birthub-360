@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  MODELS_WITH_ORGANIZATION_ID,
-  TENANT_INJECTED_MODELS,
-} from '@/lib/tenant-scoping-registry';
+import { MODELS_WITH_ORGANIZATION_ID, TENANT_INJECTED_MODELS } from '@/lib/tenant-scoping-registry';
 
 /**
  * TENANT-007 (docs/audits/repository-debt-audit/agents/TENANT.md) e Onda 1 — Segurança & Tenancy,
@@ -145,6 +142,11 @@ const KNOWN_RLS_ONLY_MODELS = [
   'WorkspaceLayout',
   'WorkspaceSection',
   'WorkspaceWidget',
+  // REMED-02: repositórios (accountGraphRepository/winLossAutopsyRepository) sempre passam
+  // organizationId explícito + withTenantContext; RLS FORCE cobre o resto.
+  'AccountGraphEdge',
+  'AccountGraphNode',
+  'WinLossAutopsyReport',
   // REMED-06 (handoff 21→01): cadeia de consentimento LGPD + Flywheel. Escrita só pelos
   // repositórios do #33 dentro de transação com app.current_tenant_id; RLS tenant_isolation FORCE
   // sem bypass cobre o isolamento, e a cadeia ainda tem REVOKE + trigger append-only.

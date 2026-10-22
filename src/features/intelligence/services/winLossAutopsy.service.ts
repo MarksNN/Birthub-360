@@ -11,9 +11,16 @@ import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import { curatedObjectionService } from '../../playbook/services/curatedObjection.service.js';
 import { commercialLearningFlywheel } from '../services/commercialLearningFlywheel.service.js';
 import { logger } from '../../../lib/logger.js';
+import {
+  PrismaWinLossAutopsyRepository,
+  type WinLossAutopsyRepository,
+} from '../infra/winLossAutopsyRepository.js';
 
 export class WinLossAutopsyService implements IWinLossAutopsyPort {
-  private reportsStore = new Map<string, WinLossAutopsyReport>();
+  // REMED-02: fonte da verdade é o PostgreSQL (WinLossAutopsyReport, RLS por tenant).
+  constructor(
+    private readonly repo: WinLossAutopsyRepository = new PrismaWinLossAutopsyRepository(),
+  ) {}
 
   /**
    * Executa a análise forense profunda de uma oportunidade (alias para integração e testes).
@@ -348,8 +355,7 @@ export class WinLossAutopsyService implements IWinLossAutopsyPort {
       humanReviewStatus: 'pending',
     };
 
-    const key = `${params.organizationId}:${id}`;
-    this.reportsStore.set(key, report);
+    await this.repo.save(report);
 
     // Publicar evento no DomainEventMesh
     await domainEventMesh.publish({
@@ -386,8 +392,7 @@ export class WinLossAutopsyService implements IWinLossAutopsyPort {
     candidateIndex: number;
     reviewedBy: string;
   }): Promise<{ promoted: boolean; playbookEntryId?: string }> {
-    const key = `${params.organizationId}:${params.reportId}`;
-    const report = this.reportsStore.get(key);
+    const report = await this.repo.find(params.organizationId, params.reportId);
     if (!report) return { promoted: false };
 
     const candidate = report.sectionH_CuratedLearningCandidates[params.candidateIndex];
@@ -396,6 +401,8 @@ export class WinLossAutopsyService implements IWinLossAutopsyPort {
     candidate.curationStatus = 'approved_for_playbook';
     report.humanReviewStatus = 'verified_by_manager';
     report.reviewerNotes = `Aprovado para o Playbook por ${params.reviewedBy} em ${new Date().toISOString()}`;
+
+    await this.repo.save(report);
 
     let playbookEntryId = `playbook-entry-${randomUUID()}`;
 
@@ -442,12 +449,11 @@ export class WinLossAutopsyService implements IWinLossAutopsyPort {
   /**
    * Recupera um relatório de autópsia.
    */
-  getAutopsyReport(organizationId: string, reportId: string): WinLossAutopsyReport | undefined {
-    return this.reportsStore.get(`${organizationId}:${reportId}`);
-  }
-
-  clear(): void {
-    this.reportsStore.clear();
+  async getAutopsyReport(
+    organizationId: string,
+    reportId: string,
+  ): Promise<WinLossAutopsyReport | undefined> {
+    return (await this.repo.find(organizationId, reportId)) ?? undefined;
   }
 }
 

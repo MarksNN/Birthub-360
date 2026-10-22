@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { AccountKnowledgeGraphService } from '../../../src/features/knowledge/services/accountKnowledgeGraph.service.js';
+import { InMemoryAccountGraphRepository } from '../../../src/features/knowledge/infra/accountGraphRepository.js';
 
 describe('AccountKnowledgeGraphService — Eixo 6 (Knowledge Graph)', () => {
-  const service = new AccountKnowledgeGraphService();
+  const service = new AccountKnowledgeGraphService(new InMemoryAccountGraphRepository());
   const orgA = 'org-tenant-alpha-001';
   const orgB = 'org-tenant-beta-002';
 

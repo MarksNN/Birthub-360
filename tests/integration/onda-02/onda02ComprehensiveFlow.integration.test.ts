@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { prisma } from '../../../src/lib/prisma';
+import { requestContext } from '../../../src/lib/async-context';
 import { accountKnowledgeGraph } from '../../../src/features/knowledge/services/accountKnowledgeGraph.service.js';
 import { accountDetectiveAgent } from '../../../src/features/intelligence/agents/tactical/accountDetective.agent.js';
 import { promiseGuardianAgent } from '../../../src/features/intelligence/agents/tactical/promiseGuardian.agent.js';
@@ -14,11 +16,23 @@ describe('Onda 02 — Comprehensive Five Integrated Commercial Journeys', () => 
   const tenantA = 'tenant-healthtech-global';
   const tenantB = 'tenant-logistics-corp';
 
-  beforeEach(() => {
-    accountKnowledgeGraph.clear();
+  beforeEach(async () => {
+    // REMED-02: grafo e autópsia agora persistem no Postgres (FK Organization) — semeia os tenants
+    // e limpa as tabelas em vez do antigo .clear() em memória.
+    await requestContext.run({ bypassRls: true }, async () => {
+      for (const id of [tenantA, tenantB]) {
+        await prisma.organization.upsert({ where: { id }, create: { id, name: id }, update: {} });
+      }
+    });
+    for (const org of [tenantA, tenantB]) {
+      await requestContext.run({ tenantId: org }, async () => {
+        await prisma.accountGraphEdge.deleteMany({ where: { organizationId: org } });
+        await prisma.accountGraphNode.deleteMany({ where: { organizationId: org } });
+        await prisma.winLossAutopsyReport.deleteMany({ where: { organizationId: org } });
+      });
+    }
     promiseGuardianAgent.clear();
     marketSensingService.clear();
-    winLossAutopsyService.clear();
     curatedObjectionService.clear();
     commercialLearningFlywheel.clear();
     domainEventMesh.clearProcessedEvents();
@@ -82,7 +96,9 @@ describe('Onda 02 — Comprehensive Five Integrated Commercial Journeys', () => 
     const graphView = await accountKnowledgeGraph.getAccountGraph(tenantA, accountId);
     expect(graphView.recommendedApproaches?.length).toBeGreaterThan(0);
 
-    const finApproach = graphView.recommendedApproaches?.find((a) => a.roleCategory === 'financial_buyer');
+    const finApproach = graphView.recommendedApproaches?.find(
+      (a) => a.roleCategory === 'financial_buyer',
+    );
     expect(finApproach).toBeDefined();
     expect(finApproach?.suggestedOpeningDraft).toContain('Dra. Beatriz');
     expect(finApproach?.strategicAngle).toContain('eficiência de capital');
@@ -131,7 +147,9 @@ describe('Onda 02 — Comprehensive Five Integrated Commercial Journeys', () => 
     });
 
     expect(commitments.length).toBeGreaterThanOrEqual(2);
-    const techCommitment = commitments.find((c) => c.commitmentType === 'answer_technical_question');
+    const techCommitment = commitments.find(
+      (c) => c.commitmentType === 'answer_technical_question',
+    );
     const callCommitment = commitments.find((c) => c.commitmentType === 'return_call');
 
     expect(techCommitment?.approvalStatus).toBe('pending_human_review');
@@ -172,7 +190,8 @@ describe('Onda 02 — Comprehensive Five Integrated Commercial Journeys', () => 
       messagesAndNotes: [
         {
           role: 'Cliente',
-          content: 'A proposta técnica de vocês foi a melhor, mas o fluxo de desembolso em 36x da concorrência foi decisivo para a nossa diretoria.',
+          content:
+            'A proposta técnica de vocês foi a melhor, mas o fluxo de desembolso em 36x da concorrência foi decisivo para a nossa diretoria.',
           date: '2026-10-17',
         },
       ],
@@ -205,22 +224,30 @@ describe('Onda 02 — Comprehensive Five Integrated Commercial Journeys', () => 
 
   it('Jornada 5 — Forecast Preventivo: CRM -> RevOps -> Advogado do Diabo -> Evidências de Risco -> Recomendação Calibrada de Forecast', async () => {
     // 1. Advogado do Diabo audita uma oportunidade de alto valor prestes a fechar no trimestre
-    const devilsAudit = await devilsAdvocateAgent.evaluateDealForecast(tenantA, 'deal-megacorp-99', {
-      dealTitle: 'Implantação Global EMR',
-      currentStage: 'Fechamento Verbal',
-      currentProbability: 90, // Vendedor declarou 90%
-      daysInCurrentStage: 28, // Quase um mês sem avançar na etapa de fechamento
-      daysSinceLastInteraction: 14, // 14 dias sem resposta do patrocinador
-      stageAverageDays: 5,
-      unresolvedObjections: ['Aprovação pendente no comitê de compliance da matriz'],
-      competitorsMentioned: ['Provedor Global'],
-    });
+    const devilsAudit = await devilsAdvocateAgent.evaluateDealForecast(
+      tenantA,
+      'deal-megacorp-99',
+      {
+        dealTitle: 'Implantação Global EMR',
+        currentStage: 'Fechamento Verbal',
+        currentProbability: 90, // Vendedor declarou 90%
+        daysInCurrentStage: 28, // Quase um mês sem avançar na etapa de fechamento
+        daysSinceLastInteraction: 14, // 14 dias sem resposta do patrocinador
+        stageAverageDays: 5,
+        unresolvedObjections: ['Aprovação pendente no comitê de compliance da matriz'],
+        competitorsMentioned: ['Provedor Global'],
+      },
+    );
 
     // 2. Detecção de Viés de Otimismo e Risco de Perda Silenciosa
     expect(devilsAudit.optimismBiasDetected).toBe(true);
     expect(devilsAudit.overallHealthScore).toBeLessThan(50);
-    expect(devilsAudit.forecastRevisionRecommendation.recommendedAction).toBe('downgrade_probability');
-    expect(devilsAudit.forecastRevisionRecommendation.recommendedProbability).toBeLessThanOrEqual(40);
+    expect(devilsAudit.forecastRevisionRecommendation.recommendedAction).toBe(
+      'downgrade_probability',
+    );
+    expect(devilsAudit.forecastRevisionRecommendation.recommendedProbability).toBeLessThanOrEqual(
+      40,
+    );
     expect(devilsAudit.forecastRevisionRecommendation.evidence.length).toBeGreaterThanOrEqual(2);
 
     // 3. Evento DEVILS_ADVOCATE_ALERT registrado no barramento para revisão do comitê de receita

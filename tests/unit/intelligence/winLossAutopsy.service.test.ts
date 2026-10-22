@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { WinLossAutopsyService } from '../../../src/features/intelligence/services/winLossAutopsy.service.js';
+import { InMemoryWinLossAutopsyRepository } from '../../../src/features/intelligence/infra/winLossAutopsyRepository.js';
 
 describe('WinLossAutopsyService — Eixo 19 (Win-Loss Deep Autopsy)', () => {
-  const service = new WinLossAutopsyService();
+  const service = new WinLossAutopsyService(new InMemoryWinLossAutopsyRepository());
   const orgId = 'org-winloss-autopsy-001';
 
   it('deve realizar autópsia forense de DEAL_LOST gerando as 9 seções estruturadas', async () => {
@@ -25,7 +26,11 @@ describe('WinLossAutopsyService — Eixo 19 (Win-Loss Deep Autopsy)', () => {
         { type: 'demo', date: '2026-09-10', notes: 'Demonstração de telemetria' },
       ],
       messagesAndNotes: [
-        { source: 'email', date: '2026-09-20', text: 'Recebemos a proposta, mas achamos o valor de implantação muito caro.' },
+        {
+          source: 'email',
+          date: '2026-09-20',
+          text: 'Recebemos a proposta, mas achamos o valor de implantação muito caro.',
+        },
       ],
       unresolvedObjections: ['Preço de implantação muito alto'],
       competitorsMentioned: ['Concorrente X'],
@@ -62,8 +67,20 @@ describe('WinLossAutopsyService — Eixo 19 (Win-Loss Deep Autopsy)', () => {
         { stageName: 'Proposta', enteredAt: '2026-09-19T10:00:00Z', durationDays: 12 },
         { stageName: 'Negociação', enteredAt: '2026-10-01T10:00:00Z', durationDays: 16 },
       ],
-      activities: [{ type: 'meeting', date: '2026-09-22', notes: 'Reunião de alinhamento técnico com diretor de TI' }],
-      messagesAndNotes: [{ source: 'whatsapp', date: '2026-10-10', text: 'Fechado! O diferencial foi a conformidade LGPD e tokenização.' }],
+      activities: [
+        {
+          type: 'meeting',
+          date: '2026-09-22',
+          notes: 'Reunião de alinhamento técnico com diretor de TI',
+        },
+      ],
+      messagesAndNotes: [
+        {
+          source: 'whatsapp',
+          date: '2026-10-10',
+          text: 'Fechado! O diferencial foi a conformidade LGPD e tokenização.',
+        },
+      ],
     });
 
     expect(report.outcome).toBe('DEAL_WON');
@@ -81,7 +98,9 @@ describe('WinLossAutopsyService — Eixo 19 (Win-Loss Deep Autopsy)', () => {
       salesCycleDays: 60,
       outcome: 'DEAL_LOST',
       closedAt: new Date().toISOString(),
-      stageHistory: [{ stageName: 'Proposta', enteredAt: '2026-08-01T10:00:00Z', durationDays: 60 }],
+      stageHistory: [
+        { stageName: 'Proposta', enteredAt: '2026-08-01T10:00:00Z', durationDays: 60 },
+      ],
       activities: [],
       messagesAndNotes: [],
       unresolvedObjections: ['Preço 40% superior ao concorrente local'],
