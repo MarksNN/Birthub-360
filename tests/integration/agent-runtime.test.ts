@@ -501,7 +501,7 @@ describe('Agent Runtime Genérico (PROMPT 4)', () => {
       await requestContext.run({ bypassRls: true }, async () => {
         await prisma.agentExecution.deleteMany({ where: { organizationId: OTHER_ORG_ID } });
         await prisma.user.delete({ where: { id: otherUser.id } });
-        await prisma.organization.delete({ where: { id: OTHER_ORG_ID } });
+        // A organização fixture é idempotente (upsert); DELETE é vedado ao papel app pela LGPD.
       });
     });
   });
