@@ -35,6 +35,16 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
 
 ### `GHSA-Q2HR-2G5M-VWHR`, `GHSA-QHR7-859C-M2P7`, `GHSA-6J4F-FJ2G-MC7P` - `brace-expansion`
 
+
+### `GHSA-CG2G-XH64-V4Q7`, `GHSA-MRV2-3PQR-J5JR`, `GHSA-C6GR-QVV4-5V3F` - `dompurify`
+
+- **Advisory:** https://github.com/advisories/GHSA-cg2g-xh64-v4q7
+- **Severidade reportada pelo `npm audit`:** critical
+- **Cadeia:** dompurify (transitiva)
+- **Motivo:** Nova advisory crítica/high sem fix non-breaking imediato disponível no momento do gate. Aceito temporariamente até atualização de dependência ou patch upstream.
+- **Dono:** Agente 00
+- **Data de reavaliação:** 2026-10-30
+
 - **Advisory:** https://github.com/advisories/GHSA-Q2HR-2G5M-VWHR
 - **Severidade reportada pelo `npm audit`:** high
 - **Cadeia:** brace-expansion (transitivas diversas)
@@ -322,11 +332,3 @@ high` no diff de manifests do PR) e Trivy passando a rodar também em PR de form
 
 
 
-### `GHSA-CG2G-XH64-V4Q7`, `GHSA-MRV2-3PQR-J5JR`, `GHSA-C6GR-QVV4-5V3F` - `dompurify`
-
-- **Advisory:** https://github.com/advisories/GHSA-cg2g-xh64-v4q7
-- **Severidade reportada pelo `npm audit`:** critical
-- **Cadeia:** dompurify (transitiva)
-- **Motivo:** Nova advisory crítica/high sem fix non-breaking imediato disponível no momento do gate. Aceito temporariamente até atualização de dependência ou patch upstream.
-- **Dono:** Agente 00
-- **Data de reavaliação:** 2026-10-30
