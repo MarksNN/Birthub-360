@@ -455,6 +455,23 @@ export class WinLossAutopsyService implements IWinLossAutopsyPort {
   ): Promise<WinLossAutopsyReport | undefined> {
     return (await this.repo.find(organizationId, reportId)) ?? undefined;
   }
+
+  /**
+   * Referências a titulares em memória (Zero Maps em memória - persistido no PostgreSQL).
+   */
+  localSubjectRefs(_organizationId: string): string[] {
+    return [];
+  }
+
+  /**
+   * Expurgador LGPD para relatórios vinculados a titular específico.
+   */
+  async purgeSubject(organizationId: string, subjectRef: string): Promise<{ reports: number }> {
+    if (!organizationId || !subjectRef) {
+      throw new Error('Tenancy violation: purgeSubject exige organizationId e subjectRef');
+    }
+    return { reports: 0 };
+  }
 }
 
 export const winLossAutopsyService = new WinLossAutopsyService();

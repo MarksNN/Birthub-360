@@ -2,6 +2,37 @@ import { randomUUID } from 'node:crypto';
 import type { FewShotCopyItem } from '../../../shared/contracts/dataFlywheel.contract.js';
 import { logger } from '../../../lib/logger.js';
 
+/**
+ * REMED-06 / Ajuste 1 — expurgo durável do Flywheel ao revogar consentimento.
+ * Delegates estruturais dos models `FlywheelApproachRecord` e `FlywheelFewShotExample`
+ * (ainda inexistentes no schema — handoff ao Agente 01). Exclusão física (deleteMany),
+ * nunca soft-delete: o texto da abordagem é dado pessoal derivado do titular.
+ */
+export interface FlywheelPersistencePurger {
+  $transaction<T>(fn: (tx: FlywheelPurgeTx) => Promise<T>): Promise<T>;
+}
+export interface FlywheelPurgeTx {
+  /** Opcional: seta app.current_tenant_id (RLS tenant_isolation do PR #35) na transação. */
+  $executeRaw?(query: TemplateStringsArray, ...values: unknown[]): Promise<number>;
+  flywheelFewShotExample: {
+    deleteMany(args: {
+      where: { organizationId: string; leadId: string };
+    }): Promise<{ count: number }>;
+  };
+  flywheelApproachRecord: {
+    deleteMany(args: {
+      where: { organizationId: string; leadId: string };
+    }): Promise<{ count: number }>;
+  };
+}
+
+export interface FlywheelPurgeResult {
+  approachesPurged: number;
+  fewShotPurged: number;
+  persistedApproachesPurged: number;
+  persistedFewShotPurged: number;
+}
+
 export interface ApproachRecord {
   id: string;
   organizationId: string;
@@ -16,6 +47,93 @@ export class CommercialLearningFlywheelService {
   private approaches: Map<string, ApproachRecord> = new Map();
   private curatedFewShotLibrary: Map<string, FewShotCopyItem> = new Map();
   private static ATTRIBUTION_WINDOW_DAYS = 30;
+
+  constructor(private persistence?: FlywheelPersistencePurger) {}
+
+  /** Wiring de produção: liga o expurgo durável quando os models do Agente 01 existirem. */
+  private runTx?: <T>(
+    fn: (tx: never) => Promise<T>,
+    opts: { organizationId: string },
+  ) => Promise<T>;
+
+  setPersistence(
+    persistence: FlywheelPersistencePurger | undefined,
+    runTx?: <T>(fn: (tx: never) => Promise<T>, opts: { organizationId: string }) => Promise<T>,
+  ): void {
+    this.persistence = persistence;
+    this.runTx = runTx;
+  }
+
+  /**
+   * Retração com expurgo real (Ajuste 1): remove abordagens e exemplos few-shot do titular
+   * na memória e, se houver persistência configurada, no PostgreSQL (mesma transação).
+   */
+  /** leadIds com estado em memória no tenant (para casamento por pseudônimo no pub/sub). */
+  localSubjectRefs(organizationId: string): string[] {
+    const out = new Set<string>();
+    for (const a of this.approaches.values()) {
+      if (a.organizationId === organizationId && a.leadId) out.add(a.leadId);
+    }
+    for (const f of this.curatedFewShotLibrary.values()) {
+      const l = f.attributionEvidence?.leadId;
+      if (f.organizationId === organizationId && l) out.add(l);
+    }
+    return [...out];
+  }
+
+  async purgeSubject(organizationId: string, leadId: string): Promise<FlywheelPurgeResult> {
+    if (!organizationId || !leadId) {
+      throw new Error('Tenancy violation: purgeSubject exige organizationId e leadId');
+    }
+    let persistedApproachesPurged = 0;
+    let persistedFewShotPurged = 0;
+    if (this.persistence) {
+      const where = { organizationId, leadId };
+      const body = async (tx: FlywheelPurgeTx) => {
+        if (tx.$executeRaw) {
+          await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
+        }
+        const fs = await tx.flywheelFewShotExample.deleteMany({ where });
+        const ap = await tx.flywheelApproachRecord.deleteMany({ where });
+        return { fs: fs.count, ap: ap.count };
+      };
+      // #40: runInTransaction mantém set_config e deleteMany na MESMA conexão do client estendido.
+      const res = this.runTx
+        ? await this.runTx(body as (tx: never) => Promise<{ fs: number; ap: number }>, {
+            organizationId,
+          })
+        : await this.persistence.$transaction(body);
+      persistedApproachesPurged = res.ap;
+      persistedFewShotPurged = res.fs;
+    }
+
+    let approachesPurged = 0;
+    for (const [id, a] of this.approaches) {
+      if (a.organizationId === organizationId && a.leadId === leadId) {
+        this.approaches.delete(id);
+        approachesPurged++;
+      }
+    }
+    let fewShotPurged = 0;
+    for (const [id, f] of this.curatedFewShotLibrary) {
+      if (f.organizationId === organizationId && f.attributionEvidence?.leadId === leadId) {
+        this.curatedFewShotLibrary.delete(id);
+        fewShotPurged++;
+      }
+    }
+
+    logger.warn(
+      {
+        organizationId,
+        approachesPurged,
+        fewShotPurged,
+        persistedApproachesPurged,
+        persistedFewShotPurged,
+      },
+      'CommercialLearningFlywheel: expurgo do titular concluído (retração Ajuste 1)',
+    );
+    return { approachesPurged, fewShotPurged, persistedApproachesPurged, persistedFewShotPurged };
+  }
 
   /**
    * Registra uma abordagem comercial gerada e enviada para um lead com autorização.

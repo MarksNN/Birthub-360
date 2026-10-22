@@ -35,7 +35,11 @@ export default defineConfig({
           environment: 'jsdom',
           globals: true,
           setupFiles: ['./tests/helpers/setup.ts'],
-          include: ['tests/unit/**/*.test.{ts,tsx}', 'tests/integration/**/*.test.{ts,tsx}'],
+          include: [
+            'tests/unit/**/*.test.{ts,tsx}',
+            'tests/integration/**/*.test.{ts,tsx}',
+            'tests/security/**/*.test.{ts,tsx}',
+          ],
           exclude: ['tests/e2e/**', 'node_modules/**'],
         },
       },

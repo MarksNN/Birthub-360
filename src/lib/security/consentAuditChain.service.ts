@@ -4,32 +4,415 @@ import type {
   IConsentAuditChainPort,
 } from '../../shared/contracts/consentAudit.contract.js';
 import { logger } from '../logger.js';
+import { canonicalJson } from './canonicalJson.js';
+import { SUBJECT_TOKEN_PATTERN, type SubjectTokenizer } from './subjectTokenizer.js';
 
-const GENESIS_HASH = '0000000000000000000000000000000000000000000000000000000000000000';
+export { canonicalJson } from './canonicalJson.js';
 
-export class ConsentAuditChainService implements IConsentAuditChainPort {
-  // Ledger imutável em memória estruturado por tenant: organizationId -> ConsentAuditEvent[]
-  private tenantChains = new Map<string, ConsentAuditEvent[]>();
+export const GENESIS_HASH = '0'.repeat(64);
+/** Versão do formato canônico/hash (F6). Mudanças exigem nova versão, nunca reescrita. */
+export const CONSENT_CHAIN_FORMAT_VERSION = 3;
 
-  private calculateHash(event: Omit<ConsentAuditEvent, 'currentHash'>): string {
-    const raw = [
-      event.previousHash,
-      event.id,
-      event.organizationId,
-      event.subjectRef,
-      event.purpose,
-      event.termsVersion,
-      event.status,
-      event.occurredAt,
-      event.operatorUserId || '',
-    ].join(':');
+/** Formatos aceitos (sem texto livre na cadeia): finalidade em CAIXA_ALTA e versão curta. */
+export const CONSENT_PURPOSE_PATTERN = /^[A-Z][A-Z0-9_]{1,63}$/;
+export const TERMS_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
 
-    return createHash('sha256').update(raw).digest('hex');
+export type ConsentChainEventKind = 'GENESIS' | 'CONSENT' | 'REVOCATION' | 'RETRACTION';
+
+/** Motivo de revogação — enum fechado; texto livre nunca entra na cadeia (F3 / P3-1). */
+export const REVOCATION_REASON_CODES = [
+  'TITULAR_REQUEST',
+  'ERASURE_REQUEST',
+  'PURPOSE_FULFILLED',
+  'LEGAL_OBLIGATION',
+  'OPERATOR_CORRECTION',
+] as const;
+export type RevocationReasonCode = (typeof REVOCATION_REASON_CODES)[number];
+export function isRevocationReasonCode(v: unknown): v is RevocationReasonCode {
+  return typeof v === 'string' && (REVOCATION_REASON_CODES as readonly string[]).includes(v);
+}
+
+export interface StoredConsentAuditEvent extends ConsentAuditEvent {
+  formatVersion: number;
+  /** 0 = gênese do tenant. */
+  sequence: number;
+  kind: ConsentChainEventKind;
+  reasonCode?: RevocationReasonCode;
+}
+
+/** Ponteiro de cabeça da cadeia (F5 / P2-2): detecta truncamento de cauda e recriação. */
+export interface ConsentChainHead {
+  organizationId: string;
+  genesisId: string;
+  genesisHash: string;
+  lastSequence: number;
+  lastHash: string;
+}
+
+/** Tarefa de expurgo (outbox) gravada na MESMA transação da revogação (F4 / P2-3). */
+export interface ConsentPurgeTask {
+  id: string;
+  organizationId: string;
+  revocationEventId: string;
+  /** Referência operacional do titular; anulada ao concluir (minimização). */
+  subjectRef: string | null;
+  shredSubjectKey: boolean;
+  status: 'PENDING' | 'DONE' | 'DEAD';
+  attempts: number;
+  nextAttemptAt: string;
+  lastError?: string;
+  completedAt?: string;
+  /** Retenção do registro da tarefa (prova do atendimento), após a qual é excluído. */
+  retainUntil?: string;
+}
+
+/** Detalhe livre opcional de um evento — FORA da cadeia, expurgável (F3). */
+export interface ConsentEventDetail {
+  eventId: string;
+  organizationId: string;
+  subjectLookupId: string;
+  detail: string;
+  /** Retenção (fora da cadeia; ConsentAuditRecord.retentionUntil está deprecated no #35). */
+  retentionUntil?: string;
+}
+
+export interface ChainLockContext {
+  head: ConsentChainHead | null;
+  last: StoredConsentAuditEvent | null;
+  append: (event: StoredConsentAuditEvent) => Promise<void>;
+  enqueuePurge: (task: ConsentPurgeTask) => Promise<void>;
+  saveDetail: (detail: ConsentEventDetail) => Promise<void>;
+}
+
+export interface ConsentAuditChainRepository {
+  /** Exclusão mútua por tenant (Postgres: transação + advisory lock); tudo no ctx é atômico. */
+  withTenantLock<T>(organizationId: string, fn: (ctx: ChainLockContext) => Promise<T>): Promise<T>;
+  listChain(organizationId: string): Promise<StoredConsentAuditEvent[]>;
+  getHead(organizationId: string): Promise<ConsentChainHead | null>;
+  /** Organizações a varrer pelo worker (sem bypass de RLS nas tabelas LGPD). */
+  listTenants(): Promise<string[]>;
+  /**
+   * Claim ATÔMICO sem colunas de lease: trava UMA tarefa PENDING vencida do tenant com
+   * `FOR UPDATE SKIP LOCKED` e mantém o lock enquanto `fn` processa; o retorno de `fn` é gravado
+   * na mesma transação. Crash → rollback → a tarefa volta a ficar disponível.
+   */
+  withNextDuePurge(
+    organizationId: string,
+    now: Date,
+    fn: (task: ConsentPurgeTask) => Promise<ConsentPurgeTask>,
+  ): Promise<boolean>;
+  deleteExpiredPurges(organizationId: string, now: Date): Promise<number>;
+  deleteDetailsForSubject(organizationId: string, subjectLookupId: string): Promise<number>;
+}
+
+export class InMemoryConsentAuditChainRepository implements ConsentAuditChainRepository {
+  private chains = new Map<string, StoredConsentAuditEvent[]>();
+  private heads = new Map<string, ConsentChainHead>();
+  readonly purges = new Map<string, ConsentPurgeTask>();
+  readonly details = new Map<string, ConsentEventDetail>();
+  private locks = new Map<string, Promise<unknown>>();
+
+  async withTenantLock<T>(
+    organizationId: string,
+    fn: (ctx: ChainLockContext) => Promise<T>,
+  ): Promise<T> {
+    const prev = this.locks.get(organizationId) ?? Promise.resolve();
+    const run = prev.then(async () => {
+      // Transação simulada: acumula e só aplica se `fn` concluir.
+      const chain = this.chains.get(organizationId) ?? [];
+      const staged: StoredConsentAuditEvent[] = [];
+      const stagedPurges: ConsentPurgeTask[] = [];
+      const stagedDetails: ConsentEventDetail[] = [];
+      let stagedHead: ConsentChainHead | undefined;
+      const result = await fn({
+        head: this.heads.get(organizationId)
+          ? { ...(this.heads.get(organizationId) as ConsentChainHead) }
+          : null,
+        last: chain.at(-1) ? { ...(chain.at(-1) as StoredConsentAuditEvent) } : null,
+        append: async (e) => {
+          // Emula o trigger BEFORE INSERT do #35: confere sequência/encadeamento e avança o head.
+          const tip = staged.at(-1) ?? chain.at(-1);
+          const h = stagedHead ?? this.heads.get(organizationId);
+          if (e.organizationId !== organizationId) throw new Error('tenant divergente');
+          if (
+            !tip
+              ? e.sequence !== 0 || e.previousHash !== GENESIS_HASH
+              : !h || e.sequence !== h.lastSequence + 1 || e.previousHash !== h.lastHash
+          ) {
+            throw new Error('trigger: sequence/previousHash fora de ordem');
+          }
+          stagedHead = tip
+            ? { ...(h as ConsentChainHead), lastSequence: e.sequence, lastHash: e.currentHash }
+            : {
+                organizationId,
+                genesisId: e.id,
+                genesisHash: e.currentHash,
+                lastSequence: 0,
+                lastHash: e.currentHash,
+              };
+          staged.push({ ...e });
+        },
+        enqueuePurge: async (t) => {
+          stagedPurges.push({ ...t });
+        },
+        saveDetail: async (d) => {
+          stagedDetails.push({ ...d });
+        },
+      });
+      chain.push(...staged);
+      this.chains.set(organizationId, chain);
+      if (stagedHead) this.heads.set(organizationId, stagedHead);
+      for (const t of stagedPurges) this.purges.set(t.id, t);
+      for (const d of stagedDetails) this.details.set(d.eventId, d);
+      return result;
+    });
+    this.locks.set(
+      organizationId,
+      run.catch(() => undefined),
+    );
+    return run;
   }
 
-  /**
-   * Registra um evento de consentimento na trilha criptográfica encadeada (Append-only).
-   */
+  async listChain(organizationId: string): Promise<StoredConsentAuditEvent[]> {
+    return (this.chains.get(organizationId) ?? []).map((e) => ({ ...e }));
+  }
+
+  async getHead(organizationId: string): Promise<ConsentChainHead | null> {
+    const h = this.heads.get(organizationId);
+    return h ? { ...h } : null;
+  }
+
+  private lockedTasks = new Set<string>();
+
+  async listTenants(): Promise<string[]> {
+    const orgs = [...this.chains.keys(), ...[...this.purges.values()].map((t) => t.organizationId)];
+    return [...new Set(orgs)];
+  }
+
+  async withNextDuePurge(
+    organizationId: string,
+    now: Date,
+    fn: (task: ConsentPurgeTask) => Promise<ConsentPurgeTask>,
+  ): Promise<boolean> {
+    // Seleção + lock síncronos: equivalente in-memory de FOR UPDATE SKIP LOCKED.
+    const t = [...this.purges.values()].find(
+      (x) =>
+        x.organizationId === organizationId &&
+        x.status === 'PENDING' &&
+        new Date(x.nextAttemptAt) <= now &&
+        !this.lockedTasks.has(x.id),
+    );
+    if (!t) return false;
+    this.lockedTasks.add(t.id);
+    try {
+      const updated = await fn({ ...t });
+      this.purges.set(updated.id, { ...updated });
+      return true;
+    } finally {
+      this.lockedTasks.delete(t.id);
+    }
+  }
+
+  async deleteExpiredPurges(organizationId: string, now: Date): Promise<number> {
+    let n = 0;
+    for (const [id, t] of this.purges) {
+      const expired = t.status !== 'PENDING' && t.retainUntil && new Date(t.retainUntil) <= now;
+      if (t.organizationId === organizationId && expired) {
+        this.purges.delete(id);
+        n++;
+      }
+    }
+    return n;
+  }
+
+  async deleteDetailsForSubject(organizationId: string, subjectLookupId: string): Promise<number> {
+    let n = 0;
+    for (const [id, d] of this.details) {
+      if (d.organizationId === organizationId && d.subjectLookupId === subjectLookupId) {
+        this.details.delete(id);
+        n++;
+      }
+    }
+    return n;
+  }
+
+  /** Somente testes: acesso direto para simular adulteração. */
+  rawChain(organizationId: string): StoredConsentAuditEvent[] {
+    return this.chains.get(organizationId) ?? [];
+  }
+
+  rawHeads(): Map<string, ConsentChainHead> {
+    return this.heads;
+  }
+
+  clear(): void {
+    this.chains.clear();
+    this.heads.clear();
+    this.purges.clear();
+    this.details.clear();
+    this.locks.clear();
+  }
+}
+
+/** hash = sha256(previousHash + JSON canônico de todos os demais campos, exceto currentHash). */
+export function computeConsentEventHash(
+  event: Omit<StoredConsentAuditEvent, 'currentHash'>,
+): string {
+  const { previousHash, ...payload } = event;
+  return createHash('sha256')
+    .update(previousHash + canonicalJson(payload))
+    .digest('hex');
+}
+
+export type ChainViolation =
+  | 'HEAD_MISSING'
+  | 'TRUNCATED'
+  | 'GENESIS_REPLACED'
+  | 'SEQUENCE_GAP'
+  | 'REORDERED'
+  | 'GENESIS_INVALID'
+  | 'PREVIOUS_HASH_MISMATCH'
+  | 'HASH_MISMATCH'
+  | 'TENANT_MISMATCH'
+  | 'PII_IN_CHAIN';
+
+export interface ChainVerificationResult {
+  valid: boolean;
+  totalRecords: number;
+  brokenAtId?: string;
+  reason?: ChainViolation;
+}
+
+/**
+ * Verificação pura da cadeia. Com `head` (ou checkpoint externo) detecta também truncamento de
+ * cauda e recriação da cadeia a partir de um novo gênese.
+ */
+export function verifyConsentChain(
+  organizationId: string,
+  chain: StoredConsentAuditEvent[],
+  head?: ConsentChainHead | null,
+): ChainVerificationResult {
+  const fail = (reason: ChainViolation, id?: string): ChainVerificationResult => {
+    logger.error(
+      { organizationId, recordId: id, reason },
+      'ConsentAuditChain: violação de integridade',
+    );
+    return { valid: false, totalRecords: chain.length, brokenAtId: id, reason };
+  };
+  let expectedPrev = GENESIS_HASH;
+  for (let i = 0; i < chain.length; i++) {
+    const r = chain[i];
+    if (r.organizationId !== organizationId) return fail('TENANT_MISMATCH', r.id);
+    if (r.sequence !== i) return fail(r.sequence < i ? 'REORDERED' : 'SEQUENCE_GAP', r.id);
+    if ((i === 0) !== (r.kind === 'GENESIS')) return fail('GENESIS_INVALID', r.id);
+    if (r.previousHash !== expectedPrev) return fail('PREVIOUS_HASH_MISMATCH', r.id);
+    const { currentHash, ...content } = r;
+    if (computeConsentEventHash(content) !== currentHash) return fail('HASH_MISMATCH', r.id);
+    if (r.kind !== 'GENESIS' && !SUBJECT_TOKEN_PATTERN.test(r.subjectRef))
+      return fail('PII_IN_CHAIN', r.id);
+    expectedPrev = currentHash;
+  }
+  if (head === undefined) return { valid: true, totalRecords: chain.length };
+  if (!head) return chain.length === 0 ? { valid: true, totalRecords: 0 } : fail('HEAD_MISSING');
+  if (chain.length === 0) return fail('TRUNCATED');
+  if (chain[0].id !== head.genesisId || chain[0].currentHash !== head.genesisHash) {
+    return fail('GENESIS_REPLACED', chain[0].id);
+  }
+  const last = chain[chain.length - 1];
+  if (last.sequence !== head.lastSequence || last.currentHash !== head.lastHash) {
+    return fail('TRUNCATED', last.id);
+  }
+  return { valid: true, totalRecords: chain.length };
+}
+
+export type SubjectPurger = (
+  organizationId: string,
+  subjectRef: string,
+) => Promise<Record<string, number>>;
+
+export class ConsentChainUnavailableError extends Error {}
+
+export interface ConsentAuditChainOptions {
+  repo: ConsentAuditChainRepository;
+  tokenizer: SubjectTokenizer;
+  /** Retenção do registro da tarefa de expurgo após conclusão (dias). */
+  purgeTaskRetentionDays?: number;
+  maxPurgeAttempts?: number;
+  /** Somente testes: ponto de injeção de falhas. */
+  hooks?: { afterShred?: (task: ConsentPurgeTask) => Promise<void> };
+  /** Notifica outras instâncias para invalidar caches em memória (pub/sub). */
+  broadcastPurge?: (organizationId: string, subjectRef: string) => Promise<void>;
+}
+
+export class ConsentAuditChainService implements IConsentAuditChainPort {
+  private readonly purgers = new Map<string, SubjectPurger>();
+
+  constructor(private readonly opts: ConsentAuditChainOptions) {}
+
+  private assertTenant(organizationId: string): void {
+    if (!organizationId || organizationId.trim() === '') {
+      throw new Error('Tenancy violation: ConsentAuditChain exige organizationId');
+    }
+  }
+
+  private async append(
+    organizationId: string,
+    build: (seq: number, previousHash: string) => Omit<StoredConsentAuditEvent, 'currentHash'>,
+    after?: (event: StoredConsentAuditEvent, ctx: ChainLockContext) => Promise<void>,
+  ): Promise<StoredConsentAuditEvent> {
+    return this.opts.repo.withTenantLock(organizationId, async (ctx) => {
+      let tip = ctx.last;
+      let head = ctx.head;
+      if (!tip && head) {
+        // Head existe mas a cadeia sumiu: recusa recriar (F5).
+        throw new ConsentChainUnavailableError(
+          'Cadeia truncada/recriada: head existe sem registros',
+        );
+      }
+      if (!tip) {
+        const g: Omit<StoredConsentAuditEvent, 'currentHash'> = {
+          formatVersion: CONSENT_CHAIN_FORMAT_VERSION,
+          id: `gen-${randomUUID()}`,
+          kind: 'GENESIS',
+          sequence: 0,
+          organizationId,
+          subjectRef: '',
+          purpose: 'GENESIS',
+          termsVersion: `consent-chain/v${CONSENT_CHAIN_FORMAT_VERSION}`,
+          status: 'GRANTED',
+          previousHash: GENESIS_HASH,
+          occurredAt: new Date().toISOString(),
+        };
+        tip = { ...g, currentHash: computeConsentEventHash(g) };
+        // O banco (trigger #35) cria o head na gênese; a aplicação não grava head.
+        await ctx.append(tip);
+        head = null;
+      }
+      // Head só é LIDO (checagem); o trigger do #35 o avança.
+      if (head && (head.lastSequence !== tip.sequence || head.lastHash !== tip.currentHash)) {
+        throw new ConsentChainUnavailableError('Head divergente do último elo — append recusado');
+      }
+      const partial = build(tip.sequence + 1, tip.currentHash);
+      const event: StoredConsentAuditEvent = {
+        ...partial,
+        currentHash: computeConsentEventHash(partial),
+      };
+      await ctx.append(event);
+      if (after) await after(event, ctx);
+      return event;
+    });
+  }
+
+  private base(kind: ConsentChainEventKind, organizationId: string, subjectToken: string) {
+    return {
+      formatVersion: CONSENT_CHAIN_FORMAT_VERSION,
+      kind,
+      organizationId,
+      subjectRef: subjectToken,
+      occurredAt: new Date().toISOString(),
+    };
+  }
+
   async recordConsent(input: {
     organizationId: string;
     subjectRef: string;
@@ -38,164 +421,257 @@ export class ConsentAuditChainService implements IConsentAuditChainPort {
     operatorUserId?: string;
     retentionDays?: number;
   }): Promise<ConsentAuditEvent> {
-    if (!input.organizationId || input.organizationId.trim() === '') {
-      throw new Error('Tenancy violation: ConsentAuditChain exige organizationId');
-    }
-
-    const chain = this.tenantChains.get(input.organizationId) || [];
-    const previousHash = chain.length > 0 ? chain[chain.length - 1].currentHash : GENESIS_HASH;
-
-    const id = `cst-${randomUUID()}`;
-    const occurredAt = new Date().toISOString();
-
+    this.assertTenant(input.organizationId);
+    if (!CONSENT_PURPOSE_PATTERN.test(input.purpose))
+      throw new Error('purpose inválido (CAIXA_ALTA_COM_UNDERSCORE)');
+    if (!TERMS_VERSION_PATTERN.test(input.termsVersion)) throw new Error('termsVersion inválido');
+    const token = await this.opts.tokenizer.tokenFor(input.organizationId, input.subjectRef);
     const retentionUntil = input.retentionDays
-      ? new Date(Date.now() + input.retentionDays * 24 * 60 * 60 * 1000).toISOString()
+      ? new Date(Date.now() + input.retentionDays * 86_400_000).toISOString()
       : undefined;
-
-    const partialEvent: Omit<ConsentAuditEvent, 'currentHash'> = {
-      id,
-      organizationId: input.organizationId,
-      subjectRef: input.subjectRef,
-      purpose: input.purpose,
-      termsVersion: input.termsVersion,
-      previousHash,
-      occurredAt,
-      operatorUserId: input.operatorUserId,
-      status: 'GRANTED',
-      retentionUntil,
-    };
-
-    const currentHash = this.calculateHash(partialEvent);
-    const event: ConsentAuditEvent = {
-      ...partialEvent,
-      currentHash,
-    };
-
-    chain.push(event);
-    this.tenantChains.set(input.organizationId, chain);
-
-    logger.info(
-      {
-        id: event.id,
-        organizationId: event.organizationId,
-        subjectRef: event.subjectRef,
-        purpose: event.purpose,
-        currentHash,
-        chainLength: chain.length,
+    const lookupId = retentionUntil
+      ? await this.opts.tokenizer.lookupId(input.organizationId, input.subjectRef)
+      : undefined;
+    const event = await this.append(
+      input.organizationId,
+      (sequence, previousHash) => ({
+        ...this.base('CONSENT', input.organizationId, token),
+        id: `cst-${randomUUID()}`,
+        sequence,
+        previousHash,
+        purpose: input.purpose,
+        termsVersion: input.termsVersion,
+        operatorUserId: input.operatorUserId,
+        status: 'GRANTED',
+      }),
+      async (ev, ctx) => {
+        // Retenção fica FORA da cadeia (ConsentEventDetail), sem texto livre.
+        if (retentionUntil && lookupId) {
+          await ctx.saveDetail({
+            eventId: ev.id,
+            organizationId: input.organizationId,
+            subjectLookupId: lookupId,
+            detail: '',
+            retentionUntil,
+          });
+        }
       },
-      'ConsentAuditChain: Consentimento registrado e selado criptograficamente na cadeia',
     );
-
+    logger.info(
+      { id: event.id, organizationId: event.organizationId, sequence: event.sequence },
+      'ConsentAuditChain: consentimento registrado',
+    );
     return event;
   }
 
   /**
-   * Registra a revogação formal de consentimento (Direito do Titular LGPD).
+   * Revogação (art. 8º §5º / art. 18, IX). `reason` DEVE ser um `RevocationReasonCode`.
+   * Na MESMA transação: evento REVOCATION + tarefa de expurgo (outbox) + detalhe livre opcional
+   * fora da cadeia. `ERASURE_REQUEST` também agenda crypto-shredding da chave do titular.
    */
   async revokeConsent(
     organizationId: string,
     subjectRef: string,
     reason: string,
     operatorUserId?: string,
+    options: { detail?: string; processNow?: boolean } = {},
   ): Promise<ConsentAuditEvent> {
-    if (!organizationId) {
-      throw new Error('Tenancy violation: ConsentAuditChain exige organizationId');
+    this.assertTenant(organizationId);
+    if (!isRevocationReasonCode(reason)) {
+      throw new Error(`reason inválido: use um de ${REVOCATION_REASON_CODES.join(', ')}`);
     }
-
-    const chain = this.tenantChains.get(organizationId) || [];
-    const previousHash = chain.length > 0 ? chain[chain.length - 1].currentHash : GENESIS_HASH;
-
-    const id = `rev-${randomUUID()}`;
-    const occurredAt = new Date().toISOString();
-
-    const partialEvent: Omit<ConsentAuditEvent, 'currentHash'> = {
-      id,
+    const token = await this.opts.tokenizer.tokenFor(organizationId, subjectRef);
+    const lookupId = await this.opts.tokenizer.lookupId(organizationId, subjectRef);
+    const event = await this.append(
       organizationId,
-      subjectRef,
-      purpose: `REVOCATION: ${reason}`,
-      termsVersion: 'REVOKED',
-      previousHash,
-      occurredAt,
-      operatorUserId,
-      status: 'REVOKED',
-    };
-
-    const currentHash = this.calculateHash(partialEvent);
-    const event: ConsentAuditEvent = {
-      ...partialEvent,
-      currentHash,
-    };
-
-    chain.push(event);
-    this.tenantChains.set(organizationId, chain);
-
-    logger.warn(
-      {
-        id: event.id,
-        organizationId,
-        subjectRef,
-        reason,
-        currentHash,
+      (sequence, previousHash) => ({
+        ...this.base('REVOCATION', organizationId, token),
+        id: `rev-${randomUUID()}`,
+        sequence,
+        previousHash,
+        purpose: 'REVOCATION',
+        termsVersion: 'REVOKED',
+        reasonCode: reason,
+        operatorUserId,
+        status: 'REVOKED',
+      }),
+      async (ev, ctx) => {
+        await ctx.enqueuePurge({
+          id: `prg-${randomUUID()}`,
+          organizationId,
+          revocationEventId: ev.id,
+          subjectRef,
+          shredSubjectKey: reason === 'ERASURE_REQUEST',
+          status: 'PENDING',
+          attempts: 0,
+          nextAttemptAt: new Date().toISOString(),
+        });
+        if (options.detail) {
+          await ctx.saveDetail({
+            eventId: ev.id,
+            organizationId,
+            subjectLookupId: lookupId,
+            detail: options.detail,
+          });
+        }
       },
-      'ConsentAuditChain: Consentimento REVOGADO com registro indelével na cadeia de blocos',
     );
-
+    logger.warn(
+      { id: event.id, organizationId, reason },
+      'ConsentAuditChain: consentimento REVOGADO',
+    );
+    if (options.processNow !== false) {
+      // Melhor esforço imediato; falhas ficam na outbox para o worker de reconciliação.
+      await this.processPendingPurges().catch((err) =>
+        logger.error(
+          { err, organizationId },
+          'ConsentAuditChain: expurgo imediato falhou; ficará pendente',
+        ),
+      );
+    }
     return event;
   }
 
+  /** Define o publicador de invalidação entre instâncias (wiring do bootstrap). */
+  /** Pseudônimo estável do titular (HMAC com o segredo do tenant) — para mensagens entre instâncias. */
+  async subjectPseudonym(organizationId: string, subjectRef: string): Promise<string> {
+    return this.opts.tokenizer.lookupId(organizationId, subjectRef);
+  }
+
+  /** Offboarding do tenant: destrói o segredo do tenant (crypto-shredding de todos os titulares). */
+  async destroyTenantKey(organizationId: string): Promise<void> {
+    await this.opts.tokenizer.destroyTenantKey(organizationId);
+    logger.warn({ organizationId }, 'ConsentAuditChain: segredo do tenant destruído (offboarding)');
+  }
+
+  setPurgeBroadcaster(fn: ConsentAuditChainOptions['broadcastPurge']): void {
+    this.opts.broadcastPurge = fn;
+  }
+
+  /** Registra um consumidor de expurgo (wiring explícito no bootstrap; deve ser idempotente). */
+  registerPurger(name: string, purger: SubjectPurger): void {
+    this.purgers.set(name, purger);
+  }
+
   /**
-   * Verifica a integridade completa da cadeia do tenant, recalculando cada hash.
-   * Detecta qualquer tentativa de adulteração de registro anterior.
+   * Processa a outbox de expurgo: idempotente e reprocessável (retry com backoff exponencial).
+   * Ao concluir: grava RETRACTION (token + contagens, sem PII), aplica crypto-shredding se
+   * pedido, anula `subjectRef` da tarefa e define a retenção do registro.
    */
-  async verifyChainIntegrity(organizationId: string): Promise<{
-    valid: boolean;
-    totalRecords: number;
-    brokenAtId?: string;
-  }> {
-    const chain = this.tenantChains.get(organizationId) || [];
-
-    if (chain.length === 0) {
-      return { valid: true, totalRecords: 0 };
-    }
-
-    let expectedPreviousHash = GENESIS_HASH;
-
-    for (let i = 0; i < chain.length; i++) {
-      const record = chain[i];
-
-      // 1. O previousHash deve bater com o currentHash do registro anterior
-      if (record.previousHash !== expectedPreviousHash) {
-        logger.error(
-          { organizationId, recordId: record.id, index: i },
-          'ConsentAuditChain: Violação de integridade detectada! Elo anterior quebrado.',
-        );
-        return { valid: false, totalRecords: chain.length, brokenAtId: record.id };
+  /**
+   * Worker da outbox: itera POR ORGANIZAÇÃO (RLS sem bypass), trava uma tarefa por vez com
+   * SKIP LOCKED e processa de forma idempotente. Ao concluir: RETRACTION (sem PII), shred se
+   * pedido, `subjectRef` anulado e retenção do registro da tarefa.
+   */
+  async processPendingPurges(
+    limit = 50,
+    now = new Date(),
+  ): Promise<{ done: number; failed: number }> {
+    let done = 0;
+    let failed = 0;
+    for (const organizationId of await this.opts.repo.listTenants()) {
+      while (done + failed < limit) {
+        let ok = false;
+        const claimed = await this.opts.repo.withNextDuePurge(organizationId, now, async (task) => {
+          try {
+            const updated = await this.runPurgeTask(task, now);
+            ok = true;
+            return updated;
+          } catch (err) {
+            const attempts = task.attempts + 1;
+            const dead = attempts >= (this.opts.maxPurgeAttempts ?? 10);
+            logger.error({ taskId: task.id, attempts, dead }, 'ConsentAuditChain: expurgo falhou');
+            return {
+              ...task,
+              attempts,
+              status: dead ? 'DEAD' : 'PENDING',
+              nextAttemptAt: new Date(
+                now.getTime() + Math.min(2 ** attempts, 3600) * 1000,
+              ).toISOString(),
+              lastError: err instanceof Error ? err.message.slice(0, 200) : 'erro',
+            };
+          }
+        });
+        if (!claimed) break;
+        if (ok) done++;
+        else failed++;
       }
-
-      // 2. O currentHash deve ser o hash criptográfico exato do conteúdo
-      const { currentHash, ...content } = record;
-      const recalculated = this.calculateHash(content);
-      if (recalculated !== record.currentHash) {
-        logger.error(
-          { organizationId, recordId: record.id, recalculated, stored: record.currentHash },
-          'ConsentAuditChain: Violação de integridade detectada! Hash recalculado divergente do armazenado.',
-        );
-        return { valid: false, totalRecords: chain.length, brokenAtId: record.id };
-      }
-
-      expectedPreviousHash = record.currentHash;
+      await this.opts.repo.deleteExpiredPurges(organizationId, now);
     }
-
-    return { valid: true, totalRecords: chain.length };
+    return { done, failed };
   }
 
-  getChain(organizationId: string): ConsentAuditEvent[] {
-    return [...(this.tenantChains.get(organizationId) || [])];
+  private async runPurgeTask(task: ConsentPurgeTask, now: Date): Promise<ConsentPurgeTask> {
+    if (!task.subjectRef) throw new Error('Tarefa sem subjectRef');
+    const subjectRef = task.subjectRef;
+    const counts: Record<string, number> = {};
+    for (const [name, purger] of this.purgers) {
+      const res = await purger(task.organizationId, subjectRef);
+      for (const [k, v] of Object.entries(res)) counts[`${name}.${k}`] = v;
+    }
+    await this.opts.broadcastPurge?.(task.organizationId, subjectRef);
+    // Idempotência: RETRACTION é gravado ANTES do shred. Tombstone presente ⇒ processamento
+    // anterior já gravou o RETRACTION e caiu antes de concluir: não recria a chave nem duplica.
+    const shredded = await this.opts.tokenizer.isShredded(task.organizationId, subjectRef);
+    const alreadyRetracted =
+      shredded || (await this.hasRetractionFor(task.organizationId, task.revocationEventId));
+    if (!alreadyRetracted) {
+      const token = await this.opts.tokenizer.tokenFor(task.organizationId, subjectRef);
+      await this.append(task.organizationId, (sequence, previousHash) => ({
+        ...this.base('RETRACTION', task.organizationId, token),
+        id: `ret-${randomUUID()}`,
+        sequence,
+        previousHash,
+        purpose: `RETRACTION:${canonicalJson({ revocationEventId: task.revocationEventId, counts })}`,
+        termsVersion: 'RETRACTED',
+        status: 'REVOKED',
+      }));
+    }
+    if (task.shredSubjectKey) {
+      const { lookupId } = await this.opts.tokenizer.shred(task.organizationId, subjectRef);
+      await this.opts.repo.deleteDetailsForSubject(task.organizationId, lookupId);
+    }
+    await this.opts.hooks?.afterShred?.(task);
+    const retentionDays = this.opts.purgeTaskRetentionDays ?? 1825;
+    return {
+      ...task,
+      subjectRef: null,
+      status: 'DONE',
+      attempts: task.attempts + 1,
+      completedAt: now.toISOString(),
+      retainUntil: new Date(now.getTime() + retentionDays * 86_400_000).toISOString(),
+      lastError: undefined,
+    };
   }
 
+  private async hasRetractionFor(
+    organizationId: string,
+    revocationEventId: string,
+  ): Promise<boolean> {
+    const chain = await this.opts.repo.listChain(organizationId);
+    return chain.some(
+      (e) =>
+        e.kind === 'RETRACTION' &&
+        e.purpose.includes(`"revocationEventId":${JSON.stringify(revocationEventId)}`),
+    );
+  }
+
+  async verifyChainIntegrity(organizationId: string): Promise<ChainVerificationResult> {
+    this.assertTenant(organizationId);
+    const [chain, head] = await Promise.all([
+      this.opts.repo.listChain(organizationId),
+      this.opts.repo.getHead(organizationId),
+    ]);
+    return verifyConsentChain(organizationId, chain, head);
+  }
+
+  async getChain(organizationId: string): Promise<StoredConsentAuditEvent[]> {
+    this.assertTenant(organizationId);
+    return this.opts.repo.listChain(organizationId);
+  }
+
+  /** Somente testes: limpa repositório em memória. */
   clear(): void {
-    this.tenantChains.clear();
+    if (this.opts.repo instanceof InMemoryConsentAuditChainRepository) this.opts.repo.clear();
   }
 }
-
-export const consentAuditChain = new ConsentAuditChainService();

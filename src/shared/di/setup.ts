@@ -18,7 +18,6 @@ import { AutomationUseCases } from '../../features/automations/application/Autom
 import { automationEngine } from '../../features/automations/automation.engine.js';
 import { PrismaAutomationRepository } from '../../features/automations/infra/PrismaAutomationRepository.js';
 import { AutomationController } from '../../features/automations/presentation/AutomationController.js';
-import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { UsageUseCases } from '../../features/billing/application/UsageUseCases.js';
 import { PrismaUsageRepository } from '../../features/billing/infra/PrismaUsageRepository.js';
 import { UsageController } from '../../features/billing/presentation/UsageController.js';
@@ -72,8 +71,8 @@ import { FeatureFlagsController } from '../../features/feature-flags/presentatio
 // `GoogleCalendarService` logo acima.
 import { callLead } from '../../features/integrations/birth-voice/birthVoice.service.js';
 import { BitrixLeadWritebackAdapter } from '../../features/integrations/bitrix/infra/BitrixLeadWritebackAdapter.js';
-import { bitrixEventMeshBridge } from '../../features/integrations/bitrix/services/bitrixEventMeshBridge.service.js';
 import { testBitrixConnection } from '../../features/integrations/bitrix/service/connections.js';
+import { bitrixEventMeshBridge } from '../../features/integrations/bitrix/services/bitrixEventMeshBridge.service.js';
 // Meeting Hub (Google Meet no agendamento público) — mesmo motivo do comentário da Onda 43 acima:
 // `src/features/calendar/routes/booking.routes.ts` não pode importar
 // `integrations/google/google.service.ts` diretamente (no-cross-feature-imports). Registrado aqui
@@ -113,10 +112,15 @@ import { ObjectionMatrixController } from '../../features/playbook/objection-mat
 import { QualificationMatrixUseCases } from '../../features/playbook/qualification-matrix/application/QualificationMatrixUseCases.js';
 import { PrismaQualificationMatrixRepository } from '../../features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
 import { QualificationMatrixController } from '../../features/playbook/qualification-matrix/presentation/QualificationMatrixController.js';
+import { configureDomainEventOutboxFromEnv } from '../../lib/queue/outbox/prismaRuntime.js';
 import { InMemoryEventBus } from '../infra/events/InMemoryEventBus.js';
+import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
 import { container } from './container.js';
 
 export function setupDI() {
+  // REMED-05: outbox do DomainEventMesh, configurada de forma SÍNCRONA antes de qualquer registro.
+  // Fail-closed: em produção sem DOMAIN_EVENT_OUTBOX=prisma lança e derruba o boot com erro claro.
+  registerDomainEventOutbox();
   // 1. Shared
   const eventBus = new InMemoryEventBus();
   container.register('EventBus', eventBus);
@@ -309,4 +313,12 @@ export function setupDI() {
 
   // Conexão do DomainEventMesh com fluxos automáticos de CRM e mensageria no Bitrix24 e WhatsApp
   bitrixEventMeshBridge.register();
+}
+
+/** Registra a UoW transacional da outbox no container (síncrono). Exportado para teste. */
+export function registerDomainEventOutbox(env: NodeJS.ProcessEnv = process.env): boolean {
+  const adapters = configureDomainEventOutboxFromEnv(env);
+  if (!adapters) return false;
+  container.register('DomainEventOutboxUnitOfWork', adapters.unitOfWork);
+  return true;
 }
