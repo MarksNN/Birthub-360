@@ -165,6 +165,9 @@ const KNOWN_RLS_ONLY_MODELS = [
   // setado); RLS FORCE tenant_isolation cobre isolamento.
   'DomainEventConsumption',
   'DomainEventOutbox',
+  // REMED-04: persistência de aprovação de rebalanceamento via PrismaRebalanceApprovalStore
+  // passando organizationId explícito e protegido por RLS FORCE tenant_isolation.
+  'RebalanceApproval',
 ].sort();
 
 describe('paridade de tenant-scoping entre os dois pontos de acesso Prisma (TENANT-007)', () => {

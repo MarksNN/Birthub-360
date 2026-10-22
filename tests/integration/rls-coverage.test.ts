@@ -174,7 +174,10 @@ describe('Row Level Security (RLS) - Cobertura e Isolamento Semântico no Banco 
 
     // onda-16: +ExternalEntityLink, +ExternalCrmStageMapping (127 -> 129); REMED-06: +ConsentAuditRecord, +FlywheelApproachRecord, +FlywheelFewShotExample +ConsentAuditChainHead, +ConsentSubjectKey, +ConsentEventDetail, +ConsentPurgeTask, +ConsentSubjectKeyTombstone (129 -> 137)
     // +1 KnowledgeChunk legado (@@ignore, drift-fix 2026-10-20) + REMED-06 v4: +TenantKeyEnvelope (137 -> 139)
-    expect(tenantScopedCount).toBe(139);
+    // +3 REMED-02: AccountGraphNode, AccountGraphEdge, WinLossAutopsyReport (139 -> 142)
+    // +2 REMED-05: DomainEventOutbox, DomainEventConsumption (142 -> 144)
+    // +1 REMED-04: RebalanceApproval (144 -> 145)
+    expect(tenantScopedCount).toBe(145);
     expect(globalCatalogCount).toBe(14);
     expect(systemInternalCount).toBe(1);
   });
