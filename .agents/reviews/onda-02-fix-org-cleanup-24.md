@@ -1,37 +1,41 @@
 # Parecer de Revisão Independente — Agente 24
-**Missão:** Correção Cirúrgica de Cleanup de Organization em Testes de Integração (Substituição de session_replication_role e Eliminação de 25P02 em Bloco de Transação)  
+**Missão:** Correção Cirúrgica de Cleanup de Organization em Testes de Integração (Ativação Canônica de app.lgpd_chain_retention_org no deleteMany Global)  
 **Onda:** 02 / CI Recovery  
 **Data:** 2026-10-22  
 **Auditor:** Agente 24 (Auditoria Independente)  
 **Autor:** Agente 01 (Plataforma e Dados) / Agente 08A (Operações Git)  
 **Base:** `origin/main` (`304a77bdf`)  
 **Branch:** `integracao/onda-02`  
-**Revisão Auditada:** Commit `768e14222`  
+**Revisão Auditada:** Commit `6730b6e1b`  
 
 ---
 
 ## 1. Contexto e Análise Forense da Causa-Raiz
-No run `39780153581` do GitHub Actions, o step `Run Integration Tests (auth, RBAC and tenant isolation)` falhou com:
+No run `39785687650` do GitHub Actions, o step `Run Integration Tests (auth, RBAC and tenant isolation)` falhou no cleanup global com:
 ```
-error: current transaction is aborted, commands ignored until end of transaction block
- ❯ node_modules/pg/lib/client.js:652:17
- ❯ deleteOrganizationsAsOwner tests/helpers/integration-setup.ts:98:9
-Serialized Error: { code: '25P02' }
+error: update or delete on table "Organization" violates foreign key constraint "ConsentAuditChainHead_organizationId_fkey" on table "ConsentAuditChainHead"
+Detail: Key (id)=(test-lgpd-off-d30a193b) is still referenced from table "ConsentAuditChainHead".
 ```
 
 ### Investigação
-1. No PostgreSQL sob `BEGIN ... COMMIT`, qualquer comando que lance um erro interno coloca a transação em estado abortado (`25P02`), fazendo com que comandos subsequentes falhem imediatamente sem executar.
-2. Na rotina de limpeza de teste `deleteOrganizationsAsOwner`, foram emitidas queries preventivas de DELETE em tabelas LGPD filhas dentro de um bloco transacional manual com `.catch(() => {})`, o que engolia o erro no runtime do Node mas deixava o Postgres em estado `ABORTED`.
-3. 99% das organizações criadas em testes de integração (ex.: `agent-memory.test.ts`, `security-idor.test.ts`, `timeline.test.ts`) não possuem registros de cadeia de consentimento (`ConsentAuditRecord`).
+1. A tabela `ConsentAuditChainHead` possui chave estrangeira `ON DELETE RESTRICT` referenciando `Organization`.
+2. Para que uma linha em `ConsentAuditChainHead` possa ser apagada (expurgo e retenção ADR-006 / migration `20261021000000`), o trigger `consent_chain_head_guard` exige:
+   ```sql
+   IF OLD."organizationId" = current_setting('app.lgpd_chain_retention_org', true)
+      AND session_user::text <> 'prospector_app' THEN
+     RETURN OLD;
+   END IF;
+   ```
+3. No cleanup global sem filtro (`prisma.organization.deleteMany()`), `targetIds` vinha vazio e o código executava um `DELETE FROM "ConsentAuditChainHead"` sem especificar o tenant correspondente na configuração da sessão. Como resultado, o trigger bloqueava o delete individual com `insufficient_privilege`, deixando as linhas órfãs em `ConsentAuditChainHead` e disparando a violação de integridade referencial ao apagar `Organization`.
 
 ---
 
-## 2. Auditoria do Diff (Commit `768e14222`)
+## 2. Auditoria do Diff (Commit `6730b6e1b`)
 Arquivo alterado: `tests/helpers/integration-setup.ts`
-- **Eliminação de `BEGIN`/`COMMIT` manual:** Cada instrução agora opera em modo autocommit, eliminando completamente a possibilidade de contaminação por SQLSTATE `25P02`.
-- **Bypass de RLS explícito:** Invocação de `set_config('app.bypass_rls', 'on', false)` na conexão do owner para garantir visibilidade administrativa sobre as tabelas com `FORCE ROW LEVEL SECURITY`.
-- **Diretriz Canônica LGPD:** Invocação de `set_config('app.lgpd_chain_retention_org', $1, false)` para autorizar expurgo por retenção conforme ADR-006 / migration `20261021000000`.
-- **Estratégia de Exclusão Direta com Fallback de Filhos:** Tenta a exclusão direta de `Organization` (`DELETE FROM "Organization" WHERE id = ANY($1::text[])`). Em caso de violação de FK de `User` ou `ConsentAuditRecord`, expurga ordenadamente as tabelas filhas e reexecuta a exclusão.
+- **Descoberta proativa de tenants no deleteMany global:** Quando nenhum filtro é passado (`targetIds.length === 0`), executa `SELECT id FROM "Organization"` para obter a lista completa de IDs no banco de teste.
+- **Ciclo de expurgo canônico por tenant:** Itera sobre cada organização encontrada, emitindo `SELECT set_config('app.lgpd_chain_retention_org', $1, false)` antes de apagar as tabelas protegidas (`ConsentAuditRecord`, `ConsentAuditChainHead` e `User`).
+- **Exclusão final consolidada:** Executa `DELETE FROM "Organization" WHERE id = ANY($1::text[])`, permitindo a deleção limpa e cascata ordenada de todas as demais tabelas filhas.
+- **Ausência de transações manuais instáveis:** Preserva o modo autocommit, eliminando o risco de `25P02`.
 
 ---
 
@@ -45,4 +49,4 @@ Arquivo alterado: `tests/helpers/integration-setup.ts`
 
 ## 4. Veredito
 **[APROVADO]**  
-A solução elimina a causa-raiz de `25P02`, preserva estritamente o least privilege em produção e assegura a limpeza segura do banco descartável de teste. Autorizado o push para `integracao/onda-02` e atualização do PR #49.
+A causa-raiz de violação de chave estrangeira em `ConsentAuditChainHead` foi totalmente eliminada com respeito estrito às regras da migration `20261021000000_lgpd_chain_restrict_org_no_app_delete`. Autorizado o push para `integracao/onda-02` e acompanhamento do PR #49.
