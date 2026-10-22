@@ -42,7 +42,8 @@ afterAll(async () => {
   await requestContext.run({ bypassRls: true }, async () => {
     await prisma.contact.deleteMany({ where: { organizationId: ORG } });
     await prisma.company.deleteMany({ where: { organizationId: ORG } });
-    await prisma.organization.delete({ where: { id: ORG } });
+    // Organization permanece como fixture no banco exclusivamente de teste: o app não tem DELETE
+    // após o hardening LGPD; a remoção administrativa não pertence ao papel prospector_app.
   });
   await pool.end();
 });
