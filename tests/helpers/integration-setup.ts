@@ -73,34 +73,39 @@ async function deleteOrganizationsAsOwner(args?: {
     throw new Error('prospector_app sem DELETE em Organization e sem URL de owner para limpar o banco de teste');
   }
   const where = args?.where;
-  let orgFilter = '';
-  let childFilter = '';
-  const params: unknown[] = [];
+  let targetIds: string[] = [];
   if (typeof where?.id === 'string') {
-    orgFilter = ' WHERE id = $1';
-    childFilter = ' WHERE "organizationId" = $1';
-    params.push(where.id);
+    targetIds = [where.id];
   } else if (where?.id && Array.isArray(where.id.in)) {
-    orgFilter = ' WHERE id = ANY($1::text[])';
-    childFilter = ' WHERE "organizationId" = ANY($1::text[])';
-    params.push(where.id.in);
+    targetIds = where.id.in;
   } else if (where && Object.keys(where).length > 0) {
     throw new Error('organization.deleteMany: filtro não suportado no fallback de owner');
   }
+
   const client = new Client({ connectionString: url });
   await client.connect();
   try {
     await client.query('BEGIN');
-    // Replica pula os triggers append-only. As FKs RESTRICT da cadeia continuam valendo,
-    // então a cadeia sai antes da Organization. Só roda no banco de teste.
-    await client.query(`SET LOCAL session_replication_role = 'replica'`);
-    await client.query(`DELETE FROM "ConsentEventDetail"${childFilter}`, params);
-    await client.query(`DELETE FROM "ConsentAuditRecord"${childFilter}`, params);
-    await client.query(`DELETE FROM "ConsentAuditChainHead"${childFilter}`, params);
-    await client.query(`DELETE FROM "ConsentSubjectKeyTombstone"${childFilter}`, params);
-    const deleted = await client.query(`DELETE FROM "Organization"${orgFilter}`, params);
+    if (targetIds.length === 0 && (!where || Object.keys(where).length === 0)) {
+      const res = await client.query<{ id: string }>('SELECT id FROM "Organization"');
+      targetIds = res.rows.map((r) => r.id);
+    }
+
+    let deletedCount = 0;
+    if (targetIds.length > 0) {
+      for (const orgId of targetIds) {
+        // Habilita a exclusão da cadeia LGPD para esta organização específica (ADR-006 / migration 20261021000000)
+        await client.query(`SELECT set_config('app.lgpd_chain_retention_org', $1, true)`, [orgId]);
+        await client.query(`DELETE FROM "ConsentEventDetail" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+        await client.query(`DELETE FROM "ConsentAuditRecord" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+        await client.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+        await client.query(`DELETE FROM "User" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+      }
+      const deleted = await client.query('DELETE FROM "Organization" WHERE id = ANY($1::text[])', [targetIds]);
+      deletedCount = deleted.rowCount ?? 0;
+    }
     await client.query('COMMIT');
-    return { count: deleted.rowCount ?? 0 };
+    return { count: deletedCount };
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;
