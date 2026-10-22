@@ -321,3 +321,12 @@ high` no diff de manifests do PR) e Trivy passando a rodar também em PR de form
 - 2026-10-21 — Auditoria de Dependências / Resolução de Bloqueador de Gate de CI: Resolvido o advisory crítico `GHSA-f2ph-cmg5-wxc8` em `storybook` e `@storybook/addon-vitest` através da atualização pontual das dependências para a versão corrigida `10.6.3` no `package-lock.json`, eliminando os dois achados críticos e garantindo exit code 0 no gate `npm run security:audit-waivers`.
 
 
+
+### `GHSA-CG2G-XH64-V4Q7`, `GHSA-MRV2-3PQR-J5JR`, `GHSA-C6GR-QVV4-5V3F` - `dompurify`
+
+- **Advisory:** https://github.com/advisories/GHSA-cg2g-xh64-v4q7
+- **Severidade reportada pelo `npm audit`:** critical
+- **Cadeia:** dompurify (transitiva)
+- **Motivo:** Nova advisory crítica/high sem fix non-breaking imediato disponível no momento do gate. Aceito temporariamente até atualização de dependência ou patch upstream.
+- **Dono:** Agente 00
+- **Data de reavaliação:** 2026-10-30
