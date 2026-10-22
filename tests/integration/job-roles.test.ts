@@ -210,7 +210,7 @@ describe('Fundação Multi-Cargo — JobRole/UserJobRole', () => {
 
       await requestContext.run({ bypassRls: true }, async () => {
         await prisma.user.delete({ where: { id: outsider.id } });
-        await prisma.organization.delete({ where: { id: OTHER_ORG_ID } });
+        // Organization é fixture idempotente no banco isolado; exclusão via app é proibida.
       });
     });
   });
@@ -259,7 +259,7 @@ describe('Fundação Multi-Cargo — JobRole/UserJobRole', () => {
       );
       await requestContext.run({ bypassRls: true }, async () => {
         await prisma.user.delete({ where: { id: userId } });
-        await prisma.organization.delete({ where: { id: OTHER_ORG_ID } });
+        // Organization é fixture idempotente no banco isolado; exclusão via app é proibida.
       });
     }
 
