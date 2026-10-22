@@ -28,7 +28,7 @@ test.describe('Onboarding de Módulos da Organização', () => {
     await page.waitForURL('**/app');
 
     // 6. Verifica a Sidebar (Core COMMAND CENTER sempre visível)
-    const commandCenter = page.locator('text=COMMAND CENTER');
+    const commandCenter = page.locator('aside').getByText('COMMAND CENTER').first();
     await expect(commandCenter).toBeVisible();
 
     // 7. Se recarregar a página, não pode voltar pro setup

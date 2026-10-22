@@ -114,7 +114,11 @@ export async function signUp(
       try {
         await page.goto('/app', { waitUntil: 'domcontentloaded' });
       } catch (err: unknown) {
-        if (!(err instanceof Error) || !err.message.includes('interrupted by another navigation')) {
+        if (
+          !(err instanceof Error) ||
+          (!err.message.includes('interrupted by another navigation') &&
+            !err.message.includes('Not attached to an active page'))
+        ) {
           throw err;
         }
       }
@@ -122,7 +126,11 @@ export async function signUp(
       try {
         await page.reload({ waitUntil: 'domcontentloaded' });
       } catch (err: unknown) {
-        if (!(err instanceof Error) || !err.message.includes('interrupted by another navigation')) {
+        if (
+          !(err instanceof Error) ||
+          (!err.message.includes('interrupted by another navigation') &&
+            !err.message.includes('Not attached to an active page'))
+        ) {
           throw err;
         }
       }

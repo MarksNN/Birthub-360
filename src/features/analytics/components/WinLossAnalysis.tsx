@@ -136,27 +136,27 @@ export function WinLossAnalysis() {
         {/* Contexto numérico real, sempre visível — não depende de rodar a análise de IA */}
         {snapshot && !snapshot.isEmpty && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Card variant="stat" padding="sm" className="bg-[#1C1D24] border-white/5">
-              <p className="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">
+            <Card variant="stat" padding="sm">
+              <p className="text-[11px] uppercase tracking-wide text-ink-2 font-semibold">
                 Ganhos no mês
               </p>
               <p className="text-2xl font-black mt-1 text-[#22c55e]">
                 {snapshot.overview.closedThisMonth}
               </p>
             </Card>
-            <Card variant="stat" padding="sm" className="bg-[#1C1D24] border-white/5">
-              <p className="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">
+            <Card variant="stat" padding="sm">
+              <p className="text-[11px] uppercase tracking-wide text-ink-2 font-semibold">
                 Perdidos no mês
               </p>
               <p className="text-2xl font-black mt-1 text-[#EF4444]">
                 {snapshot.overview.lostThisMonth}
               </p>
             </Card>
-            <Card variant="stat" padding="sm" className="bg-[#1C1D24] border-white/5">
-              <p className="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">
+            <Card variant="stat" padding="sm">
+              <p className="text-[11px] uppercase tracking-wide text-ink-2 font-semibold">
                 Principal motivo de perda
               </p>
-              <p className="text-lg font-black mt-1 text-slate-200 truncate">
+              <p className="text-lg font-black mt-1 text-ink truncate">
                 {topLossReason ? `${topLossReason.label} (${topLossReason.count})` : '—'}
               </p>
             </Card>
@@ -165,16 +165,16 @@ export function WinLossAnalysis() {
 
         {/* Intro card */}
         {!result && !loading && !error && (
-          <Card padding="lg" className="text-center border-dashed border-white/10 bg-[#1C1D24]">
+          <Card padding="lg" className="text-center border-dashed">
             <div className="flex flex-col items-center gap-4 py-6">
               <div className="flex gap-6 text-4xl">
                 <TrendingUp className="w-12 h-12 text-[#22c55e]" />
                 <TrendingDown className="w-12 h-12 text-[#EF4444]" />
               </div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-ink">
                 Análise Inteligente de Ciclos Comerciais
               </h3>
-              <p className="text-sm text-slate-400 max-w-lg">
+              <p className="text-sm text-ink-2 max-w-lg">
                 A IA examina as transcrições de WhatsApp, timelines e resultados dos leads fechados
                 nos últimos 7 dias. Ela identifica padrões de compra, objeções recorrentes e gera 3
                 recomendações práticas para o time comercial.
@@ -184,9 +184,9 @@ export function WinLossAnalysis() {
                   (item, i) => (
                     <div
                       key={i}
-                      className="bg-[#13151A] rounded-lg p-3 text-center border border-white/5"
+                      className="bg-surface-2 rounded-lg p-3 text-center border border-line"
                     >
-                      <p className="text-xs text-slate-400">{item}</p>
+                      <p className="text-xs text-ink-2">{item}</p>
                     </div>
                   ),
                 )}
@@ -201,10 +201,10 @@ export function WinLossAnalysis() {
 
         {/* Loading state */}
         {loading && (
-          <Card padding="lg" className="text-center bg-[#1C1D24] border-white/5">
+          <Card padding="lg" className="text-center">
             <Loader2 className="w-10 h-10 mx-auto mb-4 animate-spin text-[#8B7DFF]" />
-            <h3 className="text-base font-semibold text-white mb-2">IA analisando os dados…</h3>
-            <p className="text-sm text-slate-400">
+            <h3 className="text-base font-semibold text-ink mb-2">IA analisando os dados…</h3>
+            <p className="text-sm text-ink-2">
               Processando transcrições de WhatsApp, timelines de atividades e histórico de leads
               fechados desta semana.
             </p>
@@ -212,7 +212,7 @@ export function WinLossAnalysis() {
               {['Lendo leads fechados', 'Cruzando padrões', 'Gerando insights'].map((step, i) => (
                 <span
                   key={i}
-                  className="text-[10px] bg-[#13151A] border border-white/5 px-2 py-1 rounded-full text-slate-400 animate-pulse"
+                  className="text-[10px] bg-surface-2 border border-line px-2 py-1 rounded-full text-ink-2 animate-pulse"
                   style={{ animationDelay: `${i * 0.3}s` }}
                 >
                   {step}
@@ -224,10 +224,10 @@ export function WinLossAnalysis() {
 
         {/* Error state */}
         {error && (
-          <Card padding="lg" className="text-center border-red-500/20 bg-[#1C1D24]">
+          <Card padding="lg" className="text-center border-red-500/20">
             <AlertCircle className="w-8 h-8 mx-auto mb-3 text-[#EF4444]" />
-            <p className="text-sm font-semibold text-white mb-1">Falha ao gerar análise</p>
-            <p className="text-xs text-slate-400 mb-4">{error}</p>
+            <p className="text-sm font-semibold text-ink mb-1">Falha ao gerar análise</p>
+            <p className="text-xs text-ink-2 mb-4">{error}</p>
             <Button variant="outline" onClick={runAnalysis}>
               Tentar novamente
             </Button>
@@ -238,17 +238,13 @@ export function WinLossAnalysis() {
         {result && sections.length > 0 && (
           <div className="space-y-4">
             {result.generatedAt && (
-              <p className="text-[11px] text-slate-500 text-right">
+              <p className="text-[11px] text-ink-2 text-right">
                 Gerado em {new Date(result.generatedAt).toLocaleString('pt-BR')}
               </p>
             )}
 
             {sections.map((section, i) => (
-              <Card
-                key={i}
-                padding="lg"
-                className="hover:border-[#8B7DFF]/40 transition-colors bg-[#1C1D24] border-white/5"
-              >
+              <Card key={i} padding="lg" className="hover:border-brand/40 transition-colors">
                 <div className="flex items-start gap-3">
                   <span className="text-2xl shrink-0 mt-0.5">{section.icon}</span>
                   <div className="flex-1 min-w-0">
@@ -256,10 +252,10 @@ export function WinLossAnalysis() {
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#8B7DFF] bg-[#8B7DFF]/10 px-2 py-0.5 rounded-full">
                         Insight {i + 1}
                       </span>
-                      <ChevronRight className="w-3 h-3 text-slate-500" />
+                      <ChevronRight className="w-3 h-3 text-ink-2" />
                     </div>
-                    <h3 className="text-sm font-bold text-white mb-2">{section.title}</h3>
-                    <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                    <h3 className="text-sm font-bold text-ink mb-2">{section.title}</h3>
+                    <p className="text-sm text-ink-2 leading-relaxed whitespace-pre-wrap">
                       {section.content}
                     </p>
                   </div>
@@ -267,8 +263,8 @@ export function WinLossAnalysis() {
               </Card>
             ))}
 
-            <Card padding="sm" className="border-dashed border-white/10 text-center bg-[#1C1D24]">
-              <p className="text-xs text-slate-400">
+            <Card padding="sm" className="border-dashed text-center">
+              <p className="text-xs text-ink-2">
                 {resultSource === 'WEEKLY_WIN_LOSS_AUTO'
                   ? '💡 Este é o resultado da varredura automática de sexta às 19h — clique em "Rodar Análise" para gerar um novo agora com os dados mais recentes.'
                   : '💡 Resultado da última análise disparada manualmente. Uma varredura automática também roda toda sexta às 19h.'}

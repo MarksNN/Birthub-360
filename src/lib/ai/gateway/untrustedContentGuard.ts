@@ -32,9 +32,7 @@ export class UntrustedContentGuard {
     }
 
     // Sanitiza tags e caracteres de controle perigosos
-    const sanitized = content
-      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
-      .trim();
+    const sanitized = content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').trim();
 
     return {
       hasInjectionRisk: hasRisk,

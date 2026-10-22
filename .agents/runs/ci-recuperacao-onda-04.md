@@ -10,6 +10,7 @@
 **Commits da Onda:**
 - Iteração 1: `cadf763cb` (`fix(e2e-a11y): correcao de contraste WCAG AA, seletores E2E e navegacao resiliente`)
 - Iteração 2: `5a3bf4be9` (`fix(a11y-e2e): conformidade WCAG AA na landing e onboarding de modulos resiliente`)
+- Iteração 3: `HEAD` (`fix(onda-04): conformidade WCAG AA no dashboard, relatorios, winloss e landing, e resolucao de estrita visibilidade e navegacao`)
 
 ---
 
@@ -59,6 +60,13 @@ Conforme AGENTS.md §13 e §14, os domínios de alteração foram estritamente s
 
 | Spec / Teste | Falha Inicial | Causa-Raiz | Correção Cirúrgica | Arquivo Alterado |
 |---|---|---|---|---|
+| `accessibility.spec.ts` (Painel Central) | `insufficient color contrast of 3.81:1` e `4.39:1` | Botão `vancouver` com `text-primary` e `--color-heading-gold: #b45309` | `Button.tsx`: `text-[#0369a1] dark:text-[#00D4FF]`; `official-identity.css`: `--color-heading-gold: #92400e` (contraste > 5.5:1) | `src/components/ui/Button.tsx`<br>`src/styles/official-identity.css` |
+| `accessibility.spec.ts` (Relatórios) | `insufficient color contrast of 1.06:1` e `2.36:1` | `GlowChart` com fundo escuro fixo `#1C1D24` em tema claro, sofrendo colisão com regras de texto claro | `GlowChart.tsx`: adaptado para tokens temáticos `bg-surface border border-line text-ink` | `src/features/analytics/components/GlowChart.tsx` |
+| `accessibility.spec.ts` (Integrações) | `insufficient color contrast of 4.2:1` no botão WhatsApp | `--color-ok-solid` utilizava mix de 70% com preto sobre texto `#f8f9ff` | `globals.css`: calibrado para mix de 60% com preto (contraste > 5.2:1) | `src/styles/globals.css` |
+| `accessibility.spec.ts` (Análise Ganhos/Perdas) | `insufficient color contrast of 2.63:1` em parágrafo descritivo | Card com `text-slate-400` renderizado sobre fundo branco no tema claro | `WinLossAnalysis.tsx`: migrado para `text-ink` e `text-ink-2` responsivos ao tema | `src/features/analytics/components/WinLossAnalysis.tsx` |
+| `accessibility.spec.ts` (Boas-vindas / Landing) | `insufficient color contrast` nos 8 Pilares e no rodapé escuro | Cores neon inline nos pilares em tema claro e links do rodapé escuro afetados por wildcard | `Landing360.tsx`: paleta WCAG AA para pilares no tema claro; `Landing360.css`: links do rodapé com `#94a3b8` | `src/features/landing/pages/Landing360.tsx`<br>`src/features/landing/pages/Landing360.css` |
+| `organization-modules-onboarding.spec.ts` | `strict mode violation: locator('text=COMMAND CENTER') resolved to 2 elements` | Múltiplos elementos na página contendo o texto `COMMAND CENTER` | Seletor ajustado com escopo em `aside` e `.first()` | `tests/e2e/organization-modules-onboarding.spec.ts` |
+| `crm-kanban-mobile.spec.ts` | `Protocol error (Page.reload): Not attached to an active page` | Tentativa de reload concorrente durante desmontagem de contexto mobile | `helpers.ts`: captura segura do erro de protocolo no loop de espera | `tests/e2e/helpers.ts` |
 | `accessibility.spec.ts` (34 telas) | `insufficient color contrast of 3.89:1` em `Revenue Intelligence` | `text-[#0284c7]` sobre `#f8f9ff` na Sidebar presente em todas as páginas | Alterado para `text-[#0369a1] dark:text-[#00D4FF]` (contraste 5.5:1) | `src/components/layout/Sidebar.tsx` |
 | `accessibility.spec.ts` (login e pré-login) | `aria-required-children` e contraste na régua técnica / textos neon | Botões em `role="tablist"` sem `role="tab"`; cores neon em fundo claro | Adicionado `role="tab"`, tokens `#0369a1`/`#92400e` e overrides em `official-identity.css`/`Landing360.css` | `src/features/landing/pages/Landing360.tsx`<br>`Landing360.css`<br>`official-identity.css` |
 | `commercial-intelligence-rbac.spec.ts` | `Navigation interrupted by another navigation` | Concorrência entre navegação do React Router e `page.goto` | Tratamento resiliente em `signUp()` | `tests/e2e/helpers.ts` |

@@ -8,9 +8,7 @@ import {
   type SocialSellingRepository,
   InMemorySocialSellingRepository,
 } from '../infra/PrismaSocialSellingRepository.js';
-import {
-  SocialSellingApproachService as CoreService,
-} from '../server/socialSellingApproach.service.js';
+import { SocialSellingApproachService as CoreService } from '../server/socialSellingApproach.service.js';
 
 export class SocialSellingService extends CoreService {
   constructor(

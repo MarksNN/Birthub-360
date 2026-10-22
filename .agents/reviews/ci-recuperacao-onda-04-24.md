@@ -17,15 +17,22 @@ O Agente 00 submeteu para auditoria independente do Agente 24 a resolução inte
 
 ### 1. Correções de Acessibilidade (WCAG 2.2 AA):
 - `src/components/layout/Sidebar.tsx`: Elevação do contraste do texto `Revenue Intelligence` de 3.89:1 para 5.5:1 no tema claro (`text-[#0369a1] dark:text-[#00D4FF]`), eliminando a falha sistêmica em 34 telas avaliadas por `accessibility.spec.ts`.
+- `src/components/ui/Button.tsx`: Variante `vancouver` ajustada para `text-[#0369a1] dark:text-[#00D4FF]` (contraste 5.5:1 no claro contra `#f4f7fb` no Painel Central / Dashboard).
+- `src/styles/official-identity.css`: `--color-heading-gold: #92400e;` no tema claro (contraste > 5.5:1 nos cards com destaque dourado como `Ativo`).
+- `src/styles/globals.css`: `--color-ok-solid: color-mix(in srgb, var(--color-ok) 60%, black);` garantindo contraste > 5.2:1 com texto `#f8f9ff` em botões sólidos (ex.: WhatsApp em Integrações).
+- `src/features/analytics/components/GlowChart.tsx`: Contêiner e controles do gráfico de relatórios harmonizados com os tokens de superfície e texto `bg-surface border border-line text-ink`, eliminando colisão de cores de texto com fundo escuro fixo.
+- `src/features/analytics/components/WinLossAnalysis.tsx`: Adaptação semântica dos cartões e parágrafos para `text-ink` e `text-ink-2` responsivos ao tema, superando a taxa mínima de 4.5:1 em repouso.
 - `src/features/landing/pages/Landing360.tsx`:
   - Adição dos atributos `role="tab"` e `aria-selected` aos botões de alternância de login dentro do `role="tablist"`, eliminando a violação crítica `aria-required-children`.
   - Calibração dos tokens da régua técnica de conformidade para `#0369a1` (5.5:1) e `#92400e` (> 5:1).
-- `src/features/landing/pages/Landing360.css` e `src/styles/official-identity.css`:
+  - Cores acessíveis calculadas para os 8 Pilares no tema claro (`#0369a1`, `#92400e`, `#be185d`), preservando os neons originais no tema escuro.
+- `src/features/landing/pages/Landing360.css`:
   - Aplicação de regras globais de tema claro (`html:not(.dark)` e `html.light`) garantindo que classes de utilitário neon e sky-600 (`#00D4FF`, `#F59E0B`, `#FF2D9B`, `#EF4444`, `#0284c7`) renderizem com suas cores oficiais WCAG AA (`#0369a1`, `#92400e`, `#be185d`, `#b91c1c`), superando 4.5:1 em repouso sobre fundos claros da landing e da antessala.
+  - Correção dos links do rodapé escuro (`.landing-section-footer a`) com `#94a3b8` garantindo alto contraste.
 
 ### 2. Estabilidade de Testes E2E (Playwright):
-- `tests/e2e/helpers.ts`: Eliminação de concorrência e interrupção de navegação em `signUp()` durante redirecionamento pós-autenticação.
-- `tests/e2e/organization-modules-onboarding.spec.ts`: Alinhamento com a arquitetura real do produto (`CRM Comercial` é módulo base obrigatório `alwaysActive: true`; seleção do módulo opcional `Social Selling`), eliminando tentativas inválidas de clique em elemento bloqueado por regra de negócio.
+- `tests/e2e/helpers.ts`: Eliminação de concorrência e interrupção de navegação em `signUp()` durante redirecionamento pós-autenticação, e captura resiliente de erro de protocolo de desanexação de página em viewports mobile.
+- `tests/e2e/organization-modules-onboarding.spec.ts`: Alinhamento com a arquitetura real do produto (`CRM Comercial` é módulo base obrigatório `alwaysActive: true`; seleção do módulo opcional `Social Selling`), eliminando tentativas inválidas de clique em elemento bloqueado por regra de negócio, e resolução do seletor `COMMAND CENTER` em `aside` com `.first()` para conformidade em strict mode.
 - `tests/e2e/crm-kanban.spec.ts`: Atualização da classe da coluna do Kanban de `rounded-2xl` para `rounded-card`, sincronizando o teste com a evolução do design system.
 - `tests/e2e/workspace.spec.ts`: Adequação dos seletores de cabeçalho aos títulos reais renderizados (`Indicadores Chave` e `Ações Rápidas`).
 

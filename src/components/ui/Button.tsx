@@ -31,7 +31,7 @@ const buttonVariants = cva(
         cosmic: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
         brand: 'bg-brand text-on-brand font-display shadow-sm hover:bg-brand-active',
         vancouver:
-          'border border-[color:var(--brand-text)] bg-transparent text-primary hover:bg-[color:color-mix(in_srgb,var(--brand)_8%,transparent)]',
+          'border border-[color:var(--brand-text)] bg-transparent text-[#0369a1] dark:text-[#00D4FF] hover:bg-[color:color-mix(in_srgb,var(--brand)_8%,transparent)]',
       },
       size: {
         default: 'h-9 px-4 py-2',

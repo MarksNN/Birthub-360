@@ -779,6 +779,14 @@ export function Landing360({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {OFFICIAL_PILLARS.map((p) => {
                 const isActive = selectedPillar === p.id;
+                const pillarColor =
+                  theme === 'dark'
+                    ? p.color
+                    : p.color === '#00D4FF'
+                      ? '#0369a1'
+                      : p.color === '#F59E0B'
+                        ? '#92400e'
+                        : '#be185d';
 
                 return (
                   <div
@@ -798,13 +806,13 @@ export function Landing360({
                         : ''
                     }`}
                     style={{
-                      borderColor: isActive ? p.color : `${p.color}75`,
+                      borderColor: isActive ? pillarColor : `${pillarColor}75`,
                       borderWidth: '1px',
                       borderStyle: 'solid',
                       boxShadow: isActive
                         ? theme === 'dark'
                           ? `0 0 0 2px ${p.color}, 0 12px 28px -4px rgba(0,0,0,0.65), 0 0 14px 1px ${p.color}35`
-                          : `0 0 0 2px ${p.color}, 0 8px 24px -2px rgba(15,23,42,0.1), 0 0 10px ${p.color}20`
+                          : `0 0 0 2px ${pillarColor}, 0 8px 24px -2px rgba(15,23,42,0.1), 0 0 10px ${pillarColor}20`
                         : theme === 'dark'
                           ? `0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 0 8px 0 ${p.color}10`
                           : `0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)`,
@@ -816,9 +824,9 @@ export function Landing360({
                         <span
                           className="font-mono text-xs font-bold px-2.5 py-1 rounded-full"
                           style={{
-                            backgroundColor: `${p.color}22`,
-                            color: p.color,
-                            border: `1.5px solid ${p.color}55`,
+                            backgroundColor: `${pillarColor}18`,
+                            color: pillarColor,
+                            border: `1.5px solid ${pillarColor}55`,
                           }}
                         >
                           {p.id}
@@ -826,8 +834,8 @@ export function Landing360({
                         <span
                           className="font-mono text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                           style={{
-                            backgroundColor: `${p.color}22`,
-                            color: p.color,
+                            backgroundColor: `${pillarColor}18`,
+                            color: pillarColor,
                           }}
                         >
                           {p.slug}
@@ -837,9 +845,9 @@ export function Landing360({
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg transition-transform duration-300 group-hover:scale-110"
                         style={{
-                          backgroundColor: `${p.color}22`,
-                          color: p.color,
-                          border: `1.5px solid ${p.color}55`,
+                          backgroundColor: `${pillarColor}18`,
+                          color: pillarColor,
+                          border: `1.5px solid ${pillarColor}55`,
                         }}
                       >
                         {p.symbol}
@@ -850,7 +858,7 @@ export function Landing360({
                     <div className="flex-1 my-1">
                       <h3
                         className="font-display text-base sm:text-lg font-bold leading-tight mb-2 text-center"
-                        style={{ color: p.color }}
+                        style={{ color: pillarColor }}
                       >
                         {p.name}
                       </h3>
@@ -869,18 +877,18 @@ export function Landing360({
                       <div className="flex items-center gap-1.5">
                         <span
                           className="w-2 h-2 rounded-full animate-pulse"
-                          style={{ backgroundColor: p.color }}
+                          style={{ backgroundColor: pillarColor }}
                         />
                         <span
                           className="font-mono text-[11px] font-bold uppercase tracking-wider"
-                          style={{ color: p.color }}
+                          style={{ color: pillarColor }}
                         >
                           {p.tag}
                         </span>
                       </div>
                       <span
                         className="font-mono text-[11px] opacity-0 group-hover:opacity-100 transition-opacity font-bold"
-                        style={{ color: p.color }}
+                        style={{ color: pillarColor }}
                       >
                         CONECTADO →
                       </span>

@@ -68,7 +68,7 @@ export function GlowChart({ data, error }: GlowChartProps) {
     <section
       ref={sectionRef}
       data-testid="dashboard-analytics-chart"
-      className="group relative min-h-[18rem] w-full overflow-hidden rounded-2xl border border-white/5 bg-[#1C1D24] p-4 shadow-sm sm:p-5"
+      className="group relative min-h-[18rem] w-full overflow-hidden rounded-2xl border border-line bg-surface text-ink p-4 shadow-sm sm:p-5"
     >
       <motion.div
         aria-hidden="true"
@@ -93,8 +93,8 @@ export function GlowChart({ data, error }: GlowChartProps) {
             <div className="mb-1 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#8B7DFF]">
               <CircleDot className="h-3.5 w-3.5" aria-hidden="true" /> Pulso comercial
             </div>
-            <h3 className="text-lg font-black text-white">Entrada, ganho e perda por mês</h3>
-            <p className="mt-1 text-sm text-slate-400">
+            <h3 className="text-lg font-black text-ink">Entrada, ganho e perda por mês</h3>
+            <p className="mt-1 text-sm text-ink-2">
               Explore as séries reais dos últimos {chartData.length} meses e isole o sinal que quer
               analisar.
             </p>
@@ -116,7 +116,7 @@ export function GlowChart({ data, error }: GlowChartProps) {
                   aria-pressed={active}
                   className={`group/series flex min-w-[7.25rem] items-center gap-2 rounded-xl border px-3 py-2 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B7DFF] ${
                     active
-                      ? 'border-white/10 bg-[#13151A] shadow-sm'
+                      ? 'border-line bg-surface-2 shadow-sm'
                       : 'border-transparent bg-transparent opacity-55'
                   }`}
                 >
@@ -125,17 +125,17 @@ export function GlowChart({ data, error }: GlowChartProps) {
                     style={{ color: series.color, backgroundColor: series.color }}
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-ink-2">
                       {series.label}
                     </span>
-                    <span className="block text-sm font-black text-white [font-variant-numeric:tabular-nums]">
+                    <span className="block text-sm font-black text-ink [font-variant-numeric:tabular-nums]">
                       {totals[series.key].toLocaleString('pt-BR')}
                     </span>
                   </span>
                   {active ? (
-                    <Eye className="h-3.5 w-3.5 text-slate-400 transition-transform group-hover/series:scale-110" />
+                    <Eye className="h-3.5 w-3.5 text-ink-2 transition-transform group-hover/series:scale-110" />
                   ) : (
-                    <EyeOff className="h-3.5 w-3.5 text-slate-400" />
+                    <EyeOff className="h-3.5 w-3.5 text-ink-2" />
                   )}
                 </button>
               );
@@ -153,10 +153,10 @@ export function GlowChart({ data, error }: GlowChartProps) {
               <p className="text-sm font-semibold text-amber-500">
                 Não foi possível carregar a série mensal.
               </p>
-              <p className="text-xs text-slate-400">{error}</p>
+              <p className="text-xs text-ink-2">{error}</p>
             </div>
           ) : chartData.length === 0 ? (
-            <div className="flex h-64 items-center justify-center text-sm text-slate-400">
+            <div className="flex h-64 items-center justify-center text-sm text-ink-2">
               Sem dados suficientes ainda.
             </div>
           ) : (
