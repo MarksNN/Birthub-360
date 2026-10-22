@@ -27,7 +27,8 @@ afterAll(async () => {
     await prisma.copilotoConversation.deleteMany({ where: { organizationId: ORG } });
     await prisma.voiceCallLog.deleteMany({ where: { organizationId: ORG } });
   });
-  await withBypass(() => prisma.organization.delete({ where: { id: ORG } }));
+  // O papel da aplicação não pode excluir Organization após a migration LGPD.
+  // A organização de teste possui ID exclusivo e permanece no banco de teste descartável.
 });
 
 describe('Cifra em repouso de conteúdo de chamada de voz (VoiceCallLog, CopilotoTranscriptSegment)', () => {
