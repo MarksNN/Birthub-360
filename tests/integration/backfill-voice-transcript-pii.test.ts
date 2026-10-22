@@ -40,7 +40,7 @@ afterAll(async () => {
     await prisma.copilotoTranscriptSegment.deleteMany({ where: { organizationId: ORG } });
     await prisma.copilotoConversation.deleteMany({ where: { organizationId: ORG } });
     await prisma.voiceCallLog.deleteMany({ where: { organizationId: ORG } });
-    await prisma.organization.delete({ where: { id: ORG } });
+    // Mantém apenas o registro da organização no banco isolado: DELETE foi revogado do app.
   });
   await pool.end();
 });
