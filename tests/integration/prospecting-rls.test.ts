@@ -59,6 +59,15 @@ const hardDeleteOrgData = async (organizationId: string) => {
     withRlsContext(async (tx) => {
       await tx.$executeRaw`DELETE FROM "Lead" WHERE "organizationId" = ${organizationId}`;
       await tx.$executeRaw`DELETE FROM "Company" WHERE "organizationId" = ${organizationId}`;
+      // O bypass antigo fazia a limpeza silenciosamente afetar 0 linhas. Provar
+      // que a remoção realmente ocorreu impede regressão de contaminação entre testes.
+      const [remaining] = await tx.$queryRaw<[{ leads: bigint; companies: bigint }]>`
+        SELECT
+          (SELECT COUNT(*) FROM "Lead" WHERE "organizationId" = ${organizationId}) AS leads,
+          (SELECT COUNT(*) FROM "Company" WHERE "organizationId" = ${organizationId}) AS companies
+      `;
+      expect(remaining.leads).toBe(0n);
+      expect(remaining.companies).toBe(0n);
     }),
   );
 };
