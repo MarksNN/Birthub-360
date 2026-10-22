@@ -116,7 +116,7 @@ export async function eraseDataSubject(target: ErasureTarget): Promise<ErasureRe
       });
       const leadIds = leads.map((l) => l.id);
 
-// Supressão ANTES de destruir e-mail e telefone (DEBT-LGPD-001). Se o opt-out falhar,
+      // Supressão ANTES de destruir e-mail e telefone (DEBT-LGPD-001). Se o opt-out falhar,
       // a anonimização não começa: um retry ainda encontra os identificadores e nenhum canal
       // reabre o contato (B-13 e §27). Falha de supressão deve interromper a exclusão antes de destruir os identificadores.
       const { toE164BR } = await import('../../lib/phone.js');

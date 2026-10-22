@@ -80,7 +80,7 @@ test.describe('Meu Workspace (PROMPT 6)', () => {
     await expect(page.getByText('Navegação do cargo')).toBeVisible();
     // Módulo real da jornada do Closer (role-workspace-definitions.ts) — prova que a navegação
     // veio do backend, não foi hardcoded na tela.
-    await expect(page.getByRole('button', { name: 'Pipeline', exact: true })).toBeVisible();
+    await expect(page.getByRole('main').getByRole('button', { name: 'Pipeline', exact: true })).toBeVisible();
   });
 
   test('responsivo: viewport mobile mantém o cabeçalho do cargo visível sem overflow horizontal', async ({
