@@ -85,30 +85,39 @@ async function deleteOrganizationsAsOwner(args?: {
   const client = new Client({ connectionString: url });
   await client.connect();
   try {
-    await client.query('BEGIN');
-    if (targetIds.length === 0 && (!where || Object.keys(where).length === 0)) {
-      const res = await client.query<{ id: string }>('SELECT id FROM "Organization"');
-      targetIds = res.rows.map((r) => r.id);
-    }
+    // Permite bypass de RLS na conexão do owner para operações administrativas de teste
+    await client.query(`SELECT set_config('app.bypass_rls', 'on', false)`).catch(() => {});
 
-    let deletedCount = 0;
     if (targetIds.length > 0) {
       for (const orgId of targetIds) {
-        // Habilita a exclusão da cadeia LGPD para esta organização específica (ADR-006 / migration 20261021000000)
-        await client.query(`SELECT set_config('app.lgpd_chain_retention_org', $1, true)`, [orgId]);
-        await client.query(`DELETE FROM "ConsentEventDetail" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
-        await client.query(`DELETE FROM "ConsentAuditRecord" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
-        await client.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
-        await client.query(`DELETE FROM "User" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+        await client.query(`SELECT set_config('app.lgpd_chain_retention_org', $1, false)`, [orgId]).catch(() => {});
       }
-      const deleted = await client.query('DELETE FROM "Organization" WHERE id = ANY($1::text[])', [targetIds]);
-      deletedCount = deleted.rowCount ?? 0;
+      try {
+        const deleted = await client.query('DELETE FROM "Organization" WHERE id = ANY($1::text[])', [targetIds]);
+        return { count: deleted.rowCount ?? 0 };
+      } catch {
+        // Se houver FK constraint em User ou ConsentAuditRecord, limpa tabelas filhas e repete
+        for (const orgId of targetIds) {
+          await client.query(`DELETE FROM "ConsentAuditRecord" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+          await client.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+          await client.query(`DELETE FROM "User" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+        }
+        const deleted = await client.query('DELETE FROM "Organization" WHERE id = ANY($1::text[])', [targetIds]);
+        return { count: deleted.rowCount ?? 0 };
+      }
     }
-    await client.query('COMMIT');
-    return { count: deletedCount };
-  } catch (error) {
-    await client.query('ROLLBACK').catch(() => {});
-    throw error;
+
+    // deleteMany sem filtro (cleanup geral)
+    try {
+      const deleted = await client.query('DELETE FROM "Organization"');
+      return { count: deleted.rowCount ?? 0 };
+    } catch {
+      await client.query('DELETE FROM "ConsentAuditRecord"').catch(() => {});
+      await client.query('DELETE FROM "ConsentAuditChainHead"').catch(() => {});
+      await client.query('DELETE FROM "User"').catch(() => {});
+      const deleted = await client.query('DELETE FROM "Organization"');
+      return { count: deleted.rowCount ?? 0 };
+    }
   } finally {
     await client.end();
   }
