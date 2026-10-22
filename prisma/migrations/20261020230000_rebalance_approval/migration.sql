@@ -99,3 +99,13 @@ BEGIN
     RETURN n;
 END;
 $$;
+
+-- Permissões para o papel de aplicação NOSUPERUSER (prospector_app) nos seus respectivos tenants
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'prospector_app') THEN
+        GRANT EXECUTE ON FUNCTION rebalance_approval_purge(text, integer) TO prospector_app;
+        GRANT EXECUTE ON FUNCTION rebalance_approval_anonymize_lead_notes(text, text) TO prospector_app;
+    END IF;
+END;
+$$;

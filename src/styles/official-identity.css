@@ -461,3 +461,9 @@ html:not(.dark) .text-\[\#ef4444\] {
   box-shadow: 0 0 16px rgba(0, 212, 255, 0.25);
   transform: translateY(-1px);
 }
+
+/* Reforço de contraste WCAG AA — #0284c7 no tema claro (dashboard) */
+html.light [class*="0284c7"],
+html:not(.dark) [class*="0284c7"] {
+  color: #0369a1 !important;
+}
