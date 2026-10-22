@@ -111,9 +111,21 @@ export async function signUp(
     const complete = await page.request.post('/api/organization-modules/onboarding/complete');
     expect(complete.ok(), 'conclusão de onboarding via API').toBe(true);
     if (new URL(page.url()).pathname !== '/app') {
-      await page.goto('/app');
+      try {
+        await page.goto('/app', { waitUntil: 'domcontentloaded' });
+      } catch (err: unknown) {
+        if (!(err instanceof Error) || !err.message.includes('interrupted by another navigation')) {
+          throw err;
+        }
+      }
     } else {
-      await page.reload();
+      try {
+        await page.reload({ waitUntil: 'domcontentloaded' });
+      } catch (err: unknown) {
+        if (!(err instanceof Error) || !err.message.includes('interrupted by another navigation')) {
+          throw err;
+        }
+      }
     }
     await expect(page).toHaveURL(/\/app(?:[/?#]|$)/, { timeout: 20_000 });
     await expect.poll(async () => new URL(page.url()).pathname, { timeout: 5_000 }).not.toBe('/setup');

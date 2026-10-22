@@ -82,7 +82,7 @@ test.describe('Kanban do CRM — drag e drop', () => {
     // A coluna "Cadência Iniciada" deve conter o card agora.
     const columnBody = page
       .locator('h3', { hasText: 'Cadência Iniciada' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       columnBody.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible();
@@ -92,7 +92,7 @@ test.describe('Kanban do CRM — drag e drop', () => {
     await expect(page.getByText('Leads e pré-vendas')).toBeVisible({ timeout: 15_000 });
     const columnBodyAfterReload = page
       .locator('h3', { hasText: 'Cadência Iniciada' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       columnBodyAfterReload.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible();
@@ -131,7 +131,7 @@ test.describe('Kanban do CRM — drag e drop', () => {
     // Rollback: o card volta a aparecer na coluna original ("Lead Recebido") depois do refetch.
     const originalColumn = page
       .locator('h3', { hasText: 'Lead Recebido' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       originalColumn.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible({ timeout: 10_000 });
@@ -183,7 +183,7 @@ test.describe('Kanban do CRM — drag e drop', () => {
     await expect(page.getByText(/movido para Cadência Iniciada/)).toBeVisible({ timeout: 10_000 });
     const columnBody = page
       .locator('h3', { hasText: 'Cadência Iniciada' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       columnBody.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible();
@@ -237,7 +237,7 @@ test.describe('Kanban do CRM — drag e drop', () => {
     });
     const originalColumn = page
       .locator('h3', { hasText: 'Lead Recebido' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       originalColumn.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible();
@@ -287,7 +287,7 @@ test.describe('Kanban do CRM — drag e drop', () => {
 
     const columnBody = page
       .locator('h3', { hasText: 'Cadência Iniciada' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       columnBody.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible();
@@ -304,7 +304,7 @@ test.describe('Kanban do CRM — coluna vazia', () => {
     // Conta recém-criada não tem nenhum lead — todas as colunas do funil Lead começam vazias.
     const column = page
       .locator('h3', { hasText: 'Qualificação (SDR)' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(column.getByText(/Solte cards aqui/i)).toBeVisible();
     await expect(column.getByText('0', { exact: true })).toBeVisible();
   });
@@ -324,7 +324,7 @@ test.describe('Kanban do CRM — coluna vazia', () => {
 
     const columnBody = page
       .locator('h3', { hasText: 'Qualificação (SDR)' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       columnBody.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible({ timeout: 10_000 });
@@ -396,7 +396,7 @@ test.describe('Kanban do CRM — LeadDetailDrawer', () => {
     await page.keyboard.press('Escape');
     const columnBody = page
       .locator('h3', { hasText: 'Qualificação (SDR)' })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(
       columnBody.getByRole('button', { name: new RegExp(company.tradeName) }),
     ).toBeVisible({ timeout: 10_000 });
@@ -554,7 +554,7 @@ test.describe('Kanban do CRM — Filtros', () => {
     // wrapper em vez de usar o locator de role="button" (que só cobre a área arrastável/clicável).
     const cardContainer = page
       .locator('h4', { hasText: company.tradeName })
-      .locator('xpath=ancestor::div[contains(@class,"rounded-2xl")][1]');
+      .locator('xpath=ancestor::div[contains(@class,"rounded-card") or contains(@class,"rounded-2xl")][1]');
     await expect(cardContainer).toContainText(ownerName);
     await expect(cardContainer).not.toContainText(payload.updates.owner);
 

@@ -1903,10 +1903,12 @@ export function Landing360({
               >
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={authMethod === 'email'}
                   onClick={() => setAuthMethod('email')}
                   className={`py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'email'
-                      ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#00D4FF] shadow-sm'
+                      ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#0284c7] dark:text-[#00D4FF] shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
                   }`}
                 >
@@ -1915,10 +1917,12 @@ export function Landing360({
                 </button>
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={authMethod === 'sso'}
                   onClick={() => setAuthMethod('sso')}
                   className={`py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all ${
                     authMethod === 'sso'
-                      ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#00D4FF] shadow-sm'
+                      ? 'bg-[#00D4FF]/20 border border-[#00D4FF] text-[#0284c7] dark:text-[#00D4FF] shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
                   }`}
                 >
@@ -2184,32 +2188,34 @@ export function Landing360({
             <div className="mt-5 p-3 rounded-xl bg-slate-50 dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#00D4FF]">TLS 1.3</span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                  <span className="font-mono text-[10px] font-bold text-[#0284c7] dark:text-[#00D4FF]">
+                    TLS 1.3
+                  </span>
+                  <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">
                     Em Trânsito
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#00D4FF]">
+                  <span className="font-mono text-[10px] font-bold text-[#0284c7] dark:text-[#00D4FF]">
                     AES-256-GCM
                   </span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                  <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">
                     Em Repouso
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#F59E0B]">
+                  <span className="font-mono text-[10px] font-bold text-[#b45309] dark:text-[#F59E0B]">
                     LGPD / Art. 18
                   </span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                  <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">
                     Conformidade
                   </span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-[10px] font-bold text-[#10B981]">
+                  <span className="font-mono text-[10px] font-bold text-[#047857] dark:text-[#10B981]">
                     Multi-Tenant
                   </span>
-                  <span className="font-sans text-[9px] text-slate-500 dark:text-slate-400">
+                  <span className="font-sans text-[9px] font-medium text-slate-600 dark:text-slate-400">
                     Isolamento
                   </span>
                 </div>
