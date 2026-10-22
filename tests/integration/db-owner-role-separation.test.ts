@@ -223,8 +223,11 @@ describe('separação de papéis: prospector_app só DML, prospector_migrator do
    * Hoje (main + #39) não há nenhuma; o #35 adiciona as dele com guard.
    */
   const DEFINER_ALLOWLIST_WITHOUT_TENANT_GUARD: Record<string, string> = {};
-  /** EXECUTE do app: só estas funções próprias (não-extensão). Hoje: nenhuma. */
-  const APP_EXECUTE_ALLOWLIST: string[] = [];
+  /** EXECUTE do app: só estas funções próprias (não-extensão). Funções SECURITY INVOKER por tenant. */
+  const APP_EXECUTE_ALLOWLIST: string[] = [
+    'rebalance_approval_purge(text,integer)',
+    'rebalance_approval_anonymize_lead_notes(text,text)',
+  ];
 
   it('B: inventário de SECURITY DEFINER — search_path fixo e tenant guard (ou allowlist revisada)', async () => {
     const { rows } = await pool.query(
