@@ -251,12 +251,14 @@ describe('Prospecção — regressão RLS fail-closed (SQL cru fora de withRlsCo
     });
 
     it('não-regressão de isolamento de tenant: mesmo CNPJ em outro tenant não é reaproveitado', async () => {
+      const CROSS_CNPJ_PUNCTUATED = '22.333.444/0001-99';
+      const CROSS_CNPJ_DIGITS = '22333444000199';
       asTenant(ORG_B);
       await prisma.company.create({
         data: {
           legalName: 'Transportadora Do Tenant B',
           tradeName: 'Transportadora Do Tenant B',
-          cnpj: CNPJ_PUNCTUATED,
+          cnpj: CROSS_CNPJ_PUNCTUATED,
           organizationId: ORG_B,
         },
       });
@@ -266,7 +268,7 @@ describe('Prospecção — regressão RLS fail-closed (SQL cru fora de withRlsCo
         tradeName: 'Candidato Tenant A',
         source: 'Descoberta',
         organizationId: ORG_A,
-        cnpj: CNPJ_DIGITS,
+        cnpj: CROSS_CNPJ_DIGITS,
         autoEnrich: false,
       };
 

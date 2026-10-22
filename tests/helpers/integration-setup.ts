@@ -44,11 +44,15 @@ import { requestContext } from '../../src/lib/async-context';
 // usa o owner do cluster de teste (o mesmo papel do bootstrap), só quando o app recebe 42501.
 // Testes que provam o REVOKE usam SQL cru, não este método.
 const originalOrgDeleteMany = prisma.organization.deleteMany.bind(prisma.organization);
+const originalOrgDelete = prisma.organization.delete.bind(prisma.organization);
 
 function testOwnerDatabaseUrl(appUrl: string): string | null {
   if (process.env.MIGRATOR_DATABASE_URL) return process.env.MIGRATOR_DATABASE_URL;
+  if (process.env.DIRECT_URL) return process.env.DIRECT_URL;
   const replacements: Array<[string, string]> = [
+    ['prospector_app:ci_app_test_pass', 'prospector_migrator:ci_migrator_test_pass'],
     ['prospector_app:ci_app_test_pass', 'prospector:prospector_test_pass'],
+    ['prospector_app:prospector_app_pass', 'prospector_migrator:prospector_migrator_pass'],
     ['prospector_app:prospector_app_pass', 'prospector:prospector_test_pass'],
   ];
   for (const [from, to] of replacements) {
@@ -113,6 +117,19 @@ prisma.organization.deleteMany = (async (args?: { where?: { id?: string | { in?:
     return deleteOrganizationsAsOwner(args);
   }
 }) as typeof prisma.organization.deleteMany;
+
+prisma.organization.delete = (async (args: { where: { id?: string; [key: string]: unknown } }) => {
+  try {
+    return await originalOrgDelete(args as never);
+  } catch (error) {
+    if (!isOrgDeleteDenied(error)) throw error;
+    if (typeof args?.where?.id === 'string') {
+      await deleteOrganizationsAsOwner({ where: { id: args.where.id } });
+      return { id: args.where.id } as never;
+    }
+    throw error;
+  }
+}) as typeof prisma.organization.delete;
 
 // Roda fora de qualquer request HTTP, então não há tenantId nem sessão do Better Auth por trás
 // dessas queries — sem bypassRls elas seriam bloqueadas pelas mesmas policies de FORCE ROW LEVEL

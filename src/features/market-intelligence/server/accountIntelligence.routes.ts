@@ -140,7 +140,11 @@ export function createAccountIntelligenceRouter(
     requireRole(['ADMIN', 'GESTOR', 'CLOSER', 'SDR']),
     asyncHandler(async (req, res) => {
       const { id, recommendationId } = parse(recommendationParamsSchema, req.params);
-      const data = await actionExecutorService.executeAction(recommendationId, id);
+      const data = await actionExecutorService.executeAction(
+        recommendationId,
+        id,
+        (req as AuthRequest).user.organizationId,
+      );
       res.json({ success: true, data });
     }),
   );

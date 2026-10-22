@@ -90,7 +90,12 @@ describe('Camada B isolada — PostgreSQL RLS via conexão pg crua (prospector_a
         ORG_A,
         ORG_B,
       ]);
-      await client.query(`DELETE FROM "Organization" WHERE id IN ($1, $2)`, [ORG_A, ORG_B]);
+      // prospector_app não tem DELETE em Organization; ignora 42501 no cleanup direto
+      try {
+        await client.query(`DELETE FROM "Organization" WHERE id IN ($1, $2)`, [ORG_A, ORG_B]);
+      } catch (err: any) {
+        if (!/permission denied|42501/.test(err?.message ?? '')) throw err;
+      }
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK').catch(() => {});
