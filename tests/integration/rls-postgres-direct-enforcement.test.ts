@@ -90,7 +90,8 @@ describe('Camada B isolada — PostgreSQL RLS via conexão pg crua (prospector_a
         ORG_A,
         ORG_B,
       ]);
-      await client.query(`DELETE FROM "Organization" WHERE id IN ($1, $2)`, [ORG_A, ORG_B]);
+      // Mantém somente os IDs de organizações fixture no banco de teste descartável:
+      // a conexão pg usa prospector_app e não deve possuir DELETE em Organization.
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK').catch(() => {});
