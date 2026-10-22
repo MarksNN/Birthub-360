@@ -209,6 +209,7 @@
     "undici": "^6.20.0",
     "deepmerge-ts": "^8.0.2",
     "brace-expansion": "^2.0.1",
+    "dompurify": "^3.4.17",
     "uuid": "^14.0.2",
     "fast-uri": "^3.1.7",
     "@xenova/transformers": {
