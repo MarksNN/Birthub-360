@@ -7,12 +7,18 @@
 --    (session_user <> prospector_app). O app também não tem DELETE nessas tabelas (REVOKE).
 -- 3) prospector_app perde DELETE/TRUNCATE em Organization (também em scripts/db/create-app-role.sql).
 
--- A migration anterior revoga EXECUTE destas funções no dono. No CI o migrate roda como
--- prospector_app: ALTER TABLE revalida o trigger e falha com 42501 se o EXECUTE não voltar.
--- O bloco do fim revoga de novo.
+-- A migration anterior revoga EXECUTE destas funções no dono. No CI ou migrações subsequentes,
+-- ALTER TABLE pode revalidar o trigger e falhar com 42501 se o EXECUTE não voltar para o dono.
+-- O bloco abaixo verifica se o CURRENT_USER é dono da função ou superuser antes do GRANT/REVOKE,
+-- evitando P3018 (permission denied) caso o executor não tenha autoridade de concessão.
 DO $$
-DECLARE f text;
+DECLARE
+  f text;
+  fn_oid oid;
+  fn_owner text;
+  is_admin boolean;
 BEGIN
+  SELECT COALESCE(rolsuper, false) INTO is_admin FROM pg_roles WHERE rolname = CURRENT_USER;
   FOREACH f IN ARRAY ARRAY[
     'consent_audit_immutable()',
     'consent_chain_head_guard()',
@@ -23,8 +29,12 @@ BEGIN
     'lgpd_apply_consent_privileges()'
   ]
   LOOP
-    IF to_regprocedure('public.' || f) IS NOT NULL THEN
-      EXECUTE format('GRANT ALL ON FUNCTION public.%s TO CURRENT_USER', f);
+    fn_oid := to_regprocedure('public.' || f);
+    IF fn_oid IS NOT NULL THEN
+      SELECT pg_get_userbyid(proowner) INTO fn_owner FROM pg_proc WHERE oid = fn_oid;
+      IF fn_owner = CURRENT_USER OR is_admin THEN
+        EXECUTE format('GRANT ALL ON FUNCTION public.%s TO CURRENT_USER', f);
+      END IF;
     END IF;
   END LOOP;
 END
@@ -78,20 +88,41 @@ BEGIN
 END
 $$;
 
-REVOKE ALL ON FUNCTION consent_audit_immutable() FROM PUBLIC;
-REVOKE ALL ON FUNCTION consent_chain_head_guard() FROM PUBLIC;
-
 DO $$
+DECLARE
+  f text;
+  fn_oid oid;
+  fn_owner text;
+  is_admin boolean;
+  has_app boolean;
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'prospector_app') THEN
+  SELECT COALESCE(rolsuper, false) INTO is_admin FROM pg_roles WHERE rolname = CURRENT_USER;
+  has_app := EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'prospector_app');
+
+  IF has_app AND EXISTS (SELECT 1 FROM pg_class WHERE relname = 'Organization' AND relnamespace = 'public'::regnamespace) THEN
     REVOKE DELETE, TRUNCATE ON TABLE "Organization" FROM prospector_app;
-    REVOKE ALL ON FUNCTION consent_audit_immutable() FROM prospector_app;
-    REVOKE ALL ON FUNCTION consent_chain_head_guard() FROM prospector_app;
-    REVOKE ALL ON FUNCTION consent_audit_advance_head() FROM prospector_app;
-    REVOKE ALL ON FUNCTION consent_subject_key_tombstone() FROM prospector_app;
-    REVOKE ALL ON FUNCTION consent_tombstone_immutable() FROM prospector_app;
-    REVOKE ALL ON FUNCTION tenant_key_envelope_guard() FROM prospector_app;
-    REVOKE ALL ON FUNCTION lgpd_apply_consent_privileges() FROM prospector_app;
   END IF;
+
+  FOREACH f IN ARRAY ARRAY[
+    'consent_audit_immutable()',
+    'consent_chain_head_guard()',
+    'consent_audit_advance_head()',
+    'consent_subject_key_tombstone()',
+    'consent_tombstone_immutable()',
+    'tenant_key_envelope_guard()',
+    'lgpd_apply_consent_privileges()'
+  ]
+  LOOP
+    fn_oid := to_regprocedure('public.' || f);
+    IF fn_oid IS NOT NULL THEN
+      SELECT pg_get_userbyid(proowner) INTO fn_owner FROM pg_proc WHERE oid = fn_oid;
+      IF fn_owner = CURRENT_USER OR is_admin THEN
+        EXECUTE format('REVOKE ALL ON FUNCTION public.%s FROM PUBLIC', f);
+        IF has_app THEN
+          EXECUTE format('REVOKE ALL ON FUNCTION public.%s FROM prospector_app', f);
+        END IF;
+      END IF;
+    END IF;
+  END LOOP;
 END
 $$;
