@@ -53,11 +53,14 @@ const asBypass = () => requestContext.enterWith({ bypassRls: true });
 /** Hard delete de verdade (bypassa a interceptação de soft-delete do model client) — necessário
  * para os testes deste arquivo não vazarem Company/Lead de um `it` para o próximo. */
 const hardDeleteOrgData = async (organizationId: string) => {
-  asBypass();
-  await withRlsContext(async (tx) => {
-    await tx.$executeRaw`DELETE FROM "Lead" WHERE "organizationId" = ${organizationId}`;
-    await tx.$executeRaw`DELETE FROM "Company" WHERE "organizationId" = ${organizationId}`;
-  });
+  // RLS de Lead/Company exige o tenant real: bypass sem tenant pode afetar zero linhas
+  // silenciosamente, deixando CNPJs de testes anteriores e invalidando a deduplicação.
+  await requestContext.run({ tenantId: organizationId }, () =>
+    withRlsContext(async (tx) => {
+      await tx.$executeRaw`DELETE FROM "Lead" WHERE "organizationId" = ${organizationId}`;
+      await tx.$executeRaw`DELETE FROM "Company" WHERE "organizationId" = ${organizationId}`;
+    }),
+  );
 };
 
 describe('Prospecção — regressão RLS fail-closed (SQL cru fora de withRlsContext)', () => {
