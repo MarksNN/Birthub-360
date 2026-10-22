@@ -816,7 +816,7 @@ describe('Capability & Permission Engine (PROMPT 3 + hardening PROMPT 3B)', () =
       );
       await requestContext.run({ bypassRls: true }, async () => {
         await prisma.user.delete({ where: { id: otherUser.id } });
-        await prisma.organization.delete({ where: { id: OTHER_ORG_ID } });
+        // O registro da org fixture persiste apenas no banco de teste; o app não tem DELETE.
       });
     });
   });
