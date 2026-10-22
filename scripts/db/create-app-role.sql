@@ -178,8 +178,11 @@ $$;
 DO $$
 DECLARE
     r RECORD;
-    -- Allowlist revisada: assinaturas regprocedure que o app chama direto (hoje: nenhuma).
-    allowlist CONSTANT text[] := ARRAY[]::text[];
+    -- Allowlist revisada: assinaturas regprocedure que o app chama direto (funções SECURITY INVOKER por tenant).
+    allowlist CONSTANT text[] := ARRAY[
+        'rebalance_approval_purge(text,integer)',
+        'rebalance_approval_anonymize_lead_notes(text,text)'
+    ]::text[];
 BEGIN
     FOR r IN
         SELECT p.oid::regprocedure AS sig
