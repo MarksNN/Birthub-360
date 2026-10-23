@@ -103,7 +103,7 @@ export function PageTitleCard({
     <header
       data-accent={accent === 'brand' ? 'cyan' : accent === 'warning' ? 'gold' : accent}
       className={cn(
-        'bh-platform-card relative flex flex-col gap-4 overflow-hidden rounded-card border bg-surface p-5 shadow-card sm:flex-row sm:items-center sm:justify-between',
+        'bh-platform-card relative flex flex-col gap-4 overflow-hidden rounded-card border border-line bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md p-5 shadow-card border-t border-t-white/20 dark:border-t-white/10 sm:flex-row sm:items-center sm:justify-between',
         a.card,
         className,
       )}

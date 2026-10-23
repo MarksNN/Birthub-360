@@ -4,30 +4,32 @@ import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
 import { BorderBeam, type BorderBeamProps } from './BorderBeam.js';
 
-const cardVariants = cva('bh-platform-card relative overflow-hidden rounded-card text-ink', {
-  variants: {
-    variant: {
-      default:
-        'bg-surface border border-line shadow-card motion-safe:transition-shadow motion-safe:duration-200 hover:border-line-strong',
-      stat: 'bg-surface border border-line shadow-card motion-safe:transition-shadow motion-safe:duration-200 hover:border-line-strong',
-      outline:
-        'border border-line bg-transparent motion-safe:transition-colors motion-safe:duration-200 hover:border-line-strong hover:bg-surface-interactive',
-      accent: 'bg-surface border border-line shadow-card',
-      elevated: 'bg-surface border border-line shadow-card',
-      interactive:
-        'group bg-surface border border-line shadow-card cursor-pointer motion-safe:transition-colors motion-safe:duration-200 hover:border-line-strong hover:bg-surface-interactive',
-      // Variantes estruturais recomendadas pelo Design System v2.0
-      surface: 'bg-surface-2 border border-line shadow-none hover:border-line-strong',
-      panel: 'bg-surface border border-line shadow-card hover:border-line-strong',
-      metric: 'bg-surface border border-line shadow-card',
-      data: 'bg-surface-2 border border-line shadow-none',
-      feature: 'bg-surface border border-line shadow-card',
-      floating: 'bg-surface border border-line shadow-card',
-      bento: 'bg-surface border border-line shadow-card hover:border-line-strong',
-      cosmic: 'bg-surface border border-line shadow-card',
-      glass: 'border border-line bg-surface shadow-card',
-      neon: 'bg-surface border border-line shadow-card',
-    },
+const cardVariants = cva(
+  'bh-platform-card relative overflow-hidden rounded-card text-ink transition-all duration-200 ease-out border-t border-t-white/20 dark:border-t-white/10',
+  {
+    variants: {
+      variant: {
+        default:
+          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        stat: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        outline:
+          'border border-line bg-transparent hover:border-line-strong hover:bg-surface-interactive hover:-translate-y-0.5',
+        accent: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        elevated: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-elevated hover:border-line-strong hover:-translate-y-0.5',
+        interactive:
+          'group bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card cursor-pointer hover:border-line-strong hover:bg-surface-interactive hover:shadow-elevated hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]',
+        // Variantes estruturais recomendadas pelo Design System v2.0
+        surface: 'bg-surface-2 border border-line shadow-none hover:border-line-strong',
+        panel: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        metric: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        data: 'bg-surface-2 border border-line shadow-none',
+        feature: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        floating: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        bento: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        cosmic: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        glass: 'border border-line bg-surface/80 dark:bg-[#0f172a]/80 backdrop-blur-xl shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        neon: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+      },
     padding: {
       default: 'p-6',
       sm: 'p-4',

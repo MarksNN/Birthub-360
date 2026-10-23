@@ -92,13 +92,13 @@ function getSectionBadgeStyle(title: string): {
 function getActiveIconWellStyle(accent: AccentColor): string {
   switch (accent) {
     case 'cyan':
-      return 'bg-[#00D4FF]/20 text-[#0284c7] dark:text-[#00D4FF] border border-[#00D4FF]/60 shadow-[0_0_10px_rgba(0,212,255,0.3)]';
+      return 'bg-gradient-to-br from-sky-500/20 to-sky-600/10 text-[#0284c7] dark:text-[#38bdf8] border border-sky-400/40 shadow-[0_2px_8px_rgba(14,165,233,0.2)]';
     case 'pink':
-      return 'bg-[#FF2D9B]/20 text-[#be185d] dark:text-[#FF2D9B] border border-[#FF2D9B]/60 shadow-[0_0_10px_rgba(255,45,155,0.3)]';
+      return 'bg-gradient-to-br from-rose-500/20 to-rose-600/10 text-[#be185d] dark:text-[#fb7185] border border-rose-400/40 shadow-[0_2px_8px_rgba(244,63,94,0.2)]';
     case 'gold':
-      return 'bg-[#F59E0B]/20 text-[#b45309] dark:text-[#F59E0B] border border-[#F59E0B]/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
+      return 'bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-[#b45309] dark:text-[#fbbf24] border border-amber-400/40 shadow-[0_2px_8px_rgba(245,158,11,0.2)]';
     case 'iris':
-      return 'bg-[#8B7DFF]/20 text-[#6d28d9] dark:text-[#8B7DFF] border border-[#8B7DFF]/60 shadow-[0_0_10px_rgba(139,125,255,0.3)]';
+      return 'bg-gradient-to-br from-violet-500/20 to-purple-600/10 text-[#6d28d9] dark:text-[#a78bfa] border border-violet-400/40 shadow-[0_2px_8px_rgba(139,125,255,0.2)]';
   }
 }
 
@@ -113,7 +113,7 @@ const ICON_WELL =
   'grid h-8 w-8 shrink-0 place-items-center rounded-xl motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out';
 
 const ICON_WELL_QUIET =
-  'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/60 group-hover:bg-slate-200/90 dark:group-hover:bg-slate-700/90 group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:scale-105';
+  'bg-slate-100/80 dark:bg-white/[0.04] text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-white/[0.06] group-hover:bg-slate-200/70 dark:group-hover:bg-white/[0.08] group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:border-slate-300/80 dark:group-hover:border-white/[0.12]';
 
 const GHOST_CONTROL = `h-8 w-8 shrink-0 place-items-center rounded-xl border border-line text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink ${EASE} ${FOCUS_RING}`;
 
@@ -376,14 +376,14 @@ export function Sidebar({
                         {isActive && (
                           <span
                             aria-hidden="true"
-                            className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${
+                            className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${
                               accent === 'cyan'
-                                ? 'bg-[#00D4FF] shadow-[0_0_8px_#00D4FF]'
+                                ? 'bg-gradient-to-b from-sky-400 to-sky-600 shadow-[0_0_8px_rgba(14,165,233,0.5)]'
                                 : accent === 'gold'
-                                  ? 'bg-[#F59E0B] shadow-[0_0_8px_#F59E0B]'
+                                  ? 'bg-gradient-to-b from-amber-400 to-amber-600 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
                                   : accent === 'pink'
-                                    ? 'bg-[#FF2D9B] shadow-[0_0_8px_#FF2D9B]'
-                                    : 'bg-[#8B7DFF] shadow-[0_0_8px_#8B7DFF]'
+                                    ? 'bg-gradient-to-b from-rose-400 to-rose-600 shadow-[0_0_8px_rgba(244,63,94,0.5)]'
+                                    : 'bg-gradient-to-b from-violet-400 to-purple-600 shadow-[0_0_8px_rgba(139,125,255,0.5)]'
                             }`}
                           />
                         )}
