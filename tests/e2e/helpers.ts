@@ -118,7 +118,9 @@ export async function signUp(
     // O updateMany anterior pode não ver a linha (RLS) e o clique do wizard navega para /app
     // antes do POST terminar. O OnboardingGate então devolve o usuário para /setup no meio
     // do teste. Fecha o onboarding pela API autenticada e só segue quando /app permanece.
-    const complete = await page.request.post('/api/organization-modules/onboarding/complete');
+    const complete = await page.request.post('/api/organization-modules/onboarding/complete', {
+      headers: { Origin: new URL(page.url()).origin },
+    });
     // Exibe status e mensagem de erro sem registrar cookies, tokens ou cabeçalhos.
     const responseBody = await complete.json().catch(() => null);
     const safeError =
