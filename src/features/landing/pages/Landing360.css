@@ -471,7 +471,7 @@ h1:not([class*="text-"]):not([class*="landing-title-"]):not([class*="grad-text-"
   font-family: var(--font-interface, "Inter", sans-serif);
   font-weight: 700;
   font-size: 0.925rem;
-  color: #0284c7 !important;
+  color: #075985 !important;
   background: #f1f5f9 !important;
   border: 1.5px solid #0284c7 !important;
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15) !important;
@@ -1182,3 +1182,11 @@ html:not(.dark) .landing-neon-root .text-\[\#ef4444\] {
 .landing-section-footer a:hover {
   color: #38bdf8 !important;
 }
+
+/* WCAG AA: cores legíveis da landing no tema claro e no rodapé escuro. */
+html:not(.dark) .landing-neon-root .text-\[\#d97706\] { color: #92400e !important; }
+html:not(.dark) .landing-neon-root .text-\[\#db2777\] { color: #9d174d !important; }
+.landing-neon-root .landing-section-footer .text-\[\#00D4FF\] { color: #38bdf8 !important; }
+.landing-neon-root .landing-section-footer .text-\[\#FF2D9B\] { color: #f472b6 !important; }
+.landing-neon-root .landing-section-footer .text-\[\#F59E0B\],
+.landing-neon-root .landing-section-footer .text-\[\#b45309\] { color: #fbbf24 !important; }
