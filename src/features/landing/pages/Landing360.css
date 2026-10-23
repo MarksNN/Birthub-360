@@ -1183,10 +1183,30 @@ html:not(.dark) .landing-neon-root .text-\[\#ef4444\] {
   color: #38bdf8 !important;
 }
 
-/* WCAG AA: cores legíveis da landing no tema claro e no rodapé escuro. */
-html:not(.dark) .landing-neon-root .text-\[\#d97706\] { color: #92400e !important; }
-html:not(.dark) .landing-neon-root .text-\[\#db2777\] { color: #9d174d !important; }
-.landing-neon-root .landing-section-footer .text-\[\#00D4FF\] { color: #38bdf8 !important; }
-.landing-neon-root .landing-section-footer .text-\[\#FF2D9B\] { color: #f472b6 !important; }
-.landing-neon-root .landing-section-footer .text-\[\#F59E0B\],
-.landing-neon-root .landing-section-footer .text-\[\#b45309\] { color: #fbbf24 !important; }
+/* WCAG AA: contraste em fundos claros sem alterar os tons neon do tema escuro. */
+html:not(.dark) .landing-neon-root .text-\[\#d97706\] {
+  color: #92400e !important;
+}
+
+html:not(.dark) .landing-neon-root .text-\[\#db2777\] {
+  color: #9d174d !important;
+}
+
+/* O rodapé usa fundo escuro em ambos os temas: sobrepor as regras globais
+   de texto claro, cuja especificidade antes prevalecia sobre o rodapé. */
+html:not(.dark) .landing-neon-root .landing-section-footer .text-\[\#00D4FF\],
+html.dark .landing-neon-root .landing-section-footer .text-\[\#00D4FF\] {
+  color: #38bdf8 !important;
+}
+
+html:not(.dark) .landing-neon-root .landing-section-footer .text-\[\#FF2D9B\],
+html.dark .landing-neon-root .landing-section-footer .text-\[\#FF2D9B\] {
+  color: #f472b6 !important;
+}
+
+html:not(.dark) .landing-neon-root .landing-section-footer .text-\[\#F59E0B\],
+html:not(.dark) .landing-neon-root .landing-section-footer .text-\[\#b45309\],
+html.dark .landing-neon-root .landing-section-footer .text-\[\#F59E0B\],
+html.dark .landing-neon-root .landing-section-footer .text-\[\#b45309\] {
+  color: #fbbf24 !important;
+}
