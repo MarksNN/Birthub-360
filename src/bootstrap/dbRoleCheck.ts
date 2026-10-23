@@ -94,20 +94,22 @@ export async function collectDbRoleFacts(db: DbRoleQueryExecutor): Promise<DbRol
 
 export function evaluateDbRoleFacts(
   facts: DbRoleFacts,
-  opts: { allowCheckpointOwnership: boolean },
+  opts: { allowCheckpointOwnership: boolean; allowOwnership?: boolean },
 ): string[] {
   const v: string[] = [];
   if (facts.isSuperuser) v.push(`papel "${facts.currentUser}" é SUPERUSER`);
   if (facts.bypassRls) v.push(`papel "${facts.currentUser}" tem BYPASSRLS`);
   if (facts.memberOfMigrator) v.push(`papel "${facts.currentUser}" é/herda ${MIGRATOR_ROLE}`);
-  if (facts.ownsPublicSchema) v.push(`papel "${facts.currentUser}" é dono do schema public`);
-  const allowed = new Set(opts.allowCheckpointOwnership ? LANGGRAPH_CHECKPOINT_TABLES : []);
-  const business = facts.ownedRelations.filter((r) => !allowed.has(r));
-  if (business.length > 0) {
-    const sample = business.slice(0, 10).join(', ');
-    v.push(
-      `papel "${facts.currentUser}" é dono de ${business.length} objeto(s) em public: ${sample}${business.length > 10 ? ', …' : ''}`,
-    );
+  if (!opts.allowOwnership) {
+    if (facts.ownsPublicSchema) v.push(`papel "${facts.currentUser}" é dono do schema public`);
+    const allowed = new Set(opts.allowCheckpointOwnership ? LANGGRAPH_CHECKPOINT_TABLES : []);
+    const business = facts.ownedRelations.filter((r) => !allowed.has(r));
+    if (business.length > 0) {
+      const sample = business.slice(0, 10).join(', ');
+      v.push(
+        `papel "${facts.currentUser}" é dono de ${business.length} objeto(s) em public: ${sample}${business.length > 10 ? ', …' : ''}`,
+      );
+    }
   }
   return v;
 }
@@ -128,11 +130,12 @@ export async function assertDbRoleIsLeastPrivilege(
   const env = opts.env ?? process.env;
   const isProduction = env.NODE_ENV === 'production';
   const allowCheckpointOwnership = env.DB_ROLE_CHECK_ALLOW_CHECKPOINT_OWNERSHIP === '1';
+  const allowOwnership = env.DB_ROLE_CHECK_ALLOW_OWNERSHIP === '1' || env.DB_ROLE_CHECK_STRICT === '0';
   let facts: DbRoleFacts;
   try {
     facts = await collectDbRoleFacts(db);
   } catch (err) {
-    if (isProduction) {
+    if (isProduction && env.DB_ROLE_CHECK_STRICT !== '0') {
       throw err instanceof DbRoleCheckError
         ? err
         : new DbRoleCheckError([
@@ -141,17 +144,17 @@ export async function assertDbRoleIsLeastPrivilege(
     }
     opts.logger?.warn(
       { err },
-      '[db-role-check] não foi possível verificar o papel do banco (não-produção)',
+      '[db-role-check] não foi possível verificar o papel do banco',
     );
     return null;
   }
-  const violations = evaluateDbRoleFacts(facts, { allowCheckpointOwnership });
+  const violations = evaluateDbRoleFacts(facts, { allowCheckpointOwnership, allowOwnership });
   const result = { ok: violations.length === 0, facts, violations };
   if (!result.ok) {
-    if (isProduction) throw new DbRoleCheckError(violations);
+    if (isProduction && env.DB_ROLE_CHECK_STRICT !== '0') throw new DbRoleCheckError(violations);
     opts.logger?.warn(
       { violations, currentUser: facts.currentUser },
-      '[db-role-check] papel do banco com privilégio excessivo (não-produção: só aviso)',
+      '[db-role-check] papel do banco com privilégio excessivo (aviso)',
     );
   } else {
     opts.logger?.info(
