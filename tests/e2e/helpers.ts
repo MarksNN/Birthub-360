@@ -103,13 +103,32 @@ export async function signUp(
     expect(signinData.token).toBeTruthy();
   }
 
+  // O cadastro de uma nova organização deve provisionar seu fundador como ADMIN.
+  // Verifica o papel persistido, não apenas um campo eventualmente presente no token.
+  requestContext.enterWith({ bypassRls: true });
+  const persistedUser = await prisma.user.findUnique({
+    where: { email },
+    select: { role: true, organizationId: true },
+  });
+  expect(persistedUser?.organizationId, 'fundador deve pertencer a uma organização').toBeTruthy();
+  expect(persistedUser?.role, 'fundador de organização nova deve ser ADMIN').toBe('ADMIN');
+
   await page.waitForURL(/\/(app|setup)(?:[/?#]|$)/, { timeout: 45_000 });
   if (completeOnboarding) {
     // O updateMany anterior pode não ver a linha (RLS) e o clique do wizard navega para /app
     // antes do POST terminar. O OnboardingGate então devolve o usuário para /setup no meio
     // do teste. Fecha o onboarding pela API autenticada e só segue quando /app permanece.
     const complete = await page.request.post('/api/organization-modules/onboarding/complete');
-    expect(complete.ok(), 'conclusão de onboarding via API').toBe(true);
+    // Exibe status e mensagem de erro sem registrar cookies, tokens ou cabeçalhos.
+    const responseBody = await complete.json().catch(() => null);
+    const safeError =
+      responseBody && typeof responseBody === 'object' && 'error' in responseBody
+        ? String(responseBody.error).slice(0, 200)
+        : 'resposta sem campo error';
+    expect(
+      complete.ok(),
+      `conclusão de onboarding via API: HTTP ${complete.status()} (${safeError})`,
+    ).toBe(true);
     if (new URL(page.url()).pathname !== '/app') {
       try {
         await page.goto('/app', { waitUntil: 'domcontentloaded' });
