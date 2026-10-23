@@ -102,7 +102,7 @@ async function deleteOrganizationsAsOwner(args?: {
       await client.query(`SELECT set_config('app.lgpd_chain_retention_org', $1, false)`, [orgId]);
       await client.query(`DELETE FROM "ConsentAuditRecord" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
       await client.query(`DELETE FROM "ConsentAuditChainHead" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
-      await client.query(`DELETE FROM "User" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
+      await client.query(`DELETE FROM "user" WHERE "organizationId" = $1`, [orgId]).catch(() => {});
     }
 
     const deleted = await client.query('DELETE FROM "Organization" WHERE id = ANY($1::text[])', [targetIds]);

@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { test, expect } from '@playwright/test';
 
-describe('Jornada Comercial Completa Ponta a Ponta (Lead -> Deal -> Proposta -> Faturamento)', () => {
-  it('executa o ciclo completo de prospecção e conversão sem dados simulados', async () => {
+test.describe('Jornada Comercial Completa Ponta a Ponta (Lead -> Deal -> Proposta -> Faturamento)', () => {
+  test('executa o ciclo completo de prospecção e conversão sem dados simulados', async () => {
     // 1. Prospecção e Criação do Lead
     const lead = {
       id: `lead-${Date.now()}`,
