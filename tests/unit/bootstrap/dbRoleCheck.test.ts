@@ -63,6 +63,19 @@ describe('dbRoleCheck — produção (fail-closed)', () => {
       assertDbRoleIsLeastPrivilege(mockDb({}, [...owned, 'checkpoint_evil']).db, { env }),
     ).rejects.toThrow(/checkpoint_evil/);
   });
+  it('DB_ROLE_CHECK_ALLOW_OWNERSHIP tolera schema e tabelas de negócio quando ativado', async () => {
+    const owned = ['Lead', 'ForecastSnapshot'];
+    const env = { ...PROD, DB_ROLE_CHECK_ALLOW_OWNERSHIP: '1' };
+    const r = await assertDbRoleIsLeastPrivilege(mockDb({ ownsPublicSchema: true }, owned).db, { env });
+    expect(r?.ok).toBe(true);
+  });
+  it('DB_ROLE_CHECK_STRICT=0 não derruba o boot em produção mas apenas avisa', async () => {
+    const l = logger();
+    const env = { ...PROD, DB_ROLE_CHECK_STRICT: '0' };
+    const r = await assertDbRoleIsLeastPrivilege(mockDb({ isSuperuser: true }).db, { env, logger: l });
+    expect(r?.ok).toBe(false);
+    expect(l.warn).toHaveBeenCalled();
+  });
   it('falha ao consultar o catálogo é fatal', async () => {
     const db = {
       $queryRawUnsafe: vi.fn(async () => {
