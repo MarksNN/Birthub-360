@@ -3,7 +3,10 @@
  * Integração Apollo.io / BrasilAPI com cache de 30 dias.
  */
 
-import { companyCacheRepository, type CachedCompany } from '../infra/PrismaCompanyCacheRepository.js';
+import {
+  companyCacheRepository,
+  type CachedCompany,
+} from '../infra/PrismaCompanyCacheRepository.js';
 
 export class CompanyEnrichmentService {
   public async enrichByCnpj(cnpj: string): Promise<CachedCompany> {

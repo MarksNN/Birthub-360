@@ -26,7 +26,10 @@ export class RoleplaySessionService {
     score: number,
     notes: string,
   ): Promise<RoleplaySessionData> {
-    const { tokenizedText: sanitizedTranscript } = piiTokenizer.tokenize(organizationId, rawTranscript);
+    const { tokenizedText: sanitizedTranscript } = piiTokenizer.tokenize(
+      organizationId,
+      rawTranscript,
+    );
 
     const session: RoleplaySessionData = {
       id: `rps-${Date.now()}`,

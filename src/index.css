@@ -1,4 +1,4 @@
-@import './styles/globals.css';
+@import "./styles/globals.css";
 
 /* Anéis de foco universais e acessíveis WCAG 2.2 AA (Passo 68) */
 :focus-visible {

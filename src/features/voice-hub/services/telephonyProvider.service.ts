@@ -24,7 +24,10 @@ export class TelephonyProviderService {
     return { callId, status: 'IN_PROGRESS' };
   }
 
-  public calculateBilling(durationSeconds: number, provider: '3cx' | 'twilio'): TelephonyBillingEvent {
+  public calculateBilling(
+    durationSeconds: number,
+    provider: '3cx' | 'twilio',
+  ): TelephonyBillingEvent {
     // 3CX SIP Trunking: ~5 centavos/min; Twilio: ~15 centavos/min
     const ratePerMinute = provider === '3cx' ? 5 : 15;
     const minutes = Math.ceil(durationSeconds / 60);

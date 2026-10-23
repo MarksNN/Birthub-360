@@ -18,7 +18,10 @@ export class MultichannelDispatcherService {
       return { success: false, reason: 'OPT_OUT_BLOCKED' };
     }
 
-    logger.info({ leadId: request.leadId, channel: request.channel }, 'Disparo de cadência realizado com sucesso');
+    logger.info(
+      { leadId: request.leadId, channel: request.channel },
+      'Disparo de cadência realizado com sucesso',
+    );
     return { success: true };
   }
 }

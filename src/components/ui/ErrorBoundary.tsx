@@ -29,8 +29,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, State> {
         return this.props.fallback;
       }
       return (
-        <div role="alert" className="p-6 text-center border border-red-500 rounded bg-red-50 dark:bg-red-950/20">
-          <h2 className="text-lg font-bold text-red-600 dark:text-red-400">Ocorreu um erro inesperado</h2>
+        <div
+          role="alert"
+          className="p-6 text-center border border-red-500 rounded bg-red-50 dark:bg-red-950/20"
+        >
+          <h2 className="text-lg font-bold text-red-600 dark:text-red-400">
+            Ocorreu um erro inesperado
+          </h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             {this.state.error?.message || 'Por favor recarregue a página ou contate o suporte.'}
           </p>
