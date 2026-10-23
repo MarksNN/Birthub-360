@@ -23,13 +23,13 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ triggerLabel, items 
       </button>
 
       {isOpen && (
-        <ul
+        <div
           id={menuId}
           role="menu"
           className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border rounded shadow-lg z-50"
         >
           {items.map((item, idx) => (
-            <li key={idx} role="none">
+            <div key={idx} role="none">
               <button
                 type="button"
                 role="menuitem"
@@ -41,9 +41,9 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({ triggerLabel, items 
               >
                 {item.label}
               </button>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
