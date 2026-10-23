@@ -126,9 +126,9 @@ export function KpiCard({
   };
 
   const sharedClassName = cn(
-    'bh-platform-card group relative w-full overflow-hidden rounded-card border border-line bg-surface p-5 text-left text-ink shadow-sm transition-all duration-300',
+    'bh-platform-card group relative w-full overflow-hidden rounded-card border border-line bg-surface/90 dark:bg-[#0f172a]/85 backdrop-blur-md p-5 text-left text-ink shadow-card transition-all duration-200 border-t border-t-white/20 dark:border-t-white/10',
     onSelect &&
-      'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-line-strong hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:border-line-strong hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     active &&
       'border-brand/60 bg-surface-elevated shadow-[0_0_0_2px_color-mix(in_srgb,var(--brand)_25%,transparent)]',
     className,

@@ -32,70 +32,70 @@ export const SPRING_MOMENTUM = { type: 'spring', stiffness: 350, damping: 25, ma
 
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.35, ease: EASE_PREMIUM } },
+  show: { opacity: 1, transition: { duration: 0.25, ease: EASE_OUT_EXPO } },
 };
 
 export const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 16, filter: 'blur(6px)' },
+  hidden: { opacity: 0, y: 8, filter: 'blur(3px)' },
   show: {
     opacity: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.45, ease: EASE_PREMIUM },
+    transition: { duration: 0.3, ease: EASE_OUT_EXPO },
   },
 };
 
 export const fadeInDown: Variants = {
-  hidden: { opacity: 0, y: -16, filter: 'blur(6px)' },
+  hidden: { opacity: 0, y: -8, filter: 'blur(3px)' },
   show: {
     opacity: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.45, ease: EASE_PREMIUM },
+    transition: { duration: 0.3, ease: EASE_OUT_EXPO },
   },
 };
 
 export const fadeInScale: Variants = {
-  hidden: { opacity: 0, scale: 0.95, filter: 'blur(4px)' },
+  hidden: { opacity: 0, scale: 0.98, filter: 'blur(2px)' },
   show: {
     opacity: 1,
     scale: 1,
     filter: 'blur(0px)',
-    transition: { duration: 0.4, ease: EASE_PREMIUM },
+    transition: { duration: 0.28, ease: EASE_OUT_EXPO },
   },
 };
 
 export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.94 },
+  hidden: { opacity: 0, scale: 0.98 },
   show: { opacity: 1, scale: 1, transition: SPRING_SOFT },
 };
 
 export const scaleInBouncy: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  show: { opacity: 1, scale: 1, transition: SPRING_BOUNCY },
+  hidden: { opacity: 0, scale: 0.98 },
+  show: { opacity: 1, scale: 1, transition: SPRING_SOFT },
 };
 
 export const slideInRight: Variants = {
-  hidden: { opacity: 0, x: 32, filter: 'blur(4px)' },
+  hidden: { opacity: 0, x: 12, filter: 'blur(2px)' },
   show: {
     opacity: 1,
     x: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.4, ease: EASE_PREMIUM },
+    transition: { duration: 0.3, ease: EASE_OUT_EXPO },
   },
 };
 
 export const slideInLeft: Variants = {
-  hidden: { opacity: 0, x: -32, filter: 'blur(4px)' },
+  hidden: { opacity: 0, x: -12, filter: 'blur(2px)' },
   show: {
     opacity: 1,
     x: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.4, ease: EASE_PREMIUM },
+    transition: { duration: 0.3, ease: EASE_OUT_EXPO },
   },
 };
 
-export const staggerContainer = (stagger = 0.06, delayChildren = 0): Variants => ({
+export const staggerContainer = (stagger = 0.04, delayChildren = 0): Variants => ({
   hidden: {},
   show: {
     transition: { staggerChildren: stagger, delayChildren },

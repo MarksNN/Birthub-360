@@ -9,29 +9,32 @@ import { cn } from '../../lib/utils.js';
 import { Magnetic } from './Magnetic.js';
 
 const buttonVariants = cva(
-  'bh-official-control inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[13px] font-semibold tracking-[-0.011em] motion-safe:transition-colors motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:pointer-events-none disabled:bg-surface-subtle disabled:text-ink-2 disabled:border-transparent',
+  'bh-official-control inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-[13px] font-semibold tracking-[-0.015em] motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:pointer-events-none disabled:bg-surface-subtle disabled:text-ink-2 disabled:border-transparent active:scale-[0.98]',
   {
     variants: {
       variant: {
-        default: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
-        primary: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
-        tertiary: 'bg-surface text-ink hover:bg-surface-interactive',
+        default:
+          'bg-gradient-to-b from-[#0284c7] to-[#0369a1] dark:from-[#00b4d8] dark:to-[#0284c7] text-white shadow-[0_1px_2px_rgba(0,0,0,0.1),0_2px_8px_rgba(2,132,199,0.25)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.15),0_4px_16px_rgba(2,132,199,0.35)] hover:brightness-105 border-t border-t-white/20',
+        primary:
+          'bg-gradient-to-b from-[#0284c7] to-[#0369a1] dark:from-[#00b4d8] dark:to-[#0284c7] text-white shadow-[0_1px_2px_rgba(0,0,0,0.1),0_2px_8px_rgba(2,132,199,0.25)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.15),0_4px_16px_rgba(2,132,199,0.35)] hover:brightness-105 border-t border-t-white/20',
+        tertiary: 'bg-surface text-ink hover:bg-surface-interactive border border-line',
         success:
-          'bg-ok-solid text-[color:var(--palette-neon-white)] shadow-sm hover:brightness-110',
+          'bg-ok-solid text-[color:var(--palette-neon-white)] shadow-sm hover:brightness-110 border-t border-t-white/20',
         destructive:
-          // A03-P1-07: bg-btn-danger (globals.css) garante >= 4.5:1 com texto branco; #EF4444 cru dava 3.76:1.
-          'bg-btn-danger text-[color:var(--palette-neon-white)] shadow-sm hover:bg-btn-danger-hover',
+          'bg-gradient-to-b from-red-600 to-red-700 text-white shadow-sm hover:brightness-110 border-t border-t-white/20',
         outline:
-          'border border-line bg-transparent text-ink hover:border-line-strong hover:bg-surface-interactive',
+          'border border-slate-200/90 dark:border-white/10 bg-transparent text-slate-800 dark:text-slate-200 hover:bg-slate-100/70 dark:hover:bg-white/[0.05] hover:border-slate-300 dark:hover:border-white/20',
         secondary:
-          'border border-line bg-surface text-ink shadow-sm hover:bg-surface-interactive hover:border-line-strong',
+          'border border-slate-200/90 dark:border-white/10 bg-white/90 dark:bg-white/[0.05] text-slate-800 dark:text-slate-100 shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:bg-slate-50 dark:hover:bg-white/[0.08] hover:border-slate-300 dark:hover:border-white/20',
         ghost:
-          'border border-transparent text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink',
+          'border border-transparent text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-white/[0.06] hover:text-slate-900 dark:hover:text-white',
         link: 'text-primary underline-offset-4 hover:underline',
-        cosmic: 'bg-brand text-on-brand shadow-sm hover:bg-brand-active',
-        brand: 'bg-brand text-on-brand font-display shadow-sm hover:bg-brand-active',
+        cosmic:
+          'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-[#0f172a] dark:to-[#090d16] text-white border border-sky-500/30 shadow-[0_2px_12px_rgba(14,165,233,0.18)] hover:border-sky-400/60 hover:shadow-[0_4px_20px_rgba(14,165,233,0.3)]',
+        brand:
+          'bg-gradient-to-b from-[#c5a059] to-[#9b7a2d] text-slate-950 font-display font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.1),0_2px_12px_rgba(197,160,89,0.3)] hover:brightness-105 border-t border-t-white/30',
         vancouver:
-          'border border-[color:var(--brand-text)] bg-transparent text-[#0369a1] dark:text-[#00D4FF] hover:bg-[color:color-mix(in_srgb,var(--brand)_8%,transparent)]',
+          'border border-slate-300/80 dark:border-white/15 bg-white/40 dark:bg-white/[0.02] text-slate-900 dark:text-white hover:bg-slate-100/60 dark:hover:bg-white/[0.06] hover:border-sky-500/40',
       },
       size: {
         default: 'h-9 px-4 py-2',
