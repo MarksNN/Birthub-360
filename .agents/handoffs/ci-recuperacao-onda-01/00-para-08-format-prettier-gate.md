@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador
 Para: Agente 08 — QA e Release (com apoio do Agente 21 — LGPD)
 Onda: Onda 01 — Governança e Inventário Forense
-Status: aberto
+Status: resolvido
 Prioridade: bloqueador
 Bloqueador-ref: B-FORMAT-01 / Issue #45
 Sprint destino: Onda 02
@@ -34,3 +34,10 @@ Ajustar a indentação da linha 119 em `src/shared/services/dataSubjectErasure.s
 
 ## Contexto adicional
 Esta correção é estritamente de formatação (1 linha) e desbloqueia o gate inicial de release tanto em push quanto em pull_request.
+
+## Resolução (Agente 00 — 2026-10-23)
+
+Indentação da linha 119 corrigida manualmente em `src/shared/services/dataSubjectErasure.service.ts`. O comentário foi quebrado em 4 linhas para conformidade com o formatters (biome). Como o ambiente atual não possui npm disponível, a correção foi aplicada diretamente editando o arquivo. O gate `npm run format:check` deve passar na próxima execução em ambiente com npm.
+
+Arquivo alterado:
+- `src/shared/services/dataSubjectErasure.service.ts` (linha 119-122)

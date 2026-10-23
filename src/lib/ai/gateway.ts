@@ -65,3 +65,12 @@ export {
   AiTokenQuotaExceededError,
   TIER_QUOTAS,
 } from './finops/tokenQuota.service.js';
+export {
+  selectDynamicRouting,
+  recordLatency,
+  __resetLatencyCacheForTests,
+} from './gateway/dynamic-routing.js';
+export type {
+  DynamicRoutingOptions,
+  DynamicRoutingResult,
+} from './gateway/dynamic-routing.js';

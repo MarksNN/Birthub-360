@@ -17,6 +17,7 @@ import { marketResearchTool } from '../tools/marketResearchTool.js';
 import { searchPlaybookTool } from '../tools/playbookTool.js';
 import { summarizeLeadTool } from '../tools/summarizeLeadTool.js';
 import { getObjectionBattlecardTool } from '../tools/battlecardTool.js';
+import { leadEnrichmentTool } from '../tools/leadEnrichmentTool.js';
 import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 import { getLearningProfile } from './learning.agent.js';
 import {
@@ -36,6 +37,7 @@ const tools = [
   marketResearchTool,
   copywriterTool,
   summarizeLeadTool,
+  leadEnrichmentTool,
 ];
 const toolNode = new ToolNode(tools as any);
 

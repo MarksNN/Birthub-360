@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador
 Para: Agente 02 — Produto e UX & Agente 03 — Design e Acessibilidade
 Onda: Onda 01 — Governança e Inventário Forense
-Status: aberto
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: B-E2E-A11Y-01 / Issue #45
 Sprint destino: Onda 02
@@ -44,3 +44,28 @@ A suíte E2E do Playwright (`npm run test:e2e`) apresenta falhas intermitentes e
 
 ## Contexto adicional
 Não remover axe-core, não rebaixar a criticidade das regras de acessibilidade e não ignorar contrastes em tema claro.
+
+## Resolução (Agente 00 — 2026-10-23)
+
+Investigação realizada revelou que **todas as correções mencionadas no handoff já foram aplicadas** no repositório atual:
+
+1. ✅ **Contraste WCAG AA no tema claro** - `src/features/landing/pages/Landing360.css` (linhas 1138-1176) já tem overrides para light mode:
+   - Linha 1140-1143: Ciano neon `#00D4FF` → `#0369a1` na antessala
+   - Linha 1148-1153: Ciano neon `#00D4FF` → `#0369a1` na landing
+   - Linha 1155-1162: Amarelo neon `#F59E0B` → `#92400e` na landing
+   - Linha 1164-1169: Rosa neon `#FF2D9B` → `#be185d` na landing
+   - Linha 1171-1176: Vermelho neon `#EF4444` → `#b91c1c` na landing
+   - Comentário explícito: "WCAG AA em fundo claro: texto neon puro mantém a cor somente no tema dark"
+
+2. ✅ **Seletor duplicado no Workspace** - `tests/e2e/workspace.spec.ts` (linha 83) já usa `exact: true`:
+   ```typescript
+   await expect(page.getByRole('main').getByRole('button', { name: 'Pipeline', exact: true })).toBeVisible();
+   ```
+   Isso resolve o problema de múltiplos elementos coincidentes.
+
+3. ✅ **PR #51 já mergeado** - Git log confirma:
+   - Commit `acde89e34 Merge pull request #51 from MarksNN/fix/issue-45-landing-wcag-contrast`
+   - Commit `ddc9acbca fix(a11y): restore WCAG AA contrast on landing light theme and footer`
+   - Commit `7d3ab35a6 fix(a11y): format Biome CSS rules and prioritize dark footer contrast`
+
+**Conclusão:** O handoff descrevia problemas de acessibilidade E2E que já foram corrigidos em iteração anterior (PR #51). As correções de contraste WCAG AA já estão aplicadas no CSS da landing, o seletor duplicado já foi desambiguado no teste do workspace, e os commits correspondentes já foram mergeados no main. Não é necessária nenhuma alteração adicional de código.

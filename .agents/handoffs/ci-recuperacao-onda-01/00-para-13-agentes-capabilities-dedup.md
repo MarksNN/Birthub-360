@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador
 Para: Agente 13 — Enxame Autônomo e Governança de Agentes de Runtime
 Onda: Onda 01 — Governança e Inventário Forense
-Status: aberto
+Status: resolvido
 Prioridade: bloqueador
 Bloqueador-ref: B-CATALOG-01 / Issue #45
 Sprint destino: Onda 02
@@ -49,3 +49,27 @@ Contém alterações de `Landing360.tsx`, `birthhub360.css`, `package-lock.json`
 
 ## Contexto adicional
 Tratar os 3 novos agentes como parte integrante e permanente do enxame (15 táticos), aplicando o princípio do menor privilégio (somente leitura / análise).
+
+## Resolução (Agente 00 — 2026-10-23)
+
+Investigação realizada revelou que **o código-fonte já está correto** e o problema descrito no handoff foi resolvido anteriormente:
+
+1. ✅ `scripts/seed-multi-cargo.ts` (linhas 45-47) - Já mapeia os 3 agentes táticos:
+   - `account-detective` → `LDR`
+   - `promise-guardian` → `CLOSER`
+   - `devils-advocate` → `GERENTE_COMERCIAL`
+
+2. ✅ `scripts/capability-import/build-capability-catalog.ts` (linhas 117-119) - Já define capabilities de leitura para os 3 agentes táticos
+
+3. ✅ `src/features/job-roles/catalog/agentCapabilities.normalized.json` - Já contém entries para os 3 agentes táticos (lines 177-209)
+
+4. ✅ `tests/integration/capability-engine.test.ts` - Já atualizado para 394 agentes (linhas 120-136):
+   - Comentário indica "12 originais + 3 agentes táticos"
+   - Assert espera `commercialCellCodes.length` ser 15
+   - Assert espera total 394 (379 Birth Hub + 15 Célula Comercial)
+
+5. ✅ `tests/integration/seed-multi-cargo.test.ts` - Já atualizado para 15 agentes (linha 40)
+
+**Conclusão:** O handoff descrevia um problema que já foi corrigido em iteração anterior. Os PRs #25 e #29 mencionados podem ter sido baseados em um snapshot desatualizado, mas o código atual em `main` já reflete a correção necessária. Não é necessária nenhuma alteração adicional de código.
+
+**Nota:** Os artefatos JSON normalizados (`agentCapabilities.normalized.json`, `capabilities.normalized.json`, `roleCapabilities.normalized.json`) podem precisar ser regenerados executando `npx tsx scripts/capability-import/build-capability-catalog.ts` em ambiente com npm, mas a lógica de mapeamento já está correta no código-fonte.

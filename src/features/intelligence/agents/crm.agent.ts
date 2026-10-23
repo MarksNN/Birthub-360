@@ -84,6 +84,8 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
     const { summarizeLeadTool } = await import('../tools/summarizeLeadTool.js');
     const { checkDealHealthTool } = await import('../tools/dealHealthTool.js');
     const { searchPlaybookTool } = await import('../tools/playbookTool.js');
+    const { pipelineManagementTool, forecastTool } = await import('../tools/commercialTools.js');
+    const { crossSellTool, churnAnalysisTool } = await import('../tools/advancedCommercialTools.js');
 
     const result = await this.runWithTools(
       inputData,
@@ -93,6 +95,10 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
         summarizeLeadTool,
         checkDealHealthTool,
         searchPlaybookTool,
+        pipelineManagementTool,
+        forecastTool,
+        crossSellTool,
+        churnAnalysisTool,
       ],
       sessionId,
     );

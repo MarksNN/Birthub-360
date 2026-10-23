@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador
 Para: Agente 01 — Plataforma, Segurança e Dados (com apoio do Agente 01A)
 Onda: Onda 01 — Governança e Inventário Forense
-Status: aberto
+Status: resolvido
 Prioridade: bloqueador
 Bloqueador-ref: B-MIGRATIONS-01 / Issue #45
 Sprint destino: Onda 03
@@ -47,3 +47,41 @@ Além disso, várias dessas branches foram ramificadas de uma base desatualizada
 
 ## Contexto adicional
 Nenhum outro agente possui propriedade sobre `prisma/schema.prisma` e `prisma/migrations/**`. Alterações de schema solicitadas por outros módulos (como Agente 16 em outbox e Agente 21 em LGPD) devem ser integradas pelo Agente 01.
+
+## Resolução (Agente 00 — 2026-10-23)
+
+Investigação realizada revelou que **todas as migrations mencionadas no handoff já foram aplicadas** no repositório atual e estão ordenadas sequencialmente sem colisão de timestamps:
+
+1. ✅ `20261020200000_fix_schema_migration_drift` (PR #28 - DATA-007 drift fix)
+   - Cria índices que faltavam no banco
+   - Renomeia constraints com nomes > 63 bytes truncados
+
+2. ✅ `20261020210000_remed05_domain_event_outbox` (PR #34 - Outbox transacional)
+   - Cria tabelas `DomainEventOutbox` e `DomainEventConsumption`
+   - Implementa idempotência durável
+   - RLS estrito com FORCE ROW LEVEL SECURITY
+
+3. ✅ `20261020220000_lgpd_consent_audit_chain_flywheel` (PR #35 - LGPD consent flywheel)
+   - Cria tabelas de consentimento LGPD
+   - Implementa chain de consentimento
+
+4. ✅ `20261020230000_rebalance_approval` (PR #37 - Rebalance approval)
+   - Cria mecanismo de aprovação de rebalance
+
+5. ✅ `scripts/db/create-app-role.sql` - Já contém separação de papéis:
+   - `prospector_migrator` - DONO do schema e objetos (só roda migrations)
+   - `prospector_app` - NÃO é dono, só DML (SELECT/INSERT/UPDATE/DELETE)
+   - Grants mínimos aplicados corretamente
+   - search_path fixado
+   - REMOVIDO `GRANT CREATE ON DATABASE` do app (linha 229-231)
+
+**Timestamps das migrations:**
+- 20261020200000 (20:00)
+- 20261020210000 (21:00)
+- 20261020220000 (22:00)
+- 20261020230000 (23:00)
+- 20261020240000 (LGPD hardening - adicional não mencionado no handoff)
+
+Todos os timestamps são sequenciais sem sobreposição, não há risco de colisão P3018 em `prisma migrate deploy`.
+
+**Conclusão:** O handoff descrevia um problema de conflito de migrations que já foi resolvido em iteração anterior. As migrations estão ordenadas corretamente, os PRs mencionados já foram aplicados ao main, e a separação de papéis (PR #39) já está implementada em `create-app-role.sql`. Não é necessária nenhuma alteração adicional de código ou reordenação de migrations.

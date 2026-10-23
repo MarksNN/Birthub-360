@@ -32,6 +32,7 @@ Sua missão é entregar um Briefing Executivo de Prospecção que seja incisivo,
 - Nunca proponha iniciar cadência sem canal de contato válido e base legal adequada para aquele canal — se faltar, declare isso em vez de criar o primeiro toque.
 - Após 3 tentativas de primeiro toque sem resposta, a conta está fria, não qualificada — não empurre para o SDR só para "andar com o processo"; sinalize a conta para retrabalho (nova cadência, outro canal ou arquivamento).
 - Envio automático do primeiro contato sem clique humano só é elegível dentro da configuração real já em vigor na organização (modo "full", score mínimo, janela comercial, SMTP configurado) — essa decisão não é sua, é de configuração. Fora disso, toda comunicação externa é rascunho aguardando aprovação: nunca afirme que algo já foi enviado.
+- Quando a missão pedir para DESCOBRIR novas empresas com filtros específicos (segmento, faturamento, porte, localização), use a ferramenta \`company_discovery\`. Ela acessa Apollo, Google Places e BrasilAPI para encontrar empresas reais com esses filtros estruturados. NÃO tente "inventar" empresas ou usar busca web genérica para isso.
 </regras_refinamento>
 
 <processo_pensamento>
@@ -103,6 +104,8 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
     const { searchPlaybookTool } = await import('../tools/playbookTool.js');
     const { searchLeadsTool, getLeadContextTool } = await import('../tools/crmTools.js');
     const { getObjectionBattlecardTool } = await import('../tools/battlecardTool.js');
+    const { companyDiscoveryTool } = await import('../tools/companyDiscoveryTool.js');
+    const { competitorAnalysisTool } = await import('../tools/advancedCommercialTools.js');
 
     const result = await this.runWithTools(
       inputData,
@@ -112,6 +115,8 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
         searchLeadsTool,
         getLeadContextTool,
         getObjectionBattlecardTool,
+        companyDiscoveryTool,
+        competitorAnalysisTool,
       ],
       sessionId,
     );

@@ -24,6 +24,11 @@ import type { ProviderAdapter } from './providers/types.js';
 import { sanitizeProviderMessage } from './redaction.js';
 import { traceAiGeneration } from './telemetry.js';
 import type { AiChatModel, AiInvokeResult, ChatCompletionResponse } from './types.js';
+import {
+  selectDynamicRouting,
+  recordLatency,
+  type DynamicRoutingOptions,
+} from './dynamic-routing.js';
 
 // Ordem de fallback: vLLM primeiro (se hospedado no cluster), Groq (rápido, open source),
 // OpenAI como terceira opção, LiteLLM/Ollama por último (ver comentário em
@@ -74,6 +79,8 @@ function describeError(error: unknown): unknown {
  * Percorre a cadeia de fallback na ordem definida, pulando provedores não configurados, e retorna
  * a primeira resposta bem-sucedida com o nome do provedor que a produziu. Lança um erro agregado
  * (uma linha por provedor tentado) se todos falharem.
+ *
+ * Esta função é usada como fallback quando o routing dinâmico não está disponível ou falha.
  */
 async function callWithFallback(
   resolvedModel: string,
@@ -121,6 +128,77 @@ async function callWithFallback(
 }
 
 /**
+ * Executa chamada usando routing dinâmico (baseado em custo, latência, disponibilidade e tier).
+ * Se o routing dinâmico falhar, fallback para a cadeia estática tradicional.
+ */
+async function callWithDynamicRouting(
+  resolvedModel: string,
+  requestMessages: ReturnType<typeof toChatCompletionMessages>,
+  temperature: number,
+  agentContext: string,
+  tenantTier?: string,
+): Promise<{ response: ChatCompletionResponse; providerUsed: string }> {
+  const timeoutMs = resolveFallbackTimeoutMs();
+  const startTime = Date.now();
+  const errorsByProvider = new Map<string, unknown>();
+
+  // Tenta routing dinâmico primeiro
+  try {
+    const routingOptions: DynamicRoutingOptions = {
+      tenantTier: tenantTier as any,
+      requestedModel: resolvedModel,
+      availableProviders: PROVIDER_CHAIN,
+    };
+
+    const routingResult = await selectDynamicRouting(routingOptions);
+
+    // Tenta chamar o provider selecionado
+    let attempts = 0;
+    while (attempts < 3) {
+      attempts++;
+      try {
+        const response = await routingResult.selectedProvider.chatCompletion({
+          messages: requestMessages,
+          temperature,
+          agentContext,
+          resolvedModel,
+          timeoutMs,
+        });
+
+        // Registra latência para aprendizado do routing dinâmico
+        const latencyMs = Date.now() - startTime;
+        recordLatency(routingResult.selectedProvider.name, resolvedModel, latencyMs);
+
+        return { response, providerUsed: routingResult.selectedProvider.name };
+      } catch (error: any) {
+        const errMsg = String(error?.message || error);
+        const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit');
+        if (isRateLimit && attempts < 3) {
+          const match = errMsg.match(/try again in ([\d\.]+)s/i);
+          const waitMs = match ? Math.ceil(parseFloat(match[1]) * 1000) + 1500 : attempts * 5000;
+          await new Promise((resolve) => setTimeout(resolve, waitMs));
+          continue;
+        }
+        errorsByProvider.set(routingResult.selectedProvider.name, error);
+        break;
+      }
+    }
+  } catch (routingError: any) {
+    logger.warn(
+      { err: routingError, model: resolvedModel },
+      '[DynamicRouting] Falha no routing dinâmico, usando fallback estático',
+    );
+  }
+
+  // Fallback para cadeia estática se routing dinâmico falhar
+  logger.info(
+    { model: resolvedModel },
+    '[DynamicRouting] Usando cadeia de fallback estática',
+  );
+  return callWithFallback(resolvedModel, requestMessages, temperature, agentContext);
+}
+
+/**
  * Retorna um "chat model" mínimo compatível com o padrão `.invoke([HumanMessage])` do LangChain.
  * Ver providers/*.provider.ts para o comportamento específico de cada motor.
  */
@@ -152,11 +230,24 @@ export const getAiModel = (
 
       const requestMessages = toChatCompletionMessages(messages);
       const invokeStartedAt = Date.now();
-      const { response, providerUsed } = await callWithFallback(
+
+      // Resolve tenant tier para routing dinâmico
+      let tenantTier: string | undefined;
+      if (tenantId) {
+        try {
+          const tierResult = await tokenQuotaService.resolveOrganizationTier(tenantId);
+          tenantTier = tierResult.tier;
+        } catch {
+          // Se falhar ao resolver tier, continua sem tier (usa pesos padrão)
+        }
+      }
+
+      const { response, providerUsed } = await callWithDynamicRouting(
         effectiveModel,
         requestMessages,
         temperature,
         agentContext,
+        tenantTier,
       );
 
       const usage = response.usage;

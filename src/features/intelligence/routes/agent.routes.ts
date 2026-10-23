@@ -158,6 +158,99 @@ router.get('/evaluation-metrics', async (req: Request, res: Response, next: Next
   }
 });
 
+// Circuit Breaker - expor estado atual para observabilidade
+router.get('/circuit-breaker/state', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const { getCircuitBreakerState } = await import('../services/autonomyCircuitBreaker.service.js');
+    const state = getCircuitBreakerState(organizationId);
+    res.json({ success: true, data: state || null });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// --- MELHORIAS AVANÇADAS DO SWARM ---
+
+// Learning Heatmap - visualizar padrões aprendidos pelo LearningAgent
+router.get('/learning-heatmap', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id: tenantId, organizationId } = (req as AuthRequest).user;
+    const { generateLearningHeatmap } = await import('../services/learningHeatmap.service.js');
+    const heatmap = await generateLearningHeatmap(organizationId, tenantId);
+    res.json({ success: true, data: heatmap });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// Benchmark de Modelos - comparar performance entre Groq, OpenAI e vLLM
+router.get('/model-benchmark', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const { getFullSwarmModelBenchmark } = await import('../services/modelBenchmark.service.js');
+    const benchmark = await getFullSwarmModelBenchmark(organizationId);
+    res.json({ success: true, data: benchmark });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// Predição de Sucesso - prever probabilidade de sucesso antes de executar missão
+const successPredictionSchema = z.object({
+  agentRole: z.enum(['SDR', 'BDR', 'CLOSER', 'CRM', 'OPS', 'SUPERVISOR']),
+  missionType: z.string().trim().min(1),
+  leadId: z.string().trim().optional(),
+  leadScore: z.number().min(0).max(100).optional(),
+  leadStage: z.string().trim().optional(),
+  timeSinceLastContact: z.number().optional(),
+  previousAttempts: z.number().int().min(0).optional(),
+});
+
+router.post(
+  '/success-prediction',
+  validateRequest(successPredictionSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id: tenantId, organizationId } = (req as AuthRequest).user;
+      const body = req.body as z.infer<typeof successPredictionSchema>;
+      const { predictMissionSuccess } = await import('../services/successPrediction.service.js');
+      const prediction = await predictMissionSuccess({
+        organizationId,
+        tenantId,
+        ...body,
+      });
+      res.json({ success: true, data: prediction });
+    } catch (err: any) {
+      next(err);
+    }
+  },
+);
+
+// Alertas Proativos - verificar saúde dos agentes e criar alertas
+router.get('/proactive-alerts', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const { DEFAULT_ALERT_THRESHOLDS, checkAgentHealthAndCreateAlerts } = await import('../services/proactiveAlerts.service.js');
+    const alerts = await checkAgentHealthAndCreateAlerts(organizationId, DEFAULT_ALERT_THRESHOLDS);
+    res.json({ success: true, data: alerts });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// A/B Testing de Prompts - listar experimentos
+router.get('/prompt-ab-testing/experiments', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const { listPromptExperiments } = await import('../services/promptAbTesting.service.js');
+    const experiments = await listPromptExperiments(organizationId);
+    res.json({ success: true, data: experiments });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
 // AI-005 (onda 36): Golden Dataset real e versionado — ver goldenDataset.service.ts. Não é
 // escopado por tenant (o dataset é um fixture de QA compartilhado, não dado de produção de uma
 // organização) — só reaproveita a autenticação já aplicada em '/api/agent' pelo server.ts.

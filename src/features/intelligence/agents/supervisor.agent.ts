@@ -47,6 +47,16 @@ export interface SwarmEvent {
   reasoning?: string;
   /** Presente apenas em eventos 'routing': qual especialista está prestes a ser acionado. */
   nextAgent?: SwarmAgentKey;
+  /** Confiança do supervisor na decisão (0-1). Presente em eventos 'routing'. */
+  confidence?: number;
+  /** Modelo de IA usado para esta decisão (ex: 'gpt-oss-20b'). Presente em eventos 'routing'. */
+  modelUsed?: string;
+  /** Custo em tokens desta decisão. Presente em eventos 'routing'. */
+  tokensUsed?: number;
+  /** Se o roteamento usou fallback heurístico. Presente em eventos 'routing'. */
+  fallbackTriggered?: boolean;
+  /** Correlation ID para tracing distribuído. Presente em todos os eventos. */
+  correlationId?: string;
 }
 
 // Limite de saltos entre especialistas antes de forçar a síntese final (evita loops infinitos).
@@ -140,8 +150,25 @@ function buildEvent(
   step: number,
   reasoning?: string,
   nextAgent?: SwarmAgentKey,
+  confidence?: number,
+  modelUsed?: string,
+  tokensUsed?: number,
+  fallbackTriggered?: boolean,
+  correlationId?: string,
 ): SwarmEvent {
-  return { type, agent, content, step, reasoning, nextAgent };
+  return {
+    type,
+    agent,
+    content,
+    step,
+    reasoning,
+    nextAgent,
+    confidence,
+    modelUsed,
+    tokensUsed,
+    fallbackTriggered,
+    correlationId,
+  };
 }
 
 function toAiMessage(event: SwarmEvent): AIMessage {
@@ -305,17 +332,16 @@ Antes de usar a ferramenta de decisão estruturada de roteamento, faça uma brev
 
 ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
+  // Correlation ID para tracing distribuído - baseado em sessionId e timestamp
+  const correlationId = `swarm-${sessionId}-${Date.now()}`;
+  
   let decision: SupervisorDecision;
   const startTime = Date.now();
+  let fallbackTriggered = false;
+  let modelUsed: string | undefined;
+  let tokensUsed: number | undefined;
+  
   try {
-    // withStructuredOutput usa tool-calling nativo do provedor em vez de pedir JSON em texto
-    // livre e extrair na mão — antes, uma resposta do modelo com qualquer chave extra ou texto
-    // fora do JSON (comum em modelos pequenos como o gpt-oss-20b usado aqui) quebrava
-    // o regex de extração e o roteamento sempre caía no fallback heurístico, mesmo quando o
-    // modelo tinha decidido corretamente.
-    // withFallbacks() (buildModelWithFallback) devolve um RunnableWithFallbacks genérico, sem
-    // withStructuredOutput no tipo — mas em runtime é sempre um ChatOpenAI (com ou sem fallback
-    // amarrado), que expõe o método normalmente; o cast só repõe o que `any` já assumia aqui antes.
     const structuredModel = (getSupervisorLlm() as ChatOpenAI).withStructuredOutput(
       supervisorDecisionSchema,
       { name: 'route_decision', includeRaw: true },
@@ -329,11 +355,11 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
     const usage = raw?.usage_metadata;
     if (usage) {
+      modelUsed = raw.response_metadata?.model_name as string || 'local-llama3-fast';
+      tokensUsed = usage.total_tokens;
+      
       await logAiUsage({
-        model:
-          (raw.response_metadata?.model_name as string | undefined) ||
-          (raw.response_metadata?.model as string | undefined) ||
-          'local-llama3-fast',
+        model: modelUsed,
         usage: {
           totalTokens: usage.total_tokens,
           promptTokens: usage.input_tokens,
@@ -346,21 +372,22 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
     if (!result.parsed) {
       throw new Error('Supervisor não retornou uma decisão estruturada válida.');
     }
-    // Reaplica o schema: o tipo inferido do tool-calling trata os campos com .default() como
-    // opcionais (a volta por JSON Schema perde essa informação), então isto garante em runtime
-    // que instruction/reasoning nunca ficam undefined mesmo se o modelo omitir a chave.
     decision = supervisorDecisionSchema.parse(result.parsed);
   } catch (error: any) {
     logger.error({ err: error }, 'Swarm supervisor routing failed, using fallback heuristic');
     decision = fallbackDecision(state.completed, Boolean(state.leadId), state.mission);
+    fallbackTriggered = true;
   }
-  // Backstop determinístico: mesmo se o LLM ignorar a linha acima e escolher 'sdr' sem leadId.
+  
   decision = enforceLeadGuard(decision, state);
 
   const content =
     decision.action === 'finish'
       ? `Missão avaliada como concluída. ${decision.reasoning}`.trim()
       : `Encaminhando para ${AGENT_INFO[decision.action as SwarmAgentKey].label}: ${decision.instruction}`;
+
+  // Confidence score baseado em se usou structured output ou fallback
+  const confidence = fallbackTriggered ? 0.3 : 0.8;
 
   return {
     step,
@@ -375,6 +402,11 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
           step,
           decision.reasoning,
           decision.action === 'finish' ? undefined : decision.action,
+          confidence,
+          modelUsed,
+          tokensUsed,
+          fallbackTriggered,
+          correlationId,
         ),
       ),
     ],
