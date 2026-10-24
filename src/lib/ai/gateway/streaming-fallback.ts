@@ -16,8 +16,9 @@ import { requestContext } from '../../async-context.js';
 import { assertAiBudgetNotExceeded } from '../budget.js';
 import { tokenQuotaService } from '../finops/tokenQuota.service.js';
 import { recordAiUsageCost } from '../metrics.js';
-import { resolveFallbackTimeoutMs } from './http-client.js';
-import { resolveModelName } from './model-routing.js';
+import { isCircuitOpen, recordCircuitFailure, recordCircuitSuccess } from './circuit-breaker.js';
+import { normalizeTemperature, resolveFallbackTimeoutMs } from './http-client.js';
+import { resolveGroqModelName, resolveModelName } from './model-routing.js';
 import { toChatCompletionMessages } from './parsing.js';
 import { estimateCostUsd } from './pricing.js';
 import { readProviderError } from './redaction.js';
@@ -60,25 +61,35 @@ async function* streamWithProvider(
   resolvedModel: string,
   timeoutMs: number,
 ): AsyncGenerator<AiStreamChunk, AiStreamResult> {
+  // Verifica circuit breaker antes de tentar
+  if (await isCircuitOpen(provider.name)) {
+    throw new Error(
+      `Provedor "${provider.name}" temporariamente desativado após falhas recentes (nova tentativa em breve).`,
+    );
+  }
+
   const startedAt = Date.now();
   let firstTokenAt: number | null = null;
   let fullContent = '';
   let usage: ChatCompletionResponse['usage'];
   let modelUsed = resolvedModel;
 
-  // Determina a URL e headers baseados no provider
+  // Determina a URL, headers e model name baseados no provider
   let url: string;
   let apiKey: string;
   let includeMetadata = false;
+  let effectiveModel = resolvedModel;
 
   switch (provider.name) {
     case 'groq':
       url = 'https://api.groq.com/openai/v1/chat/completions';
       apiKey = process.env.GROQ_API_KEY!;
+      effectiveModel = resolveGroqModelName(resolvedModel);
       break;
     case 'openai':
       url = 'https://api.openai.com/v1/chat/completions';
       apiKey = process.env.OPENAI_API_KEY!;
+      effectiveModel = 'gpt-4o-mini'; // Fallback universal
       break;
     case 'litellm':
       url = `${process.env.OLLAMA_BASE_URL || process.env.LITELLM_URL}/v1/chat/completions`;
@@ -108,9 +119,9 @@ async function* streamWithProvider(
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: resolvedModel,
+        model: effectiveModel,
         messages: requestMessages,
-        temperature: config.temperature,
+        temperature: normalizeTemperature(config.temperature),
         stream: true,
         stream_options: { include_usage: true },
       }),
@@ -118,6 +129,7 @@ async function* streamWithProvider(
     });
   } catch (error: any) {
     // Erro de rede/timeout - permite fallback
+    await recordCircuitFailure(provider.name);
     throw error;
   }
 
@@ -126,13 +138,16 @@ async function* streamWithProvider(
     const isRecoverable = response.status >= 429 || response.status >= 500;
     if (isRecoverable) {
       const errorMsg = `HTTP ${response.status}: ${await readProviderError(response)}`;
+      await recordCircuitFailure(provider.name);
       throw new Error(errorMsg);
     }
     // Erro não recuperável (4xx exceto 429) - não faz fallback
+    await recordCircuitFailure(provider.name);
     throw new Error(`HTTP ${response.status}: ${await readProviderError(response)}`);
   }
 
   if (!response.body) {
+    await recordCircuitFailure(provider.name);
     throw new Error('Resposta sem body para streaming');
   }
 
@@ -181,11 +196,15 @@ async function* streamWithProvider(
   } catch (error: any) {
     // Erro durante o stream - se já emitiu pelo menos um chunk, não faz fallback
     if (firstTokenAt !== null) {
+      await recordCircuitFailure(provider.name);
       throw error;
     }
     // Se ainda não emitiu chunk, permite fallback
+    await recordCircuitFailure(provider.name);
     throw error;
   }
+
+  await recordCircuitSuccess(provider.name);
 
   const tokenUsage = {
     totalTokens: usage?.total_tokens ?? 0,
@@ -273,17 +292,22 @@ export async function* streamChatCompletionWithFallback(
       const config = { messages, modelName, temperature, agentContext };
       const stream = streamWithProvider(provider, config, effectiveModel, timeoutMs);
 
-      let result: AiStreamResult;
-      for await (const chunk of stream) {
-        yield chunk;
-        result = chunk as any; // O último valor do generator é o resultado
+      let result: AiStreamResult | undefined;
+
+      // Itera sobre o stream, yield cada chunk e captura o resultado final
+      const iterator = stream[Symbol.asyncIterator]();
+      let next = await iterator.next();
+
+      while (!next.done) {
+        yield next.value;
+        next = await iterator.next();
       }
 
-      // TypeScript não infere corretamente o tipo do return value do generator
-      // Precisamos capturar o valor final de forma diferente
-      const finalResult = await stream.next();
-      if (finalResult.done) {
-        return finalResult.value as AiStreamResult;
+      // Quando o stream termina, next.value contém o return value
+      result = next.value as AiStreamResult;
+
+      if (result) {
+        return result;
       }
 
       // Se chegou aqui, algo deu errado

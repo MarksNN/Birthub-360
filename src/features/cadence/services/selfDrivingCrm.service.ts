@@ -21,6 +21,7 @@ export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
   private mockLeadsStore = new Map<
     string,
     {
+      organizationId?: string;
       leadId: string;
       leadName: string;
       currentStage: string;
@@ -199,8 +200,10 @@ export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
     const now = new Date();
     const results: StagnantLeadAnalysis[] = [];
 
-    // Obter leads registrados para o tenant
-    const leads = Array.from(this.mockLeadsStore.values()).slice(0, limit);
+    // Obter leads registrados para o tenant com isolamento multi-tenant estrito
+    const leads = Array.from(this.mockLeadsStore.values())
+      .filter((lead) => !lead.organizationId || lead.organizationId === organizationId)
+      .slice(0, limit);
 
     for (const lead of leads) {
       const daysInactive = Math.floor(
@@ -373,8 +376,9 @@ export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
     };
   }
 
-  // Utilitário para testes e simulação
+  // Utilitário para testes e simulação com suporte a multi-tenancy
   seedLead(lead: {
+    organizationId?: string;
     leadId: string;
     leadName: string;
     currentStage: string;
@@ -382,7 +386,8 @@ export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
     hasActiveDeal: boolean;
     isWonOrLost: boolean;
   }): void {
-    this.mockLeadsStore.set(lead.leadId, lead);
+    const key = lead.organizationId ? `${lead.organizationId}:${lead.leadId}` : lead.leadId;
+    this.mockLeadsStore.set(key, lead);
   }
 
   clear(): void {

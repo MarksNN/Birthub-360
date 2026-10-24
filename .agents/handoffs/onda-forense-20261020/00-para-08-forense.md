@@ -1,7 +1,7 @@
 De:00
 Para:08
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Implementado pelo Agente 08: padronização de gates com Biome e integração contínua via CI canônico)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

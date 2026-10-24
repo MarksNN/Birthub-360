@@ -1,15 +1,22 @@
+import type { LeadStatus } from '@prisma/client';
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Ferramenta de Gestão de Pipeline para o CRM Agent do Swarm.
- * 
- * Permite consultar e atualizar estágios de leads no pipeline comercial.
+ *
+ * Permite consultar estágios reais de leads no pipeline comercial.
  */
 export const pipelineManagementTool = tool(
-  async ({ organizationId, stage, limit }) => {
+  async ({ organizationId: explicitOrgId, stage, limit }) => {
+    const organizationId = getTenantId() || explicitOrgId;
+    if (!organizationId) {
+      return JSON.stringify({ success: false, erro: 'Contexto de organização ausente' }, null, 2);
+    }
+
     try {
       logger.info({ organizationId, stage }, '[PipelineManagementTool] Consultando pipeline');
 
@@ -17,59 +24,61 @@ export const pipelineManagementTool = tool(
         where: {
           organizationId,
           funnel: 'Negocio',
-          ...(stage && { stage }),
+          ...(stage ? { status: stage as LeadStatus } : {}),
         },
         orderBy: { createdAt: 'desc' },
         take: limit || 20,
-        select: {
-          id: true,
-          fantasyName: true,
-          socialReason: true,
-          stage: true,
-          amount: true,
-          expectedCloseAt: true,
-          owner: true,
-          createdAt: true,
-          updatedAt: true,
+        include: {
+          company: { select: { tradeName: true, legalName: true, segment: true } },
+          pipelineStage: { select: { name: true, probability: true } },
         },
       });
 
-      return JSON.stringify({
-        success: true,
-        total: leads.length,
-        stage: stage || 'Todos',
-        leads: leads.map((l) => ({
-          id: l.id,
-          nome: l.fantasyName || l.socialReason,
-          estagio: l.stage,
-          valor: l.amount,
-          fechamentoPrevisto: l.expectedCloseAt,
-          responsavel: l.owner,
-          criadoEm: l.createdAt,
-          atualizadoEm: l.updatedAt,
-        })),
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: true,
+          total: leads.length,
+          stage: stage || 'Todos',
+          leads: leads.map((l) => ({
+            id: l.id,
+            nome: l.company?.tradeName || l.company?.legalName || 'Sem empresa vinculada',
+            segmento: l.company?.segment || null,
+            estagio: l.pipelineStage?.name || l.status,
+            statusOficial: l.status,
+            valor: l.amount ? Number(l.amount) : 0,
+            probabilidade: l.probability ?? l.pipelineStage?.probability ?? null,
+            fechamentoPrevisto: l.expectedCloseAt,
+            responsavel: l.owner,
+            criadoEm: l.createdAt,
+            atualizadoEm: l.updatedAt,
+          })),
+        },
+        null,
+        2,
+      );
     } catch (error: any) {
       logger.error({ err: error }, '[PipelineManagementTool] Erro ao consultar pipeline');
-      return JSON.stringify({
-        success: false,
-        erro: error.message || 'Falha ao consultar pipeline',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message || 'Falha ao consultar pipeline',
+        },
+        null,
+        2,
+      );
     }
   },
   {
     name: 'pipeline_management',
-    description: `Consulta leads no pipeline comercial (funil "Negócio").
+    description: `Consulta leads no pipeline comercial (funil "Negocio").
     
     Parâmetros:
-    - organizationId: ID da organização
-    - stage: Estágio específico para filtrar (opcional)
+    - stage: Status/estágio específico para filtrar (opcional, ex: Em_Negociacao, Proposta_Enviada, Reuniao_Agendada)
     - limit: Limite de resultados (padrão: 20)
-    
-    Retorna lista de leads com estágio, valor, fechamento previsto e responsável.`,
+    - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
-      organizationId: z.string().describe('ID da organização'),
-      stage: z.string().optional().describe('Estágio específico para filtrar (opcional)'),
+      organizationId: z.string().optional().describe('ID da organização (opcional)'),
+      stage: z.string().optional().describe('Status específico para filtrar (opcional)'),
       limit: z.number().optional().describe('Limite de resultados (padrão: 20)'),
     }),
   },
@@ -77,11 +86,16 @@ export const pipelineManagementTool = tool(
 
 /**
  * Ferramenta de Forecast para o CRM Agent do Swarm.
- * 
- * Calcula forecast ponderado baseado em probabilidade de estágio.
+ *
+ * Calcula forecast ponderado baseado em probabilidade de estágio real no banco.
  */
 export const forecastTool = tool(
-  async ({ organizationId }) => {
+  async ({ organizationId: explicitOrgId }) => {
+    const organizationId = getTenantId() || explicitOrgId;
+    if (!organizationId) {
+      return JSON.stringify({ success: false, erro: 'Contexto de organização ausente' }, null, 2);
+    }
+
     try {
       logger.info({ organizationId }, '[ForecastTool] Calculando forecast');
 
@@ -89,10 +103,10 @@ export const forecastTool = tool(
         where: {
           organizationId,
           funnel: 'Negocio',
-          stage: { notIn: ['Perdido', 'Ganho'] },
+          status: { notIn: ['Negocios_Perdidos', 'Negocios_Ganhos', 'Lead_Desqualificado'] },
         },
         include: {
-          crmPipelineStage: true,
+          pipelineStage: true,
         },
       });
 
@@ -100,102 +114,142 @@ export const forecastTool = tool(
       const byStage: Record<string, { count: number; total: number; weighted: number }> = {};
 
       for (const lead of leads) {
-        const probability = lead.crmPipelineStage?.probability || 50;
-        const weighted = (lead.amount || 0) * (probability / 100);
+        const probability = lead.probability ?? lead.pipelineStage?.probability ?? 50;
+        const amountNum = lead.amount ? Number(lead.amount) : 0;
+        const weighted = amountNum * (probability / 100);
         weightedTotal += weighted;
 
-        const stage = lead.stage || 'Sem estágio';
+        const stage = lead.pipelineStage?.name || lead.status || 'Sem estágio';
         if (!byStage[stage]) {
           byStage[stage] = { count: 0, total: 0, weighted: 0 };
         }
         byStage[stage].count++;
-        byStage[stage].total += lead.amount || 0;
+        byStage[stage].total += amountNum;
         byStage[stage].weighted += weighted;
       }
 
-      return JSON.stringify({
-        success: true,
-        forecastPonderado: weightedTotal,
-        totalLeads: leads.length,
-        porEstagio: byStage,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: true,
+          forecastPonderado: Math.round(weightedTotal * 100) / 100,
+          totalLeads: leads.length,
+          porEstagio: byStage,
+        },
+        null,
+        2,
+      );
     } catch (error: any) {
       logger.error({ err: error }, '[ForecastTool] Erro ao calcular forecast');
-      return JSON.stringify({
-        success: false,
-        erro: error.message || 'Falha ao calcular forecast',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message || 'Falha ao calcular forecast',
+        },
+        null,
+        2,
+      );
     }
   },
   {
     name: 'forecast',
-    description: `Calcula forecast ponderado do pipeline comercial.
+    description: `Calcula forecast ponderado real do pipeline comercial.
     
     Parâmetros:
-    - organizationId: ID da organização
-    
-    Retorna forecast ponderado baseado na probabilidade de cada estágio.`,
+    - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
-      organizationId: z.string().describe('ID da organização'),
+      organizationId: z.string().optional().describe('ID da organização (opcional)'),
     }),
   },
 );
 
 /**
- * Ferramenta de Cadência de Outbound para o Ops Agent do Swarm.
- * 
- * Cria/executa cadências de follow-up (email, WhatsApp, LinkedIn).
+ * Ferramenta de Cadência de Outbound para o Ops/BDR/SDR Agent do Swarm.
+ *
+ * Registra uma ação real em AIPendingAction para aprovação/execução na fila de cadência.
  */
 export const cadenceTool = tool(
-  async ({ leadId, organizationId, canal, mensagem }) => {
+  async ({ leadId, organizationId: explicitOrgId, canal, mensagem }) => {
+    const organizationId = getTenantId() || explicitOrgId;
+    if (!organizationId) {
+      return JSON.stringify({ success: false, erro: 'Contexto de organização ausente' }, null, 2);
+    }
+
     try {
       logger.info({ leadId, organizationId, canal }, '[CadenceTool] Criando ação de cadência');
 
-      // Verificar se o lead existe
       const lead = await prisma.lead.findFirst({
         where: { id: leadId, organizationId },
+        include: { company: { select: { tradeName: true } }, contact: { select: { name: true, email: true, phone: true, whatsapp: true } } },
       });
 
       if (!lead) {
-        return JSON.stringify({
-          success: false,
-          erro: 'Lead não encontrado',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            success: false,
+            erro: 'Lead não encontrado nesta organização',
+          },
+          null,
+          2,
+        );
       }
 
-      // Registrar ação de cadência (para aprovação se necessário)
-      // Em produção, isso integraria com o módulo cadence existente
-      return JSON.stringify({
-        success: true,
-        mensagem: 'Ação de cadência registrada para aprovação/execução',
-        leadId,
-        canal,
-        mensagem,
-        nota: 'Esta ação requer aprovação humana antes de execução real',
-      }, null, 2);
+      const pendingAction = await prisma.aIPendingAction.create({
+        data: {
+          organizationId,
+          entity: 'Lead',
+          action: 'CADENCE_TOUCH',
+          agentRole: 'OPS',
+          riskLevel: 'medium',
+          payload: {
+            leadId,
+            companyName: lead.company?.tradeName ?? null,
+            contactName: lead.contact?.name ?? null,
+            channel: canal,
+            message: mensagem,
+          },
+        },
+      });
+
+      return JSON.stringify(
+        {
+          success: true,
+          pendingActionId: pendingAction.id,
+          mensagem: 'Ação de cadência persistida em AIPendingAction para aprovação/execução',
+          leadId,
+          canal,
+          conteudo: mensagem,
+          nota: 'Esta ação aguarda aprovação humana na fila de Autonomia Comercial antes do disparo externo.',
+        },
+        null,
+        2,
+      );
     } catch (error: any) {
       logger.error({ err: error }, '[CadenceTool] Erro ao criar cadência');
-      return JSON.stringify({
-        success: false,
-        erro: error.message || 'Falha ao criar cadência',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message || 'Falha ao criar cadência',
+        },
+        null,
+        2,
+      );
     }
   },
   {
     name: 'cadence',
-    description: `Cria uma ação de cadência de follow-up para um lead.
+    description: `Registra uma ação real de cadência de follow-up (email, whatsapp, linkedin, telegram, sms) em AIPendingAction para um lead.
     
     Parâmetros:
     - leadId: ID do lead
-    - organizationId: ID da organização
-    - canal: Canal de comunicação (email, whatsapp, linkedin)
+    - canal: Canal de comunicação (email, whatsapp, linkedin, telegram, sms)
     - mensagem: Conteúdo da mensagem
-    
-    Retorna confirmação da ação criada (requer aprovação antes de execução).`,
+    - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
       leadId: z.string().describe('ID do lead'),
-      organizationId: z.string().describe('ID da organização'),
-      canal: z.enum(['email', 'whatsapp', 'linkedin']).describe('Canal de comunicação'),
+      organizationId: z.string().optional().describe('ID da organização (opcional)'),
+      canal: z
+        .enum(['email', 'whatsapp', 'linkedin', 'telegram', 'sms'])
+        .describe('Canal de comunicação'),
       mensagem: z.string().describe('Conteúdo da mensagem'),
     }),
   },

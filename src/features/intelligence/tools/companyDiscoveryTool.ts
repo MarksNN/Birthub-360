@@ -1,5 +1,6 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { discoverCandidates } from '../../prospecting/services/prospecting/discovery.js';
 import type { ProspectCriteria } from '../../prospecting/domain/prospectTypes.js';
@@ -46,7 +47,8 @@ export const companyDiscoveryTool = tool(
       if (faturamentoMin) criteria.faturamentoMin = faturamentoMin / 5;
       if (faturamentoMax) criteria.faturamentoMax = faturamentoMax / 5;
 
-      const result = await discoverCandidates(criteria);
+      const organizationId = getTenantId();
+      const result = await discoverCandidates(criteria, organizationId);
 
       logger.info(
         { candidatesCount: result.candidates.length, sources: result.sources },

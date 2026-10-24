@@ -1,7 +1,7 @@
 De:00
 Para:21
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Integrado via PR #35 / Onda 0 - ConsentAuditRecord append-only e trigger de imutabilidade)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

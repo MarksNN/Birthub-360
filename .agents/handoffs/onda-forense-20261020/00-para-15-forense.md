@@ -1,7 +1,7 @@
 De:00
 Para:15
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Integrado via PR #41 / Onda 0 - dbRoleCheck fatal fail-fast e testes de segurança)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

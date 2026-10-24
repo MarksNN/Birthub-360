@@ -11,6 +11,12 @@ import { searchPlaybookTool } from '../tools/playbookTool.js';
 import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 import { cadenceTool } from '../tools/commercialTools.js';
 import { slackNotificationTool } from '../tools/integrationTools.js';
+import { cnpjLookupTool, multiCrmSyncTool } from '../tools/integrationTools.js';
+import { universalMeetingsTool } from '../tools/universalMeetingsTool.js';
+import { universalMessagingTool } from '../tools/universalMessagingTool.js';
+import { universalNotificationsTool } from '../tools/universalNotificationsTool.js';
+import { universalOfficeDocsTool } from '../tools/universalOfficeDocsTool.js';
+import { universalTasksAndNotesTool } from '../tools/universalTasksAndNotesTool.js';
 // GOV-13: as duas ferramentas de execução (`create_follow_up_task`/`notify_team`) agora vêm de
 // `opsPendingActions.tool.ts`, não mais de `../tools/opsTools.js` — mesmo nome/schema visível ao
 // LLM, mas em vez de executar direto elas registram uma `AIPendingAction` e a execução real só
@@ -39,6 +45,13 @@ const tools = [
   notifyTeamTool,
   cadenceTool,
   slackNotificationTool,
+  cnpjLookupTool,
+  multiCrmSyncTool,
+  universalMessagingTool,
+  universalTasksAndNotesTool,
+  universalMeetingsTool,
+  universalOfficeDocsTool,
+  universalNotificationsTool,
 ];
 const toolNode = new ToolNode(tools as any);
 

@@ -93,8 +93,8 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
     const { searchPlaybookTool } = await import('../tools/playbookTool.js');
     const { getObjectionBattlecardTool } = await import('../tools/battlecardTool.js');
     const { checkDealHealthTool } = await import('../tools/dealHealthTool.js');
-    const { proposalTool } = await import('../tools/advancedCommercialTools.js');
     const { inspectContractReadinessTool } = await import('../tools/contractInspectionTool.js');
+    const { getToolsForSwarmRole } = await import('../tools/capabilityToolRegistry.js');
 
     const result = await this.runWithTools(
       inputData,
@@ -105,6 +105,7 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
         getObjectionBattlecardTool,
         checkDealHealthTool,
         inspectContractReadinessTool,
+        ...getToolsForSwarmRole('closer'),
       ],
       sessionId,
     );

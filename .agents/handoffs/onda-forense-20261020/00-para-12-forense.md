@@ -1,7 +1,7 @@
 De:00
 Para:12
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Implementado pelo Agente 12: billing com clamp UTC de datas e hardening do dialer aprovado no PR #688)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

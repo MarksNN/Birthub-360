@@ -17,7 +17,8 @@
  *   gateway/providers/*          — um adapter por provedor (Groq, OpenAI, LiteLLM/Ollama), forma uniforme
  *   gateway/embeddings.ts        — geração de embeddings (local por padrão, LiteLLM como legado)
  *   gateway/chat-model.ts        — orquestra orçamento → cadeia de fallback de provedores → custo/trace
- *   gateway/streaming.ts         — streaming de tokens (só Groq, sem fallback no meio do stream)
+ *   gateway/streaming.ts         — streaming de tokens (com fallback entre provedores antes do primeiro chunk)
+ *   gateway/streaming-fallback.ts — implementação de fallback para streaming
  *   gateway/prompt-registry.ts   — catálogo dos promptId usados em ../usage-log.ts
  *   gateway/prompt-safety.ts     — delimitador estrutural para conteúdo externo/não confiável
  *                                  interpolado num prompt (defesa contra prompt injection)

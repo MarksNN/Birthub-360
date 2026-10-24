@@ -1,7 +1,7 @@
 De:00
 Para:09
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Implementado pelo Agente 09: sincronização de rotas ativas e deep links no MainActivity.java)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

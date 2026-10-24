@@ -1,7 +1,7 @@
 De:00
 Para:16
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Integrado via PR #34 / Onda 0 - DomainEventOutbox e DomainEventConsumption)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

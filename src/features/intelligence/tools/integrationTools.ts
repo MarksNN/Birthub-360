@@ -1,114 +1,217 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import { queueLeadPushToBitrix } from '../../../lib/queue/bitrixOutbound.queue.js';
+import { ExternalCrmService } from '../../integrations/shared/ExternalCrmService.js';
+import { sendSlackMessage } from '../../integrations/slack/slack.service.js';
 
 /**
- * Ferramenta de Slack para enviar notificações do swarm.
+ * Ferramenta de Slack segura (usa sendSlackMessage com proteção SSRF e BotToken/Webhook).
  */
 export const slackNotificationTool = tool(
-  async ({ organizationId, channel, message }) => {
+  async ({ organizationId: explicitOrgId, channel, message }) => {
+    const organizationId = getTenantId() || explicitOrgId;
+    if (!organizationId) {
+      return JSON.stringify({ success: false, erro: 'Contexto de organização ausente' }, null, 2);
+    }
+
     try {
       logger.info({ organizationId, channel }, '[SlackTool] Enviando notificação');
 
       const connection = await prisma.slackConnection.findFirst({
         where: { organizationId },
+        orderBy: { createdAt: 'desc' },
       });
 
-      if (!connection || !connection.webhookUrl) {
-        return JSON.stringify({
-          success: false,
-          erro: 'Conexão Slack não configurada',
-        }, null, 2);
+      if (!connection) {
+        return JSON.stringify(
+          {
+            success: false,
+            erro: 'Nenhuma conexão Slack configurada para esta organização.',
+          },
+          null,
+          2,
+        );
       }
 
-      const response = await fetch(connection.webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: message,
-          channel: channel || connection.defaultChannel || '#general',
-        }),
-      });
+      const result = await sendSlackMessage(organizationId, connection.id, message, channel);
 
-      if (!response.ok) {
-        throw new Error(`Slack API error: ${response.status}`);
-      }
-
-      return JSON.stringify({
-        success: true,
-        mensagem: 'Notificação enviada para Slack',
-        channel: channel || connection.defaultChannel,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: true,
+          mensagem: 'Notificação enviada para Slack com sucesso',
+          channel: result.channel || connection.defaultChannel,
+          messageId: result.messageId,
+          timestamp: result.timestamp,
+        },
+        null,
+        2,
+      );
     } catch (error: any) {
       logger.error({ err: error }, '[SlackTool] Erro ao enviar notificação');
-      return JSON.stringify({
-        success: false,
-        erro: error.message,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message,
+        },
+        null,
+        2,
+      );
     }
   },
   {
     name: 'slack_notification',
-    description: `Envia notificação para canal do Slack.
+    description: `Envia notificação real para canal do Slack da organização (suporta Webhook e Bot Token).
     
     Parâmetros:
-    - organizationId: ID da organização
+    - message: Mensagem a enviar
     - channel: Canal do Slack (opcional, usa default se não informado)
-    - message: Mensagem a enviar`,
+    - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
-      organizationId: z.string().describe('ID da organização'),
-      channel: z.string().optional().describe('Canal do Slack'),
+      organizationId: z.string().optional().describe('ID da organização (opcional)'),
+      channel: z.string().optional().describe('Canal do Slack (opcional)'),
       message: z.string().describe('Mensagem a enviar'),
     }),
   },
 );
 
 /**
- * Ferramenta de Pipedrive para sincronizar com CRM externo.
+ * Ferramenta Universal de Sincronização Multi-CRM (Bitrix24, HubSpot, Pipedrive, RD Station, Monday, Omie).
+ * Mantém também o export `pipedriveSyncTool` por retrocompatibilidade.
  */
-export const pipedriveSyncTool = tool(
-  async ({ organizationId, leadId, action }) => {
+export const multiCrmSyncTool = tool(
+  async ({ organizationId: explicitOrgId, leadId, provider, action }) => {
+    const organizationId = getTenantId() || explicitOrgId;
+    if (!organizationId) {
+      return JSON.stringify({ success: false, erro: 'Contexto de organização ausente' }, null, 2);
+    }
+
     try {
-      logger.info({ organizationId, leadId, action }, '[PipedriveTool] Sincronizando');
+      logger.info({ organizationId, leadId, provider, action }, '[MultiCrmSyncTool] Sincronizando CRM');
 
-      const connection = await prisma.pipedriveConnection.findFirst({
-        where: { organizationId },
-      });
+      if (action === 'list_connections') {
+        const [externalConnections, bitrixConnections, omieConnections] = await Promise.all([
+          ExternalCrmService.listConnections(organizationId),
+          prisma.bitrixConnection.findMany({
+            where: { organizationId },
+            select: { id: true, label: true, lastImportedAt: true, inboundEventsEnabled: true },
+          }),
+          prisma.omieConnection.findMany({
+            where: { organizationId },
+            select: { id: true, label: true, createdAt: true },
+          }),
+        ]);
 
-      if (!connection) {
-        return JSON.stringify({
-          success: false,
-          erro: 'Conexão Pipedrive não configurada',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            success: true,
+            conexoesAtivas: {
+              bitrix24: bitrixConnections,
+              crmsExternos: externalConnections,
+              omieErp: omieConnections,
+              provedoresSuportados: ['bitrix24', 'hubspot', 'pipedrive', 'rdstation', 'monday', 'omie'],
+            },
+          },
+          null,
+          2,
+        );
       }
 
-      // Em produção, chamaria a API real do Pipedrive
-      return JSON.stringify({
-        success: true,
-        mensagem: `Ação ${action} registrada para sincronização com Pipedrive`,
-        nota: 'Sincronização real requer implementação de API Pipedrive',
-      }, null, 2);
+      if (!leadId) {
+        return JSON.stringify(
+          { success: false, erro: 'leadId é obrigatório para sincronizar um lead.' },
+          null,
+          2,
+        );
+      }
+
+      const lead = await prisma.lead.findFirst({
+        where: { id: leadId, organizationId },
+        include: { company: true, pipelineStage: true },
+      });
+
+      if (!lead) {
+        return JSON.stringify({ success: false, erro: 'Lead não encontrado no CRM interno.' }, null, 2);
+      }
+
+      const targetProvider = (provider || 'all').toLowerCase();
+      const syncSummary: Record<string, unknown> = {};
+
+      if (targetProvider === 'all' || targetProvider === 'bitrix24' || targetProvider === 'bitrix') {
+        const bitrixCount = await prisma.bitrixConnection.count({ where: { organizationId } });
+        if (bitrixCount > 0) {
+          await queueLeadPushToBitrix(organizationId, lead.id);
+          syncSummary.bitrix24 = 'Enfileirado para sincronização outbound com Bitrix24';
+        } else {
+          syncSummary.bitrix24 = 'Nenhuma conexão Bitrix24 ativa';
+        }
+      }
+
+      if (
+        targetProvider === 'all' ||
+        ['hubspot', 'pipedrive', 'rdstation', 'monday'].includes(targetProvider)
+      ) {
+        const pushResults = await ExternalCrmService.pushLeadToAllConnections(
+          organizationId,
+          lead.id,
+          {
+            name: lead.company?.tradeName || lead.company?.legalName || `Lead ${lead.id}`,
+            amount: lead.amount ? Number(lead.amount) : undefined,
+            stageLabel: lead.pipelineStage?.name || lead.status,
+          },
+        );
+        syncSummary.externalCrms = pushResults.map((r) =>
+          r.status === 'fulfilled' ? r.value : { status: 'rejected', reason: String(r.reason) },
+        );
+      }
+
+      return JSON.stringify(
+        {
+          success: true,
+          leadId: lead.id,
+          empresa: lead.company?.tradeName || lead.company?.legalName,
+          action,
+          provider: targetProvider,
+          resultadoSincronizacao: syncSummary,
+        },
+        null,
+        2,
+      );
     } catch (error: any) {
-      logger.error({ err: error }, '[PipedriveTool] Erro na sincronização');
-      return JSON.stringify({
-        success: false,
-        erro: error.message,
-      }, null, 2);
+      logger.error({ err: error }, '[MultiCrmSyncTool] Erro na sincronização');
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message,
+        },
+        null,
+        2,
+      );
     }
   },
   {
     name: 'pipedrive_sync',
-    description: `Sincroniza lead com Pipedrive CRM.
+    description: `Sincroniza leads ou lista conexões em múltiplos CRMs corporativos (Bitrix24, HubSpot, Pipedrive, RD Station, Monday.com e Omie ERP).
     
     Parâmetros:
-    - organizationId: ID da organização
-    - leadId: ID do lead
-    - action: Ação (create, update, delete)`,
+    - action: 'create' | 'update' | 'delete' | 'list_connections'
+    - leadId: ID do lead no CRM (obrigatório para create/update)
+    - provider: 'all' | 'bitrix24' | 'hubspot' | 'pipedrive' | 'rdstation' | 'monday' (opcional, padrão: 'all')
+    - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
-      organizationId: z.string().describe('ID da organização'),
-      leadId: z.string().describe('ID do lead'),
-      action: z.enum(['create', 'update', 'delete']).describe('Ação'),
+      organizationId: z.string().optional().describe('ID da organização (opcional)'),
+      leadId: z.string().optional().describe('ID do lead (obrigatório para create/update)'),
+      provider: z
+        .enum(['all', 'bitrix24', 'hubspot', 'pipedrive', 'rdstation', 'monday'])
+        .optional()
+        .describe('Provedor de CRM alvo (padrão: all)'),
+      action: z
+        .enum(['create', 'update', 'delete', 'list_connections'])
+        .describe('Ação a executar'),
     }),
   },
 );
+
+export const pipedriveSyncTool = multiCrmSyncTool;

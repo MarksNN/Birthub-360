@@ -1,28 +1,23 @@
 /**
- * Streaming real de tokens — só Groq (rota principal hoje), sem retry/fallback entre provedores
- * no meio do stream: uma vez que o primeiro chunk já foi entregue ao chamador, trocar de provedor
- * significaria reiniciar a resposta do zero de forma visível para quem já está lendo o texto
- * parcial. Se Groq não estiver configurado, com o circuito aberto, ou falhar antes do primeiro
- * chunk, lança — o chamador deve cair para `getAiModel(...).invoke()` (sem streaming) nesse caso,
- * igual ao comportamento de hoje.
+ * Streaming real de tokens — com fallback entre provedores antes do primeiro chunk.
+ *
+ * Tenta Groq primeiro. Se falhar antes do primeiro chunk com erro recuperável (429, 5xx, timeout),
+ * tenta o próximo provedor na cadeia (OpenAI, LiteLLM, etc.). Quando ocorre fallback, emite uma
+ * mensagem "Mudando para provedor mais rápido..." para informar o usuário.
+ *
+ * Uma vez que o primeiro chunk foi entregue ao chamador, não há mais fallback no meio do stream:
+ * trocar de provedor significaria reiniciar a resposta do zero de forma visível para quem já está
+ * lendo o texto parcial.
+ *
+ * Se todos os provedores falharem ou não estiverem configurados, lança — o chamador deve cair para
+ * `getAiModel(...).invoke()` (sem streaming) nesse caso.
  *
  * Usado só onde a saída é texto livre (Chatbook, Relatórios IA) — nunca para JSON estruturado
  * (`invokeStructured`), que depende de ler a resposta inteira para validar/reparar o formato.
  */
 import type { BaseMessage } from '@langchain/core/messages';
-import { requestContext } from '../../async-context.js';
-import { assertAiBudgetNotExceeded } from '../budget.js';
-import { tokenQuotaService } from '../finops/tokenQuota.service.js';
-import { recordAiUsageCost } from '../metrics.js';
-import { isCircuitOpen, recordCircuitFailure, recordCircuitSuccess } from './circuit-breaker.js';
-import { normalizeTemperature, resolveFallbackTimeoutMs } from './http-client.js';
-import { resolveGroqModelName, resolveModelName } from './model-routing.js';
-import { toChatCompletionMessages } from './parsing.js';
-import { estimateCostUsd } from './pricing.js';
-import { readProviderError } from './redaction.js';
-import { traceAiGeneration } from './telemetry.js';
-import { groqTelemetryService } from './groqTelemetry.service.js';
-import type { AiStreamChunk, AiStreamResult, ChatCompletionResponse } from './types.js';
+import { streamChatCompletionWithFallback } from './streaming-fallback.js';
+import type { AiStreamChunk, AiStreamResult } from './types.js';
 
 export async function* streamChatCompletion(
   messages: BaseMessage[],
@@ -30,162 +25,6 @@ export async function* streamChatCompletion(
   temperature: number,
   agentContext: string,
 ): AsyncGenerator<AiStreamChunk, AiStreamResult> {
-  await assertAiBudgetNotExceeded();
-
-  const resolvedModel = resolveModelName(modelName);
-  let effectiveModel = resolvedModel;
-  const tenantId = requestContext.getStore()?.tenantId;
-  if (tenantId) {
-    const quotaDecision = await tokenQuotaService.enforceTokenQuota({
-      organizationId: tenantId,
-      requestedModel: resolvedModel,
-    });
-    if (quotaDecision.effectiveModel && quotaDecision.effectiveModel !== resolvedModel) {
-      effectiveModel = resolveModelName(quotaDecision.effectiveModel);
-    }
-  }
-
-  if (!process.env.GROQ_API_KEY) {
-    throw new Error('Streaming de IA requer GROQ_API_KEY configurada.');
-  }
-  if (await isCircuitOpen('groq')) {
-    throw new Error(
-      'Provedor "groq" temporariamente desativado após falhas recentes (nova tentativa em breve).',
-    );
-  }
-
-  const groqModel = resolveGroqModelName(effectiveModel);
-  const requestMessages = toChatCompletionMessages(messages);
-  const timeoutMs = resolveFallbackTimeoutMs();
-  const startedAt = Date.now();
-  let firstTokenAt: number | null = null;
-
-  let response: Response;
-  try {
-    response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: groqModel,
-        messages: requestMessages,
-        temperature: normalizeTemperature(temperature),
-        stream: true,
-        stream_options: { include_usage: true },
-      }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-  } catch (error: any) {
-    await recordCircuitFailure('groq');
-    throw error;
-  }
-
-  if (!response.ok || !response.body) {
-    await recordCircuitFailure('groq');
-    throw new Error(`HTTP ${response.status}: ${await readProviderError(response)}`);
-  }
-
-  interface StreamChunkPayload {
-    model?: string;
-    choices?: Array<{ delta?: { content?: string } }>;
-    usage?: ChatCompletionResponse['usage'];
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder('utf-8');
-  let lineBuffer = '';
-  let fullContent = '';
-  let usage: ChatCompletionResponse['usage'];
-  let modelUsed = groqModel;
-
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      lineBuffer += decoder.decode(value, { stream: true });
-      const lines = lineBuffer.split('\n');
-      lineBuffer = lines.pop() || '';
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed.startsWith('data:')) continue;
-        const dataStr = trimmed.slice(5).trim();
-        if (!dataStr || dataStr === '[DONE]') continue;
-
-        let parsed: StreamChunkPayload;
-        try {
-          parsed = JSON.parse(dataStr) as StreamChunkPayload;
-        } catch {
-          continue;
-        }
-        if (parsed.model) modelUsed = parsed.model;
-        if (parsed.usage) usage = parsed.usage;
-        const delta = parsed.choices?.[0]?.delta?.content;
-        if (delta) {
-          if (firstTokenAt === null) {
-            firstTokenAt = Date.now();
-          }
-          fullContent += delta;
-          yield { delta };
-        }
-      }
-    }
-  } catch (error: any) {
-    await recordCircuitFailure('groq');
-    throw error;
-  }
-
-  await recordCircuitSuccess('groq');
-
-  const tokenUsage = {
-    totalTokens: usage?.total_tokens ?? 0,
-    promptTokens: usage?.prompt_tokens ?? 0,
-    completionTokens: usage?.completion_tokens ?? 0,
-  };
-  const estimatedCost = estimateCostUsd(modelUsed, tokenUsage);
-  const ttftMs = firstTokenAt ? firstTokenAt - startedAt : Date.now() - startedAt;
-  const latencyMs = Date.now() - startedAt;
-
-  recordAiUsageCost('groq', requestContext.getStore()?.tenantId, estimatedCost);
-
-  if (usage?.total_tokens) {
-    tokenQuotaService
-      .recordUsage({
-        organizationId: requestContext.getStore()?.tenantId,
-        model: modelUsed,
-        tokens: usage.total_tokens,
-      })
-      .catch(() => {});
-  }
-
-  groqTelemetryService.recordGroqCall({
-    model: modelUsed,
-    ttftMs,
-    latencyMs,
-    usage: tokenUsage,
-    costUsd: estimatedCost,
-    organizationId: requestContext.getStore()?.tenantId ?? null,
-  });
-
-  traceAiGeneration({
-    provider: 'groq',
-    model: modelUsed,
-    agentContext,
-    temperature,
-    input: requestMessages,
-    output: fullContent,
-    usage,
-    startedAt,
-  });
-
-  return {
-    model: modelUsed,
-    usage: {
-      totalTokens: usage?.total_tokens ?? 0,
-      promptTokens: usage?.prompt_tokens ?? 0,
-      completionTokens: usage?.completion_tokens ?? 0,
-    },
-  };
+  // Usa a implementação com fallback entre provedores
+  yield* streamChatCompletionWithFallback(messages, modelName, temperature, agentContext);
 }

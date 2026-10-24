@@ -1,8 +1,8 @@
 De:00
 Para:17
 Onda:forense20261020
-Status:aberto
-Prioridade:alto
+Status: resolvido (Implementado pelo Agente 17: isolamento multi-tenant por organizationId em mockLeadsStore, seedLead e detectStagnatedLeads)
+Prioridade: alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00
 

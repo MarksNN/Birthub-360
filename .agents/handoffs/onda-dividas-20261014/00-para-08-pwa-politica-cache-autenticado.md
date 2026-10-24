@@ -1,7 +1,7 @@
 De: 00 — Coordenador
 Para: 08 — QA e Release
 Onda: onda-dividas-20261014
-Status: aberto
+Status: resolvido (APROVADO pelo Agente 24 em .agents/reviews/24-liquidacao-geral-dividas-e-forense-20261023.md)
 Prioridade: alto
 Bloqueador-ref: DEBT-20261014-UX-001
 Sprint destino: Saneamento Onda 01

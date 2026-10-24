@@ -1,51 +1,82 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import { enrichCompany } from '../../prospecting/services/enrichment.service.js';
 import { CommercialAIService } from '../services/CommercialAIService.js';
 
 /**
- * Ferramenta de Enriquecimento de Leads para o SDR do Swarm.
- * 
- * Usa o CommercialAIService existente para:
+ * Ferramenta de Enriquecimento de Leads para o SDR/BDR do Swarm e Agentes Autônomos.
+ *
+ * Usa o pipeline real de enriquecimento (BrasilAPI/Receita Federal, Apollo, Hunter, GDELT)
+ * quando solicitado (`runExternalProviders: true`) e o CommercialAIService para:
  * - Lead Score (aderência ao ICP)
  * - Análise SWOT
  * - Matrizes BANT e GPCT
  * - Matriz de objeções prováveis
  */
 export const leadEnrichmentTool = tool(
-  async ({ leadId, organizationId }) => {
+  async ({ leadId, organizationId: explicitOrgId, runExternalProviders }) => {
+    const organizationId = getTenantId() || explicitOrgId;
+    if (!organizationId) {
+      return JSON.stringify(
+        {
+          success: false,
+          erro: 'Contexto de organização (tenant) ausente.',
+        },
+        null,
+        2,
+      );
+    }
+
     try {
       logger.info({ leadId, organizationId }, '[LeadEnrichmentTool] Iniciando enriquecimento');
 
-      // Buscar lead no CRM
       const lead = await prisma.lead.findFirst({
         where: { id: leadId, organizationId },
         include: {
-          customFields: true,
+          company: true,
+          contact: true,
         },
       });
 
       if (!lead) {
-        return JSON.stringify({
-          success: false,
-          erro: 'Lead não encontrado',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            success: false,
+            erro: 'Lead não encontrado nesta organização',
+          },
+          null,
+          2,
+        );
       }
 
-      // Converter para formato esperado pelo CommercialAIService
+      let externalEnrichmentResult: unknown = null;
+      if (runExternalProviders && lead.companyId) {
+        try {
+          externalEnrichmentResult = await enrichCompany(organizationId, lead.companyId);
+        } catch (enrichErr: any) {
+          logger.warn(
+            { err: enrichErr, leadId, companyId: lead.companyId },
+            '[LeadEnrichmentTool] Enriquecimento externo parcial/indisponível; seguindo com dados atuais do CRM',
+          );
+        }
+      }
+
+      const company = lead.company;
       const enrichedLead = {
-        fantasyName: lead.fantasyName || lead.socialReason,
-        socialReason: lead.socialReason,
-        cnaeMain: lead.cnae || null,
-        size: lead.size || null,
-        cadastralSituation: lead.situacaoCadastral || null,
-        city: lead.city || null,
-        state: lead.state || null,
-        employeesCount: lead.employeesCount || null,
-        estimatedRevenue: lead.estimatedRevenue || null,
-        technologies: lead.technologies || [],
-        description: lead.description || null,
+        fantasyName: company?.tradeName || company?.legalName || 'Empresa sem nome',
+        socialReason: company?.legalName || company?.tradeName || 'Empresa sem razão social',
+        cnaeMain: company?.cnae || undefined,
+        size: company?.size || undefined,
+        cadastralSituation: company?.situacaoCadastral || undefined,
+        city: company?.city || undefined,
+        state: company?.state || undefined,
+        employeesCount: company?.employeeCount || undefined,
+        estimatedRevenue: company?.estimatedRevenue || undefined,
+        technologies: company?.technologies || [],
+        description: company?.observations || lead.observations || undefined,
       };
 
       const commercialAI = new CommercialAIService();
@@ -59,44 +90,63 @@ export const leadEnrichmentTool = tool(
 
       logger.info({ leadId, score }, '[LeadEnrichmentTool] Enriquecimento concluído');
 
-      return JSON.stringify({
-        success: true,
-        leadId,
-        leadScore: score,
-        swot,
-        qualifications,
-        objections,
-        dadosOriginais: {
-          nome: lead.fantasyName || lead.socialReason,
-          segmento: lead.segment,
-          porte: lead.size,
-          localizacao: [lead.city, lead.state].filter(Boolean).join(', '),
+      return JSON.stringify(
+        {
+          success: true,
+          leadId,
+          companyId: lead.companyId,
+          leadScore: score,
+          swot,
+          qualifications,
+          objections,
+          externalEnrichmentTriggered: Boolean(externalEnrichmentResult),
+          dadosOriginais: {
+            nome: company?.tradeName || company?.legalName || null,
+            cnpj: company?.cnpj || null,
+            segmento: company?.segment || null,
+            porte: company?.size || null,
+            localizacao: [company?.city, company?.state].filter(Boolean).join(', '),
+            website: company?.website || null,
+            decisor: lead.contact
+              ? {
+                  nome: lead.contact.name,
+                  cargo: lead.contact.role,
+                  email: lead.contact.email,
+                  telefone: lead.contact.phone || lead.contact.whatsapp,
+                }
+              : null,
+          },
         },
-      }, null, 2);
+        null,
+        2,
+      );
     } catch (error: any) {
       logger.error({ err: error }, '[LeadEnrichmentTool] Erro no enriquecimento');
-      return JSON.stringify({
-        success: false,
-        erro: error.message || 'Falha ao enriquecer lead',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message || 'Falha ao enriquecer lead',
+        },
+        null,
+        2,
+      );
     }
   },
   {
     name: 'lead_enrichment',
-    description: `Enriquece um lead com análise de ICP, SWOT, BANT/GPCT e objeções probáveis.
-    
-    Usa o CommercialAIService para gerar:
-    - Lead Score (0-1000) baseado em porte, CNAE, maturidade tecnológica
-    - Análise SWOT (strengths, weaknesses, opportunities, threats)
-    - Matrizes BANT (Budget, Authority, Need, Timeframe) e GPCT (Goals, Plans, Challenges, Timeline)
-    - Matriz de objeções prováveis com respostas em múltiplos frameworks (consultiva, challenger, SPIN)
+    description: `Enriquece um lead do CRM com dados da Receita Federal/BrasilAPI/Apollo/Hunter (opcional) e gera análise comercial de ICP, SWOT, BANT/GPCT e matriz de objeções.
     
     Parâmetros:
     - leadId: ID do lead no CRM
-    - organizationId: ID da organização (para escopo)`,
+    - runExternalProviders: (opcional) se true, executa também o enriquecimento externo da empresa (CNPJ, Apollo, Hunter, Notícias)
+    - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
       leadId: z.string().describe('ID do lead no CRM'),
-      organizationId: z.string().describe('ID da organização'),
+      runExternalProviders: z
+        .boolean()
+        .optional()
+        .describe('Se true, consulta também BrasilAPI/Apollo/Hunter para atualizar a empresa'),
+      organizationId: z.string().optional().describe('ID da organização (opcional)'),
     }),
   },
 );

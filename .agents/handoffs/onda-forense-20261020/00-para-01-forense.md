@@ -1,7 +1,7 @@
 De:00
 Para:01
 Onda:forense20261020
-Status:aberto
+Status: resolvido (Integrado via PR #18 / Onda 0 - AccountGraphNode, WinLossAutopsyReport e migração Prisma)
 Prioridade:alto
 Bloqueador-ref:auditoria-real-ondas00-05
 Sprint destino:a definir pelo00

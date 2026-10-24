@@ -18,6 +18,13 @@ import { searchPlaybookTool } from '../tools/playbookTool.js';
 import { summarizeLeadTool } from '../tools/summarizeLeadTool.js';
 import { getObjectionBattlecardTool } from '../tools/battlecardTool.js';
 import { leadEnrichmentTool } from '../tools/leadEnrichmentTool.js';
+import { promoteAndEnrichTool } from '../tools/promoteAndEnrichTool.js';
+import { scriptAndPromptTool } from '../tools/scriptAndPromptTool.js';
+import { universalEmailTool } from '../tools/universalEmailTool.js';
+import { universalMeetingsTool } from '../tools/universalMeetingsTool.js';
+import { universalMessagingTool } from '../tools/universalMessagingTool.js';
+import { universalNotificationsTool } from '../tools/universalNotificationsTool.js';
+import { universalTasksAndNotesTool } from '../tools/universalTasksAndNotesTool.js';
 import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 import { getLearningProfile } from './learning.agent.js';
 import {
@@ -38,6 +45,13 @@ const tools = [
   copywriterTool,
   summarizeLeadTool,
   leadEnrichmentTool,
+  promoteAndEnrichTool,
+  scriptAndPromptTool,
+  universalEmailTool,
+  universalMessagingTool,
+  universalMeetingsTool,
+  universalTasksAndNotesTool,
+  universalNotificationsTool,
 ];
 const toolNode = new ToolNode(tools as any);
 
