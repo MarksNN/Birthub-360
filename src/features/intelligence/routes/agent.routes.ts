@@ -251,6 +251,36 @@ router.get('/prompt-ab-testing/experiments', async (req: Request, res: Response,
   }
 });
 
+// Dashboard Real-time do Swarm - monitoramento ao vivo
+router.get('/realtime-dashboard', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const { getSwarmRealtimeStatus } = await import('../services/swarmRealtimeDashboard.service.js');
+    const status = await getSwarmRealtimeStatus(organizationId);
+    res.json({ success: true, data: status });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// Auditoria do Swarm - logs de ações
+router.get('/audit-logs', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const { agentType, action, result } = req.query as Record<string, string>;
+    const { getSwarmAuditLogs } = await import('../services/swarmAudit.service.js');
+    const { logs, total } = await getSwarmAuditLogs({
+      organizationId,
+      agentType,
+      action,
+      result: result as 'success' | 'error' | undefined,
+    });
+    res.json({ success: true, data: { logs, total } });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
 // AI-005 (onda 36): Golden Dataset real e versionado — ver goldenDataset.service.ts. Não é
 // escopado por tenant (o dataset é um fixture de QA compartilhado, não dado de produção de uma
 // organização) — só reaproveita a autenticação já aplicada em '/api/agent' pelo server.ts.

@@ -10,6 +10,7 @@ import { getLeadContextTool, searchLeadsTool } from '../tools/crmTools.js';
 import { searchPlaybookTool } from '../tools/playbookTool.js';
 import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 import { cadenceTool } from '../tools/commercialTools.js';
+import { slackNotificationTool } from '../tools/integrationTools.js';
 // GOV-13: as duas ferramentas de execução (`create_follow_up_task`/`notify_team`) agora vêm de
 // `opsPendingActions.tool.ts`, não mais de `../tools/opsTools.js` — mesmo nome/schema visível ao
 // LLM, mas em vez de executar direto elas registram uma `AIPendingAction` e a execução real só
@@ -37,6 +38,7 @@ const tools = [
   createFollowUpTaskTool,
   notifyTeamTool,
   cadenceTool,
+  slackNotificationTool,
 ];
 const toolNode = new ToolNode(tools as any);
 
