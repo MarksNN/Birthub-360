@@ -76,6 +76,7 @@ export default defineConfig(() => {
       },
     },
     optimizeDeps: {
+      entries: ['index.html'],
       include: [
         'react',
         'react/jsx-runtime',

@@ -239,6 +239,9 @@
     },
     "@capacitor/cli": {
       "@xmldom/xmldom": "^0.9.12"
+    },
+    "tsx": {
+      "esbuild": "$esbuild"
     }
   },
   "devDependencies": {
