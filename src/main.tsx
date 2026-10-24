@@ -12,7 +12,15 @@ import './styles/globals.css';
 import './styles/official-identity.css';
 import { registerSW } from 'virtual:pwa-register';
 
-registerSW({ immediate: true });
+if (import.meta.env.PROD) {
+  registerSW({ immediate: true });
+} else if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister();
+    }
+  });
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

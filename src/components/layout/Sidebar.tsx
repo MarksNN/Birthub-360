@@ -113,7 +113,7 @@ const ICON_WELL =
   'grid h-8 w-8 shrink-0 place-items-center rounded-xl motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out';
 
 const ICON_WELL_QUIET =
-  'bg-slate-100/80 dark:bg-white/[0.04] text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-white/[0.06] group-hover:bg-slate-200/70 dark:group-hover:bg-white/[0.08] group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:border-slate-300/80 dark:group-hover:border-white/[0.12]';
+  'bg-slate-100/80 dark:bg-white/[0.04] text-sky-700 dark:text-[#70D6FF] border border-slate-200/60 dark:border-white/[0.06] group-hover:bg-slate-200/70 dark:group-hover:bg-white/[0.08] group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:border-slate-300/80 dark:group-hover:border-white/[0.12]';
 
 const GHOST_CONTROL = `h-8 w-8 shrink-0 place-items-center rounded-xl border border-line text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink ${EASE} ${FOCUS_RING}`;
 
@@ -401,7 +401,7 @@ export function Sidebar({
                             <span
                               className={`truncate font-sans text-[13px] tracking-[-0.012em] ${
                                 isActive
-                                  ? 'font-bold text-slate-950 dark:text-white'
+                                  ? 'font-bold text-brand-ink dark:text-[#00D4FF]'
                                   : 'font-medium text-slate-700 dark:text-slate-300'
                               }`}
                             >
@@ -554,10 +554,10 @@ export function Sidebar({
                     />
                   </span>
                   <div className="min-w-0">
-                    <div className="truncate font-display text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-[#6d28d9] dark:group-hover:text-[#8B7DFF] transition-colors">
+                    <div className="truncate font-display text-[13px] font-bold text-brand-ink dark:text-[#00D4FF] group-hover:text-[#6d28d9] dark:group-hover:text-[#8B7DFF] transition-colors">
                       Ver Hub de IA
                     </div>
-                    <div className="truncate font-mono text-[9.5px] text-slate-500 dark:text-slate-400">
+                    <div className="truncate font-mono text-[9.5px] text-sky-700 dark:text-[#70D6FF]">
                       Copiloto &amp; Modelos ✦
                     </div>
                   </div>

@@ -148,14 +148,40 @@ export const summarizeLead = async (leadData: string, piiValues: PiiValue[] = []
   );
 export const generateEmailDraft = async (
   context: string,
-  goal: string,
-  piiValues: PiiValue[] = [],
-) =>
-  callModel(
+  goalOrCompany: string,
+  maybeGoalOrPii?: string | PiiValue[],
+  _organizationId?: string,
+) => {
+  const goal = typeof maybeGoalOrPii === 'string' ? maybeGoalOrPii : goalOrCompany;
+  const piiValues = Array.isArray(maybeGoalOrPii) ? maybeGoalOrPii : [];
+  return callModel(
     'Você é um SDR experiente da Birth Hub 360, especializado em escrever e-mails frios e follow-ups persuasivos B2B. Baseie-se estritamente nas informações fornecidas no contexto e no objetivo, sem inventar dados, fatos ou métricas não mencionados. Se incluir assinatura ou contato, use apenas o domínio corporativo @birthhub360.com ou omita o endereço de e-mail.',
     `Escreva um e-mail profissional com foco em alta taxa de resposta.\nContexto: ${context}\nObjetivo: ${goal}`,
     'local-llama3',
     piiValues,
+  );
+};
+
+export const generateSalesPitch = async (
+  target: string,
+  objective: string,
+  _organizationId?: string,
+) =>
+  callModel(
+    'Você é um especialista em vendas e pitch comercial B2B.',
+    `Crie um pitch comercial de alto impacto para o seguinte público e objetivo:\nPúblico/Contexto: ${target}\nObjetivo: ${objective}`,
+    'local-llama3',
+  );
+
+export const handleSalesObjection = async (
+  objection: string,
+  context: string,
+  _organizationId?: string,
+) =>
+  callModel(
+    'Você é um treinador de vendas B2B focado em contorno de objeções.',
+    `Contorne a seguinte objeção com base no contexto informado:\nObjeção: ${objection}\nContexto: ${context}`,
+    'local-llama3',
   );
 export const predictConversionScore = async (leadData: string, piiValues: PiiValue[] = []) =>
   callModel(

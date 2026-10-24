@@ -381,7 +381,7 @@ export function AIEmailGenerator({
                   rel="noreferrer"
                   className="inline-flex items-center justify-center text-xs font-bold px-3.5 py-1.5 rounded-md bg-brand-active text-on-brand hover:brightness-95 transition-all active:scale-95 shadow-md shadow-brand/20"
                 >
-                  <Send className="w-3.5 h-3.5 mr-1.5" /> Enviar WhatsApp
+                  <WhatsAppIcon className="w-3.5 h-3.5 mr-1.5" /> Enviar WhatsApp
                 </a>
               )}
             </div>
@@ -519,7 +519,7 @@ function MessagePanel({
           htmlFor="msg-body"
           className="text-[10px] font-extrabold uppercase tracking-wider text-ink-2 block mb-1"
         >
-          Mensagem (WhatsApp / SMS)
+          <span className="inline-flex items-center gap-1"><WhatsAppIcon className="w-3 h-3 inline-block" /> Mensagem (WhatsApp / SMS)</span>
         </label>
         <textarea
           id="msg-body"

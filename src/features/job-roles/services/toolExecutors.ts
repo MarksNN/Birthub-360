@@ -669,6 +669,42 @@ const agentExecute: ToolExecutor = async (ctx) => {
   if (resourceJson) humanPromptParts.push(`Dados de recurso (JSON):\n${resourceJson}`);
   if (contextJson) humanPromptParts.push(`Contexto adicional (JSON):\n${contextJson}`);
 
+  if (ctx.context?.enableUniversalTools === true) {
+    const { runWithContext } = await import('../../../lib/context.js');
+    const { UniversalSpecialistAgent } = await import(
+      '../../intelligence/agents/universalSpecialist.agent.js'
+    );
+    const categories = Array.isArray(ctx.context.toolCategories)
+      ? (ctx.context.toolCategories as any[])
+      : undefined;
+    const specialist = new UniversalSpecialistAgent({
+      agentCode: ctx.agentCode,
+      agentTitle: ctx.agentCode,
+      customSystemPrompt: ctx.agentVersion.systemPrompt,
+      categories,
+    });
+    const runResult = await runWithContext(
+      { organizationId: ctx.organizationId, userId: ctx.actorId },
+      () => specialist.run(humanPromptParts.join('\n\n')),
+    );
+    if (runResult.error) {
+      throw new Error(runResult.error);
+    }
+    return {
+      summary: runResult.output || 'Execução concluída com ferramentas universais.',
+      facts: [],
+      metrics: {
+        universalToolsBound: runResult.toolsCount,
+      },
+      evidence: [
+        `AgentVersion.id=${ctx.agentVersion.id} version=${ctx.agentVersion.version}`,
+        `UniversalSpecialistAgent.sessionId=${runResult.sessionId}`,
+      ],
+      missingData: [],
+      raw: runResult,
+    };
+  }
+
   const model = getAiModel('local-llama3', 0.4, `agent.execute:${ctx.agentCode}`);
   const result = await model.invoke([
     new SystemMessage(ctx.agentVersion.systemPrompt),

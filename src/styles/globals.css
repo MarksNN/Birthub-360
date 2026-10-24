@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300..900;1,300..900&family=Outfit:wght@300..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 /* Birth Hub 360 — Tipografia Oficial Exclusiva:
    - Sora: Títulos, Heros, Ações e Display
@@ -260,8 +261,13 @@
   --shadow-nav-value: 12px 0 34px -28px rgba(26, 21, 19, 0.45);
   --shadow-nav-active-value: 0 10px 26px -14px color-mix(in srgb, var(--brand) 52%, black);
   --radius-nav-item-value: 12px;
-  --font-brand-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-brand-display: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-brand-sans: "Plus Jakarta Sans", "Nunito", ui-rounded, -apple-system-subheadline, "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --title-color-default: var(--color-heading-cyan, #0369a1);
+  --title-color-cyan: #0369a1;
+  --title-color-pink: #d91b7c;
+  --title-color-gold: #b45309;
+  --subtitle-color-default: #0284c7;
+  --font-brand-display: "Outfit", "Plus Jakarta Sans", "Nunito", ui-rounded, "Sora", system-ui, -apple-system, sans-serif;
   --font-brand-mono: "IBM Plex Mono", ui-monospace, monospace;
   --font-features-rounded: "cv05", "cv11", "ss01";
   --tracking-rounded: -0.012em;
@@ -453,6 +459,12 @@
 }
 
 .dark {
+  /* Paleta Canônica de Títulos e Subtítulos — NUNCA BRANCO OU PRETO */
+  --title-color-default: #00d4ff;
+  --title-color-cyan: #00d4ff;
+  --title-color-pink: #ff2d9b;
+  --title-color-gold: #ffc107;
+  --subtitle-color-default: #70d6ff;
   /* Paleta Oficial Neon — Dark Mode (0D0D0D fundo, 14141A cards, 70D6FF texto neon suave — SEM BRANCO OU PRETO) */
   --bg: #0d0d0d;
   --surface: #14141a;
@@ -965,16 +977,111 @@
     color: var(--ink);
   }
 
-  /* Headings consume semantic accents; descriptions remain neutral. */
+  /* Headings and titles consume canonical brand neon/gold/pink accents — NUNCA BRANCO OU PRETO */
+  *, *::before, *::after {
+    font-family: var(--font-brand-sans);
+  }
+
   h1,
   h2,
   h3,
   h4,
   h5,
-  h6 {
-    font-family: var(--font-display);
-    color: var(--card-accent, var(--color-heading-cyan));
+  h6,
+  [role="heading"],
+  .font-display,
+  [class*="title" i],
+  [class*="Title"] {
+    font-family: var(--font-brand-display) !important;
+    color: var(--title-color-default);
     letter-spacing: -0.02em;
+  }
+
+  /* Sobrescrever qualquer classe utilitária de branco ou preto quando aplicada a títulos */
+  :is(h1, h2, h3, h4, h5, h6, [role="heading"], [class*="title" i], [class*="Title"]):is(
+    .text-white,
+    .text-black,
+    .text-ink,
+    .text-slate-900,
+    .text-slate-950,
+    .text-gray-900,
+    .text-gray-950,
+    .text-zinc-900,
+    .text-neutral-900,
+    .dark\:text-white,
+    .dark\:text-white\/90,
+    .text-white\/90,
+    .text-white\/80,
+    .text-gray-800,
+    .text-slate-800
+  ) {
+    color: var(--title-color-default) !important;
+  }
+
+  /* Variações autorizadas de cores de títulos (Cyan, Gold, Pink, Gradiente) */
+  :is(h1, h2, h3, h4, h5, h6, [class*="title" i]).neon-title-gold,
+  :is(h1, h2, h3, h4, h5, h6, [class*="title" i]).text-gold {
+    color: var(--title-color-gold) !important;
+  }
+
+  :is(h1, h2, h3, h4, h5, h6, [class*="title" i]).neon-title-pink,
+  :is(h1, h2, h3, h4, h5, h6, [class*="title" i]).text-pink {
+    color: var(--title-color-pink) !important;
+  }
+
+  :is(h1, h2, h3, h4, h5, h6, [class*="title" i]).neon-title-blue,
+  :is(h1, h2, h3, h4, h5, h6, [class*="title" i]).text-neon-blue {
+    color: var(--title-color-cyan) !important;
+  }
+
+  /* Subtítulos: NUNCA brancos e NUNCA pretos */
+  :is(
+    [class*="subtitle" i],
+    [class*="Subtitle"],
+    .text-subtitle,
+    .card-subtitle,
+    [data-slot="description"],
+    header p,
+    .page-subtitle
+  ) {
+    color: var(--subtitle-color-default) !important;
+  }
+
+  /* Subtítulos que seguem imediatamente um cabeçalho */
+  :is(h1, h2, h3, h4, h5, h6) + p {
+    color: var(--subtitle-color-default) !important;
+  }
+
+  :is(
+    [class*="subtitle" i],
+    [class*="Subtitle"],
+    .text-subtitle,
+    .card-subtitle,
+    [data-slot="description"],
+    header p,
+    .page-subtitle,
+    :is(h1, h2, h3, h4, h5, h6) + p
+  ):is(
+    .text-white,
+    .text-black,
+    .text-ink,
+    .text-ink-2,
+    .text-slate-900,
+    .text-gray-900,
+    .text-zinc-900,
+    .text-neutral-900,
+    .dark\:text-white,
+    .text-white\/60,
+    .text-white\/70,
+    .text-white\/80,
+    .text-white\/90,
+    .text-gray-400,
+    .text-gray-500,
+    .text-slate-400,
+    .text-slate-500,
+    .text-muted-foreground
+  ) {
+    color: var(--subtitle-color-default) !important;
   }
 
   /* Títulos por padrão usam a identidade visual, preservando classes de cores utilitárias explícitas */

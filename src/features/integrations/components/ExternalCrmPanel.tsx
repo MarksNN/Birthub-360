@@ -29,6 +29,7 @@ import {
   Zap,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
+import { CompanyBrandIcon } from '../../../components/brand/CompanyBrandIcon.js';
 import { Card } from '../../../components/ui/Card.js';
 import { BRAND } from '../../../config/brand.js';
 import { useAuth } from '../../../contexts/AuthContext.js';
@@ -501,7 +502,7 @@ export function ExternalCrmPanel({ providerKey, displayName, authType }: Externa
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-bold text-ink">{displayName}</h2>
+              <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2"><CompanyBrandIcon name={providerKey} className="w-6 h-6 inline-block" /> {displayName}</h2>
               <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
                   isConnected
@@ -516,7 +517,7 @@ export function ExternalCrmPanel({ providerKey, displayName, authType }: Externa
                 {isConnected ? 'Conectado' : 'Desconectado'}
               </span>
             </div>
-            <p className="text-sm text-ink-2 mt-0.5">{meta.tagline}</p>
+            <p className="text-sm text-sky-700 dark:text-[#70D6FF] mt-0.5">{meta.tagline}</p>
           </div>
         </div>
 

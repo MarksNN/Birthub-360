@@ -22,6 +22,7 @@ import { useBrandAccent } from '../../../hooks/useBrandAccent.js';
 import { api } from '../../../lib/api.js';
 import { clientLogger } from '../../../lib/clientLogger.js';
 import { SWARM_BRAND } from '../agents/swarm.constants.js';
+import { UniversalEcosystemPanel } from './UniversalEcosystemPanel.js';
 
 type SwarmAgent = 'supervisor' | 'sdr' | 'bdr' | 'closer' | 'crm' | 'ops';
 type SwarmEventType = 'routing' | 'agent_result' | 'agent_error' | 'final';
@@ -110,6 +111,8 @@ const MISSION_SUGGESTIONS = [
   'Analise os negócios em risco no funil desta semana e recomende os próximos passos para cada um.',
   'Preciso de uma linha de abordagem fria para um lead do segmento logístico que ainda não respondeu.',
   'Temos uma proposta enviada e o comprador levantou objeção de preço. Monte a estratégia de fechamento sem sacrificar margem.',
+  'Varra nossos e-mails (Outlook, Gmail e IMAP) para identificar oportunidades quentes, crie tarefas no Trello/Monday/Notion e dispare um alerta rápido no Celular e no Relógio (Smartwatch).',
+  'Descubra empresas de Logística e Indústria em SP, enriqueça os decisores no CRM, gere uma planilha Excel (.xlsx) de prospecção e salve os scripts de Cold Call e WhatsApp.',
 ];
 
 function createId() {
@@ -121,7 +124,7 @@ function createId() {
 
 export function SwarmDashboard() {
   const accent = useBrandAccent();
-  const [view, setView] = useState<'mission' | 'slo'>('mission');
+  const [view, setView] = useState<'mission' | 'slo' | 'connectors' | 'studio'>('mission');
   const [mission, setMission] = useState('');
   const [leadId, setLeadId] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
@@ -598,7 +601,40 @@ export function SwarmDashboard() {
         >
           <Gauge size={12} /> SLO por agente
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            SoundFX.play('click');
+            setView('connectors');
+          }}
+          className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-widest rounded-t-lg border-b border-line transition-colors cursor-pointer ${view === 'connectors' ? `${accent.text} border-current` : 'text-ink-2 border-transparent hover:text-ink'}`}
+        >
+          <Database size={12} /> Ecossistema (21+ Plataformas)
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            SoundFX.play('click');
+            setView('studio');
+          }}
+          className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-widest rounded-t-lg border-b border-line transition-colors cursor-pointer ${view === 'studio' ? `${accent.text} border-current` : 'text-ink-2 border-transparent hover:text-ink'}`}
+        >
+          <Sparkles size={12} /> Office, Scripts & Agente Isolado
+        </button>
       </div>
+
+      {(view === 'connectors' || view === 'studio') && (
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar z-10">
+          <UniversalEcosystemPanel
+            mode={view}
+            onLaunchSwarmMission={(missionText) => {
+              setMission(missionText);
+              setView('mission');
+              void runSimulation(missionText);
+            }}
+          />
+        </div>
+      )}
 
       {view === 'slo' && (
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar z-10">

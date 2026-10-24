@@ -85,3 +85,12 @@ export const emailIntentClassifier: IntentClassifierPort = {
     }
   },
 };
+
+export const classifyEmailReplyIntent = async (params: {
+  organizationId?: string;
+  subject?: string;
+  body: string;
+}): Promise<IntentClassificationResult> => {
+  const transcript = `Assunto: ${params.subject || 'Sem assunto'}\nCorpo: ${params.body}`;
+  return emailIntentClassifier.classify(transcript);
+};

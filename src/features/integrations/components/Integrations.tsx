@@ -12,6 +12,19 @@ import {
 } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import { IconWrench } from '../../../components/icons/index.js';
+import {
+  WhatsAppIcon,
+  Bitrix24Icon,
+  GoogleIcon,
+  HubSpotIcon,
+  PipedriveIcon,
+  RDStationIcon,
+  MondayIcon,
+  SlackIcon,
+  StripeIcon,
+  OmieIcon,
+  ThreeCXIcon,
+} from '../../../components/brand/CompanyBrandIcon.js';
 import { Card } from '../../../components/ui/Card.js';
 import { BRAND } from '../../../config/brand.js';
 import { useAuth } from '../../../contexts/AuthContext.js';
@@ -210,7 +223,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'whatsapp' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">💬</span> WhatsApp
+            <WhatsAppIcon className="w-5 h-5 shrink-0" /> WhatsApp
           </button>
           <button
             type="button"
@@ -220,7 +233,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'google' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">📧</span> Google Workspace
+            <GoogleIcon className="w-5 h-5 shrink-0" /> Google Workspace
           </button>
           <button
             type="button"
@@ -230,7 +243,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'bitrix' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">🔗</span> Bitrix24
+            <Bitrix24Icon className="w-5 h-5 shrink-0" /> Bitrix24
           </button>
           <button
             type="button"
@@ -240,7 +253,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'hubspot' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">🟠</span> HubSpot
+            <HubSpotIcon className="w-5 h-5 shrink-0" /> HubSpot
           </button>
           <button
             type="button"
@@ -250,7 +263,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'pipedrive' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">🟢</span> Pipedrive
+            <PipedriveIcon className="w-5 h-5 shrink-0" /> Pipedrive
           </button>
           <button
             type="button"
@@ -260,7 +273,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'rdstation' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">🔵</span> RD Station
+            <RDStationIcon className="w-5 h-5 shrink-0" /> RD Station
           </button>
           <button
             type="button"
@@ -270,7 +283,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'monday' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">🔴</span> Monday.com
+            <MondayIcon className="w-5 h-5 shrink-0" /> Monday.com
           </button>
           <button
             type="button"
@@ -280,7 +293,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === '3cx' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <IconWrench className="w-4 h-4 text-sky-500" /> PABX 3CX
+            <ThreeCXIcon className="w-5 h-5 shrink-0" /> PABX 3CX
           </button>
           <button
             type="button"
@@ -300,7 +313,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'slack' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">💬</span> Slack
+            <SlackIcon className="w-5 h-5 shrink-0" /> Slack
           </button>
           <button
             type="button"
@@ -310,7 +323,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'stripe' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">💳</span> Stripe
+            <StripeIcon className="w-5 h-5 shrink-0" /> Stripe
           </button>
           <button
             type="button"
@@ -320,7 +333,7 @@ export function Integrations() {
             }}
             className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${activeTab === 'omie' ? 'bg-brand/10 text-brand font-semibold border border-brand/30 shadow-sm' : 'text-ink-2 hover:bg-surface-interactive hover:text-ink border border-transparent'}`}
           >
-            <span className="text-lg">🧾</span> Omie
+            <OmieIcon className="w-5 h-5 shrink-0" /> Omie ERP
           </button>
           <button
             type="button"
@@ -357,7 +370,7 @@ export function Integrations() {
                 className={`flex items-center justify-between gap-3 ${status === 'connected' ? 'mb-3' : 'mb-6'}`}
               >
                 <div className="min-w-0">
-                  <h2 className="text-xl font-bold text-ink">WhatsApp</h2>
+                  <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5"><WhatsAppIcon className="w-6 h-6 inline-block" /> WhatsApp</h2>
                   <p
                     className={`text-sm text-ink-2 ${status === 'connected' ? 'hidden sm:block' : ''}`}
                   >
@@ -369,7 +382,7 @@ export function Integrations() {
                 <div
                   className={`bg-green-50 dark:bg-green-500/10 rounded-full flex items-center justify-center shrink-0 ${status === 'connected' ? 'w-9 h-9' : 'w-12 h-12'}`}
                 >
-                  <span className={status === 'connected' ? 'text-lg' : 'text-2xl'}>💬</span>
+                  <WhatsAppIcon className={status === 'connected' ? 'w-6 h-6' : 'w-8 h-8'} />
                 </div>
               </div>
 
@@ -489,14 +502,14 @@ export function Integrations() {
             <Card className="p-8 rounded-2xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-ink">Google Workspace</h2>
+                  <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5"><GoogleIcon className="w-6 h-6 inline-block" /> Google Workspace</h2>
                   <p className="text-sm text-ink-2">
                     Gmail em modo leitura; Calendar tem leitura e escrita real (via Cadência); a
                     Agenda do produto continua local.
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">📧</span>
+                  <GoogleIcon className="w-8 h-8" />
                 </div>
               </div>
               <div className="space-y-4">
@@ -624,7 +637,7 @@ export function Integrations() {
               <div className="flex items-start justify-between mb-8">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-xl font-bold text-ink">Bitrix24</h2>
+                    <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5"><Bitrix24Icon className="w-6 h-6 inline-block" /> Bitrix24</h2>
                     {bitrixConnections.length > 0 && (
                       <>
                         <IntegrationStatusBadge
@@ -644,7 +657,7 @@ export function Integrations() {
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-soft rounded-full flex items-center justify-center shrink-0">
-                  <span className="text-2xl">🔗</span>
+                  <Bitrix24Icon className="w-8 h-8" />
                 </div>
               </div>
 
@@ -927,7 +940,7 @@ export function Integrations() {
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                       PABX Telefonia 3CX
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-sky-700 dark:text-[#70D6FF] mt-1">
                       Cadastro de PABX 3CX e teste de comunicação; recursos avançados dependem da
                       instalação 3CX conectada e dos webhooks habilitados.
                     </p>
@@ -1014,8 +1027,8 @@ export function Integrations() {
                   </div>
                 )}
 
-                <div className="p-5 rounded-xl border border-dashed border-gray-300 dark:border-white/20 bg-gray-50/50 dark:bg-white/[0.03] space-y-4">
-                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                <div className="p-5 rounded-xl border border-dashed border-line bg-surface-2/50 space-y-4">
+                  <p className="text-sm font-bold text-brand-ink dark:text-[#00D4FF]">
                     {threecxConnections.length > 0
                       ? 'Conectar outro PABX 3CX'
                       : 'Conectar Servidor 3CX PABX'}
@@ -1026,21 +1039,21 @@ export function Integrations() {
                       value={threecxLabelInput}
                       onChange={(e) => setThreecxLabelInput(e.target.value)}
                       placeholder="Nome de exibição (ex.: 3CX Comercial, Ramal 101)"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-white/10 shadow-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-white/10 shadow-sm bg-surface text-ink placeholder:text-ink-2 outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
                     />
                     <input
                       type="url"
                       value={threecxPbxUrlInput}
                       onChange={(e) => setThreecxPbxUrlInput(e.target.value)}
                       placeholder="https://seu-pabx.3cx.us"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-white/10 shadow-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-white/10 shadow-sm bg-surface text-ink placeholder:text-ink-2 outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
                     />
                     <input
                       type="text"
                       value={threecxExtensionInput}
                       onChange={(e) => setThreecxExtensionInput(e.target.value)}
                       placeholder="Ramal (ex.: 101)"
-                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-white/10 shadow-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-white/10 shadow-sm bg-surface text-ink placeholder:text-ink-2 outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
                     />
                   </div>
                   <button

@@ -182,6 +182,84 @@ export async function executeAction(action: ExecutableAction): Promise<Execution
       return { sent: true };
     }
 
+    if (action.action === 'send_whatsapp') {
+      const payload = action.payload as {
+        leadId?: string | null;
+        recipient?: string;
+        to?: string;
+        message?: string;
+        body?: string;
+      };
+      const to = payload.recipient || payload.to;
+      const text = payload.message || payload.body;
+      if (!action.organizationId || !to || !text) {
+        return { sent: false, reason: 'unsupported_action' };
+      }
+      const whatsapp = container.resolve<WhatsAppSenderPort>('WhatsAppSenderPort');
+      await whatsapp.sendWhatsAppMessage(action.organizationId, to, text, undefined, {
+        leadId: payload.leadId ?? null,
+      });
+      return { sent: true };
+    }
+
+    if (action.action === 'send_sms') {
+      const payload = action.payload as {
+        leadId?: string | null;
+        recipient?: string;
+        message?: string;
+      };
+      if (!action.organizationId || !payload.recipient || !payload.message) {
+        return { sent: false, reason: 'unsupported_action' };
+      }
+      const smsSetting = await prisma.setting.findFirst({
+        where: { organizationId: action.organizationId, key: 'integration.sms' },
+        select: { value: true },
+      });
+      const cfg = (smsSetting?.value ?? {}) as Record<string, unknown>;
+      const webhookUrl = typeof cfg.webhookUrl === 'string' ? cfg.webhookUrl.trim() : '';
+      if (!webhookUrl) {
+        return { sent: false, reason: 'not_configured' };
+      }
+      const { validateWebhookUrl } = await import('../../../lib/security/url-validator.js');
+      await validateWebhookUrl(webhookUrl);
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: payload.recipient,
+          text: payload.message,
+          leadId: payload.leadId ?? null,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+      return res.ok ? { sent: true } : { sent: false, reason: 'send_failed' };
+    }
+
+    if (action.action === 'start_cadence') {
+      const payload = action.payload as {
+        leadId?: string;
+        cadenceType?: string;
+        channels?: string[];
+      };
+      if (!action.organizationId || !payload.leadId) {
+        return { sent: false, reason: 'unsupported_action' };
+      }
+      await prisma.lead.updateMany({
+        where: { id: payload.leadId, organizationId: action.organizationId },
+        data: { status: 'Cadencia_Iniciada' },
+      });
+      await prisma.note.create({
+        data: {
+          organizationId: action.organizationId,
+          targetType: 'lead',
+          targetId: payload.leadId,
+          text: `Cadência ${payload.cadenceType || 'outbound'} iniciada após aprovação humana. Canais: ${(payload.channels || ['email', 'whatsapp']).join(', ')}.`,
+          authorName: 'Enxame de IA da Birth Hub 360',
+        },
+      });
+      return { sent: true };
+    }
+
     return { sent: false, reason: 'unsupported_action' };
   } catch (error: any) {
     if (error instanceof MailerNotConfiguredError) {

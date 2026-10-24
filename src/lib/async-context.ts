@@ -103,3 +103,15 @@ export function withTenantContext<R>(
   }
   return requestContext.run({ tenantId: tenantId.trim() }, callback);
 }
+
+
+export function runWithContext<R>(
+  context: { organizationId?: string; tenantId?: string; userId?: string; role?: string },
+  callback: () => Promise<R> | R,
+): Promise<R> | R {
+  const tenantId = (context.organizationId || context.tenantId)?.trim();
+  return requestContext.run(
+    { tenantId, userId: context.userId, role: context.role },
+    callback,
+  );
+}

@@ -9,7 +9,7 @@ import type { AiTokenUsage } from './types.js';
 
 // Preço aproximado por 1M de tokens (USD) — usado só para estimar custo no AILog e na métrica
 // ai_usage_cost_usd_total (metrics.ts), não é cobrança real.
-const PRICING_PER_MILLION_TOKENS: Record<string, { input: number; output: number }> = {
+export const PRICING_PER_MILLION_TOKENS: Record<string, { input: number; output: number }> = {
   'openai/gpt-oss-20b': { input: 0.075, output: 0.3 },
   'openai/gpt-oss-120b': { input: 0.15, output: 0.6 },
   'qwen/qwen3.8-27b': { input: 0.1, output: 0.3 },

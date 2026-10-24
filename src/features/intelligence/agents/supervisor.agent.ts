@@ -69,35 +69,35 @@ const AGENT_INFO: Record<
   sdr: {
     label: 'SDR Autônomo',
     description:
-      'Qualifica um lead no CRM (fit com o ICP, pesquisa de mercado, busca de leads, playbook e battlecards de objeção) e atualiza o status de qualificação.',
+      'Qualifica um lead no CRM (fit com o ICP, enriquecimento profundo, leitura de e-mails Outlook/M365/Gmail/IMAP para identificar oportunidades, agendamento de reuniões Meet/Teams/Zoom/Calendly, geração de scripts/prompts e battlecards de objeção) e atualiza o status de qualificação.',
     chooseWhen:
       'A missão pede para qualificar/analisar um lead específico que já existe no CRM ou localizar por nome da empresa.',
   },
   bdr: {
     label: 'BDR (Outbound)',
     description:
-      'Avalia o fit outbound de um lead/empresa (pesquisa multi-engine, playbook, consulta ao CRM, firmografia enriquecida e battlecards táticos) e sugere a linha de abordagem para o primeiro contato frio e priorização de contas.',
+      'Realiza descoberta B2B de novas empresas (Apollo, Google Places, BrasilAPI), promove e enriquece empresas e decisores no CRM, varre caixas de e-mail (Outlook, Gmail, IMAP) atrás de sinais de compra, gera scripts/prompts comerciais e prepara cadências multicanal (WhatsApp, LinkedIn, E-mail, Telegram).',
     chooseWhen:
       'A missão é sobre prospecção fria, identificação de contas no CRM, priorização por aderência ao ICP ou sugestão de abertura de contato.',
   },
   closer: {
     label: 'Closer Autônomo',
     description:
-      'Conduz estratégia de negociação para oportunidades qualificadas: contexto real do lead, matriz de objeções/battlecards, diagnóstico de saúde do deal, prontidão contratual e proteção de margem. Jamais fecha negócios autonomamente.',
+      'Conduz estratégia de negociação para oportunidades qualificadas: gera propostas comerciais, documentos Word/Google Docs, planilhas Excel/Sheets e apresentações PowerPoint/Slides, sintetiza atas de reuniões (Meet/Teams/Zoom), analisa objeções/battlecards e prontidão contratual. Jamais fecha negócios autonomamente.',
     chooseWhen:
       'A missão envolve oportunidade qualificada, proposta enviada, reunião comercial, piloto, negociação, objeção, decisão ou prontidão contratual. Não use para primeiro contato frio.',
   },
   crm: {
     label: 'Gestor de CRM',
     description:
-      'Diagnostica o risco de estagnação, aging, tempo sem interação, ICP Fit, oportunidades que precisam de enriquecimento e saúde de deals em andamento, recomendando a próxima ação concreta de tratativa.',
+      'Diagnostica pipeline, forecast ponderado, cross-sell e risco de churn; sincroniza dados com CRMs/ERPs externos (Bitrix24, HubSpot, Pipedrive, RD Station, Monday.com, Omie) e gera relatórios em Excel/Google Sheets.',
     chooseWhen:
       'A missão é sobre uma negociação/deal que já está em andamento (não um lead novo) — risco de estagnação, tempo sem interação, pipeline parado ou reenriquecimento.',
   },
   ops: {
     label: 'Agente de Operações',
     description:
-      'Executa ações concretas nas demais ferramentas do sistema: agenda tarefas de follow-up no CRM e notifica a equipe comercial.',
+      'Executa e propõe ações operacionais multi-plataforma: cria cards/tarefas e notas no Trello, Monday.com, Bitrix24, ClickUp, Asana, Notion e CRM; gera arquivos Word, Excel (.xlsx), PowerPoint e Google Docs/Sheets/Slides; envia mensagens em WhatsApp, Telegram, Teams, Slack e SMS; e dispara notificações em Pop-up na tela, Push no Celular, Relógio (Smartwatch) e SMS.',
     chooseWhen:
       'A missão pede uma AÇÃO CONCRETA a ser executada agora (agendar, notificar, criar tarefa) — não escolha só para produzir mais uma análise ou opinião.',
   },

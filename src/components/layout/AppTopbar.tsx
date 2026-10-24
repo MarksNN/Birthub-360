@@ -11,7 +11,7 @@ import { SoundFX } from '../../lib/soundEffects.js';
 import { BirthHubLogo } from '../brand/BirthHubLogo.js';
 import { AppBreadcrumbs } from './AppBreadcrumbs.js';
 import { TAB_META, type TabType } from './tabMeta.js';
-import { SyncIndicator } from './SyncIndicator.js';
+import { SyncIndicator, OfflineBadge } from './SyncIndicator.js';
 
 interface AppTopbarProps {
   activeTab: TabType;
@@ -82,11 +82,11 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
   };
 
   return (
-    <header className="relative sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2.5 bg-white/80 dark:bg-[#090D16]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.08] px-4 sm:px-6">
+    <header className="relative sticky top-0 z-20 flex h-14 sm:h-16 shrink-0 items-center gap-1.5 sm:gap-2.5 bg-white/85 dark:bg-[#090D16]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.08] px-2.5 sm:px-6 overflow-hidden">
       <button
         type="button"
         onClick={onOpenMobileNav}
-        className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[color:var(--color-text-secondary)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--color-text-primary)] lg:hidden"
+        className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[color:var(--color-text-secondary)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--color-text-primary)] lg:hidden"
         aria-label="Abrir menu de navegação"
         data-testid="topbar-open-mobile-nav"
       >
@@ -97,7 +97,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         <button
           type="button"
           onClick={handleBack}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-brand-accent)] hover:-translate-x-0.5"
+          className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:bg-[color:var(--surface-2)] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-brand-accent)] hover:-translate-x-0.5"
           aria-label="Voltar"
           title="Voltar"
           data-testid="topbar-back"
@@ -106,14 +106,14 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         </button>
       )}
 
-      <div className="flex min-w-0 items-center gap-2.5">
+      <div className="flex min-w-0 flex-1 sm:flex-initial items-center gap-2 sm:gap-2.5 overflow-hidden">
         <BirthHubLogo
           variant="mark"
           animated
-          className="h-8 w-8 shrink-0 drop-shadow-[0_0_12px_rgba(0,212,255,0.45)]"
+          className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 drop-shadow-[0_0_12px_rgba(0,212,255,0.45)]"
         />
         <div
-          className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--color-border-strong)]"
+          className="hidden sm:grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[color:var(--color-border-strong)]"
           style={{
             background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)',
           }}
@@ -123,11 +123,10 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
             strokeWidth={1.5}
           />
         </div>
-        <div className="flex flex-col leading-none">
+        <div className="flex min-w-0 flex-col leading-none overflow-hidden">
           <AppBreadcrumbs className="mb-1 hidden sm:flex" />
           <h1
-            className="truncate font-display text-base text-[color:var(--color-text-primary)] mt-0.5"
-            style={{ fontWeight: 600 }}
+            className="truncate font-display text-sm sm:text-base text-brand-ink dark:text-[#00D4FF] font-bold"
           >
             {meta.label}
           </h1>
@@ -148,16 +147,17 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           strokeWidth={1.5}
         />
         <span className="text-xs font-sans">Buscar empresa, decisor ou comando…</span>
-        <kbd className="ml-auto rounded-full border border-[color:var(--color-border-strong)] bg-[color:var(--surface-2)] px-2 py-0.5 text-[9px] font-medium text-[color:var(--color-text-muted)] transition-colors group-hover:border-[color:var(--color-brand-accent)]">
+        <kbd className="ml-auto rounded-full border border-[color:var(--color-border-strong)] bg-[color:var(--surface-2)] px-2 py-0.5 text-[9px] font-medium text-sky-700 dark:text-[#70D6FF] transition-colors group-hover:border-[color:var(--color-brand-accent)]">
           ⌘K
         </kbd>
       </button>
 
-      <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-        <SyncIndicator />
+      <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+        <OfflineBadge className="sm:hidden" />
+        <SyncIndicator className="hidden sm:inline-flex" />
 
         <div className="hidden text-right leading-tight sm:block mr-2">
-          <p className="text-[9px] font-sans uppercase tracking-[0.2em] text-[color:var(--color-text-muted)]">
+          <p className="text-[9px] font-sans uppercase tracking-[0.2em] text-sky-700 dark:text-[#70D6FF]">
             {dateLabel}
           </p>
           <p
@@ -177,15 +177,15 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
             SoundFX.play('navigate');
             toggleTheme();
           }}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-accent)] hover:text-[color:var(--color-brand-accent)]"
+          className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-accent)] hover:text-[color:var(--color-brand-accent)]"
           aria-label="Alternar tema"
           title={`Mudar para modo ${theme === 'dark' ? 'claro' : 'escuro'}`}
           data-testid="topbar-toggle-theme"
         >
           {theme === 'dark' ? (
-            <Sun className="h-4 w-4" strokeWidth={1.5} />
+            <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.5} />
           ) : (
-            <Moon className="h-4 w-4" strokeWidth={1.5} />
+            <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.5} />
           )}
         </motion.button>
 
@@ -195,7 +195,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           whileTap={{ scale: 0.92 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           onClick={toggleSound}
-          className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-300 ${
+          className={`hidden md:flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-300 ${
             soundEnabled
               ? 'border-[color:var(--color-brand-accent)] bg-[color:var(--color-brand-accent)]/10 text-[color:var(--color-brand-accent)]'
               : 'border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] hover:border-[color:var(--color-brand-accent)] hover:text-[color:var(--color-brand-accent)]'
@@ -220,14 +220,14 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
             SoundFX.play('navigate');
             navigate('/app/notifications');
           }}
-          className="relative flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-secondary)] hover:text-[color:var(--color-brand-secondary)]"
+          className="relative flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-secondary)] hover:text-[color:var(--color-brand-secondary)]"
           aria-label={unreadCount > 0 ? `Notificações — ${unreadCount} não lidas` : 'Notificações'}
           data-testid="topbar-notifications"
         >
-          <Bell className="h-4 w-4" strokeWidth={1.5} />
+          <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.5} />
           {unreadCount > 0 && (
             <span
-              className="absolute right-[7px] top-[7px] h-1.5 w-1.5 rounded-full motion-safe:animate-pulse"
+              className="absolute right-[6px] top-[6px] sm:right-[7px] sm:top-[7px] h-1.5 w-1.5 rounded-full motion-safe:animate-pulse"
               style={{
                 background: 'var(--color-brand-secondary)',
                 boxShadow: '0 0 0 3px var(--surface)',
@@ -242,7 +242,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           role="img"
           aria-label={`Avatar de ${currentUser?.name || 'Usuário'}`}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-sans text-sm text-[color:var(--color-text-primary)] cursor-pointer border border-[color:var(--color-brand-accent)]"
+          className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full font-sans text-xs sm:text-sm font-semibold text-[color:var(--color-text-primary)] cursor-pointer border border-[color:var(--color-brand-accent)]"
           style={{ background: 'var(--color-surface-elevated)', boxShadow: 'var(--shadow-card)' }}
           title={`${currentUser?.name || 'Usuário'}`}
           data-testid="topbar-avatar"
@@ -256,7 +256,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
           whileTap={{ scale: 0.92 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           onClick={logout}
-          className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-secondary)] hover:text-[color:var(--color-brand-secondary)]"
+          className="hidden sm:flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[color:var(--color-border-subtle)] text-[color:var(--color-text-secondary)] transition-all duration-300 hover:border-[color:var(--color-brand-secondary)] hover:text-[color:var(--color-brand-secondary)]"
           aria-label="Sair da conta"
           title="Sair da conta"
           data-testid="topbar-logout"

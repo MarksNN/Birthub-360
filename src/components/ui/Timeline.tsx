@@ -47,7 +47,7 @@ export function Timeline({
       case 'alert':
         return <AlertCircle className="w-3.5 h-3.5 text-amber-400" />;
       case 'whatsapp':
-        return <MessageCircle className="w-3.5 h-3.5 text-success-active dark:text-success" />;
+        return <WhatsAppIcon className="w-3.5 h-3.5" />;
       case 'email':
         return <Mail className="w-3.5 h-3.5 text-info-active dark:text-info" />;
       case 'call':

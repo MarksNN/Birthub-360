@@ -1,4 +1,5 @@
 import type React from 'react';
+import { CompanyBrandIcon } from '../brand/CompanyBrandIcon.js';
 
 export interface TechToolInfo {
   name: string;
@@ -472,7 +473,7 @@ export const TechToolLogo: React.FC<TechToolLogoProps> = ({
       <span className="flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform duration-300">
         {getTechSvgIcon(normalized, info.color)}
       </span>
-      <span className="tracking-tight text-white/90 group-hover:text-white font-medium">
+      <span className="tracking-tight text-sky-100 group-hover:text-[#00D4FF] font-medium">
         {info.name}
       </span>
       {showCategory && (

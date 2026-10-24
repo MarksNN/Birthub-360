@@ -41,6 +41,7 @@ import { clientLogger } from '../lib/clientLogger.js';
 import { SoundFX } from '../lib/soundEffects.js';
 import { toast } from '../lib/toast.js';
 import type { Lead, LeadStatus } from '../types/index.js';
+import { Bitrix24Icon } from './brand/CompanyBrandIcon.js';
 import { Button } from './ui/Button.js';
 import { ContextualTip } from './ui/ContextualTip.js';
 import { EmptyState } from './ui/EmptyState.js';
@@ -793,7 +794,7 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
               title="Abrir painel para buscar e receber leads do Bitrix24"
             >
               <Download className="w-4 h-4 rotate-180 shrink-0 text-sky-500" />
-              <span>Receber do Bitrix</span>
+              <span className="flex items-center gap-1.5"><Bitrix24Icon className="w-3.5 h-3.5 shrink-0" /> Receber do Bitrix</span>
             </Button>
           </Tooltip>
 
@@ -807,7 +808,7 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
               title="Enviar leads para o portal Bitrix24"
             >
               <Send className="w-4 h-4 shrink-0 text-sky-500" />
-              <span>Enviar para Bitrix</span>
+              <span className="flex items-center gap-1.5"><Bitrix24Icon className="w-3.5 h-3.5 shrink-0" /> Enviar para Bitrix</span>
             </Button>
           </Tooltip>
 

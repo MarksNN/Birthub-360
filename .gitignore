@@ -131,3 +131,7 @@ audit-screenshots/
 # Arquivos de pacote e deploy temporários
 *.tar.gz
 *.zip
+
+# Scripts locais com credenciais temporarias
+scripts/setup-admin-user.mjs
+scripts/verify-user.mjs

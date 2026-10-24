@@ -75,3 +75,50 @@ export type {
   DynamicRoutingOptions,
   DynamicRoutingResult,
 } from './gateway/dynamic-routing.js';
+
+
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import { getAiModel } from './gateway/chat-model.js';
+import { cleanAndParseJson } from './gateway/parsing.js';
+
+export async function generateTextOutput(options: {
+  organizationId?: string;
+  feature?: string;
+  systemInstruction?: string;
+  prompt: string;
+  fallback?: () => string;
+}): Promise<{ text: string }> {
+  try {
+    const model = getAiModel(options.feature || 'general');
+    const messages = [
+      new SystemMessage(options.systemInstruction || 'Você é um assistente prestativo e profissional.'),
+      new HumanMessage(options.prompt),
+    ];
+    const res = await model.invoke(messages);
+    return { text: res.content };
+  } catch (err) {
+    if (options.fallback) {
+      return { text: options.fallback() };
+    }
+    throw err;
+  }
+}
+
+export async function generateStructuredOutput<T>(options: {
+  organizationId?: string;
+  feature?: string;
+  systemInstruction?: string;
+  prompt: string;
+  schema?: unknown;
+}): Promise<T> {
+  const model = getAiModel(options.feature || 'general');
+  const messages = [
+    new SystemMessage(
+      (options.systemInstruction || '') +
+        '\nResponda ESTRITAMENTE em formato JSON válido, sem blocos markdown adicionais.',
+    ),
+    new HumanMessage(options.prompt),
+  ];
+  const res = await model.invoke(messages);
+  return cleanAndParseJson<T>(res.content);
+}

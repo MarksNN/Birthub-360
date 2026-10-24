@@ -36,8 +36,8 @@ html.dark,
   --accent-violet: var(--color-heading-iris);
   --accent-cyan: var(--color-heading-cyan);
   --pulse: var(--color-heading-pink);
-  --font-brand-sans: var(--font-interface);
-  --font-brand-display: var(--font-heading);
+  --font-brand-sans: "Plus Jakarta Sans", "Nunito", ui-rounded, var(--font-interface);
+  --font-brand-display: "Outfit", "Plus Jakarta Sans", "Nunito", ui-rounded, var(--font-heading);
   --font-brand-mono: var(--font-data);
   --shadow-card-value: var(--shadow-card);
   --shadow-card-hover-value: var(--shadow-elevated);
@@ -134,7 +134,7 @@ body {
   color: var(--card-accent);
 }
 .bh-platform-card:not(.bh-landing-card) {
-  --card-accent: var(--ink);
+  --card-accent: var(--title-color-default, var(--color-heading-cyan));
   background: var(--color-surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -471,4 +471,18 @@ html:not(.dark) .text-\[\#ef4444\] {
 html.light [class*="0284c7"],
 html:not(.dark) [class*="0284c7"] {
   color: #0369a1 !important;
+}
+
+/* Override títulos e subtítulos dentro de cards para nunca usar branco ou preto */
+.bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) {
+  color: var(--title-color-default, var(--color-heading-cyan)) !important;
+  font-family: var(--font-brand-display) !important;
+}
+.bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) + p,
+.bh-platform-card [class*="subtitle" i] {
+  color: var(--subtitle-color-default, #70d6ff) !important;
+}
+html.light .bh-platform-card [class*="subtitle" i],
+html.light .bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) + p {
+  color: #0284c7 !important;
 }

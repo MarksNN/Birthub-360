@@ -215,3 +215,24 @@ export const multiCrmSyncTool = tool(
 );
 
 export const pipedriveSyncTool = multiCrmSyncTool;
+
+
+import { fetchCnpjData } from '../../prospecting/services/enrichment/cnpjLookup.js';
+
+export const cnpjLookupTool = tool(
+  async ({ cnpj }: { cnpj: string }) => {
+    try {
+      const data = await fetchCnpjData(cnpj);
+      return JSON.stringify(data, null, 2);
+    } catch (err) {
+      return JSON.stringify({ error: err instanceof Error ? err.message : String(err) });
+    }
+  },
+  {
+    name: 'cnpj_lookup',
+    description: 'Consulta dados cadastrais oficiais e enriquecimento de uma empresa pelo CNPJ.',
+    schema: z.object({
+      cnpj: z.string().describe('CNPJ da empresa com ou sem formatação.'),
+    }),
+  },
+);

@@ -75,6 +75,33 @@ export default defineConfig(() => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    optimizeDeps: {
+      include: [
+        'react',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+        'react-dom',
+        'react-dom/client',
+        'react-router-dom',
+        'framer-motion',
+        'lucide-react',
+        'clsx',
+        'tailwind-merge',
+        '@radix-ui/react-slot',
+        'class-variance-authority',
+        'canvas-confetti',
+        '@react-three/fiber',
+        '@react-three/drei',
+        'three',
+        'pino',
+        'recharts',
+        'date-fns',
+        '@tanstack/react-query',
+        'better-auth/react',
+        'better-auth/client/plugins',
+      ],
+      holdUntilCrawlEnd: true,
+    },
     ssr: {
       external: [
         '@sentry/node-core',
@@ -86,6 +113,7 @@ export default defineConfig(() => {
       host: true, // Permite acesso via rede (0.0.0.0)
       port: 3024, // O backend já usa a 3024 via env.PORT e serve o Vite via middleware.
       strictPort: true, // Garante que se usarem Vite standalone, ele tente usar a 3024.
+      allowedHosts: true,
       proxy: {
         '/api': {
           target: 'http://localhost:3024',
