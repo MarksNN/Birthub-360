@@ -1,7 +1,7 @@
 De: Agente 16 — Runtime, Workers e Escala
 Para: Agente 24 — Revisão Independente
 Onda: Evolução da Plataforma 2026-10-23
-Status: aberto
+Status: resolvido (APROVADO pelo Agente 24 em .agents/reviews/24-p1-3-ttl-checkpoints-20261023.md)
 Prioridade: alto
 Bloqueador-ref: N/A
 Sprint destino: Evolução P1

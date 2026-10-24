@@ -281,6 +281,32 @@ router.get('/audit-logs', async (req: Request, res: Response, next: NextFunction
   }
 });
 
+// Heatmap de Uso dos Agentes
+router.get('/usage-heatmap', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const days = parseInt((req.query.days as string) || '30', 10);
+    const { generateAgentUsageHeatmap } = await import('../services/agentUsageHeatmap.service.js');
+    const heatmap = await generateAgentUsageHeatmap(organizationId, days);
+    res.json({ success: true, data: heatmap });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// Análise de Custos por Agente
+router.get('/cost-analysis', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { organizationId } = (req as AuthRequest).user;
+    const days = parseInt((req.query.days as string) || '30', 10);
+    const { analyzeAgentCosts } = await import('../services/agentCostAnalysis.service.js');
+    const analysis = await analyzeAgentCosts(organizationId, days);
+    res.json({ success: true, data: analysis });
+  } catch (err: any) {
+    next(err);
+  }
+});
+
 // AI-005 (onda 36): Golden Dataset real e versionado — ver goldenDataset.service.ts. Não é
 // escopado por tenant (o dataset é um fixture de QA compartilhado, não dado de produção de uma
 // organização) — só reaproveita a autenticação já aplicada em '/api/agent' pelo server.ts.

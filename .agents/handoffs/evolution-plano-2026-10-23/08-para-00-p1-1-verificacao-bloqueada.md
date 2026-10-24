@@ -1,7 +1,7 @@
 De: Agente 08 — QA e Release
 Para: Agente 00 — Coordenador
 Onda: Evolução da Plataforma 2026-10-23
-Status: em-andamento
+Status: resolvido (Decisão Agente 00: Acolhida Opção A - Execução de gates delegada ao CI canônico)
 Prioridade: alto
 Bloqueador-ref: N/A
 Sprint destino: Evolução P1

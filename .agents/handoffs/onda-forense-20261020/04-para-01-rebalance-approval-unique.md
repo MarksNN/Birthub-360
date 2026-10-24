@@ -1,8 +1,8 @@
 De:04
 Para:01
 Onda:forense20261020
-Status:aberto
-Prioridade:medio
+Status: resolvido (Implementado no Prisma via PR #37 / Onda 0 - @@unique([organizationId, recommendationId]) no model RebalanceApproval; parecer APROVADO do Agente 24)
+Prioridade: medio
 Bloqueador-ref:REMED-04 (auditoria forense @281cfcd3)
 Sprint destino:a definir pelo00
 

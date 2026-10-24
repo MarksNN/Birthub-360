@@ -1,6 +1,6 @@
 Para: Agente 00 — Coordenador
 Onda: Evolução da Plataforma 2026-10-23
-Status: bloqueado
+Status: resolvido (Decisão Agente 00: Acolhida Opção A - Gates atribuídos ao CI)
 Prioridade: alto
 Bloqueador-ref: Ambiente sem npm
 Sprint destino: Evolução P1

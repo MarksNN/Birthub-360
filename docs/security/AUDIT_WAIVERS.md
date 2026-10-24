@@ -33,9 +33,6 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
 
 ## Waivers ativos
 
-### `GHSA-Q2HR-2G5M-VWHR`, `GHSA-QHR7-859C-M2P7`, `GHSA-6J4F-FJ2G-MC7P` - `brace-expansion`
-
-
 ### `GHSA-CG2G-XH64-V4Q7`, `GHSA-MRV2-3PQR-J5JR`, `GHSA-C6GR-QVV4-5V3F` - `dompurify`
 
 - **Advisory:** https://github.com/advisories/GHSA-cg2g-xh64-v4q7
@@ -44,13 +41,6 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
 - **Motivo:** Nova advisory crítica/high sem fix non-breaking imediato disponível no momento do gate. Aceito temporariamente até atualização de dependência ou patch upstream.
 - **Dono:** Agente 00
 - **Data de reavaliação:** 2026-10-30
-
-- **Advisory:** https://github.com/advisories/GHSA-Q2HR-2G5M-VWHR
-- **Severidade reportada pelo `npm audit`:** high
-- **Cadeia:** brace-expansion (transitivas diversas)
-- **Motivo:** Sem fix direto na versao atual que nao quebre compatibilidade, aceito temporariamente ate atualizacao major ou patch de transicao.
-- **Dono:** Agente 00
-- **Data de reavaliao:** 2026-10-30
 
 ### `GHSA-G57G-F23G-4646`, `GHSA-V53P-9FQP-M79J`, `GHSA-PRGH-XP8R-P3M5` - `nodemailer`
 
