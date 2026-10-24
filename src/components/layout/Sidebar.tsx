@@ -213,7 +213,7 @@ export function Sidebar({
             title="Birth Hub 360° — Ir para Visão Geral"
             aria-label="Birth Hub 360° — Ir para Visão Geral"
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-sm transition-transform duration-200 hover:scale-105">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-sm motion-safe:transition-all motion-safe:duration-200 hover:scale-105 hover:border-[#00D4FF]/50 hover:shadow-[0_0_14px_rgba(0,212,255,0.25)]">
               <BirthHubLogo
                 variant="mark"
                 animated={false}
@@ -436,7 +436,7 @@ export function Sidebar({
                                 key={(subItem.path ?? subItem.tab) + subItem.label}
                                 type="button"
                                 onClick={(e) => selectTab(subItem.tab, e, subItem.path)}
-                                className={`group/sub flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
+                                className={`group/sub flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] motion-safe:transition-all motion-safe:duration-150 hover:translate-x-1 ${FOCUS_RING} ${
                                   isSubActive
                                     ? accent === 'cyan'
                                       ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] font-semibold shadow-sm'

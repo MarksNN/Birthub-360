@@ -136,16 +136,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         } overflow-y-auto ${
           isDark
-            ? 'bg-slate-900 border-slate-800 text-slate-200'
-            : 'bg-slate-50 border-slate-200 text-slate-800 shadow-sm'
-        }`}
+            ? 'bg-[#0c121e]/95 border-slate-800/80 text-slate-200 shadow-[4px_0_24px_rgba(0,0,0,0.25)]'
+            : 'bg-white/95 border-slate-200/80 text-slate-800 shadow-[4px_0_24px_rgba(0,0,0,0.03)]'
+        } backdrop-blur-2xl`}
       >
         {/* Sidebar Header with Atlas Identity */}
         <div
           className={`p-4 border-b sticky top-0 z-10 backdrop-blur ${
             isDark
-              ? 'border-slate-800/80 bg-slate-950/80'
-              : 'border-slate-200 bg-white/90 shadow-sm'
+              ? 'border-slate-800/80 bg-[#0c121e]/85'
+              : 'border-slate-200/80 bg-white/90 shadow-sm'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -182,7 +182,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SEÇÃO 0: BUSCAS RECENTES */}
           <div
             className={`space-y-2.5 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-950/50 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
+              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -294,7 +294,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SEÇÃO 1: MOTOR DE IA ... */}
           <div
             className={`space-y-3 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-950/50 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
+              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -546,7 +546,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             className={`space-y-2.5 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-950/50 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
+              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -590,7 +590,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             className={`space-y-2.5 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-950/50 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
+              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -767,7 +767,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             className={`space-y-2 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-950/50 border-slate-800/80' : 'bg-white border-slate-200 shadow-sm'
+              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -824,7 +824,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div
           className={`p-3 border-t flex items-center justify-between ${
-            isDark ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-white'
+            isDark ? 'border-slate-800/80 bg-[#0c121e]/90' : 'border-slate-200/80 bg-white/90 shadow-sm'
           }`}
         >
           <button

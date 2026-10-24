@@ -112,10 +112,10 @@ export function Sidebar() {
     location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const navItemClass = (path: string) =>
-    `flex items-center justify-between group/item p-2.5 rounded-lg transition-all text-xs font-semibold ${
+    `flex items-center justify-between group/item p-2.5 rounded-xl transition-all duration-200 text-xs font-semibold ${
       isActive(path)
-        ? 'shadow-none'
-        : 'text-slate-400 hover:bg-surface-interactive hover:text-white'
+        ? 'shadow-[0_2px_10px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)] ring-1 ring-black/5 dark:ring-white/10'
+        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/90 dark:hover:bg-white/[0.06] hover:text-slate-900 dark:hover:text-white hover:translate-x-1'
     }`;
 
   // `--brand-color` is tenant-controlled, so the active nav item's text color must be computed
@@ -241,16 +241,23 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="w-64 bg-slate-900 text-white h-screen flex flex-col p-4 shrink-0 overflow-y-auto border-r border-slate-850 relative select-none">
+    <div className="w-64 bg-white/95 dark:bg-[#0c121e]/95 text-slate-800 dark:text-slate-200 h-screen flex flex-col p-4 shrink-0 overflow-y-auto border-r border-slate-200/80 dark:border-slate-800/80 shadow-[4px_0_24px_rgba(0,0,0,0.03)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.25)] backdrop-blur-2xl relative select-none">
       {/* Brand Header */}
       <div className="mb-4 flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+          <div className="p-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm transition-transform duration-200 hover:scale-105">
             <AtlasLogo className="h-6 w-6" />
           </div>
           <div className="text-left">
-            <h1 className="text-base font-bold leading-none tracking-tight">Birth Hub 360</h1>
-            <span className="text-xs text-slate-400 uppercase font-semibold">Voice Enterprise</span>
+            <h1 className="text-base font-extrabold leading-none tracking-tight text-slate-900 dark:text-white">
+              Birth Hub{' '}
+              <span className="text-[#0369a1] dark:text-[#00D4FF] drop-shadow-[0_0_8px_rgba(0,212,255,0.4)]">
+                360
+              </span>
+            </h1>
+            <span className="text-[9.5px] text-[#0369a1] dark:text-[#00D4FF] uppercase font-mono font-bold tracking-wider">
+              Voice Enterprise
+            </span>
           </div>
         </div>
 
@@ -261,13 +268,13 @@ export function Sidebar() {
       <button
         type="button"
         onClick={triggerSearch}
-        className="mb-4 flex items-center justify-between gap-2 px-3 py-2 bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-300 rounded-lg text-xs transition-colors border border-slate-800 text-left cursor-pointer"
+        className="mb-4 flex items-center justify-between gap-2 px-3 py-2 bg-slate-100/80 dark:bg-white/[0.04] hover:bg-slate-200/80 dark:hover:bg-white/[0.08] text-slate-600 dark:text-slate-300 rounded-xl text-xs transition-all border border-slate-200/80 dark:border-white/[0.08] text-left cursor-pointer shadow-sm hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]"
       >
         <div className="flex items-center gap-2">
-          <Search className="h-3.5 w-3.5" />
+          <Search className="h-3.5 w-3.5 text-slate-400" />
           <span>Pesquisar...</span>
         </div>
-        <kbd className="px-1.5 py-0.5 font-mono text-[9px] bg-slate-800 border border-slate-750 text-slate-400 rounded">
+        <kbd className="px-1.5 py-0.5 font-mono text-[9px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-md shadow-xs">
           Ctrl+K
         </kbd>
       </button>
@@ -277,8 +284,8 @@ export function Sidebar() {
         {/* SECTION 1: FAVORITES (IF EXIST) */}
         {favorites.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 px-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+            <div className="flex items-center gap-1.5 px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono">
+              <Star className="h-3 w-3 text-amber-500 fill-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
               <span>Favoritos</span>
             </div>
             {favorites.map((favPath) => {
@@ -298,7 +305,8 @@ export function Sidebar() {
                   <button
                     type="button"
                     onClick={(e) => toggleFavorite(e, favPath)}
-                    className="opacity-0 group-hover/item:opacity-100 text-slate-500 hover:text-red-400 transition-opacity p-0.5"
+                    className="opacity-0 group-hover/item:opacity-100 text-slate-400 hover:text-red-500 transition-opacity p-0.5"
+                    title="Remover dos favoritos"
                   >
                     <StarOff className="h-3 w-3" />
                   </button>
@@ -310,7 +318,7 @@ export function Sidebar() {
 
         {/* SECTION 2: WORKSPACE */}
         <div className="space-y-1">
-          <p className="px-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <p className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono">
             Workspace
           </p>
           {allNavItems
@@ -329,7 +337,8 @@ export function Sidebar() {
                 <button
                   type="button"
                   onClick={(e) => toggleFavorite(e, item.path)}
-                  className={`opacity-0 group-hover/item:opacity-100 text-slate-500 hover:text-amber-400 transition-opacity p-0.5 ${favorites.includes(item.path) ? 'opacity-100 text-amber-500' : ''}`}
+                  className={`opacity-0 group-hover/item:opacity-100 text-slate-400 hover:text-amber-500 transition-opacity p-0.5 ${favorites.includes(item.path) ? 'opacity-100 text-amber-500' : ''}`}
+                  title="Favoritar item"
                 >
                   <Star
                     className={`h-3 w-3 ${favorites.includes(item.path) ? 'fill-amber-500' : ''}`}
@@ -341,7 +350,7 @@ export function Sidebar() {
 
         {/* SECTION 3: ADMINISTRATIVO */}
         <div className="space-y-1">
-          <p className="px-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <p className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono">
             Administrativo
           </p>
           {allNavItems
@@ -360,7 +369,8 @@ export function Sidebar() {
                 <button
                   type="button"
                   onClick={(e) => toggleFavorite(e, item.path)}
-                  className={`opacity-0 group-hover/item:opacity-100 text-slate-500 hover:text-amber-400 transition-opacity p-0.5 ${favorites.includes(item.path) ? 'opacity-100 text-amber-500' : ''}`}
+                  className={`opacity-0 group-hover/item:opacity-100 text-slate-400 hover:text-amber-500 transition-opacity p-0.5 ${favorites.includes(item.path) ? 'opacity-100 text-amber-500' : ''}`}
+                  title="Favoritar item"
                 >
                   <Star
                     className={`h-3 w-3 ${favorites.includes(item.path) ? 'fill-amber-500' : ''}`}
@@ -372,8 +382,8 @@ export function Sidebar() {
 
         {/* SECTION 4: HISTÓRICO / RECENTES */}
         {recents.length > 0 && (
-          <div className="space-y-1.5 pt-2 border-t border-slate-800/40">
-            <div className="flex items-center gap-1.5 px-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200/80 dark:border-slate-800/60">
+            <div className="flex items-center gap-1.5 px-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono">
               <Clock className="h-3 w-3" />
               <span>Navegação Recente</span>
             </div>
@@ -385,9 +395,9 @@ export function Sidebar() {
                   <Link
                     key={recentPath}
                     to={recentPath}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-slate-400 hover:text-white hover:bg-slate-850 transition-colors"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
                   >
-                    <ChevronRight className="h-3 w-3" />
+                    <ChevronRight className="h-3 w-3 text-slate-400" />
                     <span>{matched.label}</span>
                   </Link>
                 );
@@ -398,8 +408,10 @@ export function Sidebar() {
       </div>
 
       {/* Theme selector widget */}
-      <div className="py-2.5 px-2 mb-2 mt-4 bg-slate-850/40 rounded-lg border border-slate-800/65 flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Aparência</span>
+      <div className="py-2 px-2.5 mb-2 mt-4 bg-slate-100/80 dark:bg-white/[0.03] rounded-xl border border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between">
+        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-mono">
+          Aparência
+        </span>
         <div className="flex gap-1">
           <button
             type="button"
@@ -409,7 +421,7 @@ export function Sidebar() {
                 ? { backgroundColor: 'var(--brand-color, #ff5618)', color: accessibleBrandText }
                 : undefined
             }
-            className={`p-1.5 rounded transition-colors ${theme === 'light' ? '' : 'text-slate-500 hover:text-slate-350 hover:bg-slate-800/40'}`}
+            className={`p-1.5 rounded-lg transition-colors ${theme === 'light' ? 'shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.06]'}`}
             title="Tema Claro"
             aria-label="Tema Claro"
             aria-pressed={theme === 'light'}
@@ -424,7 +436,7 @@ export function Sidebar() {
                 ? { backgroundColor: 'var(--brand-color, #ff5618)', color: accessibleBrandText }
                 : undefined
             }
-            className={`p-1.5 rounded transition-colors ${theme === 'dark' ? '' : 'text-slate-500 hover:text-slate-350 hover:bg-slate-800/40'}`}
+            className={`p-1.5 rounded-lg transition-colors ${theme === 'dark' ? 'shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.06]'}`}
             title="Tema Escuro"
             aria-label="Tema Escuro"
             aria-pressed={theme === 'dark'}
@@ -439,7 +451,7 @@ export function Sidebar() {
                 ? { backgroundColor: 'var(--brand-color, #ff5618)', color: accessibleBrandText }
                 : undefined
             }
-            className={`p-1.5 rounded transition-colors ${theme === 'system' ? '' : 'text-slate-500 hover:text-slate-350 hover:bg-slate-800/40'}`}
+            className={`p-1.5 rounded-lg transition-colors ${theme === 'system' ? 'shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.06]'}`}
             title="Tema do Sistema"
             aria-label="Tema do Sistema"
             aria-pressed={theme === 'system'}
@@ -450,37 +462,39 @@ export function Sidebar() {
       </div>
 
       {/* User profile & Workspace settings */}
-      <div className="mt-auto pt-3 border-t border-slate-850">
+      <div className="mt-auto pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
         <div className="px-2 py-1">
           {sessionStatus === 'loading' && !user ? (
             <div className="flex items-center gap-2.5 text-left animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-slate-800 shrink-0" />
+              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 shrink-0" />
               <div className="space-y-1.5 flex-1">
-                <div className="h-2.5 w-24 rounded bg-slate-800" />
-                <div className="h-2 w-32 rounded bg-slate-800" />
+                <div className="h-2.5 w-24 rounded bg-slate-200 dark:bg-slate-800" />
+                <div className="h-2 w-32 rounded bg-slate-200 dark:bg-slate-800" />
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2.5 text-left">
               <div
-                className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-sm font-bold shrink-0"
+                className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-sm font-bold shrink-0 shadow-sm"
                 style={{ color: accessibleBrandText }}
                 aria-hidden="true"
               >
                 {user?.email?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="text-xs overflow-hidden">
-                <p className="text-white font-bold truncate">
+                <p className="text-slate-900 dark:text-white font-bold truncate">
                   {user?.email || 'Sessão não identificada'}
                 </p>
-                <p className="text-slate-500 truncate capitalize">{user?.role || '—'}</p>
+                <p className="text-slate-500 dark:text-slate-400 truncate capitalize text-[11px]">
+                  {user?.role || '—'}
+                </p>
               </div>
             </div>
           )}
           <button
             type="button"
             onClick={() => auth.logout()}
-            className="text-xs text-slate-500 hover:text-white mt-2 w-full text-left font-bold block"
+            className="text-xs text-slate-500 hover:text-red-600 dark:hover:text-red-400 mt-2 w-full text-left font-semibold block transition-colors"
           >
             Sair do Workspace
           </button>
