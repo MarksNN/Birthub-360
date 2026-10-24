@@ -15,11 +15,14 @@ import {
   Gauge,
   GraduationCap,
   Layers,
+  LayoutGrid,
+  ListFilter,
   Loader2,
   Search,
   Settings,
   ShieldCheck,
   Sparkles,
+  Star,
   Users,
   Wand2,
   Workflow,
@@ -34,7 +37,8 @@ import { Button } from '../../../components/ui/Button.js';
 import { Card, CardDescription, CardTitle } from '../../../components/ui/Card.js';
 import { PageTitleCard } from '../../../components/ui/PageTitleCard.js';
 import { useBrandAccent } from '../../../hooks/useBrandAccent.js';
-import { fadeInUp, SPRING_SOFT, staggerContainer, staggerItem } from '../../../lib/motion.js';
+import { fadeInUp, staggerContainer } from '../../../lib/motion.js';
+import { SoundFX } from '../../../lib/soundEffects.js';
 import { CopilotoIaHub } from '../../copiloto-ia/components/CopilotoIaHub.js';
 import { AIConfigCenter } from '../../dashboard/components/AIConfigCenter.js';
 import { type KnowledgeDocumentSummary, knowledgeApi } from '../../knowledge/knowledge.api.js';
@@ -68,6 +72,7 @@ export type IntelligenceTab =
   | 'commercial_cell';
 
 export type ToolCategory = 'all' | 'agents' | 'tactical' | 'governance' | 'infra';
+export type ViewMode = 'grid' | 'matrix';
 
 interface ToolCategoryConfig {
   id: ToolCategory;
@@ -319,6 +324,9 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
   },
 ];
 
+const PINNED_STORAGE_KEY = 'birthhub360:ai-hub-pinned';
+const VIEW_MODE_STORAGE_KEY = 'birthhub360:ai-hub-view-mode';
+
 interface IntelligenceHubProps {
   initialTab?: IntelligenceTab;
 }
@@ -338,7 +346,47 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
   const [activeTab, setActiveTab] = useState<IntelligenceTab | null>(initialTab ?? null);
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+      if (saved === 'matrix' || saved === 'grid') return saved;
+    }
+    return 'grid';
+  });
+
+  const [pinnedIds, setPinnedIds] = useState<IntelligenceTab[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = window.localStorage.getItem(PINNED_STORAGE_KEY);
+        if (saved) return JSON.parse(saved) as IntelligenceTab[];
+      } catch {
+        // Fallback silencioso
+      }
+    }
+    return ['commercial_cell', 'tools', 'copiloto'];
+  });
+
   const accent = useBrandAccent();
+
+  const togglePin = useCallback((id: IntelligenceTab, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    SoundFX.play('click');
+    setPinnedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(next));
+      }
+      return next;
+    });
+  }, []);
+
+  const handleChangeViewMode = useCallback((mode: ViewMode) => {
+    SoundFX.play('click');
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+    }
+  }, []);
 
   // Estado real da Base de Conhecimento (RAG) — respeita AGENTS.md Bloqueador B-06 (nunca dados fictícios)
   const [ragDocuments, setRagDocuments] = useState<KnowledgeDocumentSummary[] | null>(null);
@@ -366,6 +414,7 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && activeTab !== null) {
         setActiveTab(null);
+        SoundFX.play('navigate');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -392,8 +441,53 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
     return TOOL_DEFINITIONS.find((t) => t.id === activeTab);
   }, [activeTab]);
 
-  const _flagshipTool = useMemo(() => {
-    return TOOL_DEFINITIONS.find((t) => t.isFlagship) ?? TOOL_DEFINITIONS[0];
+  // Ferramentas fixadas que existem no catálogo
+  const pinnedTools = useMemo(() => {
+    return pinnedIds
+      .map((id) => TOOL_DEFINITIONS.find((t) => t.id === id))
+      .filter((t): t is ToolDefinition => Boolean(t));
+  }, [pinnedIds]);
+
+  // Agrupamentos por pilares operacionais (para a visualização agrupada em 'all')
+  const pillarClusters = useMemo(() => {
+    return [
+      {
+        id: 'agents' as const,
+        label: '1. Células & Enxames Autônomos',
+        subtitle:
+          'Agentes executivos especializados com orquestração coordenada e traces rastreáveis.',
+        icon: Bot,
+        tools: filteredTools.filter((t) => t.category === 'agents'),
+      },
+      {
+        id: 'tactical' as const,
+        label: '2. Operação Tática & Outreach B2B',
+        subtitle: 'Geração de abordagens multicanal, frameworks clássicos e scripts de conversão.',
+        icon: Wand2,
+        tools: filteredTools.filter((t) => t.category === 'tactical'),
+      },
+      {
+        id: 'governance' as const,
+        label: '3. Governança, Human-in-the-Loop & Qualidade',
+        subtitle:
+          'Fila de aprovação de riscos, harness contínuo com Golden Dataset e telemetria Groq.',
+        icon: ShieldCheck,
+        tools: filteredTools.filter((t) => t.category === 'governance'),
+      },
+      {
+        id: 'infra' as const,
+        label: '4. Infraestrutura, Modelos & Conhecimento',
+        subtitle:
+          'Console multi-motor (Ollama & Cloud), base de embeddings RAG e parâmetros finos.',
+        icon: Cpu,
+        tools: filteredTools.filter((t) => t.category === 'infra'),
+      },
+    ].filter((p) => p.tools.length > 0);
+  }, [filteredTools]);
+
+  const handleOpenTool = useCallback((id: IntelligenceTab) => {
+    SoundFX.play('click');
+    setActiveTab(id);
   }, []);
 
   // Se nenhuma ferramenta estiver ativa, renderiza a visão do Hub de IA com novo design de Command Center
@@ -531,7 +625,7 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                   <Button
                     type="button"
                     size="lg"
-                    onClick={() => setActiveTab('commercial_cell')}
+                    onClick={() => handleOpenTool('commercial_cell')}
                     className="w-full sm:w-auto bg-gradient-to-r from-brand to-[#00a8ff] text-on-brand font-bold shadow-glow-brand hover:opacity-95 transition-all text-sm gap-2"
                   >
                     Acessar Célula Comercial <ArrowRight className="w-4 h-4" />
@@ -541,9 +635,48 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
             </motion.div>
           )}
 
-          {/* Barra de Navegação por Categorias e Campo de Busca */}
+          {/* Barra de Capacidades Fixadas / Favoritos (se existirem ferramentas fixadas) */}
+          {pinnedTools.length > 0 && searchQuery.trim() === '' && selectedCategory === 'all' && (
+            <div className="p-3.5 rounded-card bg-surface/80 dark:bg-[#101420]/80 border border-line">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-[11px] font-bold text-ink-2 uppercase tracking-wider flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  Capacidades Fixadas ({pinnedTools.length})
+                </span>
+                <span className="text-[10px] text-ink-2">Acesso rápido diário</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                {pinnedTools.map((tool) => {
+                  const Icon = tool.icon;
+                  return (
+                    <button
+                      key={`pinned-${tool.id}`}
+                      type="button"
+                      onClick={() => handleOpenTool(tool.id)}
+                      className="flex items-center justify-between p-2.5 rounded-control bg-surface-2 hover:bg-surface border border-line hover:border-brand/40 text-left transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 rounded-md bg-brand/10 text-brand flex items-center justify-center shrink-0 group-hover:bg-brand group-hover:text-on-brand transition-colors">
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-ink truncate group-hover:text-brand transition-colors">
+                            {tool.label}
+                          </p>
+                          <p className="text-[10px] text-ink-2 truncate">{tool.badge}</p>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-3 h-3 text-ink-2 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0 ml-1.5" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Barra de Navegação por Categorias, Campo de Busca e Alternador de Modo de Visualização */}
           <div className="space-y-4 pt-2">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
               {/* Categorias / Filtros Pills */}
               <div
                 className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none"
@@ -563,7 +696,10 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                       type="button"
                       role="tab"
                       aria-selected={isSelected}
-                      onClick={() => setSelectedCategory(cat.id)}
+                      onClick={() => {
+                        SoundFX.play('click');
+                        setSelectedCategory(cat.id);
+                      }}
                       className={`inline-flex items-center gap-2 px-3 py-2 rounded-control text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-brand text-on-brand shadow-sm font-bold'
@@ -586,26 +722,57 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                 })}
               </div>
 
-              {/* Input de Busca Rápida */}
-              <div className="relative min-w-[240px] sm:w-72">
-                <Search className="w-4 h-4 text-ink-2 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Buscar capacidade, script, groq..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-surface/90 dark:bg-[#141926]/90 border border-line rounded-control pl-9 pr-8 py-2 text-xs text-ink placeholder:text-ink-2/60 focus:outline-none focus:border-brand transition-colors"
-                />
-                {searchQuery && (
+              {/* Controles da Direita: Input de Busca + Alternador Grid / Matrix */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Input de Busca Rápida */}
+                <div className="relative flex-1 sm:w-64">
+                  <Search className="w-4 h-4 text-ink-2 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Buscar capacidade, script, groq..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-surface/90 dark:bg-[#141926]/90 border border-line rounded-control pl-9 pr-8 py-2 text-xs text-ink placeholder:text-ink-2/60 focus:outline-none focus:border-brand transition-colors"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-2 hover:text-ink p-0.5 cursor-pointer"
+                      aria-label="Limpar busca"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Alternador de Modo de Exibição (Grid vs. Matrix) */}
+                <div className="flex items-center p-0.5 rounded-control bg-surface-2 border border-line shrink-0">
                   <button
                     type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-2 hover:text-ink p-0.5"
-                    aria-label="Limpar busca"
+                    onClick={() => handleChangeViewMode('grid')}
+                    title="Exibição em Cards (Bento Grid)"
+                    className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                      viewMode === 'grid'
+                        ? 'bg-brand text-on-brand shadow-xs'
+                        : 'text-ink-2 hover:text-ink'
+                    }`}
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <LayoutGrid className="w-4 h-4" />
                   </button>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => handleChangeViewMode('matrix')}
+                    title="Exibição Compacta (Command Matrix)"
+                    className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                      viewMode === 'matrix'
+                        ? 'bg-brand text-on-brand shadow-xs'
+                        : 'text-ink-2 hover:text-ink'
+                    }`}
+                  >
+                    <ListFilter className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -659,86 +826,302 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
             </div>
           )}
 
-          {/* Grade de Cards das Ferramentas com Distribuição Elegante e Hierarquia */}
-          {filteredTools.length > 0 && (
-            <motion.nav
-              aria-label="Capacidades de Inteligência Artificial"
-              variants={staggerContainer()}
-              initial="hidden"
-              animate="show"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-            >
-              {filteredTools.map((tool) => {
-                const Icon = tool.icon;
-                const isSpecial = tool.isFlagship;
+          {/* ======================================================== */}
+          {/* MODO 1: BENTO GRID VIEW                                  */}
+          {/* ======================================================== */}
+          {filteredTools.length > 0 && viewMode === 'grid' && (
+            <div className="space-y-8">
+              {/* Se a visualização for 'all' e não houver termo de busca, exibe organizado por pilares */}
+              {selectedCategory === 'all' && searchQuery.trim() === '' ? (
+                pillarClusters.map((cluster) => {
+                  const PillarIcon = cluster.icon;
+                  return (
+                    <section key={cluster.id} className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-line/60 pb-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-control bg-surface-2 border border-line flex items-center justify-center text-brand shrink-0">
+                            <PillarIcon className="w-3.5 h-3.5" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-ink tracking-tight">
+                              {cluster.label}
+                            </h3>
+                            <p className="text-xs text-ink-2 hidden sm:block">{cluster.subtitle}</p>
+                          </div>
+                        </div>
+                        <span className="text-[11px] font-semibold text-ink-2 bg-surface-2 border border-line px-2 py-0.5 rounded-full">
+                          {cluster.tools.length} capacidades
+                        </span>
+                      </div>
 
-                return (
-                  <motion.button
-                    key={tool.id}
-                    type="button"
-                    variants={staggerItem}
-                    transition={SPRING_SOFT}
-                    onClick={() => setActiveTab(tool.id)}
-                    className="text-left cursor-pointer group outline-none h-full"
-                  >
-                    <Card
-                      variant="interactive"
-                      padding="sm"
-                      className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 ${
-                        isSpecial ? 'ring-1 ring-brand/30' : ''
-                      }`}
-                    >
-                      <div>
-                        {/* Topo do Card: Ícone e Badge */}
-                        <div className="flex items-start justify-between gap-3 mb-3.5">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-10 h-10 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
-                              <Icon className="w-5 h-5" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {cluster.tools.map((tool) => {
+                          const Icon = tool.icon;
+                          const isPinned = pinnedIds.includes(tool.id);
+
+                          return (
+                            <Card
+                              key={tool.id}
+                              variant="interactive"
+                              padding="sm"
+                              onClick={() => handleOpenTool(tool.id)}
+                              className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${
+                                tool.isFlagship ? 'ring-1 ring-brand/30' : ''
+                              }`}
+                            >
+                              <div>
+                                {/* Topo do Card: Ícone, Nome e Botão de Fixar */}
+                                <div className="flex items-start justify-between gap-2 mb-3">
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="w-9 h-9 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
+                                      <Icon className="w-4 h-4" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <CardTitle className="text-xs font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
+                                        {tool.label}
+                                      </CardTitle>
+                                      <span className="text-[10px] font-mono text-ink-2 truncate block">
+                                        {tool.badge}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => togglePin(tool.id, e)}
+                                    title={
+                                      isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'
+                                    }
+                                    className={`p-1 rounded-md transition-colors cursor-pointer shrink-0 ${
+                                      isPinned
+                                        ? 'text-amber-400 hover:text-amber-300'
+                                        : 'text-ink-2/40 hover:text-ink-2'
+                                    }`}
+                                  >
+                                    <Star
+                                      className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
+                                    />
+                                  </button>
+                                </div>
+
+                                {/* Descrição Funcional */}
+                                <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
+                                  {tool.description}
+                                </CardDescription>
+                              </div>
+
+                              {/* Rodapé do Card com Meta Técnica e Link de Ação */}
+                              <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-mono text-ink-2 truncate max-w-[150px]">
+                                  {tool.techMeta}
+                                </span>
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
+                                  Acessar <ArrowRight className="w-3 h-3" />
+                                </span>
+                              </div>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  );
+                })
+              ) : (
+                /* Visualização em grade plana quando filtrado por categoria ou termo de busca */
+                <motion.nav
+                  aria-label="Capacidades de Inteligência Artificial"
+                  variants={staggerContainer()}
+                  initial="hidden"
+                  animate="show"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                >
+                  {filteredTools.map((tool) => {
+                    const Icon = tool.icon;
+                    const isPinned = pinnedIds.includes(tool.id);
+
+                    return (
+                      <Card
+                        key={tool.id}
+                        variant="interactive"
+                        padding="sm"
+                        onClick={() => handleOpenTool(tool.id)}
+                        className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${
+                          tool.isFlagship ? 'ring-1 ring-brand/30' : ''
+                        }`}
+                      >
+                        <div>
+                          {/* Topo do Card: Ícone e Badge */}
+                          <div className="flex items-start justify-between gap-3 mb-3.5">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-10 h-10 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
+                                <Icon className="w-5 h-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <CardTitle className="text-sm font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
+                                  {tool.label}
+                                </CardTitle>
+                                <span className="text-[10px] font-medium text-ink-2 uppercase tracking-wider block">
+                                  {tool.category === 'agents'
+                                    ? 'Célula & Enxame'
+                                    : tool.category === 'tactical'
+                                      ? 'Operação Tática'
+                                      : tool.category === 'governance'
+                                        ? 'Governança & Evals'
+                                        : 'Infra & Modelos'}
+                                </span>
+                              </div>
                             </div>
-                            <div>
-                              <CardTitle className="text-sm font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
-                                {tool.label}
-                              </CardTitle>
-                              <span className="text-[10px] font-medium text-ink-2 uppercase tracking-wider">
-                                {tool.category === 'agents'
-                                  ? 'Célula & Enxame'
-                                  : tool.category === 'tactical'
-                                    ? 'Operação Tática'
-                                    : tool.category === 'governance'
-                                      ? 'Governança & Evals'
-                                      : 'Infra & Modelos'}
-                              </span>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <Badge
+                                variant="secondary"
+                                className="text-[10px] font-semibold py-0.5 px-2 bg-surface-2 border-line text-ink-2"
+                              >
+                                {tool.badge}
+                              </Badge>
+                              <button
+                                type="button"
+                                onClick={(e) => togglePin(tool.id, e)}
+                                title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
+                                className={`p-1 rounded-md transition-colors cursor-pointer ${
+                                  isPinned
+                                    ? 'text-amber-400 hover:text-amber-300'
+                                    : 'text-ink-2/40 hover:text-ink-2'
+                                }`}
+                              >
+                                <Star
+                                  className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
+                                />
+                              </button>
                             </div>
                           </div>
 
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] font-semibold shrink-0 py-0.5 px-2 bg-surface-2 border-line text-ink-2"
-                          >
-                            {tool.badge}
-                          </Badge>
+                          {/* Descrição Funcional */}
+                          <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
+                            {tool.description}
+                          </CardDescription>
                         </div>
 
-                        {/* Descrição Funcional */}
-                        <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
-                          {tool.description}
-                        </CardDescription>
-                      </div>
+                        {/* Rodapé do Card com Meta Técnica e Link de Ação */}
+                        <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-mono text-ink-2 truncate max-w-[190px]">
+                            {tool.techMeta}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
+                            Acessar <ArrowRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </motion.nav>
+              )}
+            </div>
+          )}
 
-                      {/* Rodapé do Card com Meta Técnica e Link de Ação */}
-                      <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
-                        <span className="text-[11px] font-mono text-ink-2 truncate max-w-[190px]">
-                          {tool.techMeta}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
-                          Acessar <ArrowRight className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    </Card>
-                  </motion.button>
-                );
-              })}
-            </motion.nav>
+          {/* ======================================================== */}
+          {/* MODO 2: DENSE COMMAND MATRIX (Alta Densidade Operacional)  */}
+          {/* ======================================================== */}
+          {filteredTools.length > 0 && viewMode === 'matrix' && (
+            <div className="rounded-card border border-line bg-surface/90 dark:bg-[#121622]/90 overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-line bg-surface-2/70 text-ink-2 font-mono uppercase text-[10px] tracking-wider">
+                      <th className="py-3 px-4 font-semibold w-12 text-center">Pin</th>
+                      <th className="py-3 px-4 font-semibold">Capacidade / Agente</th>
+                      <th className="py-3 px-4 font-semibold">Pilar Operacional</th>
+                      <th className="py-3 px-4 font-semibold hidden md:table-cell">
+                        Stack & Metadados
+                      </th>
+                      <th className="py-3 px-4 font-semibold">Destaque</th>
+                      <th className="py-3 px-4 font-semibold text-right">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line/60">
+                    {filteredTools.map((tool) => {
+                      const Icon = tool.icon;
+                      const isPinned = pinnedIds.includes(tool.id);
+
+                      return (
+                        <tr
+                          key={tool.id}
+                          onClick={() => handleOpenTool(tool.id)}
+                          className="hover:bg-surface-2/80 transition-colors cursor-pointer group"
+                        >
+                          {/* Pin Toggle */}
+                          <td className="py-3 px-4 text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => togglePin(tool.id, e)}
+                              className={`p-1 rounded-md transition-colors cursor-pointer ${
+                                isPinned
+                                  ? 'text-amber-400 hover:text-amber-300'
+                                  : 'text-ink-2/30 hover:text-ink-2'
+                              }`}
+                            >
+                              <Star className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`} />
+                            </button>
+                          </td>
+
+                          {/* Nome e Ícone */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-7 h-7 rounded-control bg-brand/10 text-brand flex items-center justify-center shrink-0 group-hover:bg-brand group-hover:text-on-brand transition-colors">
+                                <Icon className="w-3.5 h-3.5" />
+                              </div>
+                              <div>
+                                <p className="font-bold text-ink group-hover:text-brand transition-colors">
+                                  {tool.label}
+                                </p>
+                                <p className="text-[11px] text-ink-2 line-clamp-1 max-w-sm">
+                                  {tool.description}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Categoria */}
+                          <td className="py-3 px-4">
+                            <span className="text-[11px] font-medium text-ink-2">
+                              {tool.category === 'agents'
+                                ? 'Célula & Enxame'
+                                : tool.category === 'tactical'
+                                  ? 'Operação Tática'
+                                  : tool.category === 'governance'
+                                    ? 'Governança & Evals'
+                                    : 'Infra & Modelos'}
+                            </span>
+                          </td>
+
+                          {/* Stack Metadados */}
+                          <td className="py-3 px-4 hidden md:table-cell font-mono text-[11px] text-ink-2">
+                            {tool.techMeta}
+                          </td>
+
+                          {/* Badge de Destaque */}
+                          <td className="py-3 px-4">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] font-semibold py-0.5 px-2 bg-surface-2 border-line text-ink-2 whitespace-nowrap"
+                            >
+                              {tool.badge}
+                            </Badge>
+                          </td>
+
+                          {/* Ação */}
+                          <td className="py-3 px-4 text-right">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform">
+                              Executar <ArrowRight className="w-3.5 h-3.5" />
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -753,7 +1136,10 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setActiveTab(null)}
+            onClick={() => {
+              SoundFX.play('navigate');
+              setActiveTab(null);
+            }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-control bg-surface-2 border border-line hover:border-brand/40 text-ink text-xs font-bold hover:bg-surface transition-all cursor-pointer group"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
@@ -788,7 +1174,7 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
         {/* Switcher Rápido de Ferramentas Adjacentes */}
         <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
           <span className="text-[11px] font-semibold text-ink-2 mr-1 hidden md:inline">
-            Alternar ferramenta:
+            Alternar no mesmo pilar:
           </span>
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
             {TOOL_DEFINITIONS.filter((t) => t.category === activeToolDef?.category).map((peer) => {
@@ -797,10 +1183,10 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                 <button
                   key={peer.id}
                   type="button"
-                  onClick={() => setActiveTab(peer.id)}
+                  onClick={() => handleOpenTool(peer.id)}
                   className={`text-[11px] px-2.5 py-1 rounded-control transition-colors whitespace-nowrap cursor-pointer ${
                     isCurrent
-                      ? 'bg-brand text-on-brand font-bold'
+                      ? 'bg-brand text-on-brand font-bold shadow-xs'
                       : 'bg-surface-2 text-ink-2 hover:text-ink hover:bg-surface border border-line'
                   }`}
                 >

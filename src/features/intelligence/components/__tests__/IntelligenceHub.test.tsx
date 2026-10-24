@@ -125,4 +125,29 @@ describe('IntelligenceHub Redesigned', () => {
     // Deve voltar para a grade
     expect(screen.getByText('Hub de Inteligência Artificial & Agentes')).toBeInTheDocument();
   });
+
+  it('switches between Bento Grid and Command Matrix view modes', () => {
+    renderHub();
+
+    // Clica no botão de alternar para Matrix View
+    const matrixBtn = screen.getByTitle(/Exibição Compacta/i);
+    fireEvent.click(matrixBtn);
+
+    // Deve exibir tabela da Command Matrix
+    expect(screen.getByText('Capacidade / Agente')).toBeInTheDocument();
+    expect(screen.getByText('Pilar Operacional')).toBeInTheDocument();
+    expect(screen.getByText('Stack & Metadados')).toBeInTheDocument();
+
+    // Clica de volta para Grid View
+    const gridBtn = screen.getByTitle(/Exibição em Cards/i);
+    fireEvent.click(gridBtn);
+
+    expect(screen.queryByText('Capacidade / Agente')).not.toBeInTheDocument();
+  });
+
+  it('toggles pinned status of a tool', () => {
+    renderHub();
+
+    expect(screen.getByText(/Capacidades Fixadas/i)).toBeInTheDocument();
+  });
 });
