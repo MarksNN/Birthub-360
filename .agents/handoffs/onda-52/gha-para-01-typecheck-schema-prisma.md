@@ -1,7 +1,7 @@
 De: gha — Agente de CI/GitHub Actions (workflows sob 08 — QA e Release)
 Para: 01 — Plataforma e Dados
 Onda: 52
-Status: aberto
+Status: em-andamento
 Prioridade: bloqueador
 Bloqueador-ref: GHA-TYPECHECK-01 (run 40204212570)
 Sprint destino: desbloqueio do application gate (`Run Type Check`) após #67 → #71 → #72
@@ -147,3 +147,40 @@ Observações para a decisão:
 
 - Listas completas: `tsc-main.txt` (107), `tsc-validate.txt` (99) e `tsc-diff.txt` (0 novos), geradas pelo agente GHA. O conteúdo relevante está reproduzido acima.
 - O typecheck nunca foi alcançado na main porque Trivy e lint falhavam antes. Os erros são anteriores às PRs #67/#71/#72.
+
+## Resolução
+
+Resolução parcial do 01, só da **parte de integrações** (11 erros, 5 arquivos). A parte de inteligência (55 erros, 07) continua aberta e terá decisão em separado.
+
+**Decisão: (b), o schema está correto. Não cabe criar modelo nem migration. A correção do código é do 06** (`gha-para-06-typecheck-integrations.md`).
+
+| Delegate | Modelo no schema | Migration em `prisma/migrations/` | Histórico (`git log --all -S`) | Chamadores fora do próprio `.service.ts` | Decisão |
+|---|---|---|---|---|---|
+| `calendlyConnection` | não | nenhuma | nunca existiu | 0 | (b) → 06 |
+| `googleSheetsConnection` | não | nenhuma | nunca existiu | 0 | (b) → 06 |
+| `hubspotConnection` | não | nenhuma | nunca existiu | 0 | (b) → 06 |
+| `notionConnection` | não | nenhuma | nunca existiu | 0 | (b) → 06 |
+| `zoomConnection` | não | nenhuma | nunca existiu | 0 | (b) → 06 |
+
+Fundamentos:
+
+1. **Não existe fonte de verdade de DDL.** Nenhuma migration aplicada cria essas tabelas e nenhum desses modelos jamais esteve em `prisma/schema.prisma` em qualquer ref. Por isso não há o que alinhar.
+2. **É código morto ou stub.** Nenhuma das 14 funções exportadas pelos 5 services é importada em `src/`, `tests/` ou `scripts/`. Os métodos de "uso" retornam placeholders, como `'zoom-' + Date.now()` e `https://sheets.google.com/placeholder`. Os arquivos entraram em commits de scaffold e de "liquidação geral":
+   - `58e9fd87` (hubspot);
+   - `dfe7517c` (calendly);
+   - `20eed2c8` (googleSheets e notion);
+   - `d9ea7a3a` (zoom).
+   Nenhum deles tem handoff ao 01 pedindo esses modelos.
+3. **Freeze.** Criar 5 tabelas novas seria feature nova, não bug, débito, segurança nem tenancy.
+4. **Segurança.** Os stubs gravariam `apiKey` e `apiSecret` em texto puro, o que contraria o contrato de credenciais. O padrão vigente é `ExternalCrmConnection`, com `provider` (já inclui `"hubspot"`) e config cifrada, e o `HubSpotProvider` da camada genérica já existe e está testado.
+
+Encaminhamento ao 06, conforme `gha-para-06-typecheck-integrations.md` §Alteração necessária:
+- remover os 5 services mortos; ou
+- migrar HubSpot para `ExternalCrmConnection`/`HubSpotProvider`; ou
+- colocar as integrações atrás de flag sem acesso a delegates inexistentes.
+
+Se o produto quiser mesmo Calendly, Zoom, Notion ou Google Sheets, o 06 abre handoff `06-para-01` pedindo o schema depois do freeze. O 01 então cria modelo com `organizationId`, RLS FORCE, grants pelo regime do `create-app-role.sql` e `piiFields` para os tokens.
+
+Validação desta decisão (main `58f1895b`):
+- `npm run typecheck` local deu 99 erros, e a lista é idêntica à do job `121247466311` da run `40219355968` (push na main).
+- Os 11 erros acima estão na lista. Esta resolução não os remove, porque eles saem com a correção de código do 06.
