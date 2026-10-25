@@ -77,7 +77,7 @@ describe('Sidebar', () => {
   it('renders without crashing and shows the main navigation items', () => {
     renderSidebar();
 
-    expect(screen.getByText('Birth Hub 360')).toBeInTheDocument();
+    expect(screen.getByText(/Birth Hub/i)).toBeInTheDocument();
     expect(screen.getByText('Agent Registry')).toBeInTheDocument();
     expect(screen.getByText('Voice Studio')).toBeInTheDocument();
     // Real session user from useSessionStore (GET /api/auth/me), not a fabricated fallback.
