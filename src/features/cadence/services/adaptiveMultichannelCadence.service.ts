@@ -239,6 +239,18 @@ export class AdaptiveMultichannelCadenceService implements IMultichannelCadenceP
     return this.enrollmentsStore.get(`${organizationId}:${enrollmentId}`);
   }
 
+  findEnrollmentByLead(
+    organizationId: string,
+    leadId: string,
+  ): MultichannelCadenceEnrollment | undefined {
+    for (const enrollment of this.enrollmentsStore.values()) {
+      if (enrollment.organizationId === organizationId && enrollment.leadId === leadId) {
+        return enrollment;
+      }
+    }
+    return undefined;
+  }
+
   isLeadOptedOut(organizationId: string, leadId: string): boolean {
     const optOutKey = `${organizationId}:${leadId}`;
     const blockedChannels = this.optOutRegistry.get(optOutKey);
