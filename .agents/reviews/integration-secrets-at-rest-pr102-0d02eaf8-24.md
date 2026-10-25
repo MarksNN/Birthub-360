@@ -1,64 +1,42 @@
-# Parecer Agente 24 — PR #102 (Agente 15, segredos de integração at-rest) — reauditoria do P2 (runbook)
+# Parecer Agente 24 — PR #102 (Agente 15, segredos de integração at-rest) — veredito final
 
-- **Veredito: BLOQUEADO @ `0d02eaf83e0df1afb43d9dd58cd010b17b402053`** — único motivo: diag `f0f85829` ainda em execução. A revisão estática do delta não tem bloqueio.
-- Base: `main` = `acd6c61413d6e3fc617a1f8521e50a79072b22f0`
-- Parecer anterior: BLOQUEADO @ 750452f5 (branch agente/24-review-pr102-750452f5; P2 do runbook + diag em execução)
-- Método: só fetch/diff/show/gh api (sem checkout, worktree ou npm ci). Nenhum comentário no PR e nenhuma alteração no código auditado.
+- **Veredito: APROVADO @ `0d02eaf83e0df1afb43d9dd58cd010b17b402053`** (com as condições abaixo). Substitui o BLOQUEADO @ 0d02eaf8 (commit `b0f48b74`), que dependia só da diag.
+- Base: `main` = `acd6c61413d6e3fc617a1f8521e50a79072b22f0`. PR aberto, fora de draft, head ainda `0d02eaf8`, MERGEABLE (conferido às 19:27 BRT).
+- Qualquer commit novo no PR invalida este veredito.
+- Método: só fetch/diff/show/`gh api`/logs dos jobs (sem checkout, worktree ou npm ci). Nenhum comentário no PR e nenhuma alteração no código auditado.
+- A revisão estática (delta só `.md`, runbook × código) está no commit `b0f48b74`, deste mesmo arquivo. Continua válida e não muda aqui.
 
-## Delta 750452f5 → 0d02eaf8
-- `git merge-base --is-ancestor 750452f5 0d02eaf8` ✓ (fast-forward, 1 commit: `0d02eaf83 docs(security): 15 — runbook RB-SEC-010 …`).
-- `git diff --name-only 750452f5..0d02eaf8` lista **só `.md`** ✓ (6 arquivos, +157/−42):
-  - `docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` (+188 com reescrita)
-  - `docs/ADR/ADR-010-integration-settings-at-rest.md` (+1, passo 7)
-  - `docs/security/SECRET_ROTATION_POLICY.md` (+2/−1)
-  - `docs/security/SECURITY_GUIDE.md` (+2/−1)
-  - `docs/security/runbooks/INCIDENT_RESPONSE.md` (+1/−1)
-  - `.agents/handoffs/onda-52/15-para-24-integration-secrets-at-rest.md` (linha de Status)
-- Como a árvore não-`.md` de 0d02eaf8 é idêntica à de 750452f5, a diag f0f85829 (parent 750452f5, só `ci.yml` blob `d8a7e3a0`, conferido) vale para este head.
-- gitleaks: não está instalado no box nesta rodada. Fiz uma varredura regex nas linhas adicionadas do delta (base64 ≥ 40, `sk_live`, `ghp_`, `AKIA`, `PRIVATE KEY`) e não achei nada. Os placeholders são `<DB_URL>`, `<SNAPSHOT_ID>` e `$OLD_KEY`/`$NEW_KEY`. O 15 relata gitleaks com 0 achados na faixa. O secret scan da diag deu ✓.
+## Validade da diag para este head
+- `f0f85829`: parent `750452f5`, e `git diff --name-only 750452f5 f0f85829` = só `.github/workflows/ci.yml` ✓.
+- `git diff --name-only 750452f5 0d02eaf8 | grep -v '\.md$'` = vazio ✓. A árvore de código de 0d02eaf8 é a mesma testada na diag.
+- O job fez checkout de `8878729 Merge f0f85829 into acd6c614`, e a tree de `8878729` é igual à de `f0f85829` (`e147dcea`) ✓, porque acd6c614 é ancestral de 750452f5.
 
-## Runbook × código real (`reencrypt-credentials.ts` + `credential-script-guards.ts` @ 0d02eaf8)
-Ordem ✓: pré-req backfill (opcional, com OLD_KEY) → 1 gerar chave (`read -rs`) → 2 dry-run com contagem esperada → 3 snapshot com id anotado → 4 dry-run opcional de `--model=Setting` → 5 `--apply --snapshot-confirmed=<id>` → **6 verificação obrigatória** → 7 troca da chave e deploy → validação → rollback.
+## Diag Release run `40236532644` — conferida no log do job 121299338815 (não no resumo)
+Comparada com o log da diag de main acd6c614:
+- **Type Check:** 88 erros (exit 2), igual ao baseline em multiconjunto de arquivo+código+mensagem. As únicas diferenças são 21 deslocamentos de linha em 7 arquivos tocados pelo PR (aiPendingAction.service 1, universalEmailTool 3, universalMeetingsTool 7, universalMessagingTool 1, universalNotificationsTool 1, universalOfficeDocsTool 2, universalTasksAndNotesTool 6). Nenhum erro novo ✓.
+- **Unit:** 3 falhas, 5199 ok, 1 skipped (5203 = 5118 do baseline + 85). As linhas FAIL são idênticas ao baseline: arquivo AgentExecutor e gateway×3 ✓. Os 6 arquivos novos do #102 passam todos: integrationSettings.repository 19, universalConnectors.secrets 11, universalTools.integrationSecrets 23, loggerRedaction.integrationCredentials 2, credentialScriptGuards 15, integrationSettingsBackfill 15 (= 85) ✓. AI resilience 11/11 ✓.
+- **Integration:** 1 falha, 728 ok, 2 skipped (731). A falha é só swarm-autonomous-mission-e2e, como no baseline ✓.
+- **Architecture:** depcruise "no dependency violations found" (1865 módulos, 6135 dependências), 78 violações conhecidas, cruise-coverage ✅, hotspots ✅ ✓.
+- **Migrations / Re-bootstrap / privilégios / migration-drift:** sem `##[error]`. Privilégios 3/3 (integration e unit). DATA-007 "No difference detected." ✓.
+- **Build:** "built in 21.39s" ✓. **Smoke:** health/live, ready e version ok ✓.
+- **E2E:** 33 falhas, e o conjunto ordenado de nomes é idêntico ao baseline. Axe color-contrast 489, no-focusable-content 45, nested-interactive 3, idênticos ✓.
+- **Steps com erro:** os mesmos 26 grupos de steps do baseline. Os únicos `Process completed with exit code` vêm de typecheck, unit, integration e e2e, igual ao baseline ✓.
+- Secret scan, trivy e dependency review ✓. Outros workflows em f0f85829: CodeQL, Trivy, Dependency Review, Bundle e Visual ✓. Sonar ✗ (herdado).
 
-Semântica do script, conferida:
-- **Dry-run não grava** ✓. `let dryRun = true` e `dryRun = !pre.apply` (l.44, l.174). Os dois `UPDATE` ficam sob `if (!dryRun)` (l.147, l.241). Fora isso o script só faz `SELECT` e `SET/set_config` de sessão.
-- **Guards com chaves trocadas (6a)** ✓. Exige OLD≠NEW (guards l.102) e CEK ∈ {OLD, NEW} (l.105). Não existe checagem contra a chave pública de dev nem de "CEK == OLD". Por isso `CEK=NEW OLD=NEW NEW=OLD` passa, e o CEK não é usado na cripto do script (só no guard). `--apply` junto com `--dry-run` é recusado (l.111). O runbook descreve exatamente isso (§2).
-- **Contadores** ✓. Os nomes impressos são `Total linhas | Re-criptografadas | Puladas | Erros` (models, l.253) e `Total linhas | Re-criptografadas | Erros` (Setting, l.159), iguais aos do runbook (§2, l.59–61).
-  - `Re-criptografadas` conta linhas com ≥1 campo `enc:v1:` que decifra com OLD_KEY.
-  - `Erros` conta campos (nos models) ou linhas (no Setting) que não decifram, por tag GCM inválida ou envelope inválido.
-  - `Puladas` conta campos sem prefixo (nulo/texto puro).
-  - Texto puro nunca é contado como pendente nem como erro.
-- **6a** (`OLD_KEY=$NEW_KEY NEW_KEY=$OLD_KEY`, dry-run, `Erros: 0`) ✓. Prova que todo `enc:v1:` decifra com a NEW_KEY. Com GCM (tag de 128 bits), decifrar com a chave errada falha deterministicamente, então 6a sozinho já implica "nada sob OLD". O 6b (`Re-criptografadas: 0` na direção original) é redundante, mas é uma checagem cruzada correta e inócua. Em 6b, `Erros > 0` é esperado, e o runbook diz isso.
-- **Reexecução do apply após abort** ✓. Os campos já re-cifrados falham com OLD, contam como `Erros` e não são regravados.
-- **Código de saída** ✓. O runbook diz explicitamente (l.68) que o script sai com 0 e `✅ Concluído com sucesso.` mesmo com `Erros > 0`, e que o aceite é ler os contadores. Também manda conferir `Modo: 🚀 LIVE` / `[Modo: LIVE]` no apply.
-- **Janela congelada** ✓ (pré-req 3). Gravações da app com a chave antiga entre os passos 5 e 7 são pegas pelo 6a/6b.
-- **Rollback** ✓. Antes da troca: restaurar o snapshot, ou fazer a rotação reversa com novo snapshot e verificação invertida. Depois da troca: env **e** dados juntos, nunca só um dos dois. Todo rollback depende do OK do Marcelo.
-- **Fluxo perigoso antigo eliminado** ✓. Não há mais passo "Live" sem `--apply`. O aviso (l.13) explica o defeito antigo. O OK explícito do Marcelo é exigido (l.10), e OK repassado por agente não vale.
+## Checagens adicionais desta rodada
+- **CI real em 0d02eaf8 (run 40237594474):** o application gate falha só no step 12 Type Check, com os mesmos 88 erros (md5 do conjunto ordenado `arquivo(l,c): error TSxxxx` = `1627dd8e…`, igual ao da diag) ✓. Por isso o gate real continua parado no Type Check herdado (88), que também falha em main. O job `build` falha só na consolidação. Secret scan, dependency review e trivy ✓. CodeQL ✓, Sonar ✗ (herdado).
+- **CodeQL:** os alertas #105, #106 e #107 (js/incomplete-url-substring-sanitization ×2, js/file-system-race) têm instância mais recente `fixed` em refs/pull/102/merge. A análise mais recente de refs/pull/102/merge (`cbe93843` = merge de 0d02eaf8 com acd6c614) tem 0 resultados, e há 0 alertas abertos nesse ref ✓.
+- **gitleaks 8.24.3** local, com `.gitleaks.toml` e `.gitleaksignore` de 0d02eaf8, sobre `acd6c614..0d02eaf8` (4 commits): "no leaks found" ✓. A allowlist `^sms-plain-key-0001$` é estreita e corresponde à fixture de teste `integrationSettingsBackfill.test.ts:94`.
 
-Outros docs ✓: ADR-010 passo 7, SECRET_ROTATION_POLICY.md:95–96, SECURITY_GUIDE.md:154–155 e INCIDENT_RESPONSE.md:29 estão coerentes com o contrato (dry-run por padrão, `--apply --snapshot-confirmed=<id>`, verificação, OK do Marcelo). `git grep` de reencrypt nos `.md`: as únicas menções restantes ao fluxo antigo estão em handoffs históricos da onda-14 (registro, não instrução).
+## Condições do APROVADO
+1. Backfill ou rotação em staging/produção **só com o OK explícito do Marcelo** e com snapshot confirmado (id registrado). OK repassado por agente não vale. Até este parecer não houve esse OK.
+2. **PR de follow-up P3, antes de qualquer rotação:**
+   - reencrypt sai com código ≠ 0 quando `Erros > 0`;
+   - modo `--verify`;
+   - corrigir `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md:66` ("nunca são gravadas" só vale para `Setting`; nos models há regravação parcial da linha);
+   - cobrir no reencrypt, ou ao menos avisar no runbook, as sessões WhatsApp no Redis (`wa-auth:<org>:*`, `useRedisAuthState.ts:32,38`).
+3. **Follow-up ADR-010 v2:** AAD/key-id e AuditLog no backfill.
+4. Info: o merge real continua bloqueado pelo Type Check herdado (88 erros em main), que não é deste PR.
 
-## Achados (nenhum bloqueante)
-- **P3 (doc):** `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md:66` diz que "Linhas com erro **nunca** são gravadas (fail-closed)". Isso vale só para o `Setting`, onde `reencryptIntegrationSettingValue` lança e a linha inteira é pulada. Nos models (script l.225–246), uma linha com um campo ilegível e outro legível tem o campo legível regravado (rotação parcial da linha). Na prática não tem efeito, porque o passo 2 manda parar com `Erros > 0`. Corrigir o texto no PR de follow-up.
-- **P3 (cobertura do runbook):** as sessões WhatsApp/Baileys no Redis (`wa-auth:<org>:*`, `src/features/integrations/whatsapp/useRedisAuthState.ts:32,38`, `encryptField`/`decryptField` com a mesma `CREDENTIALS_ENCRYPTION_KEY`) não são cobertas pelo `reencrypt-credentials.ts` nem citadas no runbook. Depois da troca da chave elas ficam ilegíveis, e cada org vai precisar parear o QR de novo. O problema já existia antes do #102. O runbook (§1 e §5) deve avisar disso, ou o reencrypt deve cobrir o Redis, **antes de qualquer rotação**.
-- **Info (pré-existente, fora do delta):** `SECRET_ROTATION_POLICY.md:80` aponta para um link `file:///c:/Github/...`.
-
-## Diag f0f85829 — status neste parecer (18:55 BRT)
-- Release run `40236532644`: **in_progress**.
-  - secret scan, trivy e dependency review ✓.
-  - application gate (job 121299338815) está no step 22 (Integration). Build, smoke, E2E e o upload do diagnóstico estão pendentes.
-  - O log do job ainda não está disponível. Os steps com continue-on-error aparecem como "success" no resumo, então Unit, Re-bootstrap e DATA-007 ainda não têm evidência de resultado.
-- Outros workflows da diag: CodeQL ✓, Trivy ✓, Dependency Review ✓, Bundle ✓, Visual ✓, Sonar ✗ (herdado: SONAR_TOKEN vazio e cobertura cai junto com o Unit, como no baseline).
-
-## Para virar APROVADO @ 0d02eaf8 (sem novo commit)
-Run 40236532644 concluída e batendo com o baseline main acd6c614:
-- tsc 88, drift ✓;
-- Unit falhando só AgentExecutor + gateway×3 (3/5118), com os testes novos do #102 verdes;
-- Architecture/hotspots ✓, Migrations ✓, Re-bootstrap/privilégios 3/3 ✓, DATA-007 "No difference" ✓;
-- Integration 1/731 (só swarm-autonomous-mission-e2e);
-- Build ✓, smoke ✓;
-- E2E 33 (mesmas falhas axe de accessibility.spec.ts).
-
-## Condições que acompanham o futuro APROVADO
-1. Backfill ou rotação em staging/produção **só com o OK explícito do Marcelo** e com snapshot confirmado (id registrado).
-2. Follow-ups P3 em PR separado, **antes de qualquer rotação**: reencrypt com saída ≠ 0 quando `Erros > 0` e modo `--verify`; os dois P3 de doc/cobertura acima (l.66 e Redis WhatsApp).
-3. Follow-up ADR-010 v2: AAD/key-id e AuditLog no backfill.
+## Discrepâncias com o relato do GHA
+Nenhuma. Tudo o que o GHA alegou e foi conferido aqui bate com os logs. A alegação "import lib→features não proibido" está coberta indiretamente pelo depcruise limpo.
