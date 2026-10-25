@@ -30,7 +30,7 @@ O 24 deve conferir quatro pontos:
 ## Teste esperado
 
 - `npx prisma validate` passa.
-- `npm run verify:migration-drift` sai com exit 0. Não há mudança de schema.
+- `npm run verify:migration-drift` dá o mesmo resultado da main `58f1895b` porque este PR não muda o schema. Hoje a saída é exit 2, só pelo DATA-007 do `RebalanceApproval`, que o #88 corrige. Nenhuma diferença envolve as tabelas de integração.
 - O `npm run typecheck` na main `58f1895b` mantém os mesmos 99 erros: a lista local bate com a do job `121247466311` da run `40219355968`.
 - Os 11 erros só saem depois do PR do 06. O critério do 06 é `npm run typecheck` sem os 11 erros e sem erros novos, sem `@ts-ignore` e sem `any`.
 
