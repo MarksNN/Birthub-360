@@ -284,6 +284,16 @@ jobs:
       - name: Run Integration Tests (auth, RBAC and tenant isolation)
         run: npm run test:integration -- --coverage
 
+      # Cobertura de runtime do undici 8 aninhado no testcontainers (HttpWaitStrategy) com Docker
+      # real. Reusa a imagem do service meilisearch acima (já no cache do runner: sem pull extra).
+      # Só o arquivo novo: tests/container/postgres.test.ts exige a imagem custom
+      # birthhub360/postgres-intelligence:16, que este job não builda.
+      - name: Container tests (testcontainers HttpWaitStrategy / undici 8)
+        timeout-minutes: 5
+        env:
+          RUN_INFRA_TESTS: '1'
+        run: npx vitest run -c vitest.container.config.ts tests/container/meilisearch-http-wait.test.ts
+
       - name: Run Build
         run: npm run build
 
