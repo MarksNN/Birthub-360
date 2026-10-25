@@ -7,7 +7,8 @@
 - **Head auditado:** `6cfdc15cc093427da6a00accba953b2958b49a1c`
 - **Base / merge-base:** `main` @ `333af2abb5eadea5cdc5da6a98edddd015ea864e` (1 commit à frente, 0 atrás)
 - **Blob auditado:** `docs/architecture/HOTSPOT_EXCEPTIONS.md` = `4922a8fb451267b77806b8dfabaa3906c949a82e`
-- **Decisão:** **BLOQUEADO @ 6cfdc15c** — sem defeito encontrado; falta só a evidência de CI do teste obrigatório (`test:architecture`/`check:hotspots`), porque o application gate foi *skipped* pela falha herdada do Trivy.
+- **Decisão (atualizada 2026-10-25 13:10 BRT):** **APROVADO @ 6cfdc15c** — evidência de CI obtida na validação v4b (ver seção final).
+- **Decisão anterior:** **BLOQUEADO @ 6cfdc15c** — sem defeito encontrado; falta só a evidência de CI do teste obrigatório (`test:architecture`/`check:hotspots`), porque o application gate foi *skipped* pela falha herdada do Trivy.
 
 ## Escopo
 Docs-only: 1 arquivo (`docs/architecture/HOTSPOT_EXCEPTIONS.md`, +17 −2). Nenhum código, script ou workflow alterado.
@@ -60,3 +61,14 @@ npx vitest run tests/unit/architecture/check-hotspots.test.ts   # 13/13
 gh run list -R MarksNN/Birthub-360 --commit 6cfdc15cc093427da6a00accba953b2958b49a1c
 gh run view 40208771466 --json jobs ; gh run view 40208771320 --json jobs
 ```
+
+
+## Atualização — evidência de CI (2026-10-25 13:10 BRT)
+
+- Branch descartável `agente/gha-validate-v4b` (draft #81, nunca mergear) @ `f1f451840095008c24df52e777996733ef94ad14` = main 333af2ab + merges #67 @ d07b006b, #71 @ 64ec87e0, #72 @ 91f3f138, #75 @ 75aac870 e #79 @ 6cfdc15c (`d95ef0963`) + 1 linha (`continue-on-error` só no Run Type Check). `git diff --stat d95ef0963 f1f451840` = só `.github/workflows/ci.yml` (+1).
+- Blob de `docs/architecture/HOTSPOT_EXCEPTIONS.md` em f1f45184 = `4922a8fb451267b77806b8dfabaa3906c949a82e`, idêntico ao head do #79.
+- Run `40209285892` (Central Birth Hub 360 Release), job application gate `121216993565`: Trivy verde (run 40209285876); step 13 "Architecture tests (fronteiras de dependência e hotspots)" **success**, bloqueante, sem continue-on-error (inclui depcruise e coverage).
+- A falha seguinte (step 14, deriva de OpenAPI) é independente deste PR: o #79 só altera Markdown, que não entra no gerador/verificação de OpenAPI. Unit/integração/build/E2E pulados nesse run não exercitam o conteúdo do #79; ficam como evidência obrigatória dos PRs de código (#67/#71/#72/#75), não deste.
+- P3 (rastreio da redução): GHA informa handoff interno ao 07 (cópia 03) com prazo, vencimento 07/11 21h BRT e margem zero. Não verificado no repo; segue P3 aberto até existir registro em `.agents/handoffs/`.
+
+**Veredito final: APROVADO @ 6cfdc15c.** Qualquer novo commit ou mudança no blob 4922a8fb invalida. Ordem de merge recomendada: #67 → #79 (ou #79 junto com #67), antes de #71/#72.
