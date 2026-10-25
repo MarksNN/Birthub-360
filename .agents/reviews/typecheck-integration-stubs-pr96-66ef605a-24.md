@@ -1,3 +1,37 @@
+# Revisão independente — PR #96 @ 66ef605a — Agente 24 (atualização)
+
+- **Veredito atualizado: APROVADO @ `66ef605a23d6929d01fe957981182bed820ebcc1`.** Substitui o BLOQUEADO anterior (commit `206b15b4`), que ficou mantido abaixo como histórico.
+- Data: 2026-10-25 (BRT), depois da diag. O head do PR continua `66ef605a`, conferido com `gh pr view 96`. A main atual é `aabf735a` (#91, #86, #88 e #83).
+- **Correções do GHA, conferidas:**
+  - O tree do head `66ef605a` é `74cc9ef9`.
+  - `edbb0c4b` é o tree do merge-tree `735b1962` + head, igual ao tree do `pull/96/merge` `0832e4e6`. Ele existe, mas é um tree de merge, não o do head.
+  - A base é `791b932d`, sem o #83.
+- **Diag `agente/gha-diag-pr96-66ef605a` @ `784bdd82`:**
+  - O pai único é `66ef605a`, e o diff contra o head é só `.github/workflows/ci.yml`.
+  - O blob é `8397884a`, idêntico ao de `agente/gha-validate-v4e` (`2e3d9138`).
+  - O patch-id `d113fd0a` é igual ao do patch v4e (`0fbb425f..2e3d9138`).
+- **Run `40227623063`, job `121272380409`:**
+  - A run foi disparada por um PR veículo, o #99, já fechado.
+  - No log: `HEAD is now at bcc1bcb Merge 784bdd82… into aabf735a…`. Busquei o `bcc1bcb26f88`: os pais são `aabf735a` e `784bdd82`, e o tree `7f575735` é igual ao do `git merge-tree --write-tree aabf735a 784bdd82`.
+  - **Type Check: 88 erros.** Comparando por `arquivo(linha,col): TSxxxx` com a C3 (job `121247882280`, 99 erros), há 0 erros novos. Os 11 que saíram são exatamente os de `src/features/integrations/{calendly ×6, googleSheets, hubspot, notion, zoom ×2}`.
+  - **test:architecture verde:**
+    - `✔ no dependency violations found (1862 modules)`
+    - `verify:architecture-coverage` com 1862/1810
+    - `✅ check:hotspots — 1810 arquivo(s) verificado(s), 0 acima de 1000 linhas`
+  - **OpenAPI drift verde:** `✅ Nenhuma deriva estrutural encontrada`. A C3 falhava aqui; quem corrigiu foi o #83.
+  - **Unit:** `3 failed | 5111 passed | 1 skipped`. As 3 falhas estão em `gateway.test.ts`, e o `AgentExecutor.test.ts` não carrega (Test Files 2 failed). A C3 tinha 4 falhas: a quarta, Sidebar, foi corrigida pelo #86. AI Resilience passou com 11/11.
+  - **DATA-007:** `No difference detected.` A correção veio do #88.
+  - **Integração:** `1 failed | 725 passed`. A única falha é `swarm-autonomous-mission-e2e.test.ts`, a mesma da C3.
+  - **Build: ok. Smoke: ok** (`/health/live`, `/ready` e `/version` responderam `status ok`).
+  - **E2E:** `33 failed | 75 passed`. Os 33 nomes batem um a um com os da C3 (`diff` vazio).
+  - Os steps Application gate e `build` (consolidação) ficaram vermelhos só pelas falhas herdadas de Integração e E2E.
+- **Achados:** nenhum bloqueante. O PR é remoção pura de código morto, tira 11 erros do tsc, não introduz nenhuma falha nova e todos os gates obrigatórios que rodam além do Type Check passaram.
+- **Condições:**
+  - Commit novo no PR invalida este parecer.
+  - O `pull/96/merge` que o GitHub expõe ainda é `0832e4e6`, montado sobre `735b1962`. A CI do merge real precisa rechecar sobre a main do momento.
+
+---
+
 # Revisão independente — PR #96 @ 66ef605a — Agente 24
 
 - **Veredito: BLOQUEADO @ `66ef605a23d6929d01fe957981182bed820ebcc1`**
