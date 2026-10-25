@@ -12,12 +12,14 @@ export class PgDncRepository implements DncRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async isBlocked(phoneE164: string): Promise<boolean> {
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<{ exists: number }[]>(Prisma.sql`
       SELECT 1 AS exists FROM dnc_list WHERE phone = ${phoneE164} LIMIT 1`);
     return rows.length > 0;
   }
 
   async add(phoneE164: string, reason: string): Promise<void> {
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     await this.prisma.$executeRaw(Prisma.sql`
       INSERT INTO dnc_list (phone, reason)
       VALUES (${phoneE164}, ${reason})

@@ -50,6 +50,7 @@ export class PrismaNoteRepository implements NoteRepository {
     // escopo de CRM-004/005, que pedem só Notes/Attachments cross-entity) — Company/Contact não
     // têm timeline própria hoje.
     if (entityType === 'lead') {
+      // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
       const [note] = await prisma.$transaction([
         prisma.note.create({ data: { content, author, leadId: entityId } }),
         prisma.timelineEvent.create({

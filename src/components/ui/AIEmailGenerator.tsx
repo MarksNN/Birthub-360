@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useActivePlaybook } from '../../hooks/useActivePlaybook.js';
 import { api } from '../../lib/api.js';
 import { SoundFX } from '../../lib/soundEffects.js';
+import { WhatsAppIcon } from '../brand/CompanyBrandIcon.js';
 import { Button } from './Button.js';
 
 type Channel = 'email' | 'call' | 'message';
