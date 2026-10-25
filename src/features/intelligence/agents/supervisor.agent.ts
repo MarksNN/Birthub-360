@@ -252,6 +252,16 @@ export function enforceLeadGuard(
   };
 }
 
+// Correlation ID para tracing distribuído do supervisor: baseado no thread_id do checkpoint
+// (`${tenant}:${sid}`, montado em executeMission/executeMissionStream) e timestamp.
+// Decisão do Agente 07 (opção b) — ver
+// .agents/handoffs/onda-52/07-para-00-correlationid-supervisor-thread-id.md.
+export function buildSwarmCorrelationId(config?: RunnableConfig, now: number = Date.now()): string {
+  const raw = config?.configurable?.thread_id;
+  const threadId = typeof raw === 'string' && raw ? raw : 'no-thread';
+  return `swarm-${threadId}-${now}`;
+}
+
 async function supervisorNode(state: SwarmStateType, config?: RunnableConfig) {
   const step = state.step + 1;
 
@@ -333,10 +343,7 @@ Antes de usar a ferramenta de decisão estruturada de roteamento, faça uma brev
 
 ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
-  // Correlation ID para tracing distribuído - baseado no thread_id do checkpoint
-  // (`${tenant}:${sid}`, montado em executeMission/executeMissionStream) e timestamp.
-  const threadId = (config?.configurable?.thread_id as string | undefined) ?? 'no-thread';
-  const correlationId = `swarm-${threadId}-${Date.now()}`;
+  const correlationId = buildSwarmCorrelationId(config);
   
   let decision: SupervisorDecision;
   const startTime = Date.now();
