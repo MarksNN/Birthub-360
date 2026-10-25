@@ -6,7 +6,8 @@
  *  1. a chamada externa (fetch) recebe o valor DECIFRADO;
  *  2. o JSON devolvido ao LLM não contém o segredo (nem o ciphertext).
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -22,6 +23,10 @@ vi.mock('../../../src/lib/security/url-validator.js', () => ({
 }));
 vi.mock('../../../src/features/integrations/bitrix/service/settings.js', () => ({
   getBitrixSettings: vi.fn().mockResolvedValue({ webhookUrl: null }),
+}));
+vi.mock('../../../src/shared/security/urlGuard.js', () => ({
+  assertSafeExternalUrl: vi.fn().mockResolvedValue(undefined),
+  safeFetch: vi.fn(),
 }));
 vi.mock('../../../src/features/knowledge/ingestion.service.js', () => ({
   IngestionService: class {
@@ -40,9 +45,22 @@ import { requestContext } from '../../../src/lib/async-context.js';
 import { encryptField } from '../../../src/lib/crypto/secretFields.js';
 import { fetchWithTimeout } from '../../../src/lib/http.js';
 import { prisma } from '../../../src/lib/prisma.js';
+import { safeFetch } from '../../../src/shared/security/urlGuard.js';
+import { encryptWithKey } from '../../../scripts/security/reencrypt-credentials.js';
 
 const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
 const fetchWithTimeoutMock = vi.mocked(fetchWithTimeout);
+const safeFetchMock = vi.mocked(safeFetch);
+/** Valor `enc:v1:` válido no formato, mas cifrado com OUTRA chave — decifra falha (ilegível). */
+const unreadable = (plain: string) => encryptWithKey(plain, randomBytes(32));
+/** Hostname de uma URL (comparação exata — nunca `includes` em URL; CodeQL js/incomplete-url-substring-sanitization). */
+const hostOf = (u: unknown) => {
+  try {
+    return new URL(String(u)).hostname;
+  } catch {
+    return '';
+  }
+};
 const ORG = 'org-tools-15';
 const inTenant = <T>(fn: () => Promise<T>) => requestContext.run({ tenantId: ORG }, fn);
 
@@ -74,11 +92,13 @@ let fetchMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   mockReset(prismaMock);
   fetchWithTimeoutMock.mockReset();
+  safeFetchMock.mockReset();
   fetchMock = vi.fn().mockResolvedValue(okResponse());
   vi.stubGlobal('fetch', fetchMock);
 });
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe('universalMessagingTool', () => {
@@ -192,7 +212,7 @@ describe('universalTasksAndNotesTool', () => {
     const calledUrls = [...fetchMock.mock.calls, ...fetchWithTimeoutMock.mock.calls].map((c) =>
       String(c[0]),
     );
-    const trelloCall = calledUrls.find((u) => u.includes('api.trello.com'));
+    const trelloCall = calledUrls.find((u) => hostOf(u) === 'api.trello.com');
     expect(trelloCall).toBeDefined();
     expect(trelloCall).toContain(TRELLO_KEY);
     expect(trelloCall).toContain(TRELLO_TOKEN);
@@ -233,7 +253,7 @@ describe('universalMeetingsTool', () => {
         startTime: '2026-11-01T14:00:00.000Z',
       }),
     );
-    const graphCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('graph.microsoft.com'));
+    const graphCall = fetchMock.mock.calls.find((c) => hostOf(c[0]) === 'graph.microsoft.com');
     expect(graphCall).toBeDefined();
     expect((graphCall?.[1] as { headers: Record<string, string> }).headers.Authorization).toBe(
       `Bearer ${TOKEN}`,
@@ -300,19 +320,199 @@ describe('aiPendingAction.executeAction send_sms', () => {
   });
 });
 
-describe('guard: tools não acessam prisma.setting direto', () => {
+describe('guard: tools (e aiPendingAction.service) não acessam prisma.setting direto', () => {
+  const usesSettingDirectly = (full: string) =>
+    /prisma\s*\.\s*setting\b/.test(readFileSync(full, 'utf8'));
+
   it('nenhum arquivo em src/features/intelligence/tools/** usa prisma.setting', () => {
     const root = join(process.cwd(), 'src/features/intelligence/tools');
     const offenders: string[] = [];
+    // Dirent (withFileTypes) em vez de stat + read: sem janela TOCTOU (CodeQL js/file-system-race).
     const walk = (dir: string) => {
-      for (const name of readdirSync(dir)) {
-        const full = join(dir, name);
-        if (statSync(full).isDirectory()) walk(full);
-        else if (/\.(ts|tsx|js|mjs)$/.test(name) && /prisma\s*\.\s*setting\b/.test(readFileSync(full, 'utf8')))
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (entry.isFile() && /\.(ts|tsx|js|mjs)$/.test(entry.name) && usesSettingDirectly(full))
           offenders.push(relative(process.cwd(), full));
       }
     };
     walk(root);
     expect(offenders).toEqual([]);
+  });
+
+  it('aiPendingAction.service.ts não usa prisma.setting (credenciais só via repositório)', () => {
+    const full = join(process.cwd(), 'src/features/intelligence/services/aiPendingAction.service.ts');
+    expect(usesSettingDirectly(full)).toBe(false);
+  });
+});
+
+describe('falha fechada: credencial ILEGÍVEL ≠ não configurada (sem fallback de plataforma)', () => {
+  const PLATFORM_TEAMS = 'https://acme.webhook.office.com/webhookb2/PLATFORM-teams-hook';
+  const PLATFORM_TG_TOKEN = '111111:PLATFORM-telegram-bot-token';
+
+  it('teams ilegível + TEAMS_WEBHOOK_URL na env: nenhum envio, pede reconfiguração', async () => {
+    vi.stubEnv('TEAMS_WEBHOOK_URL', PLATFORM_TEAMS);
+    seedSettings({ 'integration.teams': { webhookUrl: unreadable('https://tenant/hook') } });
+    const out = await inTenant(() =>
+      universalMessagingTool.invoke({
+        action: 'send_or_propose_message',
+        platform: 'teams',
+        message: 'oi',
+      }),
+    );
+    expect(safeFetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(prismaMock.aIPendingAction.create).not.toHaveBeenCalled();
+    expect(JSON.parse(out as string)).toMatchObject({
+      success: false,
+      platform: 'teams',
+      status: 'reconfiguration_required',
+    });
+    expectNoSecret(out, PLATFORM_TEAMS);
+  });
+
+  it('teams SEM configuração: fallback TEAMS_WEBHOOK_URL continua como antes', async () => {
+    vi.stubEnv('TEAMS_WEBHOOK_URL', PLATFORM_TEAMS);
+    seedSettings({});
+    safeFetchMock.mockResolvedValue(okResponse());
+    await inTenant(() =>
+      universalMessagingTool.invoke({
+        action: 'send_or_propose_message',
+        platform: 'teams',
+        message: 'oi',
+      }),
+    );
+    expect(safeFetchMock).toHaveBeenCalledTimes(1);
+    expect(safeFetchMock.mock.calls[0][0]).toBe(PLATFORM_TEAMS);
+  });
+
+  it('telegram ilegível + bot da plataforma na env: nenhum fetch à Bot API', async () => {
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', PLATFORM_TG_TOKEN);
+    vi.stubEnv('TELEGRAM_CHAT_ID', '-100platform');
+    seedSettings({ 'integration.telegram': { botToken: unreadable('999:tenant-bot') } });
+    const out = await inTenant(() =>
+      universalMessagingTool.invoke({
+        action: 'send_or_propose_message',
+        platform: 'telegram',
+        message: 'oi',
+      }),
+    );
+    const hosts = [...fetchMock.mock.calls, ...fetchWithTimeoutMock.mock.calls].map((c) =>
+      hostOf(c[0]),
+    );
+    expect(hosts).not.toContain('api.telegram.org');
+    expect(prismaMock.aIPendingAction.create).not.toHaveBeenCalled();
+    expect(JSON.parse(out as string)).toMatchObject({
+      success: false,
+      status: 'reconfiguration_required',
+    });
+    expectNoSecret(out, PLATFORM_TG_TOKEN);
+  });
+
+  it('telegram SEM configuração: fallback do bot da plataforma continua como antes', async () => {
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', PLATFORM_TG_TOKEN);
+    vi.stubEnv('TELEGRAM_CHAT_ID', '-100platform');
+    seedSettings({});
+    fetchWithTimeoutMock.mockResolvedValue(okResponse({ ok: true }));
+    await inTenant(() =>
+      universalMessagingTool.invoke({
+        action: 'send_or_propose_message',
+        platform: 'telegram',
+        message: 'oi',
+      }),
+    );
+    expect(fetchWithTimeoutMock.mock.calls[0][0]).toBe(
+      `https://api.telegram.org/bot${PLATFORM_TG_TOKEN}/sendMessage`,
+    );
+  });
+
+  it('create_task clickup com apiKey ilegível: configured false (não usa masked)', async () => {
+    seedSettings({ 'integration.clickup': { apiKey: unreadable('pk_clickup_tenant') } });
+    prismaMock.activity.create.mockResolvedValue({ id: 'act-1' } as never);
+    const out = await inTenant(() =>
+      universalTasksAndNotesTool.invoke({ action: 'create_task', platform: 'clickup', title: 'X' }),
+    );
+    expect(JSON.parse(out as string).externalSync.clickup).toMatchObject({
+      configured: false,
+      status: 'reconfiguration_required',
+    });
+  });
+
+  it('create_task trello com token ilegível: nenhum fetch ao Trello', async () => {
+    seedSettings({
+      'integration.trello': {
+        apiKey: encryptField('trello-key-ok-000000'),
+        token: unreadable('trello-token-tenant'),
+        defaultListId: 'list-1',
+      },
+    });
+    prismaMock.activity.create.mockResolvedValue({ id: 'act-1' } as never);
+    const out = await inTenant(() =>
+      universalTasksAndNotesTool.invoke({ action: 'create_task', platform: 'trello', title: 'X' }),
+    );
+    expect(fetchMock.mock.calls.map((c) => hostOf(c[0]))).not.toContain('api.trello.com');
+    expect(JSON.parse(out as string).externalSync.trello.status).toBe('reconfiguration_required');
+    expectNoSecret(out, 'trello-key-ok-000000');
+  });
+
+  it('list_platforms: provider ilegível → conectado false + ilegivel', async () => {
+    seedSettings({
+      'integration.trello': { apiKey: unreadable('k'), token: unreadable('t') },
+      'integration.notion': { apiKey: encryptField('secret_notion_ok_123') },
+    });
+    const out = await inTenant(() =>
+      universalTasksAndNotesTool.invoke({ action: 'list_platforms' }),
+    );
+    const p = JSON.parse(out as string).plataformasSuportadas;
+    expect(p.trello).toMatchObject({ conectado: false, ilegivel: true });
+    expect(p.notion.conectado).toBe(true);
+  });
+
+  it('notifications: push ilegível sem fetch; sms ilegível → gatewayConfigured false', async () => {
+    seedSettings({
+      'integration.push_gateway': { webhookUrl: unreadable('https://ntfy.sh/tenant-topic') },
+      'integration.sms': { webhookUrl: unreadable('https://sms/tenant') },
+    });
+    const out = await inTenant(() =>
+      universalNotificationsTool.invoke({
+        channels: ['mobile_push', 'sms_alert'],
+        title: 'Lead quente',
+        message: 'Responder agora',
+        kind: 'Alert',
+      }),
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+    const d = JSON.parse(out as string).deliveries;
+    expect(d.mobile_push.remotePushGatewayDispatched).toBe(false);
+    expect(d.mobile_push.remotePushGateway.status).toBe('reconfiguration_required');
+    expect(d.sms_alert.gatewayConfigured).toBe(false);
+    expect(d.sms_alert.gatewayUnreadable).toBe(true);
+  });
+
+  it('list_emails: M365 ilegível → sem chamada ao Graph, com aviso', async () => {
+    seedSettings({ 'integration.microsoft365': { accessToken: unreadable('m365-tok') } });
+    prismaMock.emailMessage.findMany.mockResolvedValue([]);
+    prismaMock.googleWorkspaceConnection.findUnique.mockResolvedValue(null);
+    prismaMock.conversationSignal.findMany.mockResolvedValue([]);
+    const out = await inTenant(() =>
+      universalEmailTool.invoke({ action: 'list_emails', analyzeOpportunities: false }),
+    );
+    expect(fetchWithTimeoutMock).not.toHaveBeenCalled();
+    expect(JSON.parse(out as string).integrationWarnings[0].status).toBe('reconfiguration_required');
+  });
+
+  it('send_sms (aiPendingAction): ilegível → credentials_unreadable, sem fetch', async () => {
+    seedSettings({ 'integration.sms': { webhookUrl: unreadable('https://sms/tenant') } });
+    const res = await inTenant(() =>
+      executeAction({
+        id: 'pa-3',
+        organizationId: ORG,
+        action: 'send_sms',
+        entity: 'Lead',
+        payload: { recipient: '+5511999990000', message: 'oi' },
+      } as never),
+    );
+    expect(res).toEqual({ sent: false, reason: 'credentials_unreadable' });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

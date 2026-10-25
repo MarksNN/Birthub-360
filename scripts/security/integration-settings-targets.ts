@@ -21,6 +21,16 @@ export const SECRET_FIELDS_BY_SETTING_KEY: ReadonlyMap<string, readonly string[]
   ]),
 );
 
+/** settingKey → TODOS os campos do catálogo (secretos ou não). Chave fora disto = legada/órfã. */
+export const KNOWN_FIELDS_BY_SETTING_KEY: ReadonlyMap<string, readonly string[]> = new Map(
+  UNIVERSAL_CONNECTOR_DEFINITIONS.filter((d) =>
+    (d.settingKey ?? '').startsWith('integration.'),
+  ).map((d) => [
+    d.settingKey as string,
+    (d.fields as readonly ConnectorFieldSpec[]).map((f) => f.key),
+  ]),
+);
+
 export const TARGET_SETTING_KEYS: readonly string[] = [
   ...SECRET_FIELDS_BY_SETTING_KEY.keys(),
   LEGACY_BITRIX_KEY,

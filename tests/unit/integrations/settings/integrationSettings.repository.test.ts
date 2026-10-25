@@ -13,6 +13,7 @@ vi.mock('../../../../src/lib/prisma.js', () => ({ prisma: mockDeep<PrismaClient>
 import { requestContext } from '../../../../src/lib/async-context.js';
 import { decryptField, encryptField } from '../../../../src/lib/crypto/secretFields.js';
 import {
+  IntegrationConfigUnreadableError,
   IntegrationSettingsTenantError,
   integrationSettingsRepository as repo,
   maskSecretValue,
@@ -106,14 +107,60 @@ describe('get / getMany', () => {
     await expect(inTenant(() => repo.get(ORG, 'telegram'))).resolves.toEqual({ botToken: BOT_TOKEN });
   });
 
-  it('fail-closed: ciphertext adulterado → null (não configurado)', async () => {
+  it('fail-closed: ciphertext adulterado → LANÇA IntegrationConfigUnreadableError (422), nunca null', async () => {
     const enc = encryptField(BOT_TOKEN);
     const tampered = `${enc.slice(0, -4)}AAAA`;
-    prismaMock.setting.findFirst.mockResolvedValue(row('integration.telegram', { botToken: tampered }));
-    await expect(inTenant(() => repo.get(ORG, 'telegram'))).resolves.toBeNull();
+    prismaMock.setting.findFirst.mockResolvedValue(
+      row('integration.telegram', { botToken: tampered, defaultChatId: '-100' }),
+    );
+    const err = await inTenant(() => repo.get(ORG, 'telegram')).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(IntegrationConfigUnreadableError);
+    expect((err as IntegrationConfigUnreadableError).statusCode).toBe(422);
+    expect((err as IntegrationConfigUnreadableError).fields).toEqual(['botToken']);
+    expect(String((err as Error).message)).not.toContain(tampered);
     const status = await inTenant(() => repo.getStatus(ORG, 'telegram'));
     expect(status.configured).toBe(false);
+    expect(status.unreadable).toBe(true);
+    expect(status.fields.botToken).toBe('unreadable');
+    expect(status.fields.defaultChatId).toBe('set');
     expect(status.masked.botToken).toContain('ilegível');
+  });
+
+  it('lookup: configured / unconfigured / unreadable (discriminado, sem lançar no ilegível)', async () => {
+    prismaMock.setting.findFirst.mockResolvedValueOnce(
+      row('integration.telegram', { botToken: encryptField(BOT_TOKEN) }),
+    );
+    await expect(inTenant(() => repo.lookup(ORG, 'telegram'))).resolves.toEqual({
+      state: 'configured',
+      values: { botToken: BOT_TOKEN },
+    });
+    prismaMock.setting.findFirst.mockResolvedValueOnce(null);
+    await expect(inTenant(() => repo.lookup(ORG, 'telegram'))).resolves.toEqual({
+      state: 'unconfigured',
+    });
+    prismaMock.setting.findFirst.mockResolvedValueOnce(
+      row('integration.telegram', { botToken: `${encryptField(BOT_TOKEN).slice(0, -4)}AAAA` }),
+    );
+    const res = await inTenant(() => repo.lookup(ORG, 'telegram'));
+    expect(res.state).toBe('unreadable');
+    expect(res.state === 'unreadable' && res.fields).toEqual(['botToken']);
+    expect(JSON.stringify(res)).not.toContain(BOT_TOKEN);
+  });
+
+  it('lookup NÃO engole erro de tenant (só o ilegível vira estado)', async () => {
+    await expect(repo.lookup(ORG, 'telegram')).rejects.toBeInstanceOf(
+      IntegrationSettingsTenantError,
+    );
+  });
+
+  it('getMany lança se algum provider pedido estiver ilegível', async () => {
+    prismaMock.setting.findMany.mockResolvedValue([
+      row('integration.trello', { apiKey: 'enc:v1:AAAA:BBBB:CCCC', token: encryptField('tok-abcdefgh1234') }, 'a'),
+      row('integration.notion', { apiKey: encryptField('secret_notion_abcdef') }, 'b'),
+    ]);
+    await expect(
+      inTenant(() => repo.getMany(ORG, ['trello', 'notion'] as const)),
+    ).rejects.toBeInstanceOf(IntegrationConfigUnreadableError);
   });
 
   it('getMany faz UMA query e só devolve os configurados', async () => {
@@ -203,7 +250,18 @@ describe('tenant guard (sem bypassRls)', () => {
     expect(prismaMock.setting.findFirst).not.toHaveBeenCalled();
   });
 
-  it('provider desconhecido / sem Setting (OAuth) lança', async () => {
+  it('contexto com bypassRls: true é recusado mesmo com tenantId igual, antes de query', async () => {
+    await expect(
+      requestContext.run({ tenantId: ORG, bypassRls: true } as never, () =>
+        repo.getStatus(ORG, 'telegram'),
+      ),
+    ).rejects.toBeInstanceOf(IntegrationSettingsTenantError);
+    expect(prismaMock.setting.findFirst).not.toHaveBeenCalled();
+  });
+
+  it('provider desconhecido / sem Setting (OAuth) lança AppError 400', async () => {
+    const err = await inTenant(() => repo.get(ORG, 'google_workspace' as never)).catch((e) => e);
+    expect((err as { statusCode: number }).statusCode).toBe(400);
     await expect(
       inTenant(() => repo.get(ORG, 'google_workspace' as never)),
     ).rejects.toBeInstanceOf(UnknownIntegrationProviderError);

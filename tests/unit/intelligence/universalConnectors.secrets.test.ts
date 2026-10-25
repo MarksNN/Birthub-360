@@ -23,6 +23,7 @@ import {
   saveUniversalConnectorConfig,
 } from '../../../src/features/intelligence/services/universalConnectors.service.js';
 import { requestContext } from '../../../src/lib/async-context.js';
+import { errorHandler } from '../../../src/shared/middlewares/errorHandler.js';
 import { encryptField } from '../../../src/lib/crypto/secretFields.js';
 import { prisma } from '../../../src/lib/prisma.js';
 
@@ -124,5 +125,45 @@ describe('GET /ecosystem/connectors — RBAC do maskedConfig', () => {
     }
     expect(res.text).not.toContain(`••••${BOT.slice(-4)}`);
     expect(res.text).not.toContain(BOT);
+  });
+});
+
+describe('PUT /ecosystem/connectors/:provider — erros de cliente com status correto (AppError)', () => {
+  function appAdmin() {
+    const app = express();
+    app.use(express.json());
+    app.use((req, _res, next) => {
+      (req as unknown as { user: unknown }).user = { id: 'u1', organizationId: ORG, role: 'ADMIN' };
+      requestContext.run({ tenantId: ORG, userId: 'u1', role: 'ADMIN' }, () => next());
+    });
+    app.use(universalEcosystemRouter);
+    app.use(errorHandler);
+    return app;
+  }
+
+  it('bitrix24 → 422 com mensagem amigável, sem gravar Setting', async () => {
+    const res = await request(appAdmin())
+      .put('/ecosystem/connectors/bitrix24')
+      .send({ config: { webhookUrl: 'https://acme.bitrix24.com.br/rest/1/abc/' } });
+    expect(res.status).toBe(422);
+    expect(res.text).toMatch(/Bitrix24 é configurado pela integração dedicada/);
+    expect(prismaMock.setting.create).not.toHaveBeenCalled();
+    expect(prismaMock.setting.update).not.toHaveBeenCalled();
+  });
+
+  it('provider desconhecido → 400 (não 500)', async () => {
+    const res = await request(appAdmin())
+      .put('/ecosystem/connectors/provider-que-nao-existe')
+      .send({ config: { foo: 'bar' } });
+    expect(res.status).toBe(400);
+    expect(prismaMock.setting.create).not.toHaveBeenCalled();
+  });
+
+  it('provider OAuth (sem Setting) → 422 orientando o fluxo OAuth', async () => {
+    const res = await request(appAdmin())
+      .put('/ecosystem/connectors/google_workspace')
+      .send({ config: { foo: 'bar' } });
+    expect(res.status).toBe(422);
+    expect(prismaMock.setting.create).not.toHaveBeenCalled();
   });
 });

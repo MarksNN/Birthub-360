@@ -14,7 +14,13 @@
 // próxima gravação. O backfill só encurta a janela em que o banco/backup guarda token em claro.
 //
 // SEGURANÇA DE EXECUÇÃO
-// - DRY-RUN POR PADRÃO. Só grava com `--apply` explícito.
+// - DRY-RUN POR PADRÃO. Só grava com `--apply` explícito E `--snapshot-confirmed=<id>` (id do
+//   snapshot/backup do banco tirado imediatamente antes — runbook no ADR-010).
+// - ABORTA antes de conectar se CREDENTIALS_ENCRYPTION_KEY não estiver EXPLÍCITA e válida no env,
+//   em qualquer NODE_ENV (secretFields.ts cairia na chave fixa de dev fora de produção) — ver
+//   credential-script-guards.ts.
+// - Chaves fora do catálogo (ex.: `accountSid`/`email` legados) são REPORTADAS no log
+//   (`fora_do_catalogo=`) e preservadas intactas — nunca descartadas nem cifradas.
 // - Idempotente: valor que já começa com `enc:` é pulado; rodar duas vezes não muda nada.
 // - Nunca imprime valor (nem cifrado nem em claro) — só org/key/campos.
 // - Sem `app.bypass_rls` para Setting: processa organização por organização setando
@@ -24,16 +30,27 @@
 //
 // Uso:
 //   DATABASE_URL=... CREDENTIALS_ENCRYPTION_KEY=... npx tsx scripts/security/backfill-integration-settings-encryption.ts          # dry-run
-//   DATABASE_URL=... CREDENTIALS_ENCRYPTION_KEY=... npx tsx scripts/security/backfill-integration-settings-encryption.ts --apply  # grava
+//   DATABASE_URL=... CREDENTIALS_ENCRYPTION_KEY=... npx tsx scripts/security/backfill-integration-settings-encryption.ts --apply --snapshot-confirmed=<id>  # grava
 
 import { encryptField } from '../../src/lib/crypto/secretFields.js';
 import {
+  assertBackfillPreconditions,
+  ScriptPreconditionError,
+} from './credential-script-guards.js';
+import {
+  KNOWN_FIELDS_BY_SETTING_KEY,
   LEGACY_BITRIX_KEY,
   SECRET_FIELDS_BY_SETTING_KEY,
   TARGET_SETTING_KEYS,
 } from './integration-settings-targets.js';
 
-export { LEGACY_BITRIX_KEY, SECRET_FIELDS_BY_SETTING_KEY, TARGET_SETTING_KEYS };
+export {
+  assertBackfillPreconditions,
+  KNOWN_FIELDS_BY_SETTING_KEY,
+  LEGACY_BITRIX_KEY,
+  SECRET_FIELDS_BY_SETTING_KEY,
+  TARGET_SETTING_KEYS,
+};
 
 export const ENC_PREFIX = 'enc:';
 export interface SettingRow {
@@ -47,6 +64,8 @@ export interface BackfillPlan {
   /** Novo `value` a gravar, ou `null` se nada a fazer. */
   nextValue: unknown | null;
   encryptedFields: string[];
+  /** Chaves do JSON fora do catálogo do provider — só reportadas; ficam intactas em `nextValue`. */
+  unknownFields: string[];
 }
 
 function isPlaintext(v: unknown): v is string {
@@ -60,14 +79,18 @@ export function planSettingBackfill(
 ): BackfillPlan {
   if (row.key === LEGACY_BITRIX_KEY) {
     return isPlaintext(row.value)
-      ? { nextValue: encrypt(row.value), encryptedFields: ['<value>'] }
-      : { nextValue: null, encryptedFields: [] };
+      ? { nextValue: encrypt(row.value), encryptedFields: ['<value>'], unknownFields: [] }
+      : { nextValue: null, encryptedFields: [], unknownFields: [] };
   }
   const secretFields = SECRET_FIELDS_BY_SETTING_KEY.get(row.key);
   if (!secretFields || !row.value || typeof row.value !== 'object' || Array.isArray(row.value)) {
-    return { nextValue: null, encryptedFields: [] };
+    return { nextValue: null, encryptedFields: [], unknownFields: [] };
   }
   const value = row.value as Record<string, unknown>;
+  const known = new Set(KNOWN_FIELDS_BY_SETTING_KEY.get(row.key) ?? []);
+  const unknownFields = Object.keys(value)
+    .filter((k) => !known.has(k))
+    .sort();
   const next: Record<string, unknown> = { ...value };
   const encryptedFields: string[] = [];
   for (const field of secretFields) {
@@ -78,8 +101,8 @@ export function planSettingBackfill(
     }
   }
   return encryptedFields.length > 0
-    ? { nextValue: next, encryptedFields }
-    : { nextValue: null, encryptedFields: [] };
+    ? { nextValue: next, encryptedFields, unknownFields }
+    : { nextValue: null, encryptedFields: [], unknownFields };
 }
 
 export type QueryFn = <R = Record<string, unknown>>(
@@ -89,6 +112,8 @@ export type QueryFn = <R = Record<string, unknown>>(
 
 export interface BackfillOptions {
   apply: boolean;
+  /** Obrigatório com `apply` (defesa em profundidade além do main): id do snapshot do banco. */
+  snapshotId?: string | null;
   log?: (line: string) => void;
   encrypt?: (plain: string) => string;
 }
@@ -98,12 +123,19 @@ export interface BackfillResult {
   scanned: number;
   toEncrypt: number;
   written: number;
+  /** Linhas com chaves fora do catálogo (reportadas, preservadas). */
+  rowsWithUnknownFields: number;
 }
 
 export async function runIntegrationSettingsBackfill(
   query: QueryFn,
-  { apply, log = console.log, encrypt = encryptField }: BackfillOptions,
+  { apply, snapshotId, log = console.log, encrypt = encryptField }: BackfillOptions,
 ): Promise<BackfillResult> {
+  if (apply && !snapshotId?.trim()) {
+    throw new ScriptPreconditionError(
+      'apply exige snapshotId (--snapshot-confirmed=<id>) — tire o snapshot do banco antes.',
+    );
+  }
   await query(`SELECT set_config('app.bypass_rls', 'on', false)`);
   const { rows: orgs } = await query<{ id: string }>(
     `SELECT id FROM "Organization" ORDER BY id ASC`,
@@ -116,6 +148,7 @@ export async function runIntegrationSettingsBackfill(
     scanned: 0,
     toEncrypt: 0,
     written: 0,
+    rowsWithUnknownFields: 0,
   };
 
   for (const org of orgs) {
@@ -129,6 +162,12 @@ export async function runIntegrationSettingsBackfill(
     for (const row of rows) {
       result.scanned++;
       const plan = planSettingBackfill(row, encrypt);
+      if (plan.unknownFields.length > 0) {
+        result.rowsWithUnknownFields++;
+        log(
+          `${apply ? '[APPLY]' : '[DRY-RUN]'} org=${row.organizationId} key=${row.key} fora_do_catalogo=${plan.unknownFields.join(',')} (preservadas, não cifradas)`,
+        );
+      }
       if (plan.nextValue === null) continue;
       result.toEncrypt++;
       log(
@@ -145,7 +184,7 @@ export async function runIntegrationSettingsBackfill(
   }
 
   log(
-    `Concluído [${apply ? 'APPLY' : 'DRY-RUN'}] orgs=${result.organizations} linhas=${result.scanned} a_cifrar=${result.toEncrypt} gravadas=${result.written}`,
+    `Concluído [${apply ? 'APPLY' : 'DRY-RUN'}] orgs=${result.organizations} linhas=${result.scanned} a_cifrar=${result.toEncrypt} gravadas=${result.written} linhas_com_chaves_fora_do_catalogo=${result.rowsWithUnknownFields}`,
   );
   return result;
 }
@@ -153,7 +192,9 @@ export async function runIntegrationSettingsBackfill(
 async function main() {
   const databaseUrl = process.env.DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error('DATABASE_URL é obrigatória.');
-  const apply = process.argv.includes('--apply');
+  // Aborta ANTES de conectar: chave explícita/válida; --apply só com --snapshot-confirmed=<id>.
+  const { apply, snapshotId } = assertBackfillPreconditions(process.env, process.argv);
+  if (snapshotId) console.log(`Snapshot confirmado: ${snapshotId}`);
   const { default: pg } = await import('pg');
   const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
   const client = await pool.connect();
@@ -162,8 +203,12 @@ async function main() {
       const res = await client.query(sql, params);
       return { rows: res.rows };
     };
-    await runIntegrationSettingsBackfill(query, { apply });
-    if (!apply) console.log('Nada gravado (dry-run). Rode com --apply para gravar.');
+    await runIntegrationSettingsBackfill(query, { apply, snapshotId });
+    if (!apply) {
+      console.log(
+        'Nada gravado (dry-run). Para gravar: snapshot do banco + --apply --snapshot-confirmed=<id>.',
+      );
+    }
   } finally {
     client.release();
     await pool.end();

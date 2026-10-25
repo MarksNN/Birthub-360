@@ -5,8 +5,16 @@
 //
 // Propriedade: Agente 15 (Segurança Aplicada e Rotação de Segredos)
 //
-// Uso:
-//   DATABASE_URL=... OLD_KEY=<base64-32b> NEW_KEY=<base64-32b> npx tsx scripts/security/reencrypt-credentials.ts [--dry-run] [--model=BitrixConnection]
+// Uso (DRY-RUN por padrão — só grava com --apply + --snapshot-confirmed=<id>):
+//   DATABASE_URL=... CREDENTIALS_ENCRYPTION_KEY=<atual> OLD_KEY=<base64-32b> NEW_KEY=<base64-32b> \
+//     npx tsx scripts/security/reencrypt-credentials.ts [--model=BitrixConnection]            # dry-run
+//   ... npx tsx scripts/security/reencrypt-credentials.ts --apply --snapshot-confirmed=<id>    # grava
+//
+// Pré-condições (credential-script-guards.ts, checadas ANTES de conectar): CREDENTIALS_ENCRYPTION_KEY,
+// OLD_KEY e NEW_KEY explícitas no env e válidas, em QUALQUER NODE_ENV — sem fallback entre elas nem
+// para chave de dev; OLD≠NEW; CREDENTIALS_ENCRYPTION_KEY ∈ {OLD, NEW}. `--apply` exige o id do
+// snapshot do banco tirado antes (runbook no ADR-010). Até a Onda 52 o padrão era LIVE e OLD_KEY
+// caía em CREDENTIALS_ENCRYPTION_KEY — ambos removidos (parecer 24 do #102).
 //
 // `--model=Setting` (ou sem filtro) também re-cifra os campos secretos POR CAMPO dentro do JSON
 // de `Setting.value` (`key = integration.*`, ver
@@ -17,6 +25,7 @@
 
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 import pg from 'pg';
+import { assertRotationPreconditions } from './credential-script-guards.js';
 import {
   LEGACY_BITRIX_KEY,
   SECRET_FIELDS_BY_SETTING_KEY,
@@ -31,7 +40,8 @@ const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 const BATCH_SIZE = 250;
 
-const dryRun = process.argv.includes('--dry-run');
+// Definido em main() a partir de assertRotationPreconditions — começa seguro (sem gravação).
+let dryRun = true;
 const modelFilterArg = process.argv.find((a) => a.startsWith('--model='))?.split('=')[1];
 
 const TARGET_MODELS: Record<string, string[]> = {
@@ -47,19 +57,6 @@ const TARGET_MODELS: Record<string, string[]> = {
   Contact: ['email', 'phone', 'whatsapp'],
   VoiceCallLog: ['transcript', 'summary', 'recordingUrl'],
 };
-
-function parseKey(rawKey: string | undefined, name: string): Buffer {
-  if (!rawKey?.trim()) {
-    throw new Error(`Variável ${name} não fornecida. Gere uma chave válida de 32 bytes em base64.`);
-  }
-  const buf = Buffer.from(rawKey.trim(), 'base64');
-  if (buf.length !== 32) {
-    throw new Error(
-      `${name} inválida: esperado 32 bytes após decodificação base64, recebido ${buf.length}.`,
-    );
-  }
-  return buf;
-}
 
 export function decryptWithKey(stored: string, keyBuf: Buffer): string {
   if (!stored.startsWith(VERSION_PREFIX)) {
@@ -169,19 +166,13 @@ async function main() {
     process.exit(1);
   }
 
-  const oldKeyBuf = parseKey(
-    process.env.OLD_KEY || process.env.CREDENTIALS_ENCRYPTION_KEY,
-    'OLD_KEY',
-  );
-  const newKeyBuf = parseKey(
-    process.env.NEW_KEY || process.env.NEW_CREDENTIALS_ENCRYPTION_KEY,
-    'NEW_KEY',
-  );
-
-  if (oldKeyBuf.equals(newKeyBuf)) {
-    console.error('[ERRO] OLD_KEY e NEW_KEY são idênticas. Nenhuma re-encriptação necessária.');
-    process.exit(1);
-  }
+  // Aborta (lança) antes de qualquer conexão se faltar/for inválida alguma chave, ou se --apply
+  // vier sem --snapshot-confirmed=<id>.
+  const pre = assertRotationPreconditions(process.env, process.argv);
+  const oldKeyBuf = pre.oldKey;
+  const newKeyBuf = pre.newKey;
+  dryRun = !pre.apply;
+  if (pre.snapshotId) console.log(`Snapshot confirmado: ${pre.snapshotId}`);
 
   console.log('='.repeat(70));
   console.log('🔐 RE-ENCRIPTAÇÃO DE CREDENCIAIS — ROTAÇÃO DE CHAVE MESTRA');

@@ -5,6 +5,7 @@ import { getTenantId } from '../../../lib/context.js';
 import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 /**
  * Hub Universal de Reuniões e Agenda (Google Calendar/Meet, Microsoft Teams Meetings, Zoom, Calendly e Agendamento nativo).
@@ -202,6 +203,7 @@ export const universalMeetingsTool = new DynamicStructuredTool({
 
       let meetingLink: string | null = null;
       let externalEventId: string | null = null;
+      let integrationWarning: Record<string, unknown> | null = null;
 
       if (provider === 'google_meet') {
         const googleConn = await prisma.googleWorkspaceConnection.findFirst({
@@ -246,8 +248,12 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           }
         }
       } else if (provider === 'microsoft_teams') {
-        const cfg: Record<string, string> =
-          (await integrationSettingsRepository.get(organizationId, 'microsoft365')) ?? {};
+        // Ilegível ≠ não configurado: sem chamada ao Graph; reunião fica só no CRM + aviso.
+        const m365 = await integrationSettingsRepository.lookup(organizationId, 'microsoft365');
+        if (m365.state === 'unreadable') {
+          integrationWarning = reconfigurationPayload('microsoft365', m365.message);
+        }
+        const cfg: Record<string, string> = m365.state === 'configured' ? m365.values : {};
         const accessToken = typeof cfg.accessToken === 'string' ? cfg.accessToken.trim() : '';
         if (accessToken) {
           try {
@@ -309,6 +315,7 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           endTime: end.toISOString(),
           meetingLink,
           externalEventId,
+          ...(integrationWarning ? { integrationWarning } : {}),
         },
         null,
         2,

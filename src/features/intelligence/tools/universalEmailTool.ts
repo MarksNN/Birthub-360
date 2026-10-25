@@ -6,6 +6,7 @@ import { integrationSettingsRepository } from '../../../lib/integrations/integra
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { classifyEmailReplyIntent } from '../../cadence/infra/emailIntentClassifier.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 interface NormalizedInboxMessage {
   id: string;
@@ -180,7 +181,13 @@ export const universalEmailTool = tool(
 
       // 3. Se houver configuração Microsoft 365 / Outlook Graph API em Setting, consultar /me/messages
       // Valor decifrado só server-side (header Authorization) — nunca volta para o LLM.
-      const m365Val = await integrationSettingsRepository.get(organizationId, 'microsoft365');
+      // Ilegível ≠ não configurado: sem chamada ao Graph e com aviso de reconfiguração.
+      const m365 = await integrationSettingsRepository.lookup(organizationId, 'microsoft365');
+      const m365Val = m365.state === 'configured' ? m365.values : null;
+      const integrationWarnings: Record<string, unknown>[] = [];
+      if (m365.state === 'unreadable') {
+        integrationWarnings.push(reconfigurationPayload('microsoft365', m365.message));
+      }
       if (m365Val?.accessToken) {
         try {
           const top = Math.min(limit, 10);
@@ -295,6 +302,7 @@ export const universalEmailTool = tool(
       return JSON.stringify(
         {
           success: true,
+          ...(integrationWarnings.length > 0 ? { integrationWarnings } : {}),
           totalEmailsLidos: unifiedMessages.length,
           oportunidadesQuentesDetectadas: hotOpportunities.length,
           oportunidadesClassificadasAoVivo: liveOpportunities,

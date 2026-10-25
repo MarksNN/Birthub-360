@@ -1,7 +1,7 @@
 - De: 15 — Segurança Aplicada
 - Para: 24 — Revisão Independente (revisor técnico: 06 — Integrações e Bitrix)
 - Onda: 52
-- Status: aberto (commit local, sem push e sem PR; só o 08A abre o PR depois do parecer do 24)
+- Status: aberto. PR #102 (branch `agente/15-integration-secrets-at-rest`), **24 BLOCKED em `aa4e0c22`** → rodada de correção empurrada por cima (fast-forward, sem force). O novo head é o commit que contém esta versão do handoff (`fix(security): 15 — correções do parecer 24/06 …`). Aguarda nova revisão do 24.
 - Prioridade: alto (achado ALTA)
 - Referências: diagnóstico do 15 "integration secrets at rest" (veredito ALTA), contrato 06↔15 (steering 1 e 2), `docs/ADR/ADR-010-integration-settings-at-rest.md`, #33 (KMS, Agente 21)
 
@@ -52,7 +52,60 @@ Não houve mudança de schema Prisma nem migration, e não foi usado `@ts-ignore
 - O frontend não mudou.
 - O e-mail M365 continua lendo `email`, mas o catálogo grava `mailboxEmail`. A divergência já existia na main e não foi alterada aqui (follow-up do 06).
 
-## Evidência
+## Rodada de correção (parecer 24 BLOCKED em `aa4e0c22` + steering do 06)
+
+**Itens do 24:**
+1. **Logger:** redact de `refreshToken`, `apiKey`, `clientSecret`, `webhookSecret`, `authToken` e `appKey`, na raiz e em `*.campo` (`LOGGER_REDACT_PATHS` exportado). Teste: `tests/unit/lib/loggerRedaction.integrationCredentials.test.ts`.
+2. **Scripts abortam** (`scripts/security/credential-script-guards.ts`, puro e testado em `tests/unit/security/credentialScriptGuards.test.ts`):
+   - backfill e reencrypt abortam sem `CREDENTIALS_ENCRYPTION_KEY` explícita (base64 de 32 bytes) em **qualquer** `NODE_ENV`, sem fallback para a chave de dev;
+   - `OLD_KEY`/`NEW_KEY` idem (sem fallback), precisam ser diferentes, e a chave corrente tem de ser igual a uma delas;
+   - `--apply` exige `--snapshot-confirmed=<id>`; o `run` do backfill também recusa apply sem `snapshotId` antes de qualquer query;
+   - **mudança de contrato:** o reencrypt agora roda em **dry-run por padrão** (antes gravava se não houvesse `--dry-run`), e `--apply` com `--dry-run` é recusado;
+   - o runbook do ADR-010 exige snapshot antes do `--apply`.
+3. **CodeQL** — corrigido no código de teste (`universalTools.integrationSecrets.test.ts`), **nenhum alerta dispensado via API**:
+   - #105 e #106 (`js/incomplete-url-substring-sanitization`): `includes('api.trello.com')`/`includes('graph.microsoft.com')` → comparação exata de `new URL(u).hostname` (helper `hostOf`);
+   - #107 (`js/file-system-race`): `statSync` + `readFileSync` → `readdirSync(dir, { withFileTypes: true })` com `Dirent.isDirectory()/isFile()`; `statSync` saiu do import.
+   - O fechamento dos alertas depende da próxima análise do CodeQL no PR.
+4. **ADR-010:** v2 ganhou a P3 (AAD `tenantId`+campo, key-id no prefixo, AuditLog no backfill/rotação), o runbook com snapshot e a semântica ilegível ≠ não configurado.
+
+**Steering do 06:**
+- **A. Erros com status correto:** `universalConnectors.service` usa `AppError`: provider desconhecido 400, slack sem webhook 400, `bitrix24` 422 (mensagem amigável), OAuth 422. `UnknownIntegrationProviderError` agora estende `AppError` (400). Teste de rota (supertest + `errorHandler`): bitrix24 → 422, desconhecido → 400, OAuth → 422.
+- **B. Estado por campo:** `getStatus`/`listStatus` expõem `fields: Record<campo,'set'|'unset'|'unreadable'>` e `unreadable`, com `configured=false` se houver campo ilegível. `tasks` (clickup/asana, antigo :368) e `notifications` (SMS, antigo :137) usam `configured`/`fields`, não mais a string mascarada. `list_platforms` usa `listStatus` (um provider ilegível não derruba a listagem; mostra `conectado:false, ilegivel:true`).
+- **C. Fail closed:**
+  - `get` **lança** `IntegrationConfigUnreadableError` (`AppError` 422, com `provider`/`fields`, sem valores) e `null` continua significando "não configurado"; `getMany` lança se algum pedido estiver ilegível;
+  - novo `lookup` → `configured | unconfigured | unreadable`, sem lançar no ilegível; erro de tenant continua lançando;
+  - **messaging:** Teams/Telegram com credencial ilegível **não** caem no env da plataforma: `status: 'reconfiguration_required'`, sem fetch e sem pending action;
+  - revisados os demais: e-mail (M365 → `integrationWarnings`, sem Graph), meetings (Teams → `integrationWarning`), tasks (Trello/Notion/Monday sem fetch), notifications (push sem fetch; SMS `gatewayUnreadable`), `aiPendingAction` `send_sms` → `reason: 'credentials_unreadable'`;
+  - o fallback quando **não há** configuração continua igual (testado para Teams e Telegram).
+- **Pontos baratos:**
+  - `assertTenant` recusa `bypassRls: true` mesmo com `tenantId` igual;
+  - o guard de `prisma.setting` cobre também `aiPendingAction.service.ts`;
+  - o dry-run do backfill relata chaves fora do catálogo (`accountSid`/`email` legados) por nome, sem valor, e as **preserva** (`unknownFields`, `rowsWithUnknownFields`).
+
+**Evidência desta rodada:**
+- **tsc** (`tsc --noEmit -p tsconfig.json`, Node 22): **88** erros, conjunto idêntico ao baseline de 88 ignorando linha/coluna — **0 erros novos**. Os scripts (`scripts/security/*.ts`) e os 6 arquivos de teste tocados, fora do tsconfig, foram checados à parte (`--strict`, nodenext): 0 erros.
+- **biome check --write** nos arquivos tocados: 0 erros; 3 warnings, todos em linhas pré-existentes não tocadas (`BATCH_SIZE` sem uso e `useTemplate` no reencrypt, `useOptionalChain` no `universalEmailTool`).
+- **vitest** (`-c vitest.unit.config.ts`, prisma mockado, sem Postgres): **85/85** nos testes novos/alterados:
+  - `integrationSettings.repository.test.ts` 19 (adulterado → lança 422 e `fields`; `lookup` nos 3 estados; `lookup` não engole erro de tenant; `getMany` lança; `bypassRls` recusado; provider desconhecido 400);
+  - `universalTools.integrationSecrets.test.ts` 23 (+11 de fail-closed e guard);
+  - `universalConnectors.secrets.test.ts` 11 (+3 de rota);
+  - `integrationSettingsBackfill.test.ts` 15 (+4: chaves fora do catálogo, apply sem snapshot);
+  - `credentialScriptGuards.test.ts` 15 (novo);
+  - `loggerRedaction.integrationCredentials.test.ts` 2 (novo).
+- Suítes relacionadas (`pending-actions.service`, `swarmScheduler.fullModeGates`, `intelligence.routes`, `cold-email.service` e as de `tests/unit/{lib,intelligence}` que citam universal/logger): 18 arquivos, 133/133.
+- `trivy-pr-gate.test.ts` segue falhando só porque o clone sparse não tem `.github/` (pré-existente).
+- Nada foi executado contra banco; backfill e reencrypt **não** foram rodados.
+
+**Follow-ups (não bloqueiam):**
+- `save`/`clear` fazem read-modify-write sem transação (gravações concorrentes no mesmo provider podem perder campo);
+- cobertura de testes para Teams (tasks/meetings), Monday, Notion, ClickUp e Asana além dos casos fail-closed;
+- UI do Bitrix fica com o 06;
+- erros de `validateWebhookUrl` no PUT do Hub ainda viram 500 (deveriam ser 400);
+- os anteriores: rota DELETE/clear, `mailboxEmail` vs `email` no M365, v2/KMS (#33), execução do backfill, rotação dos tokens expostos, fallback de plataforma para tenant sem config (MÉDIA, decisão de produto).
+
+## Evidência (rodada anterior, `aa4e0c22`)
+
+> Contagens e semântica abaixo são da rodada anterior. Em especial, "adulteração tratada como null" foi substituída: agora `get` lança `IntegrationConfigUnreadableError` (ver acima).
 
 - **tsc** (`tsc --noEmit -p tsconfig.json`, Node 22): **88 erros** na main `acd6c614` e **88** nesta branch. O conjunto é **idêntico** quando se ignoram os números de linha, e só as linhas deslocaram nos arquivos tocados. Não há erro novo. Os scripts e o `TwilioProvider`, que ficam fora do tsconfig, foram checados à parte, sem erros.
 - **biome check** nos 16 arquivos de produção e no ADR: 0 erros e 6 warnings, todos pré-existentes na main: `BATCH_SIZE` sem uso no reencrypt, `useTemplate`, `useOptionalChain` em `universalEmailTool` e `noNonNullAssertion` em `universalOfficeDocsTool`. Os testes ficam em path ignorado pelo `biome.json`.
@@ -97,6 +150,8 @@ Não houve mudança de schema Prisma nem migration, e não foi usado `@ts-ignore
 ## Teste esperado (24)
 
 1. `rg -n "prisma\s*\.\s*setting" src/features/intelligence/tools` não retorna nada.
-2. `vitest run -c vitest.unit.config.ts tests/unit/integrations/settings tests/unit/intelligence/universalTools.integrationSecrets.test.ts tests/unit/intelligence/universalConnectors.secrets.test.ts tests/unit/security/integrationSettingsBackfill.test.ts` deixa os 46 testes passando.
+2. `vitest run -c vitest.unit.config.ts tests/unit/integrations/settings tests/unit/intelligence/universalTools.integrationSecrets.test.ts tests/unit/intelligence/universalConnectors.secrets.test.ts tests/unit/security/integrationSettingsBackfill.test.ts tests/unit/security/credentialScriptGuards.test.ts tests/unit/lib/loggerRedaction.integrationCredentials.test.ts` deixa os 85 testes passando.
 3. `npm run typecheck` dá o mesmo total da main (88), sem erro novo.
 4. Revisão do 06: semântica de `connected`, `accountSid` do SMS, bitrix pelo Hub e follow-up do `mailboxEmail`.
+5. CodeQL no PR: #105, #106 e #107 fecham na próxima análise (corrigidos no código, sem dismiss).
+6. Fail-closed: com credencial ilegível, nenhuma tool usa env da plataforma (testes `falha fechada: …`).

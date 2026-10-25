@@ -5,6 +5,7 @@ import {
 } from '../../../lib/integrations/integrationSettings.repository.js';
 import { prisma } from '../../../lib/prisma.js';
 import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
+import { AppError } from '../../../shared/middlewares/errorHandler.js';
 import { getBitrixSettings } from '../../integrations/bitrix/service/settings.js';
 import {
   type ConnectorDefinition,
@@ -145,7 +146,7 @@ export async function saveUniversalConnectorConfig(
 ) {
   const def = UNIVERSAL_CONNECTOR_DEFINITIONS.find((d) => d.provider === provider);
   if (!def) {
-    throw new Error(`Provedor desconhecido: ${provider}`);
+    throw new AppError(`Provedor desconhecido: ${provider}`, 400);
   }
 
   // Validar URLs de webhook contra SSRF antes de salvar (valores mascarados "••••" não começam
@@ -160,7 +161,7 @@ export async function saveUniversalConnectorConfig(
     const webhookUrl = (config.webhookUrl || '').trim();
     const channelName = (config.channelName || '#vendas-swarm').trim();
     if (!webhookUrl) {
-      throw new Error('Informe a Slack Incoming Webhook URL.');
+      throw new AppError('Informe a Slack Incoming Webhook URL.', 400);
     }
     const existing = await prisma.slackConnection.findFirst({ where: { organizationId } });
     if (existing) {
@@ -180,13 +181,16 @@ export async function saveUniversalConnectorConfig(
   // lida por getBitrixSettings(). A gravação antiga em Setting `bitrix_webhook_url` (texto puro)
   // nunca era lida por ninguém — removida (Onda 52, Agente 15 + 06).
   if (provider === 'bitrix24') {
-    throw new Error(
+    // 422 via AppError (não `Error`): a mensagem amigável chega ao cliente em vez de virar um 500
+    // retryable no errorHandler.
+    throw new AppError(
       'O Bitrix24 é configurado pela integração dedicada (Configurações → Bitrix24), não pelo Hub Universal.',
+      422,
     );
   }
 
   if (!isIntegrationProvider(provider)) {
-    throw new Error(`O provedor ${provider} utiliza autenticação OAuth dedicada.`);
+    throw new AppError(`O provedor ${provider} utiliza autenticação OAuth dedicada.`, 422);
   }
 
   // Merge com o valor anterior: campo ausente, vazio ('') ou mascarado ("••••") PRESERVA o valor

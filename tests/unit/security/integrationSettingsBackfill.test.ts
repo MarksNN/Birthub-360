@@ -58,7 +58,7 @@ describe('planSettingBackfill', () => {
       value: { apiKey: TRELLO_KEY, token: TRELLO_TOKEN },
     });
     const second = planSettingBackfill({ key: 'integration.trello', value: first.nextValue });
-    expect(second).toEqual({ nextValue: null, encryptedFields: [] });
+    expect(second).toEqual({ nextValue: null, encryptedFields: [], unknownFields: [] });
 
     const partial = planSettingBackfill({
       key: 'integration.trello',
@@ -84,6 +84,29 @@ describe('planSettingBackfill', () => {
     expect(
       planSettingBackfill({ key: 'integration.trello', value: { apiKey: '', token: '' } }).nextValue,
     ).toBeNull();
+  });
+});
+
+describe('planSettingBackfill — chaves fora do catálogo (legadas)', () => {
+  it('reporta accountSid/email legados sem descartá-los nem cifrá-los', () => {
+    const plan = planSettingBackfill({
+      key: 'integration.sms',
+      value: { apiKey: 'sms-plain-key-0001', accountSid: 'AC-legacy-1', email: 'ops@acme.test' },
+    });
+    expect(plan.unknownFields).toEqual(['accountSid', 'email']);
+    expect(plan.encryptedFields).toEqual(['apiKey']);
+    const next = plan.nextValue as Record<string, string>;
+    expect(next.accountSid).toBe('AC-legacy-1');
+    expect(next.email).toBe('ops@acme.test');
+  });
+
+  it('reporta mesmo quando não há nada a cifrar (nextValue null)', () => {
+    const plan = planSettingBackfill({
+      key: 'integration.microsoft365',
+      value: { accessToken: 'enc:v1:a:b:c', email: 'legacy@acme.test' },
+    });
+    expect(plan.nextValue).toBeNull();
+    expect(plan.unknownFields).toEqual(['email']);
   });
 });
 
@@ -118,7 +141,13 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
     const { query, calls } = fakeDb(data());
     const log = vi.fn();
     const res = await runIntegrationSettingsBackfill(query, { apply: false, log });
-    expect(res).toEqual({ organizations: 2, scanned: 3, toEncrypt: 2, written: 0 });
+    expect(res).toEqual({
+      organizations: 2,
+      scanned: 3,
+      toEncrypt: 2,
+      written: 0,
+      rowsWithUnknownFields: 0,
+    });
     expect(calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
     const logged = log.mock.calls.flat().join('\n');
     expect(logged).toContain('[DRY-RUN]');
@@ -126,9 +155,37 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
     expect(logged).not.toContain('bitrix24.com/rest');
   });
 
+  it('dry-run loga as chaves fora do catálogo (sem valor) e as conta', async () => {
+    const { query, calls } = fakeDb({
+      'org-a': [
+        {
+          id: 's9',
+          key: 'integration.sms',
+          value: { apiKey: 'enc:v1:a:b:c', accountSid: 'AC-SECRET-LEGACY' },
+        },
+      ],
+    });
+    const log = vi.fn();
+    const res = await runIntegrationSettingsBackfill(query, { apply: false, log });
+    expect(res.rowsWithUnknownFields).toBe(1);
+    expect(res.toEncrypt).toBe(0);
+    const logged = log.mock.calls.flat().join('\n');
+    expect(logged).toContain('fora_do_catalogo=accountSid');
+    expect(logged).not.toContain('AC-SECRET-LEGACY');
+    expect(calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
+  });
+
+  it('apply sem snapshotId aborta antes de qualquer query', async () => {
+    const { query, calls } = fakeDb(data());
+    await expect(
+      runIntegrationSettingsBackfill(query, { apply: true, log: () => {} }),
+    ).rejects.toThrow(/snapshot/i);
+    expect(calls).toHaveLength(0);
+  });
+
   it('apply: UPDATE por linha alvo, com tenant setado e sem bypass ao tocar Setting', async () => {
     const { query, calls } = fakeDb(data());
-    const res = await runIntegrationSettingsBackfill(query, { apply: true, log: () => {} });
+    const res = await runIntegrationSettingsBackfill(query, { apply: true, snapshotId: 'snap-test', log: () => {} });
     expect(res.written).toBe(2);
     const updates = calls.filter((c) => c.sql.includes('UPDATE "Setting"'));
     expect(updates.map((u) => u.params?.[1])).toEqual(['s1', 's3']);
@@ -143,7 +200,7 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
 
   it('apply é idempotente: rodar sobre o resultado não grava nada', async () => {
     const { query, calls } = fakeDb(data());
-    await runIntegrationSettingsBackfill(query, { apply: true, log: () => {} });
+    await runIntegrationSettingsBackfill(query, { apply: true, snapshotId: 'snap-test', log: () => {} });
     const written = calls
       .filter((c) => c.sql.includes('UPDATE "Setting"'))
       .map((c) => ({ id: c.params?.[1] as string, value: JSON.parse(c.params?.[0] as string) }));
@@ -151,7 +208,7 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
     after['org-a'][0].value = written.find((w) => w.id === 's1')?.value;
     after['org-b'][0].value = written.find((w) => w.id === 's3')?.value;
     const second = fakeDb(after);
-    const res = await runIntegrationSettingsBackfill(second.query, { apply: true, log: () => {} });
+    const res = await runIntegrationSettingsBackfill(second.query, { apply: true, snapshotId: 'snap-test', log: () => {} });
     expect(res.written).toBe(0);
     expect(second.calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
   });

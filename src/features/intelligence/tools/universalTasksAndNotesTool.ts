@@ -6,6 +6,7 @@ import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
 import { getBitrixSettings } from '../../integrations/bitrix/service/settings.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 /**
  * Hub Universal de Tarefas, Projetos e Anotações (Trello, Monday.com, Bitrix24 Tasks, ClickUp, Asana, Notion e CRM Interno).
@@ -65,18 +66,18 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       }
 
       if (action === 'list_platforms') {
-        // Uma única query (getMany); os valores decifrados só viram booleanos abaixo — nenhum
-        // segredo entra no JSON devolvido ao LLM.
-        const [bitrixCfg, cfgs] = await Promise.all([
+        // Uma única query (listStatus): só estado por campo — nenhum segredo (nem decifrado) entra
+        // no JSON devolvido ao LLM. Credencial ilegível aparece como conectado:false + ilegivel.
+        const [bitrixCfg, st] = await Promise.all([
           getBitrixSettings(organizationId),
-          integrationSettingsRepository.getMany(organizationId, [
-            'trello',
-            'monday',
-            'clickup',
-            'asana',
-            'notion',
-          ] as const),
+          integrationSettingsRepository.listStatus(organizationId),
         ]);
+        const isSet = (p: keyof typeof st, ...keys: string[]) =>
+          st[p].configured && keys.every((k) => st[p].fields[k] === 'set');
+        const platformState = (p: keyof typeof st, ...keys: string[]) => ({
+          conectado: isSet(p, ...keys),
+          ...(st[p].unreadable ? { ilegivel: true, acao: 'Reconfigure a integração.' } : {}),
+        });
 
         return JSON.stringify(
           {
@@ -86,14 +87,12 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
                 ativo: true,
                 recursos: ['Activity (Tarefas/Reuniões/Calls)', 'Note (Anotações Polimórficas)'],
               },
-              trello: {
-                conectado: Boolean(cfgs.trello?.apiKey && cfgs.trello?.token),
-              },
-              monday: { conectado: Boolean(cfgs.monday?.apiKey) },
+              trello: platformState('trello', 'apiKey', 'token'),
+              monday: platformState('monday', 'apiKey'),
               bitrix24Tasks: { conectado: Boolean(bitrixCfg.webhookUrl) },
-              clickup: { conectado: Boolean(cfgs.clickup?.apiKey) },
-              asana: { conectado: Boolean(cfgs.asana?.accessToken) },
-              notion: { conectado: Boolean(cfgs.notion?.apiKey) },
+              clickup: platformState('clickup', 'apiKey'),
+              asana: platformState('asana', 'accessToken'),
+              notion: platformState('notion', 'apiKey'),
             },
           },
           null,
@@ -178,8 +177,11 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
 
         let externalSync: Record<string, unknown> | null = null;
         if (platform === 'notion' || platform === 'all') {
-          const cfg: Record<string, string> =
-            (await integrationSettingsRepository.get(organizationId, 'notion')) ?? {};
+          const notion = await integrationSettingsRepository.lookup(organizationId, 'notion');
+          if (notion.state === 'unreadable') {
+            externalSync = reconfigurationPayload('notion', notion.message);
+          }
+          const cfg: Record<string, string> = notion.state === 'configured' ? notion.values : {};
           const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
           const parentPageId =
             boardOrListId || (typeof cfg.parentPageId === 'string' ? cfg.parentPageId.trim() : '');
@@ -249,14 +251,16 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
 
       // 2. Sincronizar com Trello se solicitado
       if (platform === 'trello' || platform === 'all') {
-        const cfg: Record<string, string> =
-          (await integrationSettingsRepository.get(organizationId, 'trello')) ?? {};
+        const trello = await integrationSettingsRepository.lookup(organizationId, 'trello');
+        const cfg: Record<string, string> = trello.state === 'configured' ? trello.values : {};
         const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
         const token = typeof cfg.token === 'string' ? cfg.token.trim() : '';
         const idList =
           boardOrListId || (typeof cfg.defaultListId === 'string' ? cfg.defaultListId.trim() : '');
 
-        if (apiKey && token && idList) {
+        if (trello.state === 'unreadable') {
+          externalResults.trello = reconfigurationPayload('trello', trello.message);
+        } else if (apiKey && token && idList) {
           const url = new URL('https://api.trello.com/1/cards');
           url.searchParams.set('key', apiKey);
           url.searchParams.set('token', token);
@@ -289,13 +293,15 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
 
       // 3. Sincronizar com Monday.com se solicitado
       if (platform === 'monday' || platform === 'all') {
-        const cfg: Record<string, string> =
-          (await integrationSettingsRepository.get(organizationId, 'monday')) ?? {};
+        const monday = await integrationSettingsRepository.lookup(organizationId, 'monday');
+        const cfg: Record<string, string> = monday.state === 'configured' ? monday.values : {};
         const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
         const boardId =
           boardOrListId || (typeof cfg.boardId === 'string' ? cfg.boardId.trim() : '');
 
-        if (apiKey && boardId) {
+        if (monday.state === 'unreadable') {
+          externalResults.monday = reconfigurationPayload('monday', monday.message);
+        } else if (apiKey && boardId) {
           const res = await fetch('https://api.monday.com/v2', {
             method: 'POST',
             headers: {
@@ -364,14 +370,22 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       if (platform === 'clickup' || platform === 'asana') {
         const settingKey = platform === 'clickup' ? 'integration.clickup' : 'integration.asana';
         // Só status (nunca o segredo): o resultado volta para o LLM.
+        // Decide pelo estado por campo (`fields`), nunca por `masked` — máscara de ilegível é
+        // string não vazia e faria `configured: true` com credencial que não decifra.
         const status = await integrationSettingsRepository.getStatus(organizationId, platform);
-        const hasCredential = Boolean(status.masked.apiKey || status.masked.accessToken);
-        externalResults[platform] = {
-          configured: hasCredential,
-          message: hasCredential
-            ? `Tarefa sincronizada com ${platform.toUpperCase()} e registrada no CRM.`
-            : `Configure ${settingKey} para espelhar automaticamente no ${platform.toUpperCase()}. Tarefa salva no CRM interno.`,
-        };
+        const primary = platform === 'clickup' ? 'apiKey' : 'accessToken';
+        const hasCredential = status.configured && status.fields[primary] === 'set';
+        externalResults[platform] = status.unreadable
+          ? reconfigurationPayload(
+              platform,
+              `Credenciais de ${platform} ilegíveis — reconfigure ${settingKey}. Tarefa salva no CRM interno.`,
+            )
+          : {
+              configured: hasCredential,
+              message: hasCredential
+                ? `Tarefa sincronizada com ${platform.toUpperCase()} e registrada no CRM.`
+                : `Configure ${settingKey} para espelhar automaticamente no ${platform.toUpperCase()}. Tarefa salva no CRM interno.`,
+            };
       }
 
       return JSON.stringify(

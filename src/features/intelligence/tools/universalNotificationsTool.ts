@@ -6,6 +6,7 @@ import { logger } from '../../../lib/logger.js';
 import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
 import { notificationService } from '../../notifications/notification.service.js';
 import { sseService } from '../../notifications/sse.service.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 /**
  * Dispatcher Universal de Notificações Multi-Dispositivo:
@@ -80,8 +81,10 @@ export const universalNotificationsTool = new DynamicStructuredTool({
         const compactGlance = (wristSummary || `${title}: ${message}`).slice(0, 65);
         // URL do gateway (secret no catálogo — tópico ntfy é capability URL) decifrada só para o
         // fetch; nunca entra em `deliveries` (que volta para o LLM).
-        const cfg = await integrationSettingsRepository.get(organizationId, 'push_wearables');
-        const pushWebhookUrl = cfg?.webhookUrl?.trim() ?? '';
+        // Ilegível ≠ não configurado: sem fetch e com aviso de reconfiguração (falha fechada).
+        const push = await integrationSettingsRepository.lookup(organizationId, 'push_wearables');
+        const pushWebhookUrl =
+          push.state === 'configured' ? (push.values.webhookUrl?.trim() ?? '') : '';
 
         const wearablePayload = {
           title,
@@ -118,6 +121,9 @@ export const universalNotificationsTool = new DynamicStructuredTool({
             queuedForMobileApp: true,
             remotePushGatewayDispatched: remotePushDispatched,
             priority: kind === 'Alert' ? 'high' : 'normal',
+            ...(push.state === 'unreadable'
+              ? { remotePushGateway: reconfigurationPayload('push_wearables', push.message) }
+              : {}),
           };
         }
 
@@ -132,9 +138,16 @@ export const universalNotificationsTool = new DynamicStructuredTool({
 
       // 3. Alerta SMS se solicitado
       if (channels.includes('sms_alert')) {
+        // Estado por campo (`fields`), nunca `masked`: a máscara de ilegível é string não vazia.
         const smsStatus = await integrationSettingsRepository.getStatus(organizationId, 'sms');
         deliveries.sms_alert = {
-          gatewayConfigured: Boolean(smsStatus.masked.webhookUrl),
+          gatewayConfigured: smsStatus.configured && smsStatus.fields.webhookUrl === 'set',
+          ...(smsStatus.unreadable
+            ? {
+                gatewayUnreadable: true,
+                acao: 'Credenciais de SMS ilegíveis — reconfigure a integração no Hub Universal.',
+              }
+            : {}),
           textPreview: `[BirthHub 360] ${title}: ${message}`.slice(0, 160),
         };
       }

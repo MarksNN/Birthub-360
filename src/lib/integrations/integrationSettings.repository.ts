@@ -16,12 +16,16 @@
 // - `get`/`getMany` devolvem valores DECIFRADOS — só para uso server-side (chamar a API do
 //   provedor). Nunca serializar o retorno para o LLM, logs ou resposta HTTP. Para UI/LLM, use
 //   `getStatus`/`listStatus`, que nunca devolvem segredo.
-// - Fail-closed: se QUALQUER campo secreto não decifrar (chave errada/dado adulterado), `get`
-//   devolve `null` (integração tratada como não configurada) — `tryDecryptField` loga só
-//   model/campo/id, nunca o valor.
+// - Fail-closed: se QUALQUER campo secreto não decifrar (chave errada/dado adulterado), `get` e
+//   `getMany` LANÇAM `IntegrationConfigUnreadableError` — ilegível NÃO é "não configurado", então
+//   nenhum caller pode cair num fallback de plataforma (env) por engano. `null` continua
+//   significando só "sem configuração". `getStatus`/`listStatus` nunca lançam por isso: expõem
+//   `fields[k] = 'set' | 'unset' | 'unreadable'`, `unreadable` e `configured: false`.
+//   `tryDecryptField` loga só model/campo/id, nunca o valor.
 // - Tenant: sem `bypassRls`. O `orgId` recebido PRECISA ser igual ao tenant do requestContext
-//   (o mesmo que a extensão RLS do Prisma usa em `app.current_tenant_id`); ausência de contexto ou
-//   divergência lança `IntegrationSettingsTenantError` antes de qualquer query.
+//   (o mesmo que a extensão RLS do Prisma usa em `app.current_tenant_id`); ausência de contexto,
+//   divergência ou contexto com `bypassRls: true` lança `IntegrationSettingsTenantError` antes de
+//   qualquer query.
 // - `save` faz merge: campo ausente, `''` ou contendo `••••` (máscara devolvida pelo GET)
 //   PRESERVA o valor atual. A única forma de remover é `clear`.
 
@@ -31,7 +35,8 @@ import {
   type IntegrationProvider,
   isIntegrationProvider,
 } from '../../features/intelligence/services/universalConnectors.catalog.js';
-import { getTenantId } from '../async-context.js';
+import { AppError } from '../../shared/middlewares/errorHandler.js';
+import { getTenantId, requestContext } from '../async-context.js';
 import { DECRYPTION_FAILED_MARKER, encryptField, tryDecryptField } from '../crypto/secretFields.js';
 import { prisma } from '../prisma.js';
 
@@ -41,8 +46,15 @@ export const ENC_PREFIX = 'enc:';
 export const MASK_TOKEN = '••••';
 const UNREADABLE_MASK = `${MASK_TOKEN} (ilegível — reconfigure)`;
 
+export type IntegrationFieldState = 'set' | 'unset' | 'unreadable';
+
 export interface IntegrationStatus {
+  /** `false` se não há valor OU se qualquer campo secreto está ilegível (falha de decifra). */
   configured: boolean;
+  /** Algum campo secreto não decifrou (chave errada/rotação incompleta/adulteração) — reconfigurar. */
+  unreadable: boolean;
+  /** Estado por campo do catálogo — use isto (não `masked`) para decidir se um campo existe. */
+  fields: Record<string, IntegrationFieldState>;
   /** Só campos `secret` com valor, mascarados (`••••` + últimos 4 quando o valor tem > 8 chars). */
   masked: Record<string, string>;
   /** Campos NÃO secretos (ex.: companyDomain, boardId, schedulingUrl), em claro. */
@@ -60,14 +72,44 @@ export class IntegrationSettingsTenantError extends Error {
   }
 }
 
-export class UnknownIntegrationProviderError extends Error {
+export class UnknownIntegrationProviderError extends AppError {
   constructor(provider: string) {
-    super(`Provedor de integração desconhecido ou sem Setting: ${provider}`);
+    super(`Provedor de integração desconhecido ou sem Setting: ${provider}`, 400);
     this.name = 'UnknownIntegrationProviderError';
   }
 }
 
+/**
+ * A linha existe mas algum campo secreto não decifra. Distinto de "não configurado" de propósito:
+ * quem recebe isto NÃO pode cair em fallback de plataforma — deve pedir reconfiguração.
+ * A mensagem nunca carrega valor (só provider/campos).
+ */
+export class IntegrationConfigUnreadableError extends AppError {
+  public readonly provider: string;
+  public readonly fields: readonly string[];
+  constructor(provider: string, fields: readonly string[]) {
+    super(
+      `Credenciais de ${provider} ilegíveis (falha de decifra em: ${fields.join(', ')}). Reconfigure a integração no Hub Universal.`,
+      422,
+    );
+    this.name = 'IntegrationConfigUnreadableError';
+    this.provider = provider;
+    this.fields = fields;
+  }
+}
+
+export function isIntegrationConfigUnreadableError(
+  err: unknown,
+): err is IntegrationConfigUnreadableError {
+  return err instanceof IntegrationConfigUnreadableError;
+}
+
 function assertTenant(orgId: string): void {
+  if (requestContext.getStore()?.bypassRls === true) {
+    throw new IntegrationSettingsTenantError(
+      'integrationSettings: contexto com bypassRls recusado — credenciais só no tenant real.',
+    );
+  }
   const ctxTenant = getTenantId();
   if (!ctxTenant) {
     throw new IntegrationSettingsTenantError(
@@ -129,8 +171,12 @@ function decodeFields(
   return { values, failed };
 }
 
-function toDecrypted(decoded: DecodedFields): Record<string, string> | null {
-  if (decoded.failed.length > 0) return null;
+function toDecrypted(
+  provider: IntegrationProvider,
+  decoded: DecodedFields,
+): Record<string, string> | null {
+  if (decoded.failed.length > 0)
+    throw new IntegrationConfigUnreadableError(provider, decoded.failed);
   return Object.keys(decoded.values).length > 0 ? decoded.values : null;
 }
 
@@ -143,19 +189,28 @@ function toStatus(provider: IntegrationProvider, decoded: DecodedFields): Integr
   const def = INTEGRATION_SETTING_DEFINITIONS[provider];
   const masked: Record<string, string> = {};
   const publicFields: Record<string, string> = {};
+  const fields: Record<string, IntegrationFieldState> = {};
   for (const field of def.fields) {
     const isSecret = 'secret' in field && field.secret === true;
     if (decoded.failed.includes(field.key)) {
       masked[field.key] = UNREADABLE_MASK;
+      fields[field.key] = 'unreadable';
       continue;
     }
     const value = decoded.values[field.key];
-    if (value === undefined) continue;
+    if (value === undefined) {
+      fields[field.key] = 'unset';
+      continue;
+    }
+    fields[field.key] = 'set';
     if (isSecret) masked[field.key] = maskSecretValue(value);
     else publicFields[field.key] = value;
   }
+  const unreadable = decoded.failed.length > 0;
   return {
-    configured: decoded.failed.length === 0 && Object.keys(decoded.values).length > 0,
+    configured: !unreadable && Object.keys(decoded.values).length > 0,
+    unreadable,
+    fields,
     masked,
     publicFields,
   };
@@ -187,7 +242,10 @@ async function findRows(orgId: string, providers: readonly IntegrationProvider[]
   });
 }
 
-/** Valores DECIFRADOS — só server-side. `null` = não configurado ou falha de decifra. */
+/**
+ * Valores DECIFRADOS — só server-side. `null` = não configurado. Falha de decifra em qualquer campo
+ * secreto LANÇA `IntegrationConfigUnreadableError` (nunca `null`: ilegível ≠ não configurado).
+ */
 export async function get(
   orgId: string,
   provider: IntegrationProvider,
@@ -196,10 +254,39 @@ export async function get(
   assertTenant(orgId);
   const row = await findRow(orgId, provider);
   if (!row) return null;
-  return toDecrypted(decodeFields(provider, row.value, row.id));
+  return toDecrypted(provider, decodeFields(provider, row.value, row.id));
 }
 
-/** Como `get`, para vários providers numa ÚNICA query. Providers não configurados ficam fora. */
+export type IntegrationConfigLookup =
+  | { state: 'configured'; values: Record<string, string> }
+  | { state: 'unconfigured' }
+  | { state: 'unreadable'; fields: string[]; message: string };
+
+/**
+ * Variante de `get` que NÃO lança por ilegível: devolve o estado discriminado para o caller tratar
+ * explicitamente (tools com fallback de plataforma DEVEM usar isto e, em `unreadable`, pedir
+ * reconfiguração em vez de cair no fallback). Tenant/provider inválido continuam lançando.
+ */
+export async function lookup(
+  orgId: string,
+  provider: IntegrationProvider,
+): Promise<IntegrationConfigLookup> {
+  try {
+    const values = await get(orgId, provider);
+    return values ? { state: 'configured', values } : { state: 'unconfigured' };
+  } catch (err) {
+    if (err instanceof IntegrationConfigUnreadableError) {
+      return { state: 'unreadable', fields: [...err.fields], message: err.message };
+    }
+    throw err;
+  }
+}
+
+/**
+ * Como `get`, para vários providers numa ÚNICA query. Providers não configurados ficam fora; se
+ * QUALQUER um estiver ilegível, lança `IntegrationConfigUnreadableError` (fail-closed). Para só
+ * saber o que está configurado (UI/LLM), prefira `listStatus`.
+ */
 export async function getMany<P extends IntegrationProvider>(
   orgId: string,
   providers: readonly P[],
@@ -208,7 +295,7 @@ export async function getMany<P extends IntegrationProvider>(
   assertTenant(orgId);
   const result: Partial<Record<P, Record<string, string>>> = {};
   for (const row of await findRows(orgId, providers)) {
-    const decrypted = toDecrypted(decodeFields(row.provider, row.value, row.id));
+    const decrypted = toDecrypted(row.provider, decodeFields(row.provider, row.value, row.id));
     if (decrypted) result[row.provider as P] = decrypted;
   }
   return result;
@@ -329,6 +416,7 @@ export async function clear(
 
 export const integrationSettingsRepository = {
   get,
+  lookup,
   getMany,
   getStatus,
   listStatus,
