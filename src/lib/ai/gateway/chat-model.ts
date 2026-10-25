@@ -7,6 +7,7 @@
  */
 import type { BaseMessage } from '@langchain/core/messages';
 import { requestContext } from '../../async-context.js';
+import { logger } from '../../logger.js';
 import { assertAiBudgetNotExceeded } from '../budget.js';
 import { recordAiUsageCost } from '../metrics.js';
 import { tokenQuotaService } from '../finops/tokenQuota.service.js';
