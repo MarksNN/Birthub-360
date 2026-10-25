@@ -180,7 +180,7 @@ export async function selectDynamicRouting(
   options: DynamicRoutingOptions,
 ): Promise<DynamicRoutingResult> {
   const { tenantTier, requestedModel, availableProviders } = options;
-  const weights = adjustWeightsForTier(tenantTier);
+  const weights = adjustWeightsForTier(tierTier);
 
   // Filtra providers configurados
   const configuredProviders = availableProviders.filter((p) => p.isConfigured());

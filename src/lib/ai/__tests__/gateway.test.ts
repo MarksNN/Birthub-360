@@ -114,8 +114,7 @@ describe('AI gateway', () => {
     process.env.GROQ_API_KEY = 'gsk_test_key_for_unit_tests';
     const fetchMock = vi
       .fn()
-      .mockRejectedValueOnce(new Error('Groq offline')) // dynamic routing attempt
-      .mockRejectedValueOnce(new Error('Groq offline')) // fallback attempt
+      .mockRejectedValueOnce(new Error('Groq offline'))
       .mockResolvedValueOnce(
         jsonResponse({
           model: 'local-llama3',
@@ -130,7 +129,7 @@ describe('AI gateway', () => {
     ]);
 
     expect(result.content).toBe('fallback ativo');
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
 
     const [groqUrl, groqInit] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(groqUrl).toBe('https://api.groq.com/openai/v1/chat/completions');
@@ -140,7 +139,7 @@ describe('AI gateway', () => {
     expect(groqBody).not.toHaveProperty('metadata');
     expect(groqBody).not.toHaveProperty('user');
 
-    const [litellmUrl, litellmInit] = fetchMock.mock.calls[2] as [string, RequestInit];
+    const [litellmUrl, litellmInit] = fetchMock.mock.calls[1] as [string, RequestInit];
     expect(litellmUrl).toBe('http://litellm.test/v1/chat/completions');
     const litellmBody = JSON.parse(String(litellmInit.body));
     expect(litellmBody.messages[0]).toEqual({ role: 'system', content: 'Regra' });
@@ -163,7 +162,11 @@ describe('AI gateway', () => {
   it('rejeita respostas vazias do provedor', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockImplementation(() => Promise.resolve(jsonResponse({ choices: [{ message: { content: '   ' } }] }))),
+      vi.fn().mockResolvedValue(
+        jsonResponse({
+          choices: [{ message: { content: '   ' } }],
+        }),
+      ),
     );
 
     await expect(getAiModel().invoke([new HumanMessage('Olá')])).rejects.toThrow('resposta vazia');
@@ -268,7 +271,6 @@ describe('AI gateway', () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ error: 'Requisição inválida' }, 400))
-      .mockResolvedValueOnce(jsonResponse({ error: 'Requisição inválida' }, 400))
       .mockResolvedValueOnce(
         jsonResponse({
           model: 'local-llama3',
@@ -282,10 +284,10 @@ describe('AI gateway', () => {
     ]);
 
     expect(result.content).toBe('fallback ativo');
-    // 3 chamadas no total: 1 (dynamic) + 1 (fallback groq) + 1 (fallback litellm)
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    // Só 2 chamadas no total: 1 tentativa no Groq (sem retry por ser 4xx) + 1 no LiteLLM (último recurso).
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls[0][0]).toBe('https://api.groq.com/openai/v1/chat/completions');
-    expect(fetchMock.mock.calls[2][0]).toBe('http://litellm.test/v1/chat/completions');
+    expect(fetchMock.mock.calls[1][0]).toBe('http://litellm.test/v1/chat/completions');
   });
 
   it('abre o circuit breaker após falhas consecutivas e para de contatar o provedor', async () => {
