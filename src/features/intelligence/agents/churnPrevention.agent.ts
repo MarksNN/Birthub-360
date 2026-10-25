@@ -1,5 +1,10 @@
 import { BaseAgent } from './base.agent.js';
-import { appendLearnedStyle, SWARM_IDENTITY, SWARM_OUTPUT_CONTRACT, SWARM_UNTRUSTED_CONTENT_GUARD } from './swarm.constants.js';
+import {
+  appendLearnedStyle,
+  SWARM_IDENTITY,
+  SWARM_OUTPUT_CONTRACT,
+  SWARM_UNTRUSTED_CONTENT_GUARD,
+} from './swarm.constants.js';
 
 export class ChurnPreventionAgent extends BaseAgent {
   protected agentType = 'CHURN_PREVENTION';
@@ -44,7 +49,11 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
   async run(inputData: string, sessionId?: string) {
     const { getLeadContextTool } = await import('../tools/crmTools.js');
     const { churnAnalysisTool } = await import('../tools/advancedCommercialTools.js');
-    const result = await this.runWithTools(inputData, [getLeadContextTool, churnAnalysisTool], sessionId);
+    const result = await this.runWithTools(
+      inputData,
+      [getLeadContextTool, churnAnalysisTool],
+      sessionId,
+    );
     return { churnPlan: result.output as string | undefined };
   }
 }

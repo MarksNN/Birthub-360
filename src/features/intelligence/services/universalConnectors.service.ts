@@ -50,8 +50,17 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     settingKey: 'integration.hubspot',
     description: 'Sincronização de contatos, empresas e negócios via Private App Token ou Webhook.',
     fields: [
-      { key: 'apiKey', label: 'Private App Access Token', placeholder: 'pat-na1-...', secret: true },
-      { key: 'webhookUrl', label: 'Webhook URL (Opcional)', placeholder: 'https://api.hubapi.com/...' },
+      {
+        key: 'apiKey',
+        label: 'Private App Access Token',
+        placeholder: 'pat-na1-...',
+        secret: true,
+      },
+      {
+        key: 'webhookUrl',
+        label: 'Webhook URL (Opcional)',
+        placeholder: 'https://api.hubapi.com/...',
+      },
     ],
   },
   {
@@ -61,7 +70,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     settingKey: 'integration.pipedrive',
     description: 'Sincronização de negócios (Deals), organizações e atividades no Pipedrive.',
     fields: [
-      { key: 'apiKey', label: 'API Token Pipedrive', placeholder: '40-char API token', secret: true },
+      {
+        key: 'apiKey',
+        label: 'API Token Pipedrive',
+        placeholder: '40-char API token',
+        secret: true,
+      },
       { key: 'companyDomain', label: 'Subdomínio da Empresa', placeholder: 'suaempresa' },
     ],
   },
@@ -93,11 +107,21 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Microsoft 365 (Outlook, Teams & OneDrive)',
     group: 'email',
     settingKey: 'integration.microsoft365',
-    description: 'Leitura de e-mails no Outlook, agendamento no Microsoft Teams e documentos Office 365 via Graph API.',
+    description:
+      'Leitura de e-mails no Outlook, agendamento no Microsoft Teams e documentos Office 365 via Graph API.',
     fields: [
-      { key: 'accessToken', label: 'Microsoft Graph Access Token', placeholder: 'eyJ0eXAiOiJKV1Qi...', secret: true },
+      {
+        key: 'accessToken',
+        label: 'Microsoft Graph Access Token',
+        placeholder: 'eyJ0eXAiOiJKV1Qi...',
+        secret: true,
+      },
       { key: 'tenantId', label: 'Azure AD Tenant ID (Opcional)', placeholder: 'common ou UUID' },
-      { key: 'mailboxEmail', label: 'E-mail Corporativo Principal', placeholder: 'comercial@empresa.com.br' },
+      {
+        key: 'mailboxEmail',
+        label: 'E-mail Corporativo Principal',
+        placeholder: 'comercial@empresa.com.br',
+      },
     ],
   },
   {
@@ -105,7 +129,8 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Google Workspace (Gmail, Meet, Docs, Sheets & Slides)',
     group: 'email',
     settingKey: null, // usa GoogleWorkspaceConnection nativa
-    description: 'Conexão OAuth nativa com Gmail, Google Calendar/Meet e Google Drive/Docs/Sheets/Slides.',
+    description:
+      'Conexão OAuth nativa com Gmail, Google Calendar/Meet e Google Drive/Docs/Sheets/Slides.',
     fields: [],
   },
   {
@@ -113,11 +138,17 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Caixa Unificada IMAP / SMTP / Webhooks',
     group: 'email',
     settingKey: 'integration.imap_smtp',
-    description: 'Leitura e envio universal para Zoho Mail, Locaweb, Titan, HostGator, SendGrid, Postmark e Mailgun.',
+    description:
+      'Leitura e envio universal para Zoho Mail, Locaweb, Titan, HostGator, SendGrid, Postmark e Mailgun.',
     fields: [
       { key: 'imapHost', label: 'Servidor IMAP / SMTP', placeholder: 'imap.zoho.com' },
       { key: 'emailUser', label: 'Conta de E-mail', placeholder: 'vendas@suaempresa.com.br' },
-      { key: 'appPassword', label: 'Senha de Aplicativo / API Key', placeholder: '••••••••', secret: true },
+      {
+        key: 'appPassword',
+        label: 'Senha de Aplicativo / API Key',
+        placeholder: '••••••••',
+        secret: true,
+      },
     ],
   },
   // Mensageria & Chat
@@ -126,9 +157,14 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'WhatsApp Business (Z-API / Evolution / Meta Cloud)',
     group: 'messaging',
     settingKey: 'integration.whatsapp',
-    description: 'Disparo e leitura de conversas comerciais no WhatsApp com respeito a Opt-Out LGPD.',
+    description:
+      'Disparo e leitura de conversas comerciais no WhatsApp com respeito a Opt-Out LGPD.',
     fields: [
-      { key: 'webhookUrl', label: 'Endpoint da Instância / Gateway', placeholder: 'https://api.z-api.io/instances/...' },
+      {
+        key: 'webhookUrl',
+        label: 'Endpoint da Instância / Gateway',
+        placeholder: 'https://api.z-api.io/instances/...',
+      },
       { key: 'apiKey', label: 'Token de Segurança', placeholder: 'token...', secret: true },
     ],
   },
@@ -139,7 +175,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     settingKey: 'integration.telegram',
     description: 'Envio de mensagens para leads, grupos comerciais e alertas via Telegram Bot API.',
     fields: [
-      { key: 'botToken', label: 'Telegram Bot Token (@BotFather)', placeholder: '123456:ABC-DEF...', secret: true },
+      {
+        key: 'botToken',
+        label: 'Telegram Bot Token (@BotFather)',
+        placeholder: '123456:ABC-DEF...',
+        secret: true,
+      },
       { key: 'defaultChatId', label: 'Chat ID Padrão', placeholder: '-100123456789' },
     ],
   },
@@ -148,7 +189,8 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Microsoft Teams (Canais & Chat)',
     group: 'messaging',
     settingKey: 'integration.teams',
-    description: 'Publicação de alertas de negócios, resumos de reuniões e mensagens em canais do Microsoft Teams.',
+    description:
+      'Publicação de alertas de negócios, resumos de reuniões e mensagens em canais do Microsoft Teams.',
     fields: [
       {
         key: 'webhookUrl',
@@ -163,7 +205,8 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Slack Workspace',
     group: 'messaging',
     settingKey: null, // usa SlackConnection nativa
-    description: 'Notificações de negócios quentes, war room de vendas e alertas operacionais no Slack.',
+    description:
+      'Notificações de negócios quentes, war room de vendas e alertas operacionais no Slack.',
     fields: [
       {
         key: 'webhookUrl',
@@ -179,7 +222,8 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'SMS / Mensagem de Texto (Twilio / Zenvia / Webhook)',
     group: 'messaging',
     settingKey: 'integration.sms',
-    description: 'Envio de mensagens de texto SMS curtas para confirmação de reuniões e alertas urgentes.',
+    description:
+      'Envio de mensagens de texto SMS curtas para confirmação de reuniões e alertas urgentes.',
     fields: [
       { key: 'webhookUrl', label: 'Endpoint do Gateway SMS', placeholder: 'https://...' },
       { key: 'apiKey', label: 'API Key / Auth Token', placeholder: 'token...', secret: true },
@@ -196,7 +240,11 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     fields: [
       { key: 'apiKey', label: 'Trello API Key', placeholder: '32-char key' },
       { key: 'token', label: 'Trello OAuth Token', placeholder: '64-char token', secret: true },
-      { key: 'defaultListId', label: 'ID da Lista Padrão (idList)', placeholder: '65a1b2c3d4e5f6...' },
+      {
+        key: 'defaultListId',
+        label: 'ID da Lista Padrão (idList)',
+        placeholder: '65a1b2c3d4e5f6...',
+      },
     ],
   },
   {
@@ -206,7 +254,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     settingKey: 'integration.monday',
     description: 'Criação de itens, tarefas e atualizações em Boards do Monday.com via GraphQL v2.',
     fields: [
-      { key: 'apiKey', label: 'Monday API v2 Token', placeholder: 'eyJhbGciOiJIUzI1NiJ9...', secret: true },
+      {
+        key: 'apiKey',
+        label: 'Monday API v2 Token',
+        placeholder: 'eyJhbGciOiJIUzI1NiJ9...',
+        secret: true,
+      },
       { key: 'boardId', label: 'Board ID Padrão', placeholder: '1234567890' },
     ],
   },
@@ -217,7 +270,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     settingKey: 'integration.clickup',
     description: 'Sincronização de tarefas operacionais e follow-ups comerciais no ClickUp.',
     fields: [
-      { key: 'apiKey', label: 'ClickUp Personal Token (pk_...)', placeholder: 'pk_...', secret: true },
+      {
+        key: 'apiKey',
+        label: 'ClickUp Personal Token (pk_...)',
+        placeholder: 'pk_...',
+        secret: true,
+      },
       { key: 'listId', label: 'List ID Padrão', placeholder: '901234567' },
     ],
   },
@@ -228,7 +286,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     settingKey: 'integration.asana',
     description: 'Criação de tarefas e subtarefas de onboarding e vendas no Asana.',
     fields: [
-      { key: 'accessToken', label: 'Asana Personal Access Token', placeholder: '1/1200...', secret: true },
+      {
+        key: 'accessToken',
+        label: 'Asana Personal Access Token',
+        placeholder: '1/1200...',
+        secret: true,
+      },
       { key: 'projectId', label: 'Project GID Padrão', placeholder: '1200123456789' },
     ],
   },
@@ -237,9 +300,15 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Notion Workspace & Wiki',
     group: 'tasks_notes',
     settingKey: 'integration.notion',
-    description: 'Criação automática de páginas, atas de reunião, dossiês de leads e notas no Notion.',
+    description:
+      'Criação automática de páginas, atas de reunião, dossiês de leads e notas no Notion.',
     fields: [
-      { key: 'apiKey', label: 'Notion Internal Integration Secret', placeholder: 'secret_...', secret: true },
+      {
+        key: 'apiKey',
+        label: 'Notion Internal Integration Secret',
+        placeholder: 'secret_...',
+        secret: true,
+      },
       { key: 'parentPageId', label: 'ID da Página/Database Pai', placeholder: 'a1b2c3d4-...' },
     ],
   },
@@ -252,7 +321,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     description: 'Geração de salas de videoconferência e ingestão de transcrições do Zoom.',
     fields: [
       { key: 'accountId', label: 'Zoom Account ID', placeholder: 'account_id' },
-      { key: 'accessToken', label: 'Server-to-Server OAuth Token', placeholder: 'eyJ...', secret: true },
+      {
+        key: 'accessToken',
+        label: 'Server-to-Server OAuth Token',
+        placeholder: 'eyJ...',
+        secret: true,
+      },
     ],
   },
   {
@@ -260,10 +334,20 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
     name: 'Calendly Scheduling',
     group: 'meetings',
     settingKey: 'integration.calendly',
-    description: 'Links de agendamento automático para envio pelo SDR/BDR e leitura de eventos agendados.',
+    description:
+      'Links de agendamento automático para envio pelo SDR/BDR e leitura de eventos agendados.',
     fields: [
-      { key: 'schedulingUrl', label: 'Link de Agendamento Calendly', placeholder: 'https://calendly.com/suaempresa/demo' },
-      { key: 'apiKey', label: 'Personal Access Token (Opcional)', placeholder: 'eyJ...', secret: true },
+      {
+        key: 'schedulingUrl',
+        label: 'Link de Agendamento Calendly',
+        placeholder: 'https://calendly.com/suaempresa/demo',
+      },
+      {
+        key: 'apiKey',
+        label: 'Personal Access Token (Opcional)',
+        placeholder: 'eyJ...',
+        secret: true,
+      },
     ],
   },
   // Dispositivos Móveis, Relógio & Pop-up
@@ -280,7 +364,12 @@ export const UNIVERSAL_CONNECTOR_DEFINITIONS: ConnectorDefinition[] = [
         label: 'Push Gateway URL (FCM / OneSignal / ntfy / Capacitor Push)',
         placeholder: 'https://ntfy.sh/birthhub-alertas ou endpoint FCM',
       },
-      { key: 'apiKey', label: 'Chave de Autorização (Opcional)', placeholder: 'Bearer ...', secret: true },
+      {
+        key: 'apiKey',
+        label: 'Chave de Autorização (Opcional)',
+        placeholder: 'Bearer ...',
+        secret: true,
+      },
     ],
   },
 ];
@@ -337,7 +426,9 @@ export async function listUniversalConnectorsStatus(organizationId: string) {
       return {
         ...def,
         connected,
-        statusDetail: connected ? `Conectado (${googleConn?.email})` : 'Conecte na aba Google Workspace',
+        statusDetail: connected
+          ? `Conectado (${googleConn?.email})`
+          : 'Conecte na aba Google Workspace',
         maskedConfig: { email: googleConn?.email ?? '' },
       };
     }
@@ -347,7 +438,9 @@ export async function listUniversalConnectorsStatus(organizationId: string) {
       return {
         ...def,
         connected,
-        statusDetail: connected ? `Canal ${slackConn?.channelName || '#geral'}` : 'Aguardando Webhook',
+        statusDetail: connected
+          ? `Canal ${slackConn?.channelName || '#geral'}`
+          : 'Aguardando Webhook',
         maskedConfig: {
           webhookUrl: maskValue(slackConn?.webhookUrl, true),
           channelName: slackConn?.channelName ?? '',

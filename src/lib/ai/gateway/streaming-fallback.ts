@@ -346,9 +346,7 @@ export async function* streamChatCompletionWithFallback(
     openrouter: 'OpenRouter',
     litellm: 'Ollama/LiteLLM',
   };
-  const configured = configuredProviders
-    .map((p) => configuredNames[p.name])
-    .join(', ');
+  const configured = configuredProviders.map((p) => configuredNames[p.name]).join(', ');
 
   throw new Error(
     `Todos os motores de IA falharam para streaming (${configured}). Último erro: ${String(
