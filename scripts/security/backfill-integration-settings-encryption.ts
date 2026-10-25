@@ -27,12 +27,17 @@
 //   no env ou de rotação incompleta.
 // - `--verify` (somente leitura, sem snapshot): conta campos secretos legíveis / ilegíveis / em
 //   claro (pendentes) sob a chave de `--key-env=NOME` (padrão CREDENTIALS_ENCRYPTION_KEY).
-// - Código de saída: 0 ok; 1 pré-condição/falha; 2 = há ilegíveis (dry-run/apply/verify) ou, no
-//   --verify, algum segredo ainda em claro.
+// - Código de saída: 0 ok; 1 pré-condição/preflight/falha; 2 = há ilegíveis, conflitos ou
+//   divergência de cobertura (dry-run/apply/verify) ou, no --verify, algum segredo ainda em claro.
 // - Nunca imprime valor (nem cifrado nem em claro) — só org/key/campos.
-// - Sem `app.bypass_rls` para Setting: processa organização por organização setando
-//   `app.current_tenant_id` (mesmo padrão de backfill-contact-pii.ts). bypass só para listar
-//   Organization.
+// - RLS (PR #107, B1 — rls-coverage.ts): PREFLIGHT logado (role, rolsuper, rolbypassrls,
+//   RLS/FORCE/policy/privilégios de Setting) que aborta com 1 se a cobertura não é provável;
+//   Setting (policy só de tenant, sem bypass) processado organização por organização numa
+//   TRANSAÇÃO com `set_config('app.current_tenant_id', org, true)` (antes: GUC de sessão, fora de
+//   transação); bypass só para listar Organization. Contagem por org e global (exata com role
+//   BYPASSRLS; senão pg_class.reltuples — ANALYZE antes) — divergência = código 2. UPDATE com
+//   compare-and-set no `value` lido (a app gravou no meio = conflito, código 2). `--verify` em
+//   transações READ ONLY.
 // - Rodar em produção exige OK explícito do Marcelo (regra do Agente 15). Não executado no PR.
 //
 // Uso:
@@ -61,6 +66,17 @@ import {
   SECRET_FIELDS_BY_SETTING_KEY,
   TARGET_SETTING_KEYS,
 } from './integration-settings-targets.js';
+import {
+  type CoverageTally,
+  fmtCoverage,
+  type Log,
+  listOrganizations,
+  type QueryFn,
+  runPreflight,
+  scanTable,
+  type TableInfo,
+  type TableTarget,
+} from './rls-coverage.js';
 
 export {
   assertBackfillPreconditions,
@@ -136,10 +152,22 @@ export function planSettingBackfill(
     : { ...none, unknownFields };
 }
 
-export type QueryFn = <R = Record<string, unknown>>(
-  sql: string,
-  params?: unknown[],
-) => Promise<{ rows: R[] }>;
+export type { QueryFn } from './rls-coverage.js';
+
+export const SETTING_TARGET: TableTarget = { model: 'Setting', table: 'Setting', scope: 'org' };
+const settingFilter = (p: (v: unknown) => string) => `key = ANY(${p(TARGET_SETTING_KEYS)}::text[])`;
+
+async function preflightSetting(query: QueryFn, write: boolean, log: Log): Promise<TableInfo> {
+  const pf = await runPreflight(query, [SETTING_TARGET], { write, log });
+  const info = pf.tables.get(SETTING_TARGET.model);
+  if (!info) throw new Error('Preflight sem a tabela Setting.');
+  return info;
+}
+
+function logCoverage(log: Log, c: CoverageTally): void {
+  log(fmtCoverage(c));
+  for (const d of c.divergences.slice(0, 20)) log(`  ↳ [DIVERGÊNCIA] ${d}`);
+}
 
 export interface BackfillOptions {
   apply: boolean;
@@ -160,6 +188,10 @@ export interface BackfillResult {
   rowsWithUnknownFields: number;
   /** Linhas com campo `enc:` ilegível sob `readKey` — não gravadas; código de saída 2. */
   unreadableRows: number;
+  /** UPDATE compare-and-set que não casou (a app gravou no meio) — não gravadas; código 2. */
+  conflicts: number;
+  /** Divergências de cobertura (contagem por org / global) — código 2. */
+  divergences: number;
 }
 
 export async function runIntegrationSettingsBackfill(
@@ -171,12 +203,8 @@ export async function runIntegrationSettingsBackfill(
       'apply exige snapshotId (--snapshot-confirmed=<id>) — tire o snapshot do banco antes.',
     );
   }
-  await query(`SELECT set_config('app.bypass_rls', 'on', false)`);
-  const { rows: orgs } = await query<{ id: string }>(
-    `SELECT id FROM "Organization" ORDER BY id ASC`,
-  );
-  // Setting não está na allowlist de bypass: desliga antes de tocar Setting e usa o tenant real.
-  await query(`SELECT set_config('app.bypass_rls', 'off', false)`);
+  const info = await preflightSetting(query, apply, log);
+  const orgs = await listOrganizations(query);
 
   const result: BackfillResult = {
     organizations: orgs.length,
@@ -185,49 +213,61 @@ export async function runIntegrationSettingsBackfill(
     written: 0,
     rowsWithUnknownFields: 0,
     unreadableRows: 0,
+    conflicts: 0,
+    divergences: 0,
   };
+  const tag = apply ? '[APPLY]' : '[DRY-RUN]';
 
-  for (const org of orgs) {
-    await query(`SELECT set_config('app.current_tenant_id', $1, false)`, [org.id]);
-    const { rows } = await query<SettingRow>(
-      `SELECT id, "organizationId", key, value FROM "Setting"
-       WHERE "organizationId" = $1 AND key = ANY($2::text[])
-       ORDER BY id ASC`,
-      [org.id, TARGET_SETTING_KEYS],
-    );
-    for (const row of rows) {
+  const coverage = await scanTable(query, info, {
+    orgs,
+    columns: ['organizationId', 'key', 'value'],
+    filter: settingFilter,
+    readOnly: !apply,
+    log,
+    onRow: async (raw) => {
+      const row = raw as unknown as SettingRow;
       result.scanned++;
       const plan = planSettingBackfill(row, encrypt, readKey);
       if (plan.unknownFields.length > 0) {
         result.rowsWithUnknownFields++;
         log(
-          `${apply ? '[APPLY]' : '[DRY-RUN]'} org=${row.organizationId} key=${row.key} fora_do_catalogo=${plan.unknownFields.join(',')} (preservadas, não cifradas)`,
+          `${tag} org=${row.organizationId} key=${row.key} fora_do_catalogo=${plan.unknownFields.join(',')} (preservadas, não cifradas)`,
         );
       }
       if (plan.unreadableFields.length > 0) {
         result.unreadableRows++;
         log(
-          `${apply ? '[APPLY]' : '[DRY-RUN]'} org=${row.organizationId} key=${row.key} ILEGIVEIS=${plan.unreadableFields.join(',')} (linha não gravada)`,
+          `${tag} org=${row.organizationId} key=${row.key} ILEGIVEIS=${plan.unreadableFields.join(',')} (linha não gravada)`,
         );
-        continue;
+        return;
       }
-      if (plan.nextValue === null) continue;
+      if (plan.nextValue === null) return;
       result.toEncrypt++;
       log(
-        `${apply ? '[APPLY]' : '[DRY-RUN]'} org=${row.organizationId} key=${row.key} campos=${plan.encryptedFields.join(',')}`,
+        `${tag} org=${row.organizationId} key=${row.key} campos=${plan.encryptedFields.join(',')}`,
       );
-      if (!apply) continue;
-      await query(
+      if (!apply) return;
+      // Compare-and-set: só grava se `value` ainda é o lido (senão a app gravou no meio).
+      const r = await query(
         `UPDATE "Setting" SET value = $1::jsonb, "updatedAt" = NOW()
-         WHERE id = $2 AND "organizationId" = $3`,
-        [JSON.stringify(plan.nextValue), row.id, row.organizationId],
+         WHERE id = $2 AND "organizationId" = $3 AND value = $4::jsonb`,
+        [JSON.stringify(plan.nextValue), row.id, row.organizationId, JSON.stringify(row.value)],
       );
+      if (r.rowCount !== 1) {
+        result.conflicts++;
+        log(
+          `${tag} org=${row.organizationId} key=${row.key} CONFLITO (alterada no meio; não gravada)`,
+        );
+        return;
+      }
       result.written++;
-    }
-  }
+    },
+  });
+  logCoverage(log, coverage);
+  result.divergences = coverage.divergences.length;
 
   log(
-    `Concluído [${apply ? 'APPLY' : 'DRY-RUN'}] orgs=${result.organizations} linhas=${result.scanned} a_cifrar=${result.toEncrypt} gravadas=${result.written} linhas_com_chaves_fora_do_catalogo=${result.rowsWithUnknownFields} ilegiveis=${result.unreadableRows}`,
+    `Concluído [${apply ? 'APPLY' : 'DRY-RUN'}] orgs=${result.organizations} linhas=${result.scanned} a_cifrar=${result.toEncrypt} gravadas=${result.written} linhas_com_chaves_fora_do_catalogo=${result.rowsWithUnknownFields} ilegiveis=${result.unreadableRows} conflitos=${result.conflicts} divergencias=${result.divergences}`,
   );
   return result;
 }
@@ -240,28 +280,25 @@ export async function runIntegrationSettingsVerify(
   query: QueryFn,
   key: Buffer,
   log: (line: string) => void = console.log,
-): Promise<VerifyCounts & { organizations: number; scanned: number }> {
-  await query(`SELECT set_config('app.bypass_rls', 'on', false)`);
-  const { rows: orgs } = await query<{ id: string }>(
-    `SELECT id FROM "Organization" ORDER BY id ASC`,
-  );
-  await query(`SELECT set_config('app.bypass_rls', 'off', false)`);
-  const counts = { ...emptyCounts(), organizations: orgs.length, scanned: 0 };
-  for (const org of orgs) {
-    await query(`SELECT set_config('app.current_tenant_id', $1, false)`, [org.id]);
-    const { rows } = await query<SettingRow>(
-      `SELECT id, "organizationId", key, value FROM "Setting"
-       WHERE "organizationId" = $1 AND key = ANY($2::text[])
-       ORDER BY id ASC`,
-      [org.id, TARGET_SETTING_KEYS],
-    );
-    for (const row of rows) {
+): Promise<VerifyCounts & { organizations: number; scanned: number; divergences: number }> {
+  const info = await preflightSetting(query, false, log);
+  const orgs = await listOrganizations(query);
+  const counts = { ...emptyCounts(), organizations: orgs.length, scanned: 0, divergences: 0 };
+  const coverage = await scanTable(query, info, {
+    orgs,
+    columns: ['key', 'value'],
+    filter: settingFilter,
+    readOnly: true,
+    log,
+    onRow: async (row) => {
       counts.scanned++;
-      classifySettingValue(row.key, row.value, key, counts);
-    }
-  }
+      classifySettingValue(String(row.key), row.value, key, counts);
+    },
+  });
+  logCoverage(log, coverage);
+  counts.divergences = coverage.divergences.length;
   log(
-    `[VERIFY] orgs=${counts.organizations} linhas=${counts.scanned} legiveis=${counts.readable} ilegiveis=${counts.unreadable} em_claro=${counts.plaintext}`,
+    `[VERIFY] orgs=${counts.organizations} linhas=${counts.scanned} legiveis=${counts.readable} ilegiveis=${counts.unreadable} em_claro=${counts.plaintext} divergencias=${counts.divergences}`,
   );
   return counts;
 }
@@ -281,18 +318,18 @@ async function main(): Promise<number> {
   try {
     const query: QueryFn = async (sql, params) => {
       const res = await client.query(sql, params);
-      return { rows: res.rows };
+      return { rows: res.rows, rowCount: res.rowCount };
     };
     if (verify) {
       console.log(`VERIFY (somente leitura) com a chave de ${verify.keyEnv}`);
       const c = await runIntegrationSettingsVerify(query, verify.key);
-      if (c.unreadable > 0 || c.plaintext > 0) {
+      if (c.unreadable > 0 || c.plaintext > 0 || c.divergences > 0) {
         console.log(
-          `❌ VERIFY FALHOU: ilegiveis=${c.unreadable} em_claro(pendentes)=${c.plaintext}. Código ${EXIT_DATA_ISSUES}.`,
+          `❌ VERIFY FALHOU: ilegiveis=${c.unreadable} em_claro(pendentes)=${c.plaintext} divergencias=${c.divergences}. Código ${EXIT_DATA_ISSUES}.`,
         );
         return EXIT_DATA_ISSUES;
       }
-      console.log('✅ VERIFY OK: 0 ilegíveis e 0 pendentes em claro.');
+      console.log('✅ VERIFY OK: 0 ilegíveis, 0 pendentes em claro e cobertura conferida.');
       return 0;
     }
     const apply = pre?.apply ?? false;
@@ -308,9 +345,9 @@ async function main(): Promise<number> {
         'Nada gravado (dry-run). Para gravar: snapshot do banco + --apply --snapshot-confirmed=<id>.',
       );
     }
-    if (result.unreadableRows > 0) {
+    if (result.unreadableRows > 0 || result.conflicts > 0 || result.divergences > 0) {
       console.log(
-        `❌ ${result.unreadableRows} linha(s) com valor cifrado ilegível sob CREDENTIALS_ENCRYPTION_KEY (não gravadas). Código ${EXIT_DATA_ISSUES}.`,
+        `❌ ilegiveis=${result.unreadableRows} (linhas com valor cifrado ilegível sob CREDENTIALS_ENCRYPTION_KEY, não gravadas) conflitos=${result.conflicts} divergencias=${result.divergences}. Código ${EXIT_DATA_ISSUES}.`,
       );
       return EXIT_DATA_ISSUES;
     }

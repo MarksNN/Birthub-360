@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { decryptWithKey, encryptWithKey } from '../../../scripts/security/credential-envelope.js';
 import {
   CAS_SET_PRESERVE_TTL_LUA,
+  isWrongTypeError,
   type RedisLike,
   reencryptRedisWaAuth,
   scanAllKeys,
@@ -104,12 +105,13 @@ describe('reencryptRedisWaAuth', () => {
     expect(decryptWithKey(redis.store.get('other:key')?.value as string, OLD)).toBe('x');
   });
 
-  it('é idempotente: segunda passada com OLD encontra tudo ilegível e não grava', async () => {
+  it('é idempotente: segunda passada vê tudo "Já em NEW_KEY" (não é erro) e não grava', async () => {
     await reencryptRedisWaAuth(redis, { apply: true, oldKey: OLD, newKey: NEW });
     redis.commands = [];
     const r = await reencryptRedisWaAuth(redis, { apply: true, oldKey: OLD, newKey: NEW });
     expect(r.rotated).toBe(0);
-    expect(r.errors).toBe(3);
+    expect(r.alreadyNew).toBe(3);
+    expect(r.errors).toBe(0);
     expect(redis.commands).not.toContain('EVAL');
   });
 
@@ -149,5 +151,28 @@ describe('verifyRedisWaAuth', () => {
     await reencryptRedisWaAuth(redis, { apply: true, oldKey: OLD, newKey: NEW });
     expect(await verifyRedisWaAuth(redis, NEW)).toMatchObject({ readable: 3, unreadable: 0 });
     expect(await verifyRedisWaAuth(redis, OLD)).toMatchObject({ readable: 0, unreadable: 3 });
+  });
+});
+
+describe('erro de conexão no GET (P3 do parecer do 24 no #107)', () => {
+  const connErr = () => Object.assign(new Error('Connection is closed.'), { name: 'Error' });
+
+  it('rotação: erro que NÃO é WRONGTYPE relança (CLI: código 1), nunca vira "Erros" e segue', async () => {
+    vi.spyOn(redis, 'get').mockRejectedValue(connErr());
+    await expect(reencryptRedisWaAuth(redis, { apply: true, oldKey: OLD, newKey: NEW })).rejects.toThrow(
+      /Connection is closed/,
+    );
+    expect(redis.commands).not.toContain('EVAL');
+  });
+
+  it('verify: erro de conexão relança — nunca "VERIFY OK"', async () => {
+    vi.spyOn(redis, 'get').mockRejectedValue(new Error('ETIMEDOUT'));
+    await expect(verifyRedisWaAuth(redis, OLD)).rejects.toThrow(/ETIMEDOUT/);
+  });
+
+  it('isWrongTypeError só aceita WRONGTYPE', () => {
+    expect(isWrongTypeError(new Error('WRONGTYPE Operation against a key'))).toBe(true);
+    expect(isWrongTypeError(new Error('Connection is closed.'))).toBe(false);
+    expect(isWrongTypeError('WRONGTYPE')).toBe(false);
   });
 });

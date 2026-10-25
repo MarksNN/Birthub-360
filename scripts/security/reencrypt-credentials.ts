@@ -21,26 +21,36 @@
 // snapshot (banco, ou Redis no alvo redis-wa-auth) tirado antes.
 //
 // Alvos (`--target`, padrão `db`):
-// - `db`: os models de TARGET_MODELS e o `Setting` (segredos POR CAMPO dentro do JSON de
-//   `Setting.value`, `key = integration.*` + legada `bitrix_webhook_url`, organização por
-//   organização com `app.current_tenant_id` — Setting não aceita bypass de RLS). `--model=<Model>`
-//   restringe a um model (inclusive `--model=Setting`).
+// - `db`: TODOS os models de ENCRYPTED_MODEL_FIELDS (src/lib/crypto/encryptedModelFields.ts — a
+//   MESMA lista que a extensão do Prisma cifra; nada copiado à mão) e o `Setting` (segredos POR
+//   CAMPO dentro do JSON de `Setting.value`, `key = integration.*` + legada `bitrix_webhook_url`).
+//   `--model=<Model>` restringe a um model (inclusive `--model=Setting`).
 // - `redis-wa-auth`: sessões WhatsApp/Baileys `wa-auth:<org>:*` (useRedisAuthState.ts), cifradas
 //   com a MESMA chave. SCAN (nunca KEYS), troca atômica por chave (compare-and-set em Lua) que
-//   preserva o TTL, nunca loga valores.
+//   preserva o TTL, nunca loga valores. Erro de conexão no GET aborta (código 1).
 //
-// Gravação ATÔMICA POR LINHA: se qualquer campo cifrado de uma linha/chave não decifra com
-// OLD_KEY, a linha inteira NÃO é gravada (antes, nos models fora do Setting, os campos legíveis
-// eram regravados e o ilegível ficava para trás, deixando a linha com chaves misturadas).
+// RLS (PR #107, B1 do Agente 24 — ver rls-coverage.ts): PREFLIGHT logado (role, rolsuper,
+// rolbypassrls, RLS/FORCE/policies/privilégios por tabela) que aborta com 1 se a cobertura não é
+// provável; models com organizationId processados ORGANIZAÇÃO POR ORGANIZAÇÃO numa transação com
+// `app.current_tenant_id` local (sem bypass); `account` (sem organizationId) com bypass, que a
+// policy dele admite; contagem independente por org e global — divergência = código 2.
 //
-// `--verify` (somente leitura; sem NEW_KEY nem snapshot): conta, por model/alvo, valores legíveis,
-// ilegíveis e em claro sob UMA chave.
+// Gravação ATÔMICA POR LINHA e com compare-and-set: se qualquer campo cifrado de uma linha não
+// decifra com OLD_KEY, a linha inteira NÃO é gravada; o UPDATE só casa se os campos ainda têm o
+// valor lido (senão é Conflito — a app gravou no meio — e a linha fica para a próxima rodada).
+// Cada organização × model é uma transação: falha no meio desfaz só aquela org/model; o que já foi
+// commitado está em NEW_KEY e uma nova rodada é idempotente: valor que não decifra com OLD_KEY mas
+// decifra com NEW_KEY conta como "Já em NEW_KEY" (não é Erro nem é regravado); só o que não decifra
+// com NENHUMA das duas é Erro. O --verify com NEW_KEY é a prova final.
 //
-// Código de saída: 0 = sem problemas; 1 = pré-condição/falha de execução; 2 = há Erros (linhas
-// ilegíveis), conflitos no Redis ou, no --verify, algum valor ilegível — em dry-run, apply ou verify.
+// `--verify` (somente leitura, transações READ ONLY; sem NEW_KEY nem snapshot): conta, por
+// model/alvo, valores legíveis, ilegíveis e em claro sob UMA chave, com a mesma cobertura.
+//
+// Código de saída: 0 = sem problemas; 1 = pré-condição/preflight/falha de execução; 2 = há Erros
+// (linhas ilegíveis), Conflitos, divergência de cobertura ou, no --verify, algum valor ilegível.
 //
 
-import pg from 'pg';
+import { ENCRYPTED_MODEL_FIELDS } from '../../src/lib/crypto/encryptedModelFields.js';
 import {
   addClass,
   classifyValue,
@@ -58,6 +68,7 @@ import {
   isVerifyMode,
   parseReencryptScope,
   requireRedisUrl,
+  type ScriptEnv,
 } from './credential-script-guards.js';
 import {
   classifySettingValue,
@@ -65,33 +76,58 @@ import {
   SECRET_FIELDS_BY_SETTING_KEY,
   TARGET_SETTING_KEYS,
 } from './integration-settings-targets.js';
+import {
+  type CoverageTally,
+  type ExtraFilter,
+  fmtCoverage,
+  type Log,
+  listOrganizations,
+  type Preflight,
+  type QueryFn,
+  quoteIdent,
+  runPreflight,
+  scanTable,
+  type TableInfo,
+  type TableTarget,
+} from './rls-coverage.js';
 
 export { decryptWithKey, encryptWithKey } from './credential-envelope.js';
+export type { Log, QueryFn } from './rls-coverage.js';
 
-const { Pool } = pg;
+/**
+ * Models e campos cifrados — DERIVADO de ENCRYPTED_MODEL_FIELDS (fonte única da extensão do
+ * Prisma). Antes era uma cópia à mão que esqueceu CopilotoTranscriptSegment.text (B2 do PR #107).
+ */
+export const TARGET_MODELS: Readonly<Record<string, readonly string[]>> = ENCRYPTED_MODEL_FIELDS;
 
-export const TARGET_MODELS: Readonly<Record<string, readonly string[]>> = {
-  GoogleWorkspaceConnection: ['accessToken', 'refreshToken'],
-  BitrixConnection: ['webhookUrl', 'webhookSecret'],
-  ThreeCXConnection: ['apiKey', 'apiSecret'],
-  VoiceHubConnection: ['apiKey', 'webhookSecret'],
-  SlackConnection: ['webhookUrl', 'botToken'],
-  StripeConnection: ['secretKey', 'webhookSecret'],
-  OmieConnection: ['appKey', 'appSecret'],
-  ExternalCrmConnection: ['config'],
-  Account: ['accessToken', 'refreshToken', 'idToken'],
-  Contact: ['email', 'phone', 'whatsapp'],
-  VoiceCallLog: ['transcript', 'summary', 'recordingUrl'],
-};
+/**
+ * Model → tabela, quando o schema usa `@@map`. Antes o script usava o nome do model: `Account` é
+ * `@@map("account")`, então a tabela "não existia", saía "[PULADO]" e os tokens OAuth NUNCA eram
+ * rotacionados. Teste de contrato confere contra prisma/schema.prisma.
+ */
+export const TABLE_BY_MODEL: Readonly<Record<string, string>> = { Account: 'account' };
+
+/**
+ * Models SEM organizationId (escopo de tenant indireto). `account` é ligada a `user`, e há contas
+ * de usuário sem organização — invisíveis a qualquer tenant. Account está na allowlist de bypass
+ * (BYPASS_RLS_ALLOWED_MODELS em src/lib/prisma.ts; policy com `app.bypass_rls`), então é lida com
+ * bypass — o preflight aborta se a policy deixar de admitir isso.
+ */
+export const BYPASS_SCOPE_MODELS: readonly string[] = ['Account'];
+
 export const SETTING_MODEL = 'Setting';
 export const ALLOWED_MODELS: readonly string[] = [...Object.keys(TARGET_MODELS), SETTING_MODEL];
 export const REDIS_WA_AUTH_MATCH = 'wa-auth:*';
 
-export type QueryFn = <R = Record<string, unknown>>(
-  sql: string,
-  params?: unknown[],
-) => Promise<{ rows: R[] }>;
-export type Log = (line: string) => void;
+export function tableTargetFor(model: string): TableTarget {
+  return {
+    model,
+    table: TABLE_BY_MODEL[model] ?? model,
+    scope: BYPASS_SCOPE_MODELS.includes(model) ? 'bypass' : 'org',
+  };
+}
+
+export const SETTING_FILTER: ExtraFilter = (p) => `key = ANY(${p(TARGET_SETTING_KEYS)}::text[])`;
 
 export interface RotationKeys {
   apply: boolean;
@@ -99,10 +135,39 @@ export interface RotationKeys {
   newKey: Buffer;
 }
 
+/** Valor que já decifra com NEW_KEY (rodada anterior commitada) — não é erro nem é regravado. */
+export const ALREADY_NEW = Symbol('already-new');
+
+/**
+ * Puro: OLD_KEY → NEW_KEY de um envelope `enc:`. Devolve `ALREADY_NEW` se ele NÃO decifra com
+ * OLD_KEY mas decifra com NEW_KEY (retomada após falha parcial: idempotente). Lança se a versão é
+ * desconhecida ou se não decifra com nenhuma das duas (fail-closed).
+ */
+export function rotateEnvelope(
+  v: string,
+  oldKeyBuf: Buffer,
+  newKeyBuf: Buffer,
+): string | typeof ALREADY_NEW {
+  if (!v.startsWith(VERSION_PREFIX)) throw new Error('versão de envelope desconhecida');
+  let plain: string;
+  try {
+    plain = decryptWithKey(v, oldKeyBuf);
+  } catch (err) {
+    try {
+      decryptWithKey(v, newKeyBuf);
+    } catch {
+      throw err;
+    }
+    return ALREADY_NEW;
+  }
+  return encryptWithKey(plain, newKeyBuf);
+}
+
 /**
  * Puro: re-cifra (OLD_KEY → NEW_KEY) os campos `enc:v1:` de um `Setting.value` de integração.
  * Texto puro legado fica intocado (é trabalho do backfill-integration-settings-encryption.ts).
- * Devolve `null` se nada mudou. Lança se algum campo não decifrar com OLD_KEY (fail-closed).
+ * Devolve `null` se nada mudou. Lança se algum campo não decifrar com OLD_KEY OU tiver versão de
+ * envelope desconhecida (`enc:` sem ser `enc:v1:` — antes era pulado em silêncio): fail-closed.
  */
 export function reencryptIntegrationSettingValue(
   key: string,
@@ -110,11 +175,12 @@ export function reencryptIntegrationSettingValue(
   oldKeyBuf: Buffer,
   newKeyBuf: Buffer,
 ): { nextValue: unknown; fields: string[] } | null {
-  const rotate = (v: string) => encryptWithKey(decryptWithKey(v, oldKeyBuf), newKeyBuf);
+  const rotate = (v: string) => rotateEnvelope(v, oldKeyBuf, newKeyBuf);
+  const isEnc = (v: unknown): v is string => typeof v === 'string' && v.startsWith(ENC_ANY_PREFIX);
   if (key === LEGACY_BITRIX_KEY) {
-    return typeof value === 'string' && value.startsWith(VERSION_PREFIX)
-      ? { nextValue: rotate(value), fields: ['<value>'] }
-      : null;
+    if (!isEnc(value)) return null;
+    const r = rotate(value);
+    return r === ALREADY_NEW ? null : { nextValue: r, fields: ['<value>'] };
   }
   const secretFields = SECRET_FIELDS_BY_SETTING_KEY.get(key);
   if (!secretFields || !value || typeof value !== 'object' || Array.isArray(value)) return null;
@@ -123,10 +189,11 @@ export function reencryptIntegrationSettingValue(
   const fields: string[] = [];
   for (const f of secretFields) {
     const v = current[f];
-    if (typeof v === 'string' && v.startsWith(VERSION_PREFIX)) {
-      next[f] = rotate(v);
-      fields.push(f);
-    }
+    if (!isEnc(v)) continue;
+    const r = rotate(v);
+    if (r === ALREADY_NEW) continue;
+    next[f] = r;
+    fields.push(f);
   }
   return fields.length > 0 ? { nextValue: next, fields } : null;
 }
@@ -136,6 +203,8 @@ export interface RowPlan {
   updates: Record<string, string>;
   unreadableFields: string[];
   skipped: number;
+  /** Campos que já decifram com NEW_KEY (rodada anterior) — não regravados. */
+  alreadyNew: number;
 }
 
 /**
@@ -151,6 +220,7 @@ export function planRowReencrypt(
   const updates: Record<string, string> = {};
   const unreadableFields: string[] = [];
   let skipped = 0;
+  let alreadyNew = 0;
   for (const field of fields) {
     const val = row[field];
     if (typeof val !== 'string' || !val.startsWith(ENC_ANY_PREFIX)) {
@@ -158,13 +228,19 @@ export function planRowReencrypt(
       continue;
     }
     try {
-      if (!val.startsWith(VERSION_PREFIX)) throw new Error('versão de envelope desconhecida');
-      updates[field] = encryptWithKey(decryptWithKey(val, oldKeyBuf), newKeyBuf);
+      const r = rotateEnvelope(val, oldKeyBuf, newKeyBuf);
+      if (r === ALREADY_NEW) alreadyNew++;
+      else updates[field] = r;
     } catch {
       unreadableFields.push(field);
     }
   }
-  return { updates: unreadableFields.length > 0 ? {} : updates, unreadableFields, skipped };
+  return {
+    updates: unreadableFields.length > 0 ? {} : updates,
+    unreadableFields,
+    skipped,
+    alreadyNew,
+  };
 }
 
 export interface ModelResult {
@@ -174,119 +250,160 @@ export interface ModelResult {
   /** Linhas com ≥1 campo ilegível — NÃO gravadas. */
   errors: number;
   unreadableFields: number;
+  /** Campos que já estavam em NEW_KEY (retomada idempotente). */
+  alreadyNew: number;
+  /** UPDATE compare-and-set que não casou (a app mudou a linha no meio) — não gravadas. */
+  conflicts: number;
+  coverage: CoverageTally;
 }
 
-function quoteIdent(name: string): string {
-  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) throw new Error(`Identificador inválido: ${name}`);
-  return `"${name}"`;
+/** UPDATE de uma linha com compare-and-set nos campos alterados. Devolve se casou (1 linha). */
+async function casUpdateRow(
+  query: QueryFn,
+  info: TableInfo,
+  row: Record<string, unknown>,
+  orgId: string | null,
+  updates: Record<string, string>,
+): Promise<boolean> {
+  const cols = Object.keys(updates);
+  const params: unknown[] = [];
+  const p = (v: unknown) => {
+    params.push(v);
+    return `$${params.length}`;
+  };
+  const set = cols.map((c) => `${quoteIdent(c)} = ${p(updates[c])}`).join(', ');
+  const where = [`id = ${p(row.id)}`];
+  if (orgId !== null) where.push(`"organizationId" = ${p(orgId)}`);
+  for (const c of cols) where.push(`${quoteIdent(c)} IS NOT DISTINCT FROM ${p(row[c])}`);
+  const r = await query(
+    `UPDATE ${quoteIdent(info.table)} SET ${set} WHERE ${where.join(' AND ')}`,
+    params,
+  );
+  return r.rowCount === 1;
 }
 
 export async function reencryptModel(
   query: QueryFn,
-  model: string,
+  info: TableInfo,
   fields: readonly string[],
   { apply, oldKey, newKey }: RotationKeys,
+  { orgs, log }: { orgs: readonly string[]; log: Log },
 ): Promise<ModelResult> {
-  const selectCols = ['id', ...fields].map(quoteIdent).join(', ');
-  const { rows } = await query<Record<string, unknown>>(
-    `SELECT ${selectCols} FROM ${quoteIdent(model)}`,
-  );
-  const res: ModelResult = {
-    total: rows.length,
+  const res = {
+    total: 0,
     rotated: 0,
     skipped: 0,
+    alreadyNew: 0,
     errors: 0,
     unreadableFields: 0,
+    conflicts: 0,
   };
-  for (const row of rows) {
-    const plan = planRowReencrypt(row, fields, oldKey, newKey);
-    res.skipped += plan.skipped;
-    if (plan.unreadableFields.length > 0) {
-      res.errors++;
-      res.unreadableFields += plan.unreadableFields.length;
-      continue;
-    }
-    const cols = Object.keys(plan.updates);
-    if (cols.length === 0) continue;
-    if (apply) {
-      // Um único UPDATE por linha: todos os campos da linha mudam juntos ou nenhum.
-      const setClauses = cols.map((f, idx) => `${quoteIdent(f)} = $${idx + 2}`).join(', ');
-      await query(`UPDATE ${quoteIdent(model)} SET ${setClauses} WHERE id = $1`, [
-        row.id,
-        ...cols.map((c) => plan.updates[c]),
-      ]);
-    }
-    res.rotated++;
-  }
-  return res;
-}
-
-async function forEachOrgSettingRow(
-  query: QueryFn,
-  fn: (row: { id: string; key: string; value: unknown }, orgId: string) => Promise<void>,
-): Promise<void> {
-  await query(`SELECT set_config('app.bypass_rls', 'on', false)`);
-  const { rows: orgs } = await query<{ id: string }>(
-    `SELECT id FROM "Organization" ORDER BY id ASC`,
-  );
-  await query(`SELECT set_config('app.bypass_rls', 'off', false)`);
-  for (const org of orgs) {
-    await query(`SELECT set_config('app.current_tenant_id', $1, false)`, [org.id]);
-    const { rows } = await query<{ id: string; key: string; value: unknown }>(
-      `SELECT id, key, value FROM "Setting" WHERE "organizationId" = $1 AND key = ANY($2::text[])`,
-      [org.id, TARGET_SETTING_KEYS],
-    );
-    for (const row of rows) await fn(row, org.id);
-  }
+  const coverage = await scanTable(query, info, {
+    orgs,
+    columns: fields,
+    readOnly: !apply,
+    log,
+    onRow: async (row, orgId) => {
+      res.total++;
+      const plan = planRowReencrypt(row, fields, oldKey, newKey);
+      res.skipped += plan.skipped;
+      res.alreadyNew += plan.alreadyNew;
+      if (plan.unreadableFields.length > 0) {
+        res.errors++;
+        res.unreadableFields += plan.unreadableFields.length;
+        return;
+      }
+      if (Object.keys(plan.updates).length === 0) return;
+      if (apply && !(await casUpdateRow(query, info, row, orgId, plan.updates))) {
+        res.conflicts++;
+        return;
+      }
+      res.rotated++;
+    },
+  });
+  return { ...res, coverage };
 }
 
 export async function reencryptSettings(
   query: QueryFn,
+  info: TableInfo,
   { apply, oldKey, newKey }: RotationKeys,
-): Promise<Omit<ModelResult, 'skipped' | 'unreadableFields'>> {
-  const res = { total: 0, rotated: 0, errors: 0 };
-  await forEachOrgSettingRow(query, async (row, orgId) => {
-    res.total++;
-    let out: ReturnType<typeof reencryptIntegrationSettingValue>;
-    try {
-      out = reencryptIntegrationSettingValue(row.key, row.value, oldKey, newKey);
-    } catch {
-      res.errors++; // fail-closed: nenhum campo da linha é gravado
-      return;
-    }
-    if (!out) return;
-    if (apply) {
-      await query(
-        `UPDATE "Setting" SET value = $1::jsonb WHERE id = $2 AND "organizationId" = $3`,
-        [JSON.stringify(out.nextValue), row.id, orgId],
-      );
-    }
-    res.rotated++;
+  { orgs, log }: { orgs: readonly string[]; log: Log },
+): Promise<Omit<ModelResult, 'skipped' | 'unreadableFields' | 'alreadyNew'>> {
+  const res = { total: 0, rotated: 0, errors: 0, conflicts: 0 };
+  const coverage = await scanTable(query, info, {
+    orgs,
+    columns: ['key', 'value'],
+    filter: SETTING_FILTER,
+    readOnly: !apply,
+    log,
+    onRow: async (row, orgId) => {
+      res.total++;
+      let out: ReturnType<typeof reencryptIntegrationSettingValue>;
+      try {
+        out = reencryptIntegrationSettingValue(String(row.key), row.value, oldKey, newKey);
+      } catch {
+        res.errors++; // fail-closed: nenhum campo da linha é gravado
+        return;
+      }
+      if (!out) return;
+      if (apply) {
+        const r = await query(
+          `UPDATE "Setting" SET value = $1::jsonb
+            WHERE id = $2 AND "organizationId" = $3 AND value = $4::jsonb`,
+          [JSON.stringify(out.nextValue), row.id, orgId, JSON.stringify(row.value)],
+        );
+        if (r.rowCount !== 1) {
+          res.conflicts++;
+          return;
+        }
+      }
+      res.rotated++;
+    },
   });
-  return res;
+  return { ...res, coverage };
 }
 
 export async function verifyModel(
   query: QueryFn,
-  model: string,
+  info: TableInfo,
   fields: readonly string[],
   key: Buffer,
-): Promise<VerifyCounts> {
-  const selectCols = ['id', ...fields].map(quoteIdent).join(', ');
-  const { rows } = await query<Record<string, unknown>>(
-    `SELECT ${selectCols} FROM ${quoteIdent(model)}`,
-  );
-  const counts = emptyCounts();
-  for (const row of rows) for (const f of fields) addClass(counts, classifyValue(row[f], key));
-  return counts;
+  { orgs, log }: { orgs: readonly string[]; log: Log },
+): Promise<VerifyCounts & { rows: number; coverage: CoverageTally }> {
+  const counts = { ...emptyCounts(), rows: 0 };
+  const coverage = await scanTable(query, info, {
+    orgs,
+    columns: fields,
+    readOnly: true,
+    log,
+    onRow: async (row) => {
+      counts.rows++;
+      for (const f of fields) addClass(counts, classifyValue(row[f], key));
+    },
+  });
+  return { ...counts, coverage };
 }
 
-export async function verifySettings(query: QueryFn, key: Buffer): Promise<VerifyCounts> {
-  const counts = emptyCounts();
-  await forEachOrgSettingRow(query, async (row) =>
-    classifySettingValue(row.key, row.value, key, counts),
-  );
-  return counts;
+export async function verifySettings(
+  query: QueryFn,
+  info: TableInfo,
+  key: Buffer,
+  { orgs, log }: { orgs: readonly string[]; log: Log },
+): Promise<VerifyCounts & { rows: number; coverage: CoverageTally }> {
+  const counts = { ...emptyCounts(), rows: 0 };
+  const coverage = await scanTable(query, info, {
+    orgs,
+    columns: ['key', 'value'],
+    filter: SETTING_FILTER,
+    readOnly: true,
+    log,
+    onRow: async (row) => {
+      counts.rows++;
+      classifySettingValue(String(row.key), row.value, key, counts);
+    },
+  });
+  return { ...counts, coverage };
 }
 
 // ── Redis: sessões WhatsApp/Baileys (wa-auth:<org>:*) ─────────────────────────────────────────
@@ -314,6 +431,11 @@ end
 return 1
 `;
 
+/** Erro de tipo do Redis (chave não-string) — o único erro de GET tratado como dado. */
+export function isWrongTypeError(err: unknown): boolean {
+  return err instanceof Error && /^WRONGTYPE\b/.test(err.message);
+}
+
 /** SCAN incremental (nunca KEYS) com deduplicação — SCAN pode devolver a mesma chave mais de uma vez. */
 export async function scanAllKeys(redis: RedisLike, match: string, count = 500): Promise<string[]> {
   const seen = new Set<string>();
@@ -330,6 +452,8 @@ export interface RedisResult {
   scanned: number;
   rotated: number;
   plaintext: number;
+  /** Chaves que já decifram com NEW_KEY (retomada) — não regravadas. */
+  alreadyNew: number;
   /** Chaves cujo valor `enc:` não decifra com OLD_KEY (ou não é string) — não gravadas. */
   errors: number;
   /** Chaves alteradas pela app entre a leitura e a gravação — não gravadas; rodar de novo. */
@@ -349,6 +473,7 @@ export async function reencryptRedisWaAuth(
     scanned: 0,
     rotated: 0,
     plaintext: 0,
+    alreadyNew: 0,
     errors: 0,
     conflicts: 0,
     missing: 0,
@@ -362,8 +487,11 @@ export async function reencryptRedisWaAuth(
     let current: string | null;
     try {
       current = await redis.get(key);
-    } catch {
-      res.errors++; // ex.: WRONGTYPE — não é uma chave de sessão string
+    } catch (err) {
+      // Só WRONGTYPE (chave que não é string) é problema de DADO; erro de conexão/timeout relança
+      // e vira código 1 (antes virava "Erros" e o script seguia, mascarando Redis fora do ar).
+      if (!isWrongTypeError(err)) throw err;
+      res.errors++;
       note(key);
       continue;
     }
@@ -375,13 +503,16 @@ export async function reencryptRedisWaAuth(
       res.plaintext++; // legado em JSON puro: a app re-cifra no próximo save; rotação não toca
       continue;
     }
-    let next: string;
+    let next: string | typeof ALREADY_NEW;
     try {
-      if (!current.startsWith(VERSION_PREFIX)) throw new Error('versão de envelope desconhecida');
-      next = encryptWithKey(decryptWithKey(current, oldKey), newKey);
+      next = rotateEnvelope(current, oldKey, newKey);
     } catch {
       res.errors++;
       note(key);
+      continue;
+    }
+    if (next === ALREADY_NEW) {
+      res.alreadyNew++;
       continue;
     }
     if (apply) {
@@ -408,7 +539,8 @@ export async function verifyRedisWaAuth(
     let v: string | null;
     try {
       v = await redis.get(k);
-    } catch {
+    } catch (err) {
+      if (!isWrongTypeError(err)) throw err; // conexão/timeout → código 1, nunca "VERIFY OK"
       counts.unreadable++;
       continue;
     }
@@ -423,18 +555,20 @@ function fmtVerify(label: string, c: VerifyCounts): string {
   return `  ↳ [VERIFY] ${label}: legíveis=${c.readable} ilegíveis=${c.unreadable} em_claro=${c.plaintext}`;
 }
 
-async function withDb<T>(fn: (query: QueryFn) => Promise<T>): Promise<T> {
-  const dbUrl = process.env.DATABASE_URL?.trim();
+async function withDb<T>(env: ScriptEnv, fn: (query: QueryFn) => Promise<T>): Promise<T> {
+  const dbUrl = env.DATABASE_URL?.trim();
   if (!dbUrl) throw new Error('DATABASE_URL não definida (obrigatória para --target=db).');
-  const pool = new Pool({
+  const { default: pg } = await import('pg');
+  const pool = new pg.Pool({
     connectionString: dbUrl,
+    max: 1,
     ssl: dbUrl.includes('localhost') ? false : { rejectUnauthorized: false },
   });
   const client = await pool.connect();
   try {
     const query: QueryFn = async (sql, params) => {
       const r = await client.query(sql, params);
-      return { rows: r.rows };
+      return { rows: r.rows, rowCount: r.rowCount };
     };
     return await fn(query);
   } finally {
@@ -444,7 +578,8 @@ async function withDb<T>(fn: (query: QueryFn) => Promise<T>): Promise<T> {
 }
 
 async function withRedis<T>(url: string, fn: (redis: RedisLike) => Promise<T>): Promise<T> {
-  const { default: Redis } = await import('ioredis');
+  // Export nomeado: `default` do import dinâmico não é construível sob module=nodenext (TS2351).
+  const { Redis } = await import('ioredis');
   const redis = new Redis(url, { lazyConnect: true, maxRetriesPerRequest: 2 });
   await redis.connect();
   try {
@@ -458,122 +593,145 @@ function dbModels(model: string | null): Array<[string, readonly string[]]> {
   return Object.entries(TARGET_MODELS).filter(([m]) => !model || m === model);
 }
 
-async function tableExists(query: QueryFn, model: string): Promise<boolean> {
-  const { rows } = await query<{ exists: boolean }>(
-    `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1) AS exists`,
-    [model],
-  );
-  return Boolean(rows[0]?.exists);
+function dbTargets(model: string | null): TableTarget[] {
+  const targets = dbModels(model).map(([m]) => tableTargetFor(m));
+  if (!model || model === SETTING_MODEL) {
+    targets.push({ model: SETTING_MODEL, table: SETTING_MODEL, scope: 'org' });
+  }
+  return targets;
 }
 
-async function runVerify(argv: readonly string[], log: Log): Promise<number> {
+function tableInfo(pf: Preflight, model: string): TableInfo {
+  const info = pf.tables.get(model);
+  if (!info) throw new Error(`Preflight sem a tabela do model ${model}.`);
+  return info;
+}
+
+function logCoverage(log: Log, c: CoverageTally): number {
+  log(fmtCoverage(c));
+  for (const d of c.divergences.slice(0, 20)) log(`  ↳ [DIVERGÊNCIA] ${d}`);
+  return c.divergences.length;
+}
+
+async function runVerify(argv: readonly string[], log: Log, env: ScriptEnv): Promise<number> {
   const scope = parseReencryptScope(argv, ALLOWED_MODELS);
-  const { keyEnv, key } = assertVerifyPreconditions(process.env, argv);
-  const redisUrl = scope.target === 'redis-wa-auth' ? requireRedisUrl(process.env) : null;
+  const { keyEnv, key } = assertVerifyPreconditions(env, argv);
+  const redisUrl = scope.target === 'redis-wa-auth' ? requireRedisUrl(env) : null;
   log('='.repeat(70));
   log(
     `🔎 VERIFY (somente leitura) — chave de ${keyEnv} — alvo ${scope.target}${scope.model ? ` / ${scope.model}` : ''}`,
   );
   log('='.repeat(70));
   let unreadable = 0;
+  let divergences = 0;
   if (redisUrl) {
     const c = await withRedis(redisUrl, (r) => verifyRedisWaAuth(r, key));
     log(`${fmtVerify(REDIS_WA_AUTH_MATCH, c)} chaves=${c.scanned}`);
     unreadable += c.unreadable;
   } else {
-    await withDb(async (query) => {
-      await query(`SELECT set_config('app.bypass_rls', 'on', false)`);
+    await withDb(env, async (query) => {
+      const pf = await runPreflight(query, dbTargets(scope.model), { write: false, log });
+      const orgs = await listOrganizations(query);
+      log(`Organizações: ${orgs.length}`);
       for (const [model, fields] of dbModels(scope.model)) {
-        if (!(await tableExists(query, model))) {
-          log(`[PULADO] Tabela "${model}" não existe neste schema.`);
-          continue;
-        }
-        const c = await verifyModel(query, model, fields, key);
-        log(fmtVerify(model, c));
+        const c = await verifyModel(query, tableInfo(pf, model), fields, key, { orgs, log });
+        log(`${fmtVerify(model, c)} linhas=${c.rows}`);
+        divergences += logCoverage(log, c.coverage);
         unreadable += c.unreadable;
       }
       if (!scope.model || scope.model === SETTING_MODEL) {
-        const c = await verifySettings(query, key);
-        log(fmtVerify(`${SETTING_MODEL} (integration.* + ${LEGACY_BITRIX_KEY})`, c));
+        const c = await verifySettings(query, tableInfo(pf, SETTING_MODEL), key, { orgs, log });
+        log(
+          `${fmtVerify(`${SETTING_MODEL} (integration.* + ${LEGACY_BITRIX_KEY})`, c)} linhas=${c.rows}`,
+        );
+        divergences += logCoverage(log, c.coverage);
         unreadable += c.unreadable;
       }
     });
   }
   log('='.repeat(70));
-  if (unreadable > 0) {
+  if (unreadable > 0 || divergences > 0) {
     log(
-      `❌ VERIFY FALHOU: ${unreadable} valor(es) ilegível(is) com a chave de ${keyEnv}. Código ${EXIT_DATA_ISSUES}.`,
+      `❌ VERIFY FALHOU: ${unreadable} valor(es) ilegível(is) com a chave de ${keyEnv}; ${divergences} divergência(s) de cobertura. Código ${EXIT_DATA_ISSUES}.`,
     );
     return EXIT_DATA_ISSUES;
   }
-  log(`✅ VERIFY OK: 0 ilegíveis com a chave de ${keyEnv}.`);
+  log(`✅ VERIFY OK: 0 ilegíveis com a chave de ${keyEnv} e cobertura conferida.`);
   return 0;
 }
 
-async function runRotation(argv: readonly string[], log: Log): Promise<number> {
+async function runRotation(argv: readonly string[], log: Log, env: ScriptEnv): Promise<number> {
   const scope = parseReencryptScope(argv, ALLOWED_MODELS);
   // Aborta (lança) antes de qualquer conexão se faltar/for inválida alguma chave, ou se --apply
   // vier sem --snapshot-confirmed=<id>.
-  const pre = assertRotationPreconditions(process.env, argv);
-  const redisUrl = scope.target === 'redis-wa-auth' ? requireRedisUrl(process.env) : null;
+  const pre = assertRotationPreconditions(env, argv);
+  const redisUrl = scope.target === 'redis-wa-auth' ? requireRedisUrl(env) : null;
   const keys: RotationKeys = { apply: pre.apply, oldKey: pre.oldKey, newKey: pre.newKey };
   const mode = pre.apply ? 'LIVE' : 'DRY-RUN';
   if (pre.snapshotId) log(`Snapshot confirmado: ${pre.snapshotId}`);
   log('='.repeat(70));
   log('🔐 RE-ENCRIPTAÇÃO DE CREDENCIAIS — ROTAÇÃO DE CHAVE MESTRA');
   log(
-    `Modo: ${pre.apply ? '🚀 LIVE (gravação real)' : '🔍 DRY-RUN (simulação sem gravação)'} — alvo ${scope.target}`,
+    `Modo: ${pre.apply ? '🚀 LIVE (gravação real)' : '🔍 DRY-RUN (simulação sem gravação, transações READ ONLY)'} — alvo ${scope.target}`,
   );
   log('='.repeat(70));
 
   let errors = 0;
   let conflicts = 0;
+  let divergences = 0;
   if (redisUrl) {
     log(`\nProcessando Redis: ${REDIS_WA_AUTH_MATCH} (sessões WhatsApp/Baileys)`);
     const r = await withRedis(redisUrl, (redis) => reencryptRedisWaAuth(redis, keys));
     log(
-      `  ↳ Total chaves: ${r.scanned} | Re-criptografadas: ${r.rotated} | Em claro: ${r.plaintext} | Erros: ${r.errors} | Conflitos: ${r.conflicts} | Sumidas: ${r.missing}`,
+      `  ↳ Total chaves: ${r.scanned} | Re-criptografadas: ${r.rotated} | Em claro: ${r.plaintext} | Já em NEW_KEY: ${r.alreadyNew} | Erros: ${r.errors} | Conflitos: ${r.conflicts} | Sumidas: ${r.missing}`,
     );
     if (r.problemKeys.length > 0)
       log(`  ↳ Chaves com erro/conflito (nomes, até 20): ${r.problemKeys.join(', ')}`);
     errors += r.errors;
     conflicts += r.conflicts;
   } else {
-    await withDb(async (query) => {
-      // Bypass de RLS só para os models de conexão (manutenção de infraestrutura); Setting usa tenant.
-      await query(`SELECT set_config('app.bypass_rls', 'on', false)`);
+    await withDb(env, async (query) => {
+      const pf = await runPreflight(query, dbTargets(scope.model), { write: pre.apply, log });
+      const orgs = await listOrganizations(query);
+      log(`Organizações: ${orgs.length}`);
       for (const [model, fields] of dbModels(scope.model)) {
-        if (!(await tableExists(query, model))) {
-          log(`[PULADO] Tabela "${model}" não existe neste schema.`);
-          continue;
-        }
-        log(`\nProcessando Model: ${model} (campos: ${fields.join(', ')})`);
-        const r = await reencryptModel(query, model, fields, keys);
+        const info = tableInfo(pf, model);
         log(
-          `  ↳ Total linhas: ${r.total} | Re-criptografadas: ${r.rotated} | Puladas: ${r.skipped} | Erros: ${r.errors} (linhas com campo ilegível, não gravadas; campos ilegíveis: ${r.unreadableFields})`,
+          `\nProcessando Model: ${model} → "${info.table}" (campos: ${fields.join(', ')}; escopo ${info.scope})`,
         );
+        const r = await reencryptModel(query, info, fields, keys, { orgs, log });
+        log(
+          `  ↳ Total linhas: ${r.total} | Re-criptografadas: ${r.rotated} | Puladas: ${r.skipped} | Já em NEW_KEY: ${r.alreadyNew} | Erros: ${r.errors} (linhas com campo ilegível, não gravadas; campos ilegíveis: ${r.unreadableFields}) | Conflitos: ${r.conflicts}`,
+        );
+        divergences += logCoverage(log, r.coverage);
         errors += r.errors;
+        conflicts += r.conflicts;
       }
       if (!scope.model || scope.model === SETTING_MODEL) {
         log(`\nProcessando Model: Setting (integration.* + ${LEGACY_BITRIX_KEY}, por campo)`);
-        const r = await reencryptSettings(query, keys);
+        const r = await reencryptSettings(query, tableInfo(pf, SETTING_MODEL), keys, {
+          orgs,
+          log,
+        });
         log(
-          `  ↳ Total linhas: ${r.total} | Re-criptografadas: ${r.rotated} | Erros: ${r.errors} (linhas com campo ilegível, não gravadas)`,
+          `  ↳ Total linhas: ${r.total} | Re-criptografadas: ${r.rotated} | Erros: ${r.errors} (linhas com campo ilegível ou versão desconhecida, não gravadas) | Conflitos: ${r.conflicts}`,
         );
+        divergences += logCoverage(log, r.coverage);
         errors += r.errors;
+        conflicts += r.conflicts;
       }
     });
   }
 
   log(`\n${'='.repeat(70)}`);
-  if (errors > 0 || conflicts > 0) {
+  if (errors > 0 || conflicts > 0 || divergences > 0) {
     log(
-      `❌ Concluído COM PROBLEMAS: Erros=${errors} Conflitos=${conflicts}. [Modo: ${mode}] Código ${EXIT_DATA_ISSUES}.`,
+      `❌ Concluído COM PROBLEMAS: Erros=${errors} Conflitos=${conflicts} Divergências=${divergences}. [Modo: ${mode}] Código ${EXIT_DATA_ISSUES}.`,
     );
     log('='.repeat(70));
     return EXIT_DATA_ISSUES;
   }
-  log(`✅ Concluído sem erros. [Modo: ${mode}]`);
+  log(`✅ Concluído sem erros, cobertura conferida. [Modo: ${mode}]`);
   log('='.repeat(70));
   return 0;
 }
@@ -581,8 +739,9 @@ async function runRotation(argv: readonly string[], log: Log): Promise<number> {
 export async function main(
   argv: readonly string[] = process.argv,
   log: Log = console.log,
+  env: ScriptEnv = process.env,
 ): Promise<number> {
-  return isVerifyMode(argv) ? runVerify(argv, log) : runRotation(argv, log);
+  return isVerifyMode(argv) ? runVerify(argv, log, env) : runRotation(argv, log, env);
 }
 
 if (process.argv[1]?.endsWith('reencrypt-credentials.ts')) {

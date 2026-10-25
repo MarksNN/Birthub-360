@@ -1,9 +1,64 @@
 - De: 15 — Segurança Aplicada
 - Para: 24 — Revisão Independente (revisor técnico: 06 — Integrações e Bitrix; 01 para o desenho de schema da v2)
 - Onda: 52
-- Status: aberto. Branch `agente/15-credential-rotation-hardening`, a partir da `main` em `239a6675` (#101, por cima do merge do #102 `5dd480f8`). **Sem PR** (abertura só pelo 08A depois da revisão do 24).
+- Status: **rodada 2** — correções do parecer do 24 que reprovou o **PR #107** @ `67026811` (parecer `aabdd5af` na branch `agente/24-review-pr107-67026811`). Branch `agente/15-credential-rotation-hardening`, a partir da `main` em `239a6675`. Nenhum PR novo e nenhum comentário no #107 (o 08A conduz; o 24 revisa de novo).
 - Prioridade: alto (condição do 24 para qualquer rotação da `CREDENTIALS_ENCRYPTION_KEY`)
 - Referências: #102 (RB-SEC-010), `docs/ADR/ADR-010-integration-settings-at-rest.md`, ADR-006, #33 (KMS / F11, Agente 21)
+
+## Rodada 2 — parecer do 24 no #107 (@ `67026811`)
+
+> Nenhuma execução contra banco ou Redis reais. O teste de B1 rodou num **PostgreSQL 17 efêmero local** (cluster descartável em `/tmp`, apagado no fim), com as **147 migrations reais** aplicadas por um role `NOSUPERUSER NOBYPASSRLS` dono das tabelas.
+
+### B1 (P1) — rotação/verify sob RLS
+- **Causa:** a rotação lia com `app.bypass_rls=on` e **sem** tenant. `Contact`, `Setting`, `GoogleWorkspaceConnection`, `ThreeCXConnection` e `ExternalCrmConnection` têm policy **só tenant** (sem cláusula de bypass) + `FORCE RLS` → o script via 0 linhas e saía com 0. Reproduzido no PG real (teste "regressão: … via 0 Contacts de 2").
+- **Correção** (`scripts/security/rls-coverage.ts`, novo; `reencrypt-credentials.ts`; `backfill-integration-settings-encryption.ts`):
+  - **Preflight** logado: `current_user`, `rolsuper`, `rolbypassrls`; por tabela RLS/FORCE, se a RLS se aplica ao role, se a policy admite bypass, `organizationId`, `SELECT`/`UPDATE`, `reltuples`. Cobertura não provável → `CoverageNotProvableError`, **código 1**, antes de ler dados.
+  - Orgs via `"Organization"`; **uma transação por org × model** com `set_config('app.current_tenant_id', org, true)` e sem bypass; `account` (sem `organizationId`) com bypass (a policy admite). `UPDATE` compare-and-set filtrado por org.
+  - **Cobertura:** processadas = soma de `count(*)` por org (mesma visibilidade) **e** = global: `count(*)` exato com `BYPASSRLS`, `count(*)` sob bypass quando a policy admite (`exact-bypass`) ou `pg_class.reltuples` (`estimate`; exige `ANALYZE` logo antes, exato até 30 000, 2% acima). Divergência → **código 2**.
+  - `--verify` (e dry-run) em transações **READ ONLY**.
+- **Runbook:** seção 3.1 nova (policies, role exigido, `ANALYZE`, preflight) e pré-requisito 2 (antiga :106) com o role.
+- **Teste em PG real:** `tests/container/reencryptCredentialsRls.test.ts` (7/7). Roda com `RLS_PG_ADMIN_URL=<superuser de PG descartável>` ou `RUN_INFRA_TESTS=1 npm run test:containers` (testcontainers). Trechos:
+  ```
+  [PREFLIGHT] current_user=rot_owner_… rolsuper=false rolbypassrls=false
+  [PREFLIGHT] Contact → "Contact": escopo=org rls=true force=true rls_se_aplica=true policy_admite_bypass=false … contagem_global=estimate
+  [PREFLIGHT] ❌ Contact: contagem global só por estimativa e "Contact" nunca foi analisada (reltuples=-1) …      (→ lança, código 1)
+  Organizações: 2
+    ↳ Total linhas: 2 | Re-criptografadas: 2 | Puladas: 2 | Já em NEW_KEY: 0 | Erros: 0 … | Conflitos: 0     (Contact, apply)
+    ↳ [COBERTURA] Contact: processadas=2 soma_por_org=2 global(estimate)=2 divergências=0
+  ❌ VERIFY FALHOU: 12 valor(es) ilegível(is) com a chave de VERIFY_KEY …  Código 2.                         (verify com a OLD)
+    ↳ [VERIFY] Contact: legíveis=4 ilegíveis=1 em_claro=0 linhas=3                                          (1 Contact pendente → 2)
+    ↳ Total linhas: 3 | Re-criptografadas: 1 | Puladas: 4 | Já em NEW_KEY: 4 | Erros: 0 …                   (retomada → 0)
+    ↳ [DIVERGÊNCIA] Setting: soma por org=2 incompatível com pg_class.reltuples=3 …                         (Setting sem org → 2)
+  ```
+  Também via CLI (`npx tsx`, role da app sem bypass, mesmo PG efêmero): reencrypt verify com 1 pendente → 2; `--apply --model=Contact` → 0; verify → 0. Backfill dry-run → 0 (`a_cifrar=1`), apply → 0, verify → 0.
+
+### B2 (P1) — `CopilotoTranscriptSegment.text`
+- Lista derivada de **`ENCRYPTED_MODEL_FIELDS`** (`src/lib/crypto/encryptedModelFields.ts`, novo; `piiFields.ts` reexporta — mesma fonte da extensão Prisma). Entra `CopilotoTranscriptSegment.text`.
+- **Teste de contrato** `tests/unit/security/reencryptTargetsContract.test.ts`: cada model/campo existe no `schema.prisma`, tabela real (`@@map`), `organizationId`; novos chamadores de cifra em `src/` fora da lista falham.
+- **Bug extra achado:** `Account` é `@@map("account")`; o script antigo procurava `"Account"`, logava `[PULADO]` e **nunca rotacionava os tokens OAuth**. Corrigido (tabela vem do mapa model→tabela; coberto pelo contrato e pelo PG real).
+
+### P3
+- Erro de conexão/timeout no `GET` do Redis → relança → **código 1** (antes virava `Erros` e seguia); só `WRONGTYPE` é erro de dado. Teste no Redis fake.
+- `--verify` em **READ ONLY**.
+- `enc:` de versão desconhecida no `Setting` → erro (antes passava).
+- **TS2351** (`new Redis` com o default export do ioredis em nodenext) → import nomeado `{ Redis }`. Novo `tsconfig.scripts.json` (estende o do projeto, `noEmit`, inclui os scripts de credencial): `tsc -p tsconfig.scripts.json` = 0 erros. **Nenhum workflow alterado**; ligar na CI fica como follow-up (08A/CI).
+- Este handoff cita o #107.
+
+### Extra — retomada idempotente (achado pelo teste em PG)
+O cabeçalho do script dizia "idempotente", mas uma segunda passada contava os valores já rotacionados como `Erros` (código 2). Agora `rotateEnvelope` devolve `ALREADY_NEW` quando o valor não decifra com a `OLD_KEY` mas decifra com a `NEW_KEY`: aparece em `Já em NEW_KEY`, não é regravado e não é erro; não decifrar com nenhuma das duas continua erro (fail-closed). Vale para banco, `Setting` e Redis. **Consequência no runbook:** o passo 6b agora espera **código 0** (antes, 2 por definição) e `Re-criptografadas: 0`; `Erros > 0` no 6b passa a ser motivo de parada.
+
+### Validação (Node 22.23.3, 2026-10-25 ~20:20 UTC-3)
+- `tsc --noEmit`: 88 erros, mesmo conjunto da `main` `239a6675` (diff ordenado vazio). `tsc -p tsconfig.scripts.json`: 0. Checagem strict nodenext dos scripts: 0.
+- `biome check` nos scripts/src alterados: 0 (testes fora do `includes`).
+- vitest unit: `tests/unit/security/` 13 arquivos / 202 testes; `credentialCrypto`, `useRedisAuthState`, `whatsapp.service.lock`, `piiFields`, `secretFields`: 5 / 39. Container (PG 17 efêmero): 7/7.
+- gitleaks: ver o relatório do commit.
+
+### Pedido ao 24 (rodada 2)
+Revisar B1 (preflight, critério de cobertura com `reltuples`, transação por org × model, `account` sob bypass), B2 + contrato, os P3 e a mudança de semântica do 6b (idempotência). Nenhuma execução até OK direto do Marcelo e snapshot confirmado.
+
+---
+
+## Rodada 1 (histórico)
 
 ## Regra de execução
 
@@ -39,7 +94,7 @@
 - `integrationSettingsBackfill.test.ts`: `readKey`, `unreadableRows` e verify.
 
 **Docs:**
-- `docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` (RB-SEC-010): tabela de contrato e de códigos de saída; Redis no escopo (pré-requisitos: acesso ao Redis, workers WA parados; snapshot do Redis no passo 3; dry-run Redis no passo 2; novo passo 5b de apply no Redis, com a alternativa de re-scan do QR); **6a = `--verify --key-env=VERIFY_KEY`** (banco e Redis), **6b mantido como cross-check** (dry-run com a `NEW_KEY` como `OLD_KEY`: `Re-criptografadas: 0`, código 2 esperado pelos ilegíveis da chave antiga — o runbook explica); passo 7 reinicia os workers WA e valida a reconexão; rollback do Redis; texto da linha 66 corrigido para a semântica atômica.
+- `docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` (RB-SEC-010): tabela de contrato e de códigos de saída; Redis no escopo (pré-requisitos: acesso ao Redis, workers WA parados; snapshot do Redis no passo 3; dry-run Redis no passo 2; novo passo 5b de apply no Redis, com a alternativa de re-scan do QR); **6a = `--verify --key-env=VERIFY_KEY`** (banco e Redis), **6b mantido como cross-check** (dry-run com a `NEW_KEY` como `OLD_KEY`: `Re-criptografadas: 0`; na rodada 1 o código 2 era esperado — superado na rodada 2, agora 0); passo 7 reinicia os workers WA e valida a reconexão; rollback do Redis; texto da linha 66 corrigido para a semântica atômica.
 - `docs/security/SECRET_ROTATION_POLICY.md`: os 9 links `file:///c:/Github/Birthub-360/docs/security/runbooks/…` → `runbooks/…` (todos os destinos existem); item do reencrypt atualizado.
 - `docs/security/runbooks/ROTATE_PII_BLIND_INDEX_KEY.md:22`: o mesmo bug de link `file:///c:/…` (para `backfill-contact-pii.ts`) → caminho relativo.
 - `SECURITY_GUIDE.md`, `INCIDENT_RESPONSE.md`: menções ao reencrypt alinhadas.
