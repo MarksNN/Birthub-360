@@ -3859,6 +3859,185 @@ paths:
         '400':
           description: 'Query inválida (`days` fora do intervalo 1-90)'
 
+  /agent/circuit-breaker/state:
+    get:
+      tags: [Agent]
+      summary: >-
+        Estado atual do circuit breaker de autonomia do enxame para a organização do usuário
+        (observabilidade). `data` é `null` quando não há estado registrado.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/learning-heatmap:
+    get:
+      tags: [Agent]
+      summary: >-
+        Heatmap dos padrões aprendidos pelo LearningAgent na organização/tenant do usuário.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/model-benchmark:
+    get:
+      tags: [Agent]
+      summary: >-
+        Benchmark de performance dos modelos (Groq, OpenAI, vLLM) usados pelo enxame na
+        organização do usuário.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/success-prediction:
+    post:
+      tags: [Agent]
+      summary: >-
+        Prevê a probabilidade de sucesso de uma missão antes de executá-la (organização/tenant do
+        usuário).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentRole, missionType]
+              properties:
+                agentRole:
+                  { type: string, enum: [SDR, BDR, CLOSER, CRM, OPS, SUPERVISOR] }
+                missionType: { type: string, minLength: 1 }
+                leadId: { type: string }
+                leadScore: { type: number, minimum: 0, maximum: 100 }
+                leadStage: { type: string }
+                timeSinceLastContact: { type: number }
+                previousAttempts: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+        '400':
+          description: 'Body inválido (validação zod do `validateRequest`)'
+
+  /agent/proactive-alerts:
+    get:
+      tags: [Agent]
+      summary: >-
+        Verifica a saúde dos agentes da organização com os limiares padrão e devolve os alertas
+        proativos gerados. Apesar de ser GET, a verificação pode criar alertas (efeito colateral).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/prompt-ab-testing/experiments:
+    get:
+      tags: [Agent]
+      summary: >-
+        Lista os experimentos de A/B testing de prompts da organização do usuário.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/realtime-dashboard:
+    get:
+      tags: [Agent]
+      summary: >-
+        Status em tempo real do enxame de agentes da organização do usuário.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/audit-logs:
+    get:
+      tags: [Agent]
+      summary: >-
+        Logs de auditoria das ações do enxame na organização do usuário, com filtros opcionais.
+      parameters:
+        - name: agentType
+          in: query
+          schema: { type: string }
+        - name: action
+          in: query
+          schema: { type: string }
+        - name: result
+          in: query
+          schema: { type: string, enum: [success, error] }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      logs: { type: array, items: { type: object } }
+                      total: { type: integer }
+
+  /agent/usage-heatmap:
+    get:
+      tags: [Agent]
+      summary: >-
+        Heatmap de uso dos agentes da organização do usuário nos últimos N dias.
+      parameters:
+        - name: days
+          in: query
+          description: 'Janela em dias (default 30; parse com `parseInt`, sem validação de intervalo)'
+          schema: { type: integer, default: 30 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
+  /agent/cost-analysis:
+    get:
+      tags: [Agent]
+      summary: >-
+        Análise de custos por agente da organização do usuário nos últimos N dias.
+      parameters:
+        - name: days
+          in: query
+          description: 'Janela em dias (default 30; parse com `parseInt`, sem validação de intervalo)'
+          schema: { type: integer, default: 30 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelope'
+
   /agent/golden-dataset/summary:
     get:
       tags: [Agent]
