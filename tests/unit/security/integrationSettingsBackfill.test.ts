@@ -10,6 +10,7 @@ import {
   planSettingBackfill,
   type QueryFn,
   runIntegrationSettingsBackfill,
+  runIntegrationSettingsVerify,
   SECRET_FIELDS_BY_SETTING_KEY,
   TARGET_SETTING_KEYS,
 } from '../../../scripts/security/backfill-integration-settings-encryption.js';
@@ -58,7 +59,7 @@ describe('planSettingBackfill', () => {
       value: { apiKey: TRELLO_KEY, token: TRELLO_TOKEN },
     });
     const second = planSettingBackfill({ key: 'integration.trello', value: first.nextValue });
-    expect(second).toEqual({ nextValue: null, encryptedFields: [], unknownFields: [] });
+    expect(second).toEqual({ nextValue: null, encryptedFields: [], unknownFields: [], unreadableFields: [] });
 
     const partial = planSettingBackfill({
       key: 'integration.trello',
@@ -147,6 +148,7 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
       toEncrypt: 2,
       written: 0,
       rowsWithUnknownFields: 0,
+      unreadableRows: 0,
     });
     expect(calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
     const logged = log.mock.calls.flat().join('\n');
@@ -250,5 +252,60 @@ describe('reencryptIntegrationSettingValue (rotação de chave)', () => {
     expect(() =>
       reencryptIntegrationSettingValue('integration.trello', { apiKey: wrong }, OLD, NEW),
     ).toThrow();
+  });
+});
+
+describe('backfill — legibilidade (readKey) e --verify', () => {
+  const KEY = randomBytes(32);
+  const WRONG = randomBytes(32);
+  const enc = (p: string) => encryptWithKey(p, KEY);
+
+  it('planSettingBackfill com readKey: linha com campo enc: ilegível não é gravada (nem o campo em claro)', () => {
+    const plan = planSettingBackfill(
+      { key: 'integration.trello', value: { apiKey: encryptWithKey('x', WRONG), token: TRELLO_TOKEN } },
+      enc,
+      KEY,
+    );
+    expect(plan.unreadableFields).toEqual(['apiKey']);
+    expect(plan.nextValue).toBeNull();
+    expect(plan.encryptedFields).toEqual([]);
+  });
+
+  it('runIntegrationSettingsBackfill: conta ilegiveis= e não grava a linha', async () => {
+    const { query, calls } = fakeDb({
+      'org-a': [
+        { id: 'bad', key: 'integration.trello', value: { apiKey: encryptWithKey('x', WRONG), token: TRELLO_TOKEN } },
+        { id: 'good', key: 'integration.trello', value: { apiKey: enc('k'), token: TRELLO_TOKEN } },
+        { id: 'leg', key: LEGACY_BITRIX_KEY, value: encryptWithKey('https://x.bitrix24.com/rest/1/y/', WRONG) },
+      ],
+    });
+    const log = vi.fn();
+    const res = await runIntegrationSettingsBackfill(query, {
+      apply: true,
+      snapshotId: 'snap-test',
+      log,
+      encrypt: enc,
+      readKey: KEY,
+    });
+    expect(res.unreadableRows).toBe(2);
+    expect(res.written).toBe(1);
+    expect(calls.filter((c) => c.sql.includes('UPDATE')).map((c) => c.params?.[1])).toEqual(['good']);
+    const logged = log.mock.calls.flat().join('\n');
+    expect(logged).toContain('ilegiveis=2');
+    expect(logged).not.toContain(TRELLO_TOKEN);
+  });
+
+  it('runIntegrationSettingsVerify: legíveis / ilegíveis / em claro; nunca grava', async () => {
+    const { query, calls } = fakeDb({
+      'org-a': [
+        { id: 's1', key: 'integration.trello', value: { apiKey: enc('k'), token: TRELLO_TOKEN } },
+        { id: 's2', key: LEGACY_BITRIX_KEY, value: encryptWithKey('u', WRONG) },
+      ],
+    });
+    const log = vi.fn();
+    const c = await runIntegrationSettingsVerify(query, KEY, log);
+    expect(c).toMatchObject({ readable: 1, unreadable: 1, plaintext: 1, scanned: 2, organizations: 1 });
+    expect(calls.some((x) => x.sql.includes('UPDATE'))).toBe(false);
+    expect(log.mock.calls.flat().join('\n')).not.toContain(TRELLO_TOKEN);
   });
 });

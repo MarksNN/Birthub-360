@@ -151,7 +151,7 @@ A governança e rotação de segredos da plataforma foi padronizada sob a [Polí
   - [`ROTATE_INBOUND_WEBHOOK_SECRETS.md`](runbooks/ROTATE_INBOUND_WEBHOOK_SECRETS.md) — Webhooks de entrada (Birth Voices, 3CX, Chatwoot, Voice Result).
   - [`ROTATE_BITRIX24_WEBHOOKS.md`](runbooks/ROTATE_BITRIX24_WEBHOOKS.md), [`ROTATE_BLAND_AI_KEY.md`](runbooks/ROTATE_BLAND_AI_KEY.md), [`ROTATE_GEMINI_API_KEY.md`](runbooks/ROTATE_GEMINI_API_KEY.md).
 - **Ferramentas de Suporte:**
-  - `scripts/security/reencrypt-credentials.ts` — Re-encriptação (OLD_KEY → NEW_KEY) de credenciais persistidas, inclusive `Setting` de integrações (`--model=Setting`). **Dry-run por padrão**: só grava com `--apply --snapshot-confirmed=<id>`. Usar apenas via runbook `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md`.
+  - `scripts/security/reencrypt-credentials.ts` — Re-encriptação (OLD_KEY → NEW_KEY) de credenciais persistidas, inclusive `Setting` de integrações (`--model=Setting`). **Dry-run por padrão**: só grava com `--apply --snapshot-confirmed=<id>`. Também cobre as sessões WhatsApp no Redis (`--target=redis-wa-auth`) e tem `--verify` somente leitura; sai com código 2 se houver linha ilegível (nunca gravada). Usar apenas via runbook `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md`.
   - `scripts/security/backfill-integration-settings-encryption.ts` — Cifra segredos de integração legados em texto puro (ADR-010). Dry-run por padrão; grava só com `--apply --snapshot-confirmed=<id>`.
   - `scripts/security/audit-secret-hygiene.ts` — Diagnóstico de entropia e conformidade sem vazamento de segredos.
   - `src/lib/security/credentialCrypto.ts` — Utilitário canônico de criptografia AES-256-GCM e sanitização de logs para conectores externos.
