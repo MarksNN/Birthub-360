@@ -30,12 +30,17 @@ export const universalNotificationsTool = new DynamicStructuredTool({
       .string()
       .max(65)
       .optional()
-      .describe('Texto ultra-curto (até 65 caracteres) otimizado para leitura rápida na tela do relógio (Smartwatch).'),
+      .describe(
+        'Texto ultra-curto (até 65 caracteres) otimizado para leitura rápida na tela do relógio (Smartwatch).',
+      ),
     kind: z
       .enum(['Info', 'Success', 'Warning', 'Alert'])
       .default('Info')
       .describe('Severidade visual da notificação.'),
-    userId: z.string().optional().describe('ID do usuário destinatário (vazio envia para toda a equipe da organização).'),
+    userId: z
+      .string()
+      .optional()
+      .describe('ID do usuário destinatário (vazio envia para toda a equipe da organização).'),
     leadId: z.string().optional().describe('ID do lead associado ao alerta (opcional).'),
   }),
   func: async ({ channels, title, message, wristSummary, kind, userId, leadId }) => {
@@ -84,7 +89,8 @@ export const universalNotificationsTool = new DynamicStructuredTool({
           title,
           body: message,
           smartwatchGlanceText: compactGlance,
-          hapticPattern: kind === 'Alert' || kind === 'Warning' ? 'urgent-double-pulse' : 'gentle-tap',
+          hapticPattern:
+            kind === 'Alert' || kind === 'Warning' ? 'urgent-double-pulse' : 'gentle-tap',
           androidWearOsBridged: true,
           appleWatchShortLookTitle: title.slice(0, 32),
           entityId: leadId ?? null,
@@ -102,7 +108,10 @@ export const universalNotificationsTool = new DynamicStructuredTool({
             });
             remotePushDispatched = res.ok;
           } catch (err) {
-            logger.warn({ err }, 'Push gateway externo indisponível; mantendo notificação sincronizada via app.');
+            logger.warn(
+              { err },
+              'Push gateway externo indisponível; mantendo notificação sincronizada via app.',
+            );
           }
         }
 

@@ -77,11 +77,7 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
   async run(inputData: string, sessionId?: string) {
     const { getLeadContextTool } = await import('../tools/crmTools.js');
 
-    const result = await this.runWithTools(
-      inputData,
-      [getLeadContextTool],
-      sessionId,
-    );
+    const result = await this.runWithTools(inputData, [getLeadContextTool], sessionId);
 
     return {
       proposal: result.output as string | undefined,

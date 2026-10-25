@@ -26,7 +26,10 @@ export const universalMeetingsTool = new DynamicStructuredTool({
     durationMinutes: z.number().min(10).max(240).default(30).describe('Duração em minutos.'),
     leadId: z.string().optional().describe('ID do lead convidado.'),
     attendeeEmails: z.array(z.string()).optional().describe('E-mails dos participantes.'),
-    transcript: z.string().optional().describe('Transcrição da reunião para síntese executiva e criação de follow-ups.'),
+    transcript: z
+      .string()
+      .optional()
+      .describe('Transcrição da reunião para síntese executiva e criação de follow-ups.'),
   }),
   func: async ({
     action,
@@ -45,28 +48,29 @@ export const universalMeetingsTool = new DynamicStructuredTool({
       }
 
       if (action === 'get_booking_links') {
-        const [bookingLinks, googleConn, m365Setting, zoomSetting, calendlySetting] = await Promise.all([
-          prisma.publicBookingLink.findMany({
-            where: { organizationId, active: true },
-            take: 10,
-          }),
-          prisma.googleWorkspaceConnection.findFirst({
-            where: { organizationId },
-            select: { email: true, scope: true },
-          }),
-          prisma.setting.findFirst({
-            where: { organizationId, key: 'integration.microsoft365' },
-            select: { value: true },
-          }),
-          prisma.setting.findFirst({
-            where: { organizationId, key: 'integration.zoom' },
-            select: { value: true },
-          }),
-          prisma.setting.findFirst({
-            where: { organizationId, key: 'integration.calendly' },
-            select: { value: true },
-          }),
-        ]);
+        const [bookingLinks, googleConn, m365Setting, zoomSetting, calendlySetting] =
+          await Promise.all([
+            prisma.publicBookingLink.findMany({
+              where: { organizationId, active: true },
+              take: 10,
+            }),
+            prisma.googleWorkspaceConnection.findFirst({
+              where: { organizationId },
+              select: { email: true, scope: true },
+            }),
+            prisma.setting.findFirst({
+              where: { organizationId, key: 'integration.microsoft365' },
+              select: { value: true },
+            }),
+            prisma.setting.findFirst({
+              where: { organizationId, key: 'integration.zoom' },
+              select: { value: true },
+            }),
+            prisma.setting.findFirst({
+              where: { organizationId, key: 'integration.calendly' },
+              select: { value: true },
+            }),
+          ]);
 
         const calendlyCfg = (calendlySetting?.value ?? {}) as Record<string, unknown>;
 
@@ -74,7 +78,10 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           {
             success: true,
             provedores: {
-              googleCalendarMeet: { conectado: Boolean(googleConn), email: googleConn?.email ?? null },
+              googleCalendarMeet: {
+                conectado: Boolean(googleConn),
+                email: googleConn?.email ?? null,
+              },
               microsoftTeamsCalendar: { conectado: Boolean(m365Setting?.value) },
               zoom: { conectado: Boolean(zoomSetting?.value) },
               calendly: {
@@ -106,12 +113,18 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           take: 15,
         });
 
-        return JSON.stringify({ success: true, total: meetings.length, upcomingMeetings: meetings }, null, 2);
+        return JSON.stringify(
+          { success: true, total: meetings.length, upcomingMeetings: meetings },
+          null,
+          2,
+        );
       }
 
       if (action === 'synthesize_transcript') {
         if (!transcript || transcript.trim().length < 20) {
-          return JSON.stringify({ error: 'Forneça a transcrição (transcript) da reunião para sintetizar.' });
+          return JSON.stringify({
+            error: 'Forneça a transcrição (transcript) da reunião para sintetizar.',
+          });
         }
 
         const synthesis = await generateStructuredOutput<{
@@ -146,7 +159,13 @@ export const universalMeetingsTool = new DynamicStructuredTool({
               },
               sentiment: { type: 'string', enum: ['positive', 'neutral', 'negative'] },
             },
-            required: ['executiveSummary', 'keyDecisions', 'objectionsRaised', 'nextSteps', 'sentiment'],
+            required: [
+              'executiveSummary',
+              'keyDecisions',
+              'objectionsRaised',
+              'nextSteps',
+              'sentiment',
+            ],
           },
           fallback: () => ({
             executiveSummary: transcript.slice(0, 300),
@@ -185,7 +204,9 @@ export const universalMeetingsTool = new DynamicStructuredTool({
       // action === 'schedule_meeting'
       const meetingTitle = (title || 'Reunião Comercial / Demonstração').trim();
       const start = startTime ? new Date(startTime) : new Date(Date.now() + 48 * 60 * 60 * 1000);
-      const safeStart = Number.isNaN(start.getTime()) ? new Date(Date.now() + 48 * 60 * 60 * 1000) : start;
+      const safeStart = Number.isNaN(start.getTime())
+        ? new Date(Date.now() + 48 * 60 * 60 * 1000)
+        : start;
       const end = new Date(safeStart.getTime() + durationMinutes * 60 * 1000);
 
       let meetingLink: string | null = null;
@@ -227,7 +248,10 @@ export const universalMeetingsTool = new DynamicStructuredTool({
               meetingLink = eventData.hangoutLink ?? null;
             }
           } catch (err) {
-            logger.warn({ err }, 'Falha ao criar evento direto no Google Calendar; registrando no CRM.');
+            logger.warn(
+              { err },
+              'Falha ao criar evento direto no Google Calendar; registrando no CRM.',
+            );
           }
         }
       } else if (provider === 'microsoft_teams') {
@@ -259,12 +283,18 @@ export const universalMeetingsTool = new DynamicStructuredTool({
               signal: AbortSignal.timeout(10000),
             });
             if (res.ok) {
-              const eventData = (await res.json()) as { id?: string; onlineMeeting?: { joinUrl?: string } };
+              const eventData = (await res.json()) as {
+                id?: string;
+                onlineMeeting?: { joinUrl?: string };
+              };
               externalEventId = eventData.id ?? null;
               meetingLink = eventData.onlineMeeting?.joinUrl ?? null;
             }
           } catch (err) {
-            logger.warn({ err }, 'Falha ao criar reunião no Microsoft Teams Graph API; registrando no CRM.');
+            logger.warn(
+              { err },
+              'Falha ao criar reunião no Microsoft Teams Graph API; registrando no CRM.',
+            );
           }
         }
       }

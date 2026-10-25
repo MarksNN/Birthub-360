@@ -37,7 +37,10 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
       .optional()
       .describe('Seções estruturadas para documento Word / Google Docs.'),
     // Para Excel / Google Sheets
-    sheetColumns: z.array(z.string()).optional().describe('Cabeçalhos das colunas da planilha Excel / Google Sheets.'),
+    sheetColumns: z
+      .array(z.string())
+      .optional()
+      .describe('Cabeçalhos das colunas da planilha Excel / Google Sheets.'),
     sheetRows: z
       .array(z.array(z.union([z.string(), z.number(), z.boolean(), z.null()])))
       .optional()
@@ -57,7 +60,9 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
     syncCloud: z
       .enum(['none', 'google_workspace', 'microsoft_365'])
       .default('none')
-      .describe('Se informado, tenta também criar o arquivo direto no Google Drive/Docs/Sheets/Slides ou OneDrive/M365.'),
+      .describe(
+        'Se informado, tenta também criar o arquivo direto no Google Drive/Docs/Sheets/Slides ou OneDrive/M365.',
+      ),
   }),
   func: async ({
     docType,
@@ -82,9 +87,15 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
       if (docType === 'word_or_gdoc') {
         const sections = documentSections?.length
           ? documentSections
-          : [{ heading: title, body: 'Documento comercial gerado automaticamente pelo Swarm BirthHub 360.' }];
+          : [
+              {
+                heading: title,
+                body: 'Documento comercial gerado automaticamente pelo Swarm BirthHub 360.',
+              },
+            ];
 
-        renderedContent = `# ${title}\n\n` + sections.map((s) => `## ${s.heading}\n\n${s.body}`).join('\n\n');
+        renderedContent =
+          `# ${title}\n\n` + sections.map((s) => `## ${s.heading}\n\n${s.body}`).join('\n\n');
         formatMetadata = {
           compatibleFormats: ['Microsoft Word (.docx)', 'Google Docs', 'Markdown (.md)'],
           sectionCount: sections.length,
@@ -129,7 +140,11 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
               {
                 slideNumber: 1,
                 title,
-                bullets: ['Visão Geral da Solução', 'Diagnóstico e Oportunidades', 'Próximos Passos e ROI'],
+                bullets: [
+                  'Visão Geral da Solução',
+                  'Diagnóstico e Oportunidades',
+                  'Próximos Passos e ROI',
+                ],
                 speakerNotes: 'Apresentação gerada pelo Swarm BirthHub 360.',
               },
             ];
@@ -164,7 +179,10 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
         });
         ingestedDocId = ingested.document.id;
       } catch (ingestErr) {
-        logger.warn({ ingestErr }, 'Fallback para criação direta de Note se a ingestão vetorial falhar.');
+        logger.warn(
+          { ingestErr },
+          'Fallback para criação direta de Note se a ingestão vetorial falhar.',
+        );
       }
 
       // Vincular ao Lead ou Empresa como Nota rica se aplicável

@@ -136,7 +136,13 @@ export class AgentExecutor {
     context: AgentExecutionContext,
     config: AgentExecutionConfig,
   ): Promise<AgentExecutionResult> {
-    const { agentType, sessionId, inputData, modelName = 'local-llama3-fast', temperature = 0.4 } = context;
+    const {
+      agentType,
+      sessionId,
+      inputData,
+      modelName = 'local-llama3-fast',
+      temperature = 0.4,
+    } = context;
     const { buildSystemPrompt, buildHumanMessage } = config;
 
     // Aplicar gates de segurança
@@ -201,7 +207,8 @@ export class AgentExecutor {
       };
     } catch (error: any) {
       logger.error({ err: error, sessionId, agentType }, 'Agent execution failed (without tools)');
-      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
+      const message =
+        error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
       return { error: message, sessionId };
     }
   }
@@ -263,7 +270,8 @@ export class AgentExecutor {
       };
     } catch (error: any) {
       logger.error({ err: error, sessionId, agentType }, 'Agent execution failed (with tools)');
-      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
+      const message =
+        error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
       return { error: message, sessionId };
     }
   }
