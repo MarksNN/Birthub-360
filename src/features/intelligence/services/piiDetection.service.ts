@@ -43,10 +43,9 @@ export function detectPII(text: string): PIIDetectionResult {
   let redactedText = text;
 
   for (const [type, pattern] of Object.entries(PII_PATTERNS)) {
-    let match;
     const regex = new RegExp(pattern.source, pattern.flags);
 
-    while ((match = regex.exec(text)) !== null) {
+    for (let match = regex.exec(text); match !== null; match = regex.exec(text)) {
       positions.push({
         type,
         start: match.index,
