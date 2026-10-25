@@ -95,6 +95,7 @@ export class PrismaCompanyRepository implements CompanyRepository {
       ];
     }
 
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     const [data, total] = await prisma.$transaction([
       prisma.company.findMany({
         where,

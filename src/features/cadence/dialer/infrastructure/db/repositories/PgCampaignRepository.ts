@@ -46,6 +46,7 @@ export class PgCampaignRepository implements CampaignRepository {
   async save(campaign: Campaign, organizationId?: string): Promise<void> {
     const props = campaign.toProps();
     const orgId = this.resolveOrganizationId(organizationId, props.organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     await this.prisma.$executeRaw(Prisma.sql`
       INSERT INTO campaigns (id, organization_id, name, status, created_at, updated_at)
       VALUES (
@@ -65,6 +66,7 @@ export class PgCampaignRepository implements CampaignRepository {
 
   async findById(id: string, organizationId?: string): Promise<Campaign | null> {
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<CampaignRow[]>(Prisma.sql`
       SELECT id, organization_id, name, status, created_at, updated_at
       FROM campaigns
@@ -76,6 +78,7 @@ export class PgCampaignRepository implements CampaignRepository {
 
   async findActive(organizationId?: string): Promise<Campaign[]> {
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<CampaignRow[]>(Prisma.sql`
       SELECT id, organization_id, name, status, created_at, updated_at
       FROM campaigns
@@ -87,6 +90,7 @@ export class PgCampaignRepository implements CampaignRepository {
 
   async findAll(organizationId?: string): Promise<Campaign[]> {
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<CampaignRow[]>(Prisma.sql`
       SELECT id, organization_id, name, status, created_at, updated_at
       FROM campaigns

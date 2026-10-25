@@ -77,6 +77,7 @@ export class ActivityService {
     const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.min(Math.floor(limit), 200) : 50;
     const skip = (safePage - 1) * safeLimit;
 
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     const [activities, total] = await prisma.$transaction([
       prisma.activity.findMany({
         where,

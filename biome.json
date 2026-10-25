@@ -135,5 +135,8 @@
       }
     }
   ],
-  "plugins": ["./biome-plugins/no-prisma-tx-escape.grit"]
+  "plugins": [
+    "./biome-plugins/no-prisma-tx-escape.grit",
+    "./biome-plugins/no-new-prisma-client.grit"
+  ]
 }
