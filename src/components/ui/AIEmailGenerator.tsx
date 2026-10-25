@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useActivePlaybook } from '../../hooks/useActivePlaybook.js';
 import { api } from '../../lib/api.js';
 import { SoundFX } from '../../lib/soundEffects.js';
+import { WhatsAppIcon } from '../brand/CompanyBrandIcon.js';
 import { Button } from './Button.js';
 
 type Channel = 'email' | 'call' | 'message';
@@ -519,7 +520,9 @@ function MessagePanel({
           htmlFor="msg-body"
           className="text-[10px] font-extrabold uppercase tracking-wider text-ink-2 block mb-1"
         >
-          <span className="inline-flex items-center gap-1"><WhatsAppIcon className="w-3 h-3 inline-block" /> Mensagem (WhatsApp / SMS)</span>
+          <span className="inline-flex items-center gap-1">
+            <WhatsAppIcon className="w-3 h-3 inline-block" /> Mensagem (WhatsApp / SMS)
+          </span>
         </label>
         <textarea
           id="msg-body"

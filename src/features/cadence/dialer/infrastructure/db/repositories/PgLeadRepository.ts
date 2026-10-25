@@ -79,6 +79,7 @@ export class PgLeadRepository implements LeadRepository {
 
   async findById(id: string, organizationId?: string): Promise<Lead | null> {
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<LeadRow[]>(Prisma.sql`
       SELECT id, organization_id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at
       FROM leads
@@ -108,6 +109,7 @@ export class PgLeadRepository implements LeadRepository {
       return [];
     }
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<LeadRow[]>(Prisma.sql`
       WITH candidates AS (
         SELECT id FROM leads
@@ -134,6 +136,7 @@ export class PgLeadRepository implements LeadRepository {
     organizationId?: string,
   ): Promise<boolean> {
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<{ exists: number }[]>(Prisma.sql`
       SELECT 1 AS exists FROM leads
       WHERE organization_id = ${orgId}
@@ -158,6 +161,7 @@ export class PgLeadRepository implements LeadRepository {
     contactRatePercent: number;
   }> {
     const orgId = this.resolveOrganizationId(organizationId);
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<
       {
         total_leads: string;
@@ -232,6 +236,7 @@ export class PgLeadRepository implements LeadRepository {
       )`;
     });
 
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     await this.prisma.$executeRaw(Prisma.sql`
       INSERT INTO leads (id, organization_id, campaign_id, name, phone, status, attempts, next_attempt_at, created_at, updated_at)
       VALUES ${Prisma.join(rowFragments)}

@@ -95,7 +95,10 @@ export const universalMessagingTool = tool(
 
       if (!message?.trim()) {
         return JSON.stringify(
-          { success: false, erro: 'O parâmetro message é obrigatório para enviar/propor mensagem.' },
+          {
+            success: false,
+            erro: 'O parâmetro message é obrigatório para enviar/propor mensagem.',
+          },
           null,
           2,
         );
@@ -183,7 +186,8 @@ export const universalMessagingTool = tool(
         });
         const tgConfig = tgSetting?.value as { botToken?: string; defaultChatId?: string } | null;
         const botToken = tgConfig?.botToken || process.env.TELEGRAM_BOT_TOKEN;
-        const chatId = recipientOrChannel || tgConfig?.defaultChatId || process.env.TELEGRAM_CHAT_ID;
+        const chatId =
+          recipientOrChannel || tgConfig?.defaultChatId || process.env.TELEGRAM_CHAT_ID;
 
         if (botToken && chatId && !leadId) {
           const res = await fetchWithTimeout(
