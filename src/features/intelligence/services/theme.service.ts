@@ -17,12 +17,14 @@ export async function getUserTheme(userId: string, organizationId: string): Prom
     where: { userId_organizationId: { userId, organizationId } },
   });
 
-  return theme || {
-    userId,
-    organizationId,
-    mode: 'light',
-    customTheme: null,
-  };
+  return (
+    theme || {
+      userId,
+      organizationId,
+      mode: 'light',
+      customTheme: null,
+    }
+  );
 }
 
 export async function setUserTheme(params: {
@@ -32,7 +34,9 @@ export async function setUserTheme(params: {
   customTheme?: string;
 }): Promise<void> {
   await prisma.userTheme.upsert({
-    where: { userId_organizationId: { userId: params.userId, organizationId: params.organizationId } },
+    where: {
+      userId_organizationId: { userId: params.userId, organizationId: params.organizationId },
+    },
     create: {
       userId: params.userId,
       organizationId: params.organizationId,

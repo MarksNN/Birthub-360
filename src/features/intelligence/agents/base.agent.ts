@@ -77,7 +77,8 @@ export abstract class BaseAgent {
     } catch (error: any) {
       // AgentExecutor já registra falha e retorna {error}, mas precisamos garantir
       // que a exceção não propague (contrato original de BaseAgent).
-      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
+      const message =
+        error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
       return { error: message, sessionId: sid };
     }
   }
@@ -118,7 +119,8 @@ export abstract class BaseAgent {
     } catch (error: any) {
       // AgentExecutor já registra falha e retorna {error}, mas precisamos garantir
       // que a exceção não propague (contrato original de BaseAgent).
-      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
+      const message =
+        error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
       return { error: message, sessionId: sid };
     }
   }

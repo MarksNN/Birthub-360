@@ -3,14 +3,14 @@ import { logger } from '../../../lib/logger.js';
 
 /**
  * Predição de Sucesso - Modelo que prevê probabilidade de sucesso antes de executar.
- * 
+ *
  * Analisa contexto da missão e histórico para prever:
  * - Probabilidade de conversão
  * - Probabilidade de erro
  * - Probabilidade de override humano
  * - Custo estimado
  * - Latência estimada
- * 
+ *
  * Permite decidir se vale a pena executar uma missão antes de gastar recursos.
  */
 
@@ -53,24 +53,22 @@ export interface PredictionFactor {
 /**
  * Prediz a probabilidade de sucesso de uma missão antes de executar.
  */
-export async function predictMissionSuccess(
-  context: MissionContext,
-): Promise<SuccessPrediction> {
+export async function predictMissionSuccess(context: MissionContext): Promise<SuccessPrediction> {
   const missionId = `mission-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   // Buscar histórico similar
   const historicalData = await getHistoricalMissionData(context);
-  
+
   // Calcular predições baseadas em fatores
   const factors = analyzeFactors(context, historicalData);
-  
+
   const conversionProbability = calculateConversionProbability(context, factors, historicalData);
   const errorProbability = calculateErrorProbability(context, factors, historicalData);
   const humanOverrideProbability = calculateOverrideProbability(context, factors, historicalData);
   const estimatedCostUsd = estimateCost(context, historicalData);
   const estimatedLatencyMs = estimateLatency(context, historicalData);
   const confidence = calculatePredictionConfidence(historicalData);
-  
+
   const recommendation = makeRecommendation(
     conversionProbability,
     errorProbability,
@@ -78,7 +76,7 @@ export async function predictMissionSuccess(
     estimatedCostUsd,
     confidence,
   );
-  
+
   const reasoning = generateReasoning(
     conversionProbability,
     errorProbability,
@@ -134,7 +132,7 @@ async function getHistoricalMissionData(
   });
 
   const total = logs.length;
-  const successful = logs.filter(l => l.success).length;
+  const successful = logs.filter((l) => l.success).length;
   const avgCost = total > 0 ? logs.reduce((sum, l) => sum + (l.costUsd || 0), 0) / total : 0;
   const avgLatency = total > 0 ? logs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / total : 0;
 
@@ -180,7 +178,7 @@ function analyzeFactors(
   if (context.leadStage) {
     const positiveStages = ['QUALIFIED', 'PROPOSAL', 'NEGOTIATION'];
     const negativeStages = ['NEW', 'CONTACTED', 'LOST'];
-    
+
     if (positiveStages.includes(context.leadStage)) {
       factors.push({
         factor: 'lead_stage',
@@ -207,7 +205,8 @@ function analyzeFactors(
         weight: 0.15,
         value: `Contato recente (${context.timeSinceLastContact}h atrás)`,
       });
-    } else if (context.timeSinceLastContact > 168) { // 7 dias
+    } else if (context.timeSinceLastContact > 168) {
+      // 7 dias
       factors.push({
         factor: 'recency',
         impact: 'negative',
@@ -305,7 +304,7 @@ function calculateErrorProbability(
 
   // Ajustar com histórico
   if (historical.total > 10) {
-    const errorRate = 1 - (historical.successful / historical.total);
+    const errorRate = 1 - historical.successful / historical.total;
     probability = (probability + errorRate) / 2;
   }
 
@@ -342,7 +341,7 @@ function estimateCost(
   if (historical.total > 0) {
     return historical.avgCost;
   }
-  
+
   // Fallback por agente
   const costsByAgent: Record<MissionContext['agentRole'], number> = {
     SDR: 0.02,
@@ -352,7 +351,7 @@ function estimateCost(
     OPS: 0.005,
     SUPERVISOR: 0.005,
   };
-  
+
   return costsByAgent[context.agentRole] || 0.01;
 }
 
@@ -366,7 +365,7 @@ function estimateLatency(
   if (historical.total > 0) {
     return historical.avgLatency;
   }
-  
+
   // Fallback por agente
   const latenciesByAgent: Record<MissionContext['agentRole'], number> = {
     SDR: 1500,
@@ -376,16 +375,19 @@ function estimateLatency(
     OPS: 500,
     SUPERVISOR: 300,
   };
-  
+
   return latenciesByAgent[context.agentRole] || 1000;
 }
 
 /**
  * Calcula confiança na predição.
  */
-function calculatePredictionConfidence(
-  historical: { total: number; successful: number; avgCost: number; avgLatency: number },
-): number {
+function calculatePredictionConfidence(historical: {
+  total: number;
+  successful: number;
+  avgCost: number;
+  avgLatency: number;
+}): number {
   if (historical.total < 5) return 0.3;
   if (historical.total < 20) return 0.5;
   if (historical.total < 50) return 0.7;
@@ -406,17 +408,17 @@ function makeRecommendation(
   if (conversionProbability < 0.2 && confidence > 0.5) {
     return 'SKIP';
   }
-  
+
   // Alto risco de erro e override
   if (errorProbability > 0.4 && humanOverrideProbability > 0.5) {
     return 'REQUIRE_APPROVAL';
   }
-  
+
   // Custo alto com baixa probabilidade
   if (estimatedCostUsd > 0.05 && conversionProbability < 0.4) {
     return 'DEFER';
   }
-  
+
   // Caso contrário, executar
   return 'EXECUTE';
 }
@@ -431,21 +433,21 @@ function generateReasoning(
   recommendation: SuccessPrediction['recommendation'],
   factors: PredictionFactor[],
 ): string {
-  const positiveFactors = factors.filter(f => f.impact === 'positive').map(f => f.value);
-  const negativeFactors = factors.filter(f => f.impact === 'negative').map(f => f.value);
-  
+  const positiveFactors = factors.filter((f) => f.impact === 'positive').map((f) => f.value);
+  const negativeFactors = factors.filter((f) => f.impact === 'negative').map((f) => f.value);
+
   let reasoning = `Probabilidade de conversão: ${(conversionProbability * 100).toFixed(1)}%. `;
-  
+
   if (positiveFactors.length > 0) {
     reasoning += `Fatores positivos: ${positiveFactors.join(', ')}. `;
   }
-  
+
   if (negativeFactors.length > 0) {
     reasoning += `Fatores negativos: ${negativeFactors.join(', ')}. `;
   }
-  
+
   reasoning += `Risco de erro: ${(errorProbability * 100).toFixed(1)}%, Risco de override: ${(humanOverrideProbability * 100).toFixed(1)}%. `;
-  
+
   switch (recommendation) {
     case 'EXECUTE':
       reasoning += 'Recomendação: EXECUTAR - os benefícios superam os riscos.';
@@ -460,6 +462,6 @@ function generateReasoning(
       reasoning += 'Recomendação: REQUER APROVAÇÃO - riscos altos, validar com humano.';
       break;
   }
-  
+
   return reasoning;
 }
