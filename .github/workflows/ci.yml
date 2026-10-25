@@ -224,6 +224,18 @@ jobs:
       - name: Run Migrations (para testes de integração)
         run: npx prisma migrate deploy
 
+      - name: Re-bootstrap pós-migrate (parecer 24 do PR #62)
+        # Produção re-roda o bootstrap depois das migrations (o script é idempotente). Sem este passo o
+        # CI só via bootstrap → migrate, ordem em que a migration 20261021000000 revoga por último e
+        # esconde uma regressão do script (DELETE em Organization devolvido ao app). A suíte de
+        # integração roda sobre este estado; tests/integration/db-restricted-table-privileges.test.ts
+        # ainda re-roda o script e confere has_table_privilege.
+        env:
+          PGPASSWORD: prospector_test_pass
+          APP_DB_PASSWORD: ci_app_test_pass
+          MIGRATOR_DB_PASSWORD: ci_migrator_test_pass
+        run: bash scripts/db/bootstrap-app-role.sh localhost 5434 prospector prospectordb_test
+
       - name: Golden Dataset live regression gate
         if: ${{ env.GROQ_API_KEY != '' || env.OPENAI_API_KEY != '' }}
         continue-on-error: true
@@ -266,6 +278,7 @@ jobs:
           ALLOWED_ORIGINS=$ALLOWED_ORIGINS
           AUTH_RATE_LIMIT_MAX=$AUTH_RATE_LIMIT_MAX
           PLATFORM_OPERATOR_TOKEN=$PLATFORM_OPERATOR_TOKEN
+          BOOTSTRAP_SUPERUSER_URL=postgresql://prospector:prospector_test_pass@localhost:5434/prospectordb_test
           EOF
 
       - name: Run Integration Tests (auth, RBAC and tenant isolation)
