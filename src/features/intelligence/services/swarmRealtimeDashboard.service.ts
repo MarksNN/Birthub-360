@@ -3,7 +3,7 @@ import { logger } from '../../../lib/logger.js';
 
 /**
  * Dashboard Real-time do Swarm
- * 
+ *
  * Monitoramento ao vivo de:
  * - Execuções em andamento
  * - Agentes ativos
@@ -45,9 +45,7 @@ export interface SwarmRealtimeStatus {
 /**
  * Busca status em tempo real do swarm para uma organização
  */
-export async function getSwarmRealtimeStatus(
-  organizationId: string,
-): Promise<SwarmRealtimeStatus> {
+export async function getSwarmRealtimeStatus(organizationId: string): Promise<SwarmRealtimeStatus> {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -76,9 +74,8 @@ export async function getSwarmRealtimeStatus(
     },
   });
 
-  const avgLatencyMs = aiLogs.length > 0
-    ? aiLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / aiLogs.length
-    : 0;
+  const avgLatencyMs =
+    aiLogs.length > 0 ? aiLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / aiLogs.length : 0;
   const totalCostUsd = aiLogs.reduce((sum, l) => sum + (l.costUsd || 0), 0);
 
   // Buscar memórias em andamento
@@ -110,12 +107,12 @@ export async function getSwarmRealtimeStatus(
       status: agentRunning.length > 0 ? 'running' : 'idle',
       activeSessions: agentRunning.length,
       lastExecution: agentExecutions.length > 0 ? agentExecutions[0].createdAt.toISOString() : null,
-      avgLatencyMs: agentLogs.length > 0
-        ? agentLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / agentLogs.length
-        : 0,
-      errorRate: agentLogs.length > 0
-        ? agentLogs.filter((l) => !l.success).length / agentLogs.length
-        : 0,
+      avgLatencyMs:
+        agentLogs.length > 0
+          ? agentLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / agentLogs.length
+          : 0,
+      errorRate:
+        agentLogs.length > 0 ? agentLogs.filter((l) => !l.success).length / agentLogs.length : 0,
     };
   }
 

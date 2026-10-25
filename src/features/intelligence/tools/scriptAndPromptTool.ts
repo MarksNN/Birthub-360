@@ -33,15 +33,24 @@ export const scriptAndPromptTool = new DynamicStructuredTool({
       .describe('Tipo de script comercial ou prompt de IA a gerar.'),
     targetAudienceOrPersona: z
       .string()
-      .describe('Cargo do decisor, nicho ou persona alvo (ex: CFO de Indústria, Diretor Comercial SaaS).'),
+      .describe(
+        'Cargo do decisor, nicho ou persona alvo (ex: CFO de Indústria, Diretor Comercial SaaS).',
+      ),
     objective: z
       .string()
-      .describe('Objetivo central do script ou do prompt (ex: agendar demo de 15 min, contornar objeção de preço).'),
-    leadId: z.string().optional().describe('ID do lead para personalizar com dados reais do CRM (opcional).'),
+      .describe(
+        'Objetivo central do script ou do prompt (ex: agendar demo de 15 min, contornar objeção de preço).',
+      ),
+    leadId: z
+      .string()
+      .optional()
+      .describe('ID do lead para personalizar com dados reais do CRM (opcional).'),
     saveToPromptLibrary: z
       .boolean()
       .default(true)
-      .describe('Se true, salva o artefato gerado na tabela Prompt da organização para reuso por qualquer agente.'),
+      .describe(
+        'Se true, salva o artefato gerado na tabela Prompt da organização para reuso por qualquer agente.',
+      ),
     promptTitle: z.string().optional().describe('Título para salvar na biblioteca de Prompts.'),
   }),
   func: async ({

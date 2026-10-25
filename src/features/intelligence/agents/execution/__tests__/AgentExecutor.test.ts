@@ -10,7 +10,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AgentExecutor, type AgentExecutionContext, type AgentExecutionConfig } from '../AgentExecutor.js';
+import {
+  AgentExecutor,
+  type AgentExecutionContext,
+  type AgentExecutionConfig,
+} from '../AgentExecutor.js';
 import { assertPiiExternalConsent } from '../../services/guardrails.service.js';
 import { assertAiBudgetNotExceeded } from '../../../../lib/ai/budget.js';
 import { ensureCheckpointerReady } from '../../../../lib/ai/checkpointer.js';
@@ -60,7 +64,7 @@ describe('AgentExecutor', () => {
     it('deve passar quando todos os gates estão OK', async () => {
       // Se não lançar exceção, o teste passa
       await AgentExecutor.executeWithoutTools(mockContext, mockConfig);
-      
+
       expect(assertPiiExternalConsent).toHaveBeenCalledWith(mockContext.organizationId);
       expect(assertAiBudgetNotExceeded).toHaveBeenCalled();
       expect(ensureCheckpointerReady).toHaveBeenCalled();
