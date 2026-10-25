@@ -1,7 +1,7 @@
 - De: 15 — Segurança Aplicada
 - Para: 24 — Revisão Independente (revisor técnico: 06 — Integrações e Bitrix)
 - Onda: 52
-- Status: aberto. PR #102 (branch `agente/15-integration-secrets-at-rest`), **24 BLOCKED em `aa4e0c22`** → rodada de correção empurrada por cima (fast-forward, sem force). O novo head é o commit que contém esta versão do handoff (`fix(security): 15 — correções do parecer 24/06 …`). Aguarda nova revisão do 24.
+- Status: aberto. PR #102 (branch `agente/15-integration-secrets-at-rest`), **24 BLOCKED em `aa4e0c22`** → rodada de correção empurrada por cima (fast-forward, sem force). O novo head é o commit que contém esta versão do handoff (`fix(security): 15 — correções do parecer 24/06 …`). Aguarda nova revisão do 24. **Head atual:** commit seguinte a `db02bd60` (`fix(security): 15 — gitleaks FP #6 …`), que só adiciona ao allowlist do `.gitleaks.toml` o regex ancorado `^sms-plain-key-0001$` (fixture de `integrationSettingsBackfill.test.ts:94`, falso-positivo `generic-api-key`); gitleaks 8.24.3 local em `--no-merges --first-parent acd6c614..HEAD`: no leaks found.
 - Prioridade: alto (achado ALTA)
 - Referências: diagnóstico do 15 "integration secrets at rest" (veredito ALTA), contrato 06↔15 (steering 1 e 2), `docs/ADR/ADR-010-integration-settings-at-rest.md`, #33 (KMS, Agente 21)
 
