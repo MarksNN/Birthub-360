@@ -160,11 +160,17 @@ export async function createCalendlyEvent(params: {
       inviteesEmails: data.resource.invitees.map((i: any) => i.email),
     };
 
-    logger.info({ connectionId, eventId: event.id }, '[Calendly] Evento criado');
+    logger.info(
+      { connectionId: params.connectionId, eventId: event.id },
+      '[Calendly] Evento criado',
+    );
 
     return event;
   } catch (error: any) {
-    logger.error({ err: error, connectionId }, '[Calendly] Erro ao criar evento');
+    logger.error(
+      { err: error, connectionId: params.connectionId },
+      '[Calendly] Erro ao criar evento',
+    );
     throw error;
   }
 }
