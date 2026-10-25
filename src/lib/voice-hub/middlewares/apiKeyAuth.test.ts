@@ -29,13 +29,6 @@ vi.mock('../services/authService.js', () => ({
   refreshSession: vi.fn(),
 }));
 
-vi.mock('../lib/prisma.js', () => ({
-  prisma: {
-    tenant: { upsert: vi.fn().mockResolvedValue({}) },
-    user: { upsert: vi.fn().mockResolvedValue({}) },
-  },
-}));
-
 vi.mock('@/lib/prisma.js', () => ({
   prisma: {
     tenant: { upsert: vi.fn().mockResolvedValue({}) },

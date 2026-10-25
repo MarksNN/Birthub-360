@@ -1,0 +1,32 @@
+{
+  "_comment": "Parecer 15 (#40 L1): usos legados de prisma.$queryRaw/$executeRaw/$transaction (client global) suprimidos com biome-ignore lint/plugin/no-prisma-tx-escape. A lista só pode diminuir: ao migrar um uso para runInTransaction, remova o biome-ignore e baixe a contagem aqui. Verificado por tests/unit/architecture/prisma-tx-escape-baseline.test.ts.",
+  "rule": "lint/plugin/no-prisma-tx-escape",
+  "total": 30,
+  "files": {
+    "src/bootstrap/healthchecks.ts": 1,
+    "src/bootstrap/workerServer.ts": 2,
+    "src/features/activities/infra/PrismaActivityRepository.ts": 2,
+    "src/features/activities/services/activity.service.ts": 1,
+    "src/features/billing/infra/PrismaUsageRepository.ts": 1,
+    "src/features/cadence/infra/PrismaCadenceRunRepository.ts": 1,
+    "src/features/companies/infra/PrismaCompanyRepository.ts": 1,
+    "src/features/contacts/infra/PrismaContactRepository.ts": 1,
+    "src/features/contacts/services/contact.service.ts": 1,
+    "src/features/crm360/infra/PrismaCrm360Repository.ts": 2,
+    "src/features/intelligence/infrastructure/PrismaAiSettingsRepository.ts": 1,
+    "src/features/intelligence/infrastructure/PrismaAssistantHistoryRepository.ts": 1,
+    "src/features/job-roles/services/agentCatalog.service.ts": 1,
+    "src/features/job-roles/services/jobRole.service.ts": 1,
+    "src/features/knowledge/infra/accountGraphRepository.ts": 1,
+    "src/features/knowledge/vector-support.ts": 1,
+    "src/features/notes/infra/PrismaNoteRepository.ts": 1,
+    "src/features/playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.ts": 1,
+    "src/features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.ts": 1,
+    "src/features/prospecting/outbound/server/db.ts": 2,
+    "src/lib/ai/usage-log.ts": 1,
+    "src/lib/db/transactionContext.ts": 1,
+    "src/lib/voice-hub/controllers/health.controller.ts": 1,
+    "src/lib/voice-hub/repositories/billingRepository.ts": 1,
+    "src/lib/voice-hub/repositories/sessionRepository.ts": 2
+  }
+}

@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { Prisma } from '@prisma/client';
 import { Pool } from 'pg';
 import {
   prisma,
@@ -292,8 +293,11 @@ describe('ressalvas do parecer 15 no #40 (X1/X2/X3)', () => {
   it('X1: audit que falha dentro do tx faz runInTransaction rejeitar e nada é commitado', async () => {
     const tag = 'x1-audit-fail';
     let companyId = '';
-    await expect(
-      rit(
+    // T1 (parecer 15 #40): exige o erro que de fato propaga, não um toThrow() genérico. O INSERT do
+    // audit é recusado pelo WITH CHECK do RLS (42501, insufficient_privilege) e o Prisma 7 com
+    // driver adapter o embrulha em PrismaClientKnownRequestError P2039, com o código do Postgres em
+    // meta.driverAdapterError.cause.code. Um 25P02 (tx abortado) ou um COMMIT silencioso falhariam aqui.
+    const err = await rit(
         async (tx) => {
           const c = await tx.company.create({ data: { legalName: tag, tradeName: tag } as never });
           companyId = c.id;
@@ -308,8 +312,18 @@ describe('ressalvas do parecer 15 no #40 (X1/X2/X3)', () => {
           return 'não deveria chegar aqui';
         },
         { organizationId: ORG_A },
-      ),
-    ).rejects.toThrow();
+      ).then(
+        () => {
+          throw new Error('runInTransaction deveria rejeitar com o erro do audit (X1)');
+        },
+        (e: unknown) => e,
+      );
+    expect(err).toBeInstanceOf(Prisma.PrismaClientKnownRequestError);
+    expect(err).toMatchObject({
+      code: 'P2039',
+      meta: { modelName: 'AuditLog', driverAdapterError: { cause: { code: '42501' } } },
+    });
+    expect((err as Error).message).toMatch(/row-level security policy for table "AuditLog"/);
     expect(companyId).not.toBe('');
     expect(await asTenant(ORG_A, `SELECT 1 FROM "Company" WHERE id=$1`, [companyId])).toHaveLength(
       0,
