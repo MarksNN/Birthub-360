@@ -1,11 +1,12 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
-import { prisma } from '../../../lib/prisma.js';
+import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
 import { notificationService } from '../../notifications/notification.service.js';
 import { sseService } from '../../notifications/sse.service.js';
-import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 /**
  * Dispatcher Universal de Notificações Multi-Dispositivo:
@@ -78,12 +79,12 @@ export const universalNotificationsTool = new DynamicStructuredTool({
       // 2. Push no Celular (Android Capacitor / iOS / FCM / Webhook Push gateway) + Relógio (Smartwatch)
       if (channels.includes('mobile_push') || channels.includes('smartwatch_wrist')) {
         const compactGlance = (wristSummary || `${title}: ${message}`).slice(0, 65);
-        const pushSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.push_gateway' },
-          select: { value: true },
-        });
-        const cfg = (pushSetting?.value ?? {}) as Record<string, unknown>;
-        const pushWebhookUrl = typeof cfg.webhookUrl === 'string' ? cfg.webhookUrl.trim() : '';
+        // URL do gateway (secret no catálogo — tópico ntfy é capability URL) decifrada só para o
+        // fetch; nunca entra em `deliveries` (que volta para o LLM).
+        // Ilegível ≠ não configurado: sem fetch e com aviso de reconfiguração (falha fechada).
+        const push = await integrationSettingsRepository.lookup(organizationId, 'push_wearables');
+        const pushWebhookUrl =
+          push.state === 'configured' ? (push.values.webhookUrl?.trim() ?? '') : '';
 
         const wearablePayload = {
           title,
@@ -120,6 +121,9 @@ export const universalNotificationsTool = new DynamicStructuredTool({
             queuedForMobileApp: true,
             remotePushGatewayDispatched: remotePushDispatched,
             priority: kind === 'Alert' ? 'high' : 'normal',
+            ...(push.state === 'unreadable'
+              ? { remotePushGateway: reconfigurationPayload('push_wearables', push.message) }
+              : {}),
           };
         }
 
@@ -134,13 +138,16 @@ export const universalNotificationsTool = new DynamicStructuredTool({
 
       // 3. Alerta SMS se solicitado
       if (channels.includes('sms_alert')) {
-        const smsSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.sms' },
-          select: { value: true },
-        });
-        const cfg = (smsSetting?.value ?? {}) as Record<string, unknown>;
+        // Estado por campo (`fields`), nunca `masked`: a máscara de ilegível é string não vazia.
+        const smsStatus = await integrationSettingsRepository.getStatus(organizationId, 'sms');
         deliveries.sms_alert = {
-          gatewayConfigured: Boolean(cfg.webhookUrl || cfg.accountSid),
+          gatewayConfigured: smsStatus.configured && smsStatus.fields.webhookUrl === 'set',
+          ...(smsStatus.unreadable
+            ? {
+                gatewayUnreadable: true,
+                acao: 'Credenciais de SMS ilegíveis — reconfigure a integração no Hub Universal.',
+              }
+            : {}),
           textPreview: `[BirthHub 360] ${title}: ${message}`.slice(0, 160),
         };
       }

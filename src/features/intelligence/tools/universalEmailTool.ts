@@ -2,9 +2,11 @@ import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/async-context.js';
 import { fetchWithTimeout } from '../../../lib/http.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { classifyEmailReplyIntent } from '../../cadence/infra/emailIntentClassifier.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 interface NormalizedInboxMessage {
   id: string;
@@ -50,10 +52,7 @@ export const universalEmailTool = tool(
             where: { organizationId },
             select: { email: true, scope: true, expiresAt: true },
           }),
-          prisma.setting.findFirst({
-            where: { organizationId, key: 'integration.microsoft365' },
-            select: { value: true },
-          }),
+          integrationSettingsRepository.getStatus(organizationId, 'microsoft365'),
           prisma.emailMessage.count({ where: { organizationId } }),
         ]);
 
@@ -73,7 +72,7 @@ export const universalEmailTool = tool(
                 leituraHabilitada: Boolean(googleConn?.scope?.includes('gmail.readonly')),
               },
               microsoft365OutlookGraph: {
-                conectado: Boolean(m365Setting?.value),
+                conectado: m365Setting.configured,
               },
             },
           },
@@ -181,10 +180,14 @@ export const universalEmailTool = tool(
       }
 
       // 3. Se houver configuração Microsoft 365 / Outlook Graph API em Setting, consultar /me/messages
-      const m365Setting = await prisma.setting.findFirst({
-        where: { organizationId, key: 'integration.microsoft365' },
-      });
-      const m365Val = m365Setting?.value as { accessToken?: string; email?: string } | null;
+      // Valor decifrado só server-side (header Authorization) — nunca volta para o LLM.
+      // Ilegível ≠ não configurado: sem chamada ao Graph e com aviso de reconfiguração.
+      const m365 = await integrationSettingsRepository.lookup(organizationId, 'microsoft365');
+      const m365Val = m365.state === 'configured' ? m365.values : null;
+      const integrationWarnings: Record<string, unknown>[] = [];
+      if (m365.state === 'unreadable') {
+        integrationWarnings.push(reconfigurationPayload('microsoft365', m365.message));
+      }
       if (m365Val?.accessToken) {
         try {
           const top = Math.min(limit, 10);
@@ -299,6 +302,7 @@ export const universalEmailTool = tool(
       return JSON.stringify(
         {
           success: true,
+          ...(integrationWarnings.length > 0 ? { integrationWarnings } : {}),
           totalEmailsLidos: unifiedMessages.length,
           oportunidadesQuentesDetectadas: hotOpportunities.length,
           oportunidadesClassificadasAoVivo: liveOpportunities,

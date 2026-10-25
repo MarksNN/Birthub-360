@@ -55,6 +55,16 @@ useDefault = true
 # nome do campo, mesmo padrão dos falsos-positivos #3/#4 acima. Path-based porque os valores de
 # fixture mudam conforme os testes evoluem (novos casos de sucesso/falha) — o caminho do arquivo é
 # o identificador estável, e o padrão já cobre qualquer teste futuro nesses dois diretórios.
+#
+# Falso-positivo conhecido #6 (PR #102, Agente 15, commit db02bd60): a fixture
+# `apiKey: 'sms-plain-key-0001'` em tests/unit/security/integrationSettingsBackfill.test.ts:94 é um
+# valor SINTÉTICO de "legado em texto puro" usado para testar o planejamento do backfill de cifra
+# (planSettingBackfill) — nenhuma chamada de rede, nenhum provedor real; o próprio nome diz que é
+# fixture. A regra `generic-api-key` casa por entropia (~3.5), mesmo padrão dos #3/#4/#5. Regex do
+# VALOR EXATO (ancorado), não path: o arquivo é um teste de segurança e deve continuar sendo
+# escaneado; o regex não cobre nenhum outro valor. Allowlist (e não `// gitleaks:allow` nem
+# .gitleaksignore) porque o literal já está no diff de db02bd60 e precisa ficar suprimido para
+# qualquer range que inclua esse commit, sem reescrever histórico.
 [allowlist]
 description = "Fixtures sintéticas de teste e falsos-positivos confirmados (não são segredos reais)"
 paths = [
@@ -67,6 +77,8 @@ paths = [
 regexes = [
   '''eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiIxMjM0NTY3ODkwIn0\.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U''',
   '''manualKnownUrl''',
+  # FP #6 — fixture do teste de backfill (ver comentário acima).
+  '''^sms-plain-key-0001$''',
 ]
 
 # ACHADO REAL, JÁ REMEDIADO (02/09/2026): commit 46833fd4 (branch de desenvolvimento, mergeado em

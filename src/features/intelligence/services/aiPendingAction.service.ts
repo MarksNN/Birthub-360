@@ -1,5 +1,6 @@
 import type { AIPendingAction } from '@prisma/client';
 import { MailerNotConfiguredError, sendEmail } from '../../../lib/email/mailer.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import type { ActivityType } from '../../../lib/zod.js';
@@ -14,7 +15,13 @@ import {
 export interface ExecutionResult {
   /** Mantido como `sent` por compatibilidade com a API/UI: true significa que a ação foi executada. */
   sent: boolean;
-  reason?: 'not_configured' | 'send_failed' | 'unsupported_action' | 'missing_owner';
+  reason?:
+    | 'not_configured'
+    | 'send_failed'
+    | 'unsupported_action'
+    | 'missing_owner'
+    /** Credencial do tenant existe mas não decifra — reconfigurar; nunca tratada como ausente. */
+    | 'credentials_unreadable';
 }
 
 interface SendEmailPayload {
@@ -211,12 +218,14 @@ export async function executeAction(action: ExecutableAction): Promise<Execution
       if (!action.organizationId || !payload.recipient || !payload.message) {
         return { sent: false, reason: 'unsupported_action' };
       }
-      const smsSetting = await prisma.setting.findFirst({
-        where: { organizationId: action.organizationId, key: 'integration.sms' },
-        select: { value: true },
-      });
-      const cfg = (smsSetting?.value ?? {}) as Record<string, unknown>;
-      const webhookUrl = typeof cfg.webhookUrl === 'string' ? cfg.webhookUrl.trim() : '';
+      // Repositório valida que action.organizationId == tenant do requestContext (sem bypassRls)
+      // e decifra o webhookUrl (secret no catálogo) só para este fetch.
+      // Ilegível ≠ não configurado: falha fechada com motivo próprio (sem fetch).
+      const sms = await integrationSettingsRepository.lookup(action.organizationId, 'sms');
+      if (sms.state === 'unreadable') {
+        return { sent: false, reason: 'credentials_unreadable' };
+      }
+      const webhookUrl = sms.state === 'configured' ? (sms.values.webhookUrl?.trim() ?? '') : '';
       if (!webhookUrl) {
         return { sent: false, reason: 'not_configured' };
       }
@@ -299,7 +308,9 @@ export async function executeAndRecord(action: ExecutableAction): Promise<Execut
                 ? 'Tipo de ação ou payload ainda não suportado pelo executor.'
                 : result.reason === 'missing_owner'
                   ? 'Lead sem responsável real definido no CRM — informe o responsável explicitamente para executar esta ação.'
-                  : null,
+                  : result.reason === 'credentials_unreadable'
+                    ? 'Credenciais da integração ilegíveis (falha de decifra) — reconfigure a integração no Hub Universal.'
+                    : null,
         },
   });
 

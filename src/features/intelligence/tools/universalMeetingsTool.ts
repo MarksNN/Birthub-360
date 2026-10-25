@@ -1,9 +1,11 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { generateStructuredOutput } from '../../../lib/ai/gateway.js';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
-import { generateStructuredOutput } from '../../../lib/ai/gateway.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 /**
  * Hub Universal de Reuniões e Agenda (Google Calendar/Meet, Microsoft Teams Meetings, Zoom, Calendly e Agendamento nativo).
@@ -58,21 +60,11 @@ export const universalMeetingsTool = new DynamicStructuredTool({
               where: { organizationId },
               select: { email: true, scope: true },
             }),
-            prisma.setting.findFirst({
-              where: { organizationId, key: 'integration.microsoft365' },
-              select: { value: true },
-            }),
-            prisma.setting.findFirst({
-              where: { organizationId, key: 'integration.zoom' },
-              select: { value: true },
-            }),
-            prisma.setting.findFirst({
-              where: { organizationId, key: 'integration.calendly' },
-              select: { value: true },
-            }),
+            // Só status (booleanos + campos públicos como schedulingUrl): este JSON vai ao LLM.
+            integrationSettingsRepository.getStatus(organizationId, 'microsoft365'),
+            integrationSettingsRepository.getStatus(organizationId, 'zoom'),
+            integrationSettingsRepository.getStatus(organizationId, 'calendly'),
           ]);
-
-        const calendlyCfg = (calendlySetting?.value ?? {}) as Record<string, unknown>;
 
         return JSON.stringify(
           {
@@ -82,11 +74,11 @@ export const universalMeetingsTool = new DynamicStructuredTool({
                 conectado: Boolean(googleConn),
                 email: googleConn?.email ?? null,
               },
-              microsoftTeamsCalendar: { conectado: Boolean(m365Setting?.value) },
-              zoom: { conectado: Boolean(zoomSetting?.value) },
+              microsoftTeamsCalendar: { conectado: m365Setting.configured },
+              zoom: { conectado: zoomSetting.configured },
               calendly: {
-                conectado: Boolean(calendlyCfg.schedulingUrl || calendlyCfg.apiKey),
-                schedulingUrl: calendlyCfg.schedulingUrl ?? null,
+                conectado: calendlySetting.configured,
+                schedulingUrl: calendlySetting.publicFields.schedulingUrl ?? null,
               },
             },
             publicBookingLinks: bookingLinks.map((b) => ({
@@ -211,6 +203,7 @@ export const universalMeetingsTool = new DynamicStructuredTool({
 
       let meetingLink: string | null = null;
       let externalEventId: string | null = null;
+      let integrationWarning: Record<string, unknown> | null = null;
 
       if (provider === 'google_meet') {
         const googleConn = await prisma.googleWorkspaceConnection.findFirst({
@@ -255,11 +248,12 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           }
         }
       } else if (provider === 'microsoft_teams') {
-        const m365Setting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.microsoft365' },
-          select: { value: true },
-        });
-        const cfg = (m365Setting?.value ?? {}) as Record<string, unknown>;
+        // Ilegível ≠ não configurado: sem chamada ao Graph; reunião fica só no CRM + aviso.
+        const m365 = await integrationSettingsRepository.lookup(organizationId, 'microsoft365');
+        if (m365.state === 'unreadable') {
+          integrationWarning = reconfigurationPayload('microsoft365', m365.message);
+        }
+        const cfg: Record<string, string> = m365.state === 'configured' ? m365.values : {};
         const accessToken = typeof cfg.accessToken === 'string' ? cfg.accessToken.trim() : '';
         if (accessToken) {
           try {
@@ -321,6 +315,7 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           endTime: end.toISOString(),
           meetingLink,
           externalEventId,
+          ...(integrationWarning ? { integrationWarning } : {}),
         },
         null,
         2,
