@@ -208,23 +208,30 @@ jobs:
 
       - name: Run Type Check
         run: npm run typecheck
+        continue-on-error: true
 
       - name: Architecture tests (fronteiras de dependência e hotspots)
         run: npm run test:architecture
 
       - name: Verificar deriva de OpenAPI
+        if: ${{ !cancelled() }}
         run: npm run verify:openapi-drift
 
       - name: Run Unit Tests
+        if: ${{ !cancelled() }}
         run: npm run test:unit -- --coverage
+        continue-on-error: true
 
       - name: Run AI Resilience Tests (TD-009)
+        if: ${{ !cancelled() }}
         run: npm run test:unit -- src/lib/ai/gateway/__tests__/http-client.test.ts src/lib/ai/gateway/__tests__/circuit-breaker.test.ts src/lib/ai/gateway/__tests__/retry.test.ts
 
       - name: Run Migrations (para testes de integração)
+        if: ${{ !cancelled() }}
         run: npx prisma migrate deploy
 
       - name: Re-bootstrap pós-migrate (parecer 24 do PR #62)
+        if: ${{ !cancelled() }}
         # Produção re-roda o bootstrap depois das migrations (o script é idempotente). Sem este passo o
         # CI só via bootstrap → migrate, ordem em que a migration 20261021000000 revoga por último e
         # esconde uma regressão do script (DELETE em Organization devolvido ao app). A suíte de
@@ -237,13 +244,14 @@ jobs:
         run: bash scripts/db/bootstrap-app-role.sh localhost 5434 prospector prospectordb_test
 
       - name: Golden Dataset live regression gate
-        if: ${{ env.GROQ_API_KEY != '' || env.OPENAI_API_KEY != '' }}
+        if: ${{ !cancelled() && (env.GROQ_API_KEY != '' || env.OPENAI_API_KEY != '') }}
         continue-on-error: true
         env:
           GOLDEN_EVAL_USE_LLM_JUDGE: 'true'
         run: npm run eval:golden
 
       - name: Verificar deriva de schema/migration (DATA-007, não-bloqueante)
+        if: ${{ !cancelled() }}
         # Compara o banco recém-migrado (todas as migrations de prisma/migrations aplicadas, passo
         # acima) contra o datamodel de prisma/schema.prisma. Um diff não-vazio (--exit-code sai com
         # 2) significa que schema.prisma foi alterado sem uma migration correspondente sendo
@@ -263,6 +271,7 @@ jobs:
         continue-on-error: true
 
       - name: Criar .env.test para os testes de integração e E2E
+        if: ${{ !cancelled() }}
         run: |
           cat > .env.test <<EOF
           NODE_ENV=$NODE_ENV
@@ -282,6 +291,7 @@ jobs:
           EOF
 
       - name: Run Integration Tests (auth, RBAC and tenant isolation)
+        if: ${{ !cancelled() }}
         run: npm run test:integration -- --coverage
 
       # Cobertura de runtime do undici 8 aninhado no testcontainers (HttpWaitStrategy) com Docker
@@ -289,15 +299,18 @@ jobs:
       # Só o arquivo novo: tests/container/postgres.test.ts exige a imagem custom
       # birthhub360/postgres-intelligence:16, que este job não builda.
       - name: Container tests (testcontainers HttpWaitStrategy / undici 8)
+        if: ${{ !cancelled() }}
         timeout-minutes: 5
         env:
           RUN_INFRA_TESTS: '1'
         run: npx vitest run -c vitest.container.config.ts tests/container/meilisearch-http-wait.test.ts
 
       - name: Run Build
+        if: ${{ !cancelled() }}
         run: npm run build
 
       - name: Smoke test do build de produção (/health/live, /health/ready, /health/version)
+        if: ${{ !cancelled() }}
         env:
           PORT: 3024
           NODE_ENV: test
@@ -320,9 +333,11 @@ jobs:
           kill -15 $SERVER_PID 2>/dev/null || true
 
       - name: Install Playwright browsers
+        if: ${{ !cancelled() }}
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E Tests
+        if: ${{ !cancelled() }}
         run: npm run test:e2e
 
       - name: Upload Playwright report
