@@ -1,13 +1,17 @@
 {
-  "_comment": "Parecer 15 (#40 L1): usos legados de prisma.$queryRaw/$executeRaw/$transaction (client global) suprimidos com biome-ignore lint/plugin/no-prisma-tx-escape. A lista só pode diminuir: ao migrar um uso para runInTransaction, remova o biome-ignore e baixe a contagem aqui. Verificado por tests/unit/architecture/prisma-tx-escape-baseline.test.ts.",
+  "_comment": "Parecer 15 (#40 L1): usos legados de $queryRaw/$executeRaw/$transaction no client global (prisma.$x, this.prisma.$x e nomes pontilhados terminados em prisma; parecer 15 #75 A1) suprimidos com biome-ignore lint/plugin/no-prisma-tx-escape. A lista só pode diminuir: ao migrar um uso para runInTransaction, remova o biome-ignore e baixe a contagem aqui. Verificado por tests/unit/architecture/prisma-tx-escape-baseline.test.ts.",
   "rule": "lint/plugin/no-prisma-tx-escape",
-  "total": 30,
+  "total": 44,
   "files": {
     "src/bootstrap/healthchecks.ts": 1,
     "src/bootstrap/workerServer.ts": 2,
     "src/features/activities/infra/PrismaActivityRepository.ts": 2,
     "src/features/activities/services/activity.service.ts": 1,
     "src/features/billing/infra/PrismaUsageRepository.ts": 1,
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgCallAttemptRepository.ts": 4,
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgCampaignRepository.ts": 4,
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgDncRepository.ts": 2,
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgLeadRepository.ts": 5,
     "src/features/cadence/infra/PrismaCadenceRunRepository.ts": 1,
     "src/features/companies/infra/PrismaCompanyRepository.ts": 1,
     "src/features/contacts/infra/PrismaContactRepository.ts": 1,
@@ -24,7 +28,6 @@
     "src/features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.ts": 1,
     "src/features/prospecting/outbound/server/db.ts": 2,
     "src/lib/ai/usage-log.ts": 1,
-    "src/lib/db/transactionContext.ts": 1,
     "src/lib/voice-hub/controllers/health.controller.ts": 1,
     "src/lib/voice-hub/repositories/billingRepository.ts": 1,
     "src/lib/voice-hub/repositories/sessionRepository.ts": 2
