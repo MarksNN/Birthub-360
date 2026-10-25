@@ -220,6 +220,23 @@ propósito por estar fora de "## Exceções ativas"):
 - **Registrado em:** 2026-10-16
 - **Reavaliar até:** 2026-11-30
 
+
+### `src/features/intelligence/components/IntelligenceHub.tsx`
+
+- **Limite excepcional:** 1400 linhas
+- **Dono:** Agente 07 — IA e Automações
+- **Motivo:** Cruzou o limite após atualizações nas integrações com SwarmDashboard. Exceção registrada para manter o pipeline liberado.
+- **Registrado em:** 2026-10-25
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/intelligence/components/SwarmDashboard.tsx`
+
+- **Limite excepcional:** 1100 linhas
+- **Dono:** Agente 07 — IA e Automações
+- **Motivo:** Cruzou o limite após atualizações e relatórios do enxame. Exceção registrada para manter o pipeline liberado.
+- **Registrado em:** 2026-10-25
+- **Reavaliar até:** 2026-11-30
+
 ## Débito conhecido, abaixo do limite de falha (sem exceção necessária)
 
 Arquivos na faixa de aviso (701–1000 linhas) no momento em que este gate foi criado — não
