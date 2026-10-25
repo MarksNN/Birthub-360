@@ -5,10 +5,7 @@
 -- 2) Triggers da cadeia e do head: sem exceção de cascata. DELETE só com o marcador de retenção
 --    `app.lgpd_chain_retention_org` = organizationId da linha, numa sessão que NÃO é do app
 --    (session_user <> prospector_app). O app também não tem DELETE nessas tabelas (REVOKE).
--- 3) prospector_app perde DELETE/TRUNCATE em Organization. Re-rodar o bootstrap NÃO devolve o grant:
---    scripts/db/create-app-role.sql exclui Organization do DELETE no loop e re-aplica o REVOKE no
---    hook final db_apply_restricted_table_privileges (parecer 24 do PR #62; teste em
---    tests/integration/db-restricted-table-privileges.test.ts).
+-- 3) prospector_app perde DELETE/TRUNCATE em Organization (também em scripts/db/create-app-role.sql).
 
 -- A migration anterior revoga EXECUTE destas funções no dono. No CI ou migrações subsequentes,
 -- ALTER TABLE pode revalidar o trigger e falhar com 42501 se o EXECUTE não voltar para o dono.

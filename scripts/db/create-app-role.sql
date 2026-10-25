@@ -251,6 +251,11 @@ $$;
 -- vale mesmo se a tabela tiver sido recriada por migration (herdando DELETE do default) ou se alguém
 -- tiver dado o grant na mão. No-op para tabela que ainda não existe (bootstrap antes do migrate; a
 -- migration 20261021000000 faz o mesmo REVOKE ao criar o regime).
+-- Nota sobre a migration 20261021000000 (já aplicada; arquivo NÃO editado para preservar o checksum
+-- em _prisma_migrations): o item 3) do cabeçalho dela diz que o REVOKE vale "também em
+-- scripts/db/create-app-role.sql". Até o PR #70 isso era falso (o loop devolvia DELETE); a partir
+-- daqui é verdade por causa da exclusão no loop e deste hook (teste:
+-- tests/integration/db-restricted-table-privileges.test.ts).
 DO $db_apply_restricted_table_privileges$
 DECLARE
     t text;
