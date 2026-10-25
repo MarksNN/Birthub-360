@@ -44,11 +44,14 @@ export async function analyzeAgentCosts(
     },
   });
 
-  const agentStats = new Map<string, { 
-    count: number; 
-    totalCost: number; 
-    totalTokens: number; 
-  }>();
+  const agentStats = new Map<
+    string,
+    {
+      count: number;
+      totalCost: number;
+      totalTokens: number;
+    }
+  >();
 
   for (const log of aiLogs) {
     const agent = log.agentRole || 'UNKNOWN';
@@ -71,7 +74,7 @@ export async function analyzeAgentCosts(
   }));
 
   const totalCostUsd = agents.reduce((sum, a) => sum + a.totalCostUsd, 0);
-  
+
   agents.sort((a, b) => b.totalCostUsd - a.totalCostUsd);
 
   return {
@@ -80,8 +83,11 @@ export async function analyzeAgentCosts(
     agents,
     totalCostUsd,
     mostExpensiveAgent: agents[0]?.agentType || 'Nenhum',
-    mostEfficientAgent: agents.length > 0 
-      ? agents.reduce((min, curr) => curr.avgCostPerExecution < min.avgCostPerExecution ? curr : min).agentType
-      : 'Nenhum',
+    mostEfficientAgent:
+      agents.length > 0
+        ? agents.reduce((min, curr) =>
+            curr.avgCostPerExecution < min.avgCostPerExecution ? curr : min,
+          ).agentType
+        : 'Nenhum',
   };
 }

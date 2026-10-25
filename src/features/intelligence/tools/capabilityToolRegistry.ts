@@ -10,11 +10,7 @@ import { cadenceTool, forecastTool, pipelineManagementTool } from './commercialT
 import { companyDiscoveryTool } from './companyDiscoveryTool.js';
 import { inspectContractReadinessTool } from './contractInspectionTool.js';
 import { copywriterTool } from './copywriterTool.js';
-import {
-  getLeadContextTool,
-  searchLeadsTool,
-  updateLeadQualificationTool,
-} from './crmTools.js';
+import { getLeadContextTool, searchLeadsTool, updateLeadQualificationTool } from './crmTools.js';
 import { checkDealHealthTool } from './dealHealthTool.js';
 import { cnpjLookupTool, multiCrmSyncTool, slackNotificationTool } from './integrationTools.js';
 import { leadEnrichmentTool } from './leadEnrichmentTool.js';

@@ -84,18 +84,9 @@ export function GmailIcon({ className = 'w-5 h-5', size, ...props }: BrandIconPr
         d="M2 6.5C2 5.12 3.12 4 4.5 4L12 9.5 19.5 4c1.38 0 2.5 1.12 2.5 2.5V8L12 14.5 2 8V6.5z"
         fill="#EA4335"
       />
-      <path
-        d="M2 8v9.5C2 18.88 3.12 20 4.5 20h2V9.5L2 8z"
-        fill="#4285F4"
-      />
-      <path
-        d="M22 8v9.5c0 1.38-1.12 2.5-2.5 2.5h-2V9.5L22 8z"
-        fill="#34A853"
-      />
-      <path
-        d="M17.5 20h2c1.38 0 2.5-1.12 2.5-2.5V8l-4.5 3.5V20z"
-        fill="#FBBC05"
-      />
+      <path d="M2 8v9.5C2 18.88 3.12 20 4.5 20h2V9.5L2 8z" fill="#4285F4" />
+      <path d="M22 8v9.5c0 1.38-1.12 2.5-2.5 2.5h-2V9.5L22 8z" fill="#34A853" />
+      <path d="M17.5 20h2c1.38 0 2.5-1.12 2.5-2.5V8l-4.5 3.5V20z" fill="#FBBC05" />
     </svg>
   );
 }
@@ -419,7 +410,12 @@ export interface CompanyBrandIconProps extends BrandIconProps {
   name: string;
 }
 
-export const CompanyBrandIcon: React.FC<CompanyBrandIconProps> = ({ name, className = 'w-5 h-5', size, ...props }) => {
+export const CompanyBrandIcon: React.FC<CompanyBrandIconProps> = ({
+  name,
+  className = 'w-5 h-5',
+  size,
+  ...props
+}) => {
   const norm = name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
   if (norm.includes('whatsapp') || norm === 'wpp') {
