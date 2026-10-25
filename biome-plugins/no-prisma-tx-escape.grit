@@ -1,9 +1,15 @@
 // Parecer 15 (#40): SQL cru e $transaction no client GLOBAL escapam do tx do runInTransaction
 // (outra conexão, sem app.current_tenant_id). Defesa estática complementar ao G1 (runtime,
-// src/lib/txEscapeGuard.ts). "warn" enquanto houver usos legados (~51); subir para "error" após
-// migrá-los para runInTransaction. Não pega aliases (const db = prisma).
+// src/lib/txEscapeGuard.ts). "error" para código novo (L1); os usos legados ficam congelados com
+// biome-ignore em biome-plugins/no-prisma-tx-escape.baseline.json, que só pode diminuir (teste em
+// tests/unit/architecture/prisma-tx-escape-baseline.test.ts). Pega prisma.$x, this.prisma.$x,
+// this.deps.prisma.$x e qualquer nome pontilhado terminado em prisma/Prisma (A1 do parecer 15 no
+// #75). Não pega tx.$x nem aliases livres (const db = prisma), cobertos pelo G1 em runtime.
+// Use só grupos não-capturantes (?:...) nas regex: grupo de captura sem nome degrada a regra para
+// info em silêncio (S3 do parecer 15; o teste de baseline roda o biome num fixture para pegar isso).
 `$obj.$prop` where {
-  $obj <: `prisma`,
-  $prop <: r"^[^a-zA-Z_](queryRaw|executeRaw|queryRawUnsafe|executeRawUnsafe|queryRawTyped|runCommandRaw|transaction)$"($method),
-  register_diagnostic(span=$prop, message="parecer 15 (#40): SQL cru ou transaction no client global escapa do tx; use runInTransaction e o tx recebido.", severity="warn")
+  $obj <: or { `prisma`, `$_.prisma`, r"^(?:[\w$]+\.)*[\w$]*[pP]risma$" },
+  $prop <: r"^\$(?:queryRaw|executeRaw|queryRawUnsafe|executeRawUnsafe|queryRawTyped|runCommandRaw|transaction)$",
+  not $filename <: r".*src/lib/prisma\.ts$",
+  register_diagnostic(span=$prop, message="parecer 15 (#40): SQL cru ou transaction no client global escapa do tx; use runInTransaction e o tx recebido.", severity="error")
 }

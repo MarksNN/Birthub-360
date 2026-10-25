@@ -88,6 +88,7 @@ export async function createInboundPhoneSessionIfNoneForCallSid(
   metadata: unknown,
 ) {
   try {
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     return await prisma.$transaction(
       async (tx) => {
         const existing = await tx.session.findFirst({
@@ -140,6 +141,7 @@ export async function createOutboundPhoneSessionIfNoneInFlight(
   toNumber: string,
   metadata: unknown,
 ) {
+  // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
   return prisma.$transaction(
     async (tx) => {
       const inFlight = await tx.session.findFirst({

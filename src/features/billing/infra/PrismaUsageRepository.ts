@@ -25,6 +25,7 @@ export class PrismaUsageRepository implements UsageRepository {
   }
 
   async groupByDay(organizationId: string, since: Date): Promise<UsagePoint[]> {
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     const rows = await prisma.$queryRaw<
       Array<{ day: string; tokens: number | bigint; cost: number; calls: number | bigint }>
     >(Prisma.sql`

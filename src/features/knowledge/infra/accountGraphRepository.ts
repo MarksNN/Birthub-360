@@ -152,6 +152,7 @@ export class PrismaAccountGraphRepository implements AccountGraphRepository {
 
   async purgeNode(organizationId: string, nodeId: string): Promise<number> {
     return withTenantContext(organizationId, async () => {
+      // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
       const [edges] = await prisma.$transaction([
         prisma.accountGraphEdge.deleteMany({
           where: { organizationId, OR: [{ sourceId: nodeId }, { targetId: nodeId }] },
