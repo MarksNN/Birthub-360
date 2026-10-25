@@ -11,6 +11,7 @@ import { assertAiBudgetNotExceeded } from '../budget.js';
 import { recordAiUsageCost } from '../metrics.js';
 import { tokenQuotaService } from '../finops/tokenQuota.service.js';
 import { detectPII, detectToxicity } from '../guardrails/index.js';
+import { logger } from '../../logger.js';
 import { resolveFallbackTimeoutMs } from './http-client.js';
 import { resolveModelName } from './model-routing.js';
 import { toChatCompletionMessages } from './parsing.js';

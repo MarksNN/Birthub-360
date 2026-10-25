@@ -68,22 +68,43 @@ export const groqProvider: ProviderAdapter = {
 
         return result;
       } catch (err: any) {
-        const msg = String(err?.message || err);
-        // Preserva erro 429 útil caso um modelo posterior falhe com 404 genérico
+        const msg = String(err?.message || err).toLowerCase();
+
+        if (
+          msg.includes('econnrefused') ||
+          msg.includes('enotfound') ||
+          msg.includes('etimedout') ||
+          msg.includes('offline') ||
+          msg.includes('fetch failed') ||
+          msg.includes('network') ||
+          err.cause
+        ) {
+          throw err;
+        }
+
+        if (
+          msg.includes('401') ||
+          msg.includes('403') ||
+          (msg.includes('400') && !msg.includes('does not exist') && !msg.includes('not have access'))
+        ) {
+          throw err;
+        }
+
         if (!lastError || msg.includes('429')) {
           lastError = err;
         }
-        // Se for erro de quota de modelo específico (429), modelo não acessível nesta chave (404 / does not exist) ou resposta vazia/degenerada, tenta o próximo modelo candidato
+
         if (
           msg.includes('429') ||
           msg.includes('404') ||
           msg.includes('does not exist') ||
           msg.includes('not have access') ||
           msg.includes('tokens per day') ||
-          msg.includes('TPD') ||
-          msg.includes('Rate limit reached for model')
+          msg.includes('tpd') ||
+          msg.includes('rate limit reached for model') ||
+          msg.includes('resposta vazia')
         ) {
-          if (msg.includes('429') && !msg.includes('TPD') && !msg.includes('tokens per day')) {
+          if (msg.includes('429') && !msg.includes('tpd') && !msg.includes('tokens per day')) {
             const match = msg.match(/try again in ([0-9.]+)s/i);
             const waitMs = match ? Math.ceil(Number(match[1]) * 1000) + 200 : 1500;
             await new Promise((resolve) => setTimeout(resolve, Math.min(waitMs, 5000)));
