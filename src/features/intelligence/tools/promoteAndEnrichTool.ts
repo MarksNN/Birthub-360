@@ -71,8 +71,6 @@ export const promoteAndEnrichTool = tool(
             ? {
                 name: contactName,
                 role: contactRole || 'Decisor',
-                email: contactEmail,
-                phone: contactPhone,
               }
             : undefined,
         });

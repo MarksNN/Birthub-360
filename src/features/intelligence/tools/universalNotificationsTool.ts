@@ -53,13 +53,21 @@ export const universalNotificationsTool = new DynamicStructuredTool({
 
       const deliveries: Record<string, unknown> = {};
 
+      const kindMap = {
+        Info: 'Info' as const,
+        Success: 'Sucesso' as const,
+        Warning: 'Alerta' as const,
+        Alert: 'Alerta' as const,
+      };
+      const notificationKind = kindMap[kind] ?? 'Info';
+
       // 1. In-App Pop-up / Sino + Stream SSE em tempo real
       if (channels.includes('in_app_popup')) {
         const created = await notificationService.create({
           organizationId,
           title,
           body: message,
-          kind,
+          kind: notificationKind,
           entity: leadId ? 'lead' : 'swarm',
           entityId: leadId ?? null,
           userId: userId ?? null,

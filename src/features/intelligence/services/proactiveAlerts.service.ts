@@ -102,12 +102,11 @@ export async function calculateAgentHealthMetrics(
       createdAt: { gte: since },
     },
     select: {
-      status: true,
+      approved: true,
+      discardedAt: true,
     },
   });
 
-  const humanOverrides = pendingActions.filter(
-    (a) => a.status === 'REJECTED' || a.status === 'MODIFIED',
   ).length;
   const humanOverrideRate = pendingActions.length > 0 ? humanOverrides / pendingActions.length : 0;
 

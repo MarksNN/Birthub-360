@@ -178,7 +178,7 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
           sourceType: 'file',
           sourceName: `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
         });
-        ingestedDocId = ingested.document.id;
+        ingestedDocId = ingested.id;
       } catch (ingestErr) {
         logger.warn(
           { ingestErr },
@@ -187,14 +187,20 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
       }
 
       // Vincular ao Lead ou Empresa como Nota rica se aplicável
-      if (leadId || companyId) {
+      if (leadId) {
         await prisma.note.create({
           data: {
-            organizationId,
-            targetType: leadId ? 'lead' : 'company',
-            targetId: (leadId || companyId)!,
-            text: renderedContent.slice(0, 4000),
-            authorName: 'Swarm Office Suite',
+            leadId,
+            content: renderedContent.slice(0, 4000),
+            author: 'Swarm Office Suite',
+          },
+        });
+      } else if (companyId) {
+        await prisma.note.create({
+          data: {
+            companyId,
+            content: renderedContent.slice(0, 4000),
+            author: 'Swarm Office Suite',
           },
         });
       }

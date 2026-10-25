@@ -46,7 +46,7 @@ export function recordEnhancedFailure(organizationId: string, agentType: string)
 
   if (state.failureCount >= 5) {
     state.state = 'OPEN';
-    state.degradationLevel = Math.min(state.degradationLevel + 1, 3);
+    state.degradationLevel = Math.min(state.degradationLevel + 1, 3) as 0 | 1 | 2 | 3;
   }
 
   states.set(key, state);
@@ -66,7 +66,7 @@ export function recordEnhancedSuccess(organizationId: string, agentType: string)
 
   if (state.state === 'HALF_OPEN' && state.successCount >= 5) {
     state.state = 'CLOSED';
-    state.degradationLevel = Math.max(state.degradationLevel - 1, 0);
+    state.degradationLevel = Math.max(state.degradationLevel - 1, 0) as 0 | 1 | 2 | 3;
     state.failureCount = 0;
     state.successCount = 0;
   }

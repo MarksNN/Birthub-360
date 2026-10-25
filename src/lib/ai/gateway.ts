@@ -111,6 +111,7 @@ export async function generateStructuredOutput<T>(options: {
   systemInstruction?: string;
   prompt: string;
   schema?: unknown;
+  fallback?: () => T;
 }): Promise<T> {
   const model = getAiModel(options.feature || 'general');
   const messages = [

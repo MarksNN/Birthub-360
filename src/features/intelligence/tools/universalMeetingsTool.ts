@@ -85,7 +85,7 @@ export const universalMeetingsTool = new DynamicStructuredTool({
               id: b.id,
               slug: b.slug,
               title: b.title,
-              durationMinutes: b.durationMinutes,
+              durationMinutes: b.durationMin,
             })),
           },
           null,
@@ -97,7 +97,7 @@ export const universalMeetingsTool = new DynamicStructuredTool({
         const meetings = await prisma.activity.findMany({
           where: {
             organizationId,
-            type: 'Meeting',
+            type: 'Reuniao',
             ...(leadId ? { leadId } : {}),
             date: { gte: new Date() },
           },
@@ -172,11 +172,9 @@ export const universalMeetingsTool = new DynamicStructuredTool({
         if (leadId) {
           await prisma.note.create({
             data: {
-              organizationId,
-              targetType: 'lead',
-              targetId: leadId,
-              text: `### Ata de Reunião (${provider})\n${synthesis.executiveSummary}\n\n**Decisões:** ${synthesis.keyDecisions.join('; ')}\n**Objeções:** ${synthesis.objectionsRaised.join('; ')}`,
-              authorName: 'Swarm Meeting Intelligence',
+              leadId,
+              content: `### Ata de Reunião (${provider})\n${synthesis.executiveSummary}\n\n**Decisões:** ${synthesis.keyDecisions.join('; ')}\n**Objeções:** ${synthesis.objectionsRaised.join('; ')}`,
+              author: 'Swarm Meeting Intelligence',
             },
           });
         }
@@ -293,15 +291,19 @@ export const universalMeetingsTool = new DynamicStructuredTool({
         }
       }
 
+      if (!leadId) {
+        return JSON.stringify({ error: 'leadId é obrigatório para registrar a reunião no CRM.' });
+      }
+
       const activity = await prisma.activity.create({
         data: {
           organizationId,
-          title: meetingTitle,
-          type: 'Meeting',
-          status: 'Pending',
+          type: 'Reuniao',
+          status: 'Pendente',
+          owner: 'Swarm Meetings',
           date: safeStart,
-          leadId: leadId || null,
-          notes: `Provedor: ${provider} | Duração: ${durationMinutes}min | Participantes: ${(attendeeEmails ?? []).join(', ') || 'N/A'}${meetingLink ? ` | Link: ${meetingLink}` : ''}`,
+          leadId,
+          observations: `Título: ${meetingTitle} | Provedor: ${provider} | Duração: ${durationMinutes}min | Participantes: ${(attendeeEmails ?? []).join(', ') || 'N/A'}${meetingLink ? ` | Link: ${meetingLink}` : ''}`,
         },
       });
 

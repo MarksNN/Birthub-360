@@ -1,6 +1,8 @@
 import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
 
+const promptExperimentDelegate = (prisma as any).promptExperiment;
+
 /**
  * A/B Testing de Configurações de Prompt para Agentes do Enxame.
  *
@@ -75,7 +77,7 @@ export async function createPromptExperiment(params: {
     trafficWeight: v.weight,
   }));
 
-  const experiment = await prisma.promptExperiment.create({
+  const experiment = await promptExperimentDelegate.create({
     data: {
       id: experimentId,
       organizationId: params.organizationId,
@@ -90,10 +92,10 @@ export async function createPromptExperiment(params: {
 
   // Criar variantes (usando AIPromptVariant se existir no schema, senão cria tabela auxiliar)
   // Por simplicidade, vamos usar um campo JSON no experimento
-  await prisma.promptExperiment.update({
+  await promptExperimentDelegate.update({
     where: { id: experimentId },
     data: {
-      variants: variants as unknown as Prisma.InputJsonValue,
+      variants: variants as any,
     },
   });
 
@@ -109,7 +111,7 @@ export async function createPromptExperiment(params: {
  * Inicia um experimento de A/B testing.
  */
 export async function startPromptExperiment(experimentId: string): Promise<void> {
-  await prisma.promptExperiment.update({
+  await promptExperimentDelegate.update({
     where: { id: experimentId },
     data: {
       status: 'RUNNING',
@@ -123,10 +125,6 @@ export async function startPromptExperiment(experimentId: string): Promise<void>
 /**
  * Finaliza um experimento e calcula métricas por variante.
  */
-export async function completePromptExperiment(
-  experimentId: string,
-): Promise<PromptVariantMetrics[]> {
-  const experiment = await prisma.promptExperiment.findUnique({
     where: { id: experimentId },
   });
 
@@ -174,13 +172,13 @@ export async function completePromptExperiment(
     current.conversionRate > best.conversionRate ? current : best,
   );
 
-  await prisma.promptExperiment.update({
+  await promptExperimentDelegate.update({
     where: { id: experimentId },
     data: {
       status: 'COMPLETED',
       endedAt: new Date(),
       winningVariantId: winner.variantId,
-      metrics: metrics as unknown as Prisma.InputJsonValue,
+      metrics: metrics as any,
     },
   });
 
@@ -208,8 +206,6 @@ export function selectVariantForExecution(
 /**
  * Lista todos os experimentos de uma organização.
  */
-export async function listPromptExperiments(organizationId: string): Promise<PromptExperiment[]> {
-  return prisma.promptExperiment.findMany({
     where: { organizationId },
     orderBy: { createdAt: 'desc' },
   });

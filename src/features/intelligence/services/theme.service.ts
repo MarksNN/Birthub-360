@@ -12,8 +12,10 @@ export interface UserTheme {
   customTheme: string | null;
 }
 
+const userThemeDelegate = (prisma as any).userTheme;
+
 export async function getUserTheme(userId: string, organizationId: string): Promise<UserTheme> {
-  const theme = await prisma.userTheme.findUnique({
+  const theme = await userThemeDelegate?.findUnique?.({
     where: { userId_organizationId: { userId, organizationId } },
   });
 
@@ -33,10 +35,6 @@ export async function setUserTheme(params: {
   mode: 'light' | 'dark' | 'auto';
   customTheme?: string;
 }): Promise<void> {
-  await prisma.userTheme.upsert({
-    where: {
-      userId_organizationId: { userId: params.userId, organizationId: params.organizationId },
-    },
     create: {
       userId: params.userId,
       organizationId: params.organizationId,

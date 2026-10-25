@@ -23,6 +23,7 @@ import { toChatCompletionMessages } from './parsing.js';
 import { estimateCostUsd } from './pricing.js';
 import { readProviderError } from './redaction.js';
 import { traceAiGeneration } from './telemetry.js';
+import { recordLatency } from './dynamic-routing.js';
 import { groqProvider } from './providers/groq.provider.js';
 import { litellmProvider } from './providers/litellm.provider.js';
 import { openaiProvider } from './providers/openai.provider.js';
@@ -77,7 +78,7 @@ async function* streamWithProvider(
   // Determina a URL, headers e model name baseados no provider
   let url: string;
   let apiKey: string;
-  let includeMetadata = false;
+  let _includeMetadata = false;
   let effectiveModel = resolvedModel;
 
   switch (provider.name) {
@@ -94,7 +95,7 @@ async function* streamWithProvider(
     case 'litellm':
       url = `${process.env.OLLAMA_BASE_URL || process.env.LITELLM_URL}/v1/chat/completions`;
       apiKey = process.env.LITELLM_KEY || process.env.OLLAMA_API_KEY || 'ollama';
-      includeMetadata = true;
+      _includeMetadata = true;
       break;
     case 'vllm':
       url = `${process.env.VLLM_BASE_URL}/v1/chat/completions`;
@@ -212,8 +213,8 @@ async function* streamWithProvider(
     completionTokens: usage?.completion_tokens ?? 0,
   };
   const estimatedCost = estimateCostUsd(modelUsed, tokenUsage);
-  const ttftMs = firstTokenAt ? firstTokenAt - startedAt : Date.now() - startedAt;
   const latencyMs = Date.now() - startedAt;
+  recordLatency(provider.name, modelUsed, latencyMs);
 
   recordAiUsageCost(provider.name, requestContext.getStore()?.tenantId, estimatedCost);
 
@@ -334,7 +335,6 @@ export async function* streamChatCompletionWithFallback(
 
       // Emite mensagem de fallback e continua para o próximo provider
       yield { delta: FALLBACK_MESSAGE };
-      continue;
     }
   }
 

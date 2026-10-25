@@ -126,13 +126,12 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       if (action === 'list_notes') {
         const notes = await prisma.note.findMany({
           where: {
-            organizationId,
             ...(leadId
-              ? { targetType: 'lead', targetId: leadId }
+              ? { leadId }
               : companyId
-                ? { targetType: 'company', targetId: companyId }
+                ? { companyId }
                 : contactId
-                  ? { targetType: 'contact', targetId: contactId }
+                  ? { contactId }
                   : {}),
           },
           orderBy: { createdAt: 'desc' },
@@ -156,22 +155,11 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           return JSON.stringify({ error: 'Informe title ou description para criar a anotação.' });
         }
 
-        const targetType = leadId
-          ? 'lead'
-          : companyId
-            ? 'company'
-            : contactId
-              ? 'contact'
-              : 'general';
-        const targetId = leadId || companyId || contactId || organizationId;
-
         const internalNote = await prisma.note.create({
           data: {
-            organizationId,
-            targetType,
-            targetId,
-            text: title && description ? `### ${title}\n${description}` : noteText,
-            authorName: 'Swarm AI Agent',
+            content: title && description ? `### ${title}\n${description}` : noteText,
+            author: 'Swarm AI Agent',
+            ...(leadId ? { leadId } : companyId ? { companyId } : contactId ? { contactId } : {}),
           },
         });
 
@@ -219,8 +207,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           {
             success: true,
             noteId: internalNote.id,
-            targetType,
-            targetId,
+            targetType: leadId ? 'lead' : companyId ? 'company' : contactId ? 'contact' : 'organization',
+            targetId: leadId || companyId || contactId || organizationId,
             externalSync,
           },
           null,
@@ -232,20 +220,21 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       const taskTitle = (title || description || 'Tarefa comercial gerada pelo Swarm').trim();
       const parsedDate = dueDate ? new Date(dueDate) : new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      // 1. Persistir sempre a Activity no CRM interno para rastreabilidade completa
-      const internalActivity = await prisma.activity.create({
-        data: {
-          organizationId,
-          title: taskTitle,
-          type: 'Task',
-          status: 'Pending',
-          date: Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
-          notes: description || null,
-          leadId: leadId || null,
-          companyId: companyId || null,
-          contactId: contactId || null,
-        },
-      });
+      // 1. Persistir a Activity no CRM interno para rastreabilidade quando vinculada a um lead
+      let internalActivity: any = null;
+      if (leadId) {
+        internalActivity = await prisma.activity.create({
+          data: {
+            organizationId,
+            type: 'Tarefa',
+            owner: 'IA Commercial Agent',
+            status: 'Pendente',
+            date: Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
+            observations: `${taskTitle}${description ? ` - ${description}` : ''}`,
+            leadId,
+          },
+        });
+      }
 
       const externalResults: Record<string, unknown> = {};
 
@@ -391,9 +380,9 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       return JSON.stringify(
         {
           success: true,
-          internalActivityId: internalActivity.id,
-          title: internalActivity.title,
-          dueDate: internalActivity.date,
+          internalActivityId: internalActivity?.id ?? null,
+          title: taskTitle,
+          dueDate: parsedDate,
           externalSync: externalResults,
         },
         null,

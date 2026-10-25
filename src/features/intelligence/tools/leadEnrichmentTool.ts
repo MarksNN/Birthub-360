@@ -73,10 +73,14 @@ export const leadEnrichmentTool = tool(
         cadastralSituation: company?.situacaoCadastral || undefined,
         city: company?.city || undefined,
         state: company?.state || undefined,
-        employeesCount: company?.employeeCount || undefined,
-        estimatedRevenue: company?.estimatedRevenue || undefined,
+        employeesCount: company?.employeeCount ? String(company.employeeCount) : undefined,
+        estimatedRevenue: company?.estimatedRevenue ? String(company.estimatedRevenue) : undefined,
         technologies: company?.technologies || [],
-        description: company?.observations || lead.observations || undefined,
+        description: company?.observations || undefined,
+        cnpj: company?.cnpj || '',
+        decisionMakers: [],
+        sources: [],
+        status: (company?.status as any) || 'Active',
       };
 
       const commercialAI = new CommercialAIService();

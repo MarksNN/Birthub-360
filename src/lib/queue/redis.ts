@@ -69,7 +69,7 @@ function observeConnection(
     recordRedisReconnect(role);
     logger.warn({ redisRole: role, delayMs: delay }, 'Redis reconnect scheduled');
   });
-  redis.on('error', (err) => {
+  redis.on('error', (err: any) => {
     if (!enabled()) return;
     const status = onError(err);
     if (status === 'auth-repeat') return;

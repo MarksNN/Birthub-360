@@ -120,7 +120,7 @@ export const universalMessagingTool = tool(
           );
         }
         const res = await sendSlackMessage(organizationId, conn.id, message, recipientOrChannel);
-        return JSON.stringify({ success: true, platform: 'slack', ...res }, null, 2);
+        return JSON.stringify({ platform: 'slack', ...res }, null, 2);
       }
 
       if (platform === 'teams') {
