@@ -23,16 +23,27 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       .default('internal')
       .describe('Plataforma de tarefas/projetos ou notas alvo.'),
     title: z.string().optional().describe('Título da tarefa, card ou nota.'),
-    description: z.string().optional().describe('Descrição detalhada da tarefa ou conteúdo da anotação.'),
-    dueDate: z.string().optional().describe('Data de vencimento em ISO 8601 (ex: 2026-10-30T14:00:00Z).'),
+    description: z
+      .string()
+      .optional()
+      .describe('Descrição detalhada da tarefa ou conteúdo da anotação.'),
+    dueDate: z
+      .string()
+      .optional()
+      .describe('Data de vencimento em ISO 8601 (ex: 2026-10-30T14:00:00Z).'),
     leadId: z.string().optional().describe('ID do lead relacionado (opcional).'),
     companyId: z.string().optional().describe('ID da empresa relacionada (opcional).'),
     contactId: z.string().optional().describe('ID do contato relacionado (opcional).'),
     boardOrListId: z
       .string()
       .optional()
-      .describe('ID da lista no Trello, Board no Monday.com, Database no Notion ou List no ClickUp.'),
-    priority: z.enum(['low', 'normal', 'high', 'urgent']).default('normal').describe('Prioridade da tarefa.'),
+      .describe(
+        'ID da lista no Trello, Board no Monday.com, Database no Notion ou List no ClickUp.',
+      ),
+    priority: z
+      .enum(['low', 'normal', 'high', 'urgent'])
+      .default('normal')
+      .describe('Prioridade da tarefa.'),
   }),
   func: async ({
     action,
@@ -72,14 +83,24 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           }),
         ]);
 
-        const cfgMap = new Map(settingsRows.map((s) => [s.key, s.value as Record<string, unknown>]));
+        const cfgMap = new Map(
+          settingsRows.map((s) => [s.key, s.value as Record<string, unknown>]),
+        );
 
         return JSON.stringify(
           {
             success: true,
             plataformasSuportadas: {
-              internalCrm: { ativo: true, recursos: ['Activity (Tarefas/Reuniões/Calls)', 'Note (Anotações Polimórficas)'] },
-              trello: { conectado: Boolean(cfgMap.get('integration.trello')?.apiKey && cfgMap.get('integration.trello')?.token) },
+              internalCrm: {
+                ativo: true,
+                recursos: ['Activity (Tarefas/Reuniões/Calls)', 'Note (Anotações Polimórficas)'],
+              },
+              trello: {
+                conectado: Boolean(
+                  cfgMap.get('integration.trello')?.apiKey &&
+                    cfgMap.get('integration.trello')?.token,
+                ),
+              },
               monday: { conectado: Boolean(cfgMap.get('integration.monday')?.apiKey) },
               bitrix24Tasks: { conectado: Boolean(bitrixCfg.webhookUrl) },
               clickup: { conectado: Boolean(cfgMap.get('integration.clickup')?.apiKey) },
@@ -148,7 +169,13 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           return JSON.stringify({ error: 'Informe title ou description para criar a anotação.' });
         }
 
-        const targetType = leadId ? 'lead' : companyId ? 'company' : contactId ? 'contact' : 'general';
+        const targetType = leadId
+          ? 'lead'
+          : companyId
+            ? 'company'
+            : contactId
+              ? 'contact'
+              : 'general';
         const targetId = leadId || companyId || contactId || organizationId;
 
         const internalNote = await prisma.note.create({
@@ -169,7 +196,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           });
           const cfg = (notionSetting?.value ?? {}) as Record<string, unknown>;
           const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
-          const parentPageId = boardOrListId || (typeof cfg.parentPageId === 'string' ? cfg.parentPageId.trim() : '');
+          const parentPageId =
+            boardOrListId || (typeof cfg.parentPageId === 'string' ? cfg.parentPageId.trim() : '');
 
           if (apiKey && parentPageId) {
             const response = await fetch('https://api.notion.com/v1/pages', {
@@ -243,7 +271,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
         const cfg = (trelloSetting?.value ?? {}) as Record<string, unknown>;
         const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
         const token = typeof cfg.token === 'string' ? cfg.token.trim() : '';
-        const idList = boardOrListId || (typeof cfg.defaultListId === 'string' ? cfg.defaultListId.trim() : '');
+        const idList =
+          boardOrListId || (typeof cfg.defaultListId === 'string' ? cfg.defaultListId.trim() : '');
 
         if (apiKey && token && idList) {
           const url = new URL('https://api.trello.com/1/cards');
@@ -252,7 +281,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           url.searchParams.set('idList', idList);
           url.searchParams.set('name', taskTitle);
           if (description) url.searchParams.set('desc', description);
-          if (!Number.isNaN(parsedDate.getTime())) url.searchParams.set('due', parsedDate.toISOString());
+          if (!Number.isNaN(parsedDate.getTime()))
+            url.searchParams.set('due', parsedDate.toISOString());
 
           const res = await fetch(url.toString(), {
             method: 'POST',
@@ -283,7 +313,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
         });
         const cfg = (mondaySetting?.value ?? {}) as Record<string, unknown>;
         const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
-        const boardId = boardOrListId || (typeof cfg.boardId === 'string' ? cfg.boardId.trim() : '');
+        const boardId =
+          boardOrListId || (typeof cfg.boardId === 'string' ? cfg.boardId.trim() : '');
 
         if (apiKey && boardId) {
           const res = await fetch('https://api.monday.com/v2', {
@@ -302,7 +333,9 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
             }),
             signal: AbortSignal.timeout(10000),
           });
-          const data = (await res.json().catch(() => ({}))) as { data?: { create_item?: { id?: string } } };
+          const data = (await res.json().catch(() => ({}))) as {
+            data?: { create_item?: { id?: string } };
+          };
           externalResults.monday = {
             ok: res.ok,
             itemId: data.data?.create_item?.id ?? null,
@@ -310,7 +343,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
         } else if (platform === 'monday') {
           externalResults.monday = {
             ok: false,
-            warning: 'Credenciais do Monday.com não configuradas em Setting (integration.monday). Tarefa salva no CRM interno.',
+            warning:
+              'Credenciais do Monday.com não configuradas em Setting (integration.monday). Tarefa salva no CRM interno.',
           };
         }
       }
@@ -319,7 +353,9 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       if (platform === 'bitrix' || platform === 'all') {
         const bitrixCfg = await getBitrixSettings(organizationId);
         if (bitrixCfg.webhookUrl) {
-          const baseUrl = bitrixCfg.webhookUrl.endsWith('/') ? bitrixCfg.webhookUrl : `${bitrixCfg.webhookUrl}/`;
+          const baseUrl = bitrixCfg.webhookUrl.endsWith('/')
+            ? bitrixCfg.webhookUrl
+            : `${bitrixCfg.webhookUrl}/`;
           const taskEndpoint = `${baseUrl}tasks.task.add.json`;
           await validateWebhookUrl(taskEndpoint);
           const res = await fetch(taskEndpoint, {
@@ -335,7 +371,9 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
             }),
             signal: AbortSignal.timeout(10000),
           });
-          const data = (await res.json().catch(() => ({}))) as { result?: { task?: { id?: string } } };
+          const data = (await res.json().catch(() => ({}))) as {
+            result?: { task?: { id?: string } };
+          };
           externalResults.bitrix = {
             ok: res.ok,
             taskId: data.result?.task?.id ?? null,
@@ -353,9 +391,10 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
         const cfg = (row?.value ?? {}) as Record<string, unknown>;
         externalResults[platform] = {
           configured: Boolean(cfg.apiKey || cfg.accessToken),
-          message: cfg.apiKey || cfg.accessToken
-            ? `Tarefa sincronizada com ${platform.toUpperCase()} e registrada no CRM.`
-            : `Configure ${settingKey} para espelhar automaticamente no ${platform.toUpperCase()}. Tarefa salva no CRM interno.`,
+          message:
+            cfg.apiKey || cfg.accessToken
+              ? `Tarefa sincronizada com ${platform.toUpperCase()} e registrada no CRM.`
+              : `Configure ${settingKey} para espelhar automaticamente no ${platform.toUpperCase()}. Tarefa salva no CRM interno.`,
         };
       }
 

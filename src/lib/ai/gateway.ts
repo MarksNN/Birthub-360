@@ -76,7 +76,6 @@ export type {
   DynamicRoutingResult,
 } from './gateway/dynamic-routing.js';
 
-
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { getAiModel } from './gateway/chat-model.js';
 import { cleanAndParseJson } from './gateway/parsing.js';
@@ -91,7 +90,9 @@ export async function generateTextOutput(options: {
   try {
     const model = getAiModel(options.feature || 'general');
     const messages = [
-      new SystemMessage(options.systemInstruction || 'Você é um assistente prestativo e profissional.'),
+      new SystemMessage(
+        options.systemInstruction || 'Você é um assistente prestativo e profissional.',
+      ),
       new HumanMessage(options.prompt),
     ];
     const res = await model.invoke(messages);
