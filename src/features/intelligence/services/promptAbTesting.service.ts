@@ -3,10 +3,10 @@ import { logger } from '../../../lib/logger.js';
 
 /**
  * A/B Testing de Configurações de Prompt para Agentes do Enxame.
- * 
+ *
  * Permite testar diferentes versões de prompt para cada agente e medir
  * o impacto em métricas reais (conversão, custo, latência, override humano).
- * 
+ *
  * Fluxo:
  * 1. Criar experimento com variantes de prompt (A, B, C...)
  * 2. Trafego é distribuído proporcionalmente entre variantes
@@ -59,7 +59,7 @@ export async function createPromptExperiment(params: {
   variants: Array<{ name: string; promptTemplate: string; weight: number }>;
 }): Promise<PromptExperiment> {
   const experimentId = `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   const totalWeight = params.variants.reduce((sum, v) => sum + v.weight, 0);
   if (totalWeight === 0) {
     throw new Error('O peso total das variantes deve ser maior que 0');
@@ -123,7 +123,9 @@ export async function startPromptExperiment(experimentId: string): Promise<void>
 /**
  * Finaliza um experimento e calcula métricas por variante.
  */
-export async function completePromptExperiment(experimentId: string): Promise<PromptVariantMetrics[]> {
+export async function completePromptExperiment(
+  experimentId: string,
+): Promise<PromptVariantMetrics[]> {
   const experiment = await prisma.promptExperiment.findUnique({
     where: { id: experimentId },
   });
@@ -133,7 +135,9 @@ export async function completePromptExperiment(experimentId: string): Promise<Pr
   }
 
   const variants = experiment.variants as unknown as PromptVariant[];
-  const since = experiment.startedAt ? new Date(experiment.startedAt) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const since = experiment.startedAt
+    ? new Date(experiment.startedAt)
+    : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const metrics: PromptVariantMetrics[] = [];
 
@@ -166,8 +170,8 @@ export async function completePromptExperiment(experimentId: string): Promise<Pr
   }
 
   // Declarar vencedor (maior taxa de conversão)
-  const winner = metrics.reduce((best, current) => 
-    current.conversionRate > best.conversionRate ? current : best
+  const winner = metrics.reduce((best, current) =>
+    current.conversionRate > best.conversionRate ? current : best,
   );
 
   await prisma.promptExperiment.update({
@@ -204,9 +208,7 @@ export function selectVariantForExecution(
 /**
  * Lista todos os experimentos de uma organização.
  */
-export async function listPromptExperiments(
-  organizationId: string,
-): Promise<PromptExperiment[]> {
+export async function listPromptExperiments(organizationId: string): Promise<PromptExperiment[]> {
   return prisma.promptExperiment.findMany({
     where: { organizationId },
     orderBy: { createdAt: 'desc' },
