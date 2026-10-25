@@ -23,6 +23,7 @@ export async function checkPlatformHealth(redisClient: Redis): Promise<PlatformH
   const checks: Record<string, 'ok' | 'error'> = { database: 'error', redis: 'error' };
 
   try {
+    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     await prisma.$queryRaw`SELECT 1`;
     checks.database = 'ok';
   } catch {
