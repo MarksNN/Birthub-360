@@ -21,7 +21,7 @@ export async function createHubspotConnection(params: {
   apiKey: string;
   portalId: string;
 }): Promise<HubspotConnection> {
-  const connection = await prisma.hubspotConnection.create({
+  const connection = await (prisma as any).hubspotConnection.create({
     data: params,
   });
   logger.info({ organizationId: params.organizationId }, '[HubSpot] Conexão criada');

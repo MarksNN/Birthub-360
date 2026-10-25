@@ -116,7 +116,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
         newState.consecutiveChecks = 0;
 
         await domainEventMesh.publish({
-          eventType: 'AUTONOMY_CIRCUIT_BREAKER_TRIPPED',
+          eventType: 'AUTONOMY_CIRCUIT_BREAKER_TRIPPED' as any,
           eventVersion: '1.0.0',
           organizationId,
           correlationId: `circuit-breaker-${organizationId}`,
@@ -158,7 +158,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
           newState.consecutiveChecks = 0;
 
           await domainEventMesh.publish({
-            eventType: 'AUTONOMY_CIRCUIT_BREAKER_RECOVERED',
+            eventType: 'AUTONOMY_CIRCUIT_BREAKER_RECOVERED' as any,
             eventVersion: '1.0.0',
             organizationId,
             correlationId: `circuit-breaker-${organizationId}`,
@@ -220,7 +220,6 @@ export function clearCircuitBreakerState(organizationId: string): void {
  */
 export async function checkAllCircuitBreakers(): Promise<void> {
   const organizations = await prisma.organization.findMany({
-    where: { active: true },
     select: { id: true },
   });
 

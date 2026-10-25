@@ -270,11 +270,11 @@ export const universalEmailTool = tool(
                 subject: msg.subject,
                 leadId: msg.leadId,
                 leadCompany: msg.leadCompany,
-                intent: classification.intent,
-                urgency: classification.urgency,
-                summary: classification.summary,
-                nextStep: classification.nextStep,
-                confidence: classification.confidence,
+                intent: classification.intent || 'general',
+                urgency: classification.urgency || 'medium',
+                summary: classification.summary || '',
+                nextStep: classification.nextStep || '',
+                confidence: classification.confidence ?? 0,
               });
             }
           } catch {

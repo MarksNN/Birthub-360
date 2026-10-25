@@ -10,20 +10,44 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { MemorySaver } from '@langchain/langgraph';
 import { AgentExecutor, type AgentExecutionContext, type AgentExecutionConfig } from '../AgentExecutor.js';
-import { assertPiiExternalConsent } from '../../services/guardrails.service.js';
-import { assertAiBudgetNotExceeded } from '../../../../lib/ai/budget.js';
-import { ensureCheckpointerReady } from '../../../../lib/ai/checkpointer.js';
-import { recordAgentFailure } from '../agentMemory.store.js';
-import { saveAgentMemory } from '../agentMemory.store.js';
-import { getLearningProfile } from '../learning.agent.js';
+import { assertPiiExternalConsent } from '../../../services/guardrails.service.js';
+import { assertAiBudgetNotExceeded } from '../../../../../lib/ai/budget.js';
+import { ensureCheckpointerReady } from '../../../../../lib/ai/checkpointer.js';
+import { recordAgentFailure, saveAgentMemory } from '../../agentMemory.store.js';
+import { getLearningProfile } from '../../learning.agent.js';
 
 // Mocks
-vi.mock('../../../../features/intelligence/services/guardrails.service.js');
-vi.mock('../../../../lib/ai/budget.js');
-vi.mock('../../../../lib/ai/checkpointer.js');
-vi.mock('../agentMemory.store.js');
-vi.mock('../learning.agent.js');
+vi.mock('../../../services/guardrails.service.js');
+vi.mock('../../../../../lib/ai/budget.js');
+vi.mock('../../../../../lib/ai/checkpointer.js', () => ({
+  checkpointer: new MemorySaver(),
+  ensureCheckpointerReady: vi.fn(),
+}));
+vi.mock('../../agentMemory.store.js');
+vi.mock('../../learning.agent.js');
+
+const mockModelInvoke = vi.fn();
+vi.mock('../../../../../lib/ai/gateway.js', () => ({
+  getAiModel: vi.fn(() => ({
+    invoke: mockModelInvoke,
+  })),
+  logAiUsage: vi.fn().mockResolvedValue(undefined),
+}));
+
+const mockReactAgentInvoke = vi.fn();
+vi.mock('@langchain/langgraph/prebuilt', () => ({
+  createReactAgent: vi.fn(() => ({
+    invoke: mockReactAgentInvoke,
+  })),
+}));
+
+vi.mock('../../fallback.util.js', () => ({
+  buildModelWithFallback: vi.fn(() => ({
+    bindTools: vi.fn().mockReturnThis(),
+  })),
+}));
 
 describe('AgentExecutor', () => {
   const mockContext: AgentExecutionContext = {
@@ -50,6 +74,26 @@ describe('AgentExecutor', () => {
     vi.mocked(recordAgentFailure).mockResolvedValue(undefined);
     vi.mocked(saveAgentMemory).mockResolvedValue(undefined);
     vi.mocked(getLearningProfile).mockResolvedValue(null);
+
+    mockModelInvoke.mockReset();
+    mockModelInvoke.mockResolvedValue({
+      content: 'Test response',
+      response_metadata: {
+        model: 'local-llama3-fast',
+        tokenUsage: { promptTokens: 10, completionTokens: 20, totalTokens: 30 },
+      },
+    });
+
+    mockReactAgentInvoke.mockReset();
+    mockReactAgentInvoke.mockResolvedValue({
+      messages: [
+        {
+          content: 'Test response',
+          _getType: () => 'ai',
+          type: 'ai',
+        },
+      ],
+    });
   });
 
   afterEach(() => {
@@ -68,7 +112,9 @@ describe('AgentExecutor', () => {
 
     it('deve bloquear quando gate LGPD falha', async () => {
       const lgpdError = new Error('Sem base legal LGPD');
-      vi.mocked(assertPiiExternalConsent).mockRejectedValue(lgpdError);
+      vi.mocked(assertPiiExternalConsent).mockImplementation(() => {
+        throw lgpdError;
+      });
 
       const result = await AgentExecutor.executeWithoutTools(mockContext, mockConfig);
 
@@ -114,20 +160,6 @@ describe('AgentExecutor', () => {
 
   describe('executeWithoutTools', () => {
     it('deve executar agente sem ferramentas com sucesso', async () => {
-      // Mock do gateway de IA
-      vi.doMock('../../../../lib/ai/gateway.js', () => ({
-        getAiModel: vi.fn(() => ({
-          invoke: vi.fn().mockResolvedValue({
-            content: 'Test response',
-            response_metadata: {
-              model: 'local-llama3-fast',
-              tokenUsage: { promptTokens: 10, completionTokens: 20, totalTokens: 30 },
-            },
-          }),
-        })),
-        logAiUsage: vi.fn().mockResolvedValue(undefined),
-      }));
-
       const result = await AgentExecutor.executeWithoutTools(mockContext, mockConfig);
 
       expect(result.error).toBeUndefined();
@@ -168,15 +200,6 @@ describe('AgentExecutor', () => {
         buildSystemPrompt: vi.fn(() => 'You are a test agent'),
         buildHumanMessage: vi.fn((input) => `Human: ${input}`),
       };
-
-      // Mock do fallback.util
-      vi.doMock('../fallback.util.js', () => ({
-        buildModelWithFallback: vi.fn(() => ({
-          invoke: vi.fn().mockResolvedValue({
-            messages: [{ content: 'Test response', _getType: () => 'ai' }],
-          }),
-        })),
-      }));
 
       const result = await AgentExecutor.executeWithTools(mockContext, configWithTools);
 
@@ -230,27 +253,16 @@ describe('AgentExecutor', () => {
 
   describe('tratamento de erros', () => {
     it('deve retornar erro quando execução falha', async () => {
-      // Mock que falha na execução
-      vi.doMock('../../../../lib/ai/gateway.js', () => ({
-        getAiModel: vi.fn(() => ({
-          invoke: vi.fn().mockRejectedValue(new Error('Falha na IA')),
-        })),
-        logAiUsage: vi.fn().mockResolvedValue(undefined),
-      }));
+      mockModelInvoke.mockRejectedValueOnce(new Error('Falha na IA'));
 
       const result = await AgentExecutor.executeWithoutTools(mockContext, mockConfig);
 
-      expect(result.error).toBeDefined();
+      expect(result.error).toBe('Falha na IA');
       expect(result.sessionId).toBe(mockContext.sessionId);
     });
 
     it('deve tratar erro sem mensagem definida', async () => {
-      vi.doMock('../../../../lib/ai/gateway.js', () => ({
-        getAiModel: vi.fn(() => ({
-          invoke: vi.fn().mockRejectedValue(null),
-        })),
-        logAiUsage: vi.fn().mockResolvedValue(undefined),
-      }));
+      mockModelInvoke.mockRejectedValueOnce('Falha desconhecida');
 
       const result = await AgentExecutor.executeWithoutTools(mockContext, mockConfig);
 

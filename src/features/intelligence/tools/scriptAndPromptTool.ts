@@ -65,7 +65,7 @@ export const scriptAndPromptTool = new DynamicStructuredTool({
           include: { company: true, contact: true },
         });
         if (lead) {
-          leadContext = `Lead: ${lead.name} | Empresa: ${lead.company?.tradeName || lead.company?.legalName || 'N/A'} | Setor: ${lead.company?.cnae || lead.industry || 'N/A'} | Cargo: ${lead.contact?.role || 'Decisor'}`;
+          leadContext = `Lead: ${lead.title || 'Lead'} | Empresa: ${lead.company?.tradeName || lead.company?.legalName || 'N/A'} | Setor: ${lead.company?.segment || 'N/A'} | Cargo: ${lead.contact?.role || 'Decisor'}`;
         }
       }
 
@@ -108,10 +108,14 @@ export const scriptAndPromptTool = new DynamicStructuredTool({
         const saved = await prisma.prompt.create({
           data: {
             organizationId,
-            title: promptTitle || `[${artifactType}] ${targetAudienceOrPersona.slice(0, 60)}`,
+            name: promptTitle || `[${artifactType}] ${targetAudienceOrPersona.slice(0, 60)}`,
             category: artifactType,
-            content: generatedContent,
+            version: '1.0.0',
+            owner: 'Swarm Script Factory',
             tags: [artifactType, 'swarm-generated'],
+            variables: {},
+            history: [{ timestamp: new Date().toISOString(), content: generatedContent }],
+            approved: true,
           },
         });
         savedPromptId = saved.id;

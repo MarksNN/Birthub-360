@@ -333,7 +333,7 @@ Antes de usar a ferramenta de decisão estruturada de roteamento, faça uma brev
 ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
   // Correlation ID para tracing distribuído - baseado em sessionId e timestamp
-  const correlationId = `swarm-${sessionId}-${Date.now()}`;
+  const correlationId = `swarm-${state.leadId || 'exec'}-${Date.now()}`;
   
   let decision: SupervisorDecision;
   const startTime = Date.now();

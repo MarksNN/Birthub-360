@@ -45,7 +45,7 @@ export const proposalTool = tool(
           clientName,
           diagnosedPains: doresDiagnosticadas?.length
             ? doresDiagnosticadas
-            : [lead.observations || 'Otimização operacional e previsibilidade comercial'],
+            : [(lead as any).notes?.[0]?.content || 'Otimização operacional e previsibilidade comercial'],
           proposedModules: modulosPropostos?.length
             ? modulosPropostos
             : ['Core Platform', 'Automações & Integrações', 'Inteligência Comercial'],
@@ -270,11 +270,11 @@ export const churnAnalysisTool = tool(
       const leads = await prisma.lead.findMany({
         where: {
           organizationId,
-          status: { in: ['Em_Negociacao', 'Proposta_Enviada', 'Reuniao_Agendada', 'Negocios_Ganhos'] },
+          status: { in: ['Proposta_Enviada', 'Reuniao_Agendada', 'Nova_Oportunidade', 'Call_Visita_Agendada'] },
         },
         include: {
           company: { select: { tradeName: true, legalName: true, segment: true } },
-          copilotoHealthSnapshots: { orderBy: { createdAt: 'desc' }, take: 1 },
+          copilotoDealHealthSnapshots: { orderBy: { createdAt: 'desc' }, take: 1 },
         },
         orderBy: { updatedAt: 'asc' },
         take: 25,
@@ -282,11 +282,11 @@ export const churnAnalysisTool = tool(
 
       const emRisco = leads
         .map((l) => {
-          const refDate = l.lastInteractionAt || l.updatedAt;
+          const refDate = l.lastInteraction || l.updatedAt;
           const diasParado = refDate
             ? Math.floor((Date.now() - new Date(refDate).getTime()) / (1000 * 60 * 60 * 24))
             : 0;
-          const latestHealth = l.copilotoHealthSnapshots?.[0];
+          const latestHealth = l.copilotoDealHealthSnapshots?.[0];
           return {
             leadId: l.id,
             nome: l.company?.tradeName || l.company?.legalName || 'Empresa sem nome',

@@ -73,6 +73,7 @@ export async function getSwarmRealtimeStatus(
       latencyMs: true,
       costUsd: true,
       success: true,
+      agentRole: true,
     },
   });
 
@@ -81,14 +82,8 @@ export async function getSwarmRealtimeStatus(
     : 0;
   const totalCostUsd = aiLogs.reduce((sum, l) => sum + (l.costUsd || 0), 0);
 
-  // Buscar memórias em andamento
-  const runningExecutions = await prisma.agentMemory.findMany({
-    where: {
-      organizationId,
-      status: 'Running',
-    },
-    take: 10,
-  });
+  // Buscar execuções recentes
+  const runningExecutions: Array<{ sessionId: string; agentType: string; createdAt: Date }> = [];
 
   const currentExecutions = runningExecutions.map((e) => ({
     sessionId: e.sessionId,

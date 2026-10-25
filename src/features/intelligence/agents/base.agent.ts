@@ -1,18 +1,13 @@
-import { AIMessage, type BaseMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { StructuredToolInterface } from '@langchain/core/tools';
 import { getTenantId, getUserId } from '../../../lib/async-context.js';
-import { logger } from '../../../lib/logger.js';
-import { recordAgentFailure } from './agentMemory.store.js';
 import {
   AgentExecutor,
   type AgentExecutionContext,
   type AgentExecutionConfig,
-  type AgentExecutionResult,
-  type SerializedMessage,
 } from './execution/AgentExecutor.js';
 
 export interface AgentRunResult {
-  sessionId: string;
+  sessionId?: string;
   error?: string;
 }
 

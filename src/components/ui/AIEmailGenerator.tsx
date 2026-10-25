@@ -18,6 +18,7 @@ import { useActivePlaybook } from '../../hooks/useActivePlaybook.js';
 import { api } from '../../lib/api.js';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { Button } from './Button.js';
+import { WhatsAppIcon } from '../brand/CompanyBrandIcon.js';
 
 type Channel = 'email' | 'call' | 'message';
 type Tone = 'consultative' | 'direct' | 'roi_focused' | 'hyper_personalized';

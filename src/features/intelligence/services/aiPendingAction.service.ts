@@ -250,11 +250,9 @@ export async function executeAction(action: ExecutableAction): Promise<Execution
       });
       await prisma.note.create({
         data: {
-          organizationId: action.organizationId,
-          targetType: 'lead',
-          targetId: payload.leadId,
-          text: `Cadência ${payload.cadenceType || 'outbound'} iniciada após aprovação humana. Canais: ${(payload.channels || ['email', 'whatsapp']).join(', ')}.`,
-          authorName: 'Enxame de IA da Birth Hub 360',
+          leadId: payload.leadId,
+          content: `Cadência ${payload.cadenceType || 'outbound'} iniciada após aprovação humana. Canais: ${(payload.channels || ['email', 'whatsapp']).join(', ')}.`,
+          author: 'Enxame de IA da Birth Hub 360',
         },
       });
       return { sent: true };

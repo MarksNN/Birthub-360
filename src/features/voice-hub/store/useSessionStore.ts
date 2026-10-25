@@ -62,10 +62,10 @@ export const applyBrandColorToDom = (color: string) => {
   }
 };
 
-export const useSessionStore = create<SessionState>((set) => ({
+export const useSessionStore = create<SessionState>((set: any) => ({
   activeCalls: 0,
-  increment: () => set((state) => ({ activeCalls: state.activeCalls + 1 })),
-  decrement: () => set((state) => ({ activeCalls: Math.max(0, state.activeCalls - 1) })),
+  increment: () => set((state: any) => ({ activeCalls: state.activeCalls + 1 })),
+  decrement: () => set((state: any) => ({ activeCalls: Math.max(0, state.activeCalls - 1) })),
   brandColor: '#ff5618',
   setBrandColor: (color: string) => {
     fetch('/api/brand-color', {

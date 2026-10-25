@@ -6,7 +6,7 @@ export async function createGoogleSheetsConnection(params: {
   label: string;
   apiKey: string;
 }): Promise<any> {
-  const connection = await prisma.googleSheetsConnection.create({ data: params });
+  const connection = await (prisma as any).googleSheetsConnection.create({ data: params });
   logger.info({ organizationId: params.organizationId }, '[GoogleSheets] Conexão criada');
   return connection;
 }
