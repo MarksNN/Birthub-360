@@ -5735,10 +5735,12 @@ model RebalanceApproval {
   /// Reservado (o #23 grava null).
   noteRef          String?
   appliedToCrm     Boolean      @default(false)
-  updatedAt        DateTime?    @updatedAt @db.Timestamptz(3)
+  updatedAt        DateTime     @updatedAt @db.Timestamptz(3)
 
   @@unique([organizationId, recommendationId])
   @@index([organizationId, leadId])
+  // Índice do purge por retenção (rebalance_approval_purge filtra organizationId + decidedAt).
+  @@index([organizationId, decidedAt])
 }
 
 model FlywheelFewShotExample {
