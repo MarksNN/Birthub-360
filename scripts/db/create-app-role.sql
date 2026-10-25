@@ -165,7 +165,11 @@ BEGIN
             EXECUTE format('GRANT USAGE, SELECT ON SEQUENCE public.%I TO prospector_app', r.relname);
         ELSE
             EXECUTE format('REVOKE ALL ON TABLE public.%I FROM prospector_app', r.relname);
-            EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.%I TO prospector_app', r.relname);
+            IF r.relname = 'Organization' THEN
+                EXECUTE format('GRANT SELECT, INSERT, UPDATE ON TABLE public.%I TO prospector_app', r.relname);
+            ELSE
+                EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.%I TO prospector_app', r.relname);
+            END IF;
         END IF;
     END LOOP;
 END
