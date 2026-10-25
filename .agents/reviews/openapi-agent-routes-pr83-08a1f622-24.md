@@ -55,7 +55,7 @@ Docs-only: `docs/openapi.yaml` +179/−0. Nenhum código alterado.
 - **P4:** o enum `result: [success, error]` em `audit-logs` não é imposto pelo handler (faz cast sem validar).
 - **P4:** o 400 de `success-prediction` não referencia `#/components/schemas/ErrorResponse` (`code: VALIDATION_ERROR`, `details`). Segue o padrão das rotas vizinhas, então é inconsistência menor.
 - **Ordem/CI (informativo):** no `ci.yml`, o passo de drift vem **depois** de `npm run typecheck` e de `test:architecture`. Com o `tsc` do `main` vermelho (ver os pareceres do #75/#79), o passo de drift não vai rodar em CI nem depois do #67. Para chegar a APROVADO também é preciso o typecheck verde, ou uma evidência de CI que execute esse passo.
-- **Processo (informativo):** o #79 foi mergeado no `main` (67677295) com o parecer 24 BLOQUEADO @ 6cfdc15c, sem a evidência de CI pedida.
+- **Processo (informativo, corrigido):** o #79 recebeu APROVADO @ 6cfdc15c (commit 3bda8e28, 13:08:51 BRT) com evidência de CI da v4b (run 40209285892, Architecture verde) e foi mergeado depois, em 67677295 (13:09:24 BRT). Não houve merge sem parecer.
 
 ## Pendências para APROVADO
 1. Application gate executado com "Verificar deriva de OpenAPI" verde num head que contenha o blob `daad1bc5…`. Se o head mudar só por merge/rebase com o mesmo blob, a revisão é só de CI. Mudança de conteúdo exige nova auditoria (§40).
