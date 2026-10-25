@@ -22,3 +22,4 @@ export * from './Toggle.js';
 export * from './Magnetic.js';
 export * from './CommandPalette.js';
 export * from './VisualState.js';
+export * from './CookieConsent.js';

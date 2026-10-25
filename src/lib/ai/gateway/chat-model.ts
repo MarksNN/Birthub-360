@@ -1,3 +1,4 @@
+import { logger } from '../../voice-hub/lib/logger.js';
 /**
  * Orquestrador do gateway de chat: aplica a política de orçamento (../budget.ts), percorre a
  * cadeia de fallback entre adapters de provedor (providers/*.provider.ts) e, só depois de ter uma

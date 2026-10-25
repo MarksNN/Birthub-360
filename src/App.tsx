@@ -9,6 +9,8 @@ import { RequireModuleAccess } from './components/layout/RequireModuleAccess.js'
 import { RequireRole } from './components/layout/RequireRole.js';
 import { ClickSpark } from './components/ui/ClickSpark.js';
 import { Skeleton } from './components/ui/Skeleton.js';
+import { CookieConsent } from './components/ui/CookieConsent.js';
+
 import { ActiveRecordProvider } from './contexts/ActiveRecordContext.js';
 import { AuthProvider } from './contexts/AuthContext.js';
 import { BrandProvider } from './contexts/BrandContext.js';
@@ -606,6 +608,7 @@ export default function App() {
             <AuthProvider>
               <DailyClosingProvider>
                 <ActiveRecordProvider>
+                  <CookieConsent />
                   <ClickSpark />
                   <Suspense fallback={<PageFallback />}>
                     <Routes>

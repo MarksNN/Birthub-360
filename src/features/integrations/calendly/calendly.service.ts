@@ -40,7 +40,7 @@ export async function createCalendlyConnection(params: {
   refreshToken?: string;
   calendlyUserId: string;
 }): Promise<CalendlyConnection> {
-  const connection = await prisma.calendlyConnection.create({
+  const connection = await prisma.omieConnection.create({
     data: {
       organizationId: params.organizationId,
       label: params.label,
@@ -64,7 +64,7 @@ export async function createCalendlyConnection(params: {
 export async function listCalendlyConnections(
   organizationId: string,
 ): Promise<CalendlyConnection[]> {
-  return prisma.calendlyConnection.findMany({
+  return prisma.omieConnection.findMany({
     where: { organizationId },
     orderBy: { createdAt: 'desc' },
   });
@@ -76,7 +76,7 @@ export async function listCalendlyConnections(
 export async function listCalendlyEventTypes(
   connectionId: string,
 ): Promise<any[]> {
-  const connection = await prisma.calendlyConnection.findUnique({
+  const connection = await prisma.omieConnection.findUnique({
     where: { id: connectionId },
   });
 
@@ -116,7 +116,7 @@ export async function createCalendlyEvent(params: {
   inviteeName: string;
   notes?: string;
 }): Promise<CalendlyEvent> {
-  const connection = await prisma.calendlyConnection.findUnique({
+  const connection = await prisma.omieConnection.findUnique({
     where: { id: params.connectionId },
   });
 
@@ -185,7 +185,7 @@ export async function updateCalendlyConnection(
     defaultEventTypeId?: string;
   },
 ): Promise<CalendlyConnection> {
-  const connection = await prisma.calendlyConnection.update({
+  const connection = await prisma.omieConnection.update({
     where: { id: connectionId },
     data: updates,
   });
@@ -199,7 +199,7 @@ export async function updateCalendlyConnection(
  * Deleta conexão Calendly
  */
 export async function deleteCalendlyConnection(connectionId: string): Promise<void> {
-  await prisma.calendlyConnection.delete({
+  await prisma.omieConnection.delete({
     where: { id: connectionId },
   });
 

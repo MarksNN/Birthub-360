@@ -35,7 +35,7 @@ export async function createZoomConnection(params: {
   apiSecret: string;
   userId: string;
 }): Promise<ZoomConnection> {
-  const connection = await prisma.zoomConnection.create({
+  const connection = await prisma.omieConnection.create({
     data: {
       organizationId: params.organizationId,
       label: params.label,
@@ -58,7 +58,7 @@ export async function createZoomMeeting(params: {
   startTime: string;
   durationMinutes: number;
 }): Promise<ZoomMeeting> {
-  const connection = await prisma.zoomConnection.findUnique({
+  const connection = await prisma.omieConnection.findUnique({
     where: { id: params.connectionId },
   });
 

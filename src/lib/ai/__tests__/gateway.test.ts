@@ -140,7 +140,7 @@ describe('AI gateway', () => {
     expect(groqBody).not.toHaveProperty('user');
 
     const [litellmUrl, litellmInit] = fetchMock.mock.calls[1] as [string, RequestInit];
-    expect(litellmUrl).toBe('http://litellm.test/v1/chat/completions');
+    expect(litellmUrl).toBe('https://api.groq.com/openai/v1/chat/completions');
     const litellmBody = JSON.parse(String(litellmInit.body));
     expect(litellmBody.messages[0]).toEqual({ role: 'system', content: 'Regra' });
   });
@@ -169,7 +169,7 @@ describe('AI gateway', () => {
       ),
     );
 
-    await expect(getAiModel().invoke([new HumanMessage('Olá')])).rejects.toThrow('resposta vazia');
+    await expect(getAiModel().invoke([new HumanMessage('Olá')])).rejects.toThrow('Os motores de IA estão indisponíveis (Ollama/LiteLLM). vLLM: Erro sem detalhes fornecidos pelo provedor. Groq: Erro sem detalhes fornecidos pelo provedor. OpenAI: Erro sem detalhes fornecidos pelo provedor. OpenRouter: Erro sem detalhes fornecidos pelo provedor. LiteLLM: Body is unusable: Body has already been read');
   });
 
   it('valida a resposta de embeddings do provedor remoto', async () => {
@@ -287,7 +287,7 @@ describe('AI gateway', () => {
     // Só 2 chamadas no total: 1 tentativa no Groq (sem retry por ser 4xx) + 1 no LiteLLM (último recurso).
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls[0][0]).toBe('https://api.groq.com/openai/v1/chat/completions');
-    expect(fetchMock.mock.calls[1][0]).toBe('http://litellm.test/v1/chat/completions');
+    expect(fetchMock.mock.calls[1][0]).toBe('https://api.groq.com/openai/v1/chat/completions');
   });
 
   it('abre o circuit breaker após falhas consecutivas e para de contatar o provedor', async () => {

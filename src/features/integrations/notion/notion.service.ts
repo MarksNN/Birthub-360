@@ -16,7 +16,7 @@ export async function createNotionConnection(params: {
   apiKey: string;
   databaseId: string;
 }): Promise<NotionConnection> {
-  const connection = await prisma.notionConnection.create({ data: params });
+  const connection = await prisma.omieConnection.create({ data: params });
   logger.info({ organizationId: params.organizationId }, '[Notion] Conexão criada');
   return connection;
 }
