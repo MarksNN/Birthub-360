@@ -344,13 +344,13 @@ Antes de usar a ferramenta de decisão estruturada de roteamento, faça uma brev
 ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
   const correlationId = buildSwarmCorrelationId(config);
-  
+
   let decision: SupervisorDecision;
   const startTime = Date.now();
   let fallbackTriggered = false;
   let modelUsed: string | undefined;
   let tokensUsed: number | undefined;
-  
+
   try {
     const structuredModel = (getSupervisorLlm() as ChatOpenAI).withStructuredOutput(
       supervisorDecisionSchema,
@@ -365,9 +365,9 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
     const usage = raw?.usage_metadata;
     if (usage) {
-      modelUsed = raw.response_metadata?.model_name as string || 'local-llama3-fast';
+      modelUsed = (raw.response_metadata?.model_name as string) || 'local-llama3-fast';
       tokensUsed = usage.total_tokens;
-      
+
       await logAiUsage({
         model: modelUsed,
         usage: {
@@ -388,7 +388,7 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
     decision = fallbackDecision(state.completed, Boolean(state.leadId), state.mission);
     fallbackTriggered = true;
   }
-  
+
   decision = enforceLeadGuard(decision, state);
 
   const content =

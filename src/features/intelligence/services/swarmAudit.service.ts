@@ -3,7 +3,7 @@ import { logger } from '../../../lib/logger.js';
 
 /**
  * Serviço de Auditoria Completa do Swarm
- * 
+ *
  * Registra todas as ações do swarm com:
  * - Quem executou (agente, usuário)
  * - O que foi executado (ação, parâmetros)
@@ -83,7 +83,7 @@ export async function getSwarmAuditLogs(params: {
   offset?: number;
 }): Promise<{ logs: SwarmAuditLog[]; total: number }> {
   const where: any = { organizationId: params.organizationId };
-  
+
   if (params.agentType) where.agentType = params.agentType;
   if (params.action) where.action = params.action;
   if (params.result) where.result = params.result;

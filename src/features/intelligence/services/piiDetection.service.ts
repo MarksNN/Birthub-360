@@ -2,7 +2,7 @@ import { logger } from '../../../lib/logger.js';
 
 /**
  * Serviço de Detecção Automática de PII (Dados Pessoais Sensíveis)
- * 
+ *
  * Detecta:
  * - CPF/CNPJ
  * - E-mail
@@ -44,7 +44,7 @@ export function detectPII(text: string): PIIDetectionResult {
 
   for (const [type, pattern] of Object.entries(PII_PATTERNS)) {
     const regex = new RegExp(pattern.source, pattern.flags);
-    
+
     for (let match = regex.exec(text); match !== null; match = regex.exec(text)) {
       positions.push({
         type,
@@ -52,7 +52,7 @@ export function detectPII(text: string): PIIDetectionResult {
         end: match.index + match[0].length,
         original: match[0],
       });
-      
+
       if (!types.includes(type)) {
         types.push(type);
       }

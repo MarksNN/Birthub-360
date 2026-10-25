@@ -162,7 +162,9 @@ router.get('/evaluation-metrics', async (req: Request, res: Response, next: Next
 router.get('/circuit-breaker/state', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { organizationId } = (req as AuthRequest).user;
-    const { getCircuitBreakerState } = await import('../services/autonomyCircuitBreaker.service.js');
+    const { getCircuitBreakerState } = await import(
+      '../services/autonomyCircuitBreaker.service.js'
+    );
     const state = getCircuitBreakerState(organizationId);
     res.json({ success: true, data: state || null });
   } catch (err: any) {
@@ -231,7 +233,9 @@ router.post(
 router.get('/proactive-alerts', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { organizationId } = (req as AuthRequest).user;
-    const { DEFAULT_ALERT_THRESHOLDS, checkAgentHealthAndCreateAlerts } = await import('../services/proactiveAlerts.service.js');
+    const { DEFAULT_ALERT_THRESHOLDS, checkAgentHealthAndCreateAlerts } = await import(
+      '../services/proactiveAlerts.service.js'
+    );
     const alerts = await checkAgentHealthAndCreateAlerts(organizationId, DEFAULT_ALERT_THRESHOLDS);
     res.json({ success: true, data: alerts });
   } catch (err: any) {
@@ -240,22 +244,27 @@ router.get('/proactive-alerts', async (req: Request, res: Response, next: NextFu
 });
 
 // A/B Testing de Prompts - listar experimentos
-router.get('/prompt-ab-testing/experiments', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { organizationId } = (req as AuthRequest).user;
-    const { listPromptExperiments } = await import('../services/promptAbTesting.service.js');
-    const experiments = await listPromptExperiments(organizationId);
-    res.json({ success: true, data: experiments });
-  } catch (err: any) {
-    next(err);
-  }
-});
+router.get(
+  '/prompt-ab-testing/experiments',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { organizationId } = (req as AuthRequest).user;
+      const { listPromptExperiments } = await import('../services/promptAbTesting.service.js');
+      const experiments = await listPromptExperiments(organizationId);
+      res.json({ success: true, data: experiments });
+    } catch (err: any) {
+      next(err);
+    }
+  },
+);
 
 // Dashboard Real-time do Swarm - monitoramento ao vivo
 router.get('/realtime-dashboard', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { organizationId } = (req as AuthRequest).user;
-    const { getSwarmRealtimeStatus } = await import('../services/swarmRealtimeDashboard.service.js');
+    const { getSwarmRealtimeStatus } = await import(
+      '../services/swarmRealtimeDashboard.service.js'
+    );
     const status = await getSwarmRealtimeStatus(organizationId);
     res.json({ success: true, data: status });
   } catch (err: any) {

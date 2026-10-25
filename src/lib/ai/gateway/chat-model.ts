@@ -192,10 +192,7 @@ async function callWithDynamicRouting(
   }
 
   // Fallback para cadeia estática se routing dinâmico falhar
-  logger.info(
-    { model: resolvedModel },
-    '[DynamicRouting] Usando cadeia de fallback estática',
-  );
+  logger.info({ model: resolvedModel }, '[DynamicRouting] Usando cadeia de fallback estática');
   return callWithFallback(resolvedModel, requestMessages, temperature, agentContext);
 }
 

@@ -3,7 +3,7 @@ import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Serviço de Integração Calendly
- * 
+ *
  * Permite agendamento automático de demos e reuniões via Calendly.
  * Usa OAuth 2.0 para autenticação e webhooks para sincronização.
  */
@@ -73,9 +73,7 @@ export async function listCalendlyConnections(
 /**
  * Busca eventos disponíveis do Calendly
  */
-export async function listCalendlyEventTypes(
-  connectionId: string,
-): Promise<any[]> {
+export async function listCalendlyEventTypes(connectionId: string): Promise<any[]> {
   const connection = await prisma.calendlyConnection.findUnique({
     where: { id: connectionId },
   });
@@ -151,7 +149,7 @@ export async function createCalendlyEvent(params: {
     }
 
     const data = await response.json();
-    
+
     const event: CalendlyEvent = {
       id: data.resource.uuid,
       name: data.resource.name,
@@ -169,7 +167,10 @@ export async function createCalendlyEvent(params: {
 
     return event;
   } catch (error: any) {
-    logger.error({ err: error, connectionId: params.connectionId }, '[Calendly] Erro ao criar evento');
+    logger.error(
+      { err: error, connectionId: params.connectionId },
+      '[Calendly] Erro ao criar evento',
+    );
     throw error;
   }
 }
