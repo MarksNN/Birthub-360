@@ -10,7 +10,7 @@
 - **Sessão / branch Jules:** Sessão 08, `jules/ci-08-test-environment-20261024` (PR #63 → base `jules/ci-08-test-environment-20261024`, não `main`).
 - **SHA de partida do Jules:** `03fa29a6fb6b1ccf8668bb5b13a9a41e673bba9a`.
 - **SHA de `main` em que este relatório foi reconferido:** `7871e6f01b3037f3ecb99453c5fc0525b8216e46` (merge do #66).
-- **PRs:** #63 (relatório original do Jules, reprovado) e o PR de integração do Agente 08 contra `main` que adiciona este arquivo (branch `agente/08-jules-08-test-environment`). Nenhum dos dois altera código de produção, teste ou workflow.
+- **PRs:** #63 (relatório original do Jules, reprovado) e #69 (PR de integração do Agente 08 contra `main`, branch `agente/08-jules-08-test-environment`, que adiciona este arquivo). Nenhum dos dois altera código de produção, teste ou workflow.
 
 ## Problema investigado
 O ambiente de testes de integração (`pretest:integration` → `scripts/test/prepare-integration-env.js` + `dotenv-cli` + `prisma migrate deploy`) não subiu no sandbox do Jules.
@@ -36,7 +36,7 @@ Evidências verificáveis em `main`:
 - Só este arquivo (`.agents/handoffs/jules-ci-20261024/jules-08-para-24-test-environment.md`). O `JULES-FINAL-REPORT.md` na raiz **não** é criado.
 
 ## Checks
-Observados no PR de integração contra `main` e registrados no corpo do PR e no pedido de re-review ao 24. Falhas de `trivy scan`/`build` que também aparecem em `main` (`7871e6f0`) são pré-existentes e não vêm deste PR, que só altera documentação.
+Observados no #69 e registrados no corpo do PR e no pedido de re-review ao 24. Falhas de `trivy scan`/`build` que também aparecem em `main` (`7871e6f0`) são pré-existentes e não vêm deste PR, que só altera documentação.
 
 ## Riscos residuais
 - Enquanto o `trivy scan` derrubar o Release, o `application gate` (Postgres + integração + E2E) fica skipped em `main`. Uma regressão no ambiente de integração não seria detectada até o gate voltar a rodar.
