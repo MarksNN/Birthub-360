@@ -34,13 +34,7 @@ interface ConnectorFieldSpec {
 interface ConnectorStatusItem {
   provider: string;
   name: string;
-  group:
-    | 'crm_erp'
-    | 'email'
-    | 'messaging'
-    | 'tasks_notes'
-    | 'meetings'
-    | 'notifications_wearables';
+  group: 'crm_erp' | 'email' | 'messaging' | 'tasks_notes' | 'meetings' | 'notifications_wearables';
   settingKey: string | null;
   description: string;
   fields: ConnectorFieldSpec[];
@@ -63,7 +57,10 @@ interface UniversalEcosystemPanelProps {
 }
 
 const GROUP_LABELS: Record<ConnectorStatusItem['group'], { title: string; badge: string }> = {
-  crm_erp: { title: 'CRMs & ERPs Corporativos', badge: 'Bitrix24 · HubSpot · Pipedrive · RD · Omie' },
+  crm_erp: {
+    title: 'CRMs & ERPs Corporativos',
+    badge: 'Bitrix24 · HubSpot · Pipedrive · RD · Omie',
+  },
   email: {
     title: 'Caixas de E-mail & Suites Corporativas',
     badge: 'Outlook/M365 · Gmail · IMAP/SMTP Unificado',
@@ -90,10 +87,19 @@ const TOOL_CATEGORY_OPTIONS = [
   { id: 'prospecting_enrichment', label: 'Prospecção & Enriquecimento (Apollo/Receita/Hunter)' },
   { id: 'email_intelligence', label: 'E-mail Multi-Provedor (Outlook/Gmail/IMAP) + Sinais IA' },
   { id: 'messaging_omnichannel', label: 'Mensageria (WhatsApp/Telegram/Teams/Slack/SMS)' },
-  { id: 'tasks_projects_notes', label: 'Tarefas & Notas (Trello/Monday/Bitrix/ClickUp/Asana/Notion)' },
+  {
+    id: 'tasks_projects_notes',
+    label: 'Tarefas & Notas (Trello/Monday/Bitrix/ClickUp/Asana/Notion)',
+  },
   { id: 'meetings_calendar', label: 'Reuniões & Atas IA (Meet/Teams/Zoom/Calendly)' },
-  { id: 'office_docs_sheets_slides', label: 'Office & Workspace (Word/Docs, Excel .xlsx, PowerPoint)' },
-  { id: 'multi_device_notifications', label: 'Notificações (Pop-up, Celular, Relógio/Smartwatch, SMS)' },
+  {
+    id: 'office_docs_sheets_slides',
+    label: 'Office & Workspace (Word/Docs, Excel .xlsx, PowerPoint)',
+  },
+  {
+    id: 'multi_device_notifications',
+    label: 'Notificações (Pop-up, Celular, Relógio/Smartwatch, SMS)',
+  },
   { id: 'scripts_prompts_enablement', label: 'Fábrica de Scripts Comerciais & Prompts' },
   { id: 'crm_erp_sync', label: 'Sincronização Multi-CRM & ERP' },
   { id: 'pipeline_revops', label: 'Pipeline, Forecast, Propostas, Churn & Cross-Sell' },
@@ -245,7 +251,9 @@ export function UniversalEcosystemPanel({
       await loadEcosystemData();
     } catch (err: any) {
       setFeedback(
-        err instanceof Error ? err.message : 'Não foi possível salvar a configuração deste conector.',
+        err instanceof Error
+          ? err.message
+          : 'Não foi possível salvar a configuração deste conector.',
       );
     } finally {
       setSavingProvider(null);
@@ -304,9 +312,30 @@ export function UniversalEcosystemPanel({
           'Próximo Passo',
         ];
         payload.sheetRows = [
-          ['Indústria Alpha S.A.', 'Outlook + LinkedIn', 'Bitrix24 + Trello', 85000, 75, 'Demo Técnica Agendada'],
-          ['Grupo Logística Brasil', 'WhatsApp + Cold Call', 'HubSpot + Monday.com', 120000, 60, 'Enviar Proposta Comercial'],
-          ['TechFin Pagamentos', 'Gmail + Reunião Teams', 'Pipedrive + Notion', 64000, 85, 'Revisão Jurídica de Contrato'],
+          [
+            'Indústria Alpha S.A.',
+            'Outlook + LinkedIn',
+            'Bitrix24 + Trello',
+            85000,
+            75,
+            'Demo Técnica Agendada',
+          ],
+          [
+            'Grupo Logística Brasil',
+            'WhatsApp + Cold Call',
+            'HubSpot + Monday.com',
+            120000,
+            60,
+            'Enviar Proposta Comercial',
+          ],
+          [
+            'TechFin Pagamentos',
+            'Gmail + Reunião Teams',
+            'Pipedrive + Notion',
+            64000,
+            85,
+            'Revisão Jurídica de Contrato',
+          ],
         ];
       } else if (officeType === 'word_or_gdoc') {
         payload.documentSections = [
@@ -329,7 +358,8 @@ export function UniversalEcosystemPanel({
               'Automação End-to-End com Enxame de Agentes (BDR, SDR, Closer, CRM, Ops)',
               'Ganhos Rápidos de Conversão em 30-60-90 Dias',
             ],
-            speakerNotes: 'Abertura focada na dor executiva do decisor e retorno sobre investimento.',
+            speakerNotes:
+              'Abertura focada na dor executiva do decisor e retorno sobre investimento.',
           },
           {
             slideNumber: 2,
@@ -339,7 +369,8 @@ export function UniversalEcosystemPanel({
               'Tarefas espelhadas em Trello, Monday.com, Bitrix24 e Notion',
               'Alertas instantâneos no Celular, Relógio (Smartwatch) e Pop-up na tela',
             ],
-            speakerNotes: 'Destacar que o time comercial não precisa mudar as ferramentas que já usa.',
+            speakerNotes:
+              'Destacar que o time comercial não precisa mudar as ferramentas que já usa.',
           },
         ];
       }
@@ -393,7 +424,8 @@ export function UniversalEcosystemPanel({
           <div>
             <h3 className="text-sm font-black uppercase tracking-wider text-ink flex items-center gap-2">
               <Layers size={16} className="text-[var(--color-heading-cyan)]" />
-              Hub Universal de Plataformas Corporativas ({connectedCount}/{connectors.length} Ativas)
+              Hub Universal de Plataformas Corporativas ({connectedCount}/{connectors.length}{' '}
+              Ativas)
             </h3>
             <p className="text-xs text-ink-2 mt-1">
               Todas as conexões configuradas aqui ficam imediatamente disponíveis para o{' '}

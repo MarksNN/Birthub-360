@@ -42,7 +42,9 @@ export class UniversalSpecialistAgent extends BaseAgent {
 
   constructor(options: UniversalSpecialistOptions = {}) {
     super();
-    this.agentType = options.agentCode ? `AGENT_${options.agentCode.toUpperCase()}` : 'UNIVERSAL_SPECIALIST';
+    this.agentType = options.agentCode
+      ? `AGENT_${options.agentCode.toUpperCase()}`
+      : 'UNIVERSAL_SPECIALIST';
     this.agentTitle = options.agentTitle || 'Especialista Autônomo Universal';
     this.customSystemPrompt = options.customSystemPrompt ?? null;
     this.categories = options.categories;

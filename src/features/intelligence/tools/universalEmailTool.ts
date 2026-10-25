@@ -173,7 +173,10 @@ export const universalEmailTool = tool(
             }
           }
         } catch (gmailErr: any) {
-          logger.warn({ err: gmailErr, organizationId }, '[UniversalEmailTool] Leitura Gmail best-effort falhou');
+          logger.warn(
+            { err: gmailErr, organizationId },
+            '[UniversalEmailTool] Leitura Gmail best-effort falhou',
+          );
         }
       }
 
@@ -216,7 +219,10 @@ export const universalEmailTool = tool(
             }
           }
         } catch (outlookErr: any) {
-          logger.warn({ err: outlookErr, organizationId }, '[UniversalEmailTool] Leitura Outlook Graph best-effort falhou');
+          logger.warn(
+            { err: outlookErr, organizationId },
+            '[UniversalEmailTool] Leitura Outlook Graph best-effort falhou',
+          );
         }
       }
 
@@ -339,7 +345,10 @@ export const universalEmailTool = tool(
         .enum(['scan_opportunities', 'list_emails', 'check_providers'])
         .describe('Ação a executar nos provedores de e-mail'),
       leadId: z.string().optional().describe('Filtrar por ID do lead (opcional)'),
-      query: z.string().optional().describe('Termo para filtrar assunto/corpo/remetente (opcional)'),
+      query: z
+        .string()
+        .optional()
+        .describe('Termo para filtrar assunto/corpo/remetente (opcional)'),
       maxResults: z.number().optional().describe('Quantidade máxima de e-mails (padrão: 15)'),
       analyzeOpportunities: z
         .boolean()

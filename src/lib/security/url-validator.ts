@@ -5,7 +5,9 @@ export async function validateWebhookUrl(targetUrl: string): Promise<boolean> {
   try {
     const parsed = new URL(targetUrl);
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-      throw new Error(`Protocolo inválido: ${parsed.protocol}. Apenas http e https são permitidos.`);
+      throw new Error(
+        `Protocolo inválido: ${parsed.protocol}. Apenas http e https são permitidos.`,
+      );
     }
 
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
@@ -23,12 +25,16 @@ export async function validateWebhookUrl(targetUrl: string): Promise<boolean> {
       hostname.endsWith('.local') ||
       hostname.endsWith('.internal')
     ) {
-      throw new Error(`URL bloqueada por política de segurança SSRF: destino interno proibido (${hostname})`);
+      throw new Error(
+        `URL bloqueada por política de segurança SSRF: destino interno proibido (${hostname})`,
+      );
     }
 
     const parts = hostname.split('.').map(Number);
     if (parts.length === 4 && parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) {
-      throw new Error(`URL bloqueada por política de segurança SSRF: destino em faixa privada (${hostname})`);
+      throw new Error(
+        `URL bloqueada por política de segurança SSRF: destino em faixa privada (${hostname})`,
+      );
     }
 
     return true;
