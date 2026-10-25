@@ -92,7 +92,8 @@ Os procedimentos detalhados e comandos de validação para cada componente encon
 ## 5. Ferramentas Automatizadas de Suporte
 
 O repositório fornece utilitários executáveis em `scripts/security/`:
-- `scripts/security/reencrypt-credentials.ts`: Re-encriptação em lote de registros protegidos no banco de dados com suporte a `--dry-run`.
+- `scripts/security/reencrypt-credentials.ts`: Re-encriptação em lote (OLD_KEY → NEW_KEY) de registros protegidos no banco, incluindo `Setting` de integrações por campo (`--model=Setting`). **Dry-run por padrão** — só grava com `--apply --snapshot-confirmed=<id>`; sem `--apply` nada muda. Exige `CREDENTIALS_ENCRYPTION_KEY`, `OLD_KEY` e `NEW_KEY` explícitas. Siga o runbook `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` (verificação obrigatória antes de trocar a chave).
+- `scripts/security/backfill-integration-settings-encryption.ts`: Cifra em repouso os segredos de integração legados em texto puro em `Setting.value` (ADR-010). Dry-run por padrão; grava só com `--apply --snapshot-confirmed=<id>`.
 - `scripts/security/backfill-contact-pii.ts`: Recálculo e população de índices cegos de PII por tenant.
 - `scripts/security/audit-secret-hygiene.ts`: Diagnóstico de conformidade de variáveis de ambiente, detecção de placeholders e verificação de entropia sem exibição de segredos.
 - `scripts/security/scan-secrets.sh`: Varredura local pré-commit com Gitleaks ou motor regex de alto sinal.

@@ -59,6 +59,7 @@ O diagnóstico do Agente 15 classificou o achado como **ALTA**.
 4. Rodar com `--apply --snapshot-confirmed=<id-do-snapshot>`.
 5. Rodar o dry-run de novo: tem de dar 0 linhas a gravar (idempotência).
 6. Se der errado, restaurar o snapshot do passo 3.
+7. **Rotação de chave** (`reencrypt-credentials.ts`, inclusive `--model=Setting`): seguir [`docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md`](../security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md) (RB-SEC-010). Lá estão o snapshot, o dry-run com contagem esperada, o apply e a **verificação obrigatória** com a `NEW_KEY` (0 pendentes e 0 ilegíveis) **antes** de trocar `CREDENTIALS_ENCRYPTION_KEY`. Sem `--apply`, nada é gravado.
 
 ## v2 (adiada; depende do #33)
 
