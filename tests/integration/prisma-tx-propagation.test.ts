@@ -298,26 +298,26 @@ describe('ressalvas do parecer 15 no #40 (X1/X2/X3)', () => {
     // driver adapter o embrulha em PrismaClientKnownRequestError P2039, com o código do Postgres em
     // meta.driverAdapterError.cause.code. Um 25P02 (tx abortado) ou um COMMIT silencioso falhariam aqui.
     const err = await rit(
-        async (tx) => {
-          const c = await tx.company.create({ data: { legalName: tag, tradeName: tag } as never });
-          companyId = c.id;
-          await outboxAppend(tx, ORG_A, tag);
-          // tenantId de OUTRO tenant: o WITH CHECK do RLS de AuditLog recusa o INSERT dentro do tx.
-          await AuditService.log({
-            action: 'CREATE',
-            entity: 'X1Probe',
-            entityId: tag,
-            tenantId: ORG_B,
-          });
-          return 'não deveria chegar aqui';
-        },
-        { organizationId: ORG_A },
-      ).then(
-        () => {
-          throw new Error('runInTransaction deveria rejeitar com o erro do audit (X1)');
-        },
-        (e: unknown) => e,
-      );
+      async (tx) => {
+        const c = await tx.company.create({ data: { legalName: tag, tradeName: tag } as never });
+        companyId = c.id;
+        await outboxAppend(tx, ORG_A, tag);
+        // tenantId de OUTRO tenant: o WITH CHECK do RLS de AuditLog recusa o INSERT dentro do tx.
+        await AuditService.log({
+          action: 'CREATE',
+          entity: 'X1Probe',
+          entityId: tag,
+          tenantId: ORG_B,
+        });
+        return 'não deveria chegar aqui';
+      },
+      { organizationId: ORG_A },
+    ).then(
+      () => {
+        throw new Error('runInTransaction deveria rejeitar com o erro do audit (X1)');
+      },
+      (e: unknown) => e,
+    );
     expect(err).toBeInstanceOf(Prisma.PrismaClientKnownRequestError);
     expect(err).toMatchObject({
       code: 'P2039',

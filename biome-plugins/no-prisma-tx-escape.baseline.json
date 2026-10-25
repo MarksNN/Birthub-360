@@ -1,35 +1,74 @@
 {
-  "_comment": "Parecer 15 (#40 L1): usos legados de $queryRaw/$executeRaw/$transaction no client global (prisma.$x, this.prisma.$x e nomes pontilhados terminados em prisma; parecer 15 #75 A1) suprimidos com biome-ignore lint/plugin/no-prisma-tx-escape. A lista só pode diminuir: ao migrar um uso para runInTransaction, remova o biome-ignore e baixe a contagem aqui. Verificado por tests/unit/architecture/prisma-tx-escape-baseline.test.ts.",
+  "_comment": "Parecer 15 (#40 L1, #75 A1) e parecer 24 (#75 P2): usos legados de $queryRaw/$executeRaw/$transaction no client global (prisma.$x, this.prisma.$x e nomes pontilhados terminados em prisma), suprimidos com biome-ignore lint/plugin/no-prisma-tx-escape. Cada entrada é um uso: \"<método>:<sha256[0..16] do statement normalizado>\". A lista só pode diminuir: ao migrar um uso para runInTransaction, remova o biome-ignore e a entrada. Mudar o statement suprimido (método, SQL, corpo) muda a chave e exige revisão explícita aqui. Verificado por tests/unit/architecture/prisma-tx-escape-baseline.test.ts (a mensagem de falha mostra as chaves atuais).",
   "rule": "lint/plugin/no-prisma-tx-escape",
   "total": 44,
   "files": {
-    "src/bootstrap/healthchecks.ts": 1,
-    "src/bootstrap/workerServer.ts": 2,
-    "src/features/activities/infra/PrismaActivityRepository.ts": 2,
-    "src/features/activities/services/activity.service.ts": 1,
-    "src/features/billing/infra/PrismaUsageRepository.ts": 1,
-    "src/features/cadence/dialer/infrastructure/db/repositories/PgCallAttemptRepository.ts": 4,
-    "src/features/cadence/dialer/infrastructure/db/repositories/PgCampaignRepository.ts": 4,
-    "src/features/cadence/dialer/infrastructure/db/repositories/PgDncRepository.ts": 2,
-    "src/features/cadence/dialer/infrastructure/db/repositories/PgLeadRepository.ts": 5,
-    "src/features/cadence/infra/PrismaCadenceRunRepository.ts": 1,
-    "src/features/companies/infra/PrismaCompanyRepository.ts": 1,
-    "src/features/contacts/infra/PrismaContactRepository.ts": 1,
-    "src/features/contacts/services/contact.service.ts": 1,
-    "src/features/crm360/infra/PrismaCrm360Repository.ts": 2,
-    "src/features/intelligence/infrastructure/PrismaAiSettingsRepository.ts": 1,
-    "src/features/intelligence/infrastructure/PrismaAssistantHistoryRepository.ts": 1,
-    "src/features/job-roles/services/agentCatalog.service.ts": 1,
-    "src/features/job-roles/services/jobRole.service.ts": 1,
-    "src/features/knowledge/infra/accountGraphRepository.ts": 1,
-    "src/features/knowledge/vector-support.ts": 1,
-    "src/features/notes/infra/PrismaNoteRepository.ts": 1,
-    "src/features/playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.ts": 1,
-    "src/features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.ts": 1,
-    "src/features/prospecting/outbound/server/db.ts": 2,
-    "src/lib/ai/usage-log.ts": 1,
-    "src/lib/voice-hub/controllers/health.controller.ts": 1,
-    "src/lib/voice-hub/repositories/billingRepository.ts": 1,
-    "src/lib/voice-hub/repositories/sessionRepository.ts": 2
+    "src/bootstrap/healthchecks.ts": ["$queryRaw:0d9e9cfe1eef5a83"],
+    "src/bootstrap/workerServer.ts": ["$queryRaw:0d9e9cfe1eef5a83", "$queryRaw:0d9e9cfe1eef5a83"],
+    "src/features/activities/infra/PrismaActivityRepository.ts": [
+      "$transaction:5173b1df4de2aac7",
+      "$transaction:5545b046d2719fd7"
+    ],
+    "src/features/activities/services/activity.service.ts": ["$transaction:5545b046d2719fd7"],
+    "src/features/billing/infra/PrismaUsageRepository.ts": ["$queryRaw:ab74380e30ae6321"],
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgCallAttemptRepository.ts": [
+      "$executeRaw:ed2c4fc07d6de759",
+      "$queryRaw:81c0ff75ec710092",
+      "$queryRaw:a97d221746a146cd",
+      "$queryRaw:cc61d3a86a327c4e"
+    ],
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgCampaignRepository.ts": [
+      "$executeRaw:d6916a377de7a767",
+      "$queryRaw:0b96be037d6a5e47",
+      "$queryRaw:0ed0dcfedfbdb138",
+      "$queryRaw:abb1f06b949008bf"
+    ],
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgDncRepository.ts": [
+      "$executeRaw:7e5aff4904c53812",
+      "$queryRaw:18c1a48b3b5dc5c3"
+    ],
+    "src/features/cadence/dialer/infrastructure/db/repositories/PgLeadRepository.ts": [
+      "$executeRaw:6072a02bc1c9714d",
+      "$queryRaw:51df08e5f4fb651c",
+      "$queryRaw:b564a118d2681bf8",
+      "$queryRaw:e11399480763bbd1",
+      "$queryRaw:eac0b8205375919f"
+    ],
+    "src/features/cadence/infra/PrismaCadenceRunRepository.ts": ["$transaction:df1dcdf170ec2c4e"],
+    "src/features/companies/infra/PrismaCompanyRepository.ts": ["$transaction:ab1fdc76371de72b"],
+    "src/features/contacts/infra/PrismaContactRepository.ts": ["$transaction:1b9bf9c8a092726e"],
+    "src/features/contacts/services/contact.service.ts": ["$transaction:1b9bf9c8a092726e"],
+    "src/features/crm360/infra/PrismaCrm360Repository.ts": [
+      "$transaction:7415cb42d7d58d62",
+      "$transaction:e150812913268a2a"
+    ],
+    "src/features/intelligence/infrastructure/PrismaAiSettingsRepository.ts": [
+      "$transaction:aa946fedc6c6a83a"
+    ],
+    "src/features/intelligence/infrastructure/PrismaAssistantHistoryRepository.ts": [
+      "$transaction:c55c115bd1e79e1d"
+    ],
+    "src/features/job-roles/services/agentCatalog.service.ts": ["$transaction:95330531261229df"],
+    "src/features/job-roles/services/jobRole.service.ts": ["$transaction:044a051a9ef98158"],
+    "src/features/knowledge/infra/accountGraphRepository.ts": ["$transaction:b068873c87776ccc"],
+    "src/features/knowledge/vector-support.ts": ["$queryRaw:14d5a9a5f381d0b7"],
+    "src/features/notes/infra/PrismaNoteRepository.ts": ["$transaction:601f0e22860863d9"],
+    "src/features/playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.ts": [
+      "$transaction:7711d4ad2b58b5b9"
+    ],
+    "src/features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.ts": [
+      "$transaction:c015be9e2eb65b69"
+    ],
+    "src/features/prospecting/outbound/server/db.ts": [
+      "$executeRawUnsafe:47b8ffb23e92492c",
+      "$queryRawUnsafe:68a619ec93a7a405"
+    ],
+    "src/lib/ai/usage-log.ts": ["$executeRaw:1ee5bd5edcfaa335"],
+    "src/lib/voice-hub/controllers/health.controller.ts": ["$queryRaw:0d9e9cfe1eef5a83"],
+    "src/lib/voice-hub/repositories/billingRepository.ts": ["$transaction:a9b9970a4f6832c2"],
+    "src/lib/voice-hub/repositories/sessionRepository.ts": [
+      "$transaction:590b635ebd2053ea",
+      "$transaction:bd17263fc88d0b38"
+    ]
   }
 }

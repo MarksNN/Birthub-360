@@ -391,7 +391,7 @@ export class PrismaCrm360Repository implements ICrm360Repository {
       focusActivities,
       recentDeals,
       stageCounts,
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
+      // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     ] = await prisma.$transaction([
       prisma.lead.count({ where: { organizationId, funnel: LeadFunnel.Lead } }),
       prisma.lead.count({
