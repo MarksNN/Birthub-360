@@ -1,11 +1,12 @@
-import {
-  BaseProvider,
-  type ProviderResponse,
-  type ProviderInput,
-  type ProviderContext,
-} from './BaseProvider.js';
 import type { WebSocket } from 'ws';
 import { logger } from '../../logger.js';
+import { sanitizeObjectForLogging } from '../../security/credentialCrypto.js';
+import {
+  BaseProvider,
+  type ProviderContext,
+  type ProviderInput,
+  type ProviderResponse,
+} from './BaseProvider.js';
 
 export class TwilioProvider extends BaseProvider {
   public id = 'Twilio';
@@ -14,7 +15,8 @@ export class TwilioProvider extends BaseProvider {
   private wss?: WebSocket;
 
   public async initialize(config: Record<string, unknown>): Promise<void> {
-    logger.debug(config, `[${this.name}] Initialized with config`);
+    // Config pode trazer authToken/apiKey da conta Twilio — nunca logar em claro.
+    logger.debug(sanitizeObjectForLogging(config), `[${this.name}] Initialized with config`);
   }
 
   public async process(

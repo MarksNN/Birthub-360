@@ -1,20 +1,21 @@
-import { type NextFunction, type Request, type Response, Router } from 'express';
 import * as ExcelJS from 'exceljs';
+import { type NextFunction, type Request, type Response, Router } from 'express';
 import { z } from 'zod';
+import { hasRequiredRole } from '../../../lib/auth/authorization.js';
 import { runWithContext } from '../../../lib/context.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
 import { validateRequest } from '../../../shared/middlewares/validateRequest.js';
 import { UniversalSpecialistAgent } from '../agents/universalSpecialist.agent.js';
 import {
-  listUniversalConnectorsStatus,
-  saveUniversalConnectorConfig,
-} from '../services/universalConnectors.service.js';
-import {
   ECOSYSTEM_PLAYBOOKS,
   type PlaybookId,
   runEcosystemPlaybook,
 } from '../services/ecosystemPlaybooks.service.js';
+import {
+  listUniversalConnectorsStatus,
+  saveUniversalConnectorConfig,
+} from '../services/universalConnectors.service.js';
 import {
   getUniversalToolCatalog,
   type UniversalToolCategory,
@@ -23,7 +24,8 @@ import { universalOfficeDocsTool } from '../tools/universalOfficeDocsTool.js';
 
 const router = Router();
 const writeRoles = requireRole(['ADMIN', 'GESTOR', 'CLOSER', 'SDR']);
-const adminOrGestor = requireRole(['ADMIN', 'GESTOR']);
+const ADMIN_OR_GESTOR_ROLES = ['ADMIN', 'GESTOR'];
+const adminOrGestor = requireRole(ADMIN_OR_GESTOR_ROLES);
 
 /**
  * GET /api/agent/ecosystem/connectors
@@ -34,8 +36,12 @@ router.get(
   writeRoles,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { organizationId } = (req as AuthRequest).user;
-      const connectors = await listUniversalConnectorsStatus(organizationId);
+      const { organizationId, role } = (req as AuthRequest).user;
+      // maskedConfig (mesmo mascarado) só para quem pode editar credenciais (PUT abaixo);
+      // CLOSER/SDR veem só connected/statusDetail.
+      const connectors = await listUniversalConnectorsStatus(organizationId, {
+        includeMaskedConfig: hasRequiredRole(role, ADMIN_OR_GESTOR_ROLES),
+      });
       res.json({ success: true, data: connectors });
     } catch (err) {
       next(err);

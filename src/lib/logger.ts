@@ -51,6 +51,17 @@ export const logger = pino({
       '*.cookie',
       '*.apiKey',
       '*.api_key',
+      // Credenciais de integração (Setting integration.*, ver
+      // src/lib/integrations/integrationSettings.repository.ts) — Onda 52, Agente 15.
+      'botToken',
+      'appSecret',
+      'appPassword',
+      'webhookUrl',
+      '*.botToken',
+      '*.appSecret',
+      '*.appPassword',
+      '*.webhookUrl',
+      '*.accessToken',
       'cpf',
       '*.cpf',
       'email',

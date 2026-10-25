@@ -1,10 +1,11 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
-import { getBitrixSettings } from '../../integrations/bitrix/service/settings.js';
 import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
+import { getBitrixSettings } from '../../integrations/bitrix/service/settings.js';
 
 /**
  * Hub Universal de Tarefas, Projetos e Anotações (Trello, Monday.com, Bitrix24 Tasks, ClickUp, Asana, Notion e CRM Interno).
@@ -64,28 +65,18 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       }
 
       if (action === 'list_platforms') {
-        const [bitrixCfg, settingsRows] = await Promise.all([
+        // Uma única query (getMany); os valores decifrados só viram booleanos abaixo — nenhum
+        // segredo entra no JSON devolvido ao LLM.
+        const [bitrixCfg, cfgs] = await Promise.all([
           getBitrixSettings(organizationId),
-          prisma.setting.findMany({
-            where: {
-              organizationId,
-              key: {
-                in: [
-                  'integration.trello',
-                  'integration.monday',
-                  'integration.clickup',
-                  'integration.asana',
-                  'integration.notion',
-                ],
-              },
-            },
-            select: { key: true, value: true },
-          }),
+          integrationSettingsRepository.getMany(organizationId, [
+            'trello',
+            'monday',
+            'clickup',
+            'asana',
+            'notion',
+          ] as const),
         ]);
-
-        const cfgMap = new Map(
-          settingsRows.map((s) => [s.key, s.value as Record<string, unknown>]),
-        );
 
         return JSON.stringify(
           {
@@ -96,16 +87,13 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
                 recursos: ['Activity (Tarefas/Reuniões/Calls)', 'Note (Anotações Polimórficas)'],
               },
               trello: {
-                conectado: Boolean(
-                  cfgMap.get('integration.trello')?.apiKey &&
-                    cfgMap.get('integration.trello')?.token,
-                ),
+                conectado: Boolean(cfgs.trello?.apiKey && cfgs.trello?.token),
               },
-              monday: { conectado: Boolean(cfgMap.get('integration.monday')?.apiKey) },
+              monday: { conectado: Boolean(cfgs.monday?.apiKey) },
               bitrix24Tasks: { conectado: Boolean(bitrixCfg.webhookUrl) },
-              clickup: { conectado: Boolean(cfgMap.get('integration.clickup')?.apiKey) },
-              asana: { conectado: Boolean(cfgMap.get('integration.asana')?.accessToken) },
-              notion: { conectado: Boolean(cfgMap.get('integration.notion')?.apiKey) },
+              clickup: { conectado: Boolean(cfgs.clickup?.apiKey) },
+              asana: { conectado: Boolean(cfgs.asana?.accessToken) },
+              notion: { conectado: Boolean(cfgs.notion?.apiKey) },
             },
           },
           null,
@@ -190,11 +178,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
 
         let externalSync: Record<string, unknown> | null = null;
         if (platform === 'notion' || platform === 'all') {
-          const notionSetting = await prisma.setting.findFirst({
-            where: { organizationId, key: 'integration.notion' },
-            select: { value: true },
-          });
-          const cfg = (notionSetting?.value ?? {}) as Record<string, unknown>;
+          const cfg: Record<string, string> =
+            (await integrationSettingsRepository.get(organizationId, 'notion')) ?? {};
           const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
           const parentPageId =
             boardOrListId || (typeof cfg.parentPageId === 'string' ? cfg.parentPageId.trim() : '');
@@ -264,11 +249,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
 
       // 2. Sincronizar com Trello se solicitado
       if (platform === 'trello' || platform === 'all') {
-        const trelloSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.trello' },
-          select: { value: true },
-        });
-        const cfg = (trelloSetting?.value ?? {}) as Record<string, unknown>;
+        const cfg: Record<string, string> =
+          (await integrationSettingsRepository.get(organizationId, 'trello')) ?? {};
         const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
         const token = typeof cfg.token === 'string' ? cfg.token.trim() : '';
         const idList =
@@ -307,11 +289,8 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
 
       // 3. Sincronizar com Monday.com se solicitado
       if (platform === 'monday' || platform === 'all') {
-        const mondaySetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.monday' },
-          select: { value: true },
-        });
-        const cfg = (mondaySetting?.value ?? {}) as Record<string, unknown>;
+        const cfg: Record<string, string> =
+          (await integrationSettingsRepository.get(organizationId, 'monday')) ?? {};
         const apiKey = typeof cfg.apiKey === 'string' ? cfg.apiKey.trim() : '';
         const boardId =
           boardOrListId || (typeof cfg.boardId === 'string' ? cfg.boardId.trim() : '');
@@ -384,17 +363,14 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       // 5. Sincronizar com ClickUp ou Asana se solicitado
       if (platform === 'clickup' || platform === 'asana') {
         const settingKey = platform === 'clickup' ? 'integration.clickup' : 'integration.asana';
-        const row = await prisma.setting.findFirst({
-          where: { organizationId, key: settingKey },
-          select: { value: true },
-        });
-        const cfg = (row?.value ?? {}) as Record<string, unknown>;
+        // Só status (nunca o segredo): o resultado volta para o LLM.
+        const status = await integrationSettingsRepository.getStatus(organizationId, platform);
+        const hasCredential = Boolean(status.masked.apiKey || status.masked.accessToken);
         externalResults[platform] = {
-          configured: Boolean(cfg.apiKey || cfg.accessToken),
-          message:
-            cfg.apiKey || cfg.accessToken
-              ? `Tarefa sincronizada com ${platform.toUpperCase()} e registrada no CRM.`
-              : `Configure ${settingKey} para espelhar automaticamente no ${platform.toUpperCase()}. Tarefa salva no CRM interno.`,
+          configured: hasCredential,
+          message: hasCredential
+            ? `Tarefa sincronizada com ${platform.toUpperCase()} e registrada no CRM.`
+            : `Configure ${settingKey} para espelhar automaticamente no ${platform.toUpperCase()}. Tarefa salva no CRM interno.`,
         };
       }
 

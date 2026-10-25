@@ -2,6 +2,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import * as ExcelJS from 'exceljs';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { IngestionService } from '../../knowledge/ingestion.service.js';
@@ -211,13 +212,10 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
           synced: Boolean(googleConn?.accessToken),
         };
       } else if (syncCloud === 'microsoft_365') {
-        const m365 = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.microsoft365' },
-          select: { value: true },
-        });
+        const m365 = await integrationSettingsRepository.getStatus(organizationId, 'microsoft365');
         cloudSyncStatus = {
           provider: 'microsoft_365',
-          synced: Boolean(m365?.value),
+          synced: m365.configured,
         };
       }
 

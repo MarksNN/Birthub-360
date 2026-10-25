@@ -1,9 +1,10 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
+import { generateStructuredOutput } from '../../../lib/ai/gateway.js';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
-import { generateStructuredOutput } from '../../../lib/ai/gateway.js';
 
 /**
  * Hub Universal de Reuniões e Agenda (Google Calendar/Meet, Microsoft Teams Meetings, Zoom, Calendly e Agendamento nativo).
@@ -58,21 +59,11 @@ export const universalMeetingsTool = new DynamicStructuredTool({
               where: { organizationId },
               select: { email: true, scope: true },
             }),
-            prisma.setting.findFirst({
-              where: { organizationId, key: 'integration.microsoft365' },
-              select: { value: true },
-            }),
-            prisma.setting.findFirst({
-              where: { organizationId, key: 'integration.zoom' },
-              select: { value: true },
-            }),
-            prisma.setting.findFirst({
-              where: { organizationId, key: 'integration.calendly' },
-              select: { value: true },
-            }),
+            // Só status (booleanos + campos públicos como schedulingUrl): este JSON vai ao LLM.
+            integrationSettingsRepository.getStatus(organizationId, 'microsoft365'),
+            integrationSettingsRepository.getStatus(organizationId, 'zoom'),
+            integrationSettingsRepository.getStatus(organizationId, 'calendly'),
           ]);
-
-        const calendlyCfg = (calendlySetting?.value ?? {}) as Record<string, unknown>;
 
         return JSON.stringify(
           {
@@ -82,11 +73,11 @@ export const universalMeetingsTool = new DynamicStructuredTool({
                 conectado: Boolean(googleConn),
                 email: googleConn?.email ?? null,
               },
-              microsoftTeamsCalendar: { conectado: Boolean(m365Setting?.value) },
-              zoom: { conectado: Boolean(zoomSetting?.value) },
+              microsoftTeamsCalendar: { conectado: m365Setting.configured },
+              zoom: { conectado: zoomSetting.configured },
               calendly: {
-                conectado: Boolean(calendlyCfg.schedulingUrl || calendlyCfg.apiKey),
-                schedulingUrl: calendlyCfg.schedulingUrl ?? null,
+                conectado: calendlySetting.configured,
+                schedulingUrl: calendlySetting.publicFields.schedulingUrl ?? null,
               },
             },
             publicBookingLinks: bookingLinks.map((b) => ({
@@ -255,11 +246,8 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           }
         }
       } else if (provider === 'microsoft_teams') {
-        const m365Setting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.microsoft365' },
-          select: { value: true },
-        });
-        const cfg = (m365Setting?.value ?? {}) as Record<string, unknown>;
+        const cfg: Record<string, string> =
+          (await integrationSettingsRepository.get(organizationId, 'microsoft365')) ?? {};
         const accessToken = typeof cfg.accessToken === 'string' ? cfg.accessToken.trim() : '';
         if (accessToken) {
           try {

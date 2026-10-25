@@ -1,5 +1,6 @@
 import type { AIPendingAction } from '@prisma/client';
 import { MailerNotConfiguredError, sendEmail } from '../../../lib/email/mailer.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import type { ActivityType } from '../../../lib/zod.js';
@@ -211,12 +212,10 @@ export async function executeAction(action: ExecutableAction): Promise<Execution
       if (!action.organizationId || !payload.recipient || !payload.message) {
         return { sent: false, reason: 'unsupported_action' };
       }
-      const smsSetting = await prisma.setting.findFirst({
-        where: { organizationId: action.organizationId, key: 'integration.sms' },
-        select: { value: true },
-      });
-      const cfg = (smsSetting?.value ?? {}) as Record<string, unknown>;
-      const webhookUrl = typeof cfg.webhookUrl === 'string' ? cfg.webhookUrl.trim() : '';
+      // Repositório valida que action.organizationId == tenant do requestContext (sem bypassRls)
+      // e decifra o webhookUrl (secret no catálogo) só para este fetch.
+      const cfg = await integrationSettingsRepository.get(action.organizationId, 'sms');
+      const webhookUrl = cfg?.webhookUrl?.trim() ?? '';
       if (!webhookUrl) {
         return { sent: false, reason: 'not_configured' };
       }

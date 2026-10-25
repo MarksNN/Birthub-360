@@ -2,6 +2,7 @@ import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/async-context.js';
 import { fetchWithTimeout } from '../../../lib/http.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { assertSafeExternalUrl, safeFetch } from '../../../shared/security/urlGuard.js';
@@ -122,10 +123,9 @@ export const universalMessagingTool = tool(
       }
 
       if (platform === 'teams') {
-        const teamsSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.teams' },
-        });
-        const teamsConfig = teamsSetting?.value as { webhookUrl?: string } | null;
+        // Fallback para TEAMS_WEBHOOK_URL (credencial da PLATAFORMA) mantido de propósito —
+        // decisão de produto pendente, ver handoff 15-para-24-integration-secrets-at-rest.md.
+        const teamsConfig = await integrationSettingsRepository.get(organizationId, 'teams');
         const webhookUrl = teamsConfig?.webhookUrl || process.env.TEAMS_WEBHOOK_URL;
 
         if (!webhookUrl) {
@@ -181,10 +181,9 @@ export const universalMessagingTool = tool(
       }
 
       if (platform === 'telegram') {
-        const tgSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.telegram' },
-        });
-        const tgConfig = tgSetting?.value as { botToken?: string; defaultChatId?: string } | null;
+        // Fallback para TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID (bot da PLATAFORMA) mantido de
+        // propósito — decisão de produto pendente, ver handoff 15-para-24.
+        const tgConfig = await integrationSettingsRepository.get(organizationId, 'telegram');
         const botToken = tgConfig?.botToken || process.env.TELEGRAM_BOT_TOKEN;
         const chatId =
           recipientOrChannel || tgConfig?.defaultChatId || process.env.TELEGRAM_CHAT_ID;
