@@ -7,10 +7,10 @@ import type { ProspectCriteria } from '../../prospecting/domain/prospectTypes.js
 
 /**
  * Ferramenta de Discovery de Empresas para o BDR do Swarm.
- * 
+ *
  * Permite que o BDR descubra empresas com filtros estruturados usando
  * o sistema de prospecção existente (Apollo, Google Places, OpenStreetMap, BrasilAPI).
- * 
+ *
  * Filtros suportados:
  * - segmento: ramo de atuação (ex: "suplementação")
  * - faturamentoMin/faturamentoMax: faturamento anual em USD
@@ -20,7 +20,17 @@ import type { ProspectCriteria } from '../../prospecting/domain/prospectTypes.js
  * - quantidade: número de empresas a descobrir
  */
 export const companyDiscoveryTool = tool(
-  async ({ segmento, faturamentoMin, faturamentoMax, porte, palavrasChave, localizacao, quantidade, estado, cidade }) => {
+  async ({
+    segmento,
+    faturamentoMin,
+    faturamentoMax,
+    porte,
+    palavrasChave,
+    localizacao,
+    quantidade,
+    estado,
+    cidade,
+  }) => {
     try {
       logger.info(
         { segmento, faturamentoMin, faturamentoMax, porte, localizacao, quantidade },
@@ -69,28 +79,36 @@ export const companyDiscoveryTool = tool(
         telefone: c.phone || 'Não informado',
         fonte: c.source,
         justificativa: c.rationale,
-        faturamentoEstimado: c.annualRevenue 
+        faturamentoEstimado: c.annualRevenue
           ? `US$ ${c.annualRevenue.toLocaleString()} (~R$ ${(c.annualRevenue * 5).toLocaleString()})`
           : 'Não informado',
-        decisores: c.decisionMakers?.length 
+        decisores: c.decisionMakers?.length
           ? `${c.decisionMakers.length} decisores encontrados`
           : 'Não identificados',
       }));
 
-      return JSON.stringify({
-        success: true,
-        totalEncontrado: result.candidates.length,
-        filtrosUsados: criteria,
-        empresas: summary,
-        fonte: result.sources,
-        custoEstimado: result.costSummary,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: true,
+          totalEncontrado: result.candidates.length,
+          filtrosUsados: criteria,
+          empresas: summary,
+          fonte: result.sources,
+          custoEstimado: result.costSummary,
+        },
+        null,
+        2,
+      );
     } catch (error: any) {
       logger.error({ err: error }, '[CompanyDiscoveryTool] Erro no discovery');
-      return JSON.stringify({
-        success: false,
-        erro: error.message || 'Falha ao descobrir empresas',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          success: false,
+          erro: error.message || 'Falha ao descobrir empresas',
+        },
+        null,
+        2,
+      );
     }
   },
   {
@@ -117,14 +135,30 @@ export const companyDiscoveryTool = tool(
     - palavrasChave: "e-commerce, loja física"
     - quantidade: 10`,
     schema: z.object({
-      segmento: z.string().describe('Ramo de atuação da empresa (ex: "suplementação", "logística")'),
+      segmento: z
+        .string()
+        .describe('Ramo de atuação da empresa (ex: "suplementação", "logística")'),
       faturamentoMin: z.number().optional().describe('Faturamento anual mínimo em R$'),
       faturamentoMax: z.number().optional().describe('Faturamento anual máximo em R$'),
-      porte: z.string().optional().describe('Faixa de funcionários no formato "min,max" (ex: "11,50")'),
-      palavrasChave: z.string().optional().describe('Termos adicionais separados por vírgula (ex: "e-commerce, loja física")'),
-      localizacao: z.string().describe('Região ou estado (ex: "São Paulo", "Rio de Janeiro", "Brasil")'),
-      estado: z.string().optional().describe('Estado específico (ex: "São Paulo", "Rio de Janeiro")'),
-      cidade: z.string().optional().describe('Cidade específica (ex: "São Paulo", "Rio de Janeiro")'),
+      porte: z
+        .string()
+        .optional()
+        .describe('Faixa de funcionários no formato "min,max" (ex: "11,50")'),
+      palavrasChave: z
+        .string()
+        .optional()
+        .describe('Termos adicionais separados por vírgula (ex: "e-commerce, loja física")'),
+      localizacao: z
+        .string()
+        .describe('Região ou estado (ex: "São Paulo", "Rio de Janeiro", "Brasil")'),
+      estado: z
+        .string()
+        .optional()
+        .describe('Estado específico (ex: "São Paulo", "Rio de Janeiro")'),
+      cidade: z
+        .string()
+        .optional()
+        .describe('Cidade específica (ex: "São Paulo", "Rio de Janeiro")'),
       quantidade: z.number().optional().describe('Número de empresas a descobrir (padrão: 10)'),
     }),
   },

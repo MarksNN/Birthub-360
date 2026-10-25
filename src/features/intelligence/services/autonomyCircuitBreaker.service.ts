@@ -5,15 +5,15 @@ import { autonomyGovernorService } from './autonomyGovernor.service.js';
 
 /**
  * Circuit Breaker para degradação automática de autonomia sob alta taxa de erro.
- * 
+ *
  * Monitora a taxa de erro dos agentes e reduz automaticamente o nível de autonomia
  * quando thresholds são ultrapassados, evitando que agentes com problemas continuem
  * operando em nível alto de autonomia.
- * 
+ *
  * Thresholds:
  * - Taxa de erro > 5% em janela de 15 minutos → downgrade de autonomia
  * - Taxa de erro < 2% em janela de 15 minutos → upgrade de autonomia (recovery)
- * 
+ *
  * Estados:
  * - CLOSED: operação normal, monitorando
  * - OPEN: circuito aberto, autonomia reduzida
@@ -95,12 +95,12 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
     // Verifica se deve abrir o circuito (downgrade)
     if (errorRate > ERROR_RATE_THRESHOLD_DOWNGRADE) {
       const policy = await autonomyGovernorService.getSloMetrics(organizationId, 'last_hour');
-      
+
       // Só faz downgrade se não estiver no nível mais baixo (L0)
       if (policy.humanInterventionRatePercent < 100) {
         const previousLevel = policy.humanInterventionRatePercent === 100 ? 'L0' : 'L1';
         const newLevel = 'L0'; // Downgrade para manual total
-        
+
         await autonomyGovernorService.updatePolicy({
           organizationId,
           globalLevel: 'L0_MANUAL',
@@ -127,7 +127,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
             newLevel,
             errorRate,
             threshold: ERROR_RATE_THRESHOLD_DOWNGRADE,
-            reason: `Taxa de erro (${(errorRate * 100).toFixed(1)}%) ultrapassou threshold (${(ERROR_RATE_THRESHOLD_DOWNGRADE * 100)}%)`,
+            reason: `Taxa de erro (${(errorRate * 100).toFixed(1)}%) ultrapassou threshold (${ERROR_RATE_THRESHOLD_DOWNGRADE * 100}%)`,
           },
         });
 
@@ -140,7 +140,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
       // Verifica se deve fechar o circuito (upgrade/recovery)
       if (currentState.state === 'HALF_OPEN') {
         newState.consecutiveChecks++;
-        
+
         if (newState.consecutiveChecks >= HALF_OPEN_CHECKS) {
           // Recovery: volta ao nível anterior
           await autonomyGovernorService.updatePolicy({
@@ -169,7 +169,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
               newLevel: 'L2',
               errorRate,
               consecutiveChecks: newState.consecutiveChecks,
-              reason: `Taxa de erro estabilizada (${(errorRate * 100).toFixed(1)}%) abaixo de threshold (${(ERROR_RATE_THRESHOLD_UPGRADE * 100)}%)`,
+              reason: `Taxa de erro estabilizada (${(errorRate * 100).toFixed(1)}%) abaixo de threshold (${ERROR_RATE_THRESHOLD_UPGRADE * 100}%)`,
             },
           });
 
@@ -189,7 +189,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
     if (errorRate < ERROR_RATE_THRESHOLD_UPGRADE) {
       newState.state = 'HALF_OPEN';
       newState.consecutiveChecks = 1;
-      
+
       logger.info(
         { organizationId, errorRate },
         '[CircuitBreaker] Transição OPEN → HALF_OPEN: testando recuperação',

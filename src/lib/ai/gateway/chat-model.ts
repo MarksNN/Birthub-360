@@ -7,6 +7,7 @@
  */
 import type { BaseMessage } from '@langchain/core/messages';
 import { requestContext } from '../../async-context.js';
+import { logger } from '../../logger.js';
 import { assertAiBudgetNotExceeded } from '../budget.js';
 import { recordAiUsageCost } from '../metrics.js';
 import { tokenQuotaService } from '../finops/tokenQuota.service.js';
@@ -191,10 +192,7 @@ async function callWithDynamicRouting(
   }
 
   // Fallback para cadeia estática se routing dinâmico falhar
-  logger.info(
-    { model: resolvedModel },
-    '[DynamicRouting] Usando cadeia de fallback estática',
-  );
+  logger.info({ model: resolvedModel }, '[DynamicRouting] Usando cadeia de fallback estática');
   return callWithFallback(resolvedModel, requestMessages, temperature, agentContext);
 }
 
