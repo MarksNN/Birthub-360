@@ -3862,8 +3862,9 @@ paths:
   /agent/circuit-breaker/state:
     get:
       tags: [Agent]
-      summary: >-
-        Estado atual do circuit breaker de autonomia do enxame para a organização do usuário
+      summary: Estado atual do circuit breaker de autonomia do enxame
+      description: >-
+        Estado do circuit breaker de autonomia do enxame para a organização do usuário autenticado
         (observabilidade). `data` é `null` quando não há estado registrado.
       responses:
         '200':
@@ -3876,8 +3877,10 @@ paths:
   /agent/learning-heatmap:
     get:
       tags: [Agent]
-      summary: >-
-        Heatmap dos padrões aprendidos pelo LearningAgent na organização/tenant do usuário.
+      summary: Heatmap dos padrões aprendidos pelo LearningAgent
+      description: >-
+        Heatmap dos padrões aprendidos pelo LearningAgent, escopado por (organização, usuário
+        autenticado): o handler passa `organizationId` e o `id` do usuário autenticado.
       responses:
         '200':
           description: OK
@@ -3889,9 +3892,10 @@ paths:
   /agent/model-benchmark:
     get:
       tags: [Agent]
-      summary: >-
-        Benchmark de performance dos modelos (Groq, OpenAI, vLLM) usados pelo enxame na
-        organização do usuário.
+      deprecated: true
+      summary: Benchmark de modelos do enxame (indisponível)
+      description: >-
+        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
       responses:
         '200':
           description: OK
@@ -3899,13 +3903,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
+        '501':
+          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /agent/success-prediction:
     post:
       tags: [Agent]
-      summary: >-
-        Prevê a probabilidade de sucesso de uma missão antes de executá-la (organização/tenant do
-        usuário).
+      summary: Prevê a probabilidade de sucesso de uma missão antes de executá-la
+      description: >-
+        Predição escopada pela organização do usuário autenticado.
+        Status: hoje pode falhar com 500 por campo inexistente; correção pendente do Agente 07.
       requestBody:
         required: true
         content:
@@ -3930,14 +3941,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
         '400':
-          description: 'Body inválido (validação zod do `validateRequest`)'
+          $ref: '#/components/responses/BadRequest'
 
   /agent/proactive-alerts:
     get:
       tags: [Agent]
-      summary: >-
-        Verifica a saúde dos agentes da organização com os limiares padrão e devolve os alertas
-        proativos gerados. Apesar de ser GET, a verificação pode criar alertas (efeito colateral).
+      deprecated: true
+      summary: Alertas proativos de saúde dos agentes (indisponível)
+      description: >-
+        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
       responses:
         '200':
           description: OK
@@ -3945,12 +3957,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
+        '501':
+          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /agent/prompt-ab-testing/experiments:
     get:
       tags: [Agent]
-      summary: >-
-        Lista os experimentos de A/B testing de prompts da organização do usuário.
+      deprecated: true
+      summary: Experimentos de A/B testing de prompts (indisponível)
+      description: >-
+        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
       responses:
         '200':
           description: OK
@@ -3958,12 +3978,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
+        '501':
+          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /agent/realtime-dashboard:
     get:
       tags: [Agent]
-      summary: >-
-        Status em tempo real do enxame de agentes da organização do usuário.
+      summary: Status em tempo real do enxame de agentes
+      description: >-
+        Status em tempo real do enxame de agentes da organização do usuário autenticado.
+        Status: hoje pode falhar com 500 por campo inexistente; correção pendente do Agente 07
+        (o service filtra execuções por `status: 'Running'`, valor que não existe no enum).
       responses:
         '200':
           description: OK
@@ -3975,8 +4004,12 @@ paths:
   /agent/audit-logs:
     get:
       tags: [Agent]
-      summary: >-
-        Logs de auditoria das ações do enxame na organização do usuário, com filtros opcionais.
+      deprecated: true
+      summary: Logs de auditoria das ações do enxame (indisponível)
+      description: >-
+        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
+        Nota: a reativação exigirá requireRole(ADMIN, GESTOR), validação zod na query e os campos
+        definidos pelo Agente 21.
       parameters:
         - name: agentType
           in: query
@@ -4001,17 +4034,28 @@ paths:
                     properties:
                       logs: { type: array, items: { type: object } }
                       total: { type: integer }
+        '501':
+          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /agent/usage-heatmap:
     get:
       tags: [Agent]
-      summary: >-
-        Heatmap de uso dos agentes da organização do usuário nos últimos N dias.
+      summary: Heatmap de uso dos agentes nos últimos N dias
+      description: >-
+        Heatmap de uso dos agentes da organização do usuário autenticado nos últimos N dias.
       parameters:
         - name: days
           in: query
-          description: 'Janela em dias (default 30; parse com `parseInt`, sem validação de intervalo)'
-          schema: { type: integer, default: 30 }
+          description: >-
+            Janela em dias (default 30). O handler faz `parseInt` sem validação: o código não impõe
+            limite superior (o único teto implícito é o intervalo válido de `Date`, ~1e8 dias), por
+            isso nenhum `maximum` é documentado; `minimum: 1` reflete o uso coerente (0, negativo ou
+            não numérico geram janela inválida/NaN).
+          schema: { type: integer, minimum: 1, default: 30 }
       responses:
         '200':
           description: OK
@@ -4023,13 +4067,22 @@ paths:
   /agent/cost-analysis:
     get:
       tags: [Agent]
-      summary: >-
-        Análise de custos por agente da organização do usuário nos últimos N dias.
+      summary: Análise de custos por agente nos últimos N dias
+      description: >-
+        Análise de custos por agente da organização do usuário autenticado nos últimos N dias.
+        Status: hoje pode falhar com 500 por campo inexistente; correção pendente do Agente 07
+        (o diagnóstico citou o valor 'Running', mas este service não o usa: o select em `AILog`
+        pede `costUsd`, `promptTokens` e `completionTokens`, que não existem no modelo — ele tem
+        `cost` e `tokens`).
       parameters:
         - name: days
           in: query
-          description: 'Janela em dias (default 30; parse com `parseInt`, sem validação de intervalo)'
-          schema: { type: integer, default: 30 }
+          description: >-
+            Janela em dias (default 30). O handler faz `parseInt` sem validação: o código não impõe
+            limite superior (o único teto implícito é o intervalo válido de `Date`, ~1e8 dias), por
+            isso nenhum `maximum` é documentado; `minimum: 1` reflete o uso coerente (0, negativo ou
+            não numérico geram janela inválida/NaN).
+          schema: { type: integer, minimum: 1, default: 30 }
       responses:
         '200':
           description: OK
