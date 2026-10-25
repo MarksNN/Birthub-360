@@ -3895,28 +3895,41 @@ paths:
       deprecated: true
       summary: Benchmark de modelos do enxame (indisponível)
       description: >-
-        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
+        Endpoint indisponível: falha sempre com 500 (PrismaClientValidationError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07.
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
-        '501':
-          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. `getFullSwarmModelBenchmark` consulta `AILog` filtrando por `modelName` e selecionando `success`, `costUsd`, `promptTokens` e `completionTokens`, campos que não existem no modelo (ele tem `tokens`, `cost`, `latencyMs` e `model`), o que lança PrismaClientValidationError antes de qualquer retorno.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Planejado — não implementado; hoje responde 500.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - type: object
+                    required: [success]
+                    properties:
+                      success: { type: boolean, enum: [false] }
 
   /agent/success-prediction:
     post:
       tags: [Agent]
-      summary: Prevê a probabilidade de sucesso de uma missão antes de executá-la
+      summary: Prevê a probabilidade de sucesso de uma missão antes de executá-la (indisponível)
+      deprecated: true
       description: >-
         Predição escopada pela organização do usuário autenticado.
-        Status: hoje pode falhar com 500 por campo inexistente; correção pendente do Agente 07.
+        Status: falha sempre com 500 (PrismaClientValidationError) depois da validação do corpo; correção pendente do Agente 07.
       requestBody:
         required: true
         content:
@@ -3935,11 +3948,18 @@ paths:
                 previousAttempts: { type: integer, minimum: 0 }
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. Depois da validação do corpo (que responde 400), `predictMissionSuccess` chama primeiro `getHistoricalMissionData`, que seleciona `success` e `costUsd` em `AILog`, campos inexistentes no modelo (ele tem `cost` e `tokens`), o que lança PrismaClientValidationError.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
 
@@ -3949,20 +3969,32 @@ paths:
       deprecated: true
       summary: Alertas proativos de saúde dos agentes (indisponível)
       description: >-
-        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
+        Endpoint indisponível: falha sempre com 500 (PrismaClientValidationError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07.
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
-        '501':
-          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. `checkAgentHealthAndCreateAlerts` chama `calculateAgentHealthMetrics` para o primeiro papel (SDR), que seleciona `success` e `costUsd` em `AILog`, campos inexistentes no modelo (ele tem `cost` e `tokens`); a PrismaClientValidationError ocorre antes de qualquer alerta ser criado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Planejado — não implementado; hoje responde 500.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - type: object
+                    required: [success]
+                    properties:
+                      success: { type: boolean, enum: [false] }
 
   /agent/prompt-ab-testing/experiments:
     get:
@@ -3970,36 +4002,55 @@ paths:
       deprecated: true
       summary: Experimentos de A/B testing de prompts (indisponível)
       description: >-
-        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
+        Endpoint indisponível: falha sempre com 500 (TypeError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07.
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
-        '501':
-          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. `listPromptExperiments` chama `prisma.promptExperiment.findMany`, mas não existe model `PromptExperiment` em `prisma/schema.prisma`; o client não tem esse delegate e a chamada lança TypeError (Cannot read properties of undefined (reading 'findMany')).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Planejado — não implementado; hoje responde 500.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - type: object
+                    required: [success]
+                    properties:
+                      success: { type: boolean, enum: [false] }
 
   /agent/realtime-dashboard:
     get:
       tags: [Agent]
-      summary: Status em tempo real do enxame de agentes
+      summary: Status em tempo real do enxame de agentes (indisponível)
+      deprecated: true
       description: >-
         Status em tempo real do enxame de agentes da organização do usuário autenticado.
-        Status: hoje pode falhar com 500 por campo inexistente; correção pendente do Agente 07
-        (o service filtra execuções por `status: 'Running'`, valor que não existe no enum).
+        Status: falha sempre com 500 (PrismaClientValidationError); correção pendente do Agente 07.
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. Depois da consulta (válida) a `AgentMemory`, `getSwarmRealtimeStatus` seleciona `costUsd` e `success` em `AILog`, campos inexistentes no modelo (ele tem `cost` e `tokens`), o que lança PrismaClientValidationError. Mesmo corrigido isso, a consulta seguinte filtra `AgentMemory` por `status: 'Running'`, valor fora do enum `AgentMemoryStatus` (só `Completed` e `Failed`), e também falharia.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /agent/audit-logs:
     get:
@@ -4007,7 +4058,7 @@ paths:
       deprecated: true
       summary: Logs de auditoria das ações do enxame (indisponível)
       description: >-
-        Endpoint indisponível: hoje falha com 500 (PrismaClientValidationError) e passará a responder 501 explicitamente (padrão de voice-hub/routes/ai.routes.ts:21-31) até reimplementação pelo Agente 07.
+        Endpoint indisponível: falha sempre com 500 (TypeError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07.
         Nota: a reativação exigirá requireRole(ADMIN, GESTOR), validação zod na query e os campos
         definidos pelo Agente 21.
       parameters:
@@ -4022,7 +4073,7 @@ paths:
           schema: { type: string, enum: [success, error] }
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
@@ -4034,12 +4085,24 @@ paths:
                     properties:
                       logs: { type: array, items: { type: object } }
                       total: { type: integer }
-        '501':
-          description: Not Implemented — endpoint indisponível até reimplementação (Agente 07)
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. `getSwarmAuditLogs` chama `prisma.swarmAuditLog.findMany`/`count`, mas não existe model `SwarmAuditLog` em `prisma/schema.prisma`; o client não tem esse delegate e a chamada lança TypeError (Cannot read properties of undefined (reading 'findMany')).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Planejado — não implementado; hoje responde 500.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - type: object
+                    required: [success]
+                    properties:
+                      success: { type: boolean, enum: [false] }
 
   /agent/usage-heatmap:
     get:
@@ -4067,13 +4130,11 @@ paths:
   /agent/cost-analysis:
     get:
       tags: [Agent]
-      summary: Análise de custos por agente nos últimos N dias
+      summary: Análise de custos por agente nos últimos N dias (indisponível)
+      deprecated: true
       description: >-
         Análise de custos por agente da organização do usuário autenticado nos últimos N dias.
-        Status: hoje pode falhar com 500 por campo inexistente; correção pendente do Agente 07
-        (o diagnóstico citou o valor 'Running', mas este service não o usa: o select em `AILog`
-        pede `costUsd`, `promptTokens` e `completionTokens`, que não existem no modelo — ele tem
-        `cost` e `tokens`).
+        Status: falha sempre com 500 (PrismaClientValidationError); correção pendente do Agente 07.
       parameters:
         - name: days
           in: query
@@ -4085,11 +4146,18 @@ paths:
           schema: { type: integer, minimum: 1, default: 30 }
       responses:
         '200':
-          description: OK
+          description: OK — contrato pretendido; hoje nunca é retornado (ver 500).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataEnvelope'
+        '500':
+          description: >-
+            Comportamento atual e determinístico: falha sempre. `analyzeAgentCosts` seleciona `costUsd`, `promptTokens` e `completionTokens` em `AILog`, campos que não existem no modelo (ele tem `cost` e `tokens`), o que lança PrismaClientValidationError. Este service não usa o valor 'Running'.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /agent/golden-dataset/summary:
     get:
