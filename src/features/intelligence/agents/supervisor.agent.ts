@@ -1,4 +1,5 @@
 import { AIMessage, type BaseMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
+import type { RunnableConfig } from '@langchain/core/runnables';
 import { Annotation, StateGraph } from '@langchain/langgraph';
 import type { ChatOpenAI } from '@langchain/openai';
 import { z } from 'zod';
@@ -251,7 +252,17 @@ export function enforceLeadGuard(
   };
 }
 
-async function supervisorNode(state: SwarmStateType) {
+// Correlation ID para tracing distribuído do supervisor: baseado no thread_id do checkpoint
+// (`${tenant}:${sid}`, montado em executeMission/executeMissionStream) e timestamp.
+// Decisão do Agente 07 (opção b) — ver
+// .agents/handoffs/onda-52/07-para-00-correlationid-supervisor-thread-id.md.
+export function buildSwarmCorrelationId(config?: RunnableConfig, now: number = Date.now()): string {
+  const raw = config?.configurable?.thread_id;
+  const threadId = typeof raw === 'string' && raw ? raw : 'no-thread';
+  return `swarm-${threadId}-${now}`;
+}
+
+async function supervisorNode(state: SwarmStateType, config?: RunnableConfig) {
   const step = state.step + 1;
 
   if (step > MAX_STEPS) {
@@ -332,8 +343,7 @@ Antes de usar a ferramenta de decisão estruturada de roteamento, faça uma brev
 
 ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
-  // Correlation ID para tracing distribuído - baseado em sessionId e timestamp
-  const correlationId = `swarm-${sessionId}-${Date.now()}`;
+  const correlationId = buildSwarmCorrelationId(config);
 
   let decision: SupervisorDecision;
   const startTime = Date.now();
