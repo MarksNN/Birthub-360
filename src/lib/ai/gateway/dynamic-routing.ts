@@ -11,7 +11,7 @@ import { logger } from '../../logger.js';
 import { PRICING_PER_MILLION_TOKENS } from './pricing.js';
 import { isCircuitOpen } from './circuit-breaker.js';
 import type { ProviderAdapter } from './providers/types.js';
-import type { OrganizationTier } from '../finops/tokenQuota.service.js';
+import type { OrganizationTier } from '../../finops/tokenQuota.service.js';
 
 /** Métricas de latência recentes por provider/model (em memória, janela deslizante). */
 interface LatencyMetrics {
@@ -180,7 +180,7 @@ export async function selectDynamicRouting(
   options: DynamicRoutingOptions,
 ): Promise<DynamicRoutingResult> {
   const { tenantTier, requestedModel, availableProviders } = options;
-  const weights = adjustWeightsForTier(tenantTier);
+  const weights = adjustWeightsForTier(tierTier);
 
   // Filtra providers configurados
   const configuredProviders = availableProviders.filter((p) => p.isConfigured());

@@ -12,7 +12,6 @@ import { recordAiUsageCost } from '../metrics.js';
 import { tokenQuotaService } from '../finops/tokenQuota.service.js';
 import { detectPII, detectToxicity } from '../guardrails/index.js';
 import { resolveFallbackTimeoutMs } from './http-client.js';
-import { logger } from '../../logger.js';
 import { resolveModelName } from './model-routing.js';
 import { toChatCompletionMessages } from './parsing.js';
 import { estimateCostUsd } from './pricing.js';
