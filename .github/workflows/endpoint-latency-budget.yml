@@ -41,8 +41,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: endpoint-latency-budget-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Espelha ci.yml: PR cancela o run anterior da mesma PR; fora de PR, push/schedule/workflow_dispatch
+  # (os triggers que este workflow tiver) ficam num grupo por evento+SHA, sem cancelamento.
+  group: ${{ github.event_name == 'pull_request' && format('endpoint-latency-budget-pr-{0}', github.event.pull_request.number) || format('endpoint-latency-budget-{0}-{1}', github.event_name, github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   K6_VERSION: '0.54.0'
