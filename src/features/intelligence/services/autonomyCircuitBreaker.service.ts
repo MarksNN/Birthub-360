@@ -89,7 +89,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
     '[CircuitBreaker] Verificando taxa de erro dos agentes',
   );
 
-  let newState: CircuitBreakerState = { ...currentState };
+  const newState: CircuitBreakerState = { ...currentState };
 
   if (currentState.state === 'CLOSED' || currentState.state === 'HALF_OPEN') {
     // Verifica se deve abrir o circuito (downgrade)

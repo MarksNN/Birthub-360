@@ -53,9 +53,7 @@ const WorkspaceHome = lazy(() =>
     default: m.WorkspaceHome,
   })),
 );
-const LoginScreen = lazy(() =>
-  import('./features/auth/components/LoginScreen.js').then((m) => ({ default: m.LoginScreen })),
-);
+
 const ResetPasswordScreen = lazy(() =>
   import('./features/auth/components/ResetPasswordScreen.js').then((m) => ({
     default: m.ResetPasswordScreen,
@@ -296,9 +294,7 @@ const TermsOfUse = lazy(() => import('./pages/TermsOfUse.js'));
 const Landing360 = lazy(() =>
   import('./features/landing/pages/Landing360.js').then((m) => ({ default: m.Landing360 })),
 );
-const WelcomeScreen = lazy(() =>
-  import('./features/auth/components/WelcomeScreen.js').then((m) => ({ default: m.WelcomeScreen })),
-);
+
 const LandingInnovative = lazy(() =>
   import('./features/voice-hub/pages/LandingInnovative.js').then((m) => ({ default: m.default })),
 );
