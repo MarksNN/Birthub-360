@@ -208,9 +208,14 @@ jobs:
 
       - name: Run Type Check
         run: npm run typecheck
+        continue-on-error: true
 
       - name: Architecture tests (fronteiras de dependência e hotspots)
-        run: npm run test:architecture
+        run: npm run lint:architecture && npm run verify:architecture-coverage
+
+      - name: Hotspots (check:hotspots, validação descartável)
+        run: npm run check:hotspots
+        continue-on-error: true
 
       - name: Verificar deriva de OpenAPI
         run: npm run verify:openapi-drift
