@@ -220,16 +220,31 @@ propósito por estar fora de "## Exceções ativas"):
 - **Registrado em:** 2026-10-16
 - **Reavaliar até:** 2026-11-30
 
+### `src/features/intelligence/components/IntelligenceHub.tsx`
+
+- **Limite excepcional:** 1334 linhas (teto = tamanho atual; o arquivo não pode crescer)
+- **Dono:** Agente 07 — IA e Automações (redução; Agente 03 na parte de UI)
+- **Motivo:** exceção TEMPORÁRIA. O redesign do hub de IA em pilares operacionais (commits a96bb68d e 0774cd67, 2026-10-24) levou o arquivo a 1334 linhas sem exceção registrada, e o gate `check:hotspots` herdado da main passou a bloquear a validação dos PRs #67, #71 e #72. A exceção destrava o gate com teto no tamanho atual enquanto o Agente 07 (com o Agente 03 na UI) extrai os pilares/painéis para componentes próprios.
+- **Registrado em:** 2026-10-25
+- **Reavaliar até:** 2026-11-08
+
+### `src/features/intelligence/components/SwarmDashboard.tsx`
+
+- **Limite excepcional:** 1018 linhas (teto = tamanho atual; o arquivo não pode crescer)
+- **Dono:** Agente 07 — IA e Automações (redução; Agente 03 na parte de UI)
+- **Motivo:** exceção TEMPORÁRIA. O arquivo estava registrado como débito abaixo do limite (770 linhas) e cruzou 1000 linhas (1018) nos commits a96bb68d e 0774cd67 (2026-10-24), bloqueando o gate `check:hotspots` herdado da main e a validação dos PRs #67, #71 e #72. A exceção destrava o gate com teto no tamanho atual enquanto o dashboard do swarm é modularizado.
+- **Registrado em:** 2026-10-25
+- **Reavaliar até:** 2026-11-08
+
 ## Débito conhecido, abaixo do limite de falha (sem exceção necessária)
 
 Arquivos na faixa de aviso (701–1000 linhas) no momento em que este gate foi criado — não
 requerem exceção porque não quebram o gate, só ficam registrados aqui para não serem
 "descobertos" de novo como achado novo em uma auditoria futura. `BitrixImportPanel.tsx` e
 `CadenceHub.tsx` saíram desta lista em 2026-08-29 por já terem cruzado 1000 linhas — ver
-"Exceções ativas" acima.
+"Exceções ativas" acima. `SwarmDashboard.tsx` saiu em 2026-10-25 pelo mesmo motivo (1018 linhas).
 
 - `src/features/market-intelligence/server/accountIntelligence.service.ts` (857 linhas)
-- `src/features/intelligence/components/SwarmDashboard.tsx` (770 linhas)
 - `src/features/crm/components/LeadDetailDrawer.tsx` (726 linhas)
 - `src/components/CrmBoard.tsx` (977 linhas, 2026-09-11)
 
