@@ -135,6 +135,7 @@ export function Pagination({
             disabled={page === 1 || loading}
             onClick={() => onPageChange(1)}
             title="Primeira página"
+            aria-label="Primeira página"
             className="p-2 rounded-xl bg-surface/70 backdrop-blur-md border border-line text-ink-2 hover:bg-surface-elevated hover:shadow-sm active:scale-95 disabled:hover:scale-100 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer text-xs font-semibold"
           >
             <ChevronsLeft className="w-4 h-4" />
@@ -168,6 +169,7 @@ export function Pagination({
             disabled={page === totalPages || totalPages === 0 || loading}
             onClick={() => onPageChange(totalPages)}
             title="Última página"
+            aria-label="Última página"
             className="p-2 rounded-xl bg-surface/70 backdrop-blur-md border border-line text-ink-2 hover:bg-surface-elevated hover:shadow-sm active:scale-95 disabled:hover:scale-100 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer text-xs font-semibold"
           >
             <ChevronsRight className="w-4 h-4" />
