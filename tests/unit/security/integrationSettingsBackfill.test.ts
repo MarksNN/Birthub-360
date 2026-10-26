@@ -10,6 +10,7 @@ import {
   planSettingBackfill,
   type QueryFn,
   runIntegrationSettingsBackfill,
+  runIntegrationSettingsVerify,
   SECRET_FIELDS_BY_SETTING_KEY,
   TARGET_SETTING_KEYS,
 } from '../../../scripts/security/backfill-integration-settings-encryption.js';
@@ -19,6 +20,7 @@ import {
   reencryptIntegrationSettingValue,
 } from '../../../scripts/security/reencrypt-credentials.js';
 import { decryptField } from '../../../src/lib/crypto/secretFields.js';
+import { createFakeDb, orgRows } from './helpers/fakeRlsDb.js';
 
 const TRELLO_KEY = 'trello-api-key-plain-0001';
 const TRELLO_TOKEN = 'trello-oauth-token-plain-0002';
@@ -58,7 +60,7 @@ describe('planSettingBackfill', () => {
       value: { apiKey: TRELLO_KEY, token: TRELLO_TOKEN },
     });
     const second = planSettingBackfill({ key: 'integration.trello', value: first.nextValue });
-    expect(second).toEqual({ nextValue: null, encryptedFields: [], unknownFields: [] });
+    expect(second).toEqual({ nextValue: null, encryptedFields: [], unknownFields: [], unreadableFields: [] });
 
     const partial = planSettingBackfill({
       key: 'integration.trello',
@@ -110,22 +112,22 @@ describe('planSettingBackfill — chaves fora do catálogo (legadas)', () => {
   });
 });
 
-function fakeDb(rowsByOrg: Record<string, Array<{ id: string; key: string; value: unknown }>>) {
-  const calls: Array<{ sql: string; params?: unknown[] }> = [];
-  const query = vi.fn(async (sql: string, params?: unknown[]) => {
-    calls.push({ sql, params });
-    if (sql.includes('FROM "Organization"')) {
-      return { rows: Object.keys(rowsByOrg).map((id) => ({ id })) };
-    }
-    if (sql.includes('FROM "Setting"')) {
-      const orgId = params?.[0] as string;
-      return {
-        rows: (rowsByOrg[orgId] ?? []).map((r) => ({ ...r, organizationId: orgId })),
-      };
-    }
-    return { rows: [] };
-  }) as unknown as QueryFn;
-  return { query, calls };
+/** Postgres falso com RLS (helpers/fakeRlsDb.ts): Setting só de tenant, Organization com bypass. */
+function fakeDb(
+  rowsByOrg: Record<string, Array<{ id: string; key: string; value: unknown }>>,
+  extra: Array<{ id: string; organizationId: string | null; key: string; value: unknown }> = [],
+) {
+  const rows = [
+    ...Object.entries(rowsByOrg).flatMap(([org, rs]) => rs.map((r) => ({ ...r, organizationId: org }))),
+    ...extra,
+  ];
+  const db = createFakeDb({
+    tables: {
+      Organization: { rows: orgRows(...Object.keys(rowsByOrg)), bypassPolicy: true },
+      Setting: { rows, bypassPolicy: false },
+    },
+  });
+  return { query: db.query as QueryFn, calls: db.calls, db };
 }
 
 describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
@@ -147,8 +149,11 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
       toEncrypt: 2,
       written: 0,
       rowsWithUnknownFields: 0,
+      unreadableRows: 0,
+      conflicts: 0,
+      divergences: 0,
     });
-    expect(calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
+    expect(calls.some((c) => c.sql.startsWith('UPDATE'))).toBe(false);
     const logged = log.mock.calls.flat().join('\n');
     expect(logged).toContain('[DRY-RUN]');
     expect(logged).not.toContain(TRELLO_KEY);
@@ -172,7 +177,7 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
     const logged = log.mock.calls.flat().join('\n');
     expect(logged).toContain('fora_do_catalogo=accountSid');
     expect(logged).not.toContain('AC-SECRET-LEGACY');
-    expect(calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
+    expect(calls.some((c) => c.sql.startsWith('UPDATE'))).toBe(false);
   });
 
   it('apply sem snapshotId aborta antes de qualquer query', async () => {
@@ -183,34 +188,57 @@ describe('runIntegrationSettingsBackfill (QueryFn fake, sem banco)', () => {
     expect(calls).toHaveLength(0);
   });
 
-  it('apply: UPDATE por linha alvo, com tenant setado e sem bypass ao tocar Setting', async () => {
-    const { query, calls } = fakeDb(data());
+  it('apply: UPDATE (CAS no value) por linha alvo, em transação com o tenant LOCAL e sem bypass', async () => {
+    const { query, calls, db } = fakeDb(data());
     const res = await runIntegrationSettingsBackfill(query, { apply: true, snapshotId: 'snap-test', log: () => {} });
-    expect(res.written).toBe(2);
+    expect(res).toMatchObject({ written: 2, conflicts: 0, divergences: 0 });
     const updates = calls.filter((c) => c.sql.includes('UPDATE "Setting"'));
     expect(updates.map((u) => u.params?.[1])).toEqual(['s1', 's3']);
-    for (const u of updates) expect(String(u.params?.[0])).not.toContain(TRELLO_KEY);
+    for (const u of updates) {
+      expect(String(u.params?.[0])).not.toContain(TRELLO_KEY);
+      expect(u.sql).toContain('value = $4::jsonb');
+      expect(u).toMatchObject({ inTx: true, bypass: 'off', tenant: u.params?.[2] });
+    }
+    for (const c of calls.filter((x) => x.sql.includes('FROM "Setting"'))) {
+      expect(c).toMatchObject({ inTx: true, bypass: 'off' });
+      expect(['org-a', 'org-b']).toContain(c.tenant);
+    }
+    expect(calls.some((c) => /set_config\([^)]*false\)/i.test(c.sql))).toBe(false);
+    expect(db.rows('Setting').find((r) => r.id === 's1')?.value).not.toEqual(data()['org-a'][0].value);
+  });
 
-    const bypassOff = calls.findIndex((c) => c.sql.includes("'app.bypass_rls', 'off'"));
-    const firstSetting = calls.findIndex((c) => c.sql.includes('FROM "Setting"'));
-    expect(bypassOff).toBeGreaterThan(-1);
-    expect(bypassOff).toBeLessThan(firstSetting);
-    expect(calls[firstSetting - 1].sql).toContain('app.current_tenant_id');
+  it('dry-run só abre transações READ ONLY', async () => {
+    const { query, calls } = fakeDb(data());
+    await runIntegrationSettingsBackfill(query, { apply: false, log: () => {} });
+    const begins = calls.filter((c) => c.sql.startsWith('BEGIN'));
+    expect(begins.length).toBeGreaterThan(0);
+    for (const b of begins) expect(b.sql).toContain('READ ONLY');
+  });
+
+  it('Setting com organizationId nulo (fora de qualquer tenant) → divergência, não some em silêncio', async () => {
+    const { query } = fakeDb(data(), [
+      { id: 's0', organizationId: null, key: 'integration.trello', value: { apiKey: 'x' } },
+    ]);
+    const log = vi.fn();
+    const res = await runIntegrationSettingsBackfill(query, { apply: false, log });
+    expect(res.divergences).toBe(1);
+    expect(log.mock.calls.flat().join('\n')).toContain('[DIVERGÊNCIA]');
+  });
+
+  it('preflight: sem a tabela Setting aborta antes de ler dados', async () => {
+    const db = createFakeDb({ tables: { Organization: { rows: orgRows('o') } } });
+    await expect(runIntegrationSettingsBackfill(db.query, { apply: false, log: () => {} })).rejects.toThrow(
+      /cobertura não provável/,
+    );
   });
 
   it('apply é idempotente: rodar sobre o resultado não grava nada', async () => {
     const { query, calls } = fakeDb(data());
     await runIntegrationSettingsBackfill(query, { apply: true, snapshotId: 'snap-test', log: () => {} });
-    const written = calls
-      .filter((c) => c.sql.includes('UPDATE "Setting"'))
-      .map((c) => ({ id: c.params?.[1] as string, value: JSON.parse(c.params?.[0] as string) }));
-    const after = data();
-    after['org-a'][0].value = written.find((w) => w.id === 's1')?.value;
-    after['org-b'][0].value = written.find((w) => w.id === 's3')?.value;
-    const second = fakeDb(after);
-    const res = await runIntegrationSettingsBackfill(second.query, { apply: true, snapshotId: 'snap-test', log: () => {} });
+    const before = calls.filter((c) => c.sql.startsWith('UPDATE')).length;
+    const res = await runIntegrationSettingsBackfill(query, { apply: true, snapshotId: 'snap-test', log: () => {} });
     expect(res.written).toBe(0);
-    expect(second.calls.some((c) => c.sql.includes('UPDATE'))).toBe(false);
+    expect(calls.filter((c) => c.sql.startsWith('UPDATE')).length).toBe(before);
   });
 });
 
@@ -245,10 +273,85 @@ describe('reencryptIntegrationSettingValue (rotação de chave)', () => {
     expect(reencryptIntegrationSettingValue('outra.coisa', { apiKey: 'enc:v1:a:b:c' }, OLD, NEW)).toBeNull();
   });
 
-  it('fail-closed: campo que não decifra com OLD_KEY lança', () => {
+  it('retomada idempotente: campo já em NEW_KEY não é regravado nem lança (só o OLD rotaciona)', () => {
+    const value = { apiKey: encryptWithKey(TRELLO_KEY, NEW), token: encryptWithKey('t', OLD) };
+    const out = reencryptIntegrationSettingValue('integration.trello', value, OLD, NEW);
+    expect(out?.fields).toEqual(['token']);
+    expect((out?.nextValue as Record<string, string>).apiKey).toBe(value.apiKey);
+    expect(
+      reencryptIntegrationSettingValue('integration.trello', { apiKey: value.apiKey }, OLD, NEW),
+    ).toBeNull();
+  });
+
+  it('fail-closed: campo que não decifra com OLD_KEY nem com NEW_KEY lança', () => {
     const wrong = encryptWithKey(TRELLO_KEY, randomBytes(32));
     expect(() =>
       reencryptIntegrationSettingValue('integration.trello', { apiKey: wrong }, OLD, NEW),
     ).toThrow();
+  });
+});
+
+describe('backfill — legibilidade (readKey) e --verify', () => {
+  const KEY = randomBytes(32);
+  const WRONG = randomBytes(32);
+  const enc = (p: string) => encryptWithKey(p, KEY);
+
+  it('planSettingBackfill com readKey: linha com campo enc: ilegível não é gravada (nem o campo em claro)', () => {
+    const plan = planSettingBackfill(
+      { key: 'integration.trello', value: { apiKey: encryptWithKey('x', WRONG), token: TRELLO_TOKEN } },
+      enc,
+      KEY,
+    );
+    expect(plan.unreadableFields).toEqual(['apiKey']);
+    expect(plan.nextValue).toBeNull();
+    expect(plan.encryptedFields).toEqual([]);
+  });
+
+  it('runIntegrationSettingsBackfill: conta ilegiveis= e não grava a linha', async () => {
+    const { query, calls } = fakeDb({
+      'org-a': [
+        { id: 'bad', key: 'integration.trello', value: { apiKey: encryptWithKey('x', WRONG), token: TRELLO_TOKEN } },
+        { id: 'good', key: 'integration.trello', value: { apiKey: enc('k'), token: TRELLO_TOKEN } },
+        { id: 'leg', key: LEGACY_BITRIX_KEY, value: encryptWithKey('https://x.bitrix24.com/rest/1/y/', WRONG) },
+      ],
+    });
+    const log = vi.fn();
+    const res = await runIntegrationSettingsBackfill(query, {
+      apply: true,
+      snapshotId: 'snap-test',
+      log,
+      encrypt: enc,
+      readKey: KEY,
+    });
+    expect(res.unreadableRows).toBe(2);
+    expect(res.written).toBe(1);
+    expect(calls.filter((c) => c.sql.startsWith('UPDATE')).map((c) => c.params?.[1])).toEqual(['good']);
+    const logged = log.mock.calls.flat().join('\n');
+    expect(logged).toContain('ilegiveis=2');
+    expect(logged).not.toContain(TRELLO_TOKEN);
+  });
+
+  it('runIntegrationSettingsVerify: legíveis / ilegíveis / em claro; nunca grava', async () => {
+    const { query, calls } = fakeDb({
+      'org-a': [
+        { id: 's1', key: 'integration.trello', value: { apiKey: enc('k'), token: TRELLO_TOKEN } },
+        { id: 's2', key: LEGACY_BITRIX_KEY, value: encryptWithKey('u', WRONG) },
+      ],
+    });
+    const log = vi.fn();
+    const c = await runIntegrationSettingsVerify(query, KEY, log);
+    expect(c).toMatchObject({ readable: 1, unreadable: 1, plaintext: 1, scanned: 2, organizations: 1, divergences: 0 });
+    expect(calls.some((x) => x.sql.startsWith('UPDATE'))).toBe(false);
+    for (const b of calls.filter((x) => x.sql.startsWith('BEGIN'))) expect(b.sql).toContain('READ ONLY');
+    expect(log.mock.calls.flat().join('\n')).not.toContain(TRELLO_TOKEN);
+  });
+});
+
+describe('reencryptIntegrationSettingValue — versão de envelope desconhecida (P3)', () => {
+  it('enc:v2 (ou outra) em campo secret lança — nunca passa adiante sem rotacionar', () => {
+    const OLD = randomBytes(32);
+    expect(() =>
+      reencryptIntegrationSettingValue('integration.trello', { apiKey: 'enc:v2:a:b:c' }, OLD, randomBytes(32)),
+    ).toThrow(/vers/i);
   });
 });

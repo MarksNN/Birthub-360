@@ -77,22 +77,22 @@ flowchart LR
 
 Os procedimentos detalhados e comandos de validação para cada componente encontram-se em `docs/security/runbooks/`:
 
-1. [`ROTATE_CREDENTIALS_ENCRYPTION_KEY.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md) — Rotação da chave mestra AES-256-GCM com re-encriptação de banco via `reencrypt-credentials.ts`.
-2. [`ROTATE_PII_BLIND_INDEX_KEY.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_PII_BLIND_INDEX_KEY.md) — Rotação do HMAC de busca cega de PII e re-indexação de contatos via `backfill-contact-pii.ts`.
-3. [`ROTATE_BETTER_AUTH_SECRET.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_BETTER_AUTH_SECRET.md) — Rotação do segredo de sessões e cookies com governança de sessões ativas.
-4. [`ROTATE_PLATFORM_OPERATOR_TOKEN.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_PLATFORM_OPERATOR_TOKEN.md) — Rotação do token de operador de infraestrutura (`/admin/queues`, `/metrics`).
-5. [`ROTATE_INBOUND_WEBHOOK_SECRETS.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_INBOUND_WEBHOOK_SECRETS.md) — Rotação bilateral de webhooks receptores (Birth Voices, 3CX, Chatwoot, Voice Result).
-6. [`ROTATE_BITRIX24_WEBHOOKS.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_BITRIX24_WEBHOOKS.md) — Procedimento para portais Bitrix24 onde o token compõe a URL.
-7. [`ROTATE_BLAND_AI_KEY.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_BLAND_AI_KEY.md) — Rotação de chave externa da Bland AI (disparo de telefonia).
-8. [`ROTATE_GEMINI_API_KEY.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/ROTATE_GEMINI_API_KEY.md) — Revogação de chave do Google AI Studio exposta em histórico.
-9. [`TEMPLATE_SECRET_ROTATION.md`](file:///c:/Github/Birthub-360/docs/security/runbooks/TEMPLATE_SECRET_ROTATION.md) — Gabarito padronizado para elaboração de novos runbooks de rotação.
+1. [`ROTATE_CREDENTIALS_ENCRYPTION_KEY.md`](runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md) — Rotação da chave mestra AES-256-GCM com re-encriptação de banco via `reencrypt-credentials.ts`.
+2. [`ROTATE_PII_BLIND_INDEX_KEY.md`](runbooks/ROTATE_PII_BLIND_INDEX_KEY.md) — Rotação do HMAC de busca cega de PII e re-indexação de contatos via `backfill-contact-pii.ts`.
+3. [`ROTATE_BETTER_AUTH_SECRET.md`](runbooks/ROTATE_BETTER_AUTH_SECRET.md) — Rotação do segredo de sessões e cookies com governança de sessões ativas.
+4. [`ROTATE_PLATFORM_OPERATOR_TOKEN.md`](runbooks/ROTATE_PLATFORM_OPERATOR_TOKEN.md) — Rotação do token de operador de infraestrutura (`/admin/queues`, `/metrics`).
+5. [`ROTATE_INBOUND_WEBHOOK_SECRETS.md`](runbooks/ROTATE_INBOUND_WEBHOOK_SECRETS.md) — Rotação bilateral de webhooks receptores (Birth Voices, 3CX, Chatwoot, Voice Result).
+6. [`ROTATE_BITRIX24_WEBHOOKS.md`](runbooks/ROTATE_BITRIX24_WEBHOOKS.md) — Procedimento para portais Bitrix24 onde o token compõe a URL.
+7. [`ROTATE_BLAND_AI_KEY.md`](runbooks/ROTATE_BLAND_AI_KEY.md) — Rotação de chave externa da Bland AI (disparo de telefonia).
+8. [`ROTATE_GEMINI_API_KEY.md`](runbooks/ROTATE_GEMINI_API_KEY.md) — Revogação de chave do Google AI Studio exposta em histórico.
+9. [`TEMPLATE_SECRET_ROTATION.md`](runbooks/TEMPLATE_SECRET_ROTATION.md) — Gabarito padronizado para elaboração de novos runbooks de rotação.
 
 ---
 
 ## 5. Ferramentas Automatizadas de Suporte
 
 O repositório fornece utilitários executáveis em `scripts/security/`:
-- `scripts/security/reencrypt-credentials.ts`: Re-encriptação em lote (OLD_KEY → NEW_KEY) de registros protegidos no banco, incluindo `Setting` de integrações por campo (`--model=Setting`). **Dry-run por padrão** — só grava com `--apply --snapshot-confirmed=<id>`; sem `--apply` nada muda. Exige `CREDENTIALS_ENCRYPTION_KEY`, `OLD_KEY` e `NEW_KEY` explícitas. Siga o runbook `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` (verificação obrigatória antes de trocar a chave).
+- `scripts/security/reencrypt-credentials.ts`: Re-encriptação em lote (OLD_KEY → NEW_KEY) de registros protegidos no banco, incluindo `Setting` de integrações por campo (`--model=Setting`). **Dry-run por padrão** — só grava com `--apply --snapshot-confirmed=<id>`; sem `--apply` nada muda. Exige `CREDENTIALS_ENCRYPTION_KEY`, `OLD_KEY` e `NEW_KEY` explícitas. Linha com qualquer campo ilegível não é gravada (atômico por linha) e o script sai com código 2. `--target=redis-wa-auth` cobre as sessões WhatsApp/Baileys (`wa-auth:<org>:*`) no Redis; `--verify` (somente leitura) conta legíveis/ilegíveis/em claro sob uma chave. Siga o runbook `ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` (verificação obrigatória com `--verify` antes de trocar a chave).
 - `scripts/security/backfill-integration-settings-encryption.ts`: Cifra em repouso os segredos de integração legados em texto puro em `Setting.value` (ADR-010). Dry-run por padrão; grava só com `--apply --snapshot-confirmed=<id>`.
 - `scripts/security/backfill-contact-pii.ts`: Recálculo e população de índices cegos de PII por tenant.
 - `scripts/security/audit-secret-hygiene.ts`: Diagnóstico de conformidade de variáveis de ambiente, detecção de placeholders e verificação de entropia sem exibição de segredos.
