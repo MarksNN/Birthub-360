@@ -53,11 +53,13 @@ import { RobustScriptGenerator } from './RobustScriptGenerator.js';
 import { SalesMethodologyStudio } from './SalesMethodologyStudio.js';
 import { SuperagentCreator } from './SuperagentCreator.js';
 import { SwarmDashboard } from './SwarmDashboard.js';
+import { UniversalEcosystemPanel } from './UniversalEcosystemPanel.js';
 
 export type IntelligenceTab =
   | 'telemetry'
   | 'ai_suite'
   | 'swarm'
+  | 'ecosystem'
   | 'methodologies'
   | 'ai_config'
   | 'superagent'
@@ -171,6 +173,32 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
       'Dispara missões comerciais coordenadas entre SDR, Closer e CRM em lote, com acompanhamento de pipeline e execução paralela.',
     techMeta: 'Execução Concorrente · Swarm',
     keywords: ['enxame', 'swarm', 'missão', 'lote', 'multi-agente', 'paralelo'],
+  },
+  {
+    id: 'ecosystem',
+    label: 'Ecossistema Universal (21+ Plataformas & Office)',
+    category: 'agents',
+    icon: Layers,
+    badge: '29 Tools Universais',
+    badgeColor: 'ok',
+    description:
+      'Conectores ao vivo (Outlook/Gmail/IMAP, Trello, Monday, Bitrix, HubSpot, Pipedrive, Notion, WhatsApp, Telegram, Teams, Slack, Relógio/Celular), gerador Excel (.xlsx)/Word/PowerPoint e Playbooks encadeados.',
+    techMeta: '21+ Plataformas · Office .xlsx · Playbooks',
+    keywords: [
+      'ecossistema',
+      'trello',
+      'monday',
+      'outlook',
+      'excel',
+      'word',
+      'powerpoint',
+      'smartwatch',
+      'relógio',
+      'telegram',
+      'teams',
+      'slack',
+      'playbooks',
+    ],
   },
   {
     id: 'superagent',
@@ -1204,6 +1232,20 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
         {activeTab === 'telemetry' && <GroqTelemetryPanel />}
         {activeTab === 'ai_suite' && <AISuiteHub />}
         {activeTab === 'swarm' && <SwarmDashboard />}
+        {activeTab === 'ecosystem' && (
+          <Card variant="default" padding="lg" accentBar>
+            <div className="space-y-8">
+              <UniversalEcosystemPanel
+                mode="studio"
+                onLaunchSwarmMission={() => setActiveTab('swarm')}
+              />
+              <UniversalEcosystemPanel
+                mode="connectors"
+                onLaunchSwarmMission={() => setActiveTab('swarm')}
+              />
+            </div>
+          </Card>
+        )}
         {activeTab === 'quality' && <AgentQualityPanel />}
         {activeTab === 'methodologies' && <SalesMethodologyStudio />}
         {activeTab === 'ai_config' && <AIConfigCenter />}

@@ -36,17 +36,33 @@
  * sem exigir tocar em nenhum dos pontos de chamada.
  */
 
+export {
+  AiTokenQuotaExceededError,
+  TIER_QUOTAS,
+  TokenQuotaService,
+  tokenQuotaService,
+} from './finops/tokenQuota.service.js';
 export { getAiModel } from './gateway/chat-model.js';
 export { __resetCircuitBreakerForTests } from './gateway/circuit-breaker.js';
+export type {
+  DynamicRoutingOptions,
+  DynamicRoutingResult,
+} from './gateway/dynamic-routing.js';
+export {
+  __resetLatencyCacheForTests,
+  recordLatency,
+  selectDynamicRouting,
+} from './gateway/dynamic-routing.js';
 export { generateEmbedding } from './gateway/embeddings.js';
+export { getGroqTelemetrySnapshot } from './gateway/groqTelemetry.service.js';
 export { LOCAL_MODEL } from './gateway/model-routing.js';
 export { cleanAndParseJson, toChatCompletionMessages } from './gateway/parsing.js';
 export { estimateCostUsd } from './gateway/pricing.js';
-export { getGroqTelemetrySnapshot } from './gateway/groqTelemetry.service.js';
 export {
   UNTRUSTED_CONTENT_GUARD_INSTRUCTION,
   wrapUntrustedContent,
 } from './gateway/prompt-safety.js';
+export { litellmProvider } from './gateway/providers/litellm.provider.js';
 export { withRetry } from './gateway/retry.js';
 export { streamChatCompletion } from './gateway/streaming.js';
 export type {
@@ -58,23 +74,7 @@ export type {
   AiUsageLogInput,
   ChatCompletionMessage,
 } from './gateway/types.js';
-export { litellmProvider } from './gateway/providers/litellm.provider.js';
 export { logAiUsage } from './usage-log.js';
-export {
-  tokenQuotaService,
-  TokenQuotaService,
-  AiTokenQuotaExceededError,
-  TIER_QUOTAS,
-} from './finops/tokenQuota.service.js';
-export {
-  selectDynamicRouting,
-  recordLatency,
-  __resetLatencyCacheForTests,
-} from './gateway/dynamic-routing.js';
-export type {
-  DynamicRoutingOptions,
-  DynamicRoutingResult,
-} from './gateway/dynamic-routing.js';
 
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { getAiModel } from './gateway/chat-model.js';

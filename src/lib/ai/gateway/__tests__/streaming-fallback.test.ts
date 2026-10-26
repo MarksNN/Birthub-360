@@ -2,13 +2,13 @@
  * P2.2 - Testes para Streaming com Fallback
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { HumanMessage } from '@langchain/core/messages';
-import { streamChatCompletionWithFallback } from '../streaming-fallback.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assertAiBudgetNotExceeded } from '../../budget.js';
+import { isCircuitOpen } from '../circuit-breaker.js';
 import { groqProvider } from '../providers/groq.provider.js';
 import { openaiProvider } from '../providers/openai.provider.js';
-import { isCircuitOpen } from '../circuit-breaker.js';
+import { streamChatCompletionWithFallback } from '../streaming-fallback.js';
 
 vi.mock('../../budget.js');
 vi.mock('../circuit-breaker.js');
@@ -58,9 +58,7 @@ describe('streamChatCompletionWithFallback', () => {
       'test-context',
     );
 
-    await expect(generator.next()).rejects.toThrow(
-      'Nenhum motor de IA configurado para streaming',
-    );
+    await expect(generator.next()).rejects.toThrow('Nenhum motor de IA configurado para streaming');
   });
 
   it('deve respeitar assertAiBudgetNotExceeded', async () => {

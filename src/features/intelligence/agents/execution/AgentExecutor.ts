@@ -22,9 +22,9 @@
 import { AIMessage, type BaseMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { StructuredToolInterface } from '@langchain/core/tools';
 import { MessagesAnnotation, StateGraph } from '@langchain/langgraph';
+import { assertAiBudgetNotExceeded } from '../../../../lib/ai/budget.js';
 import { checkpointer, ensureCheckpointerReady } from '../../../../lib/ai/checkpointer.js';
 import { getAiModel, logAiUsage } from '../../../../lib/ai/gateway.js';
-import { assertAiBudgetNotExceeded } from '../../../../lib/ai/budget.js';
 import { logger } from '../../../../lib/logger.js';
 import { assertPiiExternalConsent } from '../../services/guardrails.service.js';
 import { recordAgentFailure, saveAgentMemory } from '../agentMemory.store.js';

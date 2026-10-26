@@ -7,19 +7,18 @@ import {
   type NotificationKind,
   notificationService,
 } from '../notifications/notification.service.js';
+import type {
+  CadenceActionConfig,
+  ExtendedAutomationAction,
+  ExtendedAutomationTrigger,
+  UpdateCustomFieldActionConfig,
+  WebhookActionConfig,
+} from './automation.types.js';
 import { automationHistoryService } from './automation-history.service.js';
 import {
   buildTriggerIdempotencyKey,
   claimAutomationTrigger,
 } from './automation-idempotency.service.js';
-
-import type {
-  ExtendedAutomationTrigger,
-  ExtendedAutomationAction,
-  WebhookActionConfig,
-  UpdateCustomFieldActionConfig,
-  CadenceActionConfig,
-} from './automation.types.js';
 import { cadenceIntegrationService } from './cadenceIntegration.service.js';
 
 export type AutomationTrigger = ExtendedAutomationTrigger;
@@ -560,7 +559,10 @@ export class AutomationEngine {
           data: event.data,
           organizationId: event.organizationId,
         };
-        bodyData = typeof rawBody === 'string' ? renderTemplate(rawBody, event.data) : JSON.stringify(rawBody);
+        bodyData =
+          typeof rawBody === 'string'
+            ? renderTemplate(rawBody, event.data)
+            : JSON.stringify(rawBody);
       }
 
       const response = await fetch(targetUrl, {
@@ -571,7 +573,9 @@ export class AutomationEngine {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook externo retornou status HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(
+          `Webhook externo retornou status HTTP ${response.status}: ${response.statusText}`,
+        );
       }
       return;
     }
@@ -579,7 +583,9 @@ export class AutomationEngine {
     if (automation.action === 'Atualizar campo customizado') {
       const c = config as unknown as UpdateCustomFieldActionConfig;
       if (!c.field) {
-        throw new PermanentAutomationError('Ação "Atualizar campo customizado" requer o campo "field".');
+        throw new PermanentAutomationError(
+          'Ação "Atualizar campo customizado" requer o campo "field".',
+        );
       }
       const targetEntity = c.entity ?? event.entity;
       const targetEntityId = c.entityId ?? event.entityId;
@@ -596,9 +602,12 @@ export class AutomationEngine {
     }
 
     if (automation.action === 'Enrich lead') {
-      const leadId = event.entity === 'Lead' ? event.entityId : (event.data.leadId as string | undefined);
+      const leadId =
+        event.entity === 'Lead' ? event.entityId : (event.data.leadId as string | undefined);
       if (!leadId) {
-        throw new PermanentAutomationError('Ação "Enrich lead" precisa de um lead vinculado ao evento.');
+        throw new PermanentAutomationError(
+          'Ação "Enrich lead" precisa de um lead vinculado ao evento.',
+        );
       }
       const { domainEventMesh } = await import('../../lib/queue/domainEventMesh.service.js');
       await domainEventMesh.publish({
@@ -619,11 +628,17 @@ export class AutomationEngine {
     if (automation.action === 'Mover para outra etapa de cadência') {
       const c = config as unknown as CadenceActionConfig;
       if (!c.cadenceId) {
-        throw new PermanentAutomationError('Ação "Mover para outra etapa de cadência" requer "cadenceId".');
+        throw new PermanentAutomationError(
+          'Ação "Mover para outra etapa de cadência" requer "cadenceId".',
+        );
       }
-      const leadId = c.leadId ?? (event.entity === 'Lead' ? event.entityId : (event.data.leadId as string | undefined));
+      const leadId =
+        c.leadId ??
+        (event.entity === 'Lead' ? event.entityId : (event.data.leadId as string | undefined));
       if (!leadId) {
-        throw new PermanentAutomationError('Ação "Mover para outra etapa de cadência" precisa de um leadId.');
+        throw new PermanentAutomationError(
+          'Ação "Mover para outra etapa de cadência" precisa de um leadId.',
+        );
       }
       await cadenceIntegrationService.executeCadenceAction(event.organizationId, leadId, c);
       return;

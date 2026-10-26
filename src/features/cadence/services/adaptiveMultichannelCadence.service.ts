@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   CadenceChannel,
   CadenceStep,
@@ -6,8 +8,6 @@ import type {
   MultichannelCadenceEnrollment,
   StepDispatchResult,
 } from '../../../shared/contracts/multichannelCadence.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class AdaptiveMultichannelCadenceService implements IMultichannelCadencePort {
   private enrollmentsStore = new Map<string, MultichannelCadenceEnrollment>();

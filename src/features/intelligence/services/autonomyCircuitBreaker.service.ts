@@ -1,6 +1,6 @@
+import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 import { autonomyGovernorService } from './autonomyGovernor.service.js';
 
 /**

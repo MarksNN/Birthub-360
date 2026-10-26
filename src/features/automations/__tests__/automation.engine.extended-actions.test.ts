@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { PermanentAutomationError, automationEngine } from '../automation.engine.js';
-import { cadenceIntegrationService } from '../cadenceIntegration.service.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../../lib/prisma.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
+import { automationEngine, PermanentAutomationError } from '../automation.engine.js';
+import { cadenceIntegrationService } from '../cadenceIntegration.service.js';
 
 vi.mock('../../../lib/queue/redis.js', () => ({
   connection: {},
@@ -105,23 +105,21 @@ describe('AutomationEngine — Extended Actions (P3.1 & P3.4)', () => {
         data: {},
       };
 
-      await expect(
-        (automationEngine as any).runAction(automation, event),
-      ).rejects.toThrow(PermanentAutomationError);
+      await expect((automationEngine as any).runAction(automation, event)).rejects.toThrow(
+        PermanentAutomationError,
+      );
     });
   });
 
   describe('Mover para outra etapa de cadência (P3.4)', () => {
     it('delega para cadenceIntegrationService com parâmetros corretos', async () => {
-      const spy = vi
-        .spyOn(cadenceIntegrationService, 'executeCadenceAction')
-        .mockResolvedValue({
-          success: true,
-          action: 'move_to_step',
-          leadId: 'lead-100',
-          cadenceId: 'cad-enterprise',
-          details: { currentStep: 2 },
-        });
+      const spy = vi.spyOn(cadenceIntegrationService, 'executeCadenceAction').mockResolvedValue({
+        success: true,
+        action: 'move_to_step',
+        leadId: 'lead-100',
+        cadenceId: 'cad-enterprise',
+        details: { currentStep: 2 },
+      });
 
       const automation = {
         id: 'auto-2',

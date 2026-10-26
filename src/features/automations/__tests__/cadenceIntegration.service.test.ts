@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach } from 'vitest';
-import { cadenceIntegrationService } from '../cadenceIntegration.service.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { adaptiveMultichannelCadenceService } from '../../cadence/services/adaptiveMultichannelCadence.service.js';
+import { cadenceIntegrationService } from '../cadenceIntegration.service.js';
 
 describe('CadenceIntegrationService (P3.4)', () => {
   beforeEach(() => {
@@ -68,7 +68,10 @@ describe('CadenceIntegrationService (P3.4)', () => {
     expect(result.action).toBe('pause');
     expect(result.details?.pausedDays).toBe(5);
 
-    const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead('org-1', 'lead-beta');
+    const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
+      'org-1',
+      'lead-beta',
+    );
     expect(enrollment?.status).toBe('paused');
   });
 
@@ -91,7 +94,10 @@ describe('CadenceIntegrationService (P3.4)', () => {
     expect(result.success).toBe(true);
     expect(result.action).toBe('resume');
 
-    const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead('org-1', 'lead-gamma');
+    const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
+      'org-1',
+      'lead-gamma',
+    );
     expect(enrollment?.status).toBe('active');
   });
 
@@ -105,7 +111,10 @@ describe('CadenceIntegrationService (P3.4)', () => {
     expect(result.action).toBe('restart');
     expect(result.details?.currentStep).toBe(1);
 
-    const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead('org-1', 'lead-delta');
+    const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
+      'org-1',
+      'lead-delta',
+    );
     expect(enrollment?.status).toBe('active');
     expect(enrollment?.currentStep).toBe(1);
   });

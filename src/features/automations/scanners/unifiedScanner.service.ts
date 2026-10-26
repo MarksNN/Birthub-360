@@ -1,5 +1,5 @@
-import { acquireDistributedLock } from '../../../lib/queue/distributedLock.js';
 import { logger } from '../../../lib/logger.js';
+import { acquireDistributedLock } from '../../../lib/queue/distributedLock.js';
 import { runColdLeadsScan } from '../application/cold-leads-scanner.service.js';
 import { runStagnationScan } from '../application/stagnation-scanner.service.js';
 

@@ -1,14 +1,14 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { getTenantId } from '../../../lib/context.js';
-import { logger } from '../../../lib/logger.js';
-import { prisma } from '../../../lib/prisma.js';
 import {
   generateEmailDraft,
   generateSalesPitch,
   handleSalesObjection,
 } from '../../../lib/ai/features.js';
 import { generateTextOutput } from '../../../lib/ai/gateway.js';
+import { getTenantId } from '../../../lib/context.js';
+import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Fábrica de Scripts Comerciais, Copy Multicanal, Battlecards e Prompts Reutilizáveis.

@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { unifiedScannerService } from '../unifiedScanner.service.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as distributedLock from '../../../../lib/queue/distributedLock.js';
 import * as coldLeadsScanner from '../../application/cold-leads-scanner.service.js';
 import * as stagnationScanner from '../../application/stagnation-scanner.service.js';
+import { unifiedScannerService } from '../unifiedScanner.service.js';
 
 describe('UnifiedScannerService (P3.3)', () => {
   beforeEach(() => {

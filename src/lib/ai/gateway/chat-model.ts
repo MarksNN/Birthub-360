@@ -9,9 +9,14 @@ import type { BaseMessage } from '@langchain/core/messages';
 import { requestContext } from '../../async-context.js';
 import { logger } from '../../logger.js';
 import { assertAiBudgetNotExceeded } from '../budget.js';
-import { recordAiUsageCost } from '../metrics.js';
 import { tokenQuotaService } from '../finops/tokenQuota.service.js';
 import { detectPII, detectToxicity } from '../guardrails/index.js';
+import { recordAiUsageCost } from '../metrics.js';
+import {
+  type DynamicRoutingOptions,
+  recordLatency,
+  selectDynamicRouting,
+} from './dynamic-routing.js';
 import { resolveFallbackTimeoutMs } from './http-client.js';
 import { resolveModelName } from './model-routing.js';
 import { toChatCompletionMessages } from './parsing.js';
@@ -19,17 +24,12 @@ import { estimateCostUsd } from './pricing.js';
 import { groqProvider } from './providers/groq.provider.js';
 import { litellmProvider } from './providers/litellm.provider.js';
 import { openaiProvider } from './providers/openai.provider.js';
-import { vllmProvider } from './providers/vllm.provider.js';
 import { openrouterProvider } from './providers/openrouter.provider.js';
 import type { ProviderAdapter } from './providers/types.js';
+import { vllmProvider } from './providers/vllm.provider.js';
 import { sanitizeProviderMessage } from './redaction.js';
 import { traceAiGeneration } from './telemetry.js';
 import type { AiChatModel, AiInvokeResult, ChatCompletionResponse } from './types.js';
-import {
-  selectDynamicRouting,
-  recordLatency,
-  type DynamicRoutingOptions,
-} from './dynamic-routing.js';
 
 // Ordem de fallback: vLLM primeiro (se hospedado no cluster), Groq (rápido, open source),
 // OpenAI como terceira opção, LiteLLM/Ollama por último (ver comentário em
@@ -114,7 +114,7 @@ async function callWithFallback(
         const errMsg = String(error?.message || error);
         const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit');
         if (isRateLimit && attempts < 3) {
-          const match = errMsg.match(/try again in ([\d\.]+)s/i);
+          const match = errMsg.match(/try again in ([\d.]+)s/i);
           const waitMs = match ? Math.ceil(parseFloat(match[1]) * 1000) + 1500 : attempts * 5000;
           await new Promise((resolve) => setTimeout(resolve, waitMs));
           continue;
@@ -175,7 +175,7 @@ async function callWithDynamicRouting(
         const errMsg = String(error?.message || error);
         const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit');
         if (isRateLimit && attempts < 3) {
-          const match = errMsg.match(/try again in ([\d\.]+)s/i);
+          const match = errMsg.match(/try again in ([\d.]+)s/i);
           const waitMs = match ? Math.ceil(parseFloat(match[1]) * 1000) + 1500 : attempts * 5000;
           await new Promise((resolve) => setTimeout(resolve, waitMs));
           continue;

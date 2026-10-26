@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useId, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import {
-  AlertTriangle,
   AlertCircle,
-  Info,
+  AlertTriangle,
   CheckCircle,
-  X,
   ChevronDown,
-  RefreshCw,
   ChevronRight,
+  Info,
+  RefreshCw,
+  X,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { useSessionStore } from '../../store/useSessionStore.js';
+import { colors, getAccessibleBrandForeground, getAccessibleTextOnBrand } from '../tokens.js';
 import { usePrefersReducedMotion } from './useReducedMotion.js';
-import { getAccessibleTextOnBrand, getAccessibleBrandForeground, colors } from '../tokens.js';
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';

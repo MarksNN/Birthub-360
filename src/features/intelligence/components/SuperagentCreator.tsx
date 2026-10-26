@@ -115,6 +115,16 @@ const TOOLS_LIST = [
   { id: 'powershell_exec', name: 'PowerShell System Admin Runner' },
   { id: 'crm_sync', name: 'Sincronização Bitrix24 / CRM Upsert' },
   { id: 'email_dispatch', name: 'Disparo Automático de E-mails (SMTP)' },
+  { id: 'prospecting_enrichment', name: 'Descoberta B2B & Enriquecimento (Apollo/Receita/Hunter)' },
+  { id: 'email_intelligence', name: 'E-mail Multi-Provedor (Outlook/M365, Gmail & IMAP) + Sinais IA' },
+  { id: 'messaging_omnichannel', name: 'Mensageria Omnichannel (WhatsApp, Telegram, Teams, Slack, SMS)' },
+  { id: 'tasks_projects_notes', name: 'Tarefas & Notas (Trello, Monday.com, Bitrix24, ClickUp, Asana, Notion)' },
+  { id: 'meetings_calendar', name: 'Reuniões & Atas IA (Google Meet, Teams, Zoom, Calendly)' },
+  { id: 'office_docs_sheets_slides', name: 'Suite Office & Workspace (Word/Docs, Excel .xlsx, PowerPoint/Slides)' },
+  { id: 'multi_device_notifications', name: 'Notificações (Pop-up SSE, Push Celular, Smartwatch/Relógio, SMS)' },
+  { id: 'scripts_prompts_enablement', name: 'Fábrica de Scripts Comerciais & Biblioteca de Prompts' },
+  { id: 'crm_erp_sync', name: 'Sincronização Multi-CRM & ERP (Bitrix, HubSpot, Pipedrive, RD, Omie)' },
+  { id: 'pipeline_revops', name: 'RevOps, Forecast Ponderado, Propostas IA, Cross-Sell & Churn' },
 ];
 
 export function SuperagentCreator() {
@@ -141,6 +151,49 @@ export function SuperagentCreator() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   const [resultSource, setResultSource] = useState<'ai' | 'local'>('ai');
+  const [liveMission, setLiveMission] = useState(
+    'Verifique as integrações de e-mail e CRM, gere um script comercial para o meu papel e envie um alerta de resumo no pop-up e no relógio (smartwatch).',
+  );
+  const [runningLive, setRunningLive] = useState(false);
+  const [liveOutput, setLiveOutput] = useState<string | null>(null);
+
+  const handleRunLiveSuperagent = async () => {
+    if (!result || !liveMission.trim()) return;
+    setRunningLive(true);
+    setLiveOutput(null);
+    try {
+      const validUniversalCategories = selectedTools.filter((id) =>
+        [
+          'prospecting_enrichment',
+          'email_intelligence',
+          'messaging_omnichannel',
+          'tasks_projects_notes',
+          'meetings_calendar',
+          'office_docs_sheets_slides',
+          'multi_device_notifications',
+          'scripts_prompts_enablement',
+          'crm_erp_sync',
+          'pipeline_revops',
+        ].includes(id),
+      );
+      const res = await api.post<any>('/api/agent/ecosystem/standalone-run', {
+        mission: liveMission,
+        agentTitle: name.trim() || role,
+        customSystemPrompt: result.systemPrompt,
+        categories: validUniversalCategories.length > 0 ? validUniversalCategories : undefined,
+      });
+      const payload = res?.data ?? res;
+      setLiveOutput(
+        payload?.output || payload?.error || 'Superagente executado com sucesso no runtime universal.',
+      );
+    } catch (err: any) {
+      setLiveOutput(
+        err instanceof Error ? `Erro na execução ao vivo: ${err.message}` : 'Falha ao executar Superagente.',
+      );
+    } finally {
+      setRunningLive(false);
+    }
+  };
 
   const [activeDropdown, setActiveDropdown] = useState<
     'provider' | 'model' | 'role' | 'temp' | 'memory' | null
@@ -868,6 +921,45 @@ $status | ConvertTo-Json -Depth 3
                   {activeTabOutput === 'json' && result.jsonConfig}
                   {activeTabOutput === 'python' && result.pythonScript}
                   {activeTabOutput === 'powershell' && result.powershellScript}
+                </pre>
+              </div>
+            </div>
+            <div className="mt-6 relative z-10 bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h5 className="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2">
+                  <Zap size={14} /> Testar & Executar este Superagente ao Vivo (29 Tools Universais)
+                </h5>
+                <span className="text-[11px] text-gray-400">
+                  Executa no runtime real (UniversalSpecialistAgent) com o System Prompt acima
+                </span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={liveMission}
+                  onChange={(e) => setLiveMission(e.target.value)}
+                  placeholder="Digite uma missão real para este Superagente executar agora..."
+                  className="flex-1 bg-black/60 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none"
+                />
+                <button
+                  type="button"
+                  disabled={runningLive}
+                  onClick={() => void handleRunLiveSuperagent()}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 text-black hover:bg-emerald-400 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <Zap size={14} />
+                  {runningLive ? 'Executando no Ecossistema...' : 'Executar Superagente Agora'}
+                </button>
+              </div>
+              {liveOutput && (
+                <div className="bg-black/80 border border-emerald-500/30 rounded-xl p-4 text-xs text-gray-200 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto">
+                  {liveOutput}
+                </div>
+              )}
+            </div>
+            <div>
+              <div>
+                <pre className="hidden">
                 </pre>
               </div>
             </div>
