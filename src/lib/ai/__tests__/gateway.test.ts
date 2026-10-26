@@ -325,9 +325,7 @@ describe('AI gateway', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(
-      getAiModel('local-llama3', 0, 'unit:dynamic-fallback').invoke([
-        new HumanMessage('Pedido'),
-      ]),
+      getAiModel('local-llama3', 0, 'unit:dynamic-fallback').invoke([new HumanMessage('Pedido')]),
     ).rejects.toThrow('Os motores de IA estão indisponíveis');
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
