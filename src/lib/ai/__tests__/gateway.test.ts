@@ -24,6 +24,7 @@ vi.mock('../../logger.js', () => ({
 }));
 
 import * as budgetModule from '../budget.js';
+import { __resetLatencyCacheForTests } from '../gateway/dynamic-routing.js';
 import {
   __resetCircuitBreakerForTests,
   cleanAndParseJson,
@@ -32,11 +33,17 @@ import {
   toChatCompletionMessages,
 } from '../gateway.js';
 
-const originalEnv = {
-  GROQ_API_KEY: process.env.GROQ_API_KEY,
-  LITELLM_URL: process.env.LITELLM_URL,
-  LITELLM_KEY: process.env.LITELLM_KEY,
-};
+const PROVIDER_ENV_KEYS = [
+  'GROQ_API_KEY',
+  'OPENAI_API_KEY',
+  'OPENROUTER_API_KEY',
+  'VLLM_API_URL',
+  'VLLM_API_KEY',
+  'OLLAMA_BASE_URL',
+  'OLLAMA_API_KEY',
+  'LITELLM_URL',
+  'LITELLM_KEY',
+] as const;
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -47,20 +54,18 @@ function jsonResponse(body: unknown, status = 200): Response {
 
 describe('AI gateway', () => {
   beforeEach(async () => {
-    process.env.LITELLM_URL = 'http://litellm.test/v1/';
-    process.env.LITELLM_KEY = 'test-litellm-key';
-    delete process.env.GROQ_API_KEY;
-    delete process.env.OLLAMA_BASE_URL;
+    for (const key of PROVIDER_ENV_KEYS) vi.stubEnv(key, undefined);
+    vi.stubEnv('LITELLM_URL', 'http://litellm.test/v1/');
+    vi.stubEnv('LITELLM_KEY', 'test-litellm-key');
     await __resetCircuitBreakerForTests();
+    __resetLatencyCacheForTests();
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
-    for (const [key, value] of Object.entries(originalEnv)) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
-    }
+    __resetLatencyCacheForTests();
   });
 
   it('preserva os papéis de sistema, usuário e assistente', () => {
@@ -111,7 +116,7 @@ describe('AI gateway', () => {
   });
 
   it('tenta Groq primeiro e só cai pro LiteLLM (último recurso) se Groq falhar', async () => {
-    process.env.GROQ_API_KEY = 'gsk_test_key_for_unit_tests';
+    vi.stubEnv('GROQ_API_KEY', 'gsk_test_key_for_unit_tests');
     const fetchMock = vi
       .fn()
       .mockRejectedValueOnce(new Error('Groq offline'))
@@ -267,7 +272,7 @@ describe('AI gateway', () => {
   });
 
   it('não reexecuta em erro 4xx — cai direto para o próximo provedor', async () => {
-    process.env.GROQ_API_KEY = 'gsk_test_key_for_unit_tests';
+    vi.stubEnv('GROQ_API_KEY', 'gsk_test_key_for_unit_tests');
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ error: 'Requisição inválida' }, 400))
@@ -309,6 +314,26 @@ describe('AI gateway', () => {
     ).rejects.toThrow('temporariamente desativado');
     // O circuit breaker impediu uma 4ª chamada de rede ao provedor já sabidamente fora do ar.
     expect(fetchMock).toHaveBeenCalledTimes(callsBeforeBreakerOpen);
+  });
+
+  it('não repete o provider com erro 4xx do routing dinâmico no fallback estático', async () => {
+    vi.stubEnv('GROQ_API_KEY', 'gsk_test_key_for_unit_tests');
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ error: 'Groq indisponível' }, 400))
+      .mockResolvedValueOnce(jsonResponse({ error: 'LiteLLM indisponível' }, 400));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(
+      getAiModel('local-llama3', 0, 'unit:dynamic-fallback').invoke([
+        new HumanMessage('Pedido'),
+      ]),
+    ).rejects.toThrow('Os motores de IA estão indisponíveis');
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      'https://api.groq.com/openai/v1/chat/completions',
+      'http://litellm.test/v1/chat/completions',
+    ]);
   });
 
   describe('cleanAndParseJson', () => {
