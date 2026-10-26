@@ -88,16 +88,16 @@ async function callWithFallback(
   requestMessages: ReturnType<typeof toChatCompletionMessages>,
   temperature: number,
   agentContext: string,
+  errorsByProvider = new Map<string, unknown>(),
 ): Promise<{ response: ChatCompletionResponse; providerUsed: string }> {
   const timeoutMs = resolveFallbackTimeoutMs();
   const _startTime = Date.now();
-  const errorsByProvider = new Map<string, unknown>();
 
   const chain = resolvedModel.startsWith('openrouter/')
     ? [openrouterProvider, litellmProvider]
     : PROVIDER_CHAIN;
   for (const provider of chain) {
-    if (!provider.isConfigured()) continue;
+    if (!provider.isConfigured() || errorsByProvider.has(provider.name)) continue;
     let attempts = 0;
     while (attempts < 3) {
       attempts++;
@@ -193,7 +193,7 @@ async function callWithDynamicRouting(
 
   // Fallback para cadeia estática se routing dinâmico falhar
   logger.info({ model: resolvedModel }, '[DynamicRouting] Usando cadeia de fallback estática');
-  return callWithFallback(resolvedModel, requestMessages, temperature, agentContext);
+  return callWithFallback(resolvedModel, requestMessages, temperature, agentContext, errorsByProvider);
 }
 
 /**
