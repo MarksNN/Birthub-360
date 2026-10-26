@@ -119,54 +119,65 @@ export const universalMeetingsTool = new DynamicStructuredTool({
           });
         }
 
-        const synthesis = await generateStructuredOutput<{
+        let synthesis: {
           executiveSummary: string;
           keyDecisions: string[];
           objectionsRaised: string[];
           nextSteps: Array<{ task: string; owner: string; priority: 'high' | 'normal' }>;
           sentiment: 'positive' | 'neutral' | 'negative';
-        }>({
-          organizationId,
-          feature: 'meeting_synthesis',
-          systemInstruction:
-            'Você é um especialista em inteligência de reuniões B2B. Extraia resumo executivo, decisões, objeções e próximos passos acionáveis.',
-          prompt: `Analise a transcrição de reunião abaixo:\n\n${transcript.slice(0, 12000)}`,
-          schema: {
-            type: 'object',
-            properties: {
-              executiveSummary: { type: 'string' },
-              keyDecisions: { type: 'array', items: { type: 'string' } },
-              objectionsRaised: { type: 'array', items: { type: 'string' } },
-              nextSteps: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    task: { type: 'string' },
-                    owner: { type: 'string' },
-                    priority: { type: 'string', enum: ['high', 'normal'] },
+        };
+
+        try {
+          synthesis = await generateStructuredOutput<{
+            executiveSummary: string;
+            keyDecisions: string[];
+            objectionsRaised: string[];
+            nextSteps: Array<{ task: string; owner: string; priority: 'high' | 'normal' }>;
+            sentiment: 'positive' | 'neutral' | 'negative';
+          }>({
+            organizationId,
+            feature: 'meeting_synthesis',
+            systemInstruction:
+              'Você é um especialista em inteligência de reuniões B2B. Extraia resumo executivo, decisões, objeções e próximos passos acionáveis.',
+            prompt: `Analise a transcrição de reunião abaixo:\n\n${transcript.slice(0, 12000)}`,
+            schema: {
+              type: 'object',
+              properties: {
+                executiveSummary: { type: 'string' },
+                keyDecisions: { type: 'array', items: { type: 'string' } },
+                objectionsRaised: { type: 'array', items: { type: 'string' } },
+                nextSteps: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      task: { type: 'string' },
+                      owner: { type: 'string' },
+                      priority: { type: 'string', enum: ['high', 'normal'] },
+                    },
+                    required: ['task', 'owner', 'priority'],
                   },
-                  required: ['task', 'owner', 'priority'],
                 },
+                sentiment: { type: 'string', enum: ['positive', 'neutral', 'negative'] },
               },
-              sentiment: { type: 'string', enum: ['positive', 'neutral', 'negative'] },
+              required: [
+                'executiveSummary',
+                'keyDecisions',
+                'objectionsRaised',
+                'nextSteps',
+                'sentiment',
+              ],
             },
-            required: [
-              'executiveSummary',
-              'keyDecisions',
-              'objectionsRaised',
-              'nextSteps',
-              'sentiment',
-            ],
-          },
-          fallback: () => ({
+          });
+        } catch {
+          synthesis = {
             executiveSummary: transcript.slice(0, 300),
             keyDecisions: [],
             objectionsRaised: [],
             nextSteps: [{ task: 'Enviar follow-up da reunião', owner: 'Closer', priority: 'high' }],
             sentiment: 'neutral',
-          }),
-        });
+          };
+        }
 
         // Salvar resumo como Nota e criar tarefas de follow-up
         if (leadId) {

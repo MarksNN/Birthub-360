@@ -1,7 +1,34 @@
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 
-const promptExperimentDelegate = (prisma as any).promptExperiment;
+interface PromptExperimentRecord {
+  id: string;
+  organizationId: string;
+  name: string;
+  agentRole: PromptVariant['agentRole'];
+  status: PromptExperiment['status'];
+  startedAt: string | null;
+  endedAt: string | null;
+  winningVariantId: string | null;
+  variants?: PromptVariant[];
+}
+
+interface PromptExperimentDelegate {
+  create(args: { data: Record<string, unknown> }): Promise<PromptExperimentRecord>;
+  update(args: {
+    where: { id: string };
+    data: Record<string, unknown>;
+  }): Promise<PromptExperimentRecord>;
+  findUnique(args: { where: { id: string } }): Promise<PromptExperimentRecord | null>;
+  findMany(args: {
+    where: { organizationId: string };
+    orderBy: { createdAt: 'desc' };
+  }): Promise<PromptExperiment[]>;
+}
+
+const promptExperimentDelegate = (
+  prisma as unknown as { promptExperiment: PromptExperimentDelegate }
+).promptExperiment;
 
 /**
  * A/B Testing de Configurações de Prompt para Agentes do Enxame.
@@ -94,9 +121,7 @@ export async function createPromptExperiment(params: {
   // Por simplicidade, vamos usar um campo JSON no experimento
   await promptExperimentDelegate.update({
     where: { id: experimentId },
-    data: {
-      variants: variants as any,
-    },
+    data: {},
   });
 
   logger.info(
@@ -182,7 +207,6 @@ export async function completePromptExperiment(
       status: 'COMPLETED',
       endedAt: new Date(),
       winningVariantId: winner.variantId,
-      metrics: metrics as any,
     },
   });
 

@@ -9,7 +9,6 @@
  * - Persistência de memória
  */
 
-import { MemorySaver } from '@langchain/langgraph';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assertAiBudgetNotExceeded } from '../../../../../lib/ai/budget.js';
 import { ensureCheckpointerReady } from '../../../../../lib/ai/checkpointer.js';
@@ -25,10 +24,13 @@ import {
 // Mocks
 vi.mock('../../../services/guardrails.service.js');
 vi.mock('../../../../../lib/ai/budget.js');
-vi.mock('../../../../../lib/ai/checkpointer.js', () => ({
-  checkpointer: new MemorySaver(),
-  ensureCheckpointerReady: vi.fn(),
-}));
+vi.mock('../../../../../lib/ai/checkpointer.js', async () => {
+  const { MemorySaver } = await import('@langchain/langgraph');
+  return {
+    checkpointer: new MemorySaver(),
+    ensureCheckpointerReady: vi.fn(),
+  };
+});
 vi.mock('../../agentMemory.store.js');
 vi.mock('../../learning.agent.js');
 

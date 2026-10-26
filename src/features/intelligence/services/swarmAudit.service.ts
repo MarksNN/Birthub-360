@@ -1,7 +1,40 @@
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 
-const swarmAuditLogDelegate = (prisma as any).swarmAuditLog;
+interface SwarmAuditLogRow {
+  id: string;
+  organizationId: string;
+  agentType: string;
+  action: string;
+  parameters: Record<string, unknown>;
+  result: 'success' | 'error';
+  errorMessage?: string | null;
+  userId?: string | null;
+  sessionId?: string | null;
+  correlationId?: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  createdAt: Date;
+}
+
+interface SwarmAuditLogDelegate {
+  create(args: { data: Record<string, unknown> }): Promise<SwarmAuditLogRow>;
+  findMany(args: {
+    where: Record<string, unknown>;
+    orderBy: { createdAt: 'desc' };
+    take: number;
+    skip: number;
+  }): Promise<SwarmAuditLogRow[]>;
+  count(args: { where: Record<string, unknown> }): Promise<number>;
+  groupBy(args: {
+    by: Array<'agentType' | 'action'>;
+    where: { organizationId: string };
+    _count: true;
+  }): Promise<Array<{ agentType: string; action: string; _count: number }>>;
+}
+
+const swarmAuditLogDelegate = (prisma as unknown as { swarmAuditLog: SwarmAuditLogDelegate })
+  .swarmAuditLog;
 
 /**
  * Serviço de Auditoria Completa do Swarm
@@ -52,7 +85,7 @@ export async function logSwarmAction(params: {
         organizationId: params.organizationId,
         agentType: params.agentType,
         action: params.action,
-        parameters: params.parameters as any,
+        parameters: params.parameters,
         result: params.result,
         errorMessage: params.errorMessage,
         userId: params.userId,
@@ -84,7 +117,7 @@ export async function getSwarmAuditLogs(params: {
   limit?: number;
   offset?: number;
 }): Promise<{ logs: SwarmAuditLog[]; total: number }> {
-  const where: any = { organizationId: params.organizationId };
+  const where: Record<string, unknown> = { organizationId: params.organizationId };
 
   if (params.agentType) where.agentType = params.agentType;
   if (params.action) where.action = params.action;
@@ -106,7 +139,7 @@ export async function getSwarmAuditLogs(params: {
       organizationId: l.organizationId,
       agentType: l.agentType,
       action: l.action,
-      parameters: l.parameters as Record<string, unknown>,
+      parameters: l.parameters,
       result: l.result,
       errorMessage: l.errorMessage || undefined,
       userId: l.userId || undefined,

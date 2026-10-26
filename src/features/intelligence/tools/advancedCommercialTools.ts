@@ -33,7 +33,7 @@ export const proposalTool = tool(
         include: {
           company: true,
           contact: true,
-          notes: { orderBy: { createdAt: 'desc' }, take: 3 },
+          internalNotes: { orderBy: { createdAt: 'desc' }, take: 3 },
         },
       });
 
@@ -56,10 +56,7 @@ export const proposalTool = tool(
           clientName,
           diagnosedPains: doresDiagnosticadas?.length
             ? doresDiagnosticadas
-            : [
-                (lead as any).notes?.[0]?.content ||
-                  'Otimização operacional e previsibilidade comercial',
-              ],
+            : ['Otimização operacional e previsibilidade comercial'],
           proposedModules: modulosPropostos?.length
             ? modulosPropostos
             : ['Core Platform', 'Automações & Integrações', 'Inteligência Comercial'],

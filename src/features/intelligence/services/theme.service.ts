@@ -12,7 +12,18 @@ export interface UserTheme {
   customTheme: string | null;
 }
 
-const userThemeDelegate = (prisma as any).userTheme;
+interface UserThemeDelegate {
+  findUnique?(args: {
+    where: { userId_organizationId: { userId: string; organizationId: string } };
+  }): Promise<UserTheme | null>;
+  upsert?(args: {
+    where: { userId_organizationId: { userId: string; organizationId: string } };
+    create: UserTheme;
+    update: Pick<UserTheme, 'mode' | 'customTheme'>;
+  }): Promise<UserTheme>;
+}
+
+const userThemeDelegate = (prisma as unknown as { userTheme?: UserThemeDelegate }).userTheme;
 
 export async function getUserTheme(userId: string, organizationId: string): Promise<UserTheme> {
   const theme = await userThemeDelegate?.findUnique?.({
