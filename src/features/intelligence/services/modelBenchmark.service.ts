@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Benchmark de Modelos - Compara performance entre Groq, OpenAI e vLLM.
@@ -111,7 +111,7 @@ export async function calculateModelMetrics(
     },
   });
 
-  ).length;
+  const humanOverrides = pendingActions.filter((a) => a.discardedAt !== null).length;
   const humanOverrideRate = pendingActions.length > 0 ? humanOverrides / pendingActions.length : 0;
 
   const throughputPerMinute = windowMinutes > 0 ? totalExecutions / windowMinutes : 0;

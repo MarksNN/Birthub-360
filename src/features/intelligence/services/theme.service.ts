@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Gestão de Temas (Dark Mode, Custom Themes)
@@ -35,6 +35,10 @@ export async function setUserTheme(params: {
   mode: 'light' | 'dark' | 'auto';
   customTheme?: string;
 }): Promise<void> {
+  await userThemeDelegate?.upsert?.({
+    where: {
+      userId_organizationId: { userId: params.userId, organizationId: params.organizationId },
+    },
     create: {
       userId: params.userId,
       organizationId: params.organizationId,

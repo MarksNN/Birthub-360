@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 const promptExperimentDelegate = (prisma as any).promptExperiment;
 
@@ -125,6 +125,10 @@ export async function startPromptExperiment(experimentId: string): Promise<void>
 /**
  * Finaliza um experimento e calcula métricas por variante.
  */
+export async function completePromptExperiment(
+  experimentId: string,
+): Promise<PromptVariantMetrics[]> {
+  const experiment = await promptExperimentDelegate.findUnique({
     where: { id: experimentId },
   });
 
@@ -206,6 +210,8 @@ export function selectVariantForExecution(
 /**
  * Lista todos os experimentos de uma organização.
  */
+export async function listPromptExperiments(organizationId: string): Promise<PromptExperiment[]> {
+  return promptExperimentDelegate.findMany({
     where: { organizationId },
     orderBy: { createdAt: 'desc' },
   });

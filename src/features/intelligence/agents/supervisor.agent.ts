@@ -343,6 +343,8 @@ Antes de usar a ferramenta de decisão estruturada de roteamento, faça uma brev
 
 ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
+  const correlationId = buildSwarmCorrelationId(config);
+
   let decision: SupervisorDecision;
   const startTime = Date.now();
   let fallbackTriggered = false;

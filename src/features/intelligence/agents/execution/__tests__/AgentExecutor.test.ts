@@ -9,7 +9,18 @@
  * - Persistência de memória
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { MemorySaver } from '@langchain/langgraph';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { assertAiBudgetNotExceeded } from '../../../../../lib/ai/budget.js';
+import { ensureCheckpointerReady } from '../../../../../lib/ai/checkpointer.js';
+import { assertPiiExternalConsent } from '../../../services/guardrails.service.js';
+import { recordAgentFailure, saveAgentMemory } from '../../agentMemory.store.js';
+import { getLearningProfile } from '../../learning.agent.js';
+import {
+  type AgentExecutionConfig,
+  type AgentExecutionContext,
+  AgentExecutor,
+} from '../AgentExecutor.js';
 
 // Mocks
 vi.mock('../../../services/guardrails.service.js');

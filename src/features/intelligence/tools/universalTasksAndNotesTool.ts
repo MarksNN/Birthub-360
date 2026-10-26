@@ -126,13 +126,7 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       if (action === 'list_notes') {
         const notes = await prisma.note.findMany({
           where: {
-            ...(leadId
-              ? { leadId }
-              : companyId
-                ? { companyId }
-                : contactId
-                  ? { contactId }
-                  : {}),
+            ...(leadId ? { leadId } : companyId ? { companyId } : contactId ? { contactId } : {}),
           },
           orderBy: { createdAt: 'desc' },
           take: 25,
@@ -207,7 +201,13 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
           {
             success: true,
             noteId: internalNote.id,
-            targetType: leadId ? 'lead' : companyId ? 'company' : contactId ? 'contact' : 'organization',
+            targetType: leadId
+              ? 'lead'
+              : companyId
+                ? 'company'
+                : contactId
+                  ? 'contact'
+                  : 'organization',
             targetId: leadId || companyId || contactId || organizationId,
             externalSync,
           },

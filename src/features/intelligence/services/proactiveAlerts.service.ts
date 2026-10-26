@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Alertas Proativos - Notifica quando agente tem taxa de erro acima do normal.
@@ -107,7 +107,7 @@ export async function calculateAgentHealthMetrics(
     },
   });
 
-  ).length;
+  const humanOverrides = pendingActions.filter((a) => a.discardedAt !== null).length;
   const humanOverrideRate = pendingActions.length > 0 ? humanOverrides / pendingActions.length : 0;
 
   const totalCostUsd = logs.reduce((sum, l) => sum + (l.costUsd || 0), 0);

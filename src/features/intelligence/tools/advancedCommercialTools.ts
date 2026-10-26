@@ -56,7 +56,10 @@ export const proposalTool = tool(
           clientName,
           diagnosedPains: doresDiagnosticadas?.length
             ? doresDiagnosticadas
-            : [(lead as any).notes?.[0]?.content || 'Otimização operacional e previsibilidade comercial'],
+            : [
+                (lead as any).notes?.[0]?.content ||
+                  'Otimização operacional e previsibilidade comercial',
+              ],
           proposedModules: modulosPropostos?.length
             ? modulosPropostos
             : ['Core Platform', 'Automações & Integrações', 'Inteligência Comercial'],
@@ -291,6 +294,14 @@ export const churnAnalysisTool = tool(
       const leads = await prisma.lead.findMany({
         where: {
           organizationId,
+          status: {
+            in: [
+              'Proposta_Enviada',
+              'Reuniao_Agendada',
+              'Nova_Oportunidade',
+              'Call_Visita_Agendada',
+            ],
+          },
         },
         include: {
           company: { select: { tradeName: true, legalName: true, segment: true } },
