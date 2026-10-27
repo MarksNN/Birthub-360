@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 // scripts/security/reencrypt-credentials.ts
 //
 // Utilitário de re-encriptação de credenciais e dados em repouso
@@ -70,9 +71,7 @@ function decryptWithKey(stored: string, keyBuf: Buffer): string {
 
 function encryptWithKey(plaintext: string, keyBuf: Buffer): string {
   const iv = Buffer.alloc(IV_LENGTH);
-  for (let i = 0; i < IV_LENGTH; i++) {
-    iv[i] = Math.floor(Math.random() * 256);
-  }
+  crypto.randomFillSync(iv);
   const cipher = createCipheriv(ALGORITHM, keyBuf, iv, { authTagLength: AUTH_TAG_LENGTH });
   const ciphertext = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
   const authTag = cipher.getAuthTag();

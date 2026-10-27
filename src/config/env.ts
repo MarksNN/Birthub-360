@@ -19,7 +19,7 @@ const envSchema = z
       .transform((v) => (v === '' ? '3005' : v))
       .default('3005')
       .refine((v) => /^[1-9][0-9]{0,4}$/.test(v), { message: 'Invalid PORT format' })
-      .transform((v) => parseInt(v, 10))
+      .transform((v) => Number(v))
       .refine((v) => v >= 1 && v <= 65535, { message: 'Invalid PORT range' }),
     HOST: z.string().default('0.0.0.0'),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL é obrigatória'),
