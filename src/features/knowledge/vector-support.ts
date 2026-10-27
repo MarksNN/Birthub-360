@@ -15,7 +15,6 @@ let cached: Promise<boolean> | null = null;
 
 async function detect(): Promise<boolean> {
   try {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     const rows = await prisma.$queryRaw<Array<{ present: boolean }>>`
             SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') AS present
         `;

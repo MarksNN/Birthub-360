@@ -93,7 +93,6 @@ export function createTransactionAtomic(input: {
   externalReference: string | null;
   idempotencyKey: string;
 }): Promise<Transaction | null> {
-  // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
   return prisma.$transaction(async (tx) => {
     const wallet = await tx.wallet.findUnique({ where: { organizationId: input.organizationId } });
     if (!wallet) return null;

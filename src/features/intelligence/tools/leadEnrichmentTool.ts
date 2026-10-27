@@ -4,7 +4,6 @@ import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { enrichCompany } from '../../prospecting/services/enrichment.service.js';
-import type { IEnrichedLead } from '../../../types/prospecting.js';
 import { CommercialAIService } from '../services/CommercialAIService.js';
 
 /**
@@ -66,7 +65,7 @@ export const leadEnrichmentTool = tool(
       }
 
       const company = lead.company;
-      const enrichedLead: IEnrichedLead = {
+      const enrichedLead = {
         fantasyName: company?.tradeName || company?.legalName || 'Empresa sem nome',
         socialReason: company?.legalName || company?.tradeName || 'Empresa sem razão social',
         cnaeMain: company?.cnae || undefined,
@@ -74,14 +73,10 @@ export const leadEnrichmentTool = tool(
         cadastralSituation: company?.situacaoCadastral || undefined,
         city: company?.city || undefined,
         state: company?.state || undefined,
-        employeesCount: company?.employeeCount ? String(company.employeeCount) : undefined,
-        estimatedRevenue: company?.estimatedRevenue ? String(company.estimatedRevenue) : undefined,
+        employeesCount: company?.employeeCount || undefined,
+        estimatedRevenue: company?.estimatedRevenue || undefined,
         technologies: company?.technologies || [],
-        description: company?.observations || undefined,
-        cnpj: company?.cnpj || '',
-        decisionMakers: [],
-        sources: [],
-        status: 'READY',
+        description: company?.observations || lead.observations || undefined,
       };
 
       const commercialAI = new CommercialAIService();

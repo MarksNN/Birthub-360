@@ -26,5 +26,5 @@ export async function* streamChatCompletion(
   agentContext: string,
 ): AsyncGenerator<AiStreamChunk, AiStreamResult> {
   // Usa a implementação com fallback entre provedores
-  return yield* streamChatCompletionWithFallback(messages, modelName, temperature, agentContext);
+  yield* streamChatCompletionWithFallback(messages, modelName, temperature, agentContext);
 }

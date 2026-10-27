@@ -695,7 +695,7 @@ const agentExecute: ToolExecutor = async (ctx) => {
       facts: [],
       metrics: {
         universalToolsBound: runResult.toolsCount,
-      } as Record<string, number | string | null>,
+      },
       evidence: [
         `AgentVersion.id=${ctx.agentVersion.id} version=${ctx.agentVersion.version}`,
         `UniversalSpecialistAgent.sessionId=${runResult.sessionId}`,
@@ -718,7 +718,7 @@ const agentExecute: ToolExecutor = async (ctx) => {
       promptTokens: result.response_metadata.tokenUsage.promptTokens,
       completionTokens: result.response_metadata.tokenUsage.completionTokens,
       totalTokens: result.response_metadata.tokenUsage.totalTokens,
-    } as Record<string, number | string | null>,
+    },
     evidence: [
       `AgentVersion.id=${ctx.agentVersion.id} version=${ctx.agentVersion.version}`,
       `AiModel.model=${result.response_metadata.model}`,

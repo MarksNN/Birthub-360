@@ -161,7 +161,6 @@ const TOUCH_ATTEMPTS_ORDER = [{ attemptedAt: 'asc' as const }, { id: 'asc' as co
 
 export class PrismaCadenceRunRepository implements CadenceRunRepository {
   async save(run: CadenceRunState): Promise<void> {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     await prisma.$transaction(async (tx) => {
       const alreadyPersisted = await tx.cadenceTouchAttempt.count({
         where: { cadenceRunId: run.id },

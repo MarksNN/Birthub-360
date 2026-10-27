@@ -370,9 +370,7 @@ export function Integrations() {
                 className={`flex items-center justify-between gap-3 ${status === 'connected' ? 'mb-3' : 'mb-6'}`}
               >
                 <div className="min-w-0">
-                  <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5">
-                    <WhatsAppIcon className="w-6 h-6 inline-block" /> WhatsApp
-                  </h2>
+                  <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5"><WhatsAppIcon className="w-6 h-6 inline-block" /> WhatsApp</h2>
                   <p
                     className={`text-sm text-ink-2 ${status === 'connected' ? 'hidden sm:block' : ''}`}
                   >
@@ -504,9 +502,7 @@ export function Integrations() {
             <Card className="p-8 rounded-2xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5">
-                    <GoogleIcon className="w-6 h-6 inline-block" /> Google Workspace
-                  </h2>
+                  <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5"><GoogleIcon className="w-6 h-6 inline-block" /> Google Workspace</h2>
                   <p className="text-sm text-ink-2">
                     Gmail em modo leitura; Calendar tem leitura e escrita real (via Cadência); a
                     Agenda do produto continua local.
@@ -641,9 +637,7 @@ export function Integrations() {
               <div className="flex items-start justify-between mb-8">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5">
-                      <Bitrix24Icon className="w-6 h-6 inline-block" /> Bitrix24
-                    </h2>
+                    <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2.5"><Bitrix24Icon className="w-6 h-6 inline-block" /> Bitrix24</h2>
                     {bitrixConnections.length > 0 && (
                       <>
                         <IntegrationStatusBadge

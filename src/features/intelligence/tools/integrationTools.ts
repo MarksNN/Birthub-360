@@ -89,10 +89,7 @@ export const multiCrmSyncTool = tool(
     }
 
     try {
-      logger.info(
-        { organizationId, leadId, provider, action },
-        '[MultiCrmSyncTool] Sincronizando CRM',
-      );
+      logger.info({ organizationId, leadId, provider, action }, '[MultiCrmSyncTool] Sincronizando CRM');
 
       if (action === 'list_connections') {
         const [externalConnections, bitrixConnections, omieConnections] = await Promise.all([
@@ -114,14 +111,7 @@ export const multiCrmSyncTool = tool(
               bitrix24: bitrixConnections,
               crmsExternos: externalConnections,
               omieErp: omieConnections,
-              provedoresSuportados: [
-                'bitrix24',
-                'hubspot',
-                'pipedrive',
-                'rdstation',
-                'monday',
-                'omie',
-              ],
+              provedoresSuportados: ['bitrix24', 'hubspot', 'pipedrive', 'rdstation', 'monday', 'omie'],
             },
           },
           null,
@@ -143,21 +133,13 @@ export const multiCrmSyncTool = tool(
       });
 
       if (!lead) {
-        return JSON.stringify(
-          { success: false, erro: 'Lead não encontrado no CRM interno.' },
-          null,
-          2,
-        );
+        return JSON.stringify({ success: false, erro: 'Lead não encontrado no CRM interno.' }, null, 2);
       }
 
       const targetProvider = (provider || 'all').toLowerCase();
       const syncSummary: Record<string, unknown> = {};
 
-      if (
-        targetProvider === 'all' ||
-        targetProvider === 'bitrix24' ||
-        targetProvider === 'bitrix'
-      ) {
+      if (targetProvider === 'all' || targetProvider === 'bitrix24' || targetProvider === 'bitrix') {
         const bitrixCount = await prisma.bitrixConnection.count({ where: { organizationId } });
         if (bitrixCount > 0) {
           await queueLeadPushToBitrix(organizationId, lead.id);
@@ -233,6 +215,7 @@ export const multiCrmSyncTool = tool(
 );
 
 export const pipedriveSyncTool = multiCrmSyncTool;
+
 
 import { fetchCnpjData } from '../../prospecting/services/enrichment/cnpjLookup.js';
 

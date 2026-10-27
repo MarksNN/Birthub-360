@@ -91,7 +91,7 @@ export function RichTextEditor({
     ] as any[],
     content,
     editable: !readOnly,
-    onUpdate: ({ editor: ed }: { editor: any }) => {
+    onUpdate: ({ editor: ed }) => {
       onChange?.(ed.getHTML());
     },
   });

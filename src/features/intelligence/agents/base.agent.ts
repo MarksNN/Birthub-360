@@ -1,14 +1,18 @@
+import { AIMessage, type BaseMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { StructuredToolInterface } from '@langchain/core/tools';
 import { getTenantId, getUserId } from '../../../lib/async-context.js';
-import { saveAgentMemory } from './agentMemory.store.js';
+import { logger } from '../../../lib/logger.js';
+import { recordAgentFailure } from './agentMemory.store.js';
 import {
-  type AgentExecutionConfig,
-  type AgentExecutionContext,
   AgentExecutor,
+  type AgentExecutionContext,
+  type AgentExecutionConfig,
+  type AgentExecutionResult,
+  type SerializedMessage,
 } from './execution/AgentExecutor.js';
 
 export interface AgentRunResult {
-  sessionId?: string;
+  sessionId: string;
   error?: string;
 }
 
@@ -37,18 +41,6 @@ export abstract class BaseAgent {
 
   protected abstract buildSystemPrompt(learnedStyle: string | null): string;
   protected abstract buildHumanMessage(input: string): string;
-
-  /**
-   * Persiste o histórico de mensagens da sessão no AgentMemory.
-   */
-  protected async updateMemory(sessionId: string, messages: unknown): Promise<void> {
-    await saveAgentMemory({
-      sessionId,
-      agentType: this.agentType,
-      organizationId: getTenantId(),
-      messages,
-    });
-  }
 
   /**
    * Executa o agente sem ferramentas (turno único).
@@ -85,8 +77,7 @@ export abstract class BaseAgent {
     } catch (error: any) {
       // AgentExecutor já registra falha e retorna {error}, mas precisamos garantir
       // que a exceção não propague (contrato original de BaseAgent).
-      const message =
-        error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
+      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
       return { error: message, sessionId: sid };
     }
   }
@@ -127,8 +118,7 @@ export abstract class BaseAgent {
     } catch (error: any) {
       // AgentExecutor já registra falha e retorna {error}, mas precisamos garantir
       // que a exceção não propague (contrato original de BaseAgent).
-      const message =
-        error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
+      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
       return { error: message, sessionId: sid };
     }
   }

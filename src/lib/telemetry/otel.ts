@@ -62,7 +62,7 @@ if (!isTestEnv && !isSdkDisabled) {
   // Shutdown gracioso: flush de traces pendentes antes de fechar o processo.
   // Sem isso, o último batch de spans não exportados se perde no SIGTERM.
   const shutdown = () => {
-    sdk?.shutdown().catch((err: any) => console.error('[OTel] Falha no shutdown:', err));
+    sdk?.shutdown().catch((err) => console.error('[OTel] Falha no shutdown:', err));
   };
 
   process.on('SIGTERM', shutdown);

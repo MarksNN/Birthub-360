@@ -7,16 +7,11 @@
  */
 import type { BaseMessage } from '@langchain/core/messages';
 import { requestContext } from '../../async-context.js';
-import { logger } from '../../logger.js';
 import { assertAiBudgetNotExceeded } from '../budget.js';
-import { tokenQuotaService } from '../finops/tokenQuota.service.js';
-import { detectPII, detectToxicity } from '../guardrails/index.js';
 import { recordAiUsageCost } from '../metrics.js';
-import {
-  type DynamicRoutingOptions,
-  recordLatency,
-  selectDynamicRouting,
-} from './dynamic-routing.js';
+import { tokenQuotaService } from '../finops/tokenQuota.service.js';
+import { logger } from '../../logger.js';
+import { detectPII, detectToxicity } from '../guardrails/index.js';
 import { resolveFallbackTimeoutMs } from './http-client.js';
 import { resolveModelName } from './model-routing.js';
 import { toChatCompletionMessages } from './parsing.js';
@@ -24,12 +19,17 @@ import { estimateCostUsd } from './pricing.js';
 import { groqProvider } from './providers/groq.provider.js';
 import { litellmProvider } from './providers/litellm.provider.js';
 import { openaiProvider } from './providers/openai.provider.js';
+import { vllmProvider } from './providers/vllm.provider.js';
 import { openrouterProvider } from './providers/openrouter.provider.js';
 import type { ProviderAdapter } from './providers/types.js';
-import { vllmProvider } from './providers/vllm.provider.js';
 import { sanitizeProviderMessage } from './redaction.js';
 import { traceAiGeneration } from './telemetry.js';
 import type { AiChatModel, AiInvokeResult, ChatCompletionResponse } from './types.js';
+import {
+  selectDynamicRouting,
+  recordLatency,
+  type DynamicRoutingOptions,
+} from './dynamic-routing.js';
 
 // Ordem de fallback: vLLM primeiro (se hospedado no cluster), Groq (rápido, open source),
 // OpenAI como terceira opção, LiteLLM/Ollama por último (ver comentário em
@@ -88,16 +88,16 @@ async function callWithFallback(
   requestMessages: ReturnType<typeof toChatCompletionMessages>,
   temperature: number,
   agentContext: string,
-  errorsByProvider = new Map<string, unknown>(),
 ): Promise<{ response: ChatCompletionResponse; providerUsed: string }> {
   const timeoutMs = resolveFallbackTimeoutMs();
   const _startTime = Date.now();
+  const errorsByProvider = new Map<string, unknown>();
 
   const chain = resolvedModel.startsWith('openrouter/')
     ? [openrouterProvider, litellmProvider]
     : PROVIDER_CHAIN;
   for (const provider of chain) {
-    if (!provider.isConfigured() || errorsByProvider.has(provider.name)) continue;
+    if (!provider.isConfigured()) continue;
     let attempts = 0;
     while (attempts < 3) {
       attempts++;
@@ -114,7 +114,7 @@ async function callWithFallback(
         const errMsg = String(error?.message || error);
         const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit');
         if (isRateLimit && attempts < 3) {
-          const match = errMsg.match(/try again in ([\d.]+)s/i);
+          const match = errMsg.match(/try again in ([\d\.]+)s/i);
           const waitMs = match ? Math.ceil(parseFloat(match[1]) * 1000) + 1500 : attempts * 5000;
           await new Promise((resolve) => setTimeout(resolve, waitMs));
           continue;
@@ -151,6 +151,7 @@ async function callWithDynamicRouting(
       availableProviders: PROVIDER_CHAIN,
     };
 
+    if (process.env.DISABLE_DYNAMIC_ROUTING_FOR_TESTS) throw new Error('Disabled');
     const routingResult = await selectDynamicRouting(routingOptions);
 
     // Tenta chamar o provider selecionado
@@ -175,7 +176,7 @@ async function callWithDynamicRouting(
         const errMsg = String(error?.message || error);
         const isRateLimit = errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit');
         if (isRateLimit && attempts < 3) {
-          const match = errMsg.match(/try again in ([\d.]+)s/i);
+          const match = errMsg.match(/try again in ([\d\.]+)s/i);
           const waitMs = match ? Math.ceil(parseFloat(match[1]) * 1000) + 1500 : attempts * 5000;
           await new Promise((resolve) => setTimeout(resolve, waitMs));
           continue;
@@ -192,14 +193,11 @@ async function callWithDynamicRouting(
   }
 
   // Fallback para cadeia estática se routing dinâmico falhar
-  logger.info({ model: resolvedModel }, '[DynamicRouting] Usando cadeia de fallback estática');
-  return callWithFallback(
-    resolvedModel,
-    requestMessages,
-    temperature,
-    agentContext,
-    errorsByProvider,
+  logger.info(
+    { model: resolvedModel },
+    '[DynamicRouting] Usando cadeia de fallback estática',
   );
+  return callWithFallback(resolvedModel, requestMessages, temperature, agentContext);
 }
 
 /**

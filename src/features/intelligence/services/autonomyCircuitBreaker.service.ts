@@ -1,6 +1,6 @@
-import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
+import { logger } from '../../../lib/logger.js';
 import { autonomyGovernorService } from './autonomyGovernor.service.js';
 
 /**
@@ -89,7 +89,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
     '[CircuitBreaker] Verificando taxa de erro dos agentes',
   );
 
-  const newState: CircuitBreakerState = { ...currentState };
+  let newState: CircuitBreakerState = { ...currentState };
 
   if (currentState.state === 'CLOSED' || currentState.state === 'HALF_OPEN') {
     // Verifica se deve abrir o circuito (downgrade)
@@ -116,7 +116,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
         newState.consecutiveChecks = 0;
 
         await domainEventMesh.publish({
-          eventType: 'AUTONOMY_CIRCUIT_BREAKER_TRIPPED' as any,
+          eventType: 'AUTONOMY_CIRCUIT_BREAKER_TRIPPED',
           eventVersion: '1.0.0',
           organizationId,
           correlationId: `circuit-breaker-${organizationId}`,
@@ -127,7 +127,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
             newLevel,
             errorRate,
             threshold: ERROR_RATE_THRESHOLD_DOWNGRADE,
-            reason: `Taxa de erro (${(errorRate * 100).toFixed(1)}%) ultrapassou threshold (${ERROR_RATE_THRESHOLD_DOWNGRADE * 100}%)`,
+            reason: `Taxa de erro (${(errorRate * 100).toFixed(1)}%) ultrapassou threshold (${(ERROR_RATE_THRESHOLD_DOWNGRADE * 100)}%)`,
           },
         });
 
@@ -158,7 +158,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
           newState.consecutiveChecks = 0;
 
           await domainEventMesh.publish({
-            eventType: 'AUTONOMY_CIRCUIT_BREAKER_RECOVERED' as any,
+            eventType: 'AUTONOMY_CIRCUIT_BREAKER_RECOVERED',
             eventVersion: '1.0.0',
             organizationId,
             correlationId: `circuit-breaker-${organizationId}`,
@@ -169,7 +169,7 @@ export async function checkCircuitBreaker(organizationId: string): Promise<void>
               newLevel: 'L2',
               errorRate,
               consecutiveChecks: newState.consecutiveChecks,
-              reason: `Taxa de erro estabilizada (${(errorRate * 100).toFixed(1)}%) abaixo de threshold (${ERROR_RATE_THRESHOLD_UPGRADE * 100}%)`,
+              reason: `Taxa de erro estabilizada (${(errorRate * 100).toFixed(1)}%) abaixo de threshold (${(ERROR_RATE_THRESHOLD_UPGRADE * 100)}%)`,
             },
           });
 
@@ -220,6 +220,7 @@ export function clearCircuitBreakerState(organizationId: string): void {
  */
 export async function checkAllCircuitBreakers(): Promise<void> {
   const organizations = await prisma.organization.findMany({
+    where: { active: true },
     select: { id: true },
   });
 

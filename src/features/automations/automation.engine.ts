@@ -7,22 +7,18 @@ import {
   type NotificationKind,
   notificationService,
 } from '../notifications/notification.service.js';
-import type {
-  CadenceActionConfig,
-  ExtendedAutomationAction,
-  ExtendedAutomationTrigger,
-  UpdateCustomFieldActionConfig,
-  WebhookActionConfig,
-} from './automation.types.js';
 import { automationHistoryService } from './automation-history.service.js';
 import {
   buildTriggerIdempotencyKey,
   claimAutomationTrigger,
 } from './automation-idempotency.service.js';
-import { cadenceIntegrationService } from './cadenceIntegration.service.js';
 
-export type AutomationTrigger = ExtendedAutomationTrigger;
-export type AutomationActionType = ExtendedAutomationAction;
+export type AutomationTrigger =
+  | 'Lead criado'
+  | 'Lead mudou de status'
+  | 'Atividade concluída'
+  | 'Lead estagnado';
+export type AutomationActionType = 'Notificar equipe' | 'Criar atividade' | 'Ligar via SDR de Voz';
 
 /**
  * Contexto do evento que disparou o motor. As chaves viram tanto critério de condição quanto
@@ -32,7 +28,7 @@ export interface AutomationEvent {
   organizationId: string;
   trigger: AutomationTrigger;
   /** Entidade de origem, para a notificação conseguir levar de volta a ela. */
-  entity: 'Lead' | 'Activity' | 'Company' | 'Contact' | 'Deal';
+  entity: 'Lead' | 'Activity';
   entityId: string;
   /** Campos comparáveis nas condições: status, owner, temperature, type… */
   data: Record<string, unknown>;
@@ -222,23 +218,15 @@ export class AutomationEngine {
   private async handleScoped(event: AutomationEvent): Promise<number> {
     let executed = 0;
     try {
-      const prismaTrigger = toPrismaAutomationTrigger(event.trigger as any);
-      const isStandardTrigger = [
-        'Lead_Criado',
-        'Lead_Mudou_Status',
-        'Atividade_Concluida',
-        'Lead_Estagnado',
-      ].includes(prismaTrigger);
-
-      const automations = isStandardTrigger
-        ? await prisma.automation.findMany({
-            where: {
-              organizationId: event.organizationId,
-              enabled: true,
-              trigger: prismaTrigger as never,
-            },
-          })
-        : [];
+      const automations = await prisma.automation.findMany({
+        // O Prisma Client só aceita o identificador do enum (`Lead_Mudou_Status`), nunca o
+        // rótulo humano mapeado (`@map`) que trafega no resto do sistema.
+        where: {
+          organizationId: event.organizationId,
+          enabled: true,
+          trigger: toPrismaAutomationTrigger(event.trigger) as never,
+        },
+      });
 
       for (const automation of automations) {
         if (!matchesConditions(automation.conditions, event.data)) continue;
@@ -531,116 +519,6 @@ export class AutomationEngine {
           'Automação de SDR de voz não ligou: número na lista de bloqueio (opt-out).',
         );
       }
-      return;
-    }
-
-    if (automation.action === 'Chamar webhook externo') {
-      const c = config as unknown as WebhookActionConfig;
-      if (!c.url) {
-        throw new PermanentAutomationError('Ação "Chamar webhook externo" requer o campo "url".');
-      }
-      const targetUrl = renderTemplate(c.url, event.data);
-      const method = c.method ?? 'POST';
-      const timeoutMs = c.timeoutMs ?? 10_000;
-      const headers: Record<string, string> = {
-        'content-type': 'application/json',
-        ...(c.headers ?? {}),
-      };
-      if (c.secret) {
-        headers['x-automation-secret'] = c.secret;
-      }
-
-      let bodyData: string | undefined;
-      if (method !== 'GET') {
-        const rawBody = c.body ?? {
-          event: event.trigger,
-          entity: event.entity,
-          entityId: event.entityId,
-          data: event.data,
-          organizationId: event.organizationId,
-        };
-        bodyData =
-          typeof rawBody === 'string'
-            ? renderTemplate(rawBody, event.data)
-            : JSON.stringify(rawBody);
-      }
-
-      const response = await fetch(targetUrl, {
-        method,
-        headers,
-        body: bodyData,
-        signal: AbortSignal.timeout(timeoutMs),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Webhook externo retornou status HTTP ${response.status}: ${response.statusText}`,
-        );
-      }
-      return;
-    }
-
-    if (automation.action === 'Atualizar campo customizado') {
-      const c = config as unknown as UpdateCustomFieldActionConfig;
-      if (!c.field) {
-        throw new PermanentAutomationError(
-          'Ação "Atualizar campo customizado" requer o campo "field".',
-        );
-      }
-      const targetEntity = c.entity ?? event.entity;
-      const targetEntityId = c.entityId ?? event.entityId;
-
-      if (targetEntity === 'Lead') {
-        const val = typeof c.value === 'string' ? renderTemplate(c.value, event.data) : c.value;
-        await prisma.lead.update({
-          where: { id: targetEntityId, organizationId: event.organizationId },
-          data: { [c.field]: val } as any,
-        });
-        return;
-      }
-      return;
-    }
-
-    if (automation.action === 'Enrich lead') {
-      const leadId =
-        event.entity === 'Lead' ? event.entityId : (event.data.leadId as string | undefined);
-      if (!leadId) {
-        throw new PermanentAutomationError(
-          'Ação "Enrich lead" precisa de um lead vinculado ao evento.',
-        );
-      }
-      const { domainEventMesh } = await import('../../lib/queue/domainEventMesh.service.js');
-      await domainEventMesh.publish({
-        eventType: 'LEAD_ENRICHMENT_REQUESTED' as any,
-        eventVersion: '1.0.0',
-        organizationId: event.organizationId,
-        correlationId: `enrich-${leadId}`,
-        producer: 'automation-engine',
-        aggregateId: leadId,
-        payload: {
-          leadId,
-          trigger: event.trigger,
-        },
-      });
-      return;
-    }
-
-    if (automation.action === 'Mover para outra etapa de cadência') {
-      const c = config as unknown as CadenceActionConfig;
-      if (!c.cadenceId) {
-        throw new PermanentAutomationError(
-          'Ação "Mover para outra etapa de cadência" requer "cadenceId".',
-        );
-      }
-      const leadId =
-        c.leadId ??
-        (event.entity === 'Lead' ? event.entityId : (event.data.leadId as string | undefined));
-      if (!leadId) {
-        throw new PermanentAutomationError(
-          'Ação "Mover para outra etapa de cadência" precisa de um leadId.',
-        );
-      }
-      await cadenceIntegrationService.executeCadenceAction(event.organizationId, leadId, c);
       return;
     }
 

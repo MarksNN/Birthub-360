@@ -86,7 +86,7 @@ export async function searchCompaniesPage(
   offset = 0,
 ): Promise<MeiliIdPageResult | null> {
   try {
-    const result: any = await withMeiliTimeout(
+    const result = await withMeiliTimeout(
       meili.index('companies').search(query, {
         filter: `organizationId = "${escapeMeiliFilterValue(organizationId)}"`,
         limit,
@@ -94,7 +94,7 @@ export async function searchCompaniesPage(
         attributesToRetrieve: ['id'],
       }),
     );
-    const ids = result.hits.map((hit: any) => (hit as { id: string }).id);
+    const ids = result.hits.map((hit) => (hit as { id: string }).id);
     const rawTotal =
       (result as { totalHits?: number; estimatedTotalHits?: number }).totalHits ??
       result.estimatedTotalHits;
@@ -150,14 +150,14 @@ export async function searchLeadIds(
   limit = 50,
 ): Promise<string[] | null> {
   try {
-    const result: any = await withMeiliTimeout(
+    const result = await withMeiliTimeout(
       meili.index('leads').search(query, {
         filter: `organizationId = "${escapeMeiliFilterValue(organizationId)}"`,
         limit,
         attributesToRetrieve: ['id'],
       }),
     );
-    return result.hits.map((hit: any) => (hit as { id: string }).id);
+    return result.hits.map((hit) => (hit as { id: string }).id);
   } catch (err: any) {
     logger.warn({ err }, 'Busca no Meilisearch indisponível — usando fallback do Postgres (Leads)');
     return null;

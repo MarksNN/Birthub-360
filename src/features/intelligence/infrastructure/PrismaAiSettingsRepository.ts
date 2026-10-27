@@ -9,7 +9,6 @@ export class PrismaAiSettingsRepository implements AiSettingsRepository {
   }
 
   async saveMany(settings: AiSettingInput[]): Promise<AiSettingItem[]> {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     return prisma.$transaction(
       settings.map((s) =>
         prisma.aiEngineSetting.upsert({

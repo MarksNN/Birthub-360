@@ -1,40 +1,5 @@
-import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
-
-interface SwarmAuditLogRow {
-  id: string;
-  organizationId: string;
-  agentType: string;
-  action: string;
-  parameters: Record<string, unknown>;
-  result: 'success' | 'error';
-  errorMessage?: string | null;
-  userId?: string | null;
-  sessionId?: string | null;
-  correlationId?: string | null;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  createdAt: Date;
-}
-
-interface SwarmAuditLogDelegate {
-  create(args: { data: Record<string, unknown> }): Promise<SwarmAuditLogRow>;
-  findMany(args: {
-    where: Record<string, unknown>;
-    orderBy: { createdAt: 'desc' };
-    take: number;
-    skip: number;
-  }): Promise<SwarmAuditLogRow[]>;
-  count(args: { where: Record<string, unknown> }): Promise<number>;
-  groupBy(args: {
-    by: Array<'agentType' | 'action'>;
-    where: { organizationId: string };
-    _count: true;
-  }): Promise<Array<{ agentType: string; action: string; _count: number }>>;
-}
-
-const swarmAuditLogDelegate = (prisma as unknown as { swarmAuditLog: SwarmAuditLogDelegate })
-  .swarmAuditLog;
+import { logger } from '../../../lib/logger.js';
 
 /**
  * Serviço de Auditoria Completa do Swarm
@@ -80,12 +45,12 @@ export async function logSwarmAction(params: {
   userAgent?: string;
 }): Promise<void> {
   try {
-    await swarmAuditLogDelegate.create({
+    await prisma.swarmAuditLog.create({
       data: {
         organizationId: params.organizationId,
         agentType: params.agentType,
         action: params.action,
-        parameters: params.parameters,
+        parameters: params.parameters as any,
         result: params.result,
         errorMessage: params.errorMessage,
         userId: params.userId,
@@ -117,29 +82,29 @@ export async function getSwarmAuditLogs(params: {
   limit?: number;
   offset?: number;
 }): Promise<{ logs: SwarmAuditLog[]; total: number }> {
-  const where: Record<string, unknown> = { organizationId: params.organizationId };
+  const where: any = { organizationId: params.organizationId };
 
   if (params.agentType) where.agentType = params.agentType;
   if (params.action) where.action = params.action;
   if (params.result) where.result = params.result;
 
   const [logs, total] = await Promise.all([
-    swarmAuditLogDelegate.findMany({
+    prisma.swarmAuditLog.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: params.limit || 50,
       skip: params.offset || 0,
     }),
-    swarmAuditLogDelegate.count({ where }),
+    prisma.swarmAuditLog.count({ where }),
   ]);
 
   return {
-    logs: logs.map((l: any) => ({
+    logs: logs.map((l) => ({
       id: l.id,
       organizationId: l.organizationId,
       agentType: l.agentType,
       action: l.action,
-      parameters: l.parameters,
+      parameters: l.parameters as Record<string, unknown>,
       result: l.result,
       errorMessage: l.errorMessage || undefined,
       userId: l.userId || undefined,
@@ -167,19 +132,19 @@ export async function getSwarmAuditStats(organizationId: string): Promise<{
   const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   const [total, successCount, byAgent, byAction, errorsLast24h] = await Promise.all([
-    swarmAuditLogDelegate.count({ where: { organizationId } }),
-    swarmAuditLogDelegate.count({ where: { organizationId, result: 'success' } }),
-    swarmAuditLogDelegate.groupBy({
+    prisma.swarmAuditLog.count({ where: { organizationId } }),
+    prisma.swarmAuditLog.count({ where: { organizationId, result: 'success' } }),
+    prisma.swarmAuditLog.groupBy({
       by: ['agentType'],
       where: { organizationId },
       _count: true,
     }),
-    swarmAuditLogDelegate.groupBy({
+    prisma.swarmAuditLog.groupBy({
       by: ['action'],
       where: { organizationId },
       _count: true,
     }),
-    swarmAuditLogDelegate.count({
+    prisma.swarmAuditLog.count({
       where: { organizationId, result: 'error', createdAt: { gte: last24h } },
     }),
   ]);

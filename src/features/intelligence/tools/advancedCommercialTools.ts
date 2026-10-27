@@ -12,14 +12,7 @@ import { assertPiiExternalConsent } from '../services/guardrails.service.js';
  * Gera proposta estruturada baseada em dados reais do deal via ProposalAiService.
  */
 export const proposalTool = tool(
-  async ({
-    leadId,
-    organizationId: explicitOrgId,
-    tipo,
-    duracao,
-    doresDiagnosticadas,
-    modulosPropostos,
-  }) => {
+  async ({ leadId, organizationId: explicitOrgId, tipo, duracao, doresDiagnosticadas, modulosPropostos }) => {
     const organizationId = getTenantId() || explicitOrgId;
     if (!organizationId) {
       return JSON.stringify({ success: false, erro: 'Contexto de organização ausente' }, null, 2);
@@ -33,16 +26,12 @@ export const proposalTool = tool(
         include: {
           company: true,
           contact: true,
-          internalNotes: { orderBy: { createdAt: 'desc' }, take: 3 },
+          notes: { orderBy: { createdAt: 'desc' }, take: 3 },
         },
       });
 
       if (!lead) {
-        return JSON.stringify(
-          { success: false, erro: 'Lead não encontrado nesta organização' },
-          null,
-          2,
-        );
+        return JSON.stringify({ success: false, erro: 'Lead não encontrado nesta organização' }, null, 2);
       }
 
       const clientName = lead.company?.tradeName || lead.company?.legalName || 'Cliente B2B';
@@ -56,17 +45,14 @@ export const proposalTool = tool(
           clientName,
           diagnosedPains: doresDiagnosticadas?.length
             ? doresDiagnosticadas
-            : ['Otimização operacional e previsibilidade comercial'],
+            : [lead.observations || 'Otimização operacional e previsibilidade comercial'],
           proposedModules: modulosPropostos?.length
             ? modulosPropostos
             : ['Core Platform', 'Automações & Integrações', 'Inteligência Comercial'],
           monthlyInvestmentEstimated: amountNum > 0 ? amountNum : undefined,
         });
       } catch (aiErr: any) {
-        logger.warn(
-          { err: aiErr, leadId },
-          '[ProposalTool] Fallback estrutural na geração de seções IA',
-        );
+        logger.warn({ err: aiErr, leadId }, '[ProposalTool] Fallback estrutural na geração de seções IA');
       }
 
       const proposta = {
@@ -132,11 +118,7 @@ export const competitorAnalysisTool = tool(
     try {
       logger.info({ segmento, organizationId }, '[CompetitorAnalysisTool] Analisando concorrência');
 
-      let battlecards: Array<{
-        objectionTitle: string;
-        responseScript: string;
-        keyDifferentiator: string;
-      }> = [];
+      let battlecards: Array<{ objectionTitle: string; responseScript: string; keyDifferentiator: string }> = [];
       if (organizationId) {
         battlecards = await prisma.objectionMatrixItem.findMany({
           where: {
@@ -164,10 +146,7 @@ export const competitorAnalysisTool = tool(
           `Segmento: ${segmento}. ${descricaoEmpresa ? `Contexto adicional: ${descricaoEmpresa}` : ''}`,
         );
       } catch (aiErr: any) {
-        logger.warn(
-          { err: aiErr },
-          '[CompetitorAnalysisTool] IA indisponível para análise de concorrentes',
-        );
+        logger.warn({ err: aiErr }, '[CompetitorAnalysisTool] IA indisponível para análise de concorrentes');
       }
 
       return JSON.stringify(
@@ -291,18 +270,11 @@ export const churnAnalysisTool = tool(
       const leads = await prisma.lead.findMany({
         where: {
           organizationId,
-          status: {
-            in: [
-              'Proposta_Enviada',
-              'Reuniao_Agendada',
-              'Nova_Oportunidade',
-              'Call_Visita_Agendada',
-            ],
-          },
+          status: { in: ['Em_Negociacao', 'Proposta_Enviada', 'Reuniao_Agendada', 'Negocios_Ganhos'] },
         },
         include: {
           company: { select: { tradeName: true, legalName: true, segment: true } },
-          copilotoDealHealthSnapshots: { orderBy: { createdAt: 'desc' }, take: 1 },
+          copilotoHealthSnapshots: { orderBy: { createdAt: 'desc' }, take: 1 },
         },
         orderBy: { updatedAt: 'asc' },
         take: 25,
@@ -310,11 +282,11 @@ export const churnAnalysisTool = tool(
 
       const emRisco = leads
         .map((l) => {
-          const refDate = l.lastInteraction || l.updatedAt;
+          const refDate = l.lastInteractionAt || l.updatedAt;
           const diasParado = refDate
             ? Math.floor((Date.now() - new Date(refDate).getTime()) / (1000 * 60 * 60 * 24))
             : 0;
-          const latestHealth = l.copilotoDealHealthSnapshots?.[0];
+          const latestHealth = l.copilotoHealthSnapshots?.[0];
           return {
             leadId: l.id,
             nome: l.company?.tradeName || l.company?.legalName || 'Empresa sem nome',
@@ -329,11 +301,7 @@ export const churnAnalysisTool = tool(
                 : 'Follow-up consultivo de destravamento',
           };
         })
-        .filter(
-          (item) =>
-            item.diasParado >= minDays ||
-            (item.churnRiskScore !== null && item.churnRiskScore >= 60),
-        );
+        .filter((item) => item.diasParado >= minDays || (item.churnRiskScore !== null && item.churnRiskScore >= 60));
 
       return JSON.stringify(
         {
@@ -359,10 +327,7 @@ export const churnAnalysisTool = tool(
     - organizationId: (opcional, resolvido automaticamente do contexto do tenant)`,
     schema: z.object({
       organizationId: z.string().optional().describe('ID da organização (opcional)'),
-      diasInatividadeMinimo: z
-        .number()
-        .optional()
-        .describe('Dias mínimos sem interação (padrão: 14)'),
+      diasInatividadeMinimo: z.number().optional().describe('Dias mínimos sem interação (padrão: 14)'),
     }),
   },
 );

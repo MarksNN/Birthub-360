@@ -34,7 +34,6 @@ export const logAiUsage = async (input: AiUsageLogInput): Promise<void> => {
     }
 
     const id = randomUUID();
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     await prisma.$executeRaw`
             INSERT INTO "AILog"
                 ("id", "tokens", "cost", "latencyMs", "model", "promptId", "organizationId", "agentRole", "createdAt")

@@ -22,9 +22,10 @@
 import { AIMessage, type BaseMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { StructuredToolInterface } from '@langchain/core/tools';
 import { MessagesAnnotation, StateGraph } from '@langchain/langgraph';
-import { assertAiBudgetNotExceeded } from '../../../../lib/ai/budget.js';
 import { checkpointer, ensureCheckpointerReady } from '../../../../lib/ai/checkpointer.js';
 import { getAiModel, logAiUsage } from '../../../../lib/ai/gateway.js';
+import { assertAiBudgetNotExceeded } from '../../../../lib/ai/budget.js';
+import { getTenantId, getUserId } from '../../../../lib/async-context.js';
 import { logger } from '../../../../lib/logger.js';
 import { assertPiiExternalConsent } from '../../services/guardrails.service.js';
 import { recordAgentFailure, saveAgentMemory } from '../agentMemory.store.js';
@@ -38,8 +39,8 @@ export interface SerializedMessage {
 export interface AgentExecutionContext {
   agentType: string;
   sessionId: string;
-  organizationId?: string | null;
-  userId?: string | null;
+  organizationId: string | null;
+  userId: string | null;
   inputData: string;
   modelName?: string;
   temperature?: number;
@@ -135,46 +136,40 @@ export class AgentExecutor {
     context: AgentExecutionContext,
     config: AgentExecutionConfig,
   ): Promise<AgentExecutionResult> {
-    const {
-      agentType,
-      sessionId,
-      inputData,
-      modelName = 'local-llama3-fast',
-      temperature = 0.4,
-    } = context;
+    const { agentType, sessionId, inputData, modelName = 'local-llama3-fast', temperature = 0.4 } = context;
     const { buildSystemPrompt, buildHumanMessage } = config;
 
+    // Aplicar gates de segurança
+    await applySecurityGates(context);
+
+    // Carregar perfil de estilo aprendido
+    const learnedStyle = await loadLearnedStyle(context);
+
+    // Construir grafo LangGraph com checkpointer PostgresSaver
+    const graph = new StateGraph(MessagesAnnotation)
+      .addNode('process', async (state) => {
+        const model = getAiModel(modelName, temperature, `${agentType.toLowerCase()}-agent`);
+        const startTime = Date.now();
+
+        const systemPrompt = new SystemMessage(buildSystemPrompt(learnedStyle));
+        const response = await model.invoke([systemPrompt, ...state.messages]);
+
+        await logAiUsage({
+          model: response.response_metadata.model,
+          usage: response.response_metadata.tokenUsage,
+          latencyMs: Date.now() - startTime,
+          agentRole: agentType,
+        });
+
+        return { messages: [new AIMessage(response.content)] };
+      })
+      .addEdge('__start__', 'process')
+      .addEdge('process', '__end__');
+
+    const compiled = graph.compile({ checkpointer });
+    const graphConfig = { configurable: { thread_id: sessionId } };
+
     try {
-      // Aplicar gates de segurança
-      await applySecurityGates(context);
-
-      // Carregar perfil de estilo aprendido
-      const learnedStyle = await loadLearnedStyle(context);
-
-      // Construir grafo LangGraph com checkpointer PostgresSaver
-      const graph = new StateGraph(MessagesAnnotation)
-        .addNode('process', async (state) => {
-          const model = getAiModel(modelName, temperature, `${agentType.toLowerCase()}-agent`);
-          const startTime = Date.now();
-
-          const systemPrompt = new SystemMessage(buildSystemPrompt(learnedStyle));
-          const response = await model.invoke([systemPrompt, ...state.messages]);
-
-          await logAiUsage({
-            model: response.response_metadata.model,
-            usage: response.response_metadata.tokenUsage,
-            latencyMs: Date.now() - startTime,
-            agentRole: agentType,
-          });
-
-          return { messages: [new AIMessage(response.content)] };
-        })
-        .addEdge('__start__', 'process')
-        .addEdge('process', '__end__');
-
-      const compiled = graph.compile({ checkpointer });
-      const graphConfig = { configurable: { thread_id: sessionId } };
-
       const finalState = await compiled.invoke(
         { messages: [new HumanMessage(buildHumanMessage(inputData))] },
         graphConfig,
@@ -206,8 +201,7 @@ export class AgentExecutor {
       };
     } catch (error: any) {
       logger.error({ err: error, sessionId, agentType }, 'Agent execution failed (without tools)');
-      const message =
-        error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
+      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
       return { error: message, sessionId };
     }
   }
@@ -223,13 +217,13 @@ export class AgentExecutor {
     const { agentType, sessionId, inputData, toolsModelName = 'openai/gpt-oss-20b' } = context;
     const { buildSystemPrompt, buildHumanMessage, tools = [] } = config;
 
+    // Aplicar gates de segurança
+    await applySecurityGates(context);
+
+    // Carregar perfil de estilo aprendido
+    const learnedStyle = await loadLearnedStyle(context);
+
     try {
-      // Aplicar gates de segurança
-      await applySecurityGates(context);
-
-      // Carregar perfil de estilo aprendido
-      const learnedStyle = await loadLearnedStyle(context);
-
       const { buildModelWithFallback } = await import('../fallback.util.js');
       const { createReactAgent } = await import('@langchain/langgraph/prebuilt');
 
@@ -269,8 +263,7 @@ export class AgentExecutor {
       };
     } catch (error: any) {
       logger.error({ err: error, sessionId, agentType }, 'Agent execution failed (with tools)');
-      const message =
-        error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
+      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${agentType}.`;
       return { error: message, sessionId };
     }
   }
@@ -283,9 +276,9 @@ export class AgentExecutor {
     config: AgentExecutionConfig,
   ): Promise<AgentExecutionResult> {
     if (config.useTools && config.tools && config.tools.length > 0) {
-      return AgentExecutor.executeWithTools(context, config);
+      return this.executeWithTools(context, config);
     }
-    return AgentExecutor.executeWithoutTools(context, config);
+    return this.executeWithoutTools(context, config);
   }
 }
 

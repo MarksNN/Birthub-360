@@ -89,7 +89,6 @@ export class PgCallAttemptRepository implements CallAttemptRepository {
   async save(attempt: CallAttempt): Promise<void> {
     const props = attempt.toProps();
     try {
-      // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
       await this.prisma.$executeRaw(Prisma.sql`
         INSERT INTO call_attempts (id, lead_id, campaign_id, agent_dn, status, provider_call_id, started_at, ended_at)
         VALUES (
@@ -115,7 +114,6 @@ export class PgCallAttemptRepository implements CallAttemptRepository {
   }
 
   async findById(id: string): Promise<CallAttempt | null> {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<CallAttemptRow[]>(Prisma.sql`
       SELECT id, lead_id, campaign_id,
              agent_dn, status, provider_call_id, started_at, ended_at
@@ -126,7 +124,6 @@ export class PgCallAttemptRepository implements CallAttemptRepository {
   }
 
   async findInProgress(campaignId: string): Promise<CallAttempt[]> {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<CallAttemptRow[]>(Prisma.sql`
       SELECT id, lead_id, campaign_id,
              agent_dn, status, provider_call_id, started_at, ended_at
@@ -137,7 +134,6 @@ export class PgCallAttemptRepository implements CallAttemptRepository {
   }
 
   async findBusyAgentDns(): Promise<Set<string>> {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #75 A1; Prisma.sql parametrizado); migrar para runInTransaction
     const rows = await this.prisma.$queryRaw<{ agent_dn: string }[]>(Prisma.sql`
       SELECT DISTINCT agent_dn FROM call_attempts
       WHERE status NOT IN (${terminalStatusList()})`);

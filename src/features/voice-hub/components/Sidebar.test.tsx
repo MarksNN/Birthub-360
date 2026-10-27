@@ -77,10 +77,7 @@ describe('Sidebar', () => {
   it('renders without crashing and shows the main navigation items', () => {
     renderSidebar();
 
-    // Desde 3505031f o "360" da marca é um <span> dentro do <h1>, então o texto fica dividido
-    // entre nós e getByText('Birth Hub 360') não acha mais. O nome acessível do heading junta
-    // o texto dos filhos e getByRole exige exatamente um match.
-    expect(screen.getByRole('heading', { level: 1, name: 'Birth Hub 360' })).toBeInTheDocument();
+    expect(screen.getByText('Birth Hub 360')).toBeInTheDocument();
     expect(screen.getByText('Agent Registry')).toBeInTheDocument();
     expect(screen.getByText('Voice Studio')).toBeInTheDocument();
     // Real session user from useSessionStore (GET /api/auth/me), not a fabricated fallback.

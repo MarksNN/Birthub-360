@@ -13,7 +13,14 @@ const envSchema = z
     COMMIT_SHA: z.string().default('unknown'),
     BUILD_VERSION: z.string().default('1.0.0'),
     DEPLOY_TIMESTAMP: z.string().default('unknown'),
-    PORT: z.string().default('3005'),
+    PORT: z
+      .string()
+      .trim()
+      .transform((v) => (v === '' ? '3005' : v))
+      .default('3005')
+      .refine((v) => /^[1-9][0-9]{0,4}$/.test(v), { message: 'Invalid PORT format' })
+      .transform((v) => parseInt(v, 10))
+      .refine((v) => v >= 1 && v <= 65535, { message: 'Invalid PORT range' }),
     HOST: z.string().default('0.0.0.0'),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL é obrigatória'),
     REDIS_URL: z.string().optional(),

@@ -1,7 +1,0 @@
-// Parecer 15 (#40, L2): só src/lib/prisma.ts instancia PrismaClient. Um client cru fica sem a
-// extensão de RLS/tenant, sem o roteamento para o tx do runInTransaction e sem o guard G1.
-// Importe o singleton: import { prisma } from '@/lib/prisma.js'.
-`new PrismaClient($args)` where {
-  not $filename <: r".*src/lib/prisma\.ts$",
-  register_diagnostic(span=$args, message="parecer 15 (#40 L2): new PrismaClient fora de src/lib/prisma.ts cria um client sem RLS/tenant e fora do tx; use o singleton de '@/lib/prisma.js'.", severity="error")
-}

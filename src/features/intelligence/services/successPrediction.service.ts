@@ -53,7 +53,9 @@ export interface PredictionFactor {
 /**
  * Prediz a probabilidade de sucesso de uma missão antes de executar.
  */
-export async function predictMissionSuccess(context: MissionContext): Promise<SuccessPrediction> {
+export async function predictMissionSuccess(
+  context: MissionContext,
+): Promise<SuccessPrediction> {
   const missionId = `mission-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   // Buscar histórico similar
@@ -132,7 +134,7 @@ async function getHistoricalMissionData(
   });
 
   const total = logs.length;
-  const successful = logs.filter((l) => l.success).length;
+  const successful = logs.filter(l => l.success).length;
   const avgCost = total > 0 ? logs.reduce((sum, l) => sum + (l.costUsd || 0), 0) / total : 0;
   const avgLatency = total > 0 ? logs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / total : 0;
 
@@ -205,8 +207,7 @@ function analyzeFactors(
         weight: 0.15,
         value: `Contato recente (${context.timeSinceLastContact}h atrás)`,
       });
-    } else if (context.timeSinceLastContact > 168) {
-      // 7 dias
+    } else if (context.timeSinceLastContact > 168) { // 7 dias
       factors.push({
         factor: 'recency',
         impact: 'negative',
@@ -304,7 +305,7 @@ function calculateErrorProbability(
 
   // Ajustar com histórico
   if (historical.total > 10) {
-    const errorRate = 1 - historical.successful / historical.total;
+    const errorRate = 1 - (historical.successful / historical.total);
     probability = (probability + errorRate) / 2;
   }
 
@@ -382,12 +383,9 @@ function estimateLatency(
 /**
  * Calcula confiança na predição.
  */
-function calculatePredictionConfidence(historical: {
-  total: number;
-  successful: number;
-  avgCost: number;
-  avgLatency: number;
-}): number {
+function calculatePredictionConfidence(
+  historical: { total: number; successful: number; avgCost: number; avgLatency: number },
+): number {
   if (historical.total < 5) return 0.3;
   if (historical.total < 20) return 0.5;
   if (historical.total < 50) return 0.7;
@@ -433,8 +431,8 @@ function generateReasoning(
   recommendation: SuccessPrediction['recommendation'],
   factors: PredictionFactor[],
 ): string {
-  const positiveFactors = factors.filter((f) => f.impact === 'positive').map((f) => f.value);
-  const negativeFactors = factors.filter((f) => f.impact === 'negative').map((f) => f.value);
+  const positiveFactors = factors.filter(f => f.impact === 'positive').map(f => f.value);
+  const negativeFactors = factors.filter(f => f.impact === 'negative').map(f => f.value);
 
   let reasoning = `Probabilidade de conversão: ${(conversionProbability * 100).toFixed(1)}%. `;
 
