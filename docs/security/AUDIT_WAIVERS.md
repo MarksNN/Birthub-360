@@ -32,6 +32,22 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
    ignorar auditoria em geral.
 
 ## Waivers ativos
+- **undici** (`GHSA-3WWX-PV8P-Q78V`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-PMJH-FQ2X-6V4X`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-R53P-7PC4-XJ5R`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-RFGV-XXQX-MFG5`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-3XPG-4RPP-HHHM`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-2JFJ-6HJV-FM6J`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-2GQQ-GQF2-X968`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-W293-VG96-WGC3`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-8436-99HF-9MMV`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-RX4F-C7P8-82VQ`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-F72V-6W45-Q472`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+
+- **body-parser** (`GHSA-27R3-JXMH-P828`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-4QV8-2P9J-2685`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+- **undici** (`GHSA-XJJ6-F33Q-929C`) — Vulnerabilidade indireta upstream (high). Dono: Jules. Reavaliar em: 2026-11-30.
+
 
 ### `GHSA-CG2G-XH64-V4Q7`, `GHSA-MRV2-3PQR-J5JR`, `GHSA-C6GR-QVV4-5V3F` - `dompurify`
 

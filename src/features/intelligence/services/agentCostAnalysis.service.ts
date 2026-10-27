@@ -81,7 +81,7 @@ export async function analyzeAgentCosts(
     totalCostUsd,
     mostExpensiveAgent: agents[0]?.agentType || 'Nenhum',
     mostEfficientAgent: agents.length > 0
-      ? agents.reduce((min, curr) => curr.avgCostPerExecution < min.avgCostPerExecution ? curr : min).agentType
+      ? agents.reduce((min, curr) => (curr.avgCostPerExecution < min.avgCostPerExecution ? curr : min), agents[0]).agentType
       : 'Nenhum',
   };
 }

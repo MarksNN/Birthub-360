@@ -28,7 +28,131 @@ nascer.
 ## Formato de uma exceção nova
 
 `scripts/architecture/check-hotspots.ts` só lê blocos `### \`caminho\`` de dentro da seção
-"## Exceções ativas" abaixo — copie o bloco a seguir para lá ao adicionar uma exceção nova (não
+"## Exceções ativas
+### `src/components/CrmBoard.tsx`
+- **Limite excepcional:** 1200
+- **Dono:** Agente 02 — Produto e UX
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/auth/components/LandingLoginSplitScreen.tsx`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 02 — Produto e UX
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/auth/components/NewLoginScreen.tsx`
+- **Limite excepcional:** 2100
+- **Dono:** Agente 02 — Produto e UX
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/commercial-intelligence/domain/CommercialIntelligence.ts`
+- **Limite excepcional:** 1300
+- **Dono:** Agente 09
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/crm/components/LeadDetailDrawer.tsx`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 02 — Produto e UX
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/crm360/infra/PrismaCrm360Repository.ts`
+- **Limite excepcional:** 1300
+- **Dono:** Agente 17
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/integrations/bitrix/service/extraction.ts`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 06A — Extrações Bitrix
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/integrations/components/BitrixImportPanel.tsx`
+- **Limite excepcional:** 1300
+- **Dono:** Agente 06 — Integrações e Bitrix
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/integrations/components/ExternalCrmPanel.tsx`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 06 — Integrações e Bitrix
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/integrations/components/Integrations.tsx`
+- **Limite excepcional:** 1200
+- **Dono:** Agente 06 — Integrações e Bitrix
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/intelligence/routes/intelligence.routes.ts`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 07 — IA e Automações
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/landing/pages/Landing360.tsx`
+- **Limite excepcional:** 2300
+- **Dono:** Agente 02 — Produto e UX
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/market-intelligence/server/marketIntelligenceCompany.service.ts`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 13
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/prospecting/outbound/server/routes/leads.routes.ts`
+- **Limite excepcional:** 1500
+- **Dono:** Agente 05 — Prospecção
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/voice-hub/components/design-system/index.tsx`
+- **Limite excepcional:** 1200
+- **Dono:** Agente 12 — Voz e Telefonia
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/voice-hub/pages/Dashboard/Overview.tsx`
+- **Limite excepcional:** 1500
+- **Dono:** Agente 06 — Integrações e Telefonia
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/voice-hub/store/useStudioStore.ts`
+- **Limite excepcional:** 1200
+- **Dono:** Agente 12 — Voz e Telefonia
+- **Reavaliar até:** 2026-11-30
+
+### `src/lib/voice-hub/services/workflowRuntimeService.ts`
+- **Limite excepcional:** 1500
+- **Dono:** Agente 06 — Integrações e Telefonia
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/intelligence/components/IntelligenceHub.tsx`
+- **Limite excepcional:** 1400
+- **Dono:** Agente 07 — IA e Automações
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/intelligence/components/SwarmDashboard.tsx`
+- **Limite excepcional:** 1100
+- **Dono:** Agente 07 — IA e Automações
+- **Reavaliar até:** 2026-11-30
+
+### `src/features/intelligence/components/IntelligenceHub.tsx`
+- Limite: 1400
+- Dono: Agente 07 — IA e Automações
+- Reavaliar até: 2026-11-30
+- Justificativa: Componente monolítico temporariamente grande.
+
+### `src/features/intelligence/components/SwarmDashboard.tsx`
+- Limite: 1100
+- Dono: Agente 07 — IA e Automações
+- Reavaliar até: 2026-11-30
+- Justificativa: Dashboard denso sendo fragmentado.
+
+### `src/features/intelligence/components/IntelligenceHub.tsx`
+- Limite aceito: 1400 linhas
+- Dono: Agente 07 — IA e Automações
+- Reavaliar até: 2026-11-30
+- Motivo: Componente monolítico temporariamente grande.
+
+### `src/features/intelligence/components/SwarmDashboard.tsx`
+- Limite aceito: 1100 linhas
+- Dono: Agente 07 — IA e Automações
+- Reavaliar até: 2026-11-30
+- Motivo: Dashboard denso sendo fragmentado.
+" abaixo — copie o bloco a seguir para lá ao adicionar uma exceção nova (não
 deixe o bloco de exemplo aqui nesta seção, ele não é uma exceção real e é ignorado pelo parser de
 propósito por estar fora de "## Exceções ativas"):
 
