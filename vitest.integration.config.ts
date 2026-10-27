@@ -31,6 +31,7 @@ export default defineConfig({
     // (access-request/agent-bus/agent-runtime/role-supervisor) estouraram o hook padrão de 10s só
     // por rodarem depois de mais um arquivo pesado ter sido adicionado à suíte sequencial.
     hookTimeout: 30000,
+    testTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
