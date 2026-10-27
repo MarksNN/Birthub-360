@@ -65,10 +65,18 @@ vi.mock('@/features/intelligence/agents/base.agent', async () => {
       sessionId?: string,
     ): Promise<any> {
       const sid = sessionId || `session-${this.agentType.toLowerCase()}-${Date.now()}`;
-      await (this as any).updateMemory(sid, [
-        { role: 'human', content: inputData },
-        { role: 'ai', content: STUBBED_RECOMMENDATION },
-      ]);
+      const { saveAgentMemory } = await import('@/features/intelligence/agents/agentMemory.store');
+      const { getTenantId } = await import('@/lib/async-context');
+      await saveAgentMemory({
+        sessionId: sid,
+        agentType: this.agentType,
+        organizationId: getTenantId(),
+        messages: [
+          { role: 'human', content: inputData },
+          { role: 'ai', content: STUBBED_RECOMMENDATION },
+        ],
+        status: 'Completed',
+      });
       const { logAiUsage } = await import('@/lib/ai/gateway');
       await logAiUsage({
         model: 'stub-model-e2e',
