@@ -34,10 +34,10 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     env:
-      # if: não pode ler o contexto "secrets" diretamente (só env/vars/job/etc — ver
-      # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability).
-      # Copiamos pra env no nível do job pra poder condicionar o step de scan abaixo.
+      # Credencial ausente deve reprovar o check, nunca transformar scan ignorado em verde.
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || vars.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
       # Sem isso, src/config/env.ts (importado por src/lib/prisma.ts, que quase todo teste unitário
       # acaba puxando) falha a validação do zod por falta de NODE_ENV e chama process.exit(1) — o
       # que derruba o processo do Vitest inteiro antes de qualquer teste rodar. production.yaml já
@@ -47,6 +47,23 @@ jobs:
       JWT_SECRET: ci-test-jwt-secret-not-for-production
       BETTER_AUTH_SECRET: ci-e2e-test-only-secret-not-for-production
     steps:
+      - name: Validate SonarQube configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${SONAR_TOKEN:-}" ]; then
+            echo "::error::SONAR_TOKEN is required. The scanner and quality gate cannot be skipped."
+            exit 1
+          fi
+          case "$SONAR_HOST_URL" in
+            https://sonarcloud.io|https://sonarcloud.io/|https://sonarqube.us|https://sonarqube.us/)
+              if [ -z "${SONAR_ORGANIZATION:-}" ]; then
+                echo "::error::Set the SONAR_ORGANIZATION repository variable to the verified SonarQube Cloud organization key."
+                exit 1
+              fi
+              ;;
+          esac
+
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
@@ -66,8 +83,10 @@ jobs:
         run: npm run test:unit -- --coverage
 
       - name: SonarQube Scan
-        if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@ad8210318ac8bb816e41990d5af2b304f7a6c213 # master (snapshot fixado em SHA — política de branch protection exige commit SHA completo, não branch)
+        with:
+          args: >-
+            -Dsonar.qualitygate.wait=true
+            "-Dsonar.organization=${{ env.SONAR_ORGANIZATION }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
