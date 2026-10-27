@@ -3,7 +3,7 @@ import { useId, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { auth } from '../../../lib/auth.js';
-import { AtlasLogo } from '../components/design-system/index.js';
+import { BirthubLogo } from '../components/design-system/index.js';
 import { getAccessibleTextOnBrand } from '../components/design-system/tokens.js';
 import { useSessionStore } from '../store/useSessionStore.js';
 
@@ -62,7 +62,7 @@ export default function RegisterPage() {
         <div className="p-8">
           <div className="flex items-center gap-3 mb-8 justify-center">
             <div className="p-2 bg-white border border-slate-200 rounded-lg">
-              <AtlasLogo className="h-6 w-6" />
+              <BirthubLogo className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900">Birth Voices Hub</h1>
           </div>

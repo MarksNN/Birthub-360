@@ -80,7 +80,7 @@ export default defineConfig({
         // ver docs/BrandConstitution.md. `TechToolLogo.tsx` e `ToolLogos.tsx`, que também moram
         // aqui, NÃO foram excluídos: têm lookup por chave, normalização de string e dispatch
         // condicional reais, então permanecem cobertos.
-        'src/components/ui/AtlasLogo.tsx',
+        'src/components/brand/BirthHubLogo.tsx',
         // Widget 3D decorativo (react-three-fiber) — CLAUDE.md seção 1 já documenta que é
         // decorativo; sem lógica de negócio testável em jsdom (não há WebGL real no ambiente de
         // teste).

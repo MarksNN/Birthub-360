@@ -79,7 +79,7 @@ async function verifyBrasilApi(): Promise<CheckResult> {
   try {
     const response = await fetch('https://brasilapi.com.br/api/cnpj/v1/00000000000191', {
       headers: {
-        'User-Agent': 'ProspectorAtlas/1.0',
+        'User-Agent': 'Birthub360/1.0',
         Accept: 'application/json',
       },
     });
