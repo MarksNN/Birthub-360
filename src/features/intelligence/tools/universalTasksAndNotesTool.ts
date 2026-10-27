@@ -221,7 +221,7 @@ export const universalTasksAndNotesTool = new DynamicStructuredTool({
       const parsedDate = dueDate ? new Date(dueDate) : new Date(Date.now() + 24 * 60 * 60 * 1000);
 
       // 1. Persistir a Activity no CRM interno para rastreabilidade quando vinculada a um lead
-      let internalActivity: any = null;
+      let internalActivity: { id: string } | null = null;
       if (leadId) {
         internalActivity = await prisma.activity.create({
           data: {
