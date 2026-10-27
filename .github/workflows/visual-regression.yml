@@ -16,7 +16,7 @@ jobs:
 
     services:
       postgres:
-        image: pgvector/pgvector:pg17
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: prospector
           POSTGRES_PASSWORD: prospector_test_pass
@@ -24,7 +24,7 @@ jobs:
         ports:
           - 5434:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -h 127.0.0.1 -U prospector -d prospectordb_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -34,10 +34,23 @@ jobs:
         ports:
           - 6379:6379
         options: >-
-          --health-cmd "redis-cli ping"
+          --health-cmd "redis-cli -h 127.0.0.1 ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+      meilisearch:
+        image: getmeili/meilisearch:v1.12
+        env:
+          MEILI_MASTER_KEY: ci-test-meili-key
+        ports:
+          - 7700:7700
+        options: >-
+          --health-cmd "wget --no-verbose --tries=1 --spider http://127.0.0.1:7700/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-start-period 30s
+          --health-retries 10
 
     env:
       NODE_ENV: test
@@ -103,7 +116,6 @@ jobs:
 
     - name: Run Visual Tests
       run: npm run test:visual
-      continue-on-error: true # Non-blocking for now per prompt instructions
 
     - name: Upload Visual Diff Report
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
