@@ -84,7 +84,13 @@ jobs:
       # rápido). O script é coberto por teste unitário próprio
       # (tests/unit/security-codeql-sarif.test.ts), rodado no job de aplicação normal (ci.yml).
       - name: "Gate: falhar em achado CodeQL error-level"
-        run: npx --yes tsx scripts/security/check-codeql-sarif.ts results
+        run: |
+          set -euo pipefail
+          if [ ! -d results ] || [ -z "$(find results -maxdepth 1 -type f -name '*.sarif' -size +0c -print -quit)" ]; then
+            echo "::error::CodeQL did not produce a non-empty SARIF report. Analysis evidence is required."
+            exit 1
+          fi
+          npx --yes tsx scripts/security/check-codeql-sarif.ts results
 
       - name: Upload SARIF como artefato (auditoria/retenção)
         if: always()
@@ -93,4 +99,4 @@ jobs:
           name: codeql-sarif-${{ matrix.language }}
           path: results/*.sarif
           retention-days: 30
-          if-no-files-found: warn
+          if-no-files-found: error
