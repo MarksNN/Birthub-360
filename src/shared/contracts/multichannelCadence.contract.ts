@@ -60,3 +60,5 @@ export interface IMultichannelCadencePort {
     reason: string;
   }): Promise<{ halted: boolean; channelsSuppressed: CadenceChannel[] }>;
 }
+
+export const sharedCadenceEnrollmentsStore = new Map<string, MultichannelCadenceEnrollment>();

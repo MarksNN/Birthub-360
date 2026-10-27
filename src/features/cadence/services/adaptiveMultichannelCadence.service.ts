@@ -1,16 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { logger } from '../../../lib/logger.js';
 import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import type {
-  CadenceChannel,
-  CadenceStep,
-  IMultichannelCadencePort,
-  MultichannelCadenceEnrollment,
-  StepDispatchResult,
+import {
+  type CadenceChannel,
+  type CadenceStep,
+  type IMultichannelCadencePort,
+  type MultichannelCadenceEnrollment,
+  sharedCadenceEnrollmentsStore,
+  type StepDispatchResult,
 } from '../../../shared/contracts/multichannelCadence.contract.js';
 
 export class AdaptiveMultichannelCadenceService implements IMultichannelCadencePort {
-  private enrollmentsStore = new Map<string, MultichannelCadenceEnrollment>();
+  private enrollmentsStore = sharedCadenceEnrollmentsStore;
   private cadenceStepsStore = new Map<string, CadenceStep[]>();
   private optOutRegistry = new Map<string, Set<string>>(); // organizationId:leadId -> Set de canais bloqueados
 

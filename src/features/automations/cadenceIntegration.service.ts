@@ -1,5 +1,9 @@
+import { randomUUID } from 'node:crypto';
 import { logger } from '../../lib/logger.js';
-import { adaptiveMultichannelCadenceService } from '../cadence/services/adaptiveMultichannelCadence.service.js';
+import {
+  type MultichannelCadenceEnrollment,
+  sharedCadenceEnrollmentsStore,
+} from '../../shared/contracts/multichannelCadence.contract.js';
 import type { CadenceActionConfig } from './automation.types.js';
 
 export interface CadenceActionResult {
@@ -15,6 +19,39 @@ export interface CadenceActionResult {
  * Permite que regras automatizadas avancem passos, pausem, retomem ou reiniciem cadências de vendas.
  */
 export class CadenceIntegrationService {
+  private findEnrollmentByLead(
+    organizationId: string,
+    leadId: string,
+  ): MultichannelCadenceEnrollment | undefined {
+    for (const enrollment of sharedCadenceEnrollmentsStore.values()) {
+      if (enrollment.organizationId === organizationId && enrollment.leadId === leadId) {
+        return enrollment;
+      }
+    }
+    return undefined;
+  }
+
+  private enrollLead(params: {
+    organizationId: string;
+    cadenceId: string;
+    leadId: string;
+  }): MultichannelCadenceEnrollment {
+    const enrollmentId = `enr-${randomUUID()}`;
+    const enrollment: MultichannelCadenceEnrollment = {
+      enrollmentId,
+      organizationId: params.organizationId,
+      cadenceId: params.cadenceId,
+      leadId: params.leadId,
+      contactEmail: '',
+      contactPhone: '',
+      currentStep: 1,
+      status: 'active',
+      enrolledAt: new Date().toISOString(),
+    };
+    sharedCadenceEnrollmentsStore.set(`${params.organizationId}:${enrollmentId}`, enrollment);
+    return enrollment;
+  }
+
   async executeCadenceAction(
     organizationId: string,
     leadId: string,
@@ -35,19 +72,13 @@ export class CadenceIntegrationService {
     switch (config.action) {
       case 'move_to_step': {
         const step = config.stepIndex ?? 1;
-        let enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
-          organizationId,
-          leadId,
-        );
-        if (!enrollment) {
-          enrollment = await adaptiveMultichannelCadenceService.enrollLead({
+        const enrollment =
+          this.findEnrollmentByLead(organizationId, leadId) ??
+          this.enrollLead({
             organizationId,
             cadenceId: config.cadenceId,
             leadId,
-            contactEmail: '',
-            contactPhone: '',
           });
-        }
         enrollment.currentStep = step;
         return {
           success: true,
@@ -60,10 +91,7 @@ export class CadenceIntegrationService {
 
       case 'pause': {
         const pausedDays = config.pauseDays ?? 7;
-        const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
-          organizationId,
-          leadId,
-        );
+        const enrollment = this.findEnrollmentByLead(organizationId, leadId);
         if (enrollment) {
           enrollment.status = 'paused';
         }
@@ -77,10 +105,7 @@ export class CadenceIntegrationService {
       }
 
       case 'resume': {
-        const enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
-          organizationId,
-          leadId,
-        );
+        const enrollment = this.findEnrollmentByLead(organizationId, leadId);
         if (enrollment) {
           enrollment.status = 'active';
         }
@@ -93,19 +118,13 @@ export class CadenceIntegrationService {
       }
 
       case 'restart': {
-        let enrollment = adaptiveMultichannelCadenceService.findEnrollmentByLead(
-          organizationId,
-          leadId,
-        );
-        if (!enrollment) {
-          enrollment = await adaptiveMultichannelCadenceService.enrollLead({
+        const enrollment =
+          this.findEnrollmentByLead(organizationId, leadId) ??
+          this.enrollLead({
             organizationId,
             cadenceId: config.cadenceId,
             leadId,
-            contactEmail: '',
-            contactPhone: '',
           });
-        }
         enrollment.currentStep = 1;
         enrollment.status = 'active';
         return {

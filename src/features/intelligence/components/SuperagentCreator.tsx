@@ -116,14 +116,35 @@ const TOOLS_LIST = [
   { id: 'crm_sync', name: 'Sincronização Bitrix24 / CRM Upsert' },
   { id: 'email_dispatch', name: 'Disparo Automático de E-mails (SMTP)' },
   { id: 'prospecting_enrichment', name: 'Descoberta B2B & Enriquecimento (Apollo/Receita/Hunter)' },
-  { id: 'email_intelligence', name: 'E-mail Multi-Provedor (Outlook/M365, Gmail & IMAP) + Sinais IA' },
-  { id: 'messaging_omnichannel', name: 'Mensageria Omnichannel (WhatsApp, Telegram, Teams, Slack, SMS)' },
-  { id: 'tasks_projects_notes', name: 'Tarefas & Notas (Trello, Monday.com, Bitrix24, ClickUp, Asana, Notion)' },
+  {
+    id: 'email_intelligence',
+    name: 'E-mail Multi-Provedor (Outlook/M365, Gmail & IMAP) + Sinais IA',
+  },
+  {
+    id: 'messaging_omnichannel',
+    name: 'Mensageria Omnichannel (WhatsApp, Telegram, Teams, Slack, SMS)',
+  },
+  {
+    id: 'tasks_projects_notes',
+    name: 'Tarefas & Notas (Trello, Monday.com, Bitrix24, ClickUp, Asana, Notion)',
+  },
   { id: 'meetings_calendar', name: 'Reuniões & Atas IA (Google Meet, Teams, Zoom, Calendly)' },
-  { id: 'office_docs_sheets_slides', name: 'Suite Office & Workspace (Word/Docs, Excel .xlsx, PowerPoint/Slides)' },
-  { id: 'multi_device_notifications', name: 'Notificações (Pop-up SSE, Push Celular, Smartwatch/Relógio, SMS)' },
-  { id: 'scripts_prompts_enablement', name: 'Fábrica de Scripts Comerciais & Biblioteca de Prompts' },
-  { id: 'crm_erp_sync', name: 'Sincronização Multi-CRM & ERP (Bitrix, HubSpot, Pipedrive, RD, Omie)' },
+  {
+    id: 'office_docs_sheets_slides',
+    name: 'Suite Office & Workspace (Word/Docs, Excel .xlsx, PowerPoint/Slides)',
+  },
+  {
+    id: 'multi_device_notifications',
+    name: 'Notificações (Pop-up SSE, Push Celular, Smartwatch/Relógio, SMS)',
+  },
+  {
+    id: 'scripts_prompts_enablement',
+    name: 'Fábrica de Scripts Comerciais & Biblioteca de Prompts',
+  },
+  {
+    id: 'crm_erp_sync',
+    name: 'Sincronização Multi-CRM & ERP (Bitrix, HubSpot, Pipedrive, RD, Omie)',
+  },
   { id: 'pipeline_revops', name: 'RevOps, Forecast Ponderado, Propostas IA, Cross-Sell & Churn' },
 ];
 
@@ -184,11 +205,15 @@ export function SuperagentCreator() {
       });
       const payload = res?.data ?? res;
       setLiveOutput(
-        payload?.output || payload?.error || 'Superagente executado com sucesso no runtime universal.',
+        payload?.output ||
+          payload?.error ||
+          'Superagente executado com sucesso no runtime universal.',
       );
     } catch (err: any) {
       setLiveOutput(
-        err instanceof Error ? `Erro na execução ao vivo: ${err.message}` : 'Falha ao executar Superagente.',
+        err instanceof Error
+          ? `Erro na execução ao vivo: ${err.message}`
+          : 'Falha ao executar Superagente.',
       );
     } finally {
       setRunningLive(false);
@@ -959,8 +984,7 @@ $status | ConvertTo-Json -Depth 3
             </div>
             <div>
               <div>
-                <pre className="hidden">
-                </pre>
+                <pre className="hidden"></pre>
               </div>
             </div>
           </motion.div>
