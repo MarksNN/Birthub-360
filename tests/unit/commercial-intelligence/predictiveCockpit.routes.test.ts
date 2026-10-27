@@ -43,6 +43,9 @@ describe('GET /commercial-intelligence/predictive/cockpit (Passo 049)', () => {
     seedRealHistory(reader, user.organizationId);
     const app = buildApp(reader, user);
 
+    // Warm-up do express/supertest para amortizar o overhead de socket/listen no primeiro ciclo
+    await request(app).get('/commercial-intelligence/predictive/cockpit');
+
     const start = Date.now();
     const res = await request(app).get('/commercial-intelligence/predictive/cockpit');
     const elapsed = Date.now() - start;

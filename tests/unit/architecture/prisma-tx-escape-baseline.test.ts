@@ -62,7 +62,8 @@ const GENERIC_SUPPRESSION_RE =
 const BIOME_VERSION = '2.5.14'; // a do package-lock.json; o teste confere
 const BIOME_BIN = path.join(
   ROOT,
-  'node_modules/.bin',
+  'node_modules',
+  '.bin',
   process.platform === 'win32' ? 'biome.cmd' : 'biome',
 );
 const NEW_PRISMA_CLIENT_RE = /\bnew\s+PrismaClient\s*\(/;
@@ -309,7 +310,7 @@ describe('parecer 15 (#75 S3): o Biome aplica as regras de verdade', () => {
     expect(lock.packages['node_modules/@biomejs/biome']?.version).toBe(BIOME_VERSION);
     // P3 (parecer 24): binário local do lock, sem npx (que poderia ir à rede).
     expect(existsSync(BIOME_BIN), `${BIOME_BIN} ausente: rode npm ci`).toBe(true);
-    const version = spawnSync(BIOME_BIN, ['--version'], { cwd: ROOT, encoding: 'utf8' });
+    const version = spawnSync(BIOME_BIN, ['--version'], { cwd: ROOT, encoding: 'utf8', shell: process.platform === 'win32' });
     expect(version.stdout.trim()).toBe(`Version: ${BIOME_VERSION}`);
 
     const biome = JSON.parse(readFileSync(path.join(ROOT, 'biome.json'), 'utf8')) as {
@@ -372,7 +373,7 @@ describe('parecer 15 (#75 S3): o Biome aplica as regras de verdade', () => {
       const res = spawnSync(
         BIOME_BIN,
         ['lint', `--config-path=${dir}`, '--reporter=github', path.join(dir, 'src')],
-        { cwd: ROOT, encoding: 'utf8', timeout: 90_000 },
+        { cwd: ROOT, encoding: 'utf8', timeout: 90_000, shell: process.platform === 'win32' },
       );
       const output = `${res.stdout}\n${res.stderr}`;
       const diags = output
@@ -384,7 +385,7 @@ describe('parecer 15 (#75 S3): o Biome aplica as regras de verdade', () => {
             ? {
                 level: m[1],
                 title: m[2],
-                file: rel(m[3]).replace(/^.*?src\//, 'src/'),
+                file: decodeURIComponent(m[3]).replace(/\\/g, '/').replace(/^.*?src\//, 'src/'),
                 line: Number(m[4]),
                 text: l,
               }

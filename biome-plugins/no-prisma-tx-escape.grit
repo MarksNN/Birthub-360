@@ -10,6 +10,6 @@
 `$obj.$prop` where {
   $obj <: or { `prisma`, `$_.prisma`, r"^(?:[\w$]+\.)*[\w$]*[pP]risma$" },
   $prop <: r"^\$(?:queryRaw|executeRaw|queryRawUnsafe|executeRawUnsafe|queryRawTyped|runCommandRaw|transaction)$",
-  not $filename <: r".*src/lib/prisma\.ts$",
+  not $filename <: r".*src[\\/]lib[\\/]prisma\.ts$",
   register_diagnostic(span=$prop, message="parecer 15 (#40): SQL cru ou transaction no client global escapa do tx; use runInTransaction e o tx recebido.", severity="error")
 }
