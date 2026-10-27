@@ -1,5 +1,6 @@
 import type { StructuredToolInterface } from '@langchain/core/tools';
 import { getTenantId, getUserId } from '../../../lib/async-context.js';
+import { saveAgentMemory } from './agentMemory.store.js';
 import {
   type AgentExecutionConfig,
   type AgentExecutionContext,
@@ -36,6 +37,18 @@ export abstract class BaseAgent {
 
   protected abstract buildSystemPrompt(learnedStyle: string | null): string;
   protected abstract buildHumanMessage(input: string): string;
+
+  /**
+   * Persiste o histórico de mensagens da sessão no AgentMemory.
+   */
+  protected async updateMemory(sessionId: string, messages: unknown): Promise<void> {
+    await saveAgentMemory({
+      sessionId,
+      agentType: this.agentType,
+      organizationId: getTenantId(),
+      messages,
+    });
+  }
 
   /**
    * Executa o agente sem ferramentas (turno único).
