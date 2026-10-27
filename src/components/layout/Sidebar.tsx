@@ -54,7 +54,7 @@ function getSectionBadgeStyle(title: string): {
       return {
         border: 'border-[#00D4FF]/35',
         bg: 'bg-[#00D4FF]/10',
-        text: 'text-[#0284c7] dark:text-[#00D4FF]',
+        text: 'text-[#0369a1] dark:text-[#00D4FF]',
         dot: 'bg-[#00D4FF]',
       };
     case 'RECEITA':
@@ -92,7 +92,7 @@ function getSectionBadgeStyle(title: string): {
 function getActiveIconWellStyle(accent: AccentColor): string {
   switch (accent) {
     case 'cyan':
-      return 'bg-gradient-to-br from-sky-500/20 to-sky-600/10 text-[#0284c7] dark:text-[#38bdf8] border border-sky-400/40 shadow-[0_2px_8px_rgba(14,165,233,0.2)]';
+      return 'bg-gradient-to-br from-sky-500/20 to-sky-600/10 text-[#0369a1] dark:text-[#38bdf8] border border-sky-400/40 shadow-[0_2px_8px_rgba(14,165,233,0.2)]';
     case 'pink':
       return 'bg-gradient-to-br from-rose-500/20 to-rose-600/10 text-[#be185d] dark:text-[#fb7185] border border-rose-400/40 shadow-[0_2px_8px_rgba(244,63,94,0.2)]';
     case 'gold':
@@ -439,7 +439,7 @@ export function Sidebar({
                                 className={`group/sub flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] motion-safe:transition-all motion-safe:duration-150 hover:translate-x-1 ${FOCUS_RING} ${
                                   isSubActive
                                     ? accent === 'cyan'
-                                      ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] font-semibold shadow-sm'
+                                      ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0369a1] dark:text-[#00D4FF] font-semibold shadow-sm'
                                       : accent === 'gold'
                                         ? 'bg-[#F59E0B]/15 border border-[#F59E0B]/40 text-[#b45309] dark:text-[#F59E0B] font-semibold shadow-sm'
                                         : accent === 'pink'
@@ -498,7 +498,7 @@ export function Sidebar({
                                     }}
                                     className={`flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
                                       isSubActive
-                                        ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] font-semibold'
+                                        ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0369a1] dark:text-[#00D4FF] font-semibold'
                                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                                     }`}
                                   >
@@ -545,7 +545,7 @@ export function Sidebar({
                 data-testid="sidebar-intelligence-cta"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#8B7DFF]/20 text-[#8B7DFF] border border-[#8B7DFF]/40 shadow-[0_0_10px_rgba(139,125,255,0.3)] transition-transform duration-200 group-hover:scale-105">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#8B7DFF]/20 text-[#6d28d9] dark:text-[#8B7DFF] border border-[#8B7DFF]/40 shadow-[0_0_10px_rgba(139,125,255,0.3)] transition-transform duration-200 group-hover:scale-105">
                     <ArrowRight
                       size={14}
                       strokeWidth={1.75}
@@ -562,7 +562,7 @@ export function Sidebar({
                     </div>
                   </div>
                 </div>
-                <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#8B7DFF]/15 text-[#8B7DFF] border border-[#8B7DFF]/30 shrink-0">
+                <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#8B7DFF]/15 text-[#6d28d9] dark:text-[#8B7DFF] border border-[#8B7DFF]/30 shrink-0">
                   IA
                 </span>
               </button>
@@ -571,7 +571,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={() => openTab('intelligence')}
-              className={`sidebar-footer-card mx-auto grid h-10 w-10 place-items-center rounded-xl text-[#8B7DFF] hover:scale-105 transition-all ${FOCUS_RING}`}
+              className={`sidebar-footer-card mx-auto grid h-10 w-10 place-items-center rounded-xl text-[#6d28d9] dark:text-[#8B7DFF] hover:scale-105 transition-all ${FOCUS_RING}`}
               title="Ver Hub de IA"
               aria-label="Ver Hub de IA"
               data-testid="sidebar-intelligence-icon"
