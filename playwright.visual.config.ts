@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 const PORT = process.env.PORT ?? '3000';
 const chromiumExecutablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE?.trim() || undefined;
@@ -13,9 +13,14 @@ export default defineConfig({
     ...(process.env.CI ? [['line'] as const] : []),
     ['html', { outputFolder: 'visual-regression-report', open: 'never' }],
   ],
-  snapshotPathTemplate: '{testDir}/baselines/{testFilePath}/{arg}-{projectName}{ext}',
+  // Verification never blesses a missing baseline; the manual CI command explicitly overrides this.
+  updateSnapshots: 'none',
+  snapshotPathTemplate: '{testDir}/baselines/{testFilePath}/{arg}-{projectName}-{platform}{ext}',
   use: {
     baseURL: process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`,
+    locale: 'pt-BR',
+    timezoneId: 'America/Sao_Paulo',
+    reducedMotion: 'reduce',
     trace: 'on-first-retry',
   },
   projects: [
@@ -23,30 +28,38 @@ export default defineConfig({
       name: 'desktop',
       use: {
         viewport: { width: 1440, height: 900 },
-        ...(chromiumExecutablePath ? { launchOptions: { executablePath: chromiumExecutablePath } } : {}),
+        ...(chromiumExecutablePath
+          ? { launchOptions: { executablePath: chromiumExecutablePath } }
+          : {}),
       },
     },
     {
       name: 'laptop',
       use: {
         viewport: { width: 1366, height: 768 },
-        ...(chromiumExecutablePath ? { launchOptions: { executablePath: chromiumExecutablePath } } : {}),
+        ...(chromiumExecutablePath
+          ? { launchOptions: { executablePath: chromiumExecutablePath } }
+          : {}),
       },
     },
     {
       name: 'tablet',
       use: {
         viewport: { width: 768, height: 1024 },
-        ...(chromiumExecutablePath ? { launchOptions: { executablePath: chromiumExecutablePath } } : {}),
+        ...(chromiumExecutablePath
+          ? { launchOptions: { executablePath: chromiumExecutablePath } }
+          : {}),
       },
     },
     {
       name: 'mobile',
       use: {
         viewport: { width: 390, height: 844 },
-        ...(chromiumExecutablePath ? { launchOptions: { executablePath: chromiumExecutablePath } } : {}),
+        ...(chromiumExecutablePath
+          ? { launchOptions: { executablePath: chromiumExecutablePath } }
+          : {}),
       },
-    }
+    },
   ],
   webServer: {
     command: 'npm run start:e2e',
