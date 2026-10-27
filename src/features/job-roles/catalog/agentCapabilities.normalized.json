@@ -2,13 +2,13 @@
   "summary": {
     "totalCapabilities": 30,
     "totalToolBindings": 30,
-    "verifiedBindings": 25,
-    "unverifiedBindings": 5,
+    "verifiedBindings": 26,
+    "unverifiedBindings": 4,
     "byReason": {
-      "AVAILABLE": 25,
+      "AVAILABLE": 26,
       "SOURCE_REQUIRED": 2,
       "FUTURE_TOOL": 2,
-      "TOOL_UNAVAILABLE": 1
+      "TOOL_UNAVAILABLE": 0
     },
     "totalAgentsWithCapabilityGrants": 394,
     "agentsWithDomainCapability": 43,
