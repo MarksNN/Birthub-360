@@ -855,66 +855,53 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                           const isPinned = pinnedIds.includes(tool.id);
 
                           return (
-                            <Card
-                              key={tool.id}
-                              variant="interactive"
-                              padding="sm"
-                              onClick={() => handleOpenTool(tool.id)}
-                              className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${
-                                tool.isFlagship ? 'ring-1 ring-brand/30' : ''
-                              }`}
-                            >
-                              <div>
-                                {/* Topo do Card: Ícone, Nome e Botão de Fixar */}
-                                <div className="flex items-start justify-between gap-2 mb-3">
-                                  <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="w-9 h-9 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
-                                      <Icon className="w-4 h-4" />
-                                    </div>
-                                    <div className="min-w-0">
-                                      <CardTitle className="text-xs font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
-                                        {tool.label}
-                                      </CardTitle>
-                                      <span className="text-[10px] font-mono text-ink-2 truncate block">
-                                        {tool.badge}
-                                      </span>
+                            <div key={tool.id} className="relative h-full group">
+                              <Card
+                                variant="interactive"
+                                padding="sm"
+                                onClick={() => handleOpenTool(tool.id)}
+                                className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${tool.isFlagship ? 'ring-1 ring-brand/30' : ''}`}
+                              >
+                                <div>
+                                  <div className="flex items-start justify-between gap-2 mb-3 pr-7">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                      <div className="w-9 h-9 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
+                                        <Icon className="w-4 h-4" />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <CardTitle className="text-xs font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
+                                          {tool.label}
+                                        </CardTitle>
+                                        <span className="text-[10px] font-mono text-ink-2 truncate block">
+                                          {tool.badge}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
-
-                                  <button
-                                    type="button"
-                                    onClick={(e) => togglePin(tool.id, e)}
-                                    title={
-                                      isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'
-                                    }
-                                    className={`p-1 rounded-md transition-colors cursor-pointer shrink-0 ${
-                                      isPinned
-                                        ? 'text-amber-400 hover:text-amber-300'
-                                        : 'text-ink-2/40 hover:text-ink-2'
-                                    }`}
-                                  >
-                                    <Star
-                                      className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
-                                    />
-                                  </button>
+                                  <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
+                                    {tool.description}
+                                  </CardDescription>
                                 </div>
-
-                                {/* Descrição Funcional */}
-                                <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
-                                  {tool.description}
-                                </CardDescription>
-                              </div>
-
-                              {/* Rodapé do Card com Meta Técnica e Link de Ação */}
-                              <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between gap-2">
-                                <span className="text-[10px] font-mono text-ink-2 truncate max-w-[150px]">
-                                  {tool.techMeta}
-                                </span>
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
-                                  Acessar <ArrowRight className="w-3 h-3" />
-                                </span>
-                              </div>
-                            </Card>
+                                <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between gap-2">
+                                  <span className="text-[10px] font-mono text-ink-2 truncate max-w-[150px]">
+                                    {tool.techMeta}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
+                                    Acessar <ArrowRight className="w-3 h-3" />
+                                  </span>
+                                </div>
+                              </Card>
+                              <button
+                                type="button"
+                                onClick={(e) => togglePin(tool.id, e)}
+                                title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
+                                className={`absolute top-4 right-4 z-20 p-1 rounded-md transition-colors cursor-pointer shrink-0 ${isPinned ? 'text-amber-400 hover:text-amber-300' : 'text-ink-2/40 hover:text-ink-2'}`}
+                              >
+                                <Star
+                                  className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
+                                />
+                              </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -935,78 +922,57 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                     const isPinned = pinnedIds.includes(tool.id);
 
                     return (
-                      <Card
-                        key={tool.id}
-                        variant="interactive"
-                        padding="sm"
-                        onClick={() => handleOpenTool(tool.id)}
-                        className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${
-                          tool.isFlagship ? 'ring-1 ring-brand/30' : ''
-                        }`}
-                      >
-                        <div>
-                          {/* Topo do Card: Ícone e Badge */}
-                          <div className="flex items-start justify-between gap-3 mb-3.5">
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-10 h-10 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
-                                <Icon className="w-5 h-5" />
+                      <div key={tool.id} className="relative h-full group">
+                        <Card
+                          variant="interactive"
+                          padding="sm"
+                          onClick={() => handleOpenTool(tool.id)}
+                          className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${tool.isFlagship ? 'ring-1 ring-brand/30' : ''}`}
+                        >
+                          <div>
+                            <div className="flex items-start justify-between gap-3 mb-3.5 pr-7">
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="w-10 h-10 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
+                                  <Icon className="w-5 h-5" />
+                                </div>
+                                <div className="min-w-0">
+                                  <CardTitle className="text-sm font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
+                                    {tool.label}
+                                  </CardTitle>
+                                  <span className="text-[10px] font-medium text-ink-2 uppercase tracking-wider block">
+                                    {CATEGORY_SHORT_LABELS[tool.category]}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="min-w-0">
-                                <CardTitle className="text-sm font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
-                                  {tool.label}
-                                </CardTitle>
-                                <span className="text-[10px] font-medium text-ink-2 uppercase tracking-wider block">
-                                  {tool.category === 'agents'
-                                    ? 'Célula & Enxame'
-                                    : tool.category === 'tactical'
-                                      ? 'Operação Tática'
-                                      : tool.category === 'governance'
-                                        ? 'Governança & Evals'
-                                        : 'Infra & Modelos'}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-1.5 shrink-0">
                               <Badge
                                 variant="secondary"
-                                className="text-[10px] font-semibold py-0.5 px-2 bg-surface-2 border-line text-ink-2"
+                                className="text-[10px] font-semibold py-0.5 px-2 bg-surface-2 border-line text-ink-2 shrink-0"
                               >
                                 {tool.badge}
                               </Badge>
-                              <button
-                                type="button"
-                                onClick={(e) => togglePin(tool.id, e)}
-                                title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
-                                className={`p-1 rounded-md transition-colors cursor-pointer ${
-                                  isPinned
-                                    ? 'text-amber-400 hover:text-amber-300'
-                                    : 'text-ink-2/40 hover:text-ink-2'
-                                }`}
-                              >
-                                <Star
-                                  className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
-                                />
-                              </button>
                             </div>
+                            <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
+                              {tool.description}
+                            </CardDescription>
                           </div>
-
-                          {/* Descrição Funcional */}
-                          <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
-                            {tool.description}
-                          </CardDescription>
-                        </div>
-
-                        {/* Rodapé do Card com Meta Técnica e Link de Ação */}
-                        <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
-                          <span className="text-[11px] font-mono text-ink-2 truncate max-w-[190px]">
-                            {tool.techMeta}
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
-                            Acessar <ArrowRight className="w-3.5 h-3.5" />
-                          </span>
-                        </div>
-                      </Card>
+                          <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
+                            <span className="text-[11px] font-mono text-ink-2 truncate max-w-[190px]">
+                              {tool.techMeta}
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
+                              Acessar <ArrowRight className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
+                        </Card>
+                        <button
+                          type="button"
+                          onClick={(e) => togglePin(tool.id, e)}
+                          title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
+                          className={`absolute top-4 right-4 z-20 p-1 rounded-md transition-colors cursor-pointer ${isPinned ? 'text-amber-400 hover:text-amber-300' : 'text-ink-2/40 hover:text-ink-2'}`}
+                        >
+                          <Star className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`} />
+                        </button>
+                      </div>
                     );
                   })}
                 </motion.nav>
