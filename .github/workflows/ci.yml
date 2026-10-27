@@ -52,7 +52,6 @@ jobs:
 
       - name: Dependency Review
         uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
-        continue-on-error: true
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
@@ -352,17 +351,18 @@ jobs:
           DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
           TRIVY_SCAN_RESULT: ${{ needs.trivy-scan.result }}
           APPLICATION_GATE_RESULT: ${{ needs.build-and-test.result }}
+          CI_EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           printf 'secret-scan=%s\n' "$SECRET_SCAN_RESULT"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "$CI_EVENT_NAME" = "pull_request" ]; then
             printf 'dependency-review=%s\n' "$DEPENDENCY_REVIEW_RESULT"
           fi
           printf 'trivy-scan=%s\n' "$TRIVY_SCAN_RESULT"
           printf 'application-gate=%s\n' "$APPLICATION_GATE_RESULT"
           test "$SECRET_SCAN_RESULT" = success
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
+          if [ "$CI_EVENT_NAME" = "pull_request" ]; then
+            test "$DEPENDENCY_REVIEW_RESULT" = success
           fi
           test "$TRIVY_SCAN_RESULT" = success
           test "$APPLICATION_GATE_RESULT" = success
@@ -408,6 +408,7 @@ jobs:
           --health-cmd "wget --no-verbose --tries=1 --spider http://127.0.0.1:7700/health || exit 1"
           --health-interval 10s
           --health-timeout 5s
+          --health-start-period 30s
           --health-retries 10
 
     env:
@@ -471,14 +472,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Gerar baselines *-chromium-linux.png
+      - name: Gerar baselines visuais no Linux
         run: npm run test:visual:update
 
       - name: Upload baselines geradas
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: visual-snapshots-linux
-          path: visual-regression/baselines/**/*-chromium-linux.png
+          path: visual-regression/baselines/**/*.png
           if-no-files-found: error
 
       - name: Upload Playwright report (se falhar)
