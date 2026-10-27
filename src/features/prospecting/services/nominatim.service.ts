@@ -4,7 +4,7 @@ import type { PlaceCandidate, PlaceSearchResult } from './places.service.js';
 
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search';
 const NOMINATIM_HEADERS = {
-  'User-Agent': 'ProspectorAtlas/1.0 (commercial-prospecting; contact=local-app)',
+  'User-Agent': 'Birthub360/1.0 (commercial-prospecting; contact=local-app)',
   Accept: 'application/json',
 };
 

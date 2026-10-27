@@ -58,7 +58,7 @@ export default defineConfig(() => {
               urlPattern: /\.(woff2?|ttf|otf|eot)$/,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'atlas-fonts',
+                cacheName: 'birthub360-fonts',
                 expiration: { maxAgeSeconds: 60 * 60 * 24 * 365 },
               },
             },
