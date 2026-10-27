@@ -18,7 +18,6 @@ export async function handleReadiness(_req: Request, res: Response): Promise<voi
   let isReady = true;
 
   try {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     await prisma.$queryRaw`SELECT 1`;
     dependencies.database = 'connected';
   } catch (err: any) {

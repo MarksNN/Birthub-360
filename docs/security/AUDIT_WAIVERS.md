@@ -64,9 +64,8 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
 
 - **Advisory:** CVE-2026-84961, CVE-2026-19534
 - **Severidade:** high
-- **Cadeia:** undici (presente apenas em pnpm-lock.yaml legado, fora do scan via `skip-files`). O package-lock.json oficial resolve undici para versões corrigidas em cada major: 6.29.1 (dependência direta, `million`, peer do `openai`), 7.30.1 (`@qdrant/js-client-rest`, `@ai-sdk/provider-utils`) e 8.12.3 (`testcontainers`, dev).
-- **Override (2026-10-25, agente/gha-undici-override):** o override global `"undici": "^6.20.0"` forçava 6.x em pacotes que declaram 7.x/8.x. Foi trocado por overrides escopados com piso na versão corrigida de cada major (`^7.30.1`, `^8.12.2`, `^6.29.1`), cobrindo também GHSA-xjj6-f33q-929c, GHSA-4qv8-2p9j-2685 e GHSA-f72v-6w45-q472 (2026-10-23).
-- **Motivo:** Aplicação e testes de CI utilizam npm ci e package-lock.json (onde todas as cópias de undici estão em versões corrigidas: 6.29.1, 7.30.1 e 8.12.3).
+- **Cadeia:** undici (presente apenas em pnpm-lock.yaml legado). O package-lock.json oficial do projeto já resolve undici para >=6.29.0 (versão corrigida).
+- **Motivo:** Aplicação e testes de CI utilizam npm ci e package-lock.json (onde undici já está em 6.29.0, livre das vulnerabilidades).
 - **Dono:** Agente 08 / QA e Release
 - **Data de registro:** 2026-10-07. **Reavaliar até:** 2026-11-30
 

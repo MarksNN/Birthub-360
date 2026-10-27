@@ -179,10 +179,7 @@ export const cadenceTool = tool(
 
       const lead = await prisma.lead.findFirst({
         where: { id: leadId, organizationId },
-        include: {
-          company: { select: { tradeName: true } },
-          contact: { select: { name: true, email: true, phone: true, whatsapp: true } },
-        },
+        include: { company: { select: { tradeName: true } }, contact: { select: { name: true, email: true, phone: true, whatsapp: true } } },
       });
 
       if (!lead) {

@@ -29,7 +29,6 @@ interface ExecResult {
 export class DbHandle {
   async exec(sql: string, params: any[] = []): Promise<ExecResult[]> {
     const pgSql = toPgQuery(sql);
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     const result = await prisma.$queryRawUnsafe<any[]>(pgSql, ...params);
     if (!result || result.length === 0) {
       return [];
@@ -41,7 +40,6 @@ export class DbHandle {
 
   async run(sql: string, params: any[] = []): Promise<void> {
     const pgSql = toPgQuery(sql);
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     await prisma.$executeRawUnsafe(pgSql, ...params);
   }
 }

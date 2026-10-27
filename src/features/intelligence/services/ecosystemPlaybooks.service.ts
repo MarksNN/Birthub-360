@@ -90,8 +90,7 @@ export const ECOSYSTEM_PLAYBOOKS: EcosystemPlaybookDescriptor[] = [
   },
   {
     id: 'deal_closing_war_room',
-    title:
-      '3. War Room de Fechamento (Proposta + PowerPoint/Slides + Word/Docs + Reunião + Teams/Slack)',
+    title: '3. War Room de Fechamento (Proposta + PowerPoint/Slides + Word/Docs + Reunião + Teams/Slack)',
     subtitle:
       'Prepara todo o kit de fechamento enterprise: estrutura apresentação PowerPoint/Slides, documento Word/Google Docs, links de reunião Meet/Teams/Zoom e avisa no Slack/Teams.',
     platformsInvolved: [
@@ -110,8 +109,7 @@ export const ECOSYSTEM_PLAYBOOKS: EcosystemPlaybookDescriptor[] = [
   },
   {
     id: 'meeting_to_action_pipeline',
-    title:
-      '4. Pós-Reunião Automático (Transcrição → Ata no Notion/CRM + Cards no Trello/Monday/Bitrix)',
+    title: '4. Pós-Reunião Automático (Transcrição → Ata no Notion/CRM + Cards no Trello/Monday/Bitrix)',
     subtitle:
       'Transforma a transcrição ou pauta de uma call em ata estruturada no Notion/CRM, cria as tarefas de próximo passo no Trello/Monday/Bitrix e prepara o follow-up.',
     platformsInvolved: [
@@ -346,16 +344,7 @@ export async function runEcosystemPlaybook(
                     c.website || 'N/A',
                     'Enriquecido',
                   ])
-                : [
-                    [
-                      `Empresa Alvo (${segment})`,
-                      'N/A',
-                      location,
-                      segment,
-                      'N/A',
-                      'Promovido ao CRM',
-                    ],
-                  ],
+                : [[`Empresa Alvo (${segment})`, 'N/A', location, segment, 'N/A', 'Promovido ao CRM']],
             syncCloud: 'none',
           },
         ),
@@ -378,11 +367,16 @@ export async function runEcosystemPlaybook(
     } else if (playbookId === 'deal_closing_war_room') {
       if (params.leadId) {
         steps.push(
-          await safeInvokeTool(1, 'Geração de Proposta Comercial IA', proposalTool, {
-            leadId: params.leadId,
-            offerDescription: 'Solução Enterprise BirthHub 360 com ROI projetado em 90 dias.',
-            paymentTerms: 'Anual ou parcelado em 12x corporativo',
-          }),
+          await safeInvokeTool(
+            1,
+            'Geração de Proposta Comercial IA',
+            proposalTool,
+            {
+              leadId: params.leadId,
+              offerDescription: 'Solução Enterprise BirthHub 360 com ROI projetado em 90 dias.',
+              paymentTerms: 'Anual ou parcelado em 12x corporativo',
+            },
+          ),
         );
       }
 
@@ -539,8 +533,7 @@ export async function runEcosystemPlaybook(
           {
             artifactType: 'whatsapp_script',
             targetAudienceOrPersona: 'Diretor de Operações & CFO pós-reunião de demonstração',
-            objective:
-              'Agradecer a participação, resumir os 3 combinados e confirmar a reunião de fechamento',
+            objective: 'Agradecer a participação, resumir os 3 combinados e confirmar a reunião de fechamento',
             leadId: params.leadId,
             saveToPromptLibrary: true,
           },
@@ -560,9 +553,14 @@ export async function runEcosystemPlaybook(
       );
 
       steps.push(
-        await safeInvokeTool(2, 'Cálculo de Forecast Ponderado de Receita', forecastTool, {
-          period: 'quarter',
-        }),
+        await safeInvokeTool(
+          2,
+          'Cálculo de Forecast Ponderado de Receita',
+          forecastTool,
+          {
+            period: 'quarter',
+          },
+        ),
       );
 
       steps.push(
@@ -598,24 +596,9 @@ export async function runEcosystemPlaybook(
             title: 'Relatório Executivo RevOps, Forecast & Retenção',
             sheetColumns: ['Indicador', 'Status', 'Ação Recomendada', 'Plataforma Destino'],
             sheetRows: [
-              [
-                'Saúde do Pipeline',
-                'Auditado',
-                'Priorizar deals com score >= 70',
-                'CRM + Bitrix24/HubSpot',
-              ],
-              [
-                'Previsão de Receita (Forecast)',
-                'Calculado',
-                'Acelerar propostas enviadas',
-                'Excel + BI',
-              ],
-              [
-                'Prevenção de Churn',
-                'Monitorado',
-                'Acionar plano de resgate preventivo',
-                'Trello/Monday + WhatsApp',
-              ],
+              ['Saúde do Pipeline', 'Auditado', 'Priorizar deals com score >= 70', 'CRM + Bitrix24/HubSpot'],
+              ['Previsão de Receita (Forecast)', 'Calculado', 'Acelerar propostas enviadas', 'Excel + BI'],
+              ['Prevenção de Churn', 'Monitorado', 'Acionar plano de resgate preventivo', 'Trello/Monday + WhatsApp'],
             ],
             syncCloud: 'none',
           },

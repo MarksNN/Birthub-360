@@ -53,13 +53,11 @@ import { RobustScriptGenerator } from './RobustScriptGenerator.js';
 import { SalesMethodologyStudio } from './SalesMethodologyStudio.js';
 import { SuperagentCreator } from './SuperagentCreator.js';
 import { SwarmDashboard } from './SwarmDashboard.js';
-import { UniversalEcosystemPanel } from './UniversalEcosystemPanel.js';
 
 export type IntelligenceTab =
   | 'telemetry'
   | 'ai_suite'
   | 'swarm'
-  | 'ecosystem'
   | 'methodologies'
   | 'ai_config'
   | 'superagent'
@@ -144,7 +142,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Users,
     badge: 'Flagship Tríade',
     badgeColor: 'brand',
-    description: 'Workspace executivo dos 12 agentes comerciais da Tríade e Swarm (BDR, C...',
+    description:
+      'Workspace executivo dos 12 agentes comerciais da Tríade e Swarm (BDR, Closer, AM) com Next Best Action, traces de governança e orquestração.',
     techMeta: '12 Agentes · Next Best Action · Tríade',
     keywords: ['célula', 'tríade', 'bdr', 'closer', 'sdr', 'nba', 'agentes', 'autônomo'],
     isFlagship: true,
@@ -156,7 +155,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Sparkles,
     badge: 'Voz & Reuniões',
     badgeColor: 'iris',
-    description: 'Análise em tempo real de chamadas, transcrição de reuniões e coaching c...',
+    description:
+      'Análise em tempo real de chamadas, transcrição de reuniões e coaching comercial com deal health e extração automática de compromissos.',
     techMeta: 'Reuniões · Deal Health · Coaching',
     keywords: ['copiloto', 'reunião', 'call', 'ligação', 'transcrição', 'coaching', 'deal health'],
   },
@@ -167,20 +167,10 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Bot,
     badge: 'Multi-Agente',
     badgeColor: 'gold',
-    description: 'Dispara missões comerciais coordenadas entre SDR, Closer e CRM em lote,...',
+    description:
+      'Dispara missões comerciais coordenadas entre SDR, Closer e CRM em lote, com acompanhamento de pipeline e execução paralela.',
     techMeta: 'Execução Concorrente · Swarm',
     keywords: ['enxame', 'swarm', 'missão', 'lote', 'multi-agente', 'paralelo'],
-  },
-  {
-    id: 'ecosystem',
-    label: 'Ecossistema Universal (21+ Plataformas & Office)',
-    category: 'agents',
-    icon: Layers,
-    badge: '29 Tools Universais',
-    badgeColor: 'ok',
-    description: 'Conectores ao vivo (Outlook/Gmail/IMAP, Trello, Monday, Bitrix, HubSpot...',
-    techMeta: '21+ Plataformas · Office .xlsx · Playbooks',
-    keywords: ['ecossistema', 'trello', 'monday', 'outlook', 'excel', 'word', 'playbooks'],
   },
   {
     id: 'superagent',
@@ -189,7 +179,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Sparkles,
     badge: 'Provisionamento',
     badgeColor: 'pink',
-    description: 'Modelagem e provisionamento de novos agentes comerciais: configure pers...',
+    description:
+      'Modelagem e provisionamento de novos agentes comerciais: configure persona, ferramentas permitidas, memória operacional e exporte blueprints.',
     techMeta: 'Blueprints JSON · Prompt Engineering',
     keywords: ['criador', 'superagente', 'provisionamento', 'prompt', 'blueprint', 'custom agent'],
   },
@@ -202,7 +193,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Search,
     badge: 'Prospecção Ativa',
     badgeColor: 'brand',
-    description: 'Geração cirúrgica e imediata de scripts para cold call, mensagens de Wh...',
+    description:
+      'Geração cirúrgica e imediata de scripts para cold call, mensagens de WhatsApp, e-mails de conversão e battlecards para o lead.',
     techMeta: 'Multicanal · Scripts · Battlecards',
     keywords: ['outreach', 'cold call', 'whatsapp', 'email', 'battlecard', 'lead', 'prospecção'],
   },
@@ -213,7 +205,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: GraduationCap,
     badge: 'Frameworks B2B',
     badgeColor: 'gold',
-    description: 'Estruturação tática de roteiros comerciais nos frameworks clássicos: SP...',
+    description:
+      'Estruturação tática de roteiros comerciais nos frameworks clássicos: SPIN Selling, SNAP, AIDA, MEDDPICC e Challenger Sale.',
     techMeta: 'SPIN · MEDDPICC · Challenger',
     keywords: ['metodologias', 'spin', 'snap', 'aida', 'meddpicc', 'challenger', 'frameworks'],
   },
@@ -224,7 +217,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Wand2,
     badge: 'Dores & Objeções',
     badgeColor: 'iris',
-    description: 'Simulador de perguntas de qualificação, levantamento de dores e matriz...',
+    description:
+      'Simulador de perguntas de qualificação, levantamento de dores e matriz de contorno de objeções customizada pelo ICP.',
     techMeta: 'ICP · Matriz de Objeções',
     keywords: ['gerador', 'b2b', 'icp', 'dores', 'objeções', 'qualificação'],
   },
@@ -235,7 +229,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: FileCode,
     badge: 'Engenharia',
     badgeColor: 'brand',
-    description: 'Geração de scripts em Node.js, Python e Shell para tarefas operacionais...',
+    description:
+      'Geração de scripts em Node.js, Python e Shell para tarefas operacionais de scraping, ETL de leads e automação de APIs.',
     techMeta: 'Node.js · Python · Scraping ETL',
     keywords: ['scripts', 'código', 'etl', 'scraping', 'integração', 'automação'],
   },
@@ -248,7 +243,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: CheckSquare,
     badge: 'Human-in-the-Loop',
     badgeColor: 'ok',
-    description: 'Fila executiva de aprovação humana: revise e autorize ações de alto imp...',
+    description:
+      'Fila executiva de aprovação humana: revise e autorize ações de alto impacto propostas pela IA com análise de risco e nível de confiança.',
     techMeta: 'Aprovação Executiva · Score de Risco',
     keywords: ['decisões', 'ações', 'aprovação', 'human-in-the-loop', 'risco', 'auditoria'],
   },
@@ -259,7 +255,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: ShieldCheck,
     badge: 'Auditoria & Evals',
     badgeColor: 'iris',
-    description: 'Harness contínuo de avaliação: métricas de latência, taxa de override h...',
+    description:
+      'Harness contínuo de avaliação: métricas de latência, taxa de override humano, acurácia, proteção de PII e Golden Dataset.',
     techMeta: 'Golden Dataset · Evals · Guardrails',
     keywords: ['qualidade', 'evals', 'golden dataset', 'latência', 'override', 'pii'],
   },
@@ -270,7 +267,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Gauge,
     badge: 'Groq LPU',
     badgeColor: 'brand',
-    description: 'Métricas de inferência em tempo real: TTFT (Time to First Token), consu...',
+    description:
+      'Métricas de inferência em tempo real: TTFT (Time to First Token), consumo de tokens, throughput e custo projetado na Groq Cloud.',
     techMeta: 'TTFT Real · Consumo LPU · Custos',
     keywords: ['telemetria', 'groq', 'ttft', 'tokens', 'lpu', 'latência', 'custo'],
   },
@@ -283,7 +281,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Cpu,
     badge: '20 Motores',
     badgeColor: 'brand',
-    description: 'Console de execução e orquestração dos 20 motores de IA (Ollama local e...',
+    description:
+      'Console de execução e orquestração dos 20 motores de IA (Ollama local e modelos de ponta em nuvem) disponíveis na plataforma.',
     techMeta: 'Ollama & Cloud · 20 Modelos',
     keywords: ['suíte', 'motores', 'ollama', 'modelos', 'ia', 'cloud', 'inferência'],
   },
@@ -294,7 +293,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Database,
     badge: 'Busca Vetorial',
     badgeColor: 'iris',
-    description: 'Base corporativa de documentos vetorizados que os copilotos consultam p...',
+    description:
+      'Base corporativa de documentos vetorizados que os copilotos consultam para responder com contexto de negócio e zero alucinação.',
     techMeta: 'Embeddings · Busca Semântica Híbrida',
     keywords: ['rag', 'base', 'conhecimento', 'embeddings', 'vetores', 'documentos', 'playbook'],
   },
@@ -305,7 +305,8 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Settings,
     badge: 'Roteamento',
     badgeColor: 'gold',
-    description: 'Roteamento refinado de modelos e ajuste fino de temperatura para cada p...',
+    description:
+      'Roteamento refinado de modelos e ajuste fino de temperatura para cada pipeline de geração e classificação do sistema.',
     techMeta: 'Roteamento · Parâmetros · Modelos',
     keywords: ['config', 'motores', 'temperatura', 'modelos', 'parâmetros', 'configuração'],
   },
@@ -316,18 +317,13 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     icon: Workflow,
     badge: 'Workflows n8n',
     badgeColor: 'brand',
-    description: 'Guias operacionais e blueprints de workflows no n8n e webhooks para con...',
+    description:
+      'Guias operacionais e blueprints de workflows no n8n e webhooks para conectar eventos do CRM a ações externas.',
     techMeta: 'n8n · Webhooks · Gatilhos',
     keywords: ['automações', 'n8n', 'workflow', 'webhooks', 'gatilhos', 'conectores'],
   },
 ];
 
-const CATEGORY_SHORT_LABELS: Record<ToolDefinition['category'], string> = {
-  agents: 'Células & Enxames',
-  tactical: 'Operação Tática',
-  governance: 'Governança & Decisão',
-  infra: 'Infraestrutura',
-};
 const PINNED_STORAGE_KEY = 'birthhub360:ai-hub-pinned';
 const VIEW_MODE_STORAGE_KEY = 'birthhub360:ai-hub-view-mode';
 
@@ -458,7 +454,8 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
       {
         id: 'agents' as const,
         label: '1. Células & Enxames Autônomos',
-        subtitle: 'Agentes executivos especializados com orquestração coordenada e trace...',
+        subtitle:
+          'Agentes executivos especializados com orquestração coordenada e traces rastreáveis.',
         icon: Bot,
         tools: filteredTools.filter((t) => t.category === 'agents'),
       },
@@ -472,14 +469,16 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
       {
         id: 'governance' as const,
         label: '3. Governança, Human-in-the-Loop & Qualidade',
-        subtitle: 'Fila de aprovação de riscos, harness contínuo com Golden Dataset e te...',
+        subtitle:
+          'Fila de aprovação de riscos, harness contínuo com Golden Dataset e telemetria Groq.',
         icon: ShieldCheck,
         tools: filteredTools.filter((t) => t.category === 'governance'),
       },
       {
         id: 'infra' as const,
         label: '4. Infraestrutura, Modelos & Conhecimento',
-        subtitle: 'Console multi-motor (Ollama & Cloud), base de embeddings RAG e parâme...',
+        subtitle:
+          'Console multi-motor (Ollama & Cloud), base de embeddings RAG e parâmetros finos.',
         icon: Cpu,
         tools: filteredTools.filter((t) => t.category === 'infra'),
       },
@@ -507,59 +506,65 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
 
           {/* Barra de Status Operacional e Métricas em Tempo Real */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              {
-                icon: Users,
-                box: 'bg-brand/15 border-brand/30 text-brand',
-                dot: 'bg-emerald-500 animate-pulse',
-                title: 'Célula Autônoma',
-                value: '12 Agentes Prontos',
-              },
-              {
-                icon: Gauge,
-                box: 'bg-amber-500/15 border-amber-500/30 text-amber-500',
-                dot: 'bg-amber-500',
-                title: 'Groq Cloud LPU',
-                value: 'Ultra-Low Latency',
-              },
-              {
-                icon: ShieldCheck,
-                box: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-500',
-                dot: 'bg-emerald-500',
-                title: 'Governança & Evals',
-                value: 'Guardrails Ativos',
-              },
-              {
-                icon: Database,
-                box: 'bg-sky-500/15 border-sky-500/30 text-sky-500',
-                dot: 'bg-sky-500',
-                title: 'Base Vetorial',
-                value: 'RAG Híbrido Conectado',
-              },
-            ].map((item) => {
-              const StatusIcon = item.icon;
-              return (
-                <div
-                  key={item.title}
-                  className="p-3.5 rounded-card bg-surface/90 dark:bg-[#121622]/90 border border-line flex items-center gap-3"
-                >
-                  <div
-                    className={`w-9 h-9 rounded-control border flex items-center justify-center shrink-0 ${item.box}`}
-                  >
-                    <StatusIcon className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold text-ink-2 uppercase tracking-wider">
-                      {item.title}
-                    </p>
-                    <p className="text-xs font-bold text-ink truncate flex items-center gap-1.5">
-                      <span className={`w-2 h-2 rounded-full ${item.dot}`} />
-                      {item.value}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+            <div className="p-3.5 rounded-card bg-surface/90 dark:bg-[#121622]/90 border border-line flex items-center gap-3">
+              <div className="w-9 h-9 rounded-control bg-brand/15 border border-brand/30 flex items-center justify-center text-brand shrink-0">
+                <Users className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-ink-2 uppercase tracking-wider">
+                  Célula Autônoma
+                </p>
+                <p className="text-xs font-bold text-ink truncate flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  12 Agentes Prontos
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-card bg-surface/90 dark:bg-[#121622]/90 border border-line flex items-center gap-3">
+              <div className="w-9 h-9 rounded-control bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-500 shrink-0">
+                <Gauge className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-ink-2 uppercase tracking-wider">
+                  Groq Cloud LPU
+                </p>
+                <p className="text-xs font-bold text-ink truncate flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Ultra-Low Latency
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-card bg-surface/90 dark:bg-[#121622]/90 border border-line flex items-center gap-3">
+              <div className="w-9 h-9 rounded-control bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500 shrink-0">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-ink-2 uppercase tracking-wider">
+                  Governança & Evals
+                </p>
+                <p className="text-xs font-bold text-ink truncate flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Guardrails Ativos
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-card bg-surface/90 dark:bg-[#121622]/90 border border-line flex items-center gap-3">
+              <div className="w-9 h-9 rounded-control bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-500 shrink-0">
+                <Database className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-ink-2 uppercase tracking-wider">
+                  Base Vetorial
+                </p>
+                <p className="text-xs font-bold text-ink truncate flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-sky-500" />
+                  RAG Híbrido Conectado
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Banner Hero de Destaque: Célula Comercial de Agentes (Apenas na visão geral sem busca ativa) */}
@@ -855,53 +860,66 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                           const isPinned = pinnedIds.includes(tool.id);
 
                           return (
-                            <div key={tool.id} className="relative h-full group">
-                              <Card
-                                variant="interactive"
-                                padding="sm"
-                                onClick={() => handleOpenTool(tool.id)}
-                                className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${tool.isFlagship ? 'ring-1 ring-brand/30' : ''}`}
-                              >
-                                <div>
-                                  <div className="flex items-start justify-between gap-2 mb-3 pr-7">
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                      <div className="w-9 h-9 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
-                                        <Icon className="w-4 h-4" />
-                                      </div>
-                                      <div className="min-w-0">
-                                        <CardTitle className="text-xs font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
-                                          {tool.label}
-                                        </CardTitle>
-                                        <span className="text-[10px] font-mono text-ink-2 truncate block">
-                                          {tool.badge}
-                                        </span>
-                                      </div>
+                            <Card
+                              key={tool.id}
+                              variant="interactive"
+                              padding="sm"
+                              onClick={() => handleOpenTool(tool.id)}
+                              className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${
+                                tool.isFlagship ? 'ring-1 ring-brand/30' : ''
+                              }`}
+                            >
+                              <div>
+                                {/* Topo do Card: Ícone, Nome e Botão de Fixar */}
+                                <div className="flex items-start justify-between gap-2 mb-3">
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="w-9 h-9 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
+                                      <Icon className="w-4 h-4" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <CardTitle className="text-xs font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
+                                        {tool.label}
+                                      </CardTitle>
+                                      <span className="text-[10px] font-mono text-ink-2 truncate block">
+                                        {tool.badge}
+                                      </span>
                                     </div>
                                   </div>
-                                  <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
-                                    {tool.description}
-                                  </CardDescription>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => togglePin(tool.id, e)}
+                                    title={
+                                      isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'
+                                    }
+                                    className={`p-1 rounded-md transition-colors cursor-pointer shrink-0 ${
+                                      isPinned
+                                        ? 'text-amber-400 hover:text-amber-300'
+                                        : 'text-ink-2/40 hover:text-ink-2'
+                                    }`}
+                                  >
+                                    <Star
+                                      className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
+                                    />
+                                  </button>
                                 </div>
-                                <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between gap-2">
-                                  <span className="text-[10px] font-mono text-ink-2 truncate max-w-[150px]">
-                                    {tool.techMeta}
-                                  </span>
-                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
-                                    Acessar <ArrowRight className="w-3 h-3" />
-                                  </span>
-                                </div>
-                              </Card>
-                              <button
-                                type="button"
-                                onClick={(e) => togglePin(tool.id, e)}
-                                title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
-                                className={`absolute top-4 right-4 z-20 p-1 rounded-md transition-colors cursor-pointer shrink-0 ${isPinned ? 'text-amber-400 hover:text-amber-300' : 'text-ink-2/40 hover:text-ink-2'}`}
-                              >
-                                <Star
-                                  className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
-                                />
-                              </button>
-                            </div>
+
+                                {/* Descrição Funcional */}
+                                <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
+                                  {tool.description}
+                                </CardDescription>
+                              </div>
+
+                              {/* Rodapé do Card com Meta Técnica e Link de Ação */}
+                              <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-mono text-ink-2 truncate max-w-[150px]">
+                                  {tool.techMeta}
+                                </span>
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
+                                  Acessar <ArrowRight className="w-3 h-3" />
+                                </span>
+                              </div>
+                            </Card>
                           );
                         })}
                       </div>
@@ -922,57 +940,78 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                     const isPinned = pinnedIds.includes(tool.id);
 
                     return (
-                      <div key={tool.id} className="relative h-full group">
-                        <Card
-                          variant="interactive"
-                          padding="sm"
-                          onClick={() => handleOpenTool(tool.id)}
-                          className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${tool.isFlagship ? 'ring-1 ring-brand/30' : ''}`}
-                        >
-                          <div>
-                            <div className="flex items-start justify-between gap-3 mb-3.5 pr-7">
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <div className="w-10 h-10 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
-                                  <Icon className="w-5 h-5" />
-                                </div>
-                                <div className="min-w-0">
-                                  <CardTitle className="text-sm font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
-                                    {tool.label}
-                                  </CardTitle>
-                                  <span className="text-[10px] font-medium text-ink-2 uppercase tracking-wider block">
-                                    {CATEGORY_SHORT_LABELS[tool.category]}
-                                  </span>
-                                </div>
+                      <Card
+                        key={tool.id}
+                        variant="interactive"
+                        padding="sm"
+                        onClick={() => handleOpenTool(tool.id)}
+                        className={`h-full flex flex-col justify-between border-line group-hover:border-brand/40 bg-surface/90 dark:bg-[#121622]/90 transition-all duration-200 cursor-pointer ${
+                          tool.isFlagship ? 'ring-1 ring-brand/30' : ''
+                        }`}
+                      >
+                        <div>
+                          {/* Topo do Card: Ícone e Badge */}
+                          <div className="flex items-start justify-between gap-3 mb-3.5">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-10 h-10 rounded-control bg-brand/10 border border-brand/25 text-brand flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-brand group-hover:text-on-brand transition-all duration-200">
+                                <Icon className="w-5 h-5" />
                               </div>
+                              <div className="min-w-0">
+                                <CardTitle className="text-sm font-bold text-ink group-hover:text-brand transition-colors line-clamp-1">
+                                  {tool.label}
+                                </CardTitle>
+                                <span className="text-[10px] font-medium text-ink-2 uppercase tracking-wider block">
+                                  {tool.category === 'agents'
+                                    ? 'Célula & Enxame'
+                                    : tool.category === 'tactical'
+                                      ? 'Operação Tática'
+                                      : tool.category === 'governance'
+                                        ? 'Governança & Evals'
+                                        : 'Infra & Modelos'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0">
                               <Badge
                                 variant="secondary"
-                                className="text-[10px] font-semibold py-0.5 px-2 bg-surface-2 border-line text-ink-2 shrink-0"
+                                className="text-[10px] font-semibold py-0.5 px-2 bg-surface-2 border-line text-ink-2"
                               >
                                 {tool.badge}
                               </Badge>
+                              <button
+                                type="button"
+                                onClick={(e) => togglePin(tool.id, e)}
+                                title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
+                                className={`p-1 rounded-md transition-colors cursor-pointer ${
+                                  isPinned
+                                    ? 'text-amber-400 hover:text-amber-300'
+                                    : 'text-ink-2/40 hover:text-ink-2'
+                                }`}
+                              >
+                                <Star
+                                  className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`}
+                                />
+                              </button>
                             </div>
-                            <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
-                              {tool.description}
-                            </CardDescription>
                           </div>
-                          <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
-                            <span className="text-[11px] font-mono text-ink-2 truncate max-w-[190px]">
-                              {tool.techMeta}
-                            </span>
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
-                              Acessar <ArrowRight className="w-3.5 h-3.5" />
-                            </span>
-                          </div>
-                        </Card>
-                        <button
-                          type="button"
-                          onClick={(e) => togglePin(tool.id, e)}
-                          title={isPinned ? 'Desafixar dos favoritos' : 'Fixar nos favoritos'}
-                          className={`absolute top-4 right-4 z-20 p-1 rounded-md transition-colors cursor-pointer ${isPinned ? 'text-amber-400 hover:text-amber-300' : 'text-ink-2/40 hover:text-ink-2'}`}
-                        >
-                          <Star className={`w-3.5 h-3.5 ${isPinned ? 'fill-amber-400' : ''}`} />
-                        </button>
-                      </div>
+
+                          {/* Descrição Funcional */}
+                          <CardDescription className="text-xs text-ink-2 leading-relaxed line-clamp-3">
+                            {tool.description}
+                          </CardDescription>
+                        </div>
+
+                        {/* Rodapé do Card com Meta Técnica e Link de Ação */}
+                        <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-mono text-ink-2 truncate max-w-[190px]">
+                            {tool.techMeta}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-brand group-hover:translate-x-1 transition-transform shrink-0">
+                            Acessar <ArrowRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      </Card>
                     );
                   })}
                 </motion.nav>
@@ -1045,7 +1084,13 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
                           {/* Categoria */}
                           <td className="py-3 px-4">
                             <span className="text-[11px] font-medium text-ink-2">
-                              {CATEGORY_SHORT_LABELS[tool.category]}
+                              {tool.category === 'agents'
+                                ? 'Célula & Enxame'
+                                : tool.category === 'tactical'
+                                  ? 'Operação Tática'
+                                  : tool.category === 'governance'
+                                    ? 'Governança & Evals'
+                                    : 'Infra & Modelos'}
                             </span>
                           </td>
 
@@ -1111,7 +1156,13 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
             <span className="text-ink-2">Hub de IA</span>
             <ChevronRight className="w-3.5 h-3.5 text-ink-2/60" />
             <span className="text-ink-2 font-medium">
-              {CATEGORY_SHORT_LABELS[activeToolDef?.category ?? 'infra']}
+              {activeToolDef?.category === 'agents'
+                ? 'Células & Enxames'
+                : activeToolDef?.category === 'tactical'
+                  ? 'Operação Tática'
+                  : activeToolDef?.category === 'governance'
+                    ? 'Governança & Decisão'
+                    : 'Infraestrutura'}
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-ink-2/60" />
             <span className="font-bold text-ink flex items-center gap-1.5">
@@ -1153,20 +1204,6 @@ export function IntelligenceHub({ initialTab }: IntelligenceHubProps) {
         {activeTab === 'telemetry' && <GroqTelemetryPanel />}
         {activeTab === 'ai_suite' && <AISuiteHub />}
         {activeTab === 'swarm' && <SwarmDashboard />}
-        {activeTab === 'ecosystem' && (
-          <Card variant="default" padding="lg" accentBar>
-            <div className="space-y-8">
-              <UniversalEcosystemPanel
-                mode="studio"
-                onLaunchSwarmMission={() => setActiveTab('swarm')}
-              />
-              <UniversalEcosystemPanel
-                mode="connectors"
-                onLaunchSwarmMission={() => setActiveTab('swarm')}
-              />
-            </div>
-          </Card>
-        )}
         {activeTab === 'quality' && <AgentQualityPanel />}
         {activeTab === 'methodologies' && <SalesMethodologyStudio />}
         {activeTab === 'ai_config' && <AIConfigCenter />}

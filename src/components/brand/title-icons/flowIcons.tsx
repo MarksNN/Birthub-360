@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { TitleIconProps } from './types.js';
 
 // 5.1 Pillar 1: Hub Comercial (Concentric Target Core)

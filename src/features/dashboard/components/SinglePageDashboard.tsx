@@ -82,12 +82,7 @@ export function SinglePageDashboard() {
             {error || 'Não foi possível sincronizar as métricas de pipeline com o servidor.'}
           </p>
           <div className="pt-2">
-            <Button
-              type="button"
-              variant="default"
-              onClick={() => refetch()}
-              className="gap-2 text-white font-semibold shadow-sm"
-            >
+            <Button type="button" variant="default" onClick={() => refetch()} className="gap-2 text-white font-semibold shadow-sm">
               <RotateCw className="w-4 h-4 text-white" />
               Tentar novamente
             </Button>
@@ -328,9 +323,7 @@ export function SinglePageDashboard() {
                 <div className="w-12 h-12 rounded-full bg-surface-2 mx-auto flex items-center justify-center text-ink-2">
                   <Layers className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-semibold text-brand-ink dark:text-[#00D4FF]">
-                  Nenhum dado de funil registrado
-                </h4>
+                <h4 className="text-sm font-semibold text-brand-ink dark:text-[#00D4FF]">Nenhum dado de funil registrado</h4>
                 <p className="text-xs text-sky-700 dark:text-[#70D6FF] max-w-sm mx-auto">
                   Inicie o fluxo cadastrando ou importando novos leads através do módulo de
                   prospecção.

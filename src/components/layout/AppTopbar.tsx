@@ -125,7 +125,9 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         </div>
         <div className="flex min-w-0 flex-col leading-none overflow-hidden">
           <AppBreadcrumbs className="mb-1 hidden sm:flex" />
-          <h1 className="truncate font-display text-sm sm:text-base text-brand-ink dark:text-[#00D4FF] font-bold">
+          <h1
+            className="truncate font-display text-sm sm:text-base text-brand-ink dark:text-[#00D4FF] font-bold"
+          >
             {meta.label}
           </h1>
         </div>

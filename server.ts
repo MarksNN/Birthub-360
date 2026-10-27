@@ -65,7 +65,7 @@ async function startServer() {
   // Papel do banco com menor privilégio (sem superuser/BYPASSRLS/posse) — fatal em produção.
   await assertDbRoleIsLeastPrivilege(prisma, { logger });
   const app = express();
-  const PORT = typeof env.PORT === 'number' && !isNaN(env.PORT) ? env.PORT : 3005;
+  const PORT = Number.isFinite(env.PORT) ? env.PORT : 3005;
 
   // ── Segurança de borda (trust proxy, Helmet, CORS, compressão) ─────────
   applySecurityMiddleware(app);

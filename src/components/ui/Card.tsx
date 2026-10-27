@@ -14,44 +14,34 @@ const cardVariants = cva(
         stat: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
         outline:
           'border border-line bg-transparent hover:border-line-strong hover:bg-surface-interactive hover:-translate-y-0.5',
-        accent:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
-        elevated:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-elevated hover:border-line-strong hover:-translate-y-0.5',
+        accent: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        elevated: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-elevated hover:border-line-strong hover:-translate-y-0.5',
         interactive:
           'group bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card cursor-pointer hover:border-line-strong hover:bg-surface-interactive hover:shadow-elevated hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]',
         // Variantes estruturais recomendadas pelo Design System v2.0
         surface: 'bg-surface-2 border border-line shadow-none hover:border-line-strong',
-        panel:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
-        metric:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        panel: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        metric: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
         data: 'bg-surface-2 border border-line shadow-none',
-        feature:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
-        floating:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
-        bento:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
-        cosmic:
-          'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
-        glass:
-          'border border-line bg-surface/80 dark:bg-[#0f172a]/80 backdrop-blur-xl shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        feature: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        floating: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        bento: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        cosmic: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
+        glass: 'border border-line bg-surface/80 dark:bg-[#0f172a]/80 backdrop-blur-xl shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
         neon: 'bg-surface/95 dark:bg-[#0f172a]/90 backdrop-blur-md border border-line shadow-card hover:border-line-strong hover:shadow-elevated hover:-translate-y-0.5',
       },
-      padding: {
-        default: 'p-6',
-        sm: 'p-4',
-        lg: 'p-8',
-        none: 'p-0',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      padding: 'default',
+    padding: {
+      default: 'p-6',
+      sm: 'p-4',
+      lg: 'p-8',
+      none: 'p-0',
     },
   },
-);
+  defaultVariants: {
+    variant: 'default',
+    padding: 'default',
+  },
+});
 
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,

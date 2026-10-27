@@ -8,7 +8,6 @@ import {
   Phone,
   User,
 } from 'lucide-react';
-import { WhatsAppIcon } from '../brand/CompanyBrandIcon.js';
 
 export interface TimelineItem {
   id: string;

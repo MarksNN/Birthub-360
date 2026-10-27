@@ -502,10 +502,7 @@ export function ExternalCrmPanel({ providerKey, displayName, authType }: Externa
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2">
-                <CompanyBrandIcon name={providerKey} className="w-6 h-6 inline-block" />{' '}
-                {displayName}
-              </h2>
+              <h2 className="text-xl font-bold text-brand-ink dark:text-[#00D4FF] flex items-center gap-2"><CompanyBrandIcon name={providerKey} className="w-6 h-6 inline-block" /> {displayName}</h2>
               <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
                   isConnected

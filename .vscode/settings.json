@@ -1,6 +1,5 @@
 {
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
-    "npm.packageManager": "npm",
-    "git.ignoreLimitWarning": true
+    "npm.packageManager": "npm"
 }

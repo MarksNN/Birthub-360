@@ -33,7 +33,7 @@ function deliverLocally(payload: AppNotification) {
 const subscriber = queuesEnabled ? connection.duplicate() : null;
 
 if (subscriber) {
-  subscriber.on('error', (err: any) => {
+  subscriber.on('error', (err) => {
     logger.warn({ message: err.message }, 'Voice notification Redis subscriber unavailable');
   });
 
@@ -44,7 +44,7 @@ if (subscriber) {
     );
   });
 
-  subscriber.on('message', (channel: string, message: string) => {
+  subscriber.on('message', (channel, message) => {
     if (channel !== 'voice-notifications') return;
 
     try {

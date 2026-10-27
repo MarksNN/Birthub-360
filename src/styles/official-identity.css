@@ -484,5 +484,5 @@ html:not(.dark) [class*="0284c7"] {
 }
 html.light .bh-platform-card [class*="subtitle" i],
 html.light .bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) + p {
-  color: var(--subtitle-color-default) !important;
+  color: #0284c7 !important;
 }

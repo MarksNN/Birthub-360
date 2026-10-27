@@ -64,7 +64,7 @@ export async function generateAgentUsageHeatmap(
   }));
 
   const totalExecutions = agents.reduce((sum, a) => sum + a.executions, 0);
-  agents.forEach((a) => (a.percentage = (a.executions / totalExecutions) * 100));
+  agents.forEach(a => a.percentage = (a.executions / totalExecutions) * 100);
 
   agents.sort((a, b) => b.executions - a.executions);
 

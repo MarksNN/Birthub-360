@@ -148,7 +148,7 @@
 #### B. Demais Conectores de CRM (HubSpot, Pipedrive, Salesforce, RD Station)
 1. **Finalidade:** Conectores adicionais do módulo de Integrações (`ExternalCrmConnection`).
 2. **Variáveis Exigidas:** `HUBSPOT_CLIENT_ID`, `HUBSPOT_CLIENT_SECRET`, `HUBSPOT_REDIRECT_URI`.
-3. **Estado Real:** HubSpot usa `HubSpotProvider` (`src/features/integrations/hubspot/HubspotProvider.ts`) sobre `ExternalCrmConnection` com `config` cifrada (o stub `hubspot.service.ts` foi removido na onda 52); Pipedrive (`pipedrive.service.ts`) é stub documentado; Salesforce e RD Station são entradas de catálogo/UI.
+3. **Estado Real:** HubSpot possui fluxo OAuth/Deals parcial em `src/features/integrations/hubspot/hubspot.service.ts`; Pipedrive (`pipedrive.service.ts`) é stub documentado; Salesforce e RD Station são entradas de catálogo/UI.
 
 #### C. Provedores de Prospecção e Pesquisa (Apollo.io, Hunter.io, Google Places, BrasilAPI/MinhaReceita, Serper, Tavily, SearXNG)
 1. **Finalidade:** Descoberta de empresas, validação de e-mails, busca de decisores, consulta de CNPJ/CEP e pesquisa de notícias de mercado.

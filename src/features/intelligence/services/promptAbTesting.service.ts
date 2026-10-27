@@ -1,34 +1,5 @@
-import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
-
-interface PromptExperimentRecord {
-  id: string;
-  organizationId: string;
-  name: string;
-  agentRole: PromptVariant['agentRole'];
-  status: PromptExperiment['status'];
-  startedAt: string | null;
-  endedAt: string | null;
-  winningVariantId: string | null;
-  variants?: PromptVariant[];
-}
-
-interface PromptExperimentDelegate {
-  create(args: { data: Record<string, unknown> }): Promise<PromptExperimentRecord>;
-  update(args: {
-    where: { id: string };
-    data: Record<string, unknown>;
-  }): Promise<PromptExperimentRecord>;
-  findUnique(args: { where: { id: string } }): Promise<PromptExperimentRecord | null>;
-  findMany(args: {
-    where: { organizationId: string };
-    orderBy: { createdAt: 'desc' };
-  }): Promise<PromptExperiment[]>;
-}
-
-const promptExperimentDelegate = (
-  prisma as unknown as { promptExperiment: PromptExperimentDelegate }
-).promptExperiment;
+import { logger } from '../../../lib/logger.js';
 
 /**
  * A/B Testing de Configurações de Prompt para Agentes do Enxame.
@@ -104,7 +75,7 @@ export async function createPromptExperiment(params: {
     trafficWeight: v.weight,
   }));
 
-  const experiment = await promptExperimentDelegate.create({
+  const experiment = await prisma.promptExperiment.create({
     data: {
       id: experimentId,
       organizationId: params.organizationId,
@@ -119,9 +90,11 @@ export async function createPromptExperiment(params: {
 
   // Criar variantes (usando AIPromptVariant se existir no schema, senão cria tabela auxiliar)
   // Por simplicidade, vamos usar um campo JSON no experimento
-  await promptExperimentDelegate.update({
+  await prisma.promptExperiment.update({
     where: { id: experimentId },
-    data: {},
+    data: {
+      variants: variants as unknown as Prisma.InputJsonValue,
+    },
   });
 
   logger.info(
@@ -136,7 +109,7 @@ export async function createPromptExperiment(params: {
  * Inicia um experimento de A/B testing.
  */
 export async function startPromptExperiment(experimentId: string): Promise<void> {
-  await promptExperimentDelegate.update({
+  await prisma.promptExperiment.update({
     where: { id: experimentId },
     data: {
       status: 'RUNNING',
@@ -150,10 +123,8 @@ export async function startPromptExperiment(experimentId: string): Promise<void>
 /**
  * Finaliza um experimento e calcula métricas por variante.
  */
-export async function completePromptExperiment(
-  experimentId: string,
-): Promise<PromptVariantMetrics[]> {
-  const experiment = await promptExperimentDelegate.findUnique({
+export async function completePromptExperiment(experimentId: string): Promise<PromptVariantMetrics[]> {
+  const experiment = await prisma.promptExperiment.findUnique({
     where: { id: experimentId },
   });
 
@@ -162,9 +133,7 @@ export async function completePromptExperiment(
   }
 
   const variants = experiment.variants as unknown as PromptVariant[];
-  const since = experiment.startedAt
-    ? new Date(experiment.startedAt)
-    : new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const since = experiment.startedAt ? new Date(experiment.startedAt) : new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const metrics: PromptVariantMetrics[] = [];
 
@@ -198,15 +167,16 @@ export async function completePromptExperiment(
 
   // Declarar vencedor (maior taxa de conversão)
   const winner = metrics.reduce((best, current) =>
-    current.conversionRate > best.conversionRate ? current : best,
+    current.conversionRate > best.conversionRate ? current : best
   );
 
-  await promptExperimentDelegate.update({
+  await prisma.promptExperiment.update({
     where: { id: experimentId },
     data: {
       status: 'COMPLETED',
       endedAt: new Date(),
       winningVariantId: winner.variantId,
+      metrics: metrics as unknown as Prisma.InputJsonValue,
     },
   });
 
@@ -234,8 +204,10 @@ export function selectVariantForExecution(
 /**
  * Lista todos os experimentos de uma organização.
  */
-export async function listPromptExperiments(organizationId: string): Promise<PromptExperiment[]> {
-  return promptExperimentDelegate.findMany({
+export async function listPromptExperiments(
+  organizationId: string,
+): Promise<PromptExperiment[]> {
+  return prisma.promptExperiment.findMany({
     where: { organizationId },
     orderBy: { createdAt: 'desc' },
   });

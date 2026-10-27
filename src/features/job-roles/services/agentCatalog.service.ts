@@ -200,7 +200,6 @@ export async function upsertAgentVersion(input: {
   const status = input.status ?? 'ACTIVE';
 
   try {
-    // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
     return await prisma.$transaction(async (tx) => {
       if (status === 'ACTIVE') {
         await tx.agentVersion.updateMany({

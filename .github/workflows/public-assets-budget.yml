@@ -27,10 +27,8 @@ permissions:
   contents: read
 
 concurrency:
-  # Espelha ci.yml: PR cancela o run anterior da mesma PR; fora de PR, push/schedule/workflow_dispatch
-  # (os triggers que este workflow tiver) ficam num grupo por evento+SHA, sem cancelamento.
-  group: ${{ github.event_name == 'pull_request' && format('public-assets-budget-pr-{0}', github.event.pull_request.number) || format('public-assets-budget-{0}-{1}', github.event_name, github.sha) }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: public-assets-budget-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   budget:

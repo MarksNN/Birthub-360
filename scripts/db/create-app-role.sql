@@ -45,11 +45,6 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 --     senão NOLOGIN (ambientes em que outro papel faz `SET ROLE prospector_migrator`).
 --   * prospector_app — NÃO é dono de nada e NÃO cria nada: só DML (SELECT/INSERT/UPDATE/DELETE),
 --     USAGE/SELECT nas sequences, USAGE no schema e EXECUTE só por allowlist explícita (abaixo).
---     EXCEÇÃO (regime restrito, REMED-06 v5 / parecer 24 do PR #62): em `Organization` o app tem só
---     SELECT/INSERT/UPDATE — NUNCA DELETE nem TRUNCATE (apagar org derruba em cascata opt-out, DNC e
---     supressões; a remoção é um job de offboarding fora do app). A lista fica em
---     `birthub.restricted_no_delete_tables` (abaixo), é respeitada pelo loop de grants e re-aplicada
---     pelo hook `db_apply_restricted_table_privileges` no FIM do script.
 --     Sem CREATE no banco/schema e sem TEMP (parecer 15 do PR #39: A1/A2/C3). NOSUPERUSER,
 --     NOBYPASSRLS. As tabelas do LangGraph (`checkpoint*`) nascem por migration
 --     (20261021010000_langgraph_checkpoint_tables), do migrator, como qualquer outra.
@@ -71,11 +66,6 @@ SELECT format(
 )
 WHERE EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'prospector_migrator')
 \gexec
-
--- Regime restrito (parecer 24 do PR #62): tabelas em que prospector_app NUNCA tem DELETE/TRUNCATE.
--- Fonte única para o loop de grants e para o hook final; GUC de sessão porque variável psql não é
--- interpolada dentro de DO $$ ... $$. Lista separada por vírgula, nomes exatos (case-sensitive).
-SET birthub.restricted_no_delete_tables = 'Organization';
 
 -- Garante de novo os atributos do app (inclusive se alguém tiver dado BYPASSRLS na mão).
 ALTER ROLE prospector_app NOSUPERUSER NOBYPASSRLS NOCREATEROLE NOCREATEDB NOREPLICATION;
@@ -155,10 +145,7 @@ BEGIN
 END
 $$;
 
--- Privilégios do app: zera o que existia (inclusive o GRANT ALL legado) e concede só DML —
--- SELECT/INSERT/UPDATE/DELETE, EXCETO nas tabelas de `birthub.restricted_no_delete_tables`
--- (hoje só `Organization`), que recebem SELECT/INSERT/UPDATE (sem DELETE; TRUNCATE nunca é dado).
--- O hook `db_apply_restricted_table_privileges` no fim do script re-aplica a exceção mesmo assim.
+-- Privilégios do app: zera o que existia (inclusive o GRANT ALL legado) e concede só DML.
 -- C1: em bancos vindos de PG < 15 (ou gerenciados) PUBLIC ainda tem CREATE em public.
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM prospector_app;
@@ -166,7 +153,6 @@ GRANT USAGE ON SCHEMA public TO prospector_app;
 DO $$
 DECLARE
     r RECORD;
-    no_delete CONSTANT text[] := string_to_array(current_setting('birthub.restricted_no_delete_tables'), ',');
 BEGIN
     FOR r IN
         SELECT c.relname, c.relkind FROM pg_class c
@@ -179,11 +165,7 @@ BEGIN
             EXECUTE format('GRANT USAGE, SELECT ON SEQUENCE public.%I TO prospector_app', r.relname);
         ELSE
             EXECUTE format('REVOKE ALL ON TABLE public.%I FROM prospector_app', r.relname);
-            IF r.relname = ANY (no_delete) THEN
-                EXECUTE format('GRANT SELECT, INSERT, UPDATE ON TABLE public.%I TO prospector_app', r.relname);
-            ELSE
-                EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.%I TO prospector_app', r.relname);
-            END IF;
+            EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.%I TO prospector_app', r.relname);
         END IF;
     END LOOP;
 END
@@ -217,9 +199,8 @@ END
 $$;
 
 -- Objetos FUTUROS criados pelo migrator (migrations) já nascem com DML para o app.
--- Default privileges não têm exceção por tabela: se uma migration RECRIAR `Organization`, ela nasce
--- com DELETE. Por isso tabelas com regime restrito (cadeia LGPD do PR #35, `Organization`) ajustam
--- os próprios grants na migration e nos hooks abaixo, que rodam DEPOIS destes defaults.
+-- Tabelas com regime restrito (ex.: cadeia LGPD do PR #35) ajustam os próprios grants na
+-- migration e no hook abaixo, que roda DEPOIS destes defaults.
 ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
     GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO prospector_app;
 ALTER DEFAULT PRIVILEGES FOR ROLE prospector_migrator IN SCHEMA public
@@ -244,34 +225,6 @@ BEGIN
     END IF;
 END
 $$;
-
--- Hook db_apply_restricted_table_privileges (parecer 24 do PR #62, P3-2): roda POR ÚLTIMO, depois
--- do loop, dos default privileges e do hook LGPD, e tira DELETE/TRUNCATE do app (e de PUBLIC) em toda
--- tabela de `birthub.restricted_no_delete_tables` que exista. Idempotente e independente do loop:
--- vale mesmo se a tabela tiver sido recriada por migration (herdando DELETE do default) ou se alguém
--- tiver dado o grant na mão. No-op para tabela que ainda não existe (bootstrap antes do migrate; a
--- migration 20261021000000 faz o mesmo REVOKE ao criar o regime).
--- Nota sobre a migration 20261021000000 (já aplicada; arquivo NÃO editado para preservar o checksum
--- em _prisma_migrations): o item 3) do cabeçalho dela diz que o REVOKE vale "também em
--- scripts/db/create-app-role.sql". Até o PR #70 isso era falso (o loop devolvia DELETE); a partir
--- daqui é verdade por causa da exclusão no loop e deste hook (teste:
--- tests/integration/db-restricted-table-privileges.test.ts).
-DO $db_apply_restricted_table_privileges$
-DECLARE
-    t text;
-BEGIN
-    FOREACH t IN ARRAY string_to_array(current_setting('birthub.restricted_no_delete_tables'), ',')
-    LOOP
-        IF to_regclass(format('public.%I', t)) IS NOT NULL THEN
-            EXECUTE format('REVOKE DELETE, TRUNCATE ON TABLE public.%I FROM PUBLIC, prospector_app', t);
-            IF has_table_privilege('prospector_app', format('public.%I', t), 'DELETE')
-               OR has_table_privilege('prospector_app', format('public.%I', t), 'TRUNCATE') THEN
-                RAISE EXCEPTION 'regime restrito violado: prospector_app ainda tem DELETE/TRUNCATE em %', t;
-            END IF;
-        END IF;
-    END LOOP;
-END
-$db_apply_restricted_table_privileges$;
 
 -- (PR #39) O antigo `GRANT CREATE ON DATABASE ... TO prospector_app` (AI-002, exigido pelo
 -- `PostgresSaver.setup()`) foi removido: as tabelas do LangGraph vêm da migration e o app só

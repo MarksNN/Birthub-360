@@ -19,7 +19,7 @@
 ## 2. Pré-requisitos e Ferramentas
 
 - Banco de dados PostgreSQL com permissão de escrita.
-- Script canônico: [`scripts/security/backfill-contact-pii.ts`](../../../scripts/security/backfill-contact-pii.ts).
+- Script canônico: [`scripts/security/backfill-contact-pii.ts`](file:///c:/Github/Birthub-360/scripts/security/backfill-contact-pii.ts).
 
 ---
 

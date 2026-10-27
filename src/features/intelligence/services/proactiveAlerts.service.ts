@@ -1,5 +1,5 @@
-import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import { logger } from '../../../lib/logger.js';
 
 /**
  * Alertas Proativos - Notifica quando agente tem taxa de erro acima do normal.
@@ -41,12 +41,7 @@ export interface ProactiveAlert {
   id: string;
   organizationId: string;
   agentRole: AgentHealthMetrics['agentRole'];
-  alertType:
-    | 'HIGH_ERROR_RATE'
-    | 'HIGH_LATENCY'
-    | 'HIGH_OVERRIDE_RATE'
-    | 'HIGH_COST'
-    | 'ANOMALY_DETECTED';
+  alertType: 'HIGH_ERROR_RATE' | 'HIGH_LATENCY' | 'HIGH_OVERRIDE_RATE' | 'HIGH_COST' | 'ANOMALY_DETECTED';
   severity: 'INFO' | 'WARNING' | 'CRITICAL';
   currentValue: number;
   thresholdValue: number;
@@ -82,17 +77,19 @@ export async function calculateAgentHealthMetrics(
   });
 
   const totalExecutions = logs.length;
-  const successfulExecutions = logs.filter((l) => l.success).length;
+  const successfulExecutions = logs.filter(l => l.success).length;
   const failedExecutions = totalExecutions - successfulExecutions;
   const errorRate = totalExecutions > 0 ? failedExecutions / totalExecutions : 0;
 
-  const latencies = logs.map((l) => l.latencyMs || 0).filter((l) => l > 0);
-  const avgLatencyMs =
-    latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0;
+  const latencies = logs.map(l => l.latencyMs || 0).filter(l => l > 0);
+  const avgLatencyMs = latencies.length > 0
+    ? latencies.reduce((a, b) => a + b, 0) / latencies.length
+    : 0;
 
   const sortedLatencies = latencies.sort((a, b) => a - b);
-  const p95LatencyMs =
-    sortedLatencies.length > 0 ? sortedLatencies[Math.floor(sortedLatencies.length * 0.95)] : 0;
+  const p95LatencyMs = sortedLatencies.length > 0
+    ? sortedLatencies[Math.floor(sortedLatencies.length * 0.95)]
+    : 0;
 
   // Buscar overrides humanos (AIPendingAction que foram rejeitadas ou modificadas)
   const pendingActions = await prisma.aIPendingAction.findMany({
@@ -102,13 +99,16 @@ export async function calculateAgentHealthMetrics(
       createdAt: { gte: since },
     },
     select: {
-      approved: true,
-      discardedAt: true,
+      status: true,
     },
   });
 
-  const humanOverrides = pendingActions.filter((a) => a.discardedAt !== null).length;
-  const humanOverrideRate = pendingActions.length > 0 ? humanOverrides / pendingActions.length : 0;
+  const humanOverrides = pendingActions.filter(a =>
+    a.status === 'REJECTED' || a.status === 'MODIFIED'
+  ).length;
+  const humanOverrideRate = pendingActions.length > 0
+    ? humanOverrides / pendingActions.length
+    : 0;
 
   const totalCostUsd = logs.reduce((sum, l) => sum + (l.costUsd || 0), 0);
   const avgCostUsd = totalExecutions > 0 ? totalCostUsd / totalExecutions : 0;
@@ -137,14 +137,7 @@ export async function checkAgentHealthAndCreateAlerts(
   organizationId: string,
   thresholds: AlertThreshold[],
 ): Promise<ProactiveAlert[]> {
-  const agentRoles: AgentHealthMetrics['agentRole'][] = [
-    'SDR',
-    'BDR',
-    'CLOSER',
-    'CRM',
-    'OPS',
-    'SUPERVISOR',
-  ];
+  const agentRoles: AgentHealthMetrics['agentRole'][] = ['SDR', 'BDR', 'CLOSER', 'CRM', 'OPS', 'SUPERVISOR'];
   const alerts: ProactiveAlert[] = [];
 
   for (const agentRole of agentRoles) {
@@ -160,7 +153,10 @@ export async function checkAgentHealthAndCreateAlerts(
   }
 
   if (alerts.length > 0) {
-    logger.info({ organizationId, alertCount: alerts.length }, '[ProactiveAlerts] Alertas criados');
+    logger.info(
+      { organizationId, alertCount: alerts.length },
+      '[ProactiveAlerts] Alertas criados',
+    );
   }
 
   return alerts;
@@ -172,20 +168,13 @@ export async function checkAgentHealthAndCreateAlerts(
 function shouldCreateAlert(
   metrics: AgentHealthMetrics,
   threshold: AlertThreshold,
-): Omit<
-  ProactiveAlert,
-  'id' | 'acknowledged' | 'acknowledgedBy' | 'acknowledgedAt' | 'createdAt'
-> | null {
+): Omit<ProactiveAlert, 'id' | 'acknowledged' | 'acknowledgedBy' | 'acknowledgedAt' | 'createdAt'> | null {
   const getValue = (metric: AlertThreshold['metric']): number => {
     switch (metric) {
-      case 'errorRate':
-        return metrics.errorRate;
-      case 'latency':
-        return metrics.avgLatencyMs;
-      case 'overrideRate':
-        return metrics.humanOverrideRate;
-      case 'cost':
-        return metrics.avgCostUsd;
+      case 'errorRate': return metrics.errorRate;
+      case 'latency': return metrics.avgLatencyMs;
+      case 'overrideRate': return metrics.humanOverrideRate;
+      case 'cost': return metrics.avgCostUsd;
     }
   };
 
@@ -237,14 +226,10 @@ function shouldCreateAlert(
  */
 function evaluateThreshold(value: number, threshold: AlertThreshold): boolean {
   switch (threshold.comparison) {
-    case 'gt':
-      return value > threshold.threshold;
-    case 'lt':
-      return value < threshold.threshold;
-    case 'gt_pct_change':
-      return false; // Requer histórico comparativo
-    case 'lt_pct_change':
-      return false; // Requer histórico comparativo
+    case 'gt': return value > threshold.threshold;
+    case 'lt': return value < threshold.threshold;
+    case 'gt_pct_change': return false; // Requer histórico comparativo
+    case 'lt_pct_change': return false; // Requer histórico comparativo
   }
 }
 
@@ -252,10 +237,7 @@ function evaluateThreshold(value: number, threshold: AlertThreshold): boolean {
  * Cria um alerta no banco de dados.
  */
 async function createAlert(
-  alert: Omit<
-    ProactiveAlert,
-    'id' | 'acknowledged' | 'acknowledgedBy' | 'acknowledgedAt' | 'createdAt'
-  >,
+  alert: Omit<ProactiveAlert, 'id' | 'acknowledged' | 'acknowledgedBy' | 'acknowledgedAt' | 'createdAt'>,
 ): Promise<ProactiveAlert> {
   const id = `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -279,7 +261,9 @@ async function createAlert(
 /**
  * Retorna alertas não reconhecidos para uma organização.
  */
-export async function getUnacknowledgedAlerts(organizationId: string): Promise<ProactiveAlert[]> {
+export async function getUnacknowledgedAlerts(
+  organizationId: string,
+): Promise<ProactiveAlert[]> {
   // Implementar quando schema de alertas existir
   return [];
 }
@@ -287,7 +271,10 @@ export async function getUnacknowledgedAlerts(organizationId: string): Promise<P
 /**
  * Reconhece um alerta (marca como lido).
  */
-export async function acknowledgeAlert(alertId: string, userId: string): Promise<void> {
+export async function acknowledgeAlert(
+  alertId: string,
+  userId: string,
+): Promise<void> {
   // Implementar quando schema de alertas existir
   logger.info({ alertId, userId }, '[ProactiveAlerts] Alerta reconhecido');
 }

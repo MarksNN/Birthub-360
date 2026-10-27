@@ -148,7 +148,7 @@ export const attachAuthIfPresent = async (
     // Auto-upsert User and Tenant in Dev environment so old JWT cookies don't break fresh databases
     if (process.env.NODE_ENV !== 'production' && session.organizationId) {
       try {
-        const { prisma } = await import('@/lib/prisma.js');
+        const { prisma } = await import('../lib/prisma.js');
         await prisma.tenant.upsert({
           where: { id: session.organizationId },
           update: {},

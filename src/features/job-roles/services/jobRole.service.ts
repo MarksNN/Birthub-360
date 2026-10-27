@@ -203,7 +203,6 @@ export async function assignJobRole(input: {
 
   const isPrimary = input.isPrimary ?? true;
 
-  // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
   const result = await prisma.$transaction(async (tx) => {
     if (isPrimary) {
       await tx.userJobRole.updateMany({

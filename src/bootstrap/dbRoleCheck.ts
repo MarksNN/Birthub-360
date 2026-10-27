@@ -130,8 +130,7 @@ export async function assertDbRoleIsLeastPrivilege(
   const env = opts.env ?? process.env;
   const isProduction = env.NODE_ENV === 'production';
   const allowCheckpointOwnership = env.DB_ROLE_CHECK_ALLOW_CHECKPOINT_OWNERSHIP === '1';
-  const allowOwnership =
-    env.DB_ROLE_CHECK_ALLOW_OWNERSHIP === '1' || env.DB_ROLE_CHECK_STRICT === '0';
+  const allowOwnership = env.DB_ROLE_CHECK_ALLOW_OWNERSHIP === '1' || env.DB_ROLE_CHECK_STRICT === '0';
   let facts: DbRoleFacts;
   try {
     facts = await collectDbRoleFacts(db);
@@ -143,7 +142,10 @@ export async function assertDbRoleIsLeastPrivilege(
             `não foi possível verificar o papel do banco: ${(err as Error).message}`,
           ]);
     }
-    opts.logger?.warn({ err }, '[db-role-check] não foi possível verificar o papel do banco');
+    opts.logger?.warn(
+      { err },
+      '[db-role-check] não foi possível verificar o papel do banco',
+    );
     return null;
   }
   const violations = evaluateDbRoleFacts(facts, { allowCheckpointOwnership, allowOwnership });

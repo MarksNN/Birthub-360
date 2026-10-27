@@ -1,5 +1,5 @@
-import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import { logger } from '../../../lib/logger.js';
 
 /**
  * Dashboard Real-time do Swarm
@@ -45,7 +45,9 @@ export interface SwarmRealtimeStatus {
 /**
  * Busca status em tempo real do swarm para uma organização
  */
-export async function getSwarmRealtimeStatus(organizationId: string): Promise<SwarmRealtimeStatus> {
+export async function getSwarmRealtimeStatus(
+  organizationId: string,
+): Promise<SwarmRealtimeStatus> {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -71,16 +73,22 @@ export async function getSwarmRealtimeStatus(organizationId: string): Promise<Sw
       latencyMs: true,
       costUsd: true,
       success: true,
-      agentRole: true,
     },
   });
 
-  const avgLatencyMs =
-    aiLogs.length > 0 ? aiLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / aiLogs.length : 0;
+  const avgLatencyMs = aiLogs.length > 0
+    ? aiLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / aiLogs.length
+    : 0;
   const totalCostUsd = aiLogs.reduce((sum, l) => sum + (l.costUsd || 0), 0);
 
-  // Buscar execuções recentes
-  const runningExecutions: Array<{ sessionId: string; agentType: string; createdAt: Date }> = [];
+  // Buscar memórias em andamento
+  const runningExecutions = await prisma.agentMemory.findMany({
+    where: {
+      organizationId,
+      status: 'Running',
+    },
+    take: 10,
+  });
 
   const currentExecutions = runningExecutions.map((e) => ({
     sessionId: e.sessionId,
@@ -102,12 +110,12 @@ export async function getSwarmRealtimeStatus(organizationId: string): Promise<Sw
       status: agentRunning.length > 0 ? 'running' : 'idle',
       activeSessions: agentRunning.length,
       lastExecution: agentExecutions.length > 0 ? agentExecutions[0].createdAt.toISOString() : null,
-      avgLatencyMs:
-        agentLogs.length > 0
-          ? agentLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / agentLogs.length
-          : 0,
-      errorRate:
-        agentLogs.length > 0 ? agentLogs.filter((l) => !l.success).length / agentLogs.length : 0,
+      avgLatencyMs: agentLogs.length > 0
+        ? agentLogs.reduce((sum, l) => sum + (l.latencyMs || 0), 0) / agentLogs.length
+        : 0,
+      errorRate: agentLogs.length > 0
+        ? agentLogs.filter((l) => !l.success).length / agentLogs.length
+        : 0,
     };
   }
 
