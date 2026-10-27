@@ -103,7 +103,6 @@ jobs:
 
     - name: Run Visual Tests
       run: npm run test:visual
-      continue-on-error: true # Non-blocking for now per prompt instructions
 
     - name: Upload Visual Diff Report
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
