@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useId, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import {
-  AlertTriangle,
   AlertCircle,
-  Info,
+  AlertTriangle,
   CheckCircle,
-  X,
   ChevronDown,
-  RefreshCw,
   ChevronRight,
+  Info,
+  RefreshCw,
+  X,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { useSessionStore } from '../../store/useSessionStore.js';
+import { colors, getAccessibleBrandForeground, getAccessibleTextOnBrand } from '../tokens.js';
 import { usePrefersReducedMotion } from './useReducedMotion.js';
-import { getAccessibleTextOnBrand, getAccessibleBrandForeground, colors } from '../tokens.js';
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -67,7 +67,7 @@ export function Button({
   // `--brand-color` is tenant-controlled (see brandColor.controller.ts / useSessionStore) so
   // `text-white` on the solid `bg-brand` fill can fail WCAG contrast for a light tenant color.
   // getAccessibleTextOnBrand mathematically guarantees >=~4.58:1 regardless of the chosen hue.
-  const brandColor = useSessionStore((state) => state.brandColor);
+  const brandColor = useSessionStore((state: any) => state.brandColor);
   const accessibleBrandText = getAccessibleTextOnBrand(brandColor);
 
   const baseStyle =
@@ -374,7 +374,7 @@ export function Badge({ children, variant = 'primary', className = '' }: BadgePr
   // `text-brand` at full saturation on top of them can fail contrast for a light tenant color the
   // same way `text-white` on a solid `bg-brand` fill can (see tokens.ts). Compute a same-hue,
   // contrast-safe variant for each surface instead of assuming the raw brand color always works.
-  const brandColor = useSessionStore((state) => state.brandColor);
+  const brandColor = useSessionStore((state: any) => state.brandColor);
   const brandTextOnLight = getAccessibleBrandForeground(brandColor, colors.light.surface);
   const brandTextOnDark = getAccessibleBrandForeground(brandColor, colors.dark.surface);
 
@@ -585,7 +585,7 @@ export function Avatar({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const brandColor = useSessionStore((state) => state.brandColor);
+  const brandColor = useSessionStore((state: any) => state.brandColor);
   const accessibleBrandText = getAccessibleTextOnBrand(brandColor);
   const sizes = {
     sm: 'h-8 w-8 text-xs',
@@ -649,7 +649,7 @@ export function Tabs({
   className?: string;
 }) {
   const tablistId = useId();
-  const brandColor = useSessionStore((state) => state.brandColor);
+  const brandColor = useSessionStore((state: any) => state.brandColor);
   const brandTextOnLight = getAccessibleBrandForeground(brandColor, colors.light.surface);
   const brandTextOnDark = getAccessibleBrandForeground(brandColor, colors.dark.surface);
   const reduceMotion = usePrefersReducedMotion();

@@ -1,5 +1,10 @@
 import { BaseAgent } from './base.agent.js';
-import { appendLearnedStyle, SWARM_IDENTITY, SWARM_OUTPUT_CONTRACT, SWARM_UNTRUSTED_CONTENT_GUARD } from './swarm.constants.js';
+import {
+  appendLearnedStyle,
+  SWARM_IDENTITY,
+  SWARM_OUTPUT_CONTRACT,
+  SWARM_UNTRUSTED_CONTENT_GUARD,
+} from './swarm.constants.js';
 
 export class ForecastAgent extends BaseAgent {
   protected agentType = 'FORECAST';

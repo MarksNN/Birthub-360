@@ -1,18 +1,13 @@
-import { AIMessage, type BaseMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { StructuredToolInterface } from '@langchain/core/tools';
 import { getTenantId, getUserId } from '../../../lib/async-context.js';
-import { logger } from '../../../lib/logger.js';
-import { recordAgentFailure } from './agentMemory.store.js';
 import {
-  AgentExecutor,
-  type AgentExecutionContext,
   type AgentExecutionConfig,
-  type AgentExecutionResult,
-  type SerializedMessage,
+  type AgentExecutionContext,
+  AgentExecutor,
 } from './execution/AgentExecutor.js';
 
 export interface AgentRunResult {
-  sessionId: string;
+  sessionId?: string;
   error?: string;
 }
 
@@ -77,7 +72,8 @@ export abstract class BaseAgent {
     } catch (error: any) {
       // AgentExecutor já registra falha e retorna {error}, mas precisamos garantir
       // que a exceção não propague (contrato original de BaseAgent).
-      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
+      const message =
+        error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
       return { error: message, sessionId: sid };
     }
   }
@@ -118,7 +114,8 @@ export abstract class BaseAgent {
     } catch (error: any) {
       // AgentExecutor já registra falha e retorna {error}, mas precisamos garantir
       // que a exceção não propague (contrato original de BaseAgent).
-      const message = error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
+      const message =
+        error instanceof Error ? error.message : `Falha desconhecida no Agente ${this.agentType}.`;
       return { error: message, sessionId: sid };
     }
   }

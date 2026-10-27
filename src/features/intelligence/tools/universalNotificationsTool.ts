@@ -1,11 +1,12 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
-import { prisma } from '../../../lib/prisma.js';
+import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
 import { notificationService } from '../../notifications/notification.service.js';
 import { sseService } from '../../notifications/sse.service.js';
-import { validateWebhookUrl } from '../../../lib/security/url-validator.js';
+import { reconfigurationPayload } from './integrationConfigState.js';
 
 /**
  * Dispatcher Universal de Notificações Multi-Dispositivo:
@@ -30,12 +31,17 @@ export const universalNotificationsTool = new DynamicStructuredTool({
       .string()
       .max(65)
       .optional()
-      .describe('Texto ultra-curto (até 65 caracteres) otimizado para leitura rápida na tela do relógio (Smartwatch).'),
+      .describe(
+        'Texto ultra-curto (até 65 caracteres) otimizado para leitura rápida na tela do relógio (Smartwatch).',
+      ),
     kind: z
       .enum(['Info', 'Success', 'Warning', 'Alert'])
       .default('Info')
       .describe('Severidade visual da notificação.'),
-    userId: z.string().optional().describe('ID do usuário destinatário (vazio envia para toda a equipe da organização).'),
+    userId: z
+      .string()
+      .optional()
+      .describe('ID do usuário destinatário (vazio envia para toda a equipe da organização).'),
     leadId: z.string().optional().describe('ID do lead associado ao alerta (opcional).'),
   }),
   func: async ({ channels, title, message, wristSummary, kind, userId, leadId }) => {
@@ -47,13 +53,21 @@ export const universalNotificationsTool = new DynamicStructuredTool({
 
       const deliveries: Record<string, unknown> = {};
 
+      const kindMap = {
+        Info: 'Info' as const,
+        Success: 'Sucesso' as const,
+        Warning: 'Alerta' as const,
+        Alert: 'Alerta' as const,
+      };
+      const notificationKind = kindMap[kind] ?? 'Info';
+
       // 1. In-App Pop-up / Sino + Stream SSE em tempo real
       if (channels.includes('in_app_popup')) {
         const created = await notificationService.create({
           organizationId,
           title,
           body: message,
-          kind,
+          kind: notificationKind,
           entity: leadId ? 'lead' : 'swarm',
           entityId: leadId ?? null,
           userId: userId ?? null,
@@ -73,18 +87,19 @@ export const universalNotificationsTool = new DynamicStructuredTool({
       // 2. Push no Celular (Android Capacitor / iOS / FCM / Webhook Push gateway) + Relógio (Smartwatch)
       if (channels.includes('mobile_push') || channels.includes('smartwatch_wrist')) {
         const compactGlance = (wristSummary || `${title}: ${message}`).slice(0, 65);
-        const pushSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.push_gateway' },
-          select: { value: true },
-        });
-        const cfg = (pushSetting?.value ?? {}) as Record<string, unknown>;
-        const pushWebhookUrl = typeof cfg.webhookUrl === 'string' ? cfg.webhookUrl.trim() : '';
+        // URL do gateway (secret no catálogo — tópico ntfy é capability URL) decifrada só para o
+        // fetch; nunca entra em `deliveries` (que volta para o LLM).
+        // Ilegível ≠ não configurado: sem fetch e com aviso de reconfiguração (falha fechada).
+        const push = await integrationSettingsRepository.lookup(organizationId, 'push_wearables');
+        const pushWebhookUrl =
+          push.state === 'configured' ? (push.values.webhookUrl?.trim() ?? '') : '';
 
         const wearablePayload = {
           title,
           body: message,
           smartwatchGlanceText: compactGlance,
-          hapticPattern: kind === 'Alert' || kind === 'Warning' ? 'urgent-double-pulse' : 'gentle-tap',
+          hapticPattern:
+            kind === 'Alert' || kind === 'Warning' ? 'urgent-double-pulse' : 'gentle-tap',
           androidWearOsBridged: true,
           appleWatchShortLookTitle: title.slice(0, 32),
           entityId: leadId ?? null,
@@ -102,7 +117,10 @@ export const universalNotificationsTool = new DynamicStructuredTool({
             });
             remotePushDispatched = res.ok;
           } catch (err) {
-            logger.warn({ err }, 'Push gateway externo indisponível; mantendo notificação sincronizada via app.');
+            logger.warn(
+              { err },
+              'Push gateway externo indisponível; mantendo notificação sincronizada via app.',
+            );
           }
         }
 
@@ -111,6 +129,9 @@ export const universalNotificationsTool = new DynamicStructuredTool({
             queuedForMobileApp: true,
             remotePushGatewayDispatched: remotePushDispatched,
             priority: kind === 'Alert' ? 'high' : 'normal',
+            ...(push.state === 'unreadable'
+              ? { remotePushGateway: reconfigurationPayload('push_wearables', push.message) }
+              : {}),
           };
         }
 
@@ -125,13 +146,16 @@ export const universalNotificationsTool = new DynamicStructuredTool({
 
       // 3. Alerta SMS se solicitado
       if (channels.includes('sms_alert')) {
-        const smsSetting = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.sms' },
-          select: { value: true },
-        });
-        const cfg = (smsSetting?.value ?? {}) as Record<string, unknown>;
+        // Estado por campo (`fields`), nunca `masked`: a máscara de ilegível é string não vazia.
+        const smsStatus = await integrationSettingsRepository.getStatus(organizationId, 'sms');
         deliveries.sms_alert = {
-          gatewayConfigured: Boolean(cfg.webhookUrl || cfg.accountSid),
+          gatewayConfigured: smsStatus.configured && smsStatus.fields.webhookUrl === 'set',
+          ...(smsStatus.unreadable
+            ? {
+                gatewayUnreadable: true,
+                acao: 'Credenciais de SMS ilegíveis — reconfigure a integração no Hub Universal.',
+              }
+            : {}),
           textPreview: `[BirthHub 360] ${title}: ${message}`.slice(0, 160),
         };
       }

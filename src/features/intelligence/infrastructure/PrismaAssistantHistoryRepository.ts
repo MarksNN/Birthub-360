@@ -43,6 +43,7 @@ export class PrismaAssistantHistoryRepository implements AssistantHistoryReposit
     assistantText: string,
   ): Promise<void> {
     try {
+      // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
       await prisma.$transaction([
         prisma.assistantMessage.create({
           data: {

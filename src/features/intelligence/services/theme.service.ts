@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Gestão de Temas (Dark Mode, Custom Themes)
@@ -12,17 +12,21 @@ export interface UserTheme {
   customTheme: string | null;
 }
 
+const userThemeDelegate = (prisma as any).userTheme;
+
 export async function getUserTheme(userId: string, organizationId: string): Promise<UserTheme> {
-  const theme = await prisma.userTheme.findUnique({
+  const theme = await userThemeDelegate?.findUnique?.({
     where: { userId_organizationId: { userId, organizationId } },
   });
 
-  return theme || {
-    userId,
-    organizationId,
-    mode: 'light',
-    customTheme: null,
-  };
+  return (
+    theme || {
+      userId,
+      organizationId,
+      mode: 'light',
+      customTheme: null,
+    }
+  );
 }
 
 export async function setUserTheme(params: {
@@ -31,8 +35,10 @@ export async function setUserTheme(params: {
   mode: 'light' | 'dark' | 'auto';
   customTheme?: string;
 }): Promise<void> {
-  await prisma.userTheme.upsert({
-    where: { userId_organizationId: { userId: params.userId, organizationId: params.organizationId } },
+  await userThemeDelegate?.upsert?.({
+    where: {
+      userId_organizationId: { userId: params.userId, organizationId: params.organizationId },
+    },
     create: {
       userId: params.userId,
       organizationId: params.organizationId,

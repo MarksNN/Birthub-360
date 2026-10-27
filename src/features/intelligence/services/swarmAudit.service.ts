@@ -1,9 +1,11 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
+
+const swarmAuditLogDelegate = (prisma as any).swarmAuditLog;
 
 /**
  * Serviço de Auditoria Completa do Swarm
- * 
+ *
  * Registra todas as ações do swarm com:
  * - Quem executou (agente, usuário)
  * - O que foi executado (ação, parâmetros)
@@ -45,7 +47,7 @@ export async function logSwarmAction(params: {
   userAgent?: string;
 }): Promise<void> {
   try {
-    await prisma.swarmAuditLog.create({
+    await swarmAuditLogDelegate.create({
       data: {
         organizationId: params.organizationId,
         agentType: params.agentType,
@@ -83,23 +85,23 @@ export async function getSwarmAuditLogs(params: {
   offset?: number;
 }): Promise<{ logs: SwarmAuditLog[]; total: number }> {
   const where: any = { organizationId: params.organizationId };
-  
+
   if (params.agentType) where.agentType = params.agentType;
   if (params.action) where.action = params.action;
   if (params.result) where.result = params.result;
 
   const [logs, total] = await Promise.all([
-    prisma.swarmAuditLog.findMany({
+    swarmAuditLogDelegate.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: params.limit || 50,
       skip: params.offset || 0,
     }),
-    prisma.swarmAuditLog.count({ where }),
+    swarmAuditLogDelegate.count({ where }),
   ]);
 
   return {
-    logs: logs.map((l) => ({
+    logs: logs.map((l: any) => ({
       id: l.id,
       organizationId: l.organizationId,
       agentType: l.agentType,
@@ -132,19 +134,19 @@ export async function getSwarmAuditStats(organizationId: string): Promise<{
   const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   const [total, successCount, byAgent, byAction, errorsLast24h] = await Promise.all([
-    prisma.swarmAuditLog.count({ where: { organizationId } }),
-    prisma.swarmAuditLog.count({ where: { organizationId, result: 'success' } }),
-    prisma.swarmAuditLog.groupBy({
+    swarmAuditLogDelegate.count({ where: { organizationId } }),
+    swarmAuditLogDelegate.count({ where: { organizationId, result: 'success' } }),
+    swarmAuditLogDelegate.groupBy({
       by: ['agentType'],
       where: { organizationId },
       _count: true,
     }),
-    prisma.swarmAuditLog.groupBy({
+    swarmAuditLogDelegate.groupBy({
       by: ['action'],
       where: { organizationId },
       _count: true,
     }),
-    prisma.swarmAuditLog.count({
+    swarmAuditLogDelegate.count({
       where: { organizationId, result: 'error', createdAt: { gte: last24h } },
     }),
   ]);

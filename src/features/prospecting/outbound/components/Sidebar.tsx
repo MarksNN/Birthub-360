@@ -182,7 +182,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SEÇÃO 0: BUSCAS RECENTES */}
           <div
             className={`space-y-2.5 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
+              isDark
+                ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]'
+                : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -294,7 +296,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* SEÇÃO 1: MOTOR DE IA ... */}
           <div
             className={`space-y-3 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
+              isDark
+                ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]'
+                : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -546,7 +550,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             className={`space-y-2.5 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
+              isDark
+                ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]'
+                : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -590,7 +596,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             className={`space-y-2.5 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
+              isDark
+                ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]'
+                : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -767,7 +775,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div
             className={`space-y-2 p-3.5 rounded-xl border transition ${
-              isDark ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]' : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
+              isDark
+                ? 'bg-slate-900/60 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80 shadow-[0_2px_12px_rgba(0,0,0,0.2)]'
+                : 'bg-white/90 hover:bg-white border-slate-200/80 hover:border-slate-300/80 shadow-sm'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -824,7 +834,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div
           className={`p-3 border-t flex items-center justify-between ${
-            isDark ? 'border-slate-800/80 bg-[#0c121e]/90' : 'border-slate-200/80 bg-white/90 shadow-sm'
+            isDark
+              ? 'border-slate-800/80 bg-[#0c121e]/90'
+              : 'border-slate-200/80 bg-white/90 shadow-sm'
           }`}
         >
           <button

@@ -1,14 +1,14 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { getTenantId } from '../../../lib/context.js';
-import { logger } from '../../../lib/logger.js';
-import { prisma } from '../../../lib/prisma.js';
 import {
   generateEmailDraft,
   generateSalesPitch,
   handleSalesObjection,
 } from '../../../lib/ai/features.js';
 import { generateTextOutput } from '../../../lib/ai/gateway.js';
+import { getTenantId } from '../../../lib/context.js';
+import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Fábrica de Scripts Comerciais, Copy Multicanal, Battlecards e Prompts Reutilizáveis.
@@ -33,15 +33,24 @@ export const scriptAndPromptTool = new DynamicStructuredTool({
       .describe('Tipo de script comercial ou prompt de IA a gerar.'),
     targetAudienceOrPersona: z
       .string()
-      .describe('Cargo do decisor, nicho ou persona alvo (ex: CFO de Indústria, Diretor Comercial SaaS).'),
+      .describe(
+        'Cargo do decisor, nicho ou persona alvo (ex: CFO de Indústria, Diretor Comercial SaaS).',
+      ),
     objective: z
       .string()
-      .describe('Objetivo central do script ou do prompt (ex: agendar demo de 15 min, contornar objeção de preço).'),
-    leadId: z.string().optional().describe('ID do lead para personalizar com dados reais do CRM (opcional).'),
+      .describe(
+        'Objetivo central do script ou do prompt (ex: agendar demo de 15 min, contornar objeção de preço).',
+      ),
+    leadId: z
+      .string()
+      .optional()
+      .describe('ID do lead para personalizar com dados reais do CRM (opcional).'),
     saveToPromptLibrary: z
       .boolean()
       .default(true)
-      .describe('Se true, salva o artefato gerado na tabela Prompt da organização para reuso por qualquer agente.'),
+      .describe(
+        'Se true, salva o artefato gerado na tabela Prompt da organização para reuso por qualquer agente.',
+      ),
     promptTitle: z.string().optional().describe('Título para salvar na biblioteca de Prompts.'),
   }),
   func: async ({
@@ -65,7 +74,7 @@ export const scriptAndPromptTool = new DynamicStructuredTool({
           include: { company: true, contact: true },
         });
         if (lead) {
-          leadContext = `Lead: ${lead.name} | Empresa: ${lead.company?.tradeName || lead.company?.legalName || 'N/A'} | Setor: ${lead.company?.cnae || lead.industry || 'N/A'} | Cargo: ${lead.contact?.role || 'Decisor'}`;
+          leadContext = `Lead: ${lead.title || 'Lead'} | Empresa: ${lead.company?.tradeName || lead.company?.legalName || 'N/A'} | Setor: ${lead.company?.segment || 'N/A'} | Cargo: ${lead.contact?.role || 'Decisor'}`;
         }
       }
 
@@ -108,10 +117,14 @@ export const scriptAndPromptTool = new DynamicStructuredTool({
         const saved = await prisma.prompt.create({
           data: {
             organizationId,
-            title: promptTitle || `[${artifactType}] ${targetAudienceOrPersona.slice(0, 60)}`,
+            name: promptTitle || `[${artifactType}] ${targetAudienceOrPersona.slice(0, 60)}`,
             category: artifactType,
-            content: generatedContent,
+            version: '1.0.0',
+            owner: 'Swarm Script Factory',
             tags: [artifactType, 'swarm-generated'],
+            variables: {},
+            history: [{ timestamp: new Date().toISOString(), content: generatedContent }],
+            approved: true,
           },
         });
         savedPromptId = saved.id;

@@ -69,11 +69,7 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
   async run(inputData: string, sessionId?: string) {
     const { marketResearchTool } = await import('../tools/marketResearchTool.js');
 
-    const result = await this.runWithTools(
-      inputData,
-      [marketResearchTool],
-      sessionId,
-    );
+    const result = await this.runWithTools(inputData, [marketResearchTool], sessionId);
 
     return {
       research: result.output as string | undefined,

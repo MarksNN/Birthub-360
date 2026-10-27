@@ -71,8 +71,6 @@ export const promoteAndEnrichTool = tool(
             ? {
                 name: contactName,
                 role: contactRole || 'Decisor',
-                email: contactEmail,
-                phone: contactPhone,
               }
             : undefined,
         });
@@ -183,7 +181,10 @@ export const promoteAndEnrichTool = tool(
       action: z
         .enum(['promote_candidate', 'enrich_company', 'discover_decision_makers'])
         .describe('Ação de prospecção/enriquecimento a executar'),
-      tradeName: z.string().optional().describe('Nome fantasia da empresa (para promote_candidate)'),
+      tradeName: z
+        .string()
+        .optional()
+        .describe('Nome fantasia da empresa (para promote_candidate)'),
       legalName: z.string().optional().describe('Razão social da empresa'),
       cnpj: z.string().optional().describe('CNPJ da empresa'),
       segment: z.string().optional().describe('Segmento de mercado'),

@@ -2,6 +2,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 import * as ExcelJS from 'exceljs';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/context.js';
+import { integrationSettingsRepository } from '../../../lib/integrations/integrationSettings.repository.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
 import { IngestionService } from '../../knowledge/ingestion.service.js';
@@ -37,7 +38,10 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
       .optional()
       .describe('Seções estruturadas para documento Word / Google Docs.'),
     // Para Excel / Google Sheets
-    sheetColumns: z.array(z.string()).optional().describe('Cabeçalhos das colunas da planilha Excel / Google Sheets.'),
+    sheetColumns: z
+      .array(z.string())
+      .optional()
+      .describe('Cabeçalhos das colunas da planilha Excel / Google Sheets.'),
     sheetRows: z
       .array(z.array(z.union([z.string(), z.number(), z.boolean(), z.null()])))
       .optional()
@@ -57,7 +61,9 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
     syncCloud: z
       .enum(['none', 'google_workspace', 'microsoft_365'])
       .default('none')
-      .describe('Se informado, tenta também criar o arquivo direto no Google Drive/Docs/Sheets/Slides ou OneDrive/M365.'),
+      .describe(
+        'Se informado, tenta também criar o arquivo direto no Google Drive/Docs/Sheets/Slides ou OneDrive/M365.',
+      ),
   }),
   func: async ({
     docType,
@@ -82,9 +88,15 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
       if (docType === 'word_or_gdoc') {
         const sections = documentSections?.length
           ? documentSections
-          : [{ heading: title, body: 'Documento comercial gerado automaticamente pelo Swarm BirthHub 360.' }];
+          : [
+              {
+                heading: title,
+                body: 'Documento comercial gerado automaticamente pelo Swarm BirthHub 360.',
+              },
+            ];
 
-        renderedContent = `# ${title}\n\n` + sections.map((s) => `## ${s.heading}\n\n${s.body}`).join('\n\n');
+        renderedContent =
+          `# ${title}\n\n` + sections.map((s) => `## ${s.heading}\n\n${s.body}`).join('\n\n');
         formatMetadata = {
           compatibleFormats: ['Microsoft Word (.docx)', 'Google Docs', 'Markdown (.md)'],
           sectionCount: sections.length,
@@ -129,7 +141,11 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
               {
                 slideNumber: 1,
                 title,
-                bullets: ['Visão Geral da Solução', 'Diagnóstico e Oportunidades', 'Próximos Passos e ROI'],
+                bullets: [
+                  'Visão Geral da Solução',
+                  'Diagnóstico e Oportunidades',
+                  'Próximos Passos e ROI',
+                ],
                 speakerNotes: 'Apresentação gerada pelo Swarm BirthHub 360.',
               },
             ];
@@ -162,20 +178,29 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
           sourceType: 'file',
           sourceName: `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
         });
-        ingestedDocId = ingested.document.id;
+        ingestedDocId = ingested.id;
       } catch (ingestErr) {
-        logger.warn({ ingestErr }, 'Fallback para criação direta de Note se a ingestão vetorial falhar.');
+        logger.warn(
+          { ingestErr },
+          'Fallback para criação direta de Note se a ingestão vetorial falhar.',
+        );
       }
 
       // Vincular ao Lead ou Empresa como Nota rica se aplicável
-      if (leadId || companyId) {
+      if (leadId) {
         await prisma.note.create({
           data: {
-            organizationId,
-            targetType: leadId ? 'lead' : 'company',
-            targetId: (leadId || companyId)!,
-            text: renderedContent.slice(0, 4000),
-            authorName: 'Swarm Office Suite',
+            leadId,
+            content: renderedContent.slice(0, 4000),
+            author: 'Swarm Office Suite',
+          },
+        });
+      } else if (companyId) {
+        await prisma.note.create({
+          data: {
+            companyId,
+            content: renderedContent.slice(0, 4000),
+            author: 'Swarm Office Suite',
           },
         });
       }
@@ -193,13 +218,10 @@ export const universalOfficeDocsTool = new DynamicStructuredTool({
           synced: Boolean(googleConn?.accessToken),
         };
       } else if (syncCloud === 'microsoft_365') {
-        const m365 = await prisma.setting.findFirst({
-          where: { organizationId, key: 'integration.microsoft365' },
-          select: { value: true },
-        });
+        const m365 = await integrationSettingsRepository.getStatus(organizationId, 'microsoft365');
         cloudSyncStatus = {
           provider: 'microsoft_365',
-          synced: Boolean(m365?.value),
+          synced: m365.configured,
         };
       }
 

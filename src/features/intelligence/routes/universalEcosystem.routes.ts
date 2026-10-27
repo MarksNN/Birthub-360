@@ -1,20 +1,21 @@
-import { type NextFunction, type Request, type Response, Router } from 'express';
 import * as ExcelJS from 'exceljs';
+import { type NextFunction, type Request, type Response, Router } from 'express';
 import { z } from 'zod';
+import { hasRequiredRole } from '../../../lib/auth/authorization.js';
 import { runWithContext } from '../../../lib/context.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
 import { validateRequest } from '../../../shared/middlewares/validateRequest.js';
 import { UniversalSpecialistAgent } from '../agents/universalSpecialist.agent.js';
 import {
-  listUniversalConnectorsStatus,
-  saveUniversalConnectorConfig,
-} from '../services/universalConnectors.service.js';
-import {
   ECOSYSTEM_PLAYBOOKS,
   type PlaybookId,
   runEcosystemPlaybook,
 } from '../services/ecosystemPlaybooks.service.js';
+import {
+  listUniversalConnectorsStatus,
+  saveUniversalConnectorConfig,
+} from '../services/universalConnectors.service.js';
 import {
   getUniversalToolCatalog,
   type UniversalToolCategory,
@@ -23,7 +24,8 @@ import { universalOfficeDocsTool } from '../tools/universalOfficeDocsTool.js';
 
 const router = Router();
 const writeRoles = requireRole(['ADMIN', 'GESTOR', 'CLOSER', 'SDR']);
-const adminOrGestor = requireRole(['ADMIN', 'GESTOR']);
+const ADMIN_OR_GESTOR_ROLES = ['ADMIN', 'GESTOR'];
+const adminOrGestor = requireRole(ADMIN_OR_GESTOR_ROLES);
 
 /**
  * GET /api/agent/ecosystem/connectors
@@ -34,8 +36,12 @@ router.get(
   writeRoles,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { organizationId } = (req as AuthRequest).user;
-      const connectors = await listUniversalConnectorsStatus(organizationId);
+      const { organizationId, role } = (req as AuthRequest).user;
+      // maskedConfig (mesmo mascarado) só para quem pode editar credenciais (PUT abaixo);
+      // CLOSER/SDR veem só connected/statusDetail.
+      const connectors = await listUniversalConnectorsStatus(organizationId, {
+        includeMaskedConfig: hasRequiredRole(role, ADMIN_OR_GESTOR_ROLES),
+      });
       res.json({ success: true, data: connectors });
     } catch (err) {
       next(err);
@@ -143,13 +149,9 @@ const officeGenerateSchema = z.object({
   title: z.string().trim().min(2).max(200),
   leadId: z.string().trim().optional(),
   companyId: z.string().trim().optional(),
-  documentSections: z
-    .array(z.object({ heading: z.string(), body: z.string() }))
-    .optional(),
+  documentSections: z.array(z.object({ heading: z.string(), body: z.string() })).optional(),
   sheetColumns: z.array(z.string()).optional(),
-  sheetRows: z
-    .array(z.array(z.union([z.string(), z.number(), z.boolean(), z.null()])))
-    .optional(),
+  sheetRows: z.array(z.array(z.union([z.string(), z.number(), z.boolean(), z.null()]))).optional(),
   slides: z
     .array(
       z.object({
@@ -204,8 +206,7 @@ router.post(
         }
         const buf = await workbook.xlsx.writeBuffer();
         downloadBase64 = Buffer.from(buf).toString('base64');
-        downloadMimeType =
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        downloadMimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         downloadFilename = `${body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.xlsx`;
       } else if (body.docType === 'word_or_gdoc') {
         const content = String(parsed.contentPreview || `# ${body.title}`);
@@ -238,13 +239,9 @@ router.post(
  * GET /api/agent/ecosystem/playbooks
  * Lista as receitas/playbooks multi-plataforma automatizados ponta a ponta.
  */
-router.get(
-  '/ecosystem/playbooks',
-  writeRoles,
-  (_req: Request, res: Response) => {
-    res.json({ success: true, data: ECOSYSTEM_PLAYBOOKS });
-  },
-);
+router.get('/ecosystem/playbooks', writeRoles, (_req: Request, res: Response) => {
+  res.json({ success: true, data: ECOSYSTEM_PLAYBOOKS });
+});
 
 const runPlaybookSchema = z.object({
   segment: z.string().trim().max(120).optional(),

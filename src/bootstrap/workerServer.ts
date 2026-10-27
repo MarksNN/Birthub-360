@@ -38,6 +38,7 @@ export async function startWorkerServer(
   warnUnconfiguredSecondaryIntegrations();
 
   await withTimeout(pingRedis(cacheConnection), STARTUP_REDIS_TIMEOUT_MS);
+  // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
   await prisma.$queryRaw`SELECT 1`;
 
   await scheduleJobs();
@@ -72,6 +73,7 @@ export async function startWorkerServer(
     if (req.url === '/health/ready' || req.url === '/readyz') {
       try {
         await pingRedis(cacheConnection);
+        // biome-ignore lint/plugin/no-prisma-tx-escape: uso legado congelado no baseline (parecer 15 #40 L1); migrar para runInTransaction
         await prisma.$queryRaw`SELECT 1`;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(
