@@ -1,8 +1,8 @@
 name: SonarQube Analysis
 
 # Pipeline oficial de análise de qualidade estática e cobertura do Birthub 360 no SonarQube Cloud.
-# Organização: Marks (vars.SONAR_ORGANIZATION = marks)
-# Projeto: Birthub 360 (vars.SONAR_PROJECT_KEY = birthub-360)
+# Organização: Marks (vars.SONAR_ORGANIZATION = marcelinmark26359876123123)
+# Projeto: Birthub 360 (vars.SONAR_PROJECT_KEY = MarksNN_Birthub-360)
 # Autenticação: secrets.SONAR_TOKEN
 # Validação obrigatória pré-scan: scripts/ci/validate-sonarqube-config.mjs
 

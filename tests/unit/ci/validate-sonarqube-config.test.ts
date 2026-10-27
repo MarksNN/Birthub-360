@@ -11,8 +11,8 @@ describe('SonarQube Cloud Configuration & Validation Gate for Birthub 360', () =
   const realPropertiesPath = path.join(rootDir, 'sonar-project.properties');
   const sonarqubeWorkflowPath = path.join(rootDir, '.github/workflows/sonarqube.yml');
 
-  const validProps = `sonar.organization=marks
-sonar.projectKey=birthub-360
+  const validProps = `sonar.organization=marcelinmark26359876123123
+sonar.projectKey=MarksNN_Birthub-360
 sonar.projectName=Birthub 360
 sonar.projectVersion=1.0
 sonar.sources=src
@@ -28,8 +28,8 @@ sonar.sourceEncoding=UTF-8
     const parsed = parseProperties(content);
 
     expect(parsed['sonar.projectName']).toBe('Birthub 360');
-    expect(parsed['sonar.projectKey']).toBe('birthub-360');
-    expect(parsed['sonar.organization']).toBe('marks');
+    expect(parsed['sonar.projectKey']).toBe('MarksNN_Birthub-360');
+    expect(parsed['sonar.organization']).toBe('marcelinmark26359876123123');
   });
 
   it('2. Não existem configurações ativas com identificadores legados no arquivo de propriedades', () => {
@@ -51,8 +51,8 @@ sonar.sourceEncoding=UTF-8
   it('3. A organização SonarQube é validada corretamente (aceita "marks" e rejeita legados/placeholders)', () => {
     // Aceita chave técnica oficial marks
     const validMarks = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'fake-token-12345',
       propertiesContent: validProps,
     });
@@ -62,7 +62,7 @@ sonar.sourceEncoding=UTF-8
     // Rejeita vazia
     const emptyOrg = validateSonarConfig({
       organization: '',
-      projectKey: 'birthub-360',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'fake-token-12345',
       propertiesContent: validProps,
     });
@@ -72,7 +72,7 @@ sonar.sourceEncoding=UTF-8
     // Rejeita legado prospector-atlas
     const legacyOrg = validateSonarConfig({
       organization: 'prospector-atlas',
-      projectKey: 'birthub-360',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'fake-token-12345',
       propertiesContent: validProps,
     });
@@ -82,7 +82,7 @@ sonar.sourceEncoding=UTF-8
     // Rejeita placeholder
     const placeholderOrg = validateSonarConfig({
       organization: '<YOUR_ORG>',
-      projectKey: 'birthub-360',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'fake-token-12345',
       propertiesContent: validProps,
     });
@@ -93,7 +93,7 @@ sonar.sourceEncoding=UTF-8
   it('4. A project key é validada e consistente com sonar-project.properties', () => {
     // Rejeita chave legada
     const legacyKey = validateSonarConfig({
-      organization: 'marks',
+      organization: 'marcelinmark26359876123123',
       projectKey: 'prospector-atlas',
       token: 'fake-token-12345',
       propertiesContent: validProps,
@@ -103,10 +103,10 @@ sonar.sourceEncoding=UTF-8
 
     // Rejeita conflito entre variável e arquivo
     const conflictingKey = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'MarksNN_Birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'birthub-360',
       token: 'fake-token-12345',
-      propertiesContent: validProps, // tem sonar.projectKey=birthub-360
+      propertiesContent: validProps, // tem sonar.projectKey=MarksNN_Birthub-360
     });
     expect(conflictingKey.ok).toBe(false);
     expect(conflictingKey.errors.some((e) => e.includes('Configuration conflict'))).toBe(true);
@@ -115,8 +115,8 @@ sonar.sourceEncoding=UTF-8
   it('5. O token é exigido nos contextos adequados e protegido contra vazamento', () => {
     // Falha sem token em push normal
     const missingToken = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'MarksNN_Birthub-360',
       token: '',
       isForkPr: false,
       propertiesContent: validProps,
@@ -126,8 +126,8 @@ sonar.sourceEncoding=UTF-8
 
     // Bloqueia em fork PR sem transformar indisponibilidade em aprovação fictícia
     const forkPr = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'MarksNN_Birthub-360',
       token: '',
       isForkPr: true,
       propertiesContent: validProps,
@@ -137,8 +137,8 @@ sonar.sourceEncoding=UTF-8
 
     // Garante que o valor do token não vaze nos detalhes
     const validWithSecret = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'super-sensitive-secret-token-do-not-leak',
       propertiesContent: validProps,
     });
@@ -153,8 +153,8 @@ sonar.projectName=Prospector Atlas API
 sonar.javascript.lcov.reportPaths=coverage/unit/lcov.info
 `;
     const res = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'token-xyz',
       propertiesContent: invalidFileProps,
     });
@@ -195,8 +195,8 @@ sonar.javascript.lcov.reportPaths=coverage/unit/lcov.info
 
   it('9. O workflow funciona perfeitamente com configurações oficiais válidas', () => {
     const res = validateSonarConfig({
-      organization: 'marks',
-      projectKey: 'birthub-360',
+      organization: 'marcelinmark26359876123123',
+      projectKey: 'MarksNN_Birthub-360',
       token: 'valid-token-360',
       propertiesPath: realPropertiesPath,
     });

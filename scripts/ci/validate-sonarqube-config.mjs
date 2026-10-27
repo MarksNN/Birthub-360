@@ -20,8 +20,8 @@ const PLACEHOLDER_PATTERNS = [
   /example/i,
 ];
 
-const VALID_ORGANIZATION_KEYS = ['marks', 'marksnn'];
-const VALID_PROJECT_KEY_REGEX = /^(birthub[-_]?360|marksnn[-_]birthub[-_]?360)$/i;
+const VALID_ORGANIZATION_KEYS = ['marcelinmark26359876123123'];
+const VALID_PROJECT_KEY_REGEX = /^MarksNN_Birthub-360$/;
 
 /**
  * Parses key=value pairs from a Java/Sonar properties file content.
@@ -73,7 +73,7 @@ export function validateSonarConfig(options = {}) {
   // 1. Validate Organization (SONAR_ORGANIZATION)
   if (!organization) {
     errors.push(
-      "SONAR_ORGANIZATION is missing or empty. Configure repository variable 'SONAR_ORGANIZATION' with official key 'marks'."
+      "SONAR_ORGANIZATION is missing or empty. Configure repository variable 'SONAR_ORGANIZATION' with official key 'marcelinmark26359876123123'."
     );
   } else {
     for (const pattern of PLACEHOLDER_PATTERNS) {
@@ -98,7 +98,7 @@ export function validateSonarConfig(options = {}) {
   // 2. Validate Project Key (SONAR_PROJECT_KEY)
   if (!projectKey) {
     errors.push(
-      "SONAR_PROJECT_KEY is missing or empty. Configure repository variable 'SONAR_PROJECT_KEY' with official project key 'birthub-360'."
+      "SONAR_PROJECT_KEY is missing or empty. Configure repository variable 'SONAR_PROJECT_KEY' with official project key 'MarksNN_Birthub-360'."
     );
   } else {
     for (const pattern of PLACEHOLDER_PATTERNS) {
@@ -115,7 +115,7 @@ export function validateSonarConfig(options = {}) {
     }
     if (!VALID_PROJECT_KEY_REGEX.test(projectKey)) {
       errors.push(
-        `SONAR_PROJECT_KEY '${projectKey}' does not match official Birthub 360 naming standard (expected 'birthub-360' or 'MarksNN_Birthub-360').`
+        `SONAR_PROJECT_KEY '${projectKey}' does not match official Birthub 360 naming standard (expected 'MarksNN_Birthub-360').`
       );
     }
   }
