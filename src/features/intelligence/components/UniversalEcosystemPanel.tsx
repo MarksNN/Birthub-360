@@ -23,6 +23,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../../lib/api.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
+import { EcosystemInboundEventSimulator } from './EcosystemInboundEventSimulator.js';
 
 interface ConnectorFieldSpec {
   key: string;
@@ -161,6 +162,7 @@ export function UniversalEcosystemPanel({
     }>
   >([]);
   const [runningPlaybookId, setRunningPlaybookId] = useState<string | null>(null);
+  const [testingProvider, setTestingProvider] = useState<string | null>(null);
   const [playbookReport, setPlaybookReport] = useState<{
     playbookId: string;
     title: string;
@@ -208,6 +210,24 @@ export function UniversalEcosystemPanel({
       setLoading(false);
     }
   }, []);
+
+  const handleTestConnector = async (provider: string) => {
+    SoundFX.play('click');
+    setTestingProvider(provider);
+    setFeedback(null);
+    try {
+      const res = await api.post<any>(`/api/agent/ecosystem/connectors/${provider}/test`, {});
+      const data = res?.data ?? res;
+      setFeedback(data?.message || `Teste do conector ${provider.toUpperCase()} concluído.`);
+      SoundFX.play('success');
+    } catch (err: any) {
+      setFeedback(
+        err instanceof Error ? err.message : `Falha ao testar conector ${provider.toUpperCase()}.`,
+      );
+    } finally {
+      setTestingProvider(null);
+    }
+  };
 
   const handleRunPlaybook = async (playbookId: string) => {
     SoundFX.play('click');
@@ -524,6 +544,14 @@ export function UniversalEcosystemPanel({
                       className="px-3 py-1 rounded-lg text-xs font-bold bg-surface border border-line text-ink hover:bg-surface-2 cursor-pointer"
                     >
                       {item.connected ? 'Editar Credenciais' : 'Conectar Plataforma'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={testingProvider === item.provider}
+                      onClick={() => void handleTestConnector(item.provider)}
+                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-surface-2 border border-line text-ink hover:bg-surface cursor-pointer disabled:opacity-50"
+                    >
+                      {testingProvider === item.provider ? 'Testando...' : 'Testar Ping'}
                     </button>
                   </div>
                 )}
@@ -851,6 +879,9 @@ export function UniversalEcosystemPanel({
           )}
         </div>
       )}
+
+      {/* 3.5 Receptor & Simulador Reativo de Eventos Inbound (16 Plataformas) */}
+      <EcosystemInboundEventSimulator />
 
       {/* 4. Atalhos de Missões Multi-Plataforma no Swarm */}
       <div className="bg-surface-2/60 border border-line rounded-xl p-5 space-y-3">

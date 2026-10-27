@@ -9,12 +9,14 @@ import { validateRequest } from '../../../shared/middlewares/validateRequest.js'
 import { UniversalSpecialistAgent } from '../agents/universalSpecialist.agent.js';
 import {
   ECOSYSTEM_PLAYBOOKS,
+  ingestEcosystemEvent,
   type PlaybookId,
   runEcosystemPlaybook,
 } from '../services/ecosystemPlaybooks.service.js';
 import {
   listUniversalConnectorsStatus,
   saveUniversalConnectorConfig,
+  testUniversalConnector,
 } from '../services/universalConnectors.service.js';
 import {
   getUniversalToolCatalog,
@@ -265,6 +267,76 @@ router.post(
       const body = req.body as z.infer<typeof runPlaybookSchema>;
       const report = await runEcosystemPlaybook(organizationId, userId, playbookId, body);
       res.json({ success: true, data: report });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+const ingestEventSchema = z.object({
+  sourcePlatform: z.enum([
+    'outlook_m365',
+    'gmail',
+    'imap_email',
+    'whatsapp',
+    'telegram',
+    'teams',
+    'slack',
+    'trello',
+    'monday',
+    'notion',
+    'bitrix24',
+    'hubspot',
+    'pipedrive',
+    'rdstation',
+    'calendly',
+    'zoom',
+  ]),
+  eventType: z.enum([
+    'inbound_message',
+    'task_or_card_update',
+    'meeting_completed',
+    'crm_deal_stage_change',
+  ]),
+  sender: z.string().trim().max(160).optional(),
+  subjectOrTitle: z.string().trim().min(1).max(240),
+  content: z.string().trim().min(1).max(12000),
+  leadId: z.string().trim().max(120).optional(),
+});
+
+/**
+ * POST /api/agent/ecosystem/events/ingest
+ * Ingestão de eventos reativos multi-plataforma (webhooks e simulações).
+ */
+router.post(
+  '/ecosystem/events/ingest',
+  writeRoles,
+  validateRequest(ingestEventSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id: userId, organizationId } = (req as AuthRequest).user;
+      const body = req.body as z.infer<typeof ingestEventSchema>;
+      const report = await ingestEcosystemEvent(organizationId, userId, body);
+      res.json({ success: true, data: report });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+/**
+ * POST /api/agent/ecosystem/connectors/:provider/test
+ * Testa a conexão e conectividade em tempo real de um provedor específico.
+ */
+router.post(
+  '/ecosystem/connectors/:provider/test',
+  writeRoles,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id: userId, organizationId } = (req as AuthRequest).user;
+      const provider = String(req.params.provider || '').trim();
+      const result = await testUniversalConnector(organizationId, userId, provider);
+      res.json({ success: true, data: result });
     } catch (err) {
       next(err);
     }
