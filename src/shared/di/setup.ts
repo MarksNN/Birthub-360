@@ -1,1 +1,301 @@
-PLACEHOLDER_TO_BE_REPLACED
+import { ActivityUseCases } from '../../features/activities/application/ActivityUseCases.js';
+import { PrismaActivityRepository } from '../../features/activities/infra/PrismaActivityRepository.js';
+import { ActivityController } from '../../features/activities/presentation/ActivityController.js';
+import { AnalyticsUseCases } from '../../features/analytics/application/AnalyticsUseCases.js';
+import { PrismaAnalyticsRepository } from '../../features/analytics/infra/PrismaAnalyticsRepository.js';
+import { AnalyticsController } from '../../features/analytics/presentation/AnalyticsController.js';
+// Onda 43 (Agente 13, Célula Comercial): registrados aqui — não importados diretamente por
+// src/features/intelligence/** — porque `no-cross-feature-imports` (dependency-cruiser) proíbe uma
+// feature de importar internals de outra. Este é o composition root (src/shared/), o único lugar
+// isento dessa regra; os agentes novos resolvem esses serviços via `container.resolve<T>(name)`
+// com um tipo estrutural local (mesmo padrão já usado por commercialIntelligence.routes.ts para
+// `CommercialIntelligenceController`), nunca via import direto do outro domínio.
+import { ChurnPredictionService } from '../../features/analytics/services/churn-prediction.service.js';
+import { AttachmentUseCases } from '../../features/attachments/application/AttachmentUseCases.js';
+import { PrismaAttachmentRepository } from '../../features/attachments/infra/PrismaAttachmentRepository.js';
+import { AttachmentController } from '../../features/attachments/presentation/AttachmentController.js';
+import { AutomationUseCases } from '../../features/automations/application/AutomationUseCases.js';
+import { automationEngine } from '../../features/automations/automation.engine.js';
+import { PrismaAutomationRepository } from '../../features/automations/infra/PrismaAutomationRepository.js';
+import { AutomationController } from '../../features/automations/presentation/AutomationController.js';
+import { UsageUseCases } from '../../features/billing/application/UsageUseCases.js';
+import { PrismaUsageRepository } from '../../features/billing/infra/PrismaUsageRepository.js';
+import { UsageController } from '../../features/billing/presentation/UsageController.js';
+import { BugReportUseCases } from '../../features/bug-reports/application/BugReportUseCases.js';
+import { PrismaBugReportRepository } from '../../features/bug-reports/infra/PrismaBugReportRepository.js';
+import { BugReportController } from '../../features/bug-reports/presentation/BugReportController.js';
+// ACH-17-02 (onda-43, handoff 13→17): motor real por trás do Agente Contratos & Assinatura da
+// Célula Comercial (src/features/intelligence/agents/contractSignature.agent.ts) — mesmo motivo do
+// comentário acima: `intelligence/**` não pode importar `cadence/**` diretamente
+// (no-cross-feature-imports), então a rota resolve este repositório via container com um tipo
+// estrutural local (mesmo padrão de `ChurnPredictionService`/`CommercialIntelligenceAiService`).
+import { prismaSignatureRequestRepository } from '../../features/cadence/infra/PrismaSignatureRequestRepository.js';
+import { MeetingSynthesisService } from '../../features/chatbook/services/meeting-synthesis.service.js';
+import {
+  CommercialIntelligenceUseCases,
+  currentPeriod,
+} from '../../features/commercial-intelligence/application/CommercialIntelligenceUseCases.js';
+import { CommercialIntelligenceAiService } from '../../features/commercial-intelligence/infra/CommercialIntelligenceAiService.js';
+import { PrismaCommercialIntelligenceRepository } from '../../features/commercial-intelligence/infra/PrismaCommercialIntelligenceRepository.js';
+import { PrismaForecastSnapshotStore } from '../../features/commercial-intelligence/infra/PrismaForecastSnapshotStore.js';
+import { CommercialIntelligenceController } from '../../features/commercial-intelligence/presentation/CommercialIntelligenceController.js';
+import { CompanyUseCases } from '../../features/companies/application/CompanyUseCases.js';
+import { PrismaCompanyRepository } from '../../features/companies/infra/PrismaCompanyRepository.js';
+import { CompanyController } from '../../features/companies/presentation/CompanyController.js';
+import { ContactUseCases } from '../../features/contacts/application/ContactUseCases.js';
+import { PrismaContactRepository } from '../../features/contacts/infra/PrismaContactRepository.js';
+import { ContactController } from '../../features/contacts/presentation/ContactController.js';
+import { CopilotoBitrixWritebackUseCases } from '../../features/copiloto-ia/application/CopilotoBitrixWritebackUseCases.js';
+import { CopilotoIaUseCases } from '../../features/copiloto-ia/application/CopilotoIaUseCases.js';
+import { CopilotoVoiceIngestionAdapter } from '../../features/copiloto-ia/infra/CopilotoVoiceIngestionAdapter.js';
+import { PrismaCopilotoIaRepository } from '../../features/copiloto-ia/infra/PrismaCopilotoIaRepository.js';
+import { CopilotoIaController } from '../../features/copiloto-ia/presentation/CopilotoIaController.js';
+import { CompanyDeduplicationService } from '../../features/crm/application/CompanyDeduplicationService.js';
+import { LeadDeduplicationService } from '../../features/crm/application/LeadDeduplicationService.js';
+import { LeadUseCases } from '../../features/crm/application/LeadUseCases.js';
+import { PrismaLeadRepository } from '../../features/crm/infra/PrismaLeadRepository.js';
+import { CompanyDedupController } from '../../features/crm/presentation/CompanyDedupController.js';
+import { LeadController } from '../../features/crm/presentation/LeadController.js';
+import { LeadDedupController } from '../../features/crm/presentation/LeadDedupController.js';
+import { Crm360UseCases } from '../../features/crm360/application/Crm360UseCases.js';
+import { PrismaCrm360Repository } from '../../features/crm360/infra/PrismaCrm360Repository.js';
+import { Crm360Controller } from '../../features/crm360/presentation/Crm360Controller.js';
+import { FeatureFlagsUseCases } from '../../features/feature-flags/application/FeatureFlagsUseCases.js';
+import { PrismaFeatureFlagRepository } from '../../features/feature-flags/infra/PrismaFeatureFlagRepository.js';
+import { FeatureFlagsController } from '../../features/feature-flags/presentation/FeatureFlagsController.js';
+// Negociador de IA em segundo plano (item 3 da IA Agêntica de Vendas, onda de 2026-09-15) — mesmo
+// motivo do comentário da Onda 43 acima: `intelligence/services/aiPendingAction.service.ts` não
+// pode importar `integrations/whatsapp/whatsapp.service.ts` diretamente
+// (no-cross-feature-imports). Registrado aqui e resolvido via
+// `container.resolve<WhatsAppSenderPort>('WhatsAppSenderPort')`, mesmo padrão de
+// `GoogleCalendarService` logo acima.
+import { callLead } from '../../features/integrations/birth-voice/birthVoice.service.js';
+import { BitrixLeadWritebackAdapter } from '../../features/integrations/bitrix/infra/BitrixLeadWritebackAdapter.js';
+import { testBitrixConnection } from '../../features/integrations/bitrix/service/connections.js';
+import { bitrixEventMeshBridge } from '../../features/integrations/bitrix/services/bitrixEventMeshBridge.service.js';
+// Meeting Hub (Google Meet no agendamento público) — mesmo motivo do comentário da Onda 43 acima:
+// `src/features/calendar/routes/booking.routes.ts` não pode importar
+// `integrations/google/google.service.ts` diretamente (no-cross-feature-imports). Registrado aqui
+// e resolvido via `container.resolve<GoogleCalendarServiceContract>('GoogleCalendarService')` com
+// o tipo estrutural local já usado por `agent.routes.ts`.
+import {
+  createCalendarEvent,
+  getUpcomingCalendarEvents,
+} from '../../features/integrations/google/google.service.js';
+import { StripeChargeAdapter } from '../../features/integrations/stripe/infra/StripeChargeAdapter.js';
+import { sendWhatsAppMessage } from '../../features/integrations/whatsapp/whatsapp.service.js';
+import { CloserAgent } from '../../features/intelligence/agents/closer.agent.js';
+import { SDRQualificationAgent } from '../../features/intelligence/agents/sdrQualification.agent.js';
+// Agent Runtime Genérico (PROMPT 4) — mesmo motivo do comentário da Onda 43 acima:
+// `src/features/job-roles/**` (dono do CapabilityAuthorizationService/AgentRuntime) não pode
+// importar `knowledge`/`intelligence/agents`/`integrations/bitrix` diretamente. Registrados aqui e
+// resolvidos via `container.resolve<T>(name)` em `toolExecutors.ts`, com tipos estruturais locais.
+import { searchService } from '../../features/knowledge/search.service.js';
+// AIAGENT-004 (onda 6): motor real por trás do Agente LDR — Inteligência de Leads da Célula
+// Comercial (`src/features/intelligence/agents/ldrIntelligence.agent.ts`). Mesmo motivo do
+// comentário da Onda 43 acima: `intelligence/**` não pode importar `market-intelligence/**`
+// diretamente (no-cross-feature-imports). Diferente dos demais registros, este NÃO é uma
+// instância: `AccountIntelligenceService` é construído por requisição (recebe o cliente Prisma já
+// escopado por tenant, `req.db`, e o `organizationId` da sessão autenticada), então o que vai para
+// o container é uma FÁBRICA — registrar uma instância aqui vazaria o tenant da primeira requisição
+// para todas as seguintes.
+import { AccountIntelligenceService } from '../../features/market-intelligence/server/accountIntelligence.service.js';
+import { listMarketIntelligenceCompanies } from '../../features/market-intelligence/server/marketIntelligenceCompany.service.js';
+// Use Cases
+import { NoteUseCases } from '../../features/notes/application/NoteUseCases.js';
+// Repositories
+import { PrismaNoteRepository } from '../../features/notes/infra/PrismaNoteRepository.js';
+// Controllers
+import { NoteController } from '../../features/notes/presentation/NoteController.js';
+import { PlaybookRoleplayAdapter } from '../../features/playbook/infra/PlaybookRoleplayAdapter.js';
+import { LivingPlaybookController } from '../../features/playbook/living-playbook/presentation/LivingPlaybookController.js';
+import { ObjectionMatrixUseCases } from '../../features/playbook/objection-matrix/application/ObjectionMatrixUseCases.js';
+import { PrismaObjectionMatrixRepository } from '../../features/playbook/objection-matrix/infra/PrismaObjectionMatrixRepository.js';
+import { ObjectionMatrixController } from '../../features/playbook/objection-matrix/presentation/ObjectionMatrixController.js';
+import { QualificationMatrixUseCases } from '../../features/playbook/qualification-matrix/application/QualificationMatrixUseCases.js';
+import { PrismaQualificationMatrixRepository } from '../../features/playbook/qualification-matrix/infra/PrismaQualificationMatrixRepository.js';
+import { QualificationMatrixController } from '../../features/playbook/qualification-matrix/presentation/QualificationMatrixController.js';
+import { configureDomainEventOutboxFromEnv } from '../../lib/queue/outbox/prismaRuntime.js';
+import { InMemoryEventBus } from '../infra/events/InMemoryEventBus.js';
+import { subscribeToCrmStageChanges } from '../services/crmEventBus.js';
+import { container } from './container.js';
+
+export function setupDI() {
+  // REMED-05: outbox do DomainEventMesh, configurada de forma SÍNCRONA antes de qualquer registro.
+  // Fail-closed: em produção sem DOMAIN_EVENT_OUTBOX=prisma lança e derruba o boot com erro claro.
+  registerDomainEventOutbox();
+  // 1. Shared
+  const eventBus = new InMemoryEventBus();
+  container.register('EventBus', eventBus);
+
+  // 2. Repositories
+  const noteRepository = new PrismaNoteRepository();
+  const attachmentRepository = new PrismaAttachmentRepository();
+  const activityRepository = new PrismaActivityRepository();
+  const contactRepository = new PrismaContactRepository();
+  const companyRepository = new PrismaCompanyRepository();
+  const leadRepository = new PrismaLeadRepository();
+  const automationRepository = new PrismaAutomationRepository();
+  const analyticsRepository = new PrismaAnalyticsRepository();
+  const commercialIntelligenceRepository = new PrismaCommercialIntelligenceRepository();
+  // Porta de composição entre features (crm360 -> integrations/stripe), ver
+  // src/shared/contracts/stripeCharge.contract.ts — BILLING-003 (reconciliação Fatura x Stripe)
+  // precisa confirmar uma cobrança real antes de marcar Pago, sem importar internals de
+  // integrations/stripe diretamente.
+  const stripeChargeAdapter = new StripeChargeAdapter();
+  const crm360Repository = new PrismaCrm360Repository(stripeChargeAdapter);
+  const qualificationMatrixRepository = new PrismaQualificationMatrixRepository();
+  const objectionMatrixRepository = new PrismaObjectionMatrixRepository();
+  const bugReportRepository = new PrismaBugReportRepository();
+  const usageRepository = new PrismaUsageRepository();
+  const featureFlagRepository = new PrismaFeatureFlagRepository();
+  const copilotoIaRepository = new PrismaCopilotoIaRepository();
+  // Porta de composição entre features (copiloto-ia -> integrations/bitrix), ver
+  // src/shared/contracts/bitrixWriteback.contract.ts — este arquivo é a única "raiz de composição"
+  // com licença de conhecer as duas features ao mesmo tempo.
+  const bitrixLeadWritebackAdapter = new BitrixLeadWritebackAdapter();
+  // Porta de composição na direção oposta (integrations/birth-voice -> copiloto-ia), Onda 7 item 2
+  // — ver src/shared/contracts/copilotoVoiceIngestion.contract.ts. Reaproveita o MESMO
+  // MeetingSynthesisService de chatbook já usado pelo worker de transcrição (worker.ts/
+  // src/bootstrap/workers.ts) — não duplica a integração.
+  const copilotoVoiceIngestionAdapter = new CopilotoVoiceIngestionAdapter(
+    new MeetingSynthesisService(),
+  );
+
+  container.register('NoteRepository', noteRepository);
+  container.register('AttachmentRepository', attachmentRepository);
+  container.register('ActivityRepository', activityRepository);
+  container.register('ContactRepository', contactRepository);
+  container.register('CompanyRepository', companyRepository);
+  container.register('LeadRepository', leadRepository);
+  container.register('AutomationRepository', automationRepository);
+  container.register('AnalyticsRepository', analyticsRepository);
+  container.register('CommercialIntelligenceRepository', commercialIntelligenceRepository);
+  container.register('Crm360Repository', crm360Repository);
+  container.register('QualificationMatrixRepository', qualificationMatrixRepository);
+  container.register('ObjectionMatrixRepository', objectionMatrixRepository);
+  container.register('BugReportRepository', bugReportRepository);
+  container.register('UsageRepository', usageRepository);
+  container.register('FeatureFlagRepository', featureFlagRepository);
+  container.register('CopilotoIaRepository', copilotoIaRepository);
+  container.register('CopilotoVoiceIngestionPort', copilotoVoiceIngestionAdapter);
+
+  // 3. Use Cases
+  const noteUseCases = new NoteUseCases(noteRepository);
+  const attachmentUseCases = new AttachmentUseCases(attachmentRepository);
+  const activityUseCases = new ActivityUseCases(activityRepository);
+  const contactUseCases = new ContactUseCases(contactRepository);
+  const companyUseCases = new CompanyUseCases(companyRepository);
+  const leadUseCases = new LeadUseCases(leadRepository);
+  const automationUseCases = new AutomationUseCases(automationRepository);
+  const analyticsUseCases = new AnalyticsUseCases(analyticsRepository);
+  // Store real de snapshots (model ForecastSnapshot) — sem ele, o erro histórico do Forecast e o
+  // pilar "Confiabilidade de Forecast" do Health Score nunca teriam dado em produção.
+  const commercialIntelligenceUseCases = new CommercialIntelligenceUseCases(
+    commercialIntelligenceRepository,
+    new PrismaForecastSnapshotStore(),
+  );
+  const commercialIntelligenceAiService = new CommercialIntelligenceAiService(
+    commercialIntelligenceUseCases,
+  );
+  // Onda 43: motor real por trás do Agente Churn & Retenção da Célula Comercial
+  // (src/features/intelligence/agents/churnRetention.agent.ts) — resolvido via container, nunca
+  // importado diretamente por `intelligence/**` (ver comentário no import acima).
+  const churnPredictionService = new ChurnPredictionService();
+  const crm360UseCases = new Crm360UseCases(crm360Repository);
+  const qualificationMatrixUseCases = new QualificationMatrixUseCases(
+    qualificationMatrixRepository,
+  );
+  const objectionMatrixUseCases = new ObjectionMatrixUseCases(objectionMatrixRepository);
+  const bugReportUseCases = new BugReportUseCases(bugReportRepository);
+  const usageUseCases = new UsageUseCases(usageRepository);
+  const featureFlagsUseCases = new FeatureFlagsUseCases(featureFlagRepository);
+  const copilotoIaUseCases = new CopilotoIaUseCases(copilotoIaRepository);
+  const copilotoBitrixWritebackUseCases = new CopilotoBitrixWritebackUseCases(
+    copilotoIaRepository,
+    bitrixLeadWritebackAdapter,
+  );
+
+  container.register('NoteUseCases', noteUseCases);
+  container.register('AttachmentUseCases', attachmentUseCases);
+  container.register('ActivityUseCases', activityUseCases);
+  container.register('ContactUseCases', contactUseCases);
+  container.register('CompanyUseCases', companyUseCases);
+  container.register('LeadUseCases', leadUseCases);
+  container.register('AutomationUseCases', automationUseCases);
+  container.register('AnalyticsUseCases', analyticsUseCases);
+  container.register('CommercialIntelligenceUseCases', commercialIntelligenceUseCases);
+  container.register('CommercialIntelligenceAiService', commercialIntelligenceAiService);
+  container.register('CommercialIntelligencePeriod', { currentPeriod });
+  container.register('CompanyCatalogSearch', listMarketIntelligenceCompanies);
+  container.register('ChurnPredictionService', churnPredictionService);
+  // AIAGENT-004 (onda 6): fábrica por requisição — ver comentário no import. O chamador
+  // (`agent.routes.ts`) passa `req.db` e o `organizationId` da sessão autenticada, nunca do body.
+  container.register('AccountIntelligenceServiceFactory', {
+    create: (db: ConstructorParameters<typeof AccountIntelligenceService>[0], orgId: string) =>
+      new AccountIntelligenceService(db, orgId),
+  });
+  container.register('SignatureRequestRepositoryPort', prismaSignatureRequestRepository);
+  container.register('GoogleCalendarService', { createCalendarEvent, getUpcomingCalendarEvents });
+  container.register('WhatsAppSenderPort', { sendWhatsAppMessage });
+  container.register('VoiceCallPort', { callLead });
+  // Agent Runtime Genérico (PROMPT 4) — executores reais por trás de `toolExecutors.ts`
+  // (job-roles). `MeetingSynthesisService`/`SDRQualificationAgent`/`CloserAgent` não têm
+  // dependência própria (mesmo padrão de instanciação already usado em supervisor.agent.ts —
+  // `new SDRQualificationAgent()`/`new CloserAgent()` a cada chamada), então uma única instância
+  // registrada no boot é suficiente (nenhum estado por-requisição é guardado na própria classe —
+  // tenant/sessão vêm por parâmetro/async-context em cada `run`).
+  container.register('KnowledgeSearchService', searchService);
+  container.register('MeetingSynthesisService', new MeetingSynthesisService());
+  container.register('SDRQualificationAgent', new SDRQualificationAgent());
+  container.register('CloserAgent', new CloserAgent());
+  container.register('BitrixEventMeshBridge', bitrixEventMeshBridge);
+  container.register('BitrixConnectionTester', { testBitrixConnection });
+
+  // 4. Controllers
+  container.register('NoteController', new NoteController(noteUseCases));
+  container.register('AttachmentController', new AttachmentController(attachmentUseCases));
+  container.register('ActivityController', new ActivityController(activityUseCases));
+  container.register('ContactController', new ContactController(contactUseCases));
+  container.register('CompanyController', new CompanyController(companyUseCases));
+  container.register('LeadController', new LeadController(leadUseCases));
+  container.register('AutomationController', new AutomationController(automationUseCases));
+  container.register('AnalyticsController', new AnalyticsController(analyticsUseCases));
+  container.register(
+    'CommercialIntelligenceController',
+    new CommercialIntelligenceController(commercialIntelligenceUseCases),
+  );
+  container.register('Crm360Controller', new Crm360Controller(crm360UseCases));
+  container.register(
+    'QualificationMatrixController',
+    new QualificationMatrixController(qualificationMatrixUseCases),
+  );
+  container.register(
+    'ObjectionMatrixController',
+    new ObjectionMatrixController(objectionMatrixUseCases),
+  );
+  container.register('BugReportController', new BugReportController(bugReportUseCases));
+  container.register('UsageController', new UsageController(usageUseCases));
+  container.register('FeatureFlagsController', new FeatureFlagsController(featureFlagsUseCases));
+  container.register('CopilotoIaController', new CopilotoIaController(copilotoIaUseCases));
+  container.register(
+    'CopilotoBitrixWritebackUseCases',
+    copilotoBitrixWritebackUseCases,
+  );
+  container.register('LivingPlaybookController', new LivingPlaybookController());
+  container.register('PlaybookRoleplayAdapter', new PlaybookRoleplayAdapter());
+  container.register('CompanyDeduplicationService', new CompanyDeduplicationService());
+  container.register('LeadDeduplicationService', new LeadDeduplicationService());
+  container.register('CompanyDedupController', new CompanyDedupController());
+  container.register('LeadDedupController', new LeadDedupController());
+
+  // 5. Event subscriptions
+  subscribeToCrmStageChanges(eventBus);
+
+  // 6. Automation engine
+  container.register('AutomationEngine', automationEngine);
+}
+
+function registerDomainEventOutbox() {
+  configureDomainEventOutboxFromEnv();
+}
