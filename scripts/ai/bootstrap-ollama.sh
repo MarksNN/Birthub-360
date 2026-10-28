@@ -5,7 +5,7 @@ echo "=========================================================="
 echo "🚀 Central Birth Hub 360 — Bootstrap do Ollama na Nuvem / VPS"
 echo "=========================================================="
 
-OLLAMA_CONTAINER="${1:-atlas_ollama}"
+OLLAMA_CONTAINER="${1:-birthhub_ollama}"
 
 echo "⏳ Aguardando container $OLLAMA_CONTAINER iniciar..."
 until docker exec "$OLLAMA_CONTAINER" ollama list > /dev/null 2>&1; do

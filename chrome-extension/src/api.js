@@ -4,14 +4,10 @@
 // usuário precisa estar logado na Central Birth Hub 360 na mesma janela/perfil do Chrome. Sem isso não
 // existe nenhum outro segredo/token armazenado pela extensão.
 
-// Produção real: Render (docs/deploy/producao.md §2, §8) — o caminho Oracle Cloud do ADR-004 foi
-// retirado no commit 783f8582 ("retire oracle cloud deployment resources") e o IP direto que
-// vivia aqui parou de responder (confirmado por teste de conexão). O domínio final é
-// https://app.birthhub360.com.br (já em `host_permissions`), mas o cutover de DNS/Cloudflare ainda não
-// aconteceu (§3 do guia) — até lá, o hostname real é o do serviço Render abaixo. Trocar para
-// https://app.birthhub360.com.br assim que o cutover acontecer.
-const DEFAULT_API_BASE_URL = 'https://prospector-atlas.onrender.com';
-const STORAGE_KEY = 'atlasApiBaseUrl';
+// Endpoint oficial Birth Hub 360. Validar DNS, TLS e sessão antes de publicar esta versão da extensão.
+// O usuário pode definir uma URL de backend alternativa com permissão explícita do navegador.
+const DEFAULT_API_BASE_URL = 'https://app.birthhub360.com.br';
+const STORAGE_KEY = 'birthhub360ApiBaseUrl';
 
 export async function getApiBaseUrl() {
   const stored = await chrome.storage.sync.get(STORAGE_KEY);
