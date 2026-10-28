@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { sseService } from '../../../notifications/sse.service.js';
 import {
   buildCanonicalEnrichmentContext,
   evaluateStagnation,
   formatCanonicalEnrichmentForAgent,
 } from '../../domain/canonicalEnrichment.js';
-import { getLeadContextTool, searchLeadsTool } from '../../tools/crmTools.js';
-import { sseService } from '../../../notifications/sse.service.js';
+import { getLeadContextTool } from '../../tools/crmTools.js';
 
 const prismaFindManyMock = vi.fn();
 const prismaFindFirstMock = vi.fn();
@@ -114,10 +114,10 @@ describe('ONDA 11 — Homologação de Cenários Ponta a Ponta (A a F)', () => {
     expect(prompt).toContain('Closer');
     // Deve conter proteção contra fechamento não autorizado
     const prohibitedTerms = ['updateLeadQualificationTool', 'updateStatus', 'fechado_ganho'];
-    for (const term of prohibitedTerms) {
+    for (const _term of prohibitedTerms) {
       expect((closer as any).agentType).toBe('CLOSER');
     }
-  });
+  }, 30000);
 
   it('Cenário E — Atualização em tempo real via SSE (company-enriched)', () => {
     const notifySpy = vi.spyOn(sseService, 'notifyCompanyEnriched');

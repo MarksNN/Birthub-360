@@ -1,0 +1,78 @@
+{
+  "version": "2026-10-28.1",
+  "generatedAt": "2026-10-28T00:00:00.000Z",
+  "description": "Bateria de Golden Dataset e Avaliações Factuais dos Agentes Táticos (Account Detective, Promise Guardian, Devil's Advocate)",
+  "cases": [
+    {
+      "id": "tactical-promise-001",
+      "agent": "promise-guardian",
+      "description": "Extração factual de compromisso de envio de proposta a partir de transcrição de reunião",
+      "input": {
+        "transcript": "Vendedor (Mariana): Perfeito, Dr. Fernando. Até sexta-feira às 15h eu vou enviar uma proposta comercial customizada com os valores para 50 leitos. Cliente (Dr. Fernando): Ótimo Mariana. Se puder mandar também o case de integração com o prontuário Tasy, agradeço. Vendedor (Mariana): Combinado, vou anexar o case de integração junto à proposta comercial.",
+        "promiserName": "Mariana SDR",
+        "recipientName": "Dr. Fernando",
+        "sourceType": "meeting"
+      },
+      "expected": {
+        "minCommitments": 1,
+        "detectedTypes": ["send_proposal"],
+        "requiresHumanApproval": true,
+        "zeroHallucination": true
+      }
+    },
+    {
+      "id": "tactical-promise-002",
+      "agent": "promise-guardian",
+      "description": "Conversa cordial sem promessas não deve gerar compromissos alucinados",
+      "input": {
+        "transcript": "Cliente: Gostei muito da explicação de vocês sobre a esteira de atendimento. Vendedor: Fico muito feliz! Foi um prazer apresentar nossa visão para sua equipe. Um ótimo dia!",
+        "promiserName": "Mariana SDR",
+        "recipientName": "Dr. Fernando",
+        "sourceType": "whatsapp"
+      },
+      "expected": {
+        "minCommitments": 0,
+        "maxCommitments": 0,
+        "zeroHallucination": true
+      }
+    },
+    {
+      "id": "tactical-detective-001",
+      "agent": "account-detective",
+      "description": "Dossiê executivo separando rigorosamente fatos verificados de hipóteses estratégicas",
+      "input": {
+        "companyId": "comp-hosp-sta-cecilia",
+        "companyName": "Maternidade Santa Cecília",
+        "cnpj": "12.345.678/0001-90",
+        "segment": "Saúde Suplementar / Maternidade",
+        "employeeCount": 350
+      },
+      "expected": {
+        "minVerifiedFacts": 1,
+        "allHypothesesFlagged": true,
+        "confidenceLevel": "high"
+      }
+    },
+    {
+      "id": "tactical-devils-001",
+      "agent": "devils-advocate",
+      "description": "Contestação de forecast otimista em negócio estagnado há mais de 20 dias com objeções abertas",
+      "input": {
+        "dealId": "deal-obstetricia-900",
+        "dealTitle": "Implantação de Plataforma Maternidade Santa Cecília",
+        "currentStage": "Proposta Apresentada",
+        "currentProbability": 85,
+        "daysInCurrentStage": 24,
+        "daysSinceLastInteraction": 15,
+        "stageAverageDays": 8,
+        "unresolvedObjections": ["Preço 20% acima do orçamento da diretoria", "Dúvida sobre integração HL7"]
+      },
+      "expected": {
+        "optimismBiasDetected": true,
+        "recommendedProbabilityLessThan": 85,
+        "severity": "high",
+        "minEvidences": 2
+      }
+    }
+  ]
+}
