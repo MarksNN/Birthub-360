@@ -1,9 +1,9 @@
 ---
 layout: default
-title: PROSPECTOR ATLAS
+title: Birth Hub 360
 ---
 
-# PROSPECTOR ATLAS
+# Birth Hub 360
 
 > Nota (Onda 8, Agente 18): este arquivo Jekyll não é publicado pelo pipeline atual de GitHub
 > Pages (`.github/workflows/deploy-pages.yml` publica o build estático do Vite em `dist/`, não

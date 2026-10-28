@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             : 'bg-white/95 border-slate-200/80 text-slate-800 shadow-[4px_0_24px_rgba(0,0,0,0.03)]'
         } backdrop-blur-2xl`}
       >
-        {/* Sidebar Header with Atlas Identity */}
+        {/* Sidebar Header with Birth Hub 360 Identity */}
         <div
           className={`p-4 border-b sticky top-0 z-10 backdrop-blur ${
             isDark
@@ -849,7 +849,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-[var(--brand-primary)]" />
-            <span>Manual da Marca Atlas</span>
+            <span>Manual da Marca Birth Hub 360</span>
           </button>
           <div className="flex items-center gap-1">
             <span

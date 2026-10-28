@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Left Side: Mobile Menu & Atlas Logo */}
+        {/* Left Side: Mobile Menu & Birth Hub 360 Logo */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -160,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-amber-300 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200 shadow-sm'
             }`}
-            title={isDark ? 'Ativar Modo Claro (Atlas Light)' : 'Ativar Modo Escuro (Atlas Dark)'}
+            title={isDark ? 'Ativar Modo Claro (Birth Hub 360)' : 'Ativar Modo Escuro (Birth Hub 360)'}
           >
             {isDark ? (
               <>
@@ -185,7 +185,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <BookOpen className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
-            <span>Guia Visual Atlas</span>
+            <span>Guia Visual Birth Hub 360</span>
           </button>
 
           {hasResults && (
