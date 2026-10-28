@@ -214,6 +214,26 @@ export const CAPABILITY_CATALOG: CapabilityCatalogEntry[] = [
     actionType: 'EXECUTE',
     riskLevel: 'CRITICAL',
   },
+  // --- Marketing / Outbound Copy ---
+  {
+    code: 'copy.draft',
+    name: 'Rascunhar copy de prospeccão',
+    description:
+      'Gerar rascunho de primeiro contato comercial (e-mail ou WhatsApp) personalizado para um lead, com aprovacão humana obrigatória antes do envio.',
+    domain: 'Marketing',
+    actionType: 'EXECUTE',
+    riskLevel: 'MEDIUM',
+  },
+  // --- CS / Churn ---
+  {
+    code: 'churn.analyze',
+    name: 'Analisar risco de churn',
+    description:
+      'Narrar e priorizar contas em risco de churn a partir do score calculado pelo motor real (churn-prediction.service), gerando plano de retencão priorizado.',
+    domain: 'CS',
+    actionType: 'EXECUTE',
+    riskLevel: 'MEDIUM',
+  },
   // --- Financeiro ---
   {
     code: 'billing.read',

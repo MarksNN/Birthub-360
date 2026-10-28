@@ -70,13 +70,14 @@ const UNIVERSAL_AGENT_CAPABILITIES = [
  *  inatingível para este cargo+capability. */
 const COMMERCIAL_CELL_DOMAIN_CAPABILITIES: Record<string, string[]> = {
   'ldr-intelligence': ['lead.read', 'lead.search', 'company.read', 'company.search'],
-  'bdr-outbound': ['lead.read', 'lead.search', 'company.read'],
+  'bdr-outbound': ['lead.read', 'lead.search', 'company.read', 'copy.draft'],
   'sdr-qualification': [
     'lead.read',
     'lead.qualify',
     'lead.update',
     'meeting.schedule',
     'contract.read',
+    'copy.draft',
   ],
   'closer-sales': [
     'deal.read',
@@ -103,7 +104,7 @@ const COMMERCIAL_CELL_DOMAIN_CAPABILITIES: Record<string, string[]> = {
     'billing.read',
   ],
   'billing-revenue': ['billing.read', 'billing.reconcile'],
-  'churn-retention': ['deal.read', 'company.read', 'billing.read'],
+  'churn-retention': ['deal.read', 'company.read', 'billing.read', 'churn.analyze'],
   'contract-signature': ['contract.read', 'contract.generate', 'signature.request'],
   'bitrix-guardian': ['bitrix.read', 'bitrix.write', 'lead.search', 'company.search'],
   'revenue-intelligence': [
@@ -193,6 +194,7 @@ const ROLE_DOMAIN_CAPABILITIES: Record<
     ['company.read', 'EXECUTE'],
     ['company.search', 'READ'],
     ['meeting.schedule', 'EXECUTE'],
+    ['copy.draft', 'EXECUTE'],
     ['knowledge.search', 'EXECUTE'],
   ],
   SDR: [
@@ -203,6 +205,7 @@ const ROLE_DOMAIN_CAPABILITIES: Record<
     ['meeting.schedule', 'EXECUTE'],
     ['meeting.read', 'EXECUTE'],
     ['contract.read', 'REQUEST'],
+    ['copy.draft', 'EXECUTE'],
     ['knowledge.search', 'EXECUTE'],
   ],
   CLOSER: [
@@ -254,6 +257,7 @@ const ROLE_DOMAIN_CAPABILITIES: Record<
     ['company.read', 'EXECUTE'],
     ['lead.read', 'READ'],
     ['billing.read', 'READ'],
+    ['churn.analyze', 'EXECUTE'],
     ['knowledge.search', 'EXECUTE'],
   ],
   CONTRATOS_ASSINATURA: [

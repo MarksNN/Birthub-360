@@ -168,6 +168,8 @@ export const CAPABILITY_CATEGORY_MAP: Record<CapabilityCode, AccessRequestCatego
   'contract.read': 'READ_CONSULTA',
   'contract.generate': 'CONTRATO',
   'signature.request': 'ASSINATURA',
+  'copy.draft': 'HANDOFF_OPERACIONAL',
+  'churn.analyze': 'HANDOFF_OPERACIONAL',
   'billing.read': 'FINANCEIRO',
   'billing.reconcile': 'FINANCEIRO',
   'bitrix.read': 'READ_CONSULTA',
