@@ -1,22 +1,22 @@
-import type React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  AlertCircle,
-  ShieldAlert,
-  HeartPulse,
   Activity,
-  Zap,
-  Shield,
+  AlertCircle,
   Clock,
-  Wifi,
-  WifiOff,
+  HeartPulse,
   Loader2,
   Lock,
+  Shield,
+  ShieldAlert,
+  Wifi,
+  WifiOff,
+  Zap,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
-import { useSessionStore } from '../../store/useSessionStore.js';
 import { logger } from '../../../../lib/logger.js';
+import { useSessionStore } from '../../store/useSessionStore.js';
 
 interface Alert {
   id: string;

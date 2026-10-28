@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Sparkles, X, Send } from 'lucide-react';
-import type { TabType } from '../layout/tabMeta.js';
-import { isNavHiddenTab } from '../layout/tabMeta.js';
-import { SoundFX } from '../../lib/soundEffects.js';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Mic, Send, Sparkles, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext.js';
 import { hasRequiredRole, MESA_TRATAMENTO_ROLES } from '../../lib/auth/authorization.js';
+import { SoundFX } from '../../lib/soundEffects.js';
+import type { TabType } from '../layout/tabMeta.js';
+import { isNavHiddenTab } from '../layout/tabMeta.js';
 import { AiReasoningPipeline, type AiReasoningStep } from './AiReasoningPipeline.js';
 
 interface AgentCharacter {

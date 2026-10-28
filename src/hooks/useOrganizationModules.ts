@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   describeOrganizationModulesError,
-  organizationModulesApi,
   type OrganizationModulesView,
+  organizationModulesApi,
 } from '../features/onboarding/organizationModules.api.js';
 
 /**

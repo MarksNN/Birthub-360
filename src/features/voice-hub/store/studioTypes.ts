@@ -1,11 +1,11 @@
+import type { Connection } from '@xyflow/react';
 import type {
-  StudioNode,
+  NodeLifecycleState,
   StudioEdge,
+  StudioNode,
   ValidationIssue,
   WorkflowVersionSummary,
-  NodeLifecycleState,
 } from '../lib/studio/types.js';
-import type { Connection } from '@xyflow/react';
 
 export type { NodeLifecycleState } from '../lib/studio/types.js';
 

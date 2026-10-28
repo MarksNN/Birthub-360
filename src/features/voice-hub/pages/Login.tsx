@@ -1,7 +1,7 @@
+import { ArrowRight } from 'lucide-react';
 import type React from 'react';
 import { useId, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
 import { BirthubLogo } from '../components/design-system/index.js';
 import { getAccessibleTextOnBrand } from '../components/design-system/tokens.js';
 import { useSessionStore } from '../store/useSessionStore.js';

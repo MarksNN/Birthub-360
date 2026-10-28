@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Queue } from 'bullmq';
-import { getRedisConnectionOptions } from '../lib/env.js';
 import { logger } from '../../../lib/logger.js';
+import { getRedisConnectionOptions } from '../lib/env.js';
 import { resolveActiveEndpointsForEvent } from './webhookEndpointService.js';
 
 /**

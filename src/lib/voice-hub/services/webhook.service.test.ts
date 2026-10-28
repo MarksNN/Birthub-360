@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // webhook.service.ts constructs `export const webhookService = new WebhookService()` — a Queue —
 // at module TOP LEVEL, which runs as soon as this test file's `import { WebhookService } from

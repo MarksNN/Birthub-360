@@ -5,13 +5,13 @@ import { getTenantId } from '../../../lib/async-context.js';
 import { fromPrismaLeadStatus, toPrismaLeadStatus } from '../../../lib/enumMap.js';
 import { prisma } from '../../../lib/prisma.js';
 import { LEAD_STATUS, type LeadStatus } from '../../../lib/zod.js';
-import { minimizePii } from '../services/guardrails.service.js';
 import {
   buildCanonicalEnrichmentContext,
   formatCanonicalEnrichmentForAgent,
-  toPrismaTemperature,
   toCanonicalTemperature,
+  toPrismaTemperature,
 } from '../domain/canonicalEnrichment.js';
+import { minimizePii } from '../services/guardrails.service.js';
 
 /**
  * Ferramenta para o agente ENCONTRAR o(s) Lead(s) certo(s) quando a instrução menciona uma

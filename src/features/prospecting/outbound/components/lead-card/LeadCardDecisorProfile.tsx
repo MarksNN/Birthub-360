@@ -1,5 +1,5 @@
+import { Mail, Phone } from 'lucide-react';
 import type React from 'react';
-import { Phone, Mail } from 'lucide-react';
 
 interface LeadCardDecisorProfileProps {
   name?: string;

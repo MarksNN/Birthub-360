@@ -1,14 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Sidebar } from './Sidebar.js';
-import { AppTopbar } from './AppTopbar.js';
-import { OfflineBanner } from './OfflineBanner.js';
+import { CommandPalette } from '../ui/CommandPalette.js';
 import { DataFlowLines } from '../ui/DataFlowLines.js';
+import { Toaster } from '../ui/Toaster.js';
 import { VoiceCommandWidget } from '../ui/VoiceCommandWidget.js';
+import { AppTopbar } from './AppTopbar.js';
 import { useNavigationState } from './hooks/useNavigationState.js';
 import { MobileNavDrawer } from './MobileNavDrawer.js';
-import { CommandPalette } from '../ui/CommandPalette.js';
-import { Toaster } from '../ui/Toaster.js';
+import { OfflineBanner } from './OfflineBanner.js';
+import { Sidebar } from './Sidebar.js';
 import type { TabType } from './tabMeta.js';
 
 interface MainLayoutProps {

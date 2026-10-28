@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../lib/logger.js';
+import { domainEventMesh } from '../../lib/queue/domainEventMesh.service.js';
 import type {
   GeofenceEvent,
   GeofenceRule,
@@ -6,8 +8,6 @@ import type {
   OfflineAiTask,
   VisitBriefingCache,
 } from '../../shared/contracts/mobileEdgeAi.contract.js';
-import { domainEventMesh } from '../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../lib/logger.js';
 
 export class MobileEdgeAiService implements IMobileEdgeAiPort {
   private briefings = new Map<string, VisitBriefingCache>(); // key: `${orgId}:${dealId}`

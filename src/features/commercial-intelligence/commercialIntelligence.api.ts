@@ -943,14 +943,13 @@ export async function downloadExecutiveExport(
   window.URL.revokeObjectURL(url);
 }
 
-export { formatCurrency, formatPercent, formatMultiple } from './presentation/formatMetrics.js';
-
 /** DATA-007: implementação única e pura, compartilhada por backend e frontend. */
 export {
   buildForecastRange,
   computeTrendMomentum,
   TREND_MOMENTUM_THRESHOLD_PP,
 } from './application/predictiveForecast.js';
+export { formatCurrency, formatMultiple, formatPercent } from './presentation/formatMetrics.js';
 
 export function currentMonth(): string {
   return brazilMonthKey(new Date());

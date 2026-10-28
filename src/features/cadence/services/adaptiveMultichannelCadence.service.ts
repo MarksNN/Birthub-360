@@ -6,8 +6,8 @@ import {
   type CadenceStep,
   type IMultichannelCadencePort,
   type MultichannelCadenceEnrollment,
-  sharedCadenceEnrollmentsStore,
   type StepDispatchResult,
+  sharedCadenceEnrollmentsStore,
 } from '../../../shared/contracts/multichannelCadence.contract.js';
 
 export class AdaptiveMultichannelCadenceService implements IMultichannelCadencePort {

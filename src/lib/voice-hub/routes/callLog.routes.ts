@@ -1,11 +1,11 @@
 import express from 'express';
-import { requireTenant } from '../middlewares/rbac.js';
 import {
-  listCallLogsHandler,
   createCallLogHandler,
-  updateCallLogHandler,
   deleteCallLogHandler,
+  listCallLogsHandler,
+  updateCallLogHandler,
 } from '../controllers/callLog.controller.js';
+import { requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

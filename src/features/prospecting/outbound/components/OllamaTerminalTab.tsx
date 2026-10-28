@@ -1,16 +1,16 @@
+import {
+  Check,
+  CheckCircle2,
+  Copy,
+  Play,
+  RefreshCw,
+  Server,
+  Terminal,
+  XCircle,
+} from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import type { AIConfig } from '../types.js';
-import {
-  Terminal,
-  Play,
-  CheckCircle2,
-  XCircle,
-  RefreshCw,
-  Server,
-  Copy,
-  Check,
-} from 'lucide-react';
 
 interface OllamaTerminalTabProps {
   aiConfig: AIConfig;

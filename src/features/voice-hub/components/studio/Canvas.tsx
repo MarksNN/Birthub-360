@@ -1,47 +1,48 @@
-import { useCallback, useEffect, useState, lazy, Suspense } from 'react';
 import {
-  ReactFlow,
-  MiniMap,
-  Controls,
-  Background,
-  type Connection,
-  type NodeChange,
-  type EdgeChange,
-  applyNodeChanges,
   applyEdgeChanges,
+  applyNodeChanges,
+  Background,
   BackgroundVariant,
+  type Connection,
+  Controls,
+  type EdgeChange,
+  MiniMap,
+  type NodeChange,
+  ReactFlow,
   ReactFlowProvider,
   SelectionMode,
   useOnSelectionChange,
   useReactFlow,
 } from '@xyflow/react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 
 import { authClient } from '../../../../lib/auth-client.js';
-import { useWorkflowPersistence } from '../../store/useWorkflowPersistence.js';
 import { validationEngine } from '../../../../lib/studio/ValidationEngine.js';
+import type { StudioEdge, StudioNode } from '../../lib/studio/types.js';
 import { useStudioStore, workflowGraphSnapshot } from '../../store/useStudioStore.js';
-import type { StudioNode, StudioEdge } from '../../lib/studio/types.js';
-import {
-  StartNode,
-  EndNode,
-  PromptNode,
-  ConditionNode,
-  ToolNode,
-  LlmNode,
-  VoiceNode,
-  QuestionNode,
-  SwitchNode,
-  MemoryNode,
-  KnowledgeNode,
-  HumanHandoffNode,
-} from './nodes/index.js';
+import { useWorkflowPersistence } from '../../store/useWorkflowPersistence.js';
 import { StudioEdge as CustomStudioEdge } from './edges/StudioEdge.js';
-import { TopBar } from './panels/TopBar.js';
-import { LayersPanel } from './panels/LayersPanel.js';
-import { InspectorPanel } from './panels/InspectorPanel.js';
+import {
+  ConditionNode,
+  EndNode,
+  HumanHandoffNode,
+  KnowledgeNode,
+  LlmNode,
+  MemoryNode,
+  PromptNode,
+  QuestionNode,
+  StartNode,
+  SwitchNode,
+  ToolNode,
+  VoiceNode,
+} from './nodes/index.js';
 import { BottomDrawer } from './panels/BottomDrawer.js';
+import { InspectorPanel } from './panels/InspectorPanel.js';
+import { LayersPanel } from './panels/LayersPanel.js';
+import { TopBar } from './panels/TopBar.js';
 import { VersionHistoryPanel } from './panels/VersionHistoryPanel.js';
+
 const TestSimulatorModal = lazy(() =>
   import('./panels/TestSimulatorModal.js').then((m) => ({ default: m.TestSimulatorModal })),
 );

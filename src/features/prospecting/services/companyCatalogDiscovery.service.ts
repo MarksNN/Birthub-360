@@ -1,5 +1,5 @@
-import { container } from '../../../shared/di/container.js';
 import { ESTADO_OPTIONS } from '../../../shared/constants/icp-options.js';
+import { container } from '../../../shared/di/container.js';
 import type { ProspectCandidate, ProspectCriteria } from '../domain/prospectTypes.js';
 
 interface CatalogRow {

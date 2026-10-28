@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Mic, MicOff, PhoneOff, User, Bot, Loader2, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Bot, Loader2, Mic, MicOff, PhoneOff, User, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { clientLogger as logger } from '../../../../../lib/clientLogger.js';
-import { useStudioStore } from '../../../store/useStudioStore.js';
 import { validationEngine } from '../../../../../lib/studio/ValidationEngine.js';
+import { useStudioStore } from '../../../store/useStudioStore.js';
 
 interface Recognition {
   continuous: boolean;

@@ -6,7 +6,7 @@ import { Skeleton } from '../../../../components/ui/Skeleton.js';
 import { leadsDB } from '../../../../lib/db.js';
 import { toast } from '../../../../lib/toast.js';
 import type { Lead } from '../../../../types/index.js';
-import { cadenceApi, type CadenceSequenceDTO } from '../../cadence.api.js';
+import { type CadenceSequenceDTO, cadenceApi } from '../../cadence.api.js';
 import { leadLabel } from './constants.js';
 
 export function StartRunDialog({

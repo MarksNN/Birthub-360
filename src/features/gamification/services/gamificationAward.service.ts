@@ -4,8 +4,8 @@
  */
 
 import { logger } from '../../../lib/logger.js';
-import type { ConsumptionStore } from '../../../lib/queue/outbox/outbox.ports.js';
 import { InMemoryConsumptionStore } from '../../../lib/queue/outbox/inMemory.js';
+import type { ConsumptionStore } from '../../../lib/queue/outbox/outbox.ports.js';
 import { behavioralEngineService } from './behavioralEngine.service.js';
 
 export interface GamificationAwardResult {

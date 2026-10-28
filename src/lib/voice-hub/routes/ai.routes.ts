@@ -1,17 +1,17 @@
 import express from 'express';
-import { requireTenant } from '../middlewares/rbac.js';
-import { requireAiProviderConsent } from '../middlewares/aiConsent.js';
 import {
   chatHandler,
   generateMusicHandler,
   generateVideoHandler,
-  videoStatusHandler,
-  videoDownloadHandler,
-  refactorWorkflowHandler,
   generateWorkflowHandler,
   getAiConsentHandler,
+  refactorWorkflowHandler,
   setAiConsentHandler,
+  videoDownloadHandler,
+  videoStatusHandler,
 } from '../controllers/ai.controller.js';
+import { requireAiProviderConsent } from '../middlewares/aiConsent.js';
+import { requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

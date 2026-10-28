@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createHmac, createHash } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../repositories/webhookEndpointRepository.js', () => ({
   countActiveEndpointsForTenant: vi.fn(),
@@ -15,15 +15,15 @@ vi.mock('../repositories/webhookEndpointRepository.js', () => ({
 
 import * as webhookEndpointRepository from '../repositories/webhookEndpointRepository.js';
 import {
-  MAX_ACTIVE_WEBHOOK_ENDPOINTS_PER_TENANT,
-  WebhookEndpointServiceError,
   createWebhookEndpointForTenant,
   deleteWebhookEndpointForTenant,
   findActiveSigningSecretHash,
   hashWebhookSecret,
   listWebhookEndpointsForTenant,
+  MAX_ACTIVE_WEBHOOK_ENDPOINTS_PER_TENANT,
   regenerateWebhookEndpointSecret,
   resolveActiveEndpointsForEvent,
+  WebhookEndpointServiceError,
 } from './webhookEndpointService.js';
 
 type Row = webhookEndpointRepository.TenantWebhookEndpointRecord;

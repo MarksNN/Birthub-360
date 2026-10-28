@@ -1,12 +1,12 @@
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+
+import { getAiModel } from '../../../../lib/ai/gateway.js';
 import type {
   CadenceStep,
   GiselleStrategyPlan,
   NextBestAction,
   PatriciaExecutionPlan,
 } from './triad.types.js';
-
-import { getAiModel } from '../../../../lib/ai/gateway.js';
-import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 
 export class PatriciaExecutionAgent {
   public async planExecution(strategy: GiselleStrategyPlan): Promise<PatriciaExecutionPlan> {

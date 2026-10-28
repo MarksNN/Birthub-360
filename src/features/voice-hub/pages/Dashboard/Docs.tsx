@@ -1,16 +1,16 @@
+import { Code, Layers, Palette, Play } from 'lucide-react';
 import { useState } from 'react';
-import { Code, Palette, Play, Layers } from 'lucide-react';
 import {
-  Card,
-  Button,
-  Badge,
-  Tabs,
-  Avatar,
   Alert,
+  Avatar,
+  Badge,
+  Button,
+  Card,
   Checkbox,
-  Switch,
   Input,
   Select,
+  Switch,
+  Tabs,
 } from '../../components/design-system/index.js';
 
 export default function DesignSystemDocs() {

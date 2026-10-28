@@ -1,33 +1,33 @@
-import { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext.js';
-import { Sidebar } from './components/Sidebar.js';
-import { Header } from './components/Header.js';
-import { ProspectorTab } from './components/ProspectorTab.js';
-import { PerformanceTab } from './components/PerformanceTab.js';
-import { LeadDistributionTab } from './components/LeadDistributionTab.js';
-import { TasksOverviewTab } from './components/TasksOverviewTab.js';
+import { BrandGuideModal } from './components/BrandGuideModal.js';
 import { ChatTab } from './components/ChatTab.js';
 import { DatabaseExplorerTab } from './components/DatabaseExplorerTab.js';
-import { OllamaTerminalTab } from './components/OllamaTerminalTab.js';
-import { BrandGuideModal } from './components/BrandGuideModal.js';
+import { Header } from './components/Header.js';
+import { LeadDistributionTab } from './components/LeadDistributionTab.js';
 import { LoginScreen } from './components/LoginScreen.js';
-import { ReportErrorButton } from './components/ReportErrorButton.js';
-import { UserKanbanBoard } from './components/UserKanbanBoard.js';
 import { MyTasksTab } from './components/MyTasksTab.js';
+import { OllamaTerminalTab } from './components/OllamaTerminalTab.js';
+import { PerformanceTab } from './components/PerformanceTab.js';
+import { ProspectorTab } from './components/ProspectorTab.js';
+import { ReportErrorButton } from './components/ReportErrorButton.js';
+import { Sidebar } from './components/Sidebar.js';
+import { TasksOverviewTab } from './components/TasksOverviewTab.js';
+import { UserKanbanBoard } from './components/UserKanbanBoard.js';
 import type {
   AIConfig,
-  Lead,
   DatabaseStats,
-  ThemeMode,
-  RecentSearch,
   IntegrationsConfig,
+  Lead,
   LeadStage,
-  User,
   ProspectFilters,
   ProspectRunMeta,
+  RecentSearch,
+  ThemeMode,
+  User,
 } from './types.js';
 import { resolveBitrixWebhook } from './utils/bitrix.js';
-import confetti from 'canvas-confetti';
 
 export default function App() {
   const { currentUser } = useAuth();

@@ -1,16 +1,16 @@
-import { searchPlaces } from '../search/providers/googlePlaces.provider.js';
-import { enrichOrganization, searchAndMatchPeople } from '../search/providers/apollo.provider.js';
-import { resolveAndEnrichCnpjForLead, type CnpjData } from '../cnpj.js';
+import type { DecisionMaker, Lead } from '../../types.js';
+import { type CnpjData, resolveAndEnrichCnpjForLead } from '../cnpj.js';
 import { canonicalizeDomain, normalizeCompanyName } from '../entityResolution.js';
 import {
-  withCache,
-  withRetry,
-  withCircuitBreaker,
-  withProviderRetry,
-  withProviderCircuitBreaker,
   CACHE_TTL_MS,
+  withCache,
+  withCircuitBreaker,
+  withProviderCircuitBreaker,
+  withProviderRetry,
+  withRetry,
 } from '../resilience.js';
-import type { Lead, DecisionMaker } from '../../types.js';
+import { enrichOrganization, searchAndMatchPeople } from '../search/providers/apollo.provider.js';
+import { searchPlaces } from '../search/providers/googlePlaces.provider.js';
 
 export function cleanDomain(url: string): string {
   if (!url) return '';

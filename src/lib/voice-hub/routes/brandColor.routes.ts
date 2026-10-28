@@ -1,11 +1,11 @@
 import express from 'express';
-import { requireTenant } from '../middlewares/rbac.js';
-import { attachAuthIfPresent } from '../middlewares/index.js';
 import {
   getBrandColorHandler,
-  saveBrandColorHandler,
   resetBrandColorHandler,
+  saveBrandColorHandler,
 } from '../controllers/brandColor.controller.js';
+import { attachAuthIfPresent } from '../middlewares/index.js';
+import { requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

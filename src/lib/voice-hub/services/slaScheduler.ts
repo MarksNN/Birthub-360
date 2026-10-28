@@ -1,8 +1,8 @@
 import { Queue, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
-import { getRedisConnectionOptions, getRedisUrl, getRedisRetryStrategy } from '../lib/env.js';
 import { logger } from '../../../lib/logger.js';
 import { checkPlatformHealth } from '../controllers/health.controller.js';
+import { getRedisConnectionOptions, getRedisRetryStrategy, getRedisUrl } from '../lib/env.js';
 import { listActiveTenantIds } from '../repositories/tenantRepository.js';
 import { createMetric } from './metricService.js';
 

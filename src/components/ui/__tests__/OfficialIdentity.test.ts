@@ -2,9 +2,10 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Card, CardTitle, CardDescription } from '../Card.js';
+import { Card, CardDescription, CardTitle } from '../Card.js';
 import { Input } from '../Input.js';
 import { PageTitleCard } from '../PageTitleCard.js';
+
 afterEach(cleanup);
 describe('Official identity primitive contracts', () => {
   it('keeps a card keyboard action and loading content while replacing its accent strip', () => {

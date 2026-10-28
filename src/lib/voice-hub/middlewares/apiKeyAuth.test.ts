@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Local, per-test-file override of the global ioredis mock (vitest.setup.ts) so the rate-limit
 // branch can actually be exercised — the global mock's incr() always resolves to 1, which can

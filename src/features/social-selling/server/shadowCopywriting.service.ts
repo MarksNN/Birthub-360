@@ -8,6 +8,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
 import type {
   GenerateShadowCopyInput,
   GenerateShadowCopyResult,
@@ -15,7 +16,6 @@ import type {
   SellerStylePreferences,
   SellerStyleProfile,
 } from '../../../shared/contracts/shadowCopywriting.contract.js';
-import { logger } from '../../../lib/logger.js';
 
 export interface StyleOptInParams {
   organizationId: string;

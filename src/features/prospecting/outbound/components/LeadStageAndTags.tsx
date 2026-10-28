@@ -1,21 +1,21 @@
+import {
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
+  Flame,
+  Layers,
+  Plus,
+  Sparkles,
+  Tag,
+  TrendingUp,
+  X,
+  XCircle,
+} from 'lucide-react';
 import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Lead, LeadStage, ThemeMode } from '../types.js';
 import { PREDEFINED_TAGS_SUGGESTIONS } from '../utils/searchOptions.js';
-import {
-  Tag,
-  Plus,
-  X,
-  ChevronDown,
-  Check,
-  Layers,
-  Flame,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  TrendingUp,
-  Sparkles,
-} from 'lucide-react';
 
 interface LeadStageAndTagsProps {
   lead: Lead;

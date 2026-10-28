@@ -1,11 +1,11 @@
 import { type NextFunction, type Request, type Response, Router } from 'express';
+import { container } from '../../../shared/di/container.js';
 import { routeParam } from '../../../shared/http/routeParams.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
-import { container } from '../../../shared/di/container.js';
-import { TeamController } from '../presentation/TeamController.js';
 import { TeamUseCases } from '../application/TeamUseCases.js';
 import { PrismaTeamRepository } from '../infrastructure/PrismaTeamRepository.js';
+import { TeamController } from '../presentation/TeamController.js';
 import {
   createTeamMember,
   deleteTeamMember,

@@ -1,7 +1,7 @@
+import { motion } from 'framer-motion';
+import { ArrowRight, Play, Sparkles } from 'lucide-react';
 import type React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Play } from 'lucide-react';
 
 interface HeroSectionProps {
   onOpenDemo?: () => void;

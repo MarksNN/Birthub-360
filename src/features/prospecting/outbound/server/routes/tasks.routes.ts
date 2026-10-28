@@ -1,6 +1,6 @@
-import { Router, type Request, type Response } from 'express';
-import { getDatabase, saveDatabase, logActivity } from '../db.js';
+import { type Request, type Response, Router } from 'express';
 import { requireAuth, requireManager } from '../auth.js';
+import { getDatabase, logActivity, saveDatabase } from '../db.js';
 import { isWithinMaxLength } from '../validators.js';
 
 export const tasksRouter = Router();

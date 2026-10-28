@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { api } from '../../../lib/api.js';
 import type { TimelineItem } from '../../../components/ui/Timeline.js';
+import { api } from '../../../lib/api.js';
 
 /**
  * Central unificada de conversas (item #18 do roadmap comercial) — mescla, num único feed

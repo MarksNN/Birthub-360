@@ -1,12 +1,12 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   IMarketSignalsPort,
   MarketSignalEnvelope,
   MarketSignalType,
   SignalQueryFilter,
 } from '../../../shared/contracts/marketSignals.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export interface RegulatorySignalInput {
   organizationId: string;

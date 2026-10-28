@@ -1,5 +1,4 @@
-import type { LeadFunnel, LeadStatus as PrismaLeadStatus, Prisma } from '@prisma/client';
-import { recordStageTransition } from '../../../shared/services/leadStageHistory.service.js';
+import type { LeadFunnel, Prisma, LeadStatus as PrismaLeadStatus } from '@prisma/client';
 import {
   fromPrismaActivityStatus,
   fromPrismaActivityType,
@@ -12,6 +11,7 @@ import { prisma } from '../../../lib/prisma.js';
 import { searchLeadIds } from '../../../lib/search/index.js';
 import type { LeadStatus } from '../../../lib/zod.js';
 import { recordLeadFieldChanges } from '../../../shared/services/leadFieldChangeHistory.service.js';
+import { recordStageTransition } from '../../../shared/services/leadStageHistory.service.js';
 import type { Lead, LeadRepository } from '../domain/Lead.js';
 
 /**

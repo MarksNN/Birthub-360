@@ -4,17 +4,17 @@ import express, { type Request, type Response, Router } from 'express';
 import { requestContext } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
+import type { BitrixWebhookEventPayload } from '../../../shared/contracts/domainEventMesh.contract.js';
 import { routeParam } from '../../../shared/http/routeParams.js';
 import {
   claimWebhookDelivery,
-  webhookDeliveryFingerprint,
   validateWebhookTimestamp,
+  webhookDeliveryFingerprint,
 } from '../../../shared/security/webhookReplayGuard.js';
 import { callBitrix } from './service/client.js';
 import { applyInboundCustomFields, resolveEnumMaps } from './service/customFields.js';
 import { bitrixSyncFailuresTotal } from './service/metrics.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import type { BitrixWebhookEventPayload } from '../../../shared/contracts/domainEventMesh.contract.js';
 
 // ── Webhook de ENTRADA (Bitrix → Atlas, "исходящий вебхук" no admin do portal) ──────────────────
 //

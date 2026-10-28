@@ -8,8 +8,8 @@
  */
 
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import { logger } from '../../../lib/logger.js';
 import { getAiModel } from '../../../lib/ai/gateway.js';
+import { logger } from '../../../lib/logger.js';
 import type { ProspectCriteria } from '../domain/prospectTypes.js';
 
 export interface AIProviderStatus {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useSessionStore } from '../store/useSessionStore.js';
 import { logger } from '../../../lib/logger.js';
+import { useSessionStore } from '../store/useSessionStore.js';
 
 // Real backend now exists for API Keys (.agents/handoffs/onda-4/01-para-02-api-key-endpoints-prontos.md):
 // POST/GET/DELETE /api/developers/keys, admin-only within the tenant (403 for other roles) — same

@@ -1,8 +1,8 @@
-import { Redis } from 'ioredis';
 import { Queue, Worker } from 'bullmq';
-import { createAuditLog } from '../repositories/auditLogRepository.js';
+import { Redis } from 'ioredis';
 import { logger } from '../../../lib/logger.js';
-import { getRedisUrl, getRedisRetryStrategy } from '../lib/env.js';
+import { getRedisRetryStrategy, getRedisUrl } from '../lib/env.js';
+import { createAuditLog } from '../repositories/auditLogRepository.js';
 
 const redisUrl = getRedisUrl();
 // BullMQ requires maxRetriesPerRequest: null on its connection; enqueue failures are still caught

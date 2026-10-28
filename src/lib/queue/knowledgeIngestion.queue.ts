@@ -1,7 +1,7 @@
 import { Queue, QueueEvents } from 'bullmq';
-import { connection, queuesEnabled } from './redis.js';
-import { registerQueueForMetrics } from './metrics.js';
 import { logger } from '../logger.js';
+import { registerQueueForMetrics } from './metrics.js';
+import { connection, queuesEnabled } from './redis.js';
 
 export const KNOWLEDGE_INGESTION_QUEUE_NAME = 'knowledge-ingestion-queue';
 

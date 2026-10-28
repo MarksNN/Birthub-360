@@ -1,7 +1,7 @@
 import { logger } from '../../../../lib/logger.js';
 import { validContactEmails } from '../../../../shared/utils/contact-links.js';
 import { findCompanyDomain } from '../../utils/domain.js';
-import { searchDecisionMakersAdvanced, enrichOrganizationWithContacts } from '../apollo.service.js';
+import { enrichOrganizationWithContacts, searchDecisionMakersAdvanced } from '../apollo.service.js';
 import { searchCompanyNews } from '../news.service.js';
 import type { SearchExecutionTracker } from '../searchExecution.service.js';
 import type { ProspectCandidate, ProspectCriteria } from './types.js';

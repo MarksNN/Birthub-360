@@ -1,4 +1,4 @@
-import type { StudioNode, StudioEdge } from '../lib/studio/types.js';
+import type { StudioEdge, StudioNode } from '../lib/studio/types.js';
 import { nodeRegistry } from './nodeRegistry.js';
 
 export const initialNodes: StudioNode[] = [

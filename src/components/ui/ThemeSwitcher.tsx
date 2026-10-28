@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { Monitor, Moon, Sun, Sparkles } from 'lucide-react';
+import { Monitor, Moon, Sparkles, Sun } from 'lucide-react';
 import type React from 'react';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';

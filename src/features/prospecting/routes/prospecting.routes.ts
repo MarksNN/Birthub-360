@@ -1,8 +1,8 @@
-import { AuditService } from '../../../lib/audit/audit.service.js';
-import { isValidCnpj } from '../../../lib/cnpj.js';
 import { type NextFunction, type Request, type Response, Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
+import { AuditService } from '../../../lib/audit/audit.service.js';
+import { isValidCnpj } from '../../../lib/cnpj.js';
 import { routeParam } from '../../../shared/http/routeParams.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
@@ -23,9 +23,9 @@ import {
   promoteToCrm,
   rejectCandidate,
 } from '../services/prospecting.service.js';
+import { checkProviderRateLimit } from '../services/providerRateLimit.js';
 import { findSearchExecution } from '../services/searchExecution.service.js';
 import { getTurboProviderHealth } from '../services/turboHealth.service.js';
-import { checkProviderRateLimit } from '../services/providerRateLimit.js';
 import { normalizeCompanyDomain } from '../utils/domain.js';
 
 const icebreakerService = new IcebreakerService();

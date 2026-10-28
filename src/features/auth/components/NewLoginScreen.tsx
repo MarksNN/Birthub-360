@@ -24,10 +24,6 @@ import {
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext.js';
-import { useTheme } from '../../../contexts/ThemeContext.js';
-import { authClient } from '../../../lib/auth-client.js';
-import { SoundFX } from '../../../lib/soundEffects.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
 import {
   AuthModalSectionIcon,
@@ -41,6 +37,10 @@ import {
   PillarsSectionIcon,
   PlatformSectionIcon,
 } from '../../../components/brand/LandingTitleIcons.js';
+import { useAuth } from '../../../contexts/AuthContext.js';
+import { useTheme } from '../../../contexts/ThemeContext.js';
+import { authClient } from '../../../lib/auth-client.js';
+import { SoundFX } from '../../../lib/soundEffects.js';
 import './NewLoginScreen.css';
 
 // 8 PILARES OFICIAIS DO BIRTH HUB 360°

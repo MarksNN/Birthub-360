@@ -10,14 +10,14 @@
  * - Multi-tenant estrito por organizationId.
  */
 
-import {
+import { logger } from '../../../lib/logger.js';
+import type {
   CollectiveAggregatedWorkload,
   MicroTrainingSession,
   WorkloadObjectiveMetrics,
   WorkloadPreferences,
   WorkloadRecommendation,
 } from '../../../shared/contracts/workloadWellbeing.contract.js';
-import { logger } from '../../../lib/logger.js';
 
 export interface CalendarEventSummary {
   id: string;

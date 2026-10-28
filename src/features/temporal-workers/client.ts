@@ -1,4 +1,4 @@
-import { Connection, Client } from '@temporalio/client';
+import { Client, Connection } from '@temporalio/client';
 
 export async function getTemporalClient() {
   const address = process.env.TEMPORAL_ADDRESS || 'localhost:7233';

@@ -1,13 +1,14 @@
 import { randomUUID } from 'node:crypto';
-import { AuditService, type AuditAction } from '../../lib/audit/audit.service.js';
+import { type AuditAction, AuditService } from '../../lib/audit/audit.service.js';
 import { logger } from '../../lib/logger.js';
 import { prisma } from '../../lib/prisma.js';
 import { AppError } from '../../shared/middlewares/errorHandler.js';
+import { redactResidualPii } from '../../shared/security/piiRedaction.js';
 import {
-  callMarker,
-  classifyCallOutcome,
-  callResultedInConversation,
   type CallOutcomeState,
+  callMarker,
+  callResultedInConversation,
+  classifyCallOutcome,
 } from '../integrations/birth-voice/birthVoice.helpers.js';
 import { AudioStreamBridge } from './audio-stream-bridge.js';
 import type {
@@ -24,7 +25,6 @@ import type {
   WebRTCSessionInfo,
 } from './types.js';
 import { voiceCommandExecutorService } from './voice-command-executor.service.js';
-import { redactResidualPii } from '../../shared/security/piiRedaction.js';
 
 export const MANDATORY_VOICE_AI_DISCLOSURE =
   'Esta ligação é realizada com auxílio de inteligência artificial e poderá ser gravada para fins de atendimento e segurança. Diga "opt-out" a qualquer momento para revogar o consentimento.';

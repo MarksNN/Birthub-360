@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, Send, X, Loader2, Copy, Check, RefreshCw, AlertCircle } from 'lucide-react';
+import { AlertCircle, Bot, Check, Copy, Loader2, RefreshCw, Send, Sparkles, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../../../lib/api.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 

@@ -1,4 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   AdaptiveCoachingPlan,
   CommercialBottleneck,
@@ -6,8 +8,6 @@ import type {
   IBehavioralEnginePort,
 } from '../../../shared/contracts/behavioralEngine.contract.js';
 import { calculateSellerLevel } from '../domain/Gamification.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class BehavioralEngineService implements IBehavioralEnginePort {
   // Armazenamento em memória com isolamento estrito por tenant
@@ -202,7 +202,7 @@ export class BehavioralEngineService implements IBehavioralEnginePort {
     let targetCount = 3;
     let minScore: number | undefined = 85;
     let xp = 150;
-    let badgeId: string | undefined = undefined;
+    let badgeId: string | undefined;
     let skillName = 'Contorno de Objeções';
 
     if (b.metric === 'price_objection_handling') {

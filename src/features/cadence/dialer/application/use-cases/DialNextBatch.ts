@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { CallAttempt } from '../../domain/entities/CallAttempt.js';
 import type { Campaign } from '../../domain/entities/Campaign.js';
-import type { LeadRepository } from '../ports/LeadRepository.js';
 import {
   AgentDnConflictError,
   type CallAttemptRepository,
 } from '../ports/CallAttemptRepository.js';
 import type { DialerProvider } from '../ports/DialerProvider.js';
+import type { LeadRepository } from '../ports/LeadRepository.js';
 
 export interface DialNextBatchConfig {
   callTimeoutSeconds: number;

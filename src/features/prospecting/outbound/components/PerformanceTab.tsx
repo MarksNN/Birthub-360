@@ -1,19 +1,19 @@
+import { Activity, CheckCircle2, Target, TrendingUp, User } from 'lucide-react';
 import { useMemo } from 'react';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  Legend,
-  Cell,
 } from 'recharts';
 import type { Lead } from '../types.js';
-import { TrendingUp, Target, Activity, CheckCircle2, User } from 'lucide-react';
 
 interface PerformanceTabProps {
   leads: Lead[];

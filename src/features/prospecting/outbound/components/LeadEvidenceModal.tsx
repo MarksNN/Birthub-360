@@ -1,16 +1,16 @@
+import {
+  AlertTriangle,
+  FileSearch,
+  HelpCircle,
+  Loader2,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldQuestion,
+  X,
+} from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import type { FieldEvidence, ThemeMode, VerificationStatus } from '../types.js';
-import {
-  X,
-  ShieldCheck,
-  ShieldQuestion,
-  ShieldAlert,
-  HelpCircle,
-  Loader2,
-  FileSearch,
-  AlertTriangle,
-} from 'lucide-react';
 
 interface LeadEvidenceModalProps {
   leadId: string;

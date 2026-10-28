@@ -32,7 +32,9 @@ import {
   defaultEnrichmentRepository,
   type IEnrichmentRepository,
 } from '../infra/PrismaEnrichmentRepository.js';
+
 export { defaultEnrichmentRepository, type IEnrichmentRepository };
+
 import { AppError } from '../../../shared/middlewares/errorHandler.js';
 import { IcebreakerService } from '../../intelligence/services/IcebreakerService.js';
 import { filterNewContacts } from '../utils/contactDedupe.js';

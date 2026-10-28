@@ -1,21 +1,21 @@
-import { Router, type Request, type Response } from 'express';
+import { type Request, type Response, Router } from 'express';
+import { requireAdmin } from '../auth.js';
+import { fetchCnpjPublicData } from '../cnpj.js';
 import {
-  getDatabase,
+  checkExplorerSqlSafety,
   executeQuery,
+  getDatabase,
   getStats,
   saveDatabase,
-  checkExplorerSqlSafety,
 } from '../db.js';
-import { fetchCnpjPublicData } from '../cnpj.js';
-import { providerRegistry } from '../providerRegistry.js';
-import { getSearchRun, getObservabilitySummary } from '../observability.js';
 import {
   buildFeedbackSummary,
-  type FeedbackMessageRecord,
   type FeedbackLeadRecord,
+  type FeedbackMessageRecord,
 } from '../feedbackLoop.js';
-import { requireAdmin } from '../auth.js';
 import { rateLimit } from '../middleware/rateLimit.js';
+import { getObservabilitySummary, getSearchRun } from '../observability.js';
+import { providerRegistry } from '../providerRegistry.js';
 
 export const systemRouter = Router();
 

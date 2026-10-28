@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '../../../../components/ui/Button.js';
 import { Dialog } from '../../../../components/ui/Dialog.js';
 import { toast } from '../../../../lib/toast.js';
-import { cadenceApi, type CadenceChannel, type CadenceTouchInput } from '../../cadence.api.js';
+import { type CadenceChannel, type CadenceTouchInput, cadenceApi } from '../../cadence.api.js';
 import { CHANNEL_LABEL, CHANNEL_OPTIONS, EMPTY_TOUCH } from './constants.js';
 
 export function NewSequenceDialog({

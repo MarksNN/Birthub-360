@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronDown,
@@ -11,14 +10,15 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react';
+import { useState } from 'react';
 import { fadeIn } from '../../../../lib/motion.js';
 import {
   ESTADO_OPTIONS,
   PORTE_OPTIONS,
   TECNOLOGIA_OPTIONS,
 } from '../../../../shared/constants/icp-options.js';
-import { PersonaForm, SegmentDetailsForm, TurboField } from './TurboCriteriaForms.js';
 import type { ProspectCriteria } from '../../services/prospecting.service.js';
+import { PersonaForm, SegmentDetailsForm, TurboField } from './TurboCriteriaForms.js';
 
 type PersonaOption = {
   label: string;

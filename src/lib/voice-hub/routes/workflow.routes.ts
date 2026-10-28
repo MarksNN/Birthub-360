@@ -1,18 +1,18 @@
 import express from 'express';
-import { requireTenant } from '../middlewares/rbac.js';
-import { createRateLimiter } from '../middlewares/rateLimit.js';
 import {
+  deleteWorkflowHandler,
+  duplicateWorkflowHandler,
   getWorkflowHandler,
+  getWorkflowHistoryHandler,
+  listWorkflowVersionsHandler,
+  publishWorkflowHandler,
+  restoreWorkflowVersionHandler,
+  rollbackWorkflowVersionHandler,
   saveWorkflowHandler,
   updateWorkflowHandler,
-  deleteWorkflowHandler,
-  getWorkflowHistoryHandler,
-  restoreWorkflowVersionHandler,
-  duplicateWorkflowHandler,
-  publishWorkflowHandler,
-  listWorkflowVersionsHandler,
-  rollbackWorkflowVersionHandler,
 } from '../controllers/workflow.controller.js';
+import { createRateLimiter } from '../middlewares/rateLimit.js';
+import { requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 
@@ -48,8 +48,8 @@ router.post(
 
 import {
   addCommentHandler,
-  resolveCommentHandler,
   lockNodeHandler,
+  resolveCommentHandler,
   unlockNodeHandler,
 } from '../controllers/workflowCollab.controller.js';
 

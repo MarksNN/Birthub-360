@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  checkOptOutStatus,
-  assertOptOutStatus,
-  recordContactOptOut,
-  OptOutSuppressedError,
-  isOptOutKeyword,
-} from '../optOutCheck.service.js';
 import { ANONYMIZED_CONTACT_NAME } from '../../../../shared/services/dataSubjectErasure.service.js';
 import {
-  whatsAppCadenceDispatcher,
-  emailCadenceDispatcher,
   buildVoiceCadenceDispatcher,
+  emailCadenceDispatcher,
+  whatsAppCadenceDispatcher,
 } from '../../../cadence/infra/dispatchers/CadenceDispatchers.js';
+import {
+  assertOptOutStatus,
+  checkOptOutStatus,
+  isOptOutKeyword,
+  OptOutSuppressedError,
+  recordContactOptOut,
+} from '../optOutCheck.service.js';
 
 describe('Opt-out Multicanal & LGPD (B-13 e §27)', () => {
   const ORG_A = 'org-tenant-a';

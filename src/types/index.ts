@@ -25,18 +25,17 @@ export interface PaginatedResponse<T> {
   meta: PaginatedMeta;
 }
 
+import type { CompanyStatus, ContactStatus, LeadStatus, LeadTemperature } from '../lib/zod.js';
 import type {
-  LeadQualification,
+  Activity as DomainActivity,
+  Attachment as DomainAttachment,
   Company as DomainCompany,
   Contact as DomainContact,
   Lead as DomainLead,
-  Activity as DomainActivity,
-  TimelineEvent as DomainTimelineEvent,
   Note as DomainNote,
-  Attachment as DomainAttachment,
+  TimelineEvent as DomainTimelineEvent,
+  LeadQualification,
 } from '../shared/types/crm.js';
-
-import type { CompanyStatus, ContactStatus, LeadStatus, LeadTemperature } from '../lib/zod.js';
 
 export type { LeadQualification };
 

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createHmac } from 'node:crypto';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // vi.mock(...) factories are hoisted above every other top-level statement in this file, so
 // anything they reference (the class included — a plain `class Foo {}` declaration is not
@@ -42,8 +42,8 @@ vi.mock('../repositories/webhookEndpointRepository.js', () => ({
   recordDeliveryResult: (...args: unknown[]) => mockRecordDeliveryResult(...args),
 }));
 
-import { startWebhookWorker } from './webhook.worker.js';
 import type { WebhookPayload } from './webhook.service.js';
+import { startWebhookWorker } from './webhook.worker.js';
 
 const ORIGINAL_ENV = { ...process.env };
 const mockFetch = vi.fn();

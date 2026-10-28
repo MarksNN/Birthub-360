@@ -1,6 +1,6 @@
-import type React from 'react';
 import { motion } from 'framer-motion';
-import { Globe, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Globe } from 'lucide-react';
+import type React from 'react';
 
 interface IntegrationItem {
   name: string;

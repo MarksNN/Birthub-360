@@ -6,8 +6,8 @@ import {
   type BottleneckSeverity,
   type CommercialFilter,
   commercialIntelligenceApi,
-  formatCurrency,
   type FunnelBottleneckReport,
+  formatCurrency,
 } from '../commercialIntelligence.api.js';
 import { MetricInfo } from './MetricInfo.js';
 

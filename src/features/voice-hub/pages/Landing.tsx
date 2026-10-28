@@ -1,17 +1,17 @@
 import type React from 'react';
 import {
-  LandingNavbar,
-  HeroSection,
-  MetricsBar,
   BenefitsBentoGrid,
-  ProductModulesSection,
-  HowItWorksTimeline,
-  InteractiveAnalyticsSection,
   ComparisonTable,
+  HeroSection,
+  HowItWorksTimeline,
   IntegrationsGrid,
-  SecurityGovernanceSection,
-  PricingFaqSection,
+  InteractiveAnalyticsSection,
   LandingFooter,
+  LandingNavbar,
+  MetricsBar,
+  PricingFaqSection,
+  ProductModulesSection,
+  SecurityGovernanceSection,
 } from '../components/landing/index.js';
 
 export default function LandingPage(): React.ReactElement {

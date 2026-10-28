@@ -1,3 +1,7 @@
+import {
+  getAllUniversalTools,
+  type UniversalToolCategory,
+} from '../tools/capabilityToolRegistry.js';
 import { BaseAgent } from './base.agent.js';
 import {
   appendLearnedStyle,
@@ -5,10 +9,6 @@ import {
   SWARM_OUTPUT_CONTRACT,
   SWARM_UNTRUSTED_CONTENT_GUARD,
 } from './swarm.constants.js';
-import {
-  getAllUniversalTools,
-  type UniversalToolCategory,
-} from '../tools/capabilityToolRegistry.js';
 
 export interface UniversalSpecialistOptions {
   agentCode?: string;

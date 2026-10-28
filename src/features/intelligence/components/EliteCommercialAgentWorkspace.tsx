@@ -1,26 +1,26 @@
-import type React from 'react';
-import { useState, useEffect, useCallback } from 'react';
-import { SoundFX } from '../../../lib/soundEffects.js';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  SkipForward,
-  CheckCircle2,
-  Shield,
-  Zap,
-  Brain,
-  ChevronRight,
-  TrendingUp,
-  Target,
   Activity,
-  Sparkles,
+  AlertCircle,
+  Award,
+  Brain,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
   HelpCircle,
   Layers,
-  Award,
-  Clock,
-  AlertCircle,
+  Shield,
+  SkipForward,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
-import type { AgentCenterTrace, SellerWorkspaceOverview } from '../agents/triad/triad.types.js';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { SoundFX } from '../../../lib/soundEffects.js';
 import { CORE_AND_SPECIALIST_TAXONOMY } from '../agents/triad/agentGraphTaxonomy.js';
+import type { AgentCenterTrace, SellerWorkspaceOverview } from '../agents/triad/triad.types.js';
 
 export const EliteCommercialAgentWorkspace: React.FC = () => {
   const [overview, setOverview] = useState<SellerWorkspaceOverview | null>(null);

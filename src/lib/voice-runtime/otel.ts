@@ -1,10 +1,10 @@
 import {
-  trace,
-  metrics,
-  ValueType,
-  type Tracer,
-  type Meter,
   type Attributes,
+  type Meter,
+  metrics,
+  type Tracer,
+  trace,
+  ValueType,
 } from '@opentelemetry/api';
 
 // Create a custom collector to store real-time spans and metrics for the frontend ObservabilityPage

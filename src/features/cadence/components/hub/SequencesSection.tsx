@@ -6,7 +6,7 @@ import { EmptyState } from '../../../../components/ui/EmptyState.js';
 import { Skeleton } from '../../../../components/ui/Skeleton.js';
 import { SoundFX } from '../../../../lib/soundEffects.js';
 import { toast } from '../../../../lib/toast.js';
-import { cadenceApi, type CadenceSequenceDTO } from '../../cadence.api.js';
+import { type CadenceSequenceDTO, cadenceApi } from '../../cadence.api.js';
 import { formatDateTime } from './constants.js';
 
 /**

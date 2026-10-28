@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react';
 import {
-  Settings,
-  Globe,
+  AlertTriangle,
+  ArrowRight,
   Bell,
+  Globe,
   Keyboard,
   LayoutGrid,
+  Settings,
   SlidersHorizontal,
-  ArrowRight,
-  AlertTriangle,
 } from 'lucide-react';
-import {
-  Card,
-  Button,
-  Badge,
-  Switch,
-  Select,
-  useToast,
-  ToastContainer,
-  Skeleton,
-} from '../../components/design-system.js';
+import { useEffect, useState } from 'react';
 import { logger } from '../../../lib/logger.js';
+import {
+  Badge,
+  Button,
+  Card,
+  Select,
+  Skeleton,
+  Switch,
+  ToastContainer,
+  useToast,
+} from '../../components/design-system.js';
 
 const PREFERENCES_DEFAULTS = {
   lang: 'pt',

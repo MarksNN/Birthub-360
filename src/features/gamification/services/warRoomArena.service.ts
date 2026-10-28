@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   ArenaParticipant,
   ArenaPedagogicalScore,
@@ -7,8 +9,6 @@ import type {
   WarRoomArenaRoom,
   WarRoomMode,
 } from '../../../shared/contracts/warRoomArena.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class WarRoomArenaService implements IWarRoomArenaPort {
   private rooms = new Map<string, WarRoomArenaRoom>(); // key: `${orgId}:${roomId}`

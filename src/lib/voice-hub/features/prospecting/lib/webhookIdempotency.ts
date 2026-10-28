@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { Redis } from 'ioredis';
-import { getRedisUrl, getRedisRetryStrategy } from '../../../lib/env.js';
+import { getRedisRetryStrategy, getRedisUrl } from '../../../lib/env.js';
 import { logger } from '../../../lib/logger.js';
 
 /**

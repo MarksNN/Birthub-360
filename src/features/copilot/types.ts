@@ -1,13 +1,13 @@
 import type {
-  ObjectionCategory,
-  ObjectionDetectionResult,
-  SuggestedRebuttal,
-} from '../../shared/services/objectionDetection.service.js';
-import type {
   LiveLatencyMetrics,
   LiveVoiceSessionState,
   LiveVoiceTransportType,
 } from '../../shared/contracts/bimodalLiveVoice.contract.js';
+import type {
+  ObjectionCategory,
+  ObjectionDetectionResult,
+  SuggestedRebuttal,
+} from '../../shared/services/objectionDetection.service.js';
 
 export type HUDSize = 'compact' | 'standard' | 'expanded';
 

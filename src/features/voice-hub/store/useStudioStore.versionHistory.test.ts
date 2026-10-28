@@ -7,7 +7,7 @@
 // workflow's data — AGENTS.md §14/§15), a successful rollback replaces the canvas with the
 // server's response and refreshes the list, and a rejected rollback (422) surfaces `issues[]`
 // without silently mutating the canvas.
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStudioStore } from './useStudioStore.js';
 
 function jsonResponse(body: unknown, ok = true, status = 200) {

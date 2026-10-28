@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { BRAND } from '../../../../../config/brand.js';
 import { api } from '../../../../../lib/api.js';
 import {
+  BIRTHHUB360_SEGMENTO_OPTIONS,
   ESTADO_OPTIONS,
   PORTE_OPTIONS,
   SEGMENTO_OPTIONS,
-  BIRTHHUB360_SEGMENTO_OPTIONS,
 } from '../../../../../shared/constants/icp-options.js';
 import type { ProspectCandidate, ProspectCriteria } from '../../../services/prospecting.service.js';
 import { CandidateCard } from '../CandidateCard.js';

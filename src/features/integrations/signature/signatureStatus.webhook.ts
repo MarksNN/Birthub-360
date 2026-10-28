@@ -5,8 +5,8 @@ import { logger } from '../../../lib/logger.js';
 import type { SignatureStatus } from '../../../shared/domain/signature.js';
 import {
   claimWebhookDelivery,
-  webhookDeliveryFingerprint,
   validateWebhookTimestamp,
+  webhookDeliveryFingerprint,
 } from '../../../shared/security/webhookReplayGuard.js';
 import { applySignatureStatusUpdate } from '../../cadence/application/documentSignature.js';
 import { prismaSignatureRequestRepository } from '../../cadence/infra/PrismaSignatureRequestRepository.js';

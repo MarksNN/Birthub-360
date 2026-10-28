@@ -1,6 +1,6 @@
+import { TerminalSafetyService } from '../../../../../shared/security/terminalSafety.service.js';
 import type { StudioGenerationRequest } from '../schema.js';
 import { invokeText, SYSTEM_RULES, stripCodeFence } from '../shared.js';
-import { TerminalSafetyService } from '../../../../../shared/security/terminalSafety.service.js';
 
 export async function generateScript(
   request: Extract<StudioGenerationRequest, { kind: 'script' }>,

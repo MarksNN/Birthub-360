@@ -1,6 +1,6 @@
-import type React from 'react';
 import { motion } from 'framer-motion';
-import { Users, PhoneCall, BarChart3, Boxes, Sliders, Building2, CheckCircle2 } from 'lucide-react';
+import { BarChart3, Boxes, Building2, CheckCircle2, PhoneCall, Sliders, Users } from 'lucide-react';
+import type React from 'react';
 
 interface ModuleCardProps {
   icon: React.ElementType;

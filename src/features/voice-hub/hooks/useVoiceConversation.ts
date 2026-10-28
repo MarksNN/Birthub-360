@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import type { Question } from '../types.js';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { logger } from '../../../lib/logger.js';
+import type { Question } from '../types.js';
 
 const POSITIVE_WORDS = [
   'sim',

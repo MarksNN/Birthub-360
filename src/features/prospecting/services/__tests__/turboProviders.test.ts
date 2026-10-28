@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 const mocks = vi.hoisted(() => ({ fetch: vi.fn(), fetchRetry: vi.fn(), key: vi.fn() }));
 vi.mock('../../../../lib/http.js', () => ({ fetchWithTimeout: mocks.fetch }));
 vi.mock('../../../../lib/enrichment/providerFetch.js', () => ({
@@ -8,8 +9,10 @@ vi.mock('../../../../config/prospecting-integrations.js', () => ({
   getPaidProspectingKey: mocks.key,
 }));
 vi.mock('../../../../lib/logger.js', () => ({ logger: { error: vi.fn() } }));
-import { searchGooglePlacesCandidates } from '../places.service.js';
+
 import { searchNominatimCandidates } from '../nominatim.service.js';
+import { searchGooglePlacesCandidates } from '../places.service.js';
+
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.key.mockReturnValue('test-fixture');

@@ -1,23 +1,23 @@
-import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
-import type { Lead, ThemeMode } from '../types.js';
-import { calculateLeadQuality } from '../utils/leadQuality.js';
 import {
-  ShieldCheck,
-  AlertTriangle,
   AlertCircle,
+  AlertTriangle,
+  Briefcase,
   Check,
-  X,
+  Globe,
   Info,
-  Sparkles,
-  UserCheck,
   Mail,
   // Linkedin removed
   Phone,
-  Globe,
-  Briefcase,
+  ShieldCheck,
+  Sparkles,
+  UserCheck,
+  X,
 } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LinkedinIcon as Linkedin } from '../../../../components/ui/icons/LinkedinIcon.js';
+import type { Lead, ThemeMode } from '../types.js';
+import { calculateLeadQuality } from '../utils/leadQuality.js';
 
 interface LeadQualityBadgeProps {
   lead: Lead;

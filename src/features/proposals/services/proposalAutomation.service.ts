@@ -1,11 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   CommercialProposalDraft,
   IProposalAutomationPort,
   ProposalItem,
 } from '../../../shared/contracts/proposalAutomation.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class ProposalAutomationService implements IProposalAutomationPort {
   private proposalsStore = new Map<string, CommercialProposalDraft>();

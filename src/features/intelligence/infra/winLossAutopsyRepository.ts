@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client';
-import type { WinLossAutopsyReport } from '../../../shared/contracts/winLossAutopsy.contract.js';
 import { withTenantContext } from '../../../lib/async-context.js';
 import { prisma } from '../../../lib/prisma.js';
+import type { WinLossAutopsyReport } from '../../../shared/contracts/winLossAutopsy.contract.js';
 
 /**
  * REMED-02: persistência da Autópsia Win-Loss. Fonte da verdade = PostgreSQL

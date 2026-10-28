@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
+import { clearMetrics, createMetric, listMetrics } from '../services/metricService.js';
 import { metricSchema } from '../validators/index.js';
-import { listMetrics, createMetric, clearMetrics } from '../services/metricService.js';
 
 export async function listMetricsHandler(req: Request, res: Response) {
   const metrics = await listMetrics(req.organizationId!, req.voiceHubUser?.id);

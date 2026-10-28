@@ -1,6 +1,5 @@
 import canvasConfetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
-import { SoundFX } from '../../../lib/soundEffects.js';
 import {
   AlertTriangle,
   Bot,
@@ -21,6 +20,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useBrandAccent } from '../../../hooks/useBrandAccent.js';
 import { api } from '../../../lib/api.js';
 import { clientLogger } from '../../../lib/clientLogger.js';
+import { SoundFX } from '../../../lib/soundEffects.js';
 import { SWARM_BRAND } from '../agents/swarm.constants.js';
 import { UniversalEcosystemPanel } from './UniversalEcosystemPanel.js';
 

@@ -1,40 +1,40 @@
-import type React from 'react';
-import { useState, useEffect } from 'react';
-import type {
-  Lead,
-  AIConfig,
-  ThemeMode,
-  IntegrationsConfig,
-  LeadStage,
-  User,
-  ProspectFilters,
-  ProspectRunMeta,
-} from '../types.js';
-import { LeadCard } from './LeadCard.js';
-import { resolveBitrixWebhook } from '../utils/bitrix.js';
-import { SearchCombobox } from './SearchCombobox.js';
-import { MetricsChart } from './MetricsChart.js';
-import { ProspectRunSummary } from './ProspectRunSummary.js';
-import { SEARCH_SCHEMA_CONFIG } from '../utils/searchOptions.js';
+import confetti from 'canvas-confetti';
 import {
-  Search,
-  Sparkles,
-  Loader2,
+  Building2,
+  Check,
   CheckCircle2,
-  Flame,
+  DollarSign,
   FileCode,
   FileSpreadsheet,
-  Send,
-  Check,
-  Building2,
+  Flame,
+  Loader2,
   MapPin,
+  Search,
+  Send,
+  Sparkles,
+  Square,
   Truck,
   UserCheck,
   Users,
-  DollarSign,
-  Square,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import type {
+  AIConfig,
+  IntegrationsConfig,
+  Lead,
+  LeadStage,
+  ProspectFilters,
+  ProspectRunMeta,
+  ThemeMode,
+  User,
+} from '../types.js';
+import { resolveBitrixWebhook } from '../utils/bitrix.js';
+import { SEARCH_SCHEMA_CONFIG } from '../utils/searchOptions.js';
+import { LeadCard } from './LeadCard.js';
+import { MetricsChart } from './MetricsChart.js';
+import { ProspectRunSummary } from './ProspectRunSummary.js';
+import { SearchCombobox } from './SearchCombobox.js';
 
 interface ProspectorTabProps {
   user: User;

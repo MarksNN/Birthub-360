@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   CadenceRecommendation,
   EngagementChannel,
@@ -10,8 +12,6 @@ import type {
 import type { OptOutRepository } from '../../../shared/domain/optOut.js';
 import { isOptedOut } from '../application/optOutService.js';
 import { InMemoryOptOutRepository } from '../infra/InMemoryOptOutRepository.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 import { adaptiveMultichannelCadenceService } from './adaptiveMultichannelCadence.service.js';
 
 export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
@@ -224,7 +224,7 @@ export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
           adaptiveMultichannelCadenceService.isLeadOptedOut(organizationId, lead.leadId);
 
         let eligible = !isOptedOutFlag && !lead.isWonOrLost;
-        let ineligibilityReason: string | undefined = undefined;
+        let ineligibilityReason: string | undefined;
 
         if (isOptedOutFlag) {
           eligible = false;
@@ -235,9 +235,9 @@ export class SelfDrivingCrmService implements ISelfDrivingCrmPort {
             'Lead já encerrado formalmente no CRM (Ganho ou Perdido Definitivo).';
         }
 
-        let strategy: StagnantLeadAnalysis['recommendedStrategy'] = undefined;
-        let copySubject: string | undefined = undefined;
-        let bodySnippet: string | undefined = undefined;
+        let strategy: StagnantLeadAnalysis['recommendedStrategy'];
+        let copySubject: string | undefined;
+        let bodySnippet: string | undefined;
 
         if (eligible) {
           if (daysInactive > 45) {

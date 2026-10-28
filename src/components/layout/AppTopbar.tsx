@@ -10,8 +10,8 @@ import { OPEN_COMMAND_PALETTE_EVENT } from '../../lib/paletteIntent.js';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { BirthHubLogo } from '../brand/BirthHubLogo.js';
 import { AppBreadcrumbs } from './AppBreadcrumbs.js';
+import { OfflineBadge, SyncIndicator } from './SyncIndicator.js';
 import { TAB_META, type TabType } from './tabMeta.js';
-import { SyncIndicator, OfflineBadge } from './SyncIndicator.js';
 
 interface AppTopbarProps {
   activeTab: TabType;

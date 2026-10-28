@@ -1,5 +1,5 @@
-import { Target, LineChart, Layers, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Layers, LineChart, Settings, Target } from 'lucide-react';
 
 interface PlaceholderProps {
   title: string;

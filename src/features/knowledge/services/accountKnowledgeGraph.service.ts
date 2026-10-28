@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   AccountGraphView,
   GraphEdge,
@@ -9,8 +11,6 @@ import type {
   MultiThreadingApproach,
   RelationshipConfidence,
 } from '../../../shared/contracts/accountKnowledgeGraph.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 import {
   type AccountGraphRepository,
   PrismaAccountGraphRepository,

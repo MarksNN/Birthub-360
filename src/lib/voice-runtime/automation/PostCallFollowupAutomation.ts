@@ -1,7 +1,7 @@
+import { logger } from '../../logger.js';
+import type { IntentAnalysisResult } from '../intelligence/IntentEngine.js';
 import { observability } from '../Observability.js';
 import type { VoiceSession } from '../types.js';
-import type { IntentAnalysisResult } from '../intelligence/IntentEngine.js';
-import { logger } from '../../logger.js';
 
 export interface PostCallFollowupResult {
   sessionId: string;

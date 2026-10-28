@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Campaign } from '../../domain/entities/Campaign.js';
 import type { CampaignRepository } from '../ports/CampaignRepository.js';
-import type { LeadRepository, CampaignStats } from '../ports/LeadRepository.js';
+import type { CampaignStats, LeadRepository } from '../ports/LeadRepository.js';
 
 export class CampaignNotFoundError extends Error {
   constructor(id: string) {

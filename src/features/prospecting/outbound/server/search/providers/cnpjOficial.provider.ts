@@ -5,7 +5,7 @@
 // para que o Provider Registry e o Query Planner tratem esta fonte como
 // qualquer outra, por capacidade.
 
-import { fetchCnpjPublicData, type CnpjData } from '../../cnpj.js';
+import { type CnpjData, fetchCnpjPublicData } from '../../cnpj.js';
 import type {
   ProviderCapability,
   ProviderHealth,

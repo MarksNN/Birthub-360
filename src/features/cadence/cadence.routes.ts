@@ -2,10 +2,16 @@ import { randomUUID } from 'node:crypto';
 import { type NextFunction, type Request, type Response, Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../lib/prisma.js';
+import { prismaOptOutRepository } from '../../shared/infra/PrismaOptOutRepository.js';
 import type { AuthRequest } from '../../shared/middlewares/authenticateToken.js';
 import { AppError } from '../../shared/middlewares/errorHandler.js';
 import { requireRole } from '../../shared/middlewares/requireRole.js';
 import { validateRequest } from '../../shared/middlewares/validateRequest.js';
+import {
+  checkOptOutStatus,
+  recordContactOptOut,
+} from '../../shared/services/optOutCheck.service.js';
+import { recordOptOut } from '../../shared/services/optOutService.js';
 import { scheduleVerifiedMeeting } from './application/scheduleMeeting.js';
 import { deactivateCadenceSequence } from './application/sequenceService.js';
 import {
@@ -20,12 +26,6 @@ import { prismaCadenceRunRepository } from './infra/PrismaCadenceRunRepository.j
 import { prismaCadenceSequenceRepository } from './infra/PrismaCadenceSequenceRepository.js';
 import { prismaCalendarSchedulerPort } from './infra/PrismaCalendarSchedulerPort.js';
 import { prismaMeetingConfirmationNotePort } from './infra/PrismaMeetingConfirmationNotePort.js';
-import { prismaOptOutRepository } from '../../shared/infra/PrismaOptOutRepository.js';
-import { recordOptOut } from '../../shared/services/optOutService.js';
-import {
-  checkOptOutStatus,
-  recordContactOptOut,
-} from '../../shared/services/optOutCheck.service.js';
 import { parseCadenceSequenceDefinition } from './jobs/cadenceRun.worker.js';
 
 /**

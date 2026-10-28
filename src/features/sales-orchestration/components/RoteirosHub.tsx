@@ -1,20 +1,20 @@
-import { useState } from 'react';
 import {
-  MessageSquareText,
-  Copy,
   Check,
-  Phone,
-  MessageSquare,
+  Copy,
   Mail,
-  Users,
+  MessageSquare,
+  MessageSquareText,
+  Phone,
   Plus,
   Sparkles,
+  Users,
 } from 'lucide-react';
-import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
-import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/Card.js';
-import { KpiCard } from '../../../components/ui/KpiCard.js';
-import { Button } from '../../../components/ui/Button.js';
+import { useState } from 'react';
 import { Badge } from '../../../components/ui/Badge.js';
+import { Button } from '../../../components/ui/Button.js';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card.js';
+import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
+import { KpiCard } from '../../../components/ui/KpiCard.js';
 import {
   DemoBadge,
   NO_API_SUBTITLE,

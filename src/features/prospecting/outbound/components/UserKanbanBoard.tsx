@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import type { Lead, User } from '../types.js';
-import { LeadCard } from './LeadCard.js';
 import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { Lead, User } from '../types.js';
 import { computeNextAction, urgencyWeight } from '../utils/nextAction.js';
+import { LeadCard } from './LeadCard.js';
 
 interface UserKanbanBoardProps {
   user: User;

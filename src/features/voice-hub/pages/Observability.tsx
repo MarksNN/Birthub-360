@@ -1,39 +1,39 @@
-import { useState, useEffect } from 'react';
-import {
-  Card,
-  Badge,
-  Spinner,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-} from '../../components/design-system.js';
+import type { Attributes } from '@opentelemetry/api';
 import {
   Activity,
   BarChart2,
+  Layers,
+  RefreshCw,
   Server,
-  Zap,
   Shield,
   Terminal,
-  RefreshCw,
-  Layers,
+  Zap,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
-import type { Attributes } from '@opentelemetry/api';
 import { logger } from '../../../lib/logger.js';
+import {
+  Badge,
+  Card,
+  Spinner,
+  Table,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '../../components/design-system.js';
 
 interface LocalSpan {
   id: string;

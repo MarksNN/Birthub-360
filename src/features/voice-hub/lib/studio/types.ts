@@ -1,9 +1,10 @@
-import type { Node, Edge } from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react';
 import type {
-  StudioNodeData as SharedNodeData,
-  StudioEdgeData as SharedEdgeData,
   NodeType,
+  StudioEdgeData as SharedEdgeData,
+  StudioNodeData as SharedNodeData,
 } from '../../../../lib/studio/types.js';
+
 export * from '../../../../lib/studio/types.js';
 
 export type NodeLifecycleState =

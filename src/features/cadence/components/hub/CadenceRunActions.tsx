@@ -2,7 +2,7 @@ import { CalendarClock, Pause, Play, Square } from 'lucide-react';
 import { useState } from 'react';
 import { useConfirmDialog } from '../../../../components/ui/ConfirmDialog.js';
 import { toast } from '../../../../lib/toast.js';
-import { cadenceApi, type CadenceRunDTO } from '../../cadence.api.js';
+import { type CadenceRunDTO, cadenceApi } from '../../cadence.api.js';
 
 /** CYC-009 (onda 29) — as únicas duas ações reais possíveis num run não-terminal (`pauseCadenceRun`/`resumeCadenceRun`/`stopCadenceManually` já existiam no domínio, só sem rota nenhuma chamando-os). Parar é irreversível (mesmo raciocínio de `stopCadenceManually` — "distinta de pausa: não tem retomada") — por isso exige confirmação, mesmo padrão de `window.confirm` já usado em `LeadDetailDrawer.tsx` para excluir um lead. */
 export function CadenceRunActions({

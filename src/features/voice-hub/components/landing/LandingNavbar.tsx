@@ -1,7 +1,7 @@
+import { ArrowRight, Menu, Sparkles, X } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Menu, X, ArrowRight } from 'lucide-react';
 import { BirthHubLogo } from '../../../../components/brand/BirthHubLogo.js';
 
 export function LandingNavbar(): React.ReactElement {

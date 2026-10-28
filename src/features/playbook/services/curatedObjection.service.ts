@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
 import type {
   CuratedObjectionItem,
   ICuratedObjectionPort,
   ObjectionCurationStatus,
 } from '../../../shared/contracts/dataFlywheel.contract.js';
-import { logger } from '../../../lib/logger.js';
 import { PrismaObjectionMatrixRepository } from '../objection-matrix/infra/PrismaObjectionMatrixRepository.js';
 
 export class CuratedObjectionService implements ICuratedObjectionPort {

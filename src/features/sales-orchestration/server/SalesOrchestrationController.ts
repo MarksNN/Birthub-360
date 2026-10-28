@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
-import { SalesOrchestrationService } from './SalesOrchestrationService.js';
 import { AppError } from '../../../shared/middlewares/errorHandler.js';
+import { SalesOrchestrationService } from './SalesOrchestrationService.js';
 
 export class SalesOrchestrationController {
   static async getOverview(req: Request, res: Response, next: NextFunction): Promise<void> {

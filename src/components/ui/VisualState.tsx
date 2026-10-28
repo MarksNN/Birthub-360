@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import {
   AlertTriangle,
   Ban,
@@ -8,7 +9,6 @@ import {
   RotateCcw,
   Sparkles,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils.js';
 
 export type VisualStateType =

@@ -1,19 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response } from 'express';
-import {
-  addCommentHandler,
-  resolveCommentHandler,
-  lockNodeHandler,
-  unlockNodeHandler,
-} from './workflowCollab.controller.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   addComment,
-  resolveComment,
-  lockNode,
-  unlockNode,
   ConflictError,
+  lockNode,
+  resolveComment,
+  unlockNode,
 } from '../services/workflowCollabService.js';
 import { NotFoundError } from '../services/workflowService.js';
+import {
+  addCommentHandler,
+  lockNodeHandler,
+  resolveCommentHandler,
+  unlockNodeHandler,
+} from './workflowCollab.controller.js';
 
 vi.mock('../services/workflowCollabService.js', () => ({
   addComment: vi.fn(),

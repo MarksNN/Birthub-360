@@ -1,19 +1,19 @@
+import {
+  Activity,
+  BookOpen,
+  Code,
+  Link,
+  Plus,
+  Settings2,
+  ShieldAlert,
+  Trash2,
+  Variable,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import type React from 'react';
 import { useId, useState } from 'react';
-import {
-  Settings2,
-  Code,
-  Activity,
-  Variable,
-  Plus,
-  BookOpen,
-  Link,
-  Trash2,
-  ShieldAlert,
-} from 'lucide-react';
 import type { StudioNode } from '../../../lib/studio/types.js';
-import { useStudioStore, nodeRegistry } from '../../../store/useStudioStore.js';
-import { motion, AnimatePresence } from 'motion/react';
+import { nodeRegistry, useStudioStore } from '../../../store/useStudioStore.js';
 
 interface InspectorPanelProps {
   selectedNode: StudioNode | null;

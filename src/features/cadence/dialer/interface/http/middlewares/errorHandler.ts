@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import type { Logger } from '../../../infrastructure/logger.js';
+import { CampaignNotFoundError } from '../../../application/use-cases/ManageCampaign.js';
 import { InvalidCampaignTransitionError } from '../../../domain/entities/Campaign.js';
 import { InvalidPhoneNumberError } from '../../../domain/value-objects/PhoneNumber.js';
-import { CampaignNotFoundError } from '../../../application/use-cases/ManageCampaign.js';
+import type { Logger } from '../../../infrastructure/logger.js';
 
 /**
  * Traduz erros de domínio/aplicação conhecidos em respostas HTTP com o

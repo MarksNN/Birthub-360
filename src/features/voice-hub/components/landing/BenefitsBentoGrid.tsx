@@ -1,15 +1,15 @@
-import type React from 'react';
 import { motion } from 'framer-motion';
 import {
-  Bot,
-  Mic2,
-  LineChart,
-  Cpu,
-  ShieldCheck,
-  Workflow,
-  Sparkles,
   ArrowUpRight,
+  Bot,
+  Cpu,
+  LineChart,
+  Mic2,
+  ShieldCheck,
+  Sparkles,
+  Workflow,
 } from 'lucide-react';
+import type React from 'react';
 
 interface BentoCardProps {
   icon: React.ElementType;

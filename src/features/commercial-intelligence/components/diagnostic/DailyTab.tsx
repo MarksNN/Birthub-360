@@ -1,4 +1,3 @@
-import type React from 'react';
 import {
   AlertTriangle,
   CheckSquare,
@@ -9,6 +8,7 @@ import {
   Square,
   Zap,
 } from 'lucide-react';
+import type React from 'react';
 import { DIAGNOSTIC_DATA } from './constants.js';
 import type { ChannelTag, DailyTask } from './types.js';
 

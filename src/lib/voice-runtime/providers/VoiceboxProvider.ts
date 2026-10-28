@@ -1,10 +1,10 @@
+import { logger } from '../../logger.js';
 import {
   BaseProvider,
-  type ProviderResponse,
-  type ProviderInput,
   type ProviderContext,
+  type ProviderInput,
+  type ProviderResponse,
 } from './BaseProvider.js';
-import { logger } from '../../logger.js';
 
 export class VoiceboxProvider extends BaseProvider {
   public id = 'Voicebox';

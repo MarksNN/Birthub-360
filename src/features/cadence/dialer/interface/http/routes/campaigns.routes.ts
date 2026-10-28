@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import type { ManageCampaign } from '../../../application/use-cases/ManageCampaign.js';
 import type { CampaignRepository } from '../../../application/ports/CampaignRepository.js';
+import type { ManageCampaign } from '../../../application/use-cases/ManageCampaign.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 
 const createCampaignSchema = z.object({

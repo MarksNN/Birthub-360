@@ -4,9 +4,9 @@
  */
 
 import {
+  InMemorySocialSellingRepository,
   type SocialSellingDraft,
   type SocialSellingRepository,
-  InMemorySocialSellingRepository,
 } from '../infra/PrismaSocialSellingRepository.js';
 import { SocialSellingApproachService as CoreService } from '../server/socialSellingApproach.service.js';
 

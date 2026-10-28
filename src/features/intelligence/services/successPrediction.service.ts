@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma.js';
 import { logger } from '../../../lib/logger.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Predição de Sucesso - Modelo que prevê probabilidade de sucesso antes de executar.

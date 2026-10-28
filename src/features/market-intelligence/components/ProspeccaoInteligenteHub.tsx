@@ -1,26 +1,29 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
+  AlertTriangle,
+  Building2,
+  CheckCircle2,
+  Database,
+  PlugZap,
+  Plus,
   Search,
   Users,
-  Database,
-  CheckCircle2,
-  Plus,
-  AlertTriangle,
-  PlugZap,
-  Building2,
 } from 'lucide-react';
-import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Badge } from '../../../components/ui/Badge.js';
+import { BlockedState, SourceRequiredIcon } from '../../../components/ui/BlockedState.js';
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from '../../../components/ui/Card.js';
-import { KpiCard } from '../../../components/ui/KpiCard.js';
-import { Badge } from '../../../components/ui/Badge.js';
+import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
+import { EmptyState } from '../../../components/ui/EmptyState.js';
 import { Input } from '../../../components/ui/Input.js';
+import { KpiCard } from '../../../components/ui/KpiCard.js';
+import { Skeleton } from '../../../components/ui/Skeleton.js';
 import {
   Table,
   TableBody,
@@ -29,9 +32,6 @@ import {
   TableHeader,
   TableRow,
 } from '../../../components/ui/Table.js';
-import { EmptyState } from '../../../components/ui/EmptyState.js';
-import { BlockedState, SourceRequiredIcon } from '../../../components/ui/BlockedState.js';
-import { Skeleton } from '../../../components/ui/Skeleton.js';
 import { api } from '../../../lib/api.js';
 
 type ProviderState = {

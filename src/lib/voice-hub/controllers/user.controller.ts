@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
-import { createUserSchema, updateUserSchema } from '../validators/index.js';
-import {
-  listUsers,
-  createUserInTenant,
-  updateUserProfile,
-  deleteUser,
-  anonymizeUserData,
-  UserServiceError,
-} from '../services/userService.js';
 import { writeAuditLog } from '../services/audit.js';
+import {
+  anonymizeUserData,
+  createUserInTenant,
+  deleteUser,
+  listUsers,
+  UserServiceError,
+  updateUserProfile,
+} from '../services/userService.js';
+import { createUserSchema, updateUserSchema } from '../validators/index.js';
 
 export async function listUsersHandler(req: Request, res: Response) {
   const users = await listUsers(req.organizationId!);

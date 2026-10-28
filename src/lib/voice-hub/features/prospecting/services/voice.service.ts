@@ -1,10 +1,10 @@
 import { logger } from '../../../lib/logger.js';
-import type { Birthhub360OutboundPayload } from '../validators/birthhub360.schema.js';
+import { getAiConsent } from '../../../services/settingService.js';
 import {
   buildBirthhub360OutboundIdempotencyKey,
   claimIdempotencyKey,
 } from '../lib/webhookIdempotency.js';
-import { getAiConsent } from '../../../services/settingService.js';
+import type { Birthhub360OutboundPayload } from '../validators/birthhub360.schema.js';
 
 export interface TriggerOutboundCallResult {
   success: boolean;

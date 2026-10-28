@@ -10,16 +10,16 @@ import {
   SuppressedNumberError,
 } from './birthVoice.service.js';
 import {
-  computeHourlyAnswerRates,
-  prioritizeDialCandidates,
-  scoreDialCandidate,
-} from './coldCall.scoring.js';
-import {
   type CallWindow,
   type DialPolicy,
   evaluateLead,
   isWithinCallWindow,
 } from './coldCall.policy.js';
+import {
+  computeHourlyAnswerRates,
+  prioritizeDialCandidates,
+  scoreDialCandidate,
+} from './coldCall.scoring.js';
 
 /**
  * Etapa do funil que a campanha fria ataca. Leads mais adiante já têm um humano conduzindo — uma

@@ -9,13 +9,13 @@ import type { CopilotoVoiceIngestionPort } from '../../../shared/contracts/copil
 import { container } from '../../../shared/di/container.js';
 import {
   claimWebhookDelivery,
-  webhookDeliveryFingerprint,
   validateWebhookTimestamp,
+  webhookDeliveryFingerprint,
 } from '../../../shared/security/webhookReplayGuard.js';
-import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
-import { sendWhatsAppMessage } from '../whatsapp/whatsapp.service.js';
 import { checkOptOutStatus } from '../../../shared/services/optOutCheck.service.js';
+import { resolveCadencePendingVoiceTouch } from '../../cadence/infra/cadenceWebhookResolver.js';
 import { syncActivityToBitrix } from '../bitrix/service/outboundSync.js';
+import { sendWhatsAppMessage } from '../whatsapp/whatsapp.service.js';
 import {
   buildObservations,
   type CallEndedData,

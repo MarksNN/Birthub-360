@@ -4,8 +4,8 @@
  */
 
 import {
-  companyCacheRepository,
   type CachedCompany,
+  companyCacheRepository,
 } from '../infra/PrismaCompanyCacheRepository.js';
 
 export class CompanyEnrichmentService {

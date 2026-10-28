@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
+import { getChecklist, resetChecklist, saveChecklist } from '../services/settingService.js';
 import { checklistSchema } from '../validators/index.js';
-import { getChecklist, saveChecklist, resetChecklist } from '../services/settingService.js';
 
 export async function getChecklistHandler(req: Request, res: Response) {
   const checklist = await getChecklist(req.organizationId!, req.voiceHubUser?.id);

@@ -1,22 +1,22 @@
+import {
+  AlertCircle,
+  BarChart2,
+  FastForward,
+  List,
+  Pause,
+  Play,
+  Plus,
+  Sparkles,
+  Square,
+  Terminal,
+  Trash2,
+  Variable,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import type React from 'react';
 import { useState } from 'react';
-import {
-  Play,
-  Pause,
-  Square,
-  AlertCircle,
-  List,
-  Terminal,
-  BarChart2,
-  Sparkles,
-  Variable,
-  Plus,
-  Trash2,
-  FastForward,
-} from 'lucide-react';
-import { useStudioStore } from '../../../store/useStudioStore.js';
 import { validationEngine } from '../../../../../lib/studio/ValidationEngine.js';
-import { motion, AnimatePresence } from 'motion/react';
+import { useStudioStore } from '../../../store/useStudioStore.js';
 import { ValidationIssuesList } from './ValidationIssuesList.js';
 
 export function BottomDrawer() {

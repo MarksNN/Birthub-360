@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../repositories/apiKeyRepository.js', () => ({
   createApiKey: vi.fn(),
@@ -17,8 +17,8 @@ vi.mock('../repositories/userRepository.js', () => ({
 import * as apiKeyRepository from '../repositories/apiKeyRepository.js';
 import * as userRepository from '../repositories/userRepository.js';
 import {
-  ApiKeyServiceError,
   API_KEY_PREFIX,
+  ApiKeyServiceError,
   authenticateApiKey,
   createApiKeyForTenant,
   isApiKeyFormat,

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 import { Activity, BrainCircuit, Check, CheckCircle2, FileSearch, Zap } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const AI_STEPS = [
   { id: 'context', label: 'CONTEXT', icon: FileSearch },

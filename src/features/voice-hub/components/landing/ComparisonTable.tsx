@@ -1,5 +1,5 @@
+import { Check, Sparkles, X } from 'lucide-react';
 import type React from 'react';
-import { Check, X, Sparkles } from 'lucide-react';
 
 interface ComparisonRow {
   feature: string;

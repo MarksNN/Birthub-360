@@ -23,10 +23,6 @@ import {
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext.js';
-import { useTheme } from '../../../contexts/ThemeContext.js';
-import { authClient } from '../../../lib/auth-client.js';
-import { SoundFX } from '../../../lib/soundEffects.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
 import {
   AiDiagnosticLayerIcon,
@@ -36,6 +32,10 @@ import {
   ReactiveCardIcon,
   SilosCardIcon,
 } from '../../../components/brand/LandingTitleIcons.js';
+import { useAuth } from '../../../contexts/AuthContext.js';
+import { useTheme } from '../../../contexts/ThemeContext.js';
+import { authClient } from '../../../lib/auth-client.js';
+import { SoundFX } from '../../../lib/soundEffects.js';
 import './Landing360.css';
 
 // 8 PILARES OFICIAIS COMPLETOS DO BIRTH HUB 360° (PALETA NEON OFICIAL - DOURADO RADIANTE)

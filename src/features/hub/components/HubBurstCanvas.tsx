@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion';
 import type React from 'react';
 import { forwardRef, useImperativeHandle } from 'react';
-import { motion } from 'framer-motion';
 
 export interface BurstHandle {
   triggerBurst: (x?: number, y?: number, colorRgb?: string) => void;

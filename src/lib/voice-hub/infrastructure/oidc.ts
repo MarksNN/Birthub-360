@@ -1,4 +1,4 @@
-import { discovery, type Configuration } from 'openid-client';
+import { type Configuration, discovery } from 'openid-client';
 
 let oidcConfiguration: Promise<Configuration | undefined> | undefined;
 

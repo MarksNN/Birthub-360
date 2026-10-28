@@ -1,6 +1,6 @@
-import { BaseProvider, type ProviderResponse } from './BaseProvider.js';
 import { ElevenLabsClient } from 'elevenlabs';
 import { logger } from '../../logger.js';
+import { BaseProvider, type ProviderResponse } from './BaseProvider.js';
 
 export class ElevenLabsProvider extends BaseProvider {
   public id = 'ElevenLabs';

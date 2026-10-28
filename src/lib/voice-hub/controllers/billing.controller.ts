@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import { changePlanSchema } from '../validators/index.js';
 import { logger } from '../../../lib/logger.js';
 import { writeAuditLog } from '../services/audit.js';
 import {
@@ -11,6 +10,7 @@ import {
   ProrationNotSupportedError,
 } from '../services/billingService.js';
 import { createNotification } from '../services/notificationService.js';
+import { changePlanSchema } from '../validators/index.js';
 
 const BILLING_DEFAULT_PAGE_SIZE = 20;
 const BILLING_MAX_PAGE_SIZE = 100;

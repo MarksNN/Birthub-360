@@ -3,13 +3,12 @@
  * Acionadas pelo ExternalCrmPanel.
  */
 
-import { Router } from 'express';
-import express from 'express';
+import type { Request, Response } from 'express';
+import express, { Router } from 'express';
 import { z } from 'zod';
+import { logger } from '../../../lib/logger.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
 import { ExternalCrmService } from './ExternalCrmService.js';
-import { logger } from '../../../lib/logger.js';
-import type { Request, Response } from 'express';
 
 export const externalCrmRoutes = Router();
 

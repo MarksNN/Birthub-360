@@ -1,10 +1,10 @@
-import type { CompanyStatus, ActivityStatus, ActivityType } from '../../lib/zod.js';
 import type {
   LeadFunnel,
   ContactStatus as PrismaContactStatus,
   LeadStatus as PrismaLeadStatus,
   LeadTemperature as PrismaLeadTemperature,
 } from '@prisma/client';
+import type { ActivityStatus, ActivityType, CompanyStatus } from '../../lib/zod.js';
 
 export interface LeadQualification {
   segmentoOperacao?: string;

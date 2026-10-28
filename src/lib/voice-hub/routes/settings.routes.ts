@@ -1,11 +1,11 @@
 import express from 'express';
-import { requireTenant } from '../middlewares/rbac.js';
 import {
-  getSettingsHandler,
   createSettingsHandler,
-  updateSettingsHandler,
+  getSettingsHandler,
   resetSettingsHandler,
+  updateSettingsHandler,
 } from '../controllers/settings.controller.js';
+import { requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

@@ -11,7 +11,7 @@ import type {
 } from '../domain/Guardrail.js';
 import { prismaGuardrailRepository } from '../infra/PrismaGuardrailRepository.js';
 
-export type { GuardrailEventEntity, CreateGuardrailEventData, GuardrailRepository };
+export type { CreateGuardrailEventData, GuardrailEventEntity, GuardrailRepository };
 
 const CPF_REGEX = /\d{3}\.\d{3}\.\d{3}-\d{2}/g;
 // AIAGENT-006 (docs/audits/repository-debt-audit/agents/AIAGENT.md): o guard original só

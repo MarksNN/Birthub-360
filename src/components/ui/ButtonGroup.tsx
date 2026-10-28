@@ -1,7 +1,7 @@
-import * as React from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '../../lib/utils.js';
+import type * as React from 'react';
 import { SoundFX } from '../../lib/soundEffects.js';
+import { cn } from '../../lib/utils.js';
 
 export interface ButtonGroupItem<T extends string = string> {
   value: T;

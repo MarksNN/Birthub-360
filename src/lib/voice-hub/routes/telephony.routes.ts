@@ -1,13 +1,13 @@
-import express, { type Request, type Response, type NextFunction } from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import twilio from 'twilio';
+import { logger } from '../../../lib/logger.js';
 import {
+  dialStatusHandler,
+  gatherHandler,
   incomingCallHandler,
   outboundCallHandler,
-  gatherHandler,
   statusCallbackHandler,
-  dialStatusHandler,
 } from '../controllers/telephony.controller.js';
-import { logger } from '../../../lib/logger.js';
 
 const router = express.Router();
 

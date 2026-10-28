@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   BimodalLiveSession,
   BimodalSessionConfig,
@@ -6,8 +8,6 @@ import type {
   LiveLatencyMetrics,
   LiveVoiceSessionState,
 } from '../../../shared/contracts/bimodalLiveVoice.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class BimodalLiveVoiceService implements IBimodalLiveVoicePort {
   private sessions = new Map<string, BimodalLiveSession>(); // key: `${orgId}:${sessionId}`

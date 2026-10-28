@@ -10,15 +10,15 @@ import pdfParse from 'pdf-parse';
 import { z } from 'zod';
 import { getAiModel } from '../../lib/ai/gateway.js';
 import { logger } from '../../lib/logger.js';
+import {
+  knowledgeIngestionQueue,
+  knowledgeIngestionQueueEvents,
+} from '../../lib/queue/knowledgeIngestion.queue.js';
 import { routeParam } from '../../shared/http/routeParams.js';
 import type { AuthRequest } from '../../shared/middlewares/authenticateToken.js';
 import { requireRole } from '../../shared/middlewares/requireRole.js';
 import { validateRequest } from '../../shared/middlewares/validateRequest.js';
 import { ingestionService } from './ingestion.service.js';
-import {
-  knowledgeIngestionQueue,
-  knowledgeIngestionQueueEvents,
-} from '../../lib/queue/knowledgeIngestion.queue.js';
 import { searchService } from './search.service.js';
 
 const router = Router();

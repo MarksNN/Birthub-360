@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { useState } from 'react';
-import { describe, it, expect, vi } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button, Input, EmptyState, Modal, Switch, Tabs, Card } from './index.js';
+import { useState } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { Button, Card, EmptyState, Input, Modal, Switch, Tabs } from './index.js';
 
 describe('design-system primitives', () => {
   describe('Button', () => {

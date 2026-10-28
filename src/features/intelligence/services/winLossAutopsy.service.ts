@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   AutopsyFactorHypothesis,
   AutopsyTimelineEvent,
@@ -7,14 +9,12 @@ import type {
   WinLossAutopsyReport,
   WinLossOutcome,
 } from '../../../shared/contracts/winLossAutopsy.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import { curatedObjectionService } from '../../playbook/services/curatedObjection.service.js';
-import { commercialLearningFlywheel } from '../services/commercialLearningFlywheel.service.js';
-import { logger } from '../../../lib/logger.js';
 import {
   PrismaWinLossAutopsyRepository,
   type WinLossAutopsyRepository,
 } from '../infra/winLossAutopsyRepository.js';
+import { commercialLearningFlywheel } from '../services/commercialLearningFlywheel.service.js';
 
 export class WinLossAutopsyService implements IWinLossAutopsyPort {
   // REMED-02: fonte da verdade é o PostgreSQL (WinLossAutopsyReport, RLS por tenant).

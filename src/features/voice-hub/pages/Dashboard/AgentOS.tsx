@@ -1,23 +1,23 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Badge } from '../../components/design-system/index.js';
 import {
-  Settings,
-  Brain,
-  Mic,
-  Database,
-  Wrench,
-  Shield,
   Activity,
-  GitBranch,
-  PlaySquare,
   ArrowLeft,
-  Save,
-  Rocket,
-  Zap,
-  MessageSquare,
+  Brain,
+  Database,
   FlaskConical,
+  GitBranch,
+  MessageSquare,
+  Mic,
+  PlaySquare,
+  Rocket,
+  Save,
+  Settings,
+  Shield,
+  Wrench,
+  Zap,
 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Badge, Button, Card } from '../../components/design-system/index.js';
 
 // Version Control, Playground preview and Health & Analytics below render illustrative content —
 // no endpoint backs deploy history, a live playground transcript or per-agent health/CSAT/cost

@@ -7,7 +7,7 @@ import type {
 } from '../domain/Prompt.js';
 import { prismaPromptRepository } from '../infra/PrismaPromptRepository.js';
 
-export type { PromptEntity, CreatePromptData, UpdatePromptData, PromptRepository };
+export type { CreatePromptData, PromptEntity, PromptRepository, UpdatePromptData };
 
 export interface CreatePromptInput {
   name: string;

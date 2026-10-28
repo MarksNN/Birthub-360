@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   IValueRealizationPort,
   ValueMetricType,
@@ -7,8 +9,6 @@ import type {
   ValueRealizationSummary,
   ValueRealizationTracker,
 } from '../../../shared/contracts/valueRealization.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class ValueRealizationService implements IValueRealizationPort {
   private trackersStore = new Map<string, ValueRealizationTracker>(); // key: `${orgId}:${trackerId}`
@@ -107,7 +107,7 @@ export class ValueRealizationService implements IValueRealizationPort {
     }
 
     let newStatus: ValueRealizationStatus = 'MEASURED_ON_TRACK';
-    let divergenceNotes: string | undefined = undefined;
+    let divergenceNotes: string | undefined;
 
     if (isTargetMet) {
       newStatus = 'ACHIEVED';

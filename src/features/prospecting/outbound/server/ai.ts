@@ -1,6 +1,18 @@
-import { env } from '../../../../config/env.js';
 import { GoogleGenAI } from '@google/genai';
-import type { AIConfig, Lead, DecisionMaker, OutreachCopies } from '../src/types.js';
+import { env } from '../../../../config/env.js';
+import type { AIConfig, DecisionMaker, Lead, OutreachCopies } from '../src/types.js';
+import {
+  extractGeminiTokenUsage,
+  extractGroqTokenUsage,
+  extractOllamaTokenUsage,
+  recordAiGenerationLog,
+} from './aiGenerationLog.js';
+import {
+  type CopiesStringField,
+  safeParseJson,
+  validateCopiesShape,
+  validateEnrichmentShape,
+} from './aiSchemas.js';
 import type { EvidenceRecord } from './evidence.js';
 import {
   buildLeadEvidenceContext,
@@ -8,18 +20,6 @@ import {
   formatEvidenceContextForPrompt,
   type PersonalizationLevel,
 } from './leadEvidenceContext.js';
-import {
-  safeParseJson,
-  validateCopiesShape,
-  validateEnrichmentShape,
-  type CopiesStringField,
-} from './aiSchemas.js';
-import {
-  recordAiGenerationLog,
-  extractOllamaTokenUsage,
-  extractGroqTokenUsage,
-  extractGeminiTokenUsage,
-} from './aiGenerationLog.js';
 
 // IA & Guardrails (CPI follow-up, pós Wave 0) — versão do prompt-base de
 // outreach. Bump manual sempre que o TEXTO do prompt (system ou user) mudar

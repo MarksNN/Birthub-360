@@ -4,6 +4,11 @@ import {
   fromPrismaLeadStatus,
 } from '../../../lib/enumMap.js';
 import {
+  brazilMonthKey,
+  brazilMonthRange,
+  shiftBrazilMonth,
+} from '../../../shared/time/brazilCalendar.js';
+import {
   type AnalyticsDashboard,
   type AnalyticsRepository,
   type CohortRow,
@@ -18,11 +23,6 @@ import {
   type SalesSummaryMetrics,
   WON,
 } from '../domain/Analytics.js';
-import {
-  brazilMonthKey,
-  brazilMonthRange,
-  shiftBrazilMonth,
-} from '../../../shared/time/brazilCalendar.js';
 
 function startOfCurrentMonth(now: Date): Date {
   return brazilMonthRange(brazilMonthKey(now)).start;

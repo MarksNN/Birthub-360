@@ -5,9 +5,9 @@ import type {
   SecuritySweepReport,
   SecurityVulnerability,
 } from '../../../shared/contracts/continuousSecurityAudit.contract.js';
+import { logger } from '../../logger.js';
 import type { IGlobalSecurityEventSink } from '../events/globalSecurityEvent.port.js';
 import { LoggerGlobalSecurityEventSink } from '../events/loggerGlobalSecurityEventSink.js';
-import { logger } from '../../logger.js';
 
 export class ContinuousSecurityAuditService implements IContinuousSecurityAuditPort {
   private latestReport: SecuritySweepReport | null = null;

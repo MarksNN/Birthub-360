@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
+import { discoverCriteriaSchema } from '../../schemas/discoverCriteria.schema.js';
+import { ExclusionSet } from '../../utils/exclusionSet.js';
+import type { ProspectCandidate } from '../prospectTypes.js';
 import {
   annotateTurboCandidate,
   getTurboFilterWarnings,
   hasUnavailableDiscoveryFilter,
   matchesTurboLocalFilters,
 } from '../turboQuality.js';
-import type { ProspectCandidate } from '../prospectTypes.js';
-import { discoverCriteriaSchema } from '../../schemas/discoverCriteria.schema.js';
-import { ExclusionSet } from '../../utils/exclusionSet.js';
+
 const candidate = (): ProspectCandidate => ({
   tradeName: 'Empresa Teste',
   legalNameGuess: null,

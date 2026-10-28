@@ -1,5 +1,5 @@
-import { isQdrantConfigured, qdrant } from './index.js';
 import { logger } from '../logger.js';
+import { isQdrantConfigured, qdrant } from './index.js';
 
 export const QDRANT_FUNNEL_COLLECTION = 'sales_funnel_deals';
 export const VECTOR_DIMENSION = 768;

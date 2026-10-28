@@ -1,12 +1,12 @@
 import express from 'express';
-import { requireTenant, requireRole } from '../middlewares/rbac.js';
 import {
-  listUsersHandler,
-  createUserHandler,
-  updateUserHandler,
-  deleteUserHandler,
   anonymizeUserHandler,
+  createUserHandler,
+  deleteUserHandler,
+  listUsersHandler,
+  updateUserHandler,
 } from '../controllers/user.controller.js';
+import { requireRole, requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

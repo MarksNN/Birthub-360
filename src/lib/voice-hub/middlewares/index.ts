@@ -1,11 +1,11 @@
 import type express from 'express';
 import { Redis } from 'ioredis';
-import { verifyToken, type TokenPayload } from '../lib/auth-tokens.js';
-import { refreshSession } from '../services/authService.js';
-import { setCookie, ACCESS_TOKEN_MAX_AGE_MS } from '../lib/cookies.js';
-import { authenticateApiKey, isApiKeyFormat } from '../services/apiKeyService.js';
-import { getRedisUrl, getRedisRetryStrategy } from '../lib/env.js';
 import { logger } from '../../../lib/logger.js';
+import { type TokenPayload, verifyToken } from '../lib/auth-tokens.js';
+import { ACCESS_TOKEN_MAX_AGE_MS, setCookie } from '../lib/cookies.js';
+import { getRedisRetryStrategy, getRedisUrl } from '../lib/env.js';
+import { authenticateApiKey, isApiKeyFormat } from '../services/apiKeyService.js';
+import { refreshSession } from '../services/authService.js';
 
 export const csrfProtection = (
   req: express.Request,

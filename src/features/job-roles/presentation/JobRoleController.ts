@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
-import type { AgentCapability } from '../domain/JobRoleDomain.js';
 import { JobRoleUseCases } from '../application/JobRoleUseCases.js';
+import type { AgentCapability } from '../domain/JobRoleDomain.js';
 
 export class JobRoleController {
   constructor(private useCases = new JobRoleUseCases()) {}

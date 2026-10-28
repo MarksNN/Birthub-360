@@ -1,4 +1,4 @@
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, type NodeProps, Position } from '@xyflow/react';
 import type { LucideIcon } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import type { StudioNode } from '../../../lib/studio/types.js';

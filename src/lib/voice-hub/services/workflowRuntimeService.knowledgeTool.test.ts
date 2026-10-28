@@ -16,8 +16,10 @@ vi.mock('./settingService.js', () => ({
   getAiConsent: vi.fn(),
 }));
 
-import { findActiveWorkflowForTenant } from '../repositories/workflowRepository.js';
+import type { NodeType, StudioEdge, StudioNode } from '@/lib/studio/types.js';
+import type { KnowledgeDocument } from '@/lib/voice-runtime/intelligence/KnowledgeConfidenceEngine.js';
 import { getAgent } from '../repositories/agentRepository.js';
+import { findActiveWorkflowForTenant } from '../repositories/workflowRepository.js';
 import { getAiConsent } from './settingService.js';
 import {
   initializeWorkflowRuntime,
@@ -25,8 +27,6 @@ import {
   resumeAfterTool,
   validateRuntimeCompatibility,
 } from './workflowRuntimeService.js';
-import type { StudioEdge, StudioNode, NodeType } from '@/lib/studio/types.js';
-import type { KnowledgeDocument } from '@/lib/voice-runtime/intelligence/KnowledgeConfidenceEngine.js';
 
 const mockFindActive = vi.mocked(findActiveWorkflowForTenant);
 const mockGetAgent = vi.mocked(getAgent);

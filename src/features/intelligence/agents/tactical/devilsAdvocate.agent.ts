@@ -1,9 +1,9 @@
+import { logger } from '../../../../lib/logger.js';
+import { domainEventMesh } from '../../../../lib/queue/domainEventMesh.service.js';
 import type {
   DevilsAdvocateAnalysis,
   IDevilsAdvocatePort,
 } from '../../../../shared/contracts/tacticalSwarm.contract.js';
-import { domainEventMesh } from '../../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../../lib/logger.js';
 
 export class DevilsAdvocateAgent implements IDevilsAdvocatePort {
   /**

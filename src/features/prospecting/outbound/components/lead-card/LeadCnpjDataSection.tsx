@@ -1,5 +1,5 @@
+import { Briefcase, Check, CheckCircle2, Loader2, RefreshCw, Shield } from 'lucide-react';
 import type React from 'react';
-import { Shield, CheckCircle2, Check, Loader2, RefreshCw, Briefcase } from 'lucide-react';
 
 export interface LeadCnpjDataSectionProps {
   isDark: boolean;

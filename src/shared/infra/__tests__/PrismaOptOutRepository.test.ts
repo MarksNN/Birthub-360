@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const db = vi.hoisted(() => ({ create: vi.fn(), findMany: vi.fn() }));
 vi.mock('../../../lib/prisma.js', () => ({ prisma: { optOutRecord: db } }));
 
-import { PrismaOptOutRepository } from '../PrismaOptOutRepository.js';
 import { PrismaOptOutRepository as LegacyRepository } from '../../../features/cadence/infra/PrismaOptOutRepository.js';
+import { PrismaOptOutRepository } from '../PrismaOptOutRepository.js';
 
 const row = {
   id: 'opt-out-1',

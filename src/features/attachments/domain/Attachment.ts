@@ -3,6 +3,7 @@ import type { Repository } from '../../../shared/domain/Repository.js';
 export type AttachmentEntityType = 'lead' | 'company' | 'contact';
 
 import type { Attachment } from '../../../shared/types/crm.js';
+
 export type { Attachment };
 
 export interface CreateAttachmentInput {

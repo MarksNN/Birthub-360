@@ -3,8 +3,12 @@
  * Permite validar tokens e credenciais antes e depois de salvar conexões.
  */
 
-import { type Request, type Response, Router } from 'express';
-import express from 'express';
+/**
+ * Rotas de teste e validação em tempo real de integrações (ping endpoint).
+ * Permite validar tokens e credenciais antes e depois de salvar conexões.
+ */
+
+import express, { type Request, type Response, Router } from 'express';
 import { z } from 'zod';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';

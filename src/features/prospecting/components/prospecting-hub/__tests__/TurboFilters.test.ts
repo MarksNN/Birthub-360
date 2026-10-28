@@ -1,5 +1,5 @@
-import { createElement, useState } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { createElement, useState } from 'react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ProspectCriteria } from '../../../domain/prospectTypes.js';

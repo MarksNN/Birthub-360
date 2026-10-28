@@ -4,16 +4,16 @@
  * Vetorial (RAG) do Agente SDR via pgvector ou Qdrant.
  */
 
+import {
+  type EmbeddingMetadata,
+  initializeQdrantCollection,
+  searchEmbeddings,
+  upsertEmbedding,
+} from '../embeddings/qdrant.js';
 import { EMBEDDING_DIMENSIONS } from '../local-embeddings.js';
 import { callProvider } from './circuit-breaker.js';
 import { normalizeApiBaseUrl, resolveEmbeddingTimeoutMs } from './http-client.js';
 import { readProviderError } from './redaction.js';
-import {
-  initializeQdrantCollection,
-  upsertEmbedding,
-  searchEmbeddings,
-  type EmbeddingMetadata,
-} from '../embeddings/qdrant.js';
 
 const MAX_EMBEDDING_INPUT_CHARS = 100_000;
 

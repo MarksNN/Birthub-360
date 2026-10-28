@@ -4,9 +4,10 @@
 // backend (.agents/handoffs/onda-5/00-para-02-conectar-developers-webhooks.md). Follows the same
 // component-test pattern as components/Sidebar.test.tsx (mock useSessionStore, stub global fetch)
 // — not owned by Agente 08 (__tests__/**), kept alongside the component per this onda's precedent.
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DevelopersPage from './Developers.js';
 
 let mockRole = 'admin';

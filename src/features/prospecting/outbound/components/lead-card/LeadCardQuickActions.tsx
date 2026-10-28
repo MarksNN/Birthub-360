@@ -1,5 +1,5 @@
-﻿import type React from 'react';
-import { Phone, MessageSquare, Mail, ArrowUpRight } from 'lucide-react';
+﻿import { ArrowUpRight, Mail, MessageSquare, Phone } from 'lucide-react';
+import type React from 'react';
 
 interface LeadCardQuickActionsProps {
   phone?: string;

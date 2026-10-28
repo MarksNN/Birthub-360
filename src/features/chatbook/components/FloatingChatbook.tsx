@@ -22,16 +22,16 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button.js';
 import { AiReasoningVisualizer } from '../../../components/ui/AiReasoningVisualizer.js';
+import { Button } from '../../../components/ui/Button.js';
 import { BRAND } from '../../../config/brand.js';
 import { PLAYBOOKS } from '../../../config/playbooks.js';
 import { useActivePlaybook } from '../../../hooks/useActivePlaybook.js';
 import { useAssistantChat } from '../../../hooks/useAssistantChat.js';
-import { SoundFX } from '../../../lib/soundEffects.js';
 import { usePlaybookMatrixData } from '../../../hooks/usePlaybookMatrixData.js';
 import { usePlaybookMatrixFilters } from '../../../hooks/usePlaybookMatrixFilters.js';
 import { useRoleplaySimulator } from '../../../hooks/useRoleplaySimulator.js';
+import { SoundFX } from '../../../lib/soundEffects.js';
 
 interface FloatingChatbookProps {
   isOpen: boolean;

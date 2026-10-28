@@ -10,7 +10,6 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { Badge } from '../../../components/ui/Badge.js';
 import { Button } from '../../../components/ui/Button.js';
-import { BRAND } from '../../../config/brand.js';
 import {
   Card,
   CardContent,
@@ -20,6 +19,7 @@ import {
 } from '../../../components/ui/Card.js';
 import { Dialog } from '../../../components/ui/Dialog.js';
 import { EmptyState } from '../../../components/ui/EmptyState.js';
+import { BRAND } from '../../../config/brand.js';
 import { api } from '../../../lib/api.js';
 
 // ── Histórico real de sincronização Bitrix24 ────────────────────────────────────────────────────

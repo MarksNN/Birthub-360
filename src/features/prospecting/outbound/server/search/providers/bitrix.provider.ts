@@ -14,9 +14,9 @@
 // de negócio/resiliência fica no serviço, o adapter só empacota o resultado.
 
 import {
+  type BitrixDuplicateResult,
   checkBitrixDuplicate,
   fetchWithRetry,
-  type BitrixDuplicateResult,
 } from '../../services/bitrix.js';
 import { isUrlSafeForOutboundWebhook } from '../../validators.js';
 import type {

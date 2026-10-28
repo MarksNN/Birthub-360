@@ -1,15 +1,15 @@
-import type React from 'react';
 import {
-  ListChecks,
-  Loader2,
+  Calendar,
   CheckCircle2,
   Circle,
-  Calendar,
-  Plus,
-  Square,
+  ListChecks,
+  Loader2,
   Mic,
+  Plus,
   Save,
+  Square,
 } from 'lucide-react';
+import type React from 'react';
 import type { LeadTask } from '../../types.js';
 
 export interface LeadTasksAndActivitySectionProps {

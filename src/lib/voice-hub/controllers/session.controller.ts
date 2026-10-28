@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
-import { sessionSchema } from '../validators/index.js';
 import {
-  listSessions,
   createSession,
-  updateSession,
   deleteSession,
+  listSessions,
   NotFoundError,
+  updateSession,
 } from '../services/sessionService.js';
+import { sessionSchema } from '../validators/index.js';
 
 const updateSessionSchema = z.object({
   status: z.string().optional(),

@@ -1,5 +1,5 @@
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { getAiModel } from '../../../../lib/ai/gateway.js';
-import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 import type { DecisionMakerInfo } from '../triad/triad.types.js';
 
 export interface EnrichmentResult {

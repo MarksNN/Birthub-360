@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Same mocking shape as `__tests__/telephonyService.test.ts` (Agente 08) — see
 // `.agents/handoffs/onda-6/04-para-05-transferDetails-contrato.md`.
@@ -33,16 +33,16 @@ vi.mock('./workflowRuntimeService.js', () => ({
   resumeAfterTool: vi.fn(),
 }));
 
+import { llmProviderGateway } from '@/lib/voice-runtime/providers/LLMGateway.js';
 import { findAgentById } from '../repositories/agentRepository.js';
 import { findSessionById, updateSession } from '../repositories/sessionRepository.js';
-import { llmProviderGateway } from '@/lib/voice-runtime/providers/LLMGateway.js';
+import { handleTurn } from './telephonyService.js';
 import {
   prepareWorkflowTurn,
   resumeAfterTool,
   type WorkflowNode,
   type WorkflowRuntimeState,
 } from './workflowRuntimeService.js';
-import { handleTurn } from './telephonyService.js';
 
 const mockFindById = vi.mocked(findAgentById);
 const mockFindSessionById = vi.mocked(findSessionById);

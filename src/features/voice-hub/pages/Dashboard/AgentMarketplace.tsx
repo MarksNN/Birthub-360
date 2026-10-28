@@ -1,5 +1,5 @@
-import { Card, Button, Badge } from '../../components/design-system/index.js';
-import { Sparkles, DownloadCloud, Star, FlaskConical } from 'lucide-react';
+import { DownloadCloud, FlaskConical, Sparkles, Star } from 'lucide-react';
+import { Badge, Button, Card } from '../../components/design-system/index.js';
 
 // Template catalog and ratings/downloads below are illustrative — there is no marketplace backend
 // yet (no endpoint lists/installs a template), so these are labeled as example data per

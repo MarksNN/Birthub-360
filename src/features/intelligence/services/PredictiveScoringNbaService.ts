@@ -11,11 +11,11 @@ import {
   searchSimilarWonDealsInQdrant,
   VECTOR_DIMENSION,
 } from '../../../lib/qdrant/funnelVectorStore.ts';
+import type { NextBestActionResult } from '../../activities/services/next-best-action.service.js';
 import {
   computeLookalikeScore,
   type LookalikeScoreResult,
 } from '../../prospecting/services/lookalike-scoring.service.js';
-import type { NextBestActionResult } from '../../activities/services/next-best-action.service.js';
 
 export interface PredictiveLeadScoreResult {
   leadId: string;

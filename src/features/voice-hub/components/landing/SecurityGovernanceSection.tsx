@@ -1,6 +1,6 @@
-import type React from 'react';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Lock, FileKey, History, UserCheck, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, FileKey, History, Lock, ShieldCheck, UserCheck } from 'lucide-react';
+import type React from 'react';
 
 interface SecurityFeature {
   title: string;

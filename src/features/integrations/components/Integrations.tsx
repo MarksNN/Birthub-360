@@ -11,20 +11,20 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
-import { IconWrench } from '../../../components/icons/index.js';
 import {
-  WhatsAppIcon,
   Bitrix24Icon,
   GoogleIcon,
   HubSpotIcon,
+  MondayIcon,
+  OmieIcon,
   PipedriveIcon,
   RDStationIcon,
-  MondayIcon,
   SlackIcon,
   StripeIcon,
-  OmieIcon,
   ThreeCXIcon,
+  WhatsAppIcon,
 } from '../../../components/brand/CompanyBrandIcon.js';
+import { IconWrench } from '../../../components/icons/index.js';
 import { Card } from '../../../components/ui/Card.js';
 import { BRAND } from '../../../config/brand.js';
 import { useAuth } from '../../../contexts/AuthContext.js';

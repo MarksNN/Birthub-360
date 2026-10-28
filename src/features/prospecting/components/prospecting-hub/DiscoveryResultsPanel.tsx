@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Database, Loader2, RefreshCw, Search, UserPlus } from 'lucide-react';
+import { useState } from 'react';
+import { SoundFX } from '../../../../lib/soundEffects.js';
 import type { FitScoreResult } from '../../services/enrichment.service.js';
 import type { DiscoverResult, ProspectCandidate } from '../../services/prospecting.service.js';
-import { SoundFX } from '../../../../lib/soundEffects.js';
 import { CandidateCard } from './CandidateCard.js';
 import { SearchExecutionPanel } from './SearchExecutionPanel.js';
 import { TurboProvidersPanel } from './TurboProvidersPanel.js';

@@ -1,6 +1,6 @@
 import { getPaidProspectingKey } from '../../../config/prospecting-integrations.js';
-import { discoverViaCompanyCatalog } from './companyCatalogDiscovery.service.js';
 import { checkApolloConnection } from './apollo.service.js';
+import { discoverViaCompanyCatalog } from './companyCatalogDiscovery.service.js';
 export async function getTurboProviderHealth() {
   const apollo = await checkApolloConnection();
   const { getTurboAIProviderHealth } = await import('../../../lib/ai/turboSearch.js');

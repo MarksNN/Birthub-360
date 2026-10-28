@@ -1,5 +1,5 @@
-import type React from 'react';
 import { Building2, Sparkles } from 'lucide-react';
+import type React from 'react';
 import type { LeadStatus } from './types.js';
 
 interface LeadCardHeaderProps {

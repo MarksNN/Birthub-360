@@ -1,4 +1,4 @@
-import type { Company, Prisma, Contact, EnrichmentLog } from '@prisma/client';
+import type { Company, Contact, EnrichmentLog, Prisma } from '@prisma/client';
 
 export interface IEnrichmentRepository {
   findCompanyById(id: string, organizationId: string): Promise<Company | null>;

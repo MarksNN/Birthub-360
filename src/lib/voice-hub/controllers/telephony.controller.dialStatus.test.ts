@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response } from 'express';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { dialStatusHandler, gatherHandler } from './telephony.controller.js';
 
 vi.mock('../services/telephonyService.js', () => ({
@@ -11,6 +11,7 @@ vi.mock('../services/telephonyService.js', () => ({
 }));
 
 import { handleTurn } from '../services/telephonyService.js';
+
 const mockHandleTurn = vi.mocked(handleTurn);
 
 function fakeRes() {

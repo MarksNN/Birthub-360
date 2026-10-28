@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Minimal fake of the one ioredis surface this module touches: `set(...)` with NX semantics, and
 // `on('error', ...)` for the error listener wired up at client construction time.

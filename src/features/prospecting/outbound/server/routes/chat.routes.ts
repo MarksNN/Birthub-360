@@ -1,7 +1,7 @@
-import { Router, type Request, type Response } from 'express';
-import { getDatabase, saveDatabase } from '../db.js';
-import { checkOllamaConnection, chatWithLLaMA3 } from '../ai.js';
+import { type Request, type Response, Router } from 'express';
+import { chatWithLLaMA3, checkOllamaConnection } from '../ai.js';
 import { requireAuth } from '../auth.js';
+import { getDatabase, saveDatabase } from '../db.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 
 const heavyAiLimiter = rateLimit({

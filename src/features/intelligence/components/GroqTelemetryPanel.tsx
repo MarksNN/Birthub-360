@@ -23,6 +23,7 @@ import {
   Zap,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
+import { Button } from '../../../components/ui/Button.js';
 import {
   Card,
   CardContent,
@@ -30,12 +31,11 @@ import {
   CardHeader,
   CardTitle,
 } from '../../../components/ui/Card.js';
-import { Button } from '../../../components/ui/Button.js';
 import { Skeleton } from '../../../components/ui/Skeleton.js';
 import { api } from '../../../lib/api.js';
+import { fadeInUp, staggerContainer, staggerItem } from '../../../lib/motion.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { toast } from '../../../lib/toast.js';
-import { fadeInUp, staggerContainer, staggerItem } from '../../../lib/motion.js';
 
 interface GroqCallRecord {
   id: string;

@@ -1,6 +1,6 @@
-import type React from 'react';
 import { motion } from 'framer-motion';
-import { Database, Search, PhoneCall, Trophy, ArrowRight } from 'lucide-react';
+import { ArrowRight, Database, PhoneCall, Search, Trophy } from 'lucide-react';
+import type React from 'react';
 
 interface TimelineStep {
   step: string;

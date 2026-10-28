@@ -14,9 +14,9 @@ import { LinkedinIcon as Linkedin } from '../../../../../components/ui/icons/Lin
 import { BRAND } from '../../../../../config/brand.js';
 import { api } from '../../../../../lib/api.js';
 import {
+  BIRTHHUB360_SEGMENTO_OPTIONS,
   ESTADO_OPTIONS,
   SEGMENTO_OPTIONS,
-  BIRTHHUB360_SEGMENTO_OPTIONS,
 } from '../../../../../shared/constants/icp-options.js';
 import type {
   DecisionMaker,

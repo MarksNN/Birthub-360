@@ -1,51 +1,54 @@
 import { Router } from 'express';
-
+import { attachUser } from './auth.js';
 // Modular child routers
 import {
   authRouter,
   hashPassword,
-  verifyHashedPassword,
   normalizeCompany,
   SCRYPT_PREFIX,
+  verifyHashedPassword,
 } from './routes/auth.routes.js';
-import { systemRouter } from './routes/system.routes.js';
 import { campaignsRouter } from './routes/campaigns.routes.js';
-import { tasksRouter } from './routes/tasks.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
 import { integrationsRouter } from './routes/integrations.routes.js';
 import { leadsRouter } from './routes/leads.routes.js';
-
+import { systemRouter } from './routes/system.routes.js';
+import { tasksRouter } from './routes/tasks.routes.js';
+import {
+  APOLLO_PREFERRED_TITLES,
+  cleanDomain,
+  cleanDomainForCache,
+  enrichLeadWithApollo,
+  findLeads,
+  normalizeLinkedInUrl,
+  resolveCnpjWithResilience,
+  slugify,
+} from './services/leadSearch.service.js';
 // Utilities & Services
 import {
   formatLeadRow,
-  validateChangedLeadFields,
   upsertMessageWithVersioning,
+  validateChangedLeadFields,
 } from './utils/formatLead.js';
-import {
-  findLeads,
-  enrichLeadWithApollo,
-  resolveCnpjWithResilience,
-  cleanDomain,
-  cleanDomainForCache,
-  slugify,
-  normalizeLinkedInUrl,
-  APOLLO_PREFERRED_TITLES,
-} from './services/leadSearch.service.js';
-import { attachUser } from './auth.js';
 
 // Re-exports for backwards compatibility
-export { formatLeadRow, validateChangedLeadFields, upsertMessageWithVersioning };
 export {
-  findLeads,
-  enrichLeadWithApollo,
-  resolveCnpjWithResilience,
+  APOLLO_PREFERRED_TITLES,
   cleanDomain,
   cleanDomainForCache,
-  slugify,
+  enrichLeadWithApollo,
+  findLeads,
+  formatLeadRow,
+  hashPassword,
+  normalizeCompany,
   normalizeLinkedInUrl,
-  APOLLO_PREFERRED_TITLES,
+  resolveCnpjWithResilience,
+  SCRYPT_PREFIX,
+  slugify,
+  upsertMessageWithVersioning,
+  validateChangedLeadFields,
+  verifyHashedPassword,
 };
-export { hashPassword, verifyHashedPassword, normalizeCompany, SCRYPT_PREFIX };
 
 export const apiRouter = Router();
 

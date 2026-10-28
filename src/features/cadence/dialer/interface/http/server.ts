@@ -1,15 +1,15 @@
 import express, { type Express } from 'express';
 import { pinoHttp } from 'pino-http';
-import type { Logger } from '../../infrastructure/logger.js';
-import type { ManageCampaign } from '../../application/use-cases/ManageCampaign.js';
-import type { ImportLeads } from '../../application/use-cases/ImportLeads.js';
 import type { CampaignRepository } from '../../application/ports/CampaignRepository.js';
 import type { DncRepository } from '../../application/ports/DncRepository.js';
-import { healthRoutes } from './routes/health.routes.js';
-import { campaignsRoutes } from './routes/campaigns.routes.js';
-import { leadsRoutes } from './routes/leads.routes.js';
-import { dncRoutes } from './routes/dnc.routes.js';
+import type { ImportLeads } from '../../application/use-cases/ImportLeads.js';
+import type { ManageCampaign } from '../../application/use-cases/ManageCampaign.js';
+import type { Logger } from '../../infrastructure/logger.js';
 import { createErrorHandler } from './middlewares/errorHandler.js';
+import { campaignsRoutes } from './routes/campaigns.routes.js';
+import { dncRoutes } from './routes/dnc.routes.js';
+import { healthRoutes } from './routes/health.routes.js';
+import { leadsRoutes } from './routes/leads.routes.js';
 
 export interface ServerDependencies {
   logger: Logger;

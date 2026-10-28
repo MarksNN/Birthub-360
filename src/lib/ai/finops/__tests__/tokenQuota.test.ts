@@ -38,18 +38,18 @@ vi.mock('../../../langfuse.js', () => ({
 
 import { requestContext } from '../../../async-context.js';
 import {
+  aiTokenQuotaAlertTotal,
+  aiTokenQuotaBlockedTotal,
+  aiTokenQuotaFallbackTotal,
+  aiTokenUsageTotal,
+} from '../../metrics.js';
+import {
   __resetTokenQuotaCacheForTests,
   AiTokenQuotaExceededError,
   normalizeTier,
   TIER_QUOTAS,
   tokenQuotaService,
 } from '../tokenQuota.service.js';
-import {
-  aiTokenQuotaAlertTotal,
-  aiTokenQuotaBlockedTotal,
-  aiTokenQuotaFallbackTotal,
-  aiTokenUsageTotal,
-} from '../../metrics.js';
 
 describe('TokenQuotaService — Governança e FinOps de Tokens de IA (Onda 15)', () => {
   beforeEach(() => {

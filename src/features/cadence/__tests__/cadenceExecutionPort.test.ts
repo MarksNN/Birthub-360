@@ -1,16 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { InMemoryOptOutRepository } from '../infra/InMemoryOptOutRepository.js';
-import { InMemoryCadenceRateLimitPort } from '../infra/InMemoryCadenceRateLimitPort.js';
-import { InMemoryCadenceRunRepository } from '../infra/InMemoryCadenceRunRepository.js';
-import {
-  CadenceExecutionService,
-  type CadenceChannelDispatcherPort,
-  type TaskCreationPort,
-} from '../application/CadenceExecutionService.js';
 import type {
   EnqueueSwarmActionInput,
   SwarmTouchNotification,
 } from '../application/CadenceExecutionPort.js';
+import {
+  type CadenceChannelDispatcherPort,
+  CadenceExecutionService,
+  type TaskCreationPort,
+} from '../application/CadenceExecutionService.js';
 import type { LeadSubjectResolver } from '../application/cadenceService.js';
 import {
   type CadenceRunState,
@@ -18,6 +15,9 @@ import {
   recordTouchAttempt,
   startCadenceRun,
 } from '../domain/cadence.js';
+import { InMemoryCadenceRateLimitPort } from '../infra/InMemoryCadenceRateLimitPort.js';
+import { InMemoryCadenceRunRepository } from '../infra/InMemoryCadenceRunRepository.js';
+import { InMemoryOptOutRepository } from '../infra/InMemoryOptOutRepository.js';
 
 const SEGUNDA_10H_SP = new Date('2026-08-03T13:00:00Z'); // 10:00 horário de Brasília
 const SEGUNDA_22H_SP = new Date('2026-08-04T01:00:00Z'); // 22:00 horário de Brasília

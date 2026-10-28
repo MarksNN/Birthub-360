@@ -1,12 +1,11 @@
 import { api } from '../../lib/api.js';
+import type {
+  AutomationActionLabel as AutomationAction,
+  AutomationTriggerLabel as AutomationTrigger,
+} from '../../lib/enumMap.js';
 import { LEAD_STATUS } from '../../lib/zod.js';
 
-import type {
-  AutomationTriggerLabel as AutomationTrigger,
-  AutomationActionLabel as AutomationAction,
-} from '../../lib/enumMap.js';
-
-export type { AutomationTrigger, AutomationAction };
+export type { AutomationAction, AutomationTrigger };
 
 /**
  * Operador numérico de condição (ver `matchesConditions` em `automation.engine.ts`), usado pelas

@@ -1,4 +1,4 @@
-import type { User, IntegrationsConfig } from '../types.js';
+import type { IntegrationsConfig, User } from '../types.js';
 
 // Decide qual webhook do Bitrix24 usar. Por padrão ('auto') segue a organização do
 // usuário logado para o Bitrix da Birthub 360. 'totaltrac'/'birthhub360'/'custom' continuam disponíveis como

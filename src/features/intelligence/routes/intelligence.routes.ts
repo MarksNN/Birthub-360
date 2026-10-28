@@ -2,7 +2,6 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { type Prisma, ReportSource } from '@prisma/client';
 import { type NextFunction, type Request, type Response, Router } from 'express';
 import { z } from 'zod';
-import { swarmObservabilityRoutes } from './swarm-observability.routes.js';
 import {
   analyzeCompetitors,
   analyzeSentiment,
@@ -67,6 +66,7 @@ import {
 } from '../services/studio.service.js';
 import { analyzeOrgWinLoss, persistWinLossReport } from '../services/winLossAnalysis.worker.js';
 import { aiSuiteRouter } from './ai-suite.routes.js';
+import { swarmObservabilityRoutes } from './swarm-observability.routes.js';
 
 const router = Router();
 

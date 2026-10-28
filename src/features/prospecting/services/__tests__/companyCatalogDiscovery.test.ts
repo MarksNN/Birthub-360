@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { container } from '../../../../shared/di/container.js';
 import { discoverViaCompanyCatalog } from '../companyCatalogDiscovery.service.js';
+
 const search = vi.fn();
 beforeEach(() => {
   vi.clearAllMocks();

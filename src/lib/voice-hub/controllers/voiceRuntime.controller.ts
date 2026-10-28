@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
-import { voiceRuntimeSchema } from '../validators/index.js';
-import {
-  getVoiceRuntimeConfig,
-  saveVoiceRuntimeConfig,
-  resetVoiceRuntimeConfig,
-} from '../services/settingService.js';
 import { sessionManager } from '../../voice-runtime/SessionManager.js';
 import type { AgentRuntimeConfig } from '../../voice-runtime/types.js';
+import {
+  getVoiceRuntimeConfig,
+  resetVoiceRuntimeConfig,
+  saveVoiceRuntimeConfig,
+} from '../services/settingService.js';
+import { voiceRuntimeSchema } from '../validators/index.js';
 
 const DEFAULT_RUNTIME_CONFIG: AgentRuntimeConfig = {
   providerStt: 'whisper',

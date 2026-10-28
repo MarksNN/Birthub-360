@@ -2,6 +2,7 @@ import type { LeadFunnel, LeadStatus, LeadTemperature } from '@prisma/client';
 import type { Repository } from '../../../shared/domain/Repository.js';
 
 import type { Lead } from '../../../shared/types/crm.js';
+
 export type { Lead };
 
 export interface LeadRepository extends Repository<Lead> {

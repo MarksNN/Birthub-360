@@ -2,8 +2,9 @@
  * Wiring explícito (P3-3) dos consumidores de expurgo da cadeia de consentimento, do worker de
  * reconciliação da outbox (F4/P2-3) e da invalidação entre instâncias via Redis pub/sub (P2-5).
  */
-import { commercialLearningFlywheel } from '../features/intelligence/services/commercialLearningFlywheel.service.js';
+
 import type { FlywheelPersistencePurger } from '../features/intelligence/services/commercialLearningFlywheel.service.js';
+import { commercialLearningFlywheel } from '../features/intelligence/services/commercialLearningFlywheel.service.js';
 import { winLossAutopsyService } from '../features/intelligence/services/winLossAutopsy.service.js';
 import { semanticCache } from '../lib/ai/cache/semanticCache.service.js';
 import { logger } from '../lib/logger.js';

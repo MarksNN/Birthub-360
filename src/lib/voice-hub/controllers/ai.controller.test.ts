@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response } from 'express';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock dependencies
 vi.mock('@/lib/voice-runtime/providers/LLMGateway.js', () => ({
@@ -21,18 +21,16 @@ const mockGetVideosOperation = vi.fn();
 
 vi.mock('@google/genai', () => {
   return {
-    GoogleGenAI: vi.fn().mockImplementation(function () {
-      return {
-        models: {
-          generateContent: mockGenerateContent,
-          generateContentStream: mockGenerateContentStream,
-          generateVideos: mockGenerateVideos,
-        },
-        operations: {
-          getVideosOperation: mockGetVideosOperation,
-        },
-      };
-    }),
+    GoogleGenAI: vi.fn().mockImplementation(() => ({
+      models: {
+        generateContent: mockGenerateContent,
+        generateContentStream: mockGenerateContentStream,
+        generateVideos: mockGenerateVideos,
+      },
+      operations: {
+        getVideosOperation: mockGetVideosOperation,
+      },
+    })),
     GenerateVideosOperation: vi.fn().mockImplementation(function (this: { name?: string }) {
       this.name = '';
     }),
@@ -43,14 +41,14 @@ import { llmProviderGateway } from '@/lib/voice-runtime/providers/LLMGateway.js'
 import { getAiConsent, grantAiConsent, revokeAiConsent } from '../services/settingService.js';
 import {
   chatHandler,
-  getAiConsentHandler,
-  setAiConsentHandler,
-  ttsHandler,
   generateMusicHandler,
   generateVideoHandler,
-  videoStatusHandler,
-  refactorWorkflowHandler,
   generateWorkflowHandler,
+  getAiConsentHandler,
+  refactorWorkflowHandler,
+  setAiConsentHandler,
+  ttsHandler,
+  videoStatusHandler,
 } from './ai.controller.js';
 
 function fakeResponse() {

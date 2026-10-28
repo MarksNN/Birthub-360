@@ -5,9 +5,9 @@
 
 import {
   type ITeamRepository,
+  type MemberInvite,
   type TeamMember,
   TeamRole,
-  type MemberInvite,
 } from '../domain/TeamDomain.js';
 
 export class TeamUseCases {

@@ -8,9 +8,9 @@ import { BITRIX_FIELD_MAP } from '../bitrixFieldMap.js';
 import { callBitrix, getConnectionWebhookUrl, getStatusLabels } from './client.js';
 import { applyInboundCustomFields, resolveEnumMaps } from './customFields.js';
 import { type BitrixDealStage, getBitrixUsers } from './deals.js';
+import { acquireBitrixSyncLock, releaseBitrixSyncLock } from './idempotentSync.js';
 import { findOwnershipConflict, notifyOwnershipConflict } from './ownershipGuard.js';
 import { resolveBirthubUserIdByEmail } from './userMapping.js';
-import { acquireBitrixSyncLock, releaseBitrixSyncLock } from './idempotentSync.js';
 
 const LEAD_UF_CRM_CODES = BITRIX_FIELD_MAP.map((m) => m.leadCode).filter((c): c is string =>
   Boolean(c),

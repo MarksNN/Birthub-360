@@ -1,28 +1,28 @@
-import type React from 'react';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, MotionConfig, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { MotionConfig, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import {
-  Sparkles,
-  Shield,
-  Globe,
-  ArrowRight,
-  ChevronDown,
   Activity,
-  Database,
-  Lock,
-  Terminal,
-  Radio,
-  Network,
-  Zap,
-  Server,
+  ArrowRight,
   Bot,
   BrainCircuit,
+  ChevronDown,
+  Database,
+  Globe,
+  Lock,
+  Network,
+  Radio,
+  Server,
+  Shield,
+  Sparkles,
+  Terminal,
+  Zap,
 } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../../contexts/ThemeContext.js';
 import './LandingInnovative.css';
-import { useToast, ToastContainer } from '../components/design-system/index.js';
 import { BirthHubLogo } from '../../../components/brand/BirthHubLogo.js';
+import { ToastContainer, useToast } from '../components/design-system/index.js';
 
 // Sophisticated magnetic button component
 const MagneticButton: React.FC<{

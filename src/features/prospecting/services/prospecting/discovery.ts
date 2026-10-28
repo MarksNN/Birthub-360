@@ -9,19 +9,19 @@ import {
 } from '../../domain/queryPlanner.js';
 import { evaluateCandidateRequirements } from '../../domain/requirementEngine.js';
 import { buildSearchIntent } from '../../domain/searchIntent.js';
-import { ExclusionSet } from '../../utils/exclusionSet.js';
-import { fetchApolloCandidates } from '../apollo.service.js';
-import { searchNominatimCandidates } from '../nominatim.service.js';
-import { searchGooglePlacesCandidates } from '../places.service.js';
-import { type SearchExecutionStatus, SearchExecutionTracker } from '../searchExecution.service.js';
-import { discoverViaCompanyCatalog } from '../companyCatalogDiscovery.service.js';
-import { fetchCnpjData } from '../enrichment/cnpjLookup.js';
 import {
   annotateTurboCandidate,
   getTurboFilterWarnings,
   hasUnavailableDiscoveryFilter,
   matchesTurboLocalFilters,
 } from '../../domain/turboQuality.js';
+import { ExclusionSet } from '../../utils/exclusionSet.js';
+import { fetchApolloCandidates } from '../apollo.service.js';
+import { discoverViaCompanyCatalog } from '../companyCatalogDiscovery.service.js';
+import { fetchCnpjData } from '../enrichment/cnpjLookup.js';
+import { searchNominatimCandidates } from '../nominatim.service.js';
+import { searchGooglePlacesCandidates } from '../places.service.js';
+import { type SearchExecutionStatus, SearchExecutionTracker } from '../searchExecution.service.js';
 import { enrichCandidatesWithQualityData } from './qualityEnrichment.js';
 import type { DiscoverResult, ProspectCandidate, ProspectCriteria } from './types.js';
 

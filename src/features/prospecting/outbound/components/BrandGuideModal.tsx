@@ -1,6 +1,6 @@
+import { Check, Copy, HeartHandshake, Palette, Sparkles, Target, Type, X } from 'lucide-react';
 import React from 'react';
 import { BirthubLogo } from './BirthubLogo.js';
-import { X, Sparkles, Target, HeartHandshake, Check, Copy, Palette, Type } from 'lucide-react';
 
 interface BrandGuideModalProps {
   isOpen: boolean;

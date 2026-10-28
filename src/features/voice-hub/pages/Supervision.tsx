@@ -1,7 +1,7 @@
+import { Info, PhoneCall } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { LiveSupervisor } from '../../components/LiveSupervisor/LiveSupervisor.js';
-import { PhoneCall, Info } from 'lucide-react';
 
 export default function SupervisionPage() {
   // There is currently no backend endpoint that lists active calls tenant-wide for a supervisor

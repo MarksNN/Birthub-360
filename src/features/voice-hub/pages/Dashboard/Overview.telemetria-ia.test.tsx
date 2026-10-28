@@ -7,8 +7,9 @@
 // component-test pattern as pages/Dashboard/Developers.webhooks.test.tsx (mock react-router-dom,
 // stub global fetch) — not owned by Agente 08 (__tests__/**), kept alongside the page per that
 // onda's precedent.
-import { describe, it, expect, vi, afterEach } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import RebuiltExecutiveOverview from './Overview.js';
 
 const mockNavigate = vi.fn();

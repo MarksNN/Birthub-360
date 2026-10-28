@@ -4,13 +4,13 @@ import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   Table,
-  TableHeader,
   TableBody,
+  TableCaption,
+  TableCell,
   TableFooter,
   TableHead,
+  TableHeader,
   TableRow,
-  TableCell,
-  TableCaption,
 } from '../Table.js';
 
 afterEach(() => {

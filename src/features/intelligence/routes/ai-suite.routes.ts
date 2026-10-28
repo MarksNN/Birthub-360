@@ -5,11 +5,11 @@ import { requireRole } from '../../../shared/middlewares/requireRole.js';
 import { validateRequest } from '../../../shared/middlewares/validateRequest.js';
 import { searchService } from '../../knowledge/search.service.js';
 import { aiSuite } from '../services/CentralAISuiteService.js';
-import { predictiveScoringNbaService } from '../services/PredictiveScoringNbaService.js';
 import {
   assertPiiExternalConsent,
   PiiConsentRequiredError,
 } from '../services/guardrails.service.js';
+import { predictiveScoringNbaService } from '../services/PredictiveScoringNbaService.js';
 
 export const aiSuiteRouter = Router();
 

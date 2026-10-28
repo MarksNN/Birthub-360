@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
+import { useEffect, useRef } from 'react';
 
 export default function LineChart() {
   const chartRef = useRef<HTMLDivElement | null>(null);

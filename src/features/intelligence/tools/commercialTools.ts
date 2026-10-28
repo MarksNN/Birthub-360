@@ -1,5 +1,5 @@
-import type { LeadStatus } from '@prisma/client';
 import { tool } from '@langchain/core/tools';
+import type { LeadStatus } from '@prisma/client';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';

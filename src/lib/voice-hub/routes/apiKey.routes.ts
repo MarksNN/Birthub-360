@@ -1,11 +1,11 @@
 import express from 'express';
-import { requireTenant, requireRole } from '../middlewares/rbac.js';
-import { createRateLimiter } from '../middlewares/rateLimit.js';
 import {
   createApiKeyHandler,
   listApiKeysHandler,
   revokeApiKeyHandler,
 } from '../controllers/apiKey.controller.js';
+import { createRateLimiter } from '../middlewares/rateLimit.js';
+import { requireRole, requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

@@ -26,8 +26,8 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import { toast } from '../../../lib/toast.js';
 import {
-  objectionDetectionService,
   type ObjectionCategory,
+  objectionDetectionService,
   type SuggestedRebuttal,
 } from '../../../shared/services/objectionDetection.service.js';
 import { useLiveCopilotSession } from '../copilotLiveBus.js';

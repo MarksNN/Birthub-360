@@ -1,5 +1,5 @@
+import { Building2, Calendar, Circle, ListChecks, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Loader2, Calendar, Circle, Building2, ListChecks } from 'lucide-react';
 import type { LeadTask } from '../types.js';
 
 interface TasksOverviewTabProps {

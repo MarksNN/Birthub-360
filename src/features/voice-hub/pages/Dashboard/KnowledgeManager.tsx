@@ -1,21 +1,21 @@
-import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
 import {
-  UploadCloud,
-  RefreshCw,
+  AlertTriangle,
+  Bot,
   Database,
+  FileText,
+  Plus,
+  RefreshCw,
   Search,
   ShieldCheck,
-  Plus,
-  Trash2,
-  FileText,
-  AlertTriangle,
-  X,
   Sparkles,
-  Bot,
+  Trash2,
+  UploadCloud,
+  X,
 } from 'lucide-react';
-import { Card, Button, Badge, EmptyState, Skeleton } from '../../components/design-system/index.js';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { logger } from '../../../../lib/logger.js';
+import { Badge, Button, Card, EmptyState, Skeleton } from '../../components/design-system/index.js';
 
 interface KnowledgeDoc {
   id: string;

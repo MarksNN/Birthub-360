@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { TabNavCards, type TabCardItem } from '../TabNavCards.js';
+import { type TabCardItem, TabNavCards } from '../TabNavCards.js';
 
 afterEach(() => {
   cleanup();

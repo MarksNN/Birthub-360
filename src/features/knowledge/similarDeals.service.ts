@@ -1,6 +1,6 @@
-import { prisma, withRlsContext } from '../../lib/prisma.js';
-import { logger } from '../../lib/logger.js';
 import { wrapUntrustedContent } from '../../lib/ai/gateway.js';
+import { logger } from '../../lib/logger.js';
+import { prisma, withRlsContext } from '../../lib/prisma.js';
 
 export interface SimilarDealItem {
   id: string;

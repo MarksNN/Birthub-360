@@ -1,5 +1,5 @@
-import type React from 'react';
 import { Bot, Sparkles, Target } from 'lucide-react';
+import type React from 'react';
 import { OBJECTIONS_DATABASE, PITCHES_BY_SEGMENT } from './constants.js';
 import type { CallAnalysisResult, SegmentKey } from './types.js';
 

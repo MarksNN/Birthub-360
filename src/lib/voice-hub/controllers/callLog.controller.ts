@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
-import { callLogSchema } from '../validators/index.js';
-import {
-  listCallLogs,
-  createCallLog,
-  updateCallLog,
-  deleteCallLog,
-  NotFoundError,
-} from '../services/callLogService.js';
 import { writeAuditLog } from '../services/audit.js';
+import {
+  createCallLog,
+  deleteCallLog,
+  listCallLogs,
+  NotFoundError,
+  updateCallLog,
+} from '../services/callLogService.js';
+import { callLogSchema } from '../validators/index.js';
 
 export async function listCallLogsHandler(req: Request, res: Response) {
   const logs = await listCallLogs(req.organizationId!);

@@ -1,4 +1,5 @@
 import { BirthHubLogo } from './BirthHubLogo.js';
+
 interface AnimatedBirthHubEmblemProps {
   size?: number;
   className?: string;

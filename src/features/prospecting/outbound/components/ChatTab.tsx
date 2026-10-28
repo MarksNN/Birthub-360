@@ -1,18 +1,18 @@
-import type React from 'react';
-import { useState, useEffect, useRef } from 'react';
-import type { AIConfig, ChatMessage, ChatSession, ThemeMode } from '../types.js';
 import {
-  Send,
   Bot,
-  User,
+  Check,
+  Copy,
+  Database,
+  Lightbulb,
   Loader2,
   MessageSquare,
   Plus,
-  Database,
-  Lightbulb,
-  Copy,
-  Check,
+  Send,
+  User,
 } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { AIConfig, ChatMessage, ChatSession, ThemeMode } from '../types.js';
 
 interface ChatTabProps {
   aiConfig: AIConfig;

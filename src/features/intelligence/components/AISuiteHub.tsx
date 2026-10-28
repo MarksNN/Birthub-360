@@ -1,7 +1,5 @@
 import canvasConfetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
-import type React from 'react';
-import { useCallback, useState } from 'react';
 import {
   Activity,
   AlertCircle,
@@ -25,11 +23,13 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import { SoundFX } from '../../../lib/soundEffects.js';
+import type React from 'react';
+import { useCallback, useState } from 'react';
 import { Button } from '../../../components/ui/Button.js';
 import { Card, CardDescription, CardTitle } from '../../../components/ui/Card.js';
 import { useBrandAccent } from '../../../hooks/useBrandAccent.js';
 import { api } from '../../../lib/api.js';
+import { SoundFX } from '../../../lib/soundEffects.js';
 
 interface AICapability {
   id: number;

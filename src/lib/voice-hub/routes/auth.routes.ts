@@ -1,10 +1,10 @@
 import express from 'express';
 import {
-  registerHandler,
   loginHandler,
-  meHandler,
   logoutHandler,
+  meHandler,
   refreshHandler,
+  registerHandler,
 } from '../controllers/auth.controller.js';
 import { requireTenant } from '../middlewares/rbac.js';
 

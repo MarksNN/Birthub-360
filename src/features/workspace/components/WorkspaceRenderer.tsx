@@ -1,7 +1,7 @@
+import { motion } from 'framer-motion';
+import { Compass, Layers, Loader2, UserX } from 'lucide-react';
 import type React from 'react';
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Layers, UserX, Compass, Loader2 } from 'lucide-react';
 import { BlockedState } from '../../../components/ui/BlockedState.js';
 import { useWorkspace } from '../../../hooks/useWorkspace.js';
 import { cn } from '../../../lib/utils.js';

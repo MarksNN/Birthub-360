@@ -14,8 +14,9 @@
 // file is colocated with `workflowService.ts`, which Agente 07 owns, and vitest's default include
 // glob picks it up (`vite.config.ts` sets no explicit `test.include`, so any `*.test.ts` file in
 // the project runs under `npm run test`).
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { Prisma, type WorkflowVersion } from '@prisma/client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../repositories/workflowRepository.js', () => ({
   findWorkflowForTenant: vi.fn(),
@@ -35,16 +36,16 @@ vi.mock('../../studio/ValidationEngine.js', () => ({
   },
 }));
 
+import type { NodeType, StudioEdge, StudioNode } from '../../studio/types.js';
 import * as workflowRepository from '../repositories/workflowRepository.js';
 import {
-  publishWorkflow,
   listWorkflowVersions,
-  rollbackToVersion,
   NotFoundError,
+  publishWorkflow,
+  rollbackToVersion,
   ValidationFailedError,
   type WorkflowMetadata,
 } from './workflowService.js';
-import type { NodeType, StudioEdge, StudioNode } from '../../studio/types.js';
 
 const mockFindForTenant = vi.mocked(workflowRepository.findWorkflowForTenant);
 const mockFindByIdForTenant = vi.mocked(workflowRepository.findWorkflowByIdForTenant);

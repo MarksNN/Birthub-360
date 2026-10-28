@@ -1,11 +1,11 @@
 import { Bot, Layers, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import type { Workspace } from '../../features/workspace/workspace.api.js';
+import { cn } from '../../lib/utils.js';
 import type { TabType } from '../layout/tabMeta.js';
 import { TAB_META } from '../layout/tabMeta.js';
 import { EmptyState } from '../ui/EmptyState.js';
 import { VisualState } from '../ui/VisualState.js';
-import { cn } from '../../lib/utils.js';
-import type { Workspace } from '../../features/workspace/workspace.api.js';
 
 const ACCESS_LEVEL_LABEL: Record<string, string> = {
   EXECUTION: 'Execução Autônoma',

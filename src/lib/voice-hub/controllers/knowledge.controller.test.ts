@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response } from 'express';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../services/agentService.js', () => ({
   getAgent: vi.fn(),
@@ -19,12 +19,12 @@ vi.mock('../infrastructure/antivirus.js', async () => {
   };
 });
 
-import { getAgent, updateAgentConfig } from '../services/agentService.js';
 import {
   AntivirusUnavailableError,
   InfectedFileError,
   scanBufferForViruses,
 } from '../infrastructure/antivirus.js';
+import { getAgent, updateAgentConfig } from '../services/agentService.js';
 import { uploadKnowledgeDocumentHandler } from './knowledge.controller.js';
 
 const mockGetAgent = vi.mocked(getAgent);

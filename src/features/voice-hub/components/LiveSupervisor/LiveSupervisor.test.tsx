@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as socketIoClient from 'socket.io-client';
-import { LiveSupervisor } from './LiveSupervisor.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSessionStore } from '../../store/useSessionStore.js';
+import { LiveSupervisor } from './LiveSupervisor.js';
 
 type Handler = (data?: unknown) => void;
 type MockSocket = {

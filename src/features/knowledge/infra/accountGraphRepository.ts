@@ -1,4 +1,6 @@
 import type { Prisma } from '@prisma/client';
+import { withTenantContext } from '../../../lib/async-context.js';
+import { prisma } from '../../../lib/prisma.js';
 import type {
   GraphEdge,
   GraphNode,
@@ -6,8 +8,6 @@ import type {
   GraphRelationshipType,
   RelationshipConfidence,
 } from '../../../shared/contracts/accountKnowledgeGraph.contract.js';
-import { withTenantContext } from '../../../lib/async-context.js';
-import { prisma } from '../../../lib/prisma.js';
 
 /**
  * REMED-02: porta de persistência do Grafo de Contas. Fonte da verdade = PostgreSQL

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
   mockAdd,
@@ -71,8 +71,8 @@ vi.mock('../../../lib/logger.js', () => ({
   logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 
-import { startSlaScheduler, stopSlaScheduler, PLATFORM_READY_METRIC_NAME } from './slaScheduler.js';
 import { logger } from '../../../lib/logger.js';
+import { PLATFORM_READY_METRIC_NAME, startSlaScheduler, stopSlaScheduler } from './slaScheduler.js';
 
 beforeEach(() => {
   vi.clearAllMocks();

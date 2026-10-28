@@ -1,11 +1,11 @@
-import { Router, type Request, type Response, type NextFunction } from 'express';
+import { type NextFunction, type Request, type Response, Router } from 'express';
 import { prisma } from '../../../lib/prisma.js';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
 import { brazilMonthKey, brazilMonthRange } from '../../../shared/time/brazilCalendar.js';
 import type {
   AgentCenterTrace,
-  SellerWorkspaceOverview,
   NextBestAction,
+  SellerWorkspaceOverview,
 } from '../agents/triad/triad.types.js';
 
 const router = Router();

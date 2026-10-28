@@ -5,12 +5,12 @@ import type {
   Next,
 } from '@temporalio/worker';
 import {
-  TenantContextMissingError,
   getTenantId,
+  TenantContextMissingError,
   withTenantContext,
 } from '../../lib/async-context.js';
 
-export { TenantContextMissingError, getTenantId, withTenantContext };
+export { getTenantId, TenantContextMissingError, withTenantContext };
 
 /**
  * Extracts and validates tenantId or organizationId from an unknown input payload or header.

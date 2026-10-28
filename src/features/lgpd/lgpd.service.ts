@@ -2,13 +2,13 @@ import { logger } from '../../lib/logger.js';
 import { prisma } from '../../lib/prisma.js';
 import { eraseDataSubject } from '../../shared/services/dataSubjectErasure.service.js';
 import {
-  checkOptOutStatus,
   assertOptOutStatus,
-  recordContactOptOut,
-  OptOutSuppressedError,
+  checkOptOutStatus,
   isOptOutKeyword,
   type OptOutChannel,
   type OptOutCheckResult,
+  OptOutSuppressedError,
+  recordContactOptOut,
 } from './services/optOutCheck.service.js';
 
 export class LgpdService {
@@ -103,11 +103,11 @@ export class LgpdService {
 export const lgpdService = new LgpdService();
 
 export {
-  checkOptOutStatus,
   assertOptOutStatus,
-  recordContactOptOut,
-  OptOutSuppressedError,
+  checkOptOutStatus,
   isOptOutKeyword,
   type OptOutChannel,
   type OptOutCheckResult,
+  OptOutSuppressedError,
+  recordContactOptOut,
 };

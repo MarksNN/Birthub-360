@@ -2,8 +2,8 @@ import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
-import { discoverCandidates } from '../../prospecting/services/prospecting/discovery.js';
 import type { ProspectCriteria } from '../../prospecting/domain/prospectTypes.js';
+import { discoverCandidates } from '../../prospecting/services/prospecting/discovery.js';
 
 /**
  * Ferramenta de Discovery de Empresas para o BDR do Swarm.

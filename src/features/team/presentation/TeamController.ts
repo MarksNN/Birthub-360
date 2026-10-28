@@ -3,11 +3,11 @@
  * Clean Architecture Modular HTTP / Route Controller
  */
 
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { AuthRequest } from '../../../shared/middlewares/authenticateToken.js';
-import { ASSIGNABLE_ROLES } from '../services/team.service.js';
 import type { TeamUseCases } from '../application/TeamUseCases.js';
 import type { TeamRole } from '../domain/TeamDomain.js';
+import { ASSIGNABLE_ROLES } from '../services/team.service.js';
 
 export class TeamController {
   constructor(private readonly teamUseCases: TeamUseCases) {}

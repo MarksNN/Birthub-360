@@ -1,8 +1,8 @@
 import type { CallAttempt } from '../../domain/entities/CallAttempt.js';
 import type { Lead } from '../../domain/entities/Lead.js';
 import type { CallAttemptRepository } from '../ports/CallAttemptRepository.js';
-import type { LeadRepository } from '../ports/LeadRepository.js';
 import type { CallStatusSnapshot } from '../ports/DialerProvider.js';
+import type { LeadRepository } from '../ports/LeadRepository.js';
 
 export interface SyncCallStatusesConfig {
   maxAttempts: number;

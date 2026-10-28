@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../services/voice.service.js', () => ({
   voiceProspectingService: { triggerOutboundCall: vi.fn() },
@@ -19,13 +19,13 @@ vi.mock('../../../repositories/birthhub360CallResultRepository.js', () => ({
   upsertBirthub360CallResult: vi.fn(),
 }));
 
-import { voiceProspectingService } from '../services/voice.service.js';
+import { upsertBirthub360CallResult } from '../../../repositories/birthhub360CallResultRepository.js';
 import {
   beginBlandCallbackProcessing,
   completeBlandCallbackProcessing,
   releaseBlandCallbackProcessing,
 } from '../lib/webhookIdempotency.js';
-import { upsertBirthub360CallResult } from '../../../repositories/birthhub360CallResultRepository.js';
+import { voiceProspectingService } from '../services/voice.service.js';
 import birthhub360Routes from './birthhub360.routes.js';
 
 const mockTrigger = vi.mocked(voiceProspectingService.triggerOutboundCall);

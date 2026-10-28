@@ -6,7 +6,7 @@ import type {
 } from '../domain/SavedView.js';
 import { prismaSavedViewRepository } from '../infra/PrismaSavedViewRepository.js';
 
-export type { SavedViewFilters, SavedViewEntity, SavedViewRepository };
+export type { SavedViewEntity, SavedViewFilters, SavedViewRepository };
 
 const VALID_FUNNELS = new Set(['Lead', 'Negocio']);
 

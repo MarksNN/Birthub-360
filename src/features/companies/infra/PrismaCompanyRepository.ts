@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client';
-import { toDeterministicCnpj } from '../../../lib/cnpj.js';
 import { env } from '../../../config/env.js';
+import { toDeterministicCnpj } from '../../../lib/cnpj.js';
 import { fromPrismaCompanyStatus, toPrismaCompanyStatus } from '../../../lib/enumMap.js';
 import { prisma } from '../../../lib/prisma.js';
 import { searchCompaniesPage } from '../../../lib/search/index.js';

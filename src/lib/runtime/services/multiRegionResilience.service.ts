@@ -5,8 +5,8 @@ import type {
   RegionIdentifier,
   RegionTelemetry,
 } from '../../../shared/contracts/multiRegionResilience.contract.js';
-import { domainEventMesh } from '../../queue/domainEventMesh.service.js';
 import { logger } from '../../logger.js';
+import { domainEventMesh } from '../../queue/domainEventMesh.service.js';
 
 export class MultiRegionResilienceService implements IMultiRegionResiliencePort {
   private regions = new Map<RegionIdentifier, RegionTelemetry>();

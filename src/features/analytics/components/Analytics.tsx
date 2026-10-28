@@ -7,8 +7,8 @@ import {
   Loader2,
   RefreshCw,
   Table2,
-  TrendingUp,
   TrendingDown,
+  TrendingUp,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { BarChart, LineChart } from '../../../components/charts/index.js';

@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { logger } from '../../../lib/logger.js';
-import { fetchCnpjPublicData, type CnpjData } from '../outbound/server/cnpj.js';
+import { type CnpjData, fetchCnpjPublicData } from '../outbound/server/cnpj.js';
 
 export interface DuckDBCnpjCompany {
   cnpj: string;

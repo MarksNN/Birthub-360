@@ -1,14 +1,14 @@
 import { type Job, Worker } from 'bullmq';
+import {
+  type IngestOptions,
+  ingestionService,
+} from '../../features/knowledge/ingestion.service.js';
 import { requestContext } from '../async-context.js';
 import { logger } from '../logger.js';
 import { isFinalAttempt, recordDeadLetter } from './deadLetter.js';
+import { KNOWLEDGE_INGESTION_QUEUE_NAME } from './knowledgeIngestion.queue.js';
 import { recordQueueJobCompleted } from './metrics.js';
 import { connection } from './redis.js';
-import { KNOWLEDGE_INGESTION_QUEUE_NAME } from './knowledgeIngestion.queue.js';
-import {
-  ingestionService,
-  type IngestOptions,
-} from '../../features/knowledge/ingestion.service.js';
 
 export function createKnowledgeIngestionWorker() {
   const worker = new Worker<IngestOptions>(

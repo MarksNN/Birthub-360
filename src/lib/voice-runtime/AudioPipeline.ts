@@ -1,6 +1,6 @@
-import type { AudioChunk } from './types.js';
-import { streamingEngine } from './StreamingEngine.js';
 import { observability } from './Observability.js';
+import { streamingEngine } from './StreamingEngine.js';
+import type { AudioChunk } from './types.js';
 
 export class AudioPipeline {
   public processInputChunk(sessionId: string, rawChunk: ArrayBuffer | Uint8Array): AudioChunk {

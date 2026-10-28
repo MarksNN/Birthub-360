@@ -1,20 +1,20 @@
-import type React from 'react';
 import {
-  Zap,
-  Loader2,
-  Sparkles,
   Check,
-  PhoneCall,
+  Copy,
+  Edit3,
+  Flame,
+  ListChecks,
+  Loader2,
   Mail,
   MessageSquare,
-  ShieldAlert,
-  ListChecks,
-  Flame,
-  Terminal,
+  PhoneCall,
   RefreshCw,
-  Edit3,
-  Copy,
+  ShieldAlert,
+  Sparkles,
+  Terminal,
+  Zap,
 } from 'lucide-react';
+import type React from 'react';
 import { LinkedinIcon as Linkedin } from '../../../../../components/ui/icons/LinkedinIcon.js';
 import type { OutreachCopies } from '../../types.js';
 

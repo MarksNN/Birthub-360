@@ -1,8 +1,8 @@
 import type {
+  CallStatusSnapshot,
   DialerProvider,
   OriginateCallInput,
   OriginateCallResult,
-  CallStatusSnapshot,
 } from '../../application/ports/DialerProvider.js';
 import type { CallAttemptStatus } from '../../domain/entities/CallAttempt.js';
 import type { ThreeCxCallControlClient } from './ThreeCxCallControlClient.js';

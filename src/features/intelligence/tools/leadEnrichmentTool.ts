@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { prisma } from '../../../lib/prisma.js';
-import { enrichCompany } from '../../prospecting/services/enrichment.service.js';
 import type { IEnrichedLead } from '../../../types/prospecting.js';
+import { enrichCompany } from '../../prospecting/services/enrichment.service.js';
 import { CommercialAIService } from '../services/CommercialAIService.js';
 
 /**

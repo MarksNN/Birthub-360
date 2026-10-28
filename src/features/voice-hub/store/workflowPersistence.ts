@@ -1,7 +1,7 @@
-import type { StudioNode, StudioEdge, NodeLifecycleState } from '../lib/studio/types.js';
-import type { StudioState } from './studioTypes.js';
 import { clientLogger as logger } from '../../../lib/clientLogger.js';
+import type { NodeLifecycleState, StudioEdge, StudioNode } from '../lib/studio/types.js';
 import { nodeRegistry } from './nodeRegistry.js';
+import type { StudioState } from './studioTypes.js';
 /** Persist graph content, excluding ReactFlow's transient interaction state. */
 export function workflowGraphSnapshot(nodes: StudioNode[], edges: StudioEdge[]): string {
   return JSON.stringify({

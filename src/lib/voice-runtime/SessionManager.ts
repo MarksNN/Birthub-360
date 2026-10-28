@@ -1,14 +1,14 @@
-import type { VoiceSession, SessionState, AgentRuntimeConfig, ConversationTurn } from './types.js';
-import { observability } from './Observability.js';
+import { getAiConsent } from '../voice-hub/services/settingService.js';
+import { webhookService } from '../voice-hub/services/webhook.service.js';
+import { audioPipeline } from './AudioPipeline.js';
+import { postCallFollowupAutomation } from './automation/PostCallFollowupAutomation.js';
+import { failoverEngine } from './FailoverEngine.js';
+import { type IntentAnalysisResult, intentEngine } from './intelligence/IntentEngine.js';
 import { latencyMonitor } from './LatencyMonitor.js';
 import { memoryPipeline } from './MemoryPipeline.js';
+import { observability } from './Observability.js';
 import { streamingEngine } from './StreamingEngine.js';
-import { audioPipeline } from './AudioPipeline.js';
-import { failoverEngine } from './FailoverEngine.js';
-import { webhookService } from '../voice-hub/services/webhook.service.js';
-import { getAiConsent } from '../voice-hub/services/settingService.js';
-import { intentEngine, type IntentAnalysisResult } from './intelligence/IntentEngine.js';
-import { postCallFollowupAutomation } from './automation/PostCallFollowupAutomation.js';
+import type { AgentRuntimeConfig, ConversationTurn, SessionState, VoiceSession } from './types.js';
 
 // A session with no activity for this long is considered abandoned. Without this, a session that
 // never reaches endSession() (dropped WebSocket, crashed client, etc.) lives in `sessions` /

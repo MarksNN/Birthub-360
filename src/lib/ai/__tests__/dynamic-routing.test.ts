@@ -3,13 +3,13 @@
  * Valida seleção de provider/model baseada em custo, latência, disponibilidade e tenant tier.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  selectDynamicRouting,
-  recordLatency,
-  __resetLatencyCacheForTests,
-} from '../gateway/dynamic-routing.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isCircuitOpen } from '../gateway/circuit-breaker.js';
+import {
+  __resetLatencyCacheForTests,
+  recordLatency,
+  selectDynamicRouting,
+} from '../gateway/dynamic-routing.js';
 import type { ProviderAdapter } from '../gateway/providers/types.js';
 
 // Mock do circuit breaker

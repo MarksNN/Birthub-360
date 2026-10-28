@@ -2,6 +2,7 @@
  * Schemas Zod - Index
  * Exporta todos os schemas de validação estruturada
  */
-export { LeadSchema, type Lead } from './lead.schema.js';
-export { CompanySchema, type Company } from './company.schema.js';
-export { EnrichmentSchema, type Enrichment } from './enrichment.schema.js';
+
+export { type Company, CompanySchema } from './company.schema.js';
+export { type Enrichment, EnrichmentSchema } from './enrichment.schema.js';
+export { type Lead, LeadSchema } from './lead.schema.js';

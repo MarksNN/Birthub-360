@@ -1,6 +1,6 @@
-import type { ThreeCxAuthClient } from './ThreeCxAuthClient.js';
 import { CircuitBreaker } from '../http/CircuitBreaker.js';
 import { isNetworkError, withRetry } from '../http/retry.js';
+import type { ThreeCxAuthClient } from './ThreeCxAuthClient.js';
 
 /**
  * Formato de "participante" devolvido pela Call Control API.

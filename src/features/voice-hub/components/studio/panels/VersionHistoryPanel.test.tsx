@@ -6,11 +6,12 @@
 // §14/§15), requires explicit confirmation before rollback, and surfaces a 422 rollback
 // rejection's `issues[]` via the same `ValidationIssuesList` publish already uses — never a
 // silent failure.
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { VersionHistoryPanel } from './VersionHistoryPanel.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStudioStore } from '../../../store/useStudioStore.js';
+import { VersionHistoryPanel } from './VersionHistoryPanel.js';
 
 function jsonResponse(body: unknown, ok = true, status = 200) {
   return Promise.resolve({

@@ -27,14 +27,14 @@ import {
 import {
   EnvTenantPepperProvider,
   InMemorySubjectKeyStore,
-  MissingPepperError,
-  KmsEnvelopeTenantKeyProvider,
   type KmsEnvelopeClient,
-  type WrappedTenantKeyStore,
-  UnavailableTenantKeyProvider,
+  KmsEnvelopeTenantKeyProvider,
+  MissingPepperError,
   type SubjectKeyStore,
   SubjectTokenizer,
   type TenantPepperProvider,
+  UnavailableTenantKeyProvider,
+  type WrappedTenantKeyStore,
 } from './subjectTokenizer.js';
 
 /** Sinais de ambiente produtivo independentes de NODE_ENV. */

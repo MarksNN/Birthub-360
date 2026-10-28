@@ -9,7 +9,8 @@
  * - Multi-tenant estrito por organizationId.
  */
 
-import {
+import { logger } from '../../../lib/logger.js';
+import type {
   ConversationalDynamicMetrics,
   ExplicitObjectionItem,
   MethodologyAdherence,
@@ -19,7 +20,6 @@ import {
   RealtimeCoachingHint,
   SpeakerTurn,
 } from '../../../shared/contracts/conversationalCoaching.contract.js';
-import { logger } from '../../../lib/logger.js';
 
 export interface AnalyzeCallInput {
   organizationId: string;

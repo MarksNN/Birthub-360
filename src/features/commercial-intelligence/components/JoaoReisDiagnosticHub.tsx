@@ -20,21 +20,21 @@ import { Dialog } from '../../../components/ui/Dialog.js';
 import type { FunnelBarItem } from '../../../components/ui/FunnelBars.js';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import {
+  type ActiveTab,
+  type CallAnalysisResult,
   CHANNEL_HEX,
+  type ChannelTag,
   ComparativeTab,
-  DEAL_STAGE_LABEL,
-  DIAGNOSTIC_DATA,
   DailyTab,
+  type DailyTask,
+  DEAL_STAGE_LABEL,
   DEFAULT_DAILY_PLAN,
+  DIAGNOSTIC_DATA,
   DiagnosticBottlenecksTab,
   EmCadenciaTab,
   IaCoachTab,
   MonthFunnelTab,
   Pauta1to1Tab,
-  type ActiveTab,
-  type CallAnalysisResult,
-  type ChannelTag,
-  type DailyTask,
   type SegmentKey,
 } from './diagnostic/index.js';
 

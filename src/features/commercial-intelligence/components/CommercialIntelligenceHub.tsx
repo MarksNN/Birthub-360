@@ -1,6 +1,5 @@
-import React from 'react';
 import { LineChart, SlidersHorizontal } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import {

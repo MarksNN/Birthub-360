@@ -2,8 +2,9 @@
 // (which was calling Prisma directly, bypassing the Controller → Service → Repository boundary —
 // see the PR review finding this resolves) so `OrganizationAiConsent` has the same repository-layer
 // isolation as every other model: no Prisma import outside src/repositories/**.
-import { prisma } from '@/lib/prisma.js';
+
 import type { OrganizationAiConsent } from '@prisma/client';
+import { prisma } from '@/lib/prisma.js';
 
 export function findByTenantId(organizationId: string): Promise<OrganizationAiConsent | null> {
   return prisma.organizationAiConsent.findUnique({ where: { organizationId } });

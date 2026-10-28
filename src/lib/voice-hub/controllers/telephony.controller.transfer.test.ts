@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response } from 'express';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Same mocking shape as `__tests__/telephony.controller.test.ts` (Agente 08) — see
 // `.agents/handoffs/onda-6/04-para-05-transferDetails-contrato.md`.

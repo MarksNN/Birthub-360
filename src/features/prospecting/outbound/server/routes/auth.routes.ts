@@ -1,7 +1,7 @@
-import { Router, type Request, type Response } from 'express';
 import crypto from 'node:crypto';
+import { type Request, type Response, Router } from 'express';
+import { buildLogoutCookie, buildSessionCookie, createSessionToken, requireAuth } from '../auth.js';
 import { getDatabase } from '../db.js';
-import { requireAuth, createSessionToken, buildSessionCookie, buildLogoutCookie } from '../auth.js';
 
 export const SCRYPT_PREFIX = 'scrypt$';
 

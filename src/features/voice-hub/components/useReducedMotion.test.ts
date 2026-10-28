@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { usePrefersReducedMotion } from './useReducedMotion.js';
 
 afterEach(() => {

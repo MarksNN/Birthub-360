@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
+import { getBrandColor, resetBrandColor, saveBrandColor } from '../services/settingService.js';
 import { brandColorSchema } from '../validators/index.js';
-import { getBrandColor, saveBrandColor, resetBrandColor } from '../services/settingService.js';
 
 export async function getBrandColorHandler(req: Request, res: Response) {
   const brandColor = await getBrandColor(req.organizationId ?? null);

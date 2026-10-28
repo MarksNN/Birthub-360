@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import twilio from 'twilio';
+import { logger } from '@/lib/logger.js';
 import * as telephonyService from '../services/telephonyService.js';
 import type { TransferDetails, VoiceOverride } from '../services/workflowRuntimeService.js';
-import { logger } from '@/lib/logger.js';
 
 const { VoiceResponse } = twilio.twiml;
 

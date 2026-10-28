@@ -1,6 +1,6 @@
 import express from 'express';
-import { requireTenant } from '../middlewares/rbac.js';
 import { initiateOutboundCallHandler } from '../controllers/voiceOutbound.controller.js';
+import { requireTenant } from '../middlewares/rbac.js';
 
 const router = express.Router();
 

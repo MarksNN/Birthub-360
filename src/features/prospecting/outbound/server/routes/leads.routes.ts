@@ -1,54 +1,54 @@
-import { Router, type Request, type Response } from 'express';
-import { getDatabase, saveDatabase, logActivity } from '../db.js';
-import { generateCopiesWithEngine, enrichLeadWithPublicNewsAndScripts } from '../ai.js';
-import { resolveAndEnrichCnpjForLead, type CnpjData } from '../cnpj.js';
-import { parseSearchIntent, validateSearchIntent } from '../searchIntent.js';
-import { buildRequirementsFromSearchIntent, evaluateRequirements } from '../requirementEngine.js';
-import { planSearch } from '../queryPlanner.js';
-import { buildFunnelSummary } from '../progressiveSearch.js';
-import { buildCompanyKey, findDuplicate, type CompanyKey } from '../entityResolution.js';
+import { type Request, type Response, Router } from 'express';
+import { z } from 'zod';
+import type { DecisionMaker, Lead } from '../../types.js';
+import { enrichLeadWithPublicNewsAndScripts, generateCopiesWithEngine } from '../ai.js';
+import { requireAuth } from '../auth.js';
+import { type CnpjData, resolveAndEnrichCnpjForLead } from '../cnpj.js';
+import { getDatabase, logActivity, saveDatabase } from '../db.js';
+import { buildCompanyKey, type CompanyKey, findDuplicate } from '../entityResolution.js';
 import {
   buildCnpjEvidence,
   buildDecisionMakerEvidence,
-  saveFieldEvidence,
   getFieldEvidence,
+  saveFieldEvidence,
 } from '../evidence.js';
-import { computeLeadScores } from '../scoring.js';
-import { detectSignalsForLead } from '../signals.js';
-import {
-  startSearchRun,
-  attachSearchPlan,
-  recordStep,
-  recordProviderCall,
-  recordCandidateDecision,
-  finishSearchRun,
-} from '../observability.js';
-import { complementDecisionMakerEmail as complementDecisionMakerEmailWithHunter } from '../search/providers/hunter.provider.js';
-import { resolveBitrixWebhookForCompany, checkBitrixDuplicate } from '../services/bitrix.js';
 import { rateLimit } from '../middleware/rateLimit.js';
 import {
-  withCache,
-  hasFreshCacheEntry,
+  attachSearchPlan,
+  finishSearchRun,
+  recordCandidateDecision,
+  recordProviderCall,
+  recordStep,
+  startSearchRun,
+} from '../observability.js';
+import { buildFunnelSummary } from '../progressiveSearch.js';
+import { planSearch } from '../queryPlanner.js';
+import { buildRequirementsFromSearchIntent, evaluateRequirements } from '../requirementEngine.js';
+import {
   CACHE_TTL_MS,
   createBudgetTracker,
+  getCircuitState,
   hasEnrichmentBudget,
+  hasFreshCacheEntry,
   isBudgetExhausted,
+  parseSearchBudget,
   recordApiCall,
   recordEnrichment,
-  parseSearchBudget,
-  getCircuitState,
+  withCache,
 } from '../resilience.js';
-import { requireAuth } from '../auth.js';
-import type { Lead, DecisionMaker } from '../../types.js';
-import { validateChangedLeadFields, upsertMessageWithVersioning } from '../utils/formatLead.js';
+import { computeLeadScores } from '../scoring.js';
+import { complementDecisionMakerEmail as complementDecisionMakerEmailWithHunter } from '../search/providers/hunter.provider.js';
+import { parseSearchIntent, validateSearchIntent } from '../searchIntent.js';
+import { checkBitrixDuplicate, resolveBitrixWebhookForCompany } from '../services/bitrix.js';
 import {
-  findLeads,
-  enrichLeadWithApollo,
-  resolveCnpjWithResilience,
-  cleanDomainForCache,
   buildCnpjCacheKey,
+  cleanDomainForCache,
+  enrichLeadWithApollo,
+  findLeads,
+  resolveCnpjWithResilience,
 } from '../services/leadSearch.service.js';
-import { z } from 'zod';
+import { detectSignalsForLead } from '../signals.js';
+import { upsertMessageWithVersioning, validateChangedLeadFields } from '../utils/formatLead.js';
 
 const heavyAiLimiter = rateLimit({
   windowMs: 60_000,

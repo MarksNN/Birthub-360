@@ -1,11 +1,11 @@
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import { getAiModel } from '../../../../lib/ai/gateway.js';
 import type {
   AccountIntelligencePack,
   DecisionMakerInfo,
   GiselleStrategyPlan,
   TransparentScore,
 } from './triad.types.js';
-import { getAiModel } from '../../../../lib/ai/gateway.js';
-import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 
 export interface GiselleStrategyInput {
   companyName: string;

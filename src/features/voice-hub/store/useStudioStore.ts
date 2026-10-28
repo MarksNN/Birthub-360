@@ -1,28 +1,30 @@
+import { addEdge } from '@xyflow/react';
 import { create } from 'zustand';
+import { clientLogger as logger } from '../../../lib/clientLogger.js';
+import { validationEngine } from '../../../lib/studio/ValidationEngine.js';
 import type {
-  StudioNode,
-  StudioEdge,
   NodeType,
+  StudioEdge,
+  StudioNode,
   ValidationIssue,
   WorkflowVersionSummary,
 } from '../lib/studio/types.js';
-import { validationEngine } from '../../../lib/studio/ValidationEngine.js';
-import { addEdge } from '@xyflow/react';
-import { clientLogger as logger } from '../../../lib/clientLogger.js';
+import { initialEdges, initialNodes } from './initialData.js';
 import { nodeRegistry } from './nodeRegistry.js';
-import { initialNodes, initialEdges } from './initialData.js';
 import { createWorkflowPersistenceActions } from './workflowPersistence.js';
+
 export { workflowGraphSnapshot } from './workflowPersistence.js';
+
 import type { NodeLifecycleState, StudioState } from './studioTypes.js';
 
-// Re-exports for backwards compatibility
-export { nodeRegistry };
 export type {
   NodeLifecycleState,
   NodeRegistryItem,
   SimulationLog,
   StudioState,
 } from './studioTypes.js';
+// Re-exports for backwards compatibility
+export { nodeRegistry };
 
 let workflowEpoch = 0;
 

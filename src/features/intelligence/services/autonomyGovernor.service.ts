@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   AgentActionEvaluation,
   AgentSloMetrics,
@@ -6,8 +8,6 @@ import type {
   AutonomyPolicyConfig,
   IAutonomyGovernorPort,
 } from '../../../shared/contracts/autonomyLimits.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class AutonomyGovernorService implements IAutonomyGovernorPort {
   private policiesStore = new Map<string, AutonomyPolicyConfig>();

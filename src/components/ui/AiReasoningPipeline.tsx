@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Database, Brain, Sparkles, CheckCircle2, Zap } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Brain, CheckCircle2, Database, Sparkles, Zap } from 'lucide-react';
 
 export type AiReasoningStep = 'CONTEXT' | 'ANALYSIS' | 'RECOMMENDATION' | 'APPROVAL' | 'EXECUTION';
 

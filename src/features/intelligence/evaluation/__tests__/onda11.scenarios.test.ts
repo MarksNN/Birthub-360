@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { sseService } from '../../../notifications/sse.service.js';
 import {
   buildCanonicalEnrichmentContext,
   evaluateStagnation,
   formatCanonicalEnrichmentForAgent,
 } from '../../domain/canonicalEnrichment.js';
 import { getLeadContextTool, searchLeadsTool } from '../../tools/crmTools.js';
-import { sseService } from '../../../notifications/sse.service.js';
 
 const prismaFindManyMock = vi.fn();
 const prismaFindFirstMock = vi.fn();

@@ -1,7 +1,20 @@
+import {
+  AlertTriangle,
+  Check,
+  ChevronRight,
+  Cpu,
+  Globe,
+  LayoutTemplate,
+  Mic,
+  Radar,
+  RefreshCw,
+  Search,
+  Settings,
+} from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { Card } from '../../../components/ui/Card.js';
 import { Button } from '../../../components/ui/Button.js';
+import { Card } from '../../../components/ui/Card.js';
 import { PRODUCT_MODULES } from '../../../config/product-modules.js';
 import {
   setOrganizationModulesCache,
@@ -11,19 +24,6 @@ import {
   describeOrganizationModulesError,
   organizationModulesApi,
 } from '../organizationModules.api.js';
-import {
-  Settings,
-  LayoutTemplate,
-  Search,
-  Mic,
-  Radar,
-  Globe,
-  Cpu,
-  Check,
-  ChevronRight,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
   Settings: <Settings className="w-8 h-8" />,

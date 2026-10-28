@@ -1,25 +1,25 @@
-import { useState } from 'react';
 import {
-  Component,
+  BookOpen,
+  BrainCircuit,
   ChevronDown,
   ChevronRight,
+  Component,
   Database,
-  Mic,
-  Headphones,
-  Play,
-  Square,
-  MessageSquare,
-  GitBranch,
-  Wrench,
-  BrainCircuit,
-  HelpCircle,
-  Split,
-  BookOpen,
-  Search,
   FolderOpen,
+  GitBranch,
+  Headphones,
+  HelpCircle,
+  MessageSquare,
+  Mic,
+  Play,
+  Search,
+  Split,
+  Square,
+  Wrench,
 } from 'lucide-react';
+import { useState } from 'react';
 import type { StudioNode } from '../../../lib/studio/types.js';
-import { useStudioStore, nodeRegistry } from '../../../store/useStudioStore.js';
+import { nodeRegistry, useStudioStore } from '../../../store/useStudioStore.js';
 
 interface LayersPanelProps {
   nodes: StudioNode[];

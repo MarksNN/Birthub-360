@@ -13,12 +13,12 @@
  */
 
 import { metrics, trace } from '@opentelemetry/api';
+import { AppError } from '../../../shared/middlewares/errorHandler.js';
 import { requestContext } from '../../async-context.js';
 import { getLangfuseClient } from '../../langfuse.js';
 import { logger } from '../../logger.js';
 import { prisma } from '../../prisma.js';
 import { cacheConnection } from '../../queue/redis.js';
-import { AppError } from '../../../shared/middlewares/errorHandler.js';
 import {
   recordTokenQuotaAlert,
   recordTokenQuotaBlocked,

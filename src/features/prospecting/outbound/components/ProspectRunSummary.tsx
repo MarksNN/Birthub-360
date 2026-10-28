@@ -1,6 +1,6 @@
+import { AlertTriangle, ArrowRight, Check, Copy, Filter, Info } from 'lucide-react';
 import React, { useState } from 'react';
 import type { ProspectRunMeta, SearchFunnelStage, StopReason, ThemeMode } from '../types.js';
-import { Filter, Copy, Check, AlertTriangle, ArrowRight, Info } from 'lucide-react';
 
 interface ProspectRunSummaryProps {
   meta: ProspectRunMeta | null;

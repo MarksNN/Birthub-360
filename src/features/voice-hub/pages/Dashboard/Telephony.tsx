@@ -1,5 +1,5 @@
+import { Download, Globe, Loader2, Music, Phone, Play, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { Phone, Globe, Shield, Music, Play, Loader2, Download } from 'lucide-react';
 
 export default function TelephonyPage() {
   const [musicPrompt, setMusicPrompt] = useState(

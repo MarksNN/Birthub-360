@@ -2,6 +2,8 @@ import confetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Award, Check, ChevronRight, Sparkles, Trophy, Volume2, VolumeX, Zap } from 'lucide-react';
 import { useState } from 'react';
+import type { SellerScore } from '../../features/gamification/domain/Gamification.js';
+import { BADGE_DEFINITIONS } from '../../features/gamification/domain/Gamification.js';
 import { SoundFX } from '../../lib/soundEffects.js';
 import { cn } from '../../lib/utils.js';
 import { Button } from './Button.js';
@@ -13,9 +15,6 @@ import {
   Trophy3DIcon,
 } from './icons/Isometric3DIcons.js';
 import { TiltCard } from './TiltCard.js';
-
-import type { SellerScore } from '../../features/gamification/domain/Gamification.js';
-import { BADGE_DEFINITIONS } from '../../features/gamification/domain/Gamification.js';
 
 export interface GamificationWidgetProps {
   initialXp?: number;

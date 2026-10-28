@@ -1,7 +1,7 @@
+import { AlertCircle, Code2, Database, Play, RefreshCw, Table } from 'lucide-react';
 import type React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { DatabaseStats, QueryResult, ThemeMode } from '../types.js';
-import { Database, Play, Table, RefreshCw, AlertCircle, Code2 } from 'lucide-react';
 
 interface DatabaseExplorerTabProps {
   dbStats: DatabaseStats | null;

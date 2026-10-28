@@ -3,11 +3,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.js';
-import { initSentry } from './lib/monitoring/sentry.js';
 import { initPostHogClient } from './lib/analytics/posthog-client.js';
+import { initSentry } from './lib/monitoring/sentry.js';
 
 initSentry(false);
 initPostHogClient();
+
 import './styles/globals.css';
 import './styles/official-identity.css';
 import { registerSW } from 'virtual:pwa-register';

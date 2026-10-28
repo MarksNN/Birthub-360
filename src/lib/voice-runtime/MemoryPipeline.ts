@@ -1,5 +1,5 @@
-import type { ConversationTurn, MemoryNode, MemoryLevel } from './types.js';
 import { observability } from './Observability.js';
+import type { ConversationTurn, MemoryLevel, MemoryNode } from './types.js';
 
 export class MemoryPipeline {
   private memoryStore: Map<

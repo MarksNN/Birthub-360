@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../repositories/billingRepository.js', () => ({
   findWalletByTenant: vi.fn(),

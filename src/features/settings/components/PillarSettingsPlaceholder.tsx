@@ -1,31 +1,31 @@
-import { useState } from 'react';
 import {
+  AlertCircle,
+  BrainCircuit,
+  Building2,
+  Database,
+  LineChart,
+  Link as LinkIcon,
+  Phone,
+  Save,
   Settings,
   Shield,
-  Zap,
-  Link as LinkIcon,
-  Save,
   Sliders,
-  Database,
-  BrainCircuit,
-  Phone,
-  Building2,
   Target,
-  LineChart,
   Workflow,
-  AlertCircle,
+  Zap,
 } from 'lucide-react';
-import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
+import { useState } from 'react';
+import { Badge } from '../../../components/ui/Badge.js';
+import { Button } from '../../../components/ui/Button.js';
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from '../../../components/ui/Card.js';
-import { Button } from '../../../components/ui/Button.js';
+import { CommandCenterHeader } from '../../../components/ui/CommandCenterHeader.js';
 import { Input } from '../../../components/ui/Input.js';
-import { Badge } from '../../../components/ui/Badge.js';
 
 interface PillarSettingsProps {
   pillarName: string;

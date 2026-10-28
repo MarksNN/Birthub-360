@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Birthhub360OutboundPayload } from '../validators/birthhub360.schema.js';
 
 vi.mock('../lib/webhookIdempotency.js', () => ({
@@ -12,8 +12,8 @@ vi.mock('../../../services/settingService.js', () => ({
   getAiConsent: vi.fn(),
 }));
 
-import { claimIdempotencyKey } from '../lib/webhookIdempotency.js';
 import { getAiConsent } from '../../../services/settingService.js';
+import { claimIdempotencyKey } from '../lib/webhookIdempotency.js';
 import {
   BlandConfigurationError,
   ExternalAiConsentRequiredError,

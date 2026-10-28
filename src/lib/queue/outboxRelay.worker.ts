@@ -4,7 +4,7 @@
  */
 
 import { logger } from '../logger.js';
-import { outboxDispatcher, type OutboxMessage } from './outboxDispatcher.service.js';
+import { type OutboxMessage, outboxDispatcher } from './outboxDispatcher.service.js';
 
 export class OutboxRelayWorker {
   private isRunning = false;

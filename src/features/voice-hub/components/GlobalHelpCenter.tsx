@@ -1,11 +1,11 @@
+import { ArrowRight, Lightbulb, Send, ShieldCheck, Sparkles, X } from 'lucide-react';
 import type React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Sparkles, X, Send, ArrowRight, Lightbulb, ShieldCheck } from 'lucide-react';
-import { Card, Button, Spinner } from './design-system/index.js';
-import { getAccessibleTextOnBrand } from './design-system/tokens.js';
-import { useSessionStore } from '../store/useSessionStore.js';
 import { logger } from '../../../lib/logger.js';
+import { useSessionStore } from '../store/useSessionStore.js';
+import { Button, Card, Spinner } from './design-system/index.js';
+import { getAccessibleTextOnBrand } from './design-system/tokens.js';
 
 interface Message {
   id: string;

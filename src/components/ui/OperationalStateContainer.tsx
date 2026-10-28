@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Clock, RefreshCw } from 'lucide-react';
+import type * as React from 'react';
 import { cn } from '../../lib/utils.js';
 import { Button } from './Button.js';
 import { EmptyState } from './EmptyState.js';

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../repositories/notificationRepository.js', () => ({
   createNotification: vi.fn(),
@@ -9,11 +9,11 @@ vi.mock('../repositories/notificationRepository.js', () => ({
 }));
 
 import {
+  countUnreadForUser,
   createNotification as createNotificationRow,
   findNotificationsForUser,
-  countUnreadForUser,
-  markNotificationAsRead as markNotificationAsReadRow,
   markAllAsReadForUser,
+  markNotificationAsRead as markNotificationAsReadRow,
 } from '../repositories/notificationRepository.js';
 import {
   createNotification,

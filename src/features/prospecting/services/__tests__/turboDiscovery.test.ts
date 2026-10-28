@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 const mocks = vi.hoisted(() => ({
   apollo: vi.fn(),
   places: vi.fn(),
@@ -44,7 +45,9 @@ vi.mock('../searchExecution.service.js', () => ({
     finish = mocks.finish;
   },
 }));
+
 import { discoverCandidates } from '../prospecting/discovery.js';
+
 const criteria = { segmento: 'Tecnologia', localizacao: 'Brasil', quantidade: 10 };
 beforeEach(() => {
   vi.clearAllMocks();

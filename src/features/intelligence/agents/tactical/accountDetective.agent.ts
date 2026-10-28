@@ -1,8 +1,8 @@
+import { logger } from '../../../../lib/logger.js';
 import type {
   AccountExecutiveDossier,
   IAccountDetectivePort,
 } from '../../../../shared/contracts/tacticalSwarm.contract.js';
-import { logger } from '../../../../lib/logger.js';
 
 export class AccountDetectiveAgent implements IAccountDetectivePort {
   /**

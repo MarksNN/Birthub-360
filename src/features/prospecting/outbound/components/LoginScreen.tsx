@@ -1,17 +1,17 @@
-import type React from 'react';
-import { useState } from 'react';
 import {
+  ArrowRight,
+  Building2,
+  ListChecks,
+  Loader2,
   Lock,
   Mail,
-  Loader2,
-  ArrowRight,
-  Sun,
   Moon,
-  Building2,
   Sparkles,
-  ListChecks,
+  Sun,
 } from 'lucide-react';
-import type { User, ThemeMode } from '../types.js';
+import type React from 'react';
+import { useState } from 'react';
+import type { ThemeMode, User } from '../types.js';
 import { BirthubLogo } from './BirthubLogo.js';
 
 interface LoginScreenProps {

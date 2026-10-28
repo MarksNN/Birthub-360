@@ -6,17 +6,20 @@ import { logAiUsage } from '../../../lib/ai/gateway.js';
 import { getTenantId } from '../../../lib/async-context.js';
 import { logger } from '../../../lib/logger.js';
 import { assertPiiExternalConsent } from '../services/guardrails.service.js';
-import { getLeadContextTool, searchLeadsTool } from '../tools/crmTools.js';
-import { searchPlaybookTool } from '../tools/playbookTool.js';
-import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 import { cadenceTool } from '../tools/commercialTools.js';
-import { slackNotificationTool } from '../tools/integrationTools.js';
-import { cnpjLookupTool, multiCrmSyncTool } from '../tools/integrationTools.js';
+import { getLeadContextTool, searchLeadsTool } from '../tools/crmTools.js';
+import {
+  cnpjLookupTool,
+  multiCrmSyncTool,
+  slackNotificationTool,
+} from '../tools/integrationTools.js';
+import { searchPlaybookTool } from '../tools/playbookTool.js';
 import { universalMeetingsTool } from '../tools/universalMeetingsTool.js';
 import { universalMessagingTool } from '../tools/universalMessagingTool.js';
 import { universalNotificationsTool } from '../tools/universalNotificationsTool.js';
 import { universalOfficeDocsTool } from '../tools/universalOfficeDocsTool.js';
 import { universalTasksAndNotesTool } from '../tools/universalTasksAndNotesTool.js';
+import { recordAgentFailure, saveAgentMemory } from './agentMemory.store.js';
 // GOV-13: as duas ferramentas de execução (`create_follow_up_task`/`notify_team`) agora vêm de
 // `opsPendingActions.tool.ts`, não mais de `../tools/opsTools.js` — mesmo nome/schema visível ao
 // LLM, mas em vez de executar direto elas registram uma `AIPendingAction` e a execução real só

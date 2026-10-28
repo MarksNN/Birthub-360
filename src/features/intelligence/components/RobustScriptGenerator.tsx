@@ -16,10 +16,10 @@ import {
   TerminalSquare,
 } from 'lucide-react';
 import { useState } from 'react';
+import { BorderBeam } from '../../../components/ui/BorderBeam.js';
 import { useActivePlaybook } from '../../../hooks/useActivePlaybook.js';
 import { useBrandAccent } from '../../../hooks/useBrandAccent.js';
 import { api } from '../../../lib/api.js';
-import { BorderBeam } from '../../../components/ui/BorderBeam.js';
 import { TerminalSafetyService } from '../../../shared/security/terminalSafety.service.js';
 
 const LANGUAGES = [

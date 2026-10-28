@@ -1,13 +1,13 @@
-import type React from 'react';
 import {
-  UserCheck,
   CheckCircle2,
-  Mail,
-  ShieldCheck,
   Loader2,
-  Phone,
+  Mail,
   MessageCircle,
+  Phone,
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
+import type React from 'react';
 import { LinkedinIcon as Linkedin } from '../../../../../components/ui/icons/LinkedinIcon.js';
 
 export interface LeadDecisionMakerSectionProps {

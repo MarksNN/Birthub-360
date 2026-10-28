@@ -1,6 +1,6 @@
-import * as userRepository from '../repositories/userRepository.js';
-import { getOrCreateSystemRole, type SystemRoleName } from '../repositories/roleRepository.js';
 import { hashPassword } from '../lib/auth-tokens.js';
+import { getOrCreateSystemRole, type SystemRoleName } from '../repositories/roleRepository.js';
+import * as userRepository from '../repositories/userRepository.js';
 
 export class UserServiceError extends Error {
   status: number;

@@ -1,6 +1,6 @@
+import { Heart, ShieldCheck } from 'lucide-react';
 import type React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Heart } from 'lucide-react';
 import { BirthHubLogo } from '../../../../components/brand/BirthHubLogo.js';
 
 export function LandingFooter(): React.ReactElement {

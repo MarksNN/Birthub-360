@@ -1,11 +1,11 @@
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { getTenantId, TenantContextMissingError } from '../../../../../../lib/async-context.js';
+import type { CampaignRepository } from '../../../application/ports/CampaignRepository.js';
 import {
   Campaign,
   type CampaignProps,
   type CampaignStatus,
 } from '../../../domain/entities/Campaign.js';
-import type { CampaignRepository } from '../../../application/ports/CampaignRepository.js';
 
 interface CampaignRow {
   id: string;

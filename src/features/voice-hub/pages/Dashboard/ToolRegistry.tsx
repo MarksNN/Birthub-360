@@ -1,5 +1,5 @@
-import { Card, Button, Badge } from '../../components/design-system/index.js';
-import { Plug, Plus, Settings, FlaskConical } from 'lucide-react';
+import { FlaskConical, Plug, Plus, Settings } from 'lucide-react';
+import { Badge, Button, Card } from '../../components/design-system/index.js';
 
 // ToolEngine (lib/voice-runtime/ToolEngine.ts) has no live tool registered yet in production
 // (verified: no call site invokes registerTool outside its own module), so the usage/latency

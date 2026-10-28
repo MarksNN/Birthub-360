@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/prisma.js', () => ({
   prisma: {
@@ -15,10 +15,10 @@ vi.mock('@/lib/prisma.js', () => ({
 
 import { prisma } from '@/lib/prisma.js';
 import {
+  countUnreadForUser,
   createNotification,
   findNotificationByIdForUser,
   findNotificationsForUser,
-  countUnreadForUser,
   markAllAsReadForUser,
   markNotificationAsRead,
 } from './notificationRepository.js';

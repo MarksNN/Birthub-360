@@ -1,6 +1,5 @@
+import { AlertTriangle, Check, CreditCard, History, Lock, Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { CreditCard, Zap, History, AlertTriangle, Lock, Check } from 'lucide-react';
-import { useSessionStore } from '../../store/useSessionStore.js';
 import { logger } from '../../../lib/logger.js';
 import {
   Badge,
@@ -8,10 +7,11 @@ import {
   EmptyState,
   Skeleton,
   Table,
+  TableCell,
   TableHead,
   TableRow,
-  TableCell,
 } from '../../components/design-system.js';
+import { useSessionStore } from '../../store/useSessionStore.js';
 
 interface WalletSummary {
   organizationId: string;

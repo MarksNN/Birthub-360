@@ -24,6 +24,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from '../../../components/ui/Button.js';
 import { Card } from '../../../components/ui/Card.js';
 import { Dialog } from '../../../components/ui/Dialog.js';
+import { PageHeader } from '../../../components/ui/PageHeader.js';
 import { useAuth } from '../../../contexts/AuthContext.js';
 import { useBrandAccent } from '../../../hooks/useBrandAccent.js';
 import { downloadFile } from '../../../lib/api.js';
@@ -45,7 +46,6 @@ import {
   monthGridRange,
   moveToDay,
 } from '../calendar.util.js';
-import { PageHeader } from '../../../components/ui/PageHeader.js';
 import { BookingLinksModal } from './BookingLinksModal.js';
 
 const WEEKDAYS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];

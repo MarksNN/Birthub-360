@@ -1,5 +1,5 @@
+import { AlertCircle, Home, RotateCcw } from 'lucide-react';
 import React, { type ErrorInfo, type ReactNode } from 'react';
-import { AlertCircle, RotateCcw, Home } from 'lucide-react';
 import { logger } from '../../../../lib/logger.js';
 import { useSessionStore } from '../../store/useSessionStore.js';
 import { getAccessibleTextOnBrand } from './tokens.js';

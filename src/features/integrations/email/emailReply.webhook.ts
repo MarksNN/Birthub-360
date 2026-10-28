@@ -10,15 +10,15 @@ import {
   type InboundEmailReply,
   isGenuineLeadReply,
 } from '../../../shared/domain/replyTracking.js';
+import { prismaOptOutRepository } from '../../../shared/infra/PrismaOptOutRepository.js';
 import {
   claimWebhookDelivery,
-  webhookDeliveryFingerprint,
   validateWebhookTimestamp,
+  webhookDeliveryFingerprint,
 } from '../../../shared/security/webhookReplayGuard.js';
+import { isOptOutKeyword, recordOptOut } from '../../../shared/services/optOutService.js';
 import { emailIntentClassifier } from '../../cadence/infra/emailIntentClassifier.js';
 import { prismaConversationSignalPort } from '../../cadence/infra/PrismaConversationSignalPort.js';
-import { isOptOutKeyword, recordOptOut } from '../../../shared/services/optOutService.js';
-import { prismaOptOutRepository } from '../../../shared/infra/PrismaOptOutRepository.js';
 
 /**
  * CYC-003 (onda 26) — transporte de ENTRADA de e-mail, hoje um stub: nenhum provedor real

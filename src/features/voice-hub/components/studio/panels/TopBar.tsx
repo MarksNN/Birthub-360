@@ -1,20 +1,20 @@
 import {
+  CheckCircle2,
+  Download,
+  History,
+  LayoutGrid,
+  Loader2,
+  Maximize,
+  MessageSquare,
+  Minus,
   Play,
+  Plus,
+  Search,
   Settings,
   Share,
-  Download,
-  MessageSquare,
-  LayoutGrid,
-  Search,
-  Maximize,
-  Minus,
-  Plus,
-  Loader2,
-  CheckCircle2,
-  History,
+  ShieldAlert,
 } from 'lucide-react';
 import type { ValidationIssue } from '../../../lib/studio/types.js';
-import { ShieldAlert } from 'lucide-react';
 
 interface TopBarProps {
   issues: ValidationIssue[];

@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   IAutonomousSdrPort,
   ScheduledMeetingProposal,
   SdrCallExecutionResult,
   SdrCallInput,
 } from '../../../shared/contracts/autonomousSdr.contract.js';
-import { isWithinCallWindow, type CallWindow } from '../../../shared/policies/coldCall.policy.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
+import { type CallWindow, isWithinCallWindow } from '../../../shared/policies/coldCall.policy.js';
 
 export class AutonomousSdrService implements IAutonomousSdrPort {
   private meetingsStore = new Map<string, ScheduledMeetingProposal>();

@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BottomDrawer } from './BottomDrawer.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useStudioStore } from '../../../store/useStudioStore.js';
+import { BottomDrawer } from './BottomDrawer.js';
 
 // Regression coverage for the Onda 3 QA handoff
 // (.agents/handoffs/onda-3/03-para-07-studio-labels-e-teclado.md): the "new variable" (key/value)

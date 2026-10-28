@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
-import { userSettingsSchema } from '../validators/index.js';
 import {
   getUserSettings,
-  saveUserSettings,
   resetUserSettings,
+  saveUserSettings,
 } from '../services/settingService.js';
+import { userSettingsSchema } from '../validators/index.js';
 
 export async function getSettingsHandler(req: Request, res: Response) {
   const settings = await getUserSettings(req.organizationId!, req.voiceHubUser?.id);

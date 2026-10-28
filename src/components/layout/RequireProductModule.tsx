@@ -1,8 +1,8 @@
-import type React from 'react';
-import { useOrganizationModules } from '../../hooks/useOrganizationModules.js';
-import type { ProductModuleKey } from '../../config/product-modules.js';
-import { Card } from '../ui/Card.js';
 import { Lock } from 'lucide-react';
+import type React from 'react';
+import type { ProductModuleKey } from '../../config/product-modules.js';
+import { useOrganizationModules } from '../../hooks/useOrganizationModules.js';
+import { Card } from '../ui/Card.js';
 
 interface Props {
   module: ProductModuleKey;

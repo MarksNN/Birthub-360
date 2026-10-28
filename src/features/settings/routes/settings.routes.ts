@@ -3,10 +3,10 @@
  * Clean Architecture Route Handler using DI Container
  */
 
-import { Router, type Request, type Response, type NextFunction } from 'express';
+import { type NextFunction, type Request, type Response, Router } from 'express';
 import { container } from '../../../shared/di/container.js';
-import type { SettingsController } from '../presentation/SettingsController.js';
 import { requireRole } from '../../../shared/middlewares/requireRole.js';
+import type { SettingsController } from '../presentation/SettingsController.js';
 
 const router = Router();
 

@@ -17,24 +17,24 @@
 //   silenciosamente tratado como "vale 0".
 
 import type {
-  RequirementEvaluation,
+  DataQualityScore,
   FitScore,
   IntentScore,
-  Signal,
-  DataQualityScore,
-  ScoringWeights,
   LeadScores,
+  RequirementEvaluation,
+  ScoringWeights,
+  Signal,
 } from '../src/types.js';
 import type { EvidenceRecord, VerificationStatus } from './evidence.js';
 import { isSignalActive } from './signals.js';
 
 export type {
+  DataQualityScore,
   FitScore,
   IntentScore,
-  Signal,
-  DataQualityScore,
-  ScoringWeights,
   LeadScores,
+  ScoringWeights,
+  Signal,
 } from '../src/types.js';
 
 /** Versão do modelo de score. Muda só quando a fórmula abaixo muda de forma

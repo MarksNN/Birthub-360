@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { CloudOff, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useOnlineStatus } from '../../hooks/useOnlineStatus.js';
 import { offlineSyncService } from '../../features/mobile/offlineSync.service.js';
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js';
 
 export type NetworkSyncStatus = 'online' | 'offline' | 'syncing';
 

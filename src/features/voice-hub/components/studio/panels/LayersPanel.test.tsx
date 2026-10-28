@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach } from 'vitest';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { LayersPanel } from './LayersPanel.js';
-import { InspectorPanel } from './InspectorPanel.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useStudioStore } from '../../../store/useStudioStore.js';
+import { InspectorPanel } from './InspectorPanel.js';
+import { LayersPanel } from './LayersPanel.js';
 
 // Regression coverage for the Onda 3 QA handoff
 // (.agents/handoffs/onda-3/03-para-07-studio-labels-e-teclado.md):

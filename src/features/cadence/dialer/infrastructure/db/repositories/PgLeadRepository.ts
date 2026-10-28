@@ -1,8 +1,8 @@
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { getTenantId, TenantContextMissingError } from '../../../../../../lib/async-context.js';
+import type { LeadRepository } from '../../../application/ports/LeadRepository.js';
 import { Lead, type LeadProps, type LeadStatus } from '../../../domain/entities/Lead.js';
 import { PhoneNumber } from '../../../domain/value-objects/PhoneNumber.js';
-import type { LeadRepository } from '../../../application/ports/LeadRepository.js';
 
 interface LeadRow {
   id: string;

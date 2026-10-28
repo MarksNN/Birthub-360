@@ -1,23 +1,23 @@
-import type React from 'react';
-import { useState } from 'react';
 import {
-  Database,
-  ShieldCheck,
   Check,
-  History,
-  Trash2,
-  ChevronUp,
+  CheckCircle2,
   ChevronDown,
-  Target,
+  ChevronUp,
+  Cpu,
+  Database,
+  Eye,
+  History,
   Info,
   Key,
-  Terminal,
-  Eye,
-  Cpu,
   RefreshCw,
-  CheckCircle2,
+  ShieldCheck,
+  Target,
+  Terminal,
+  Trash2,
   XCircle,
 } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
 import type { ThemeMode } from '../types.js';
 import { BirthubLogo } from './BirthubLogo.js';
 import { RecentSearchModal } from './RecentSearchModal.js';

@@ -1,9 +1,9 @@
-import { Button } from './Button.js';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './Card.js';
-import { Input } from './Input.js';
+import { Bot, Database, Shield, Sparkles } from 'lucide-react';
 import { Badge } from './Badge.js';
+import { Button } from './Button.js';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './Card.js';
+import { Input } from './Input.js';
 import { AnimatedIcon } from './icons/AnimatedIcon.js';
-import { Sparkles, Bot, Shield, Database } from 'lucide-react';
 
 export function StyleShowcase() {
   return (

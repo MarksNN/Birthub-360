@@ -1,12 +1,13 @@
-import { createElement } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { createElement } from 'react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const { getMock, postMock } = vi.hoisted(() => ({ getMock: vi.fn(), postMock: vi.fn() }));
 vi.mock('@/lib/api', () => ({ api: { get: getMock, post: postMock } }));
-import { TurboProvidersPanel } from '../TurboProvidersPanel.js';
+
 import { SearchExecutionPanel } from '../SearchExecutionPanel.js';
+import { TurboProvidersPanel } from '../TurboProvidersPanel.js';
 
 afterEach(() => {
   cleanup();

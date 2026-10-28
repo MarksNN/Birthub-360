@@ -1,22 +1,22 @@
-import React from 'react';
-import type { RecentSearch, ThemeMode } from '../types.js';
 import {
-  X,
-  Search,
+  ArrowUpRight,
+  Check,
   Clock,
+  Copy,
+  Database,
   Layers,
   MapPin,
-  Truck,
   Package,
-  UserCheck,
-  Sparkles,
   Play,
-  ArrowUpRight,
+  Search,
+  Sparkles,
   Trash2,
-  Copy,
-  Check,
-  Database,
+  Truck,
+  UserCheck,
+  X,
 } from 'lucide-react';
+import React from 'react';
+import type { RecentSearch, ThemeMode } from '../types.js';
 
 interface RecentSearchModalProps {
   search: RecentSearch | null;

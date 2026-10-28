@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { logger } from '../../../lib/logger.js';
+import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
 import type {
   BuyerPersona,
   BuyerPersonaArchetype,
@@ -8,8 +10,6 @@ import type {
   RoleplayTurn,
   SalesMethodologyFramework,
 } from '../../../shared/contracts/multimodalRoleplay.contract.js';
-import { domainEventMesh } from '../../../lib/queue/domainEventMesh.service.js';
-import { logger } from '../../../lib/logger.js';
 
 export class MultimodalRoleplaySimulatorService implements IMultimodalRoleplayPort {
   private sessions = new Map<string, MultimodalRoleplaySession>();
