@@ -1,5 +1,5 @@
 /** Nome do evento global disparado para abrir o Command Palette (⌘K/Ctrl+K ou clique na busca do topbar). */
-export const OPEN_COMMAND_PALETTE_EVENT = 'atlas:open-command-palette';
+export const OPEN_COMMAND_PALETTE_EVENT = 'birthhub360:open-command-palette';
 
 /** Nome do evento global disparado para abrir o copiloto de IA flutuante a partir de qualquer tela. */
 export const OPEN_AI_CHAT_EVENT = 'birthhub:open-ai-chat';
