@@ -57,7 +57,7 @@ const DASHBOARD_SCREENSHOT_OPTIONS = { fullPage: true, maxDiffPixels: 600 };
 
 async function setTheme(page: import('@playwright/test').Page, theme: 'light' | 'dark') {
   await page.addInitScript((t) => {
-    window.localStorage.setItem('atlas_theme', t);
+    window.localStorage.setItem('birthhub360_theme', t);
   }, theme);
 }
 

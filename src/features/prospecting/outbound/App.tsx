@@ -76,12 +76,12 @@ export default function App() {
 
   // Theme state with local persistence
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('atlas_theme');
+    const saved = localStorage.getItem('birthhub360_theme');
     return saved === 'light' || saved === 'dark' ? saved : 'light';
   });
 
   useEffect(() => {
-    localStorage.setItem('atlas_theme', theme);
+    localStorage.setItem('birthhub360_theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
@@ -155,7 +155,7 @@ export default function App() {
   // Recent Searches State
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() => {
     try {
-      const saved = localStorage.getItem('atlas_recent_searches');
+      const saved = localStorage.getItem('birthhub360_recent_searches');
       return saved
         ? JSON.parse(saved)
         : [
@@ -180,7 +180,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem('atlas_recent_searches', JSON.stringify(recentSearches));
+    localStorage.setItem('birthhub360_recent_searches', JSON.stringify(recentSearches));
   }, [recentSearches]);
 
   // Relational Database Stats
