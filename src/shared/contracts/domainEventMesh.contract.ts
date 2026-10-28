@@ -61,7 +61,8 @@ export type DomainEventType =
   | 'WHATSAPP_MESSAGE_RECEIVED'
   | 'WHATSAPP_MESSAGE_SENT'
   | 'BITRIX_WEBHOOK_RECEIVED'
-  | 'BITRIX_STAGE_SYNCHRONIZED';
+  | 'BITRIX_STAGE_SYNCHRONIZED'
+  | 'LEAD_ENRICHMENT_REQUESTED';
 
 export interface DomainEventEnvelope<T = Record<string, unknown>> {
   eventId: string;
