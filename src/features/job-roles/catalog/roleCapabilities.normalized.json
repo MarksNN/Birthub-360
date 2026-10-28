@@ -1,6 +1,6 @@
 {
   "summary": {
-    "total": 113
+    "total": 116
   },
   "roleCapabilities": [
     {
@@ -80,6 +80,11 @@
     },
     {
       "jobRoleCode": "BDR",
+      "capabilityCode": "copy.draft",
+      "accessLevel": "EXECUTE"
+    },
+    {
+      "jobRoleCode": "BDR",
       "capabilityCode": "knowledge.search",
       "accessLevel": "EXECUTE"
     },
@@ -132,6 +137,11 @@
       "jobRoleCode": "SDR",
       "capabilityCode": "contract.read",
       "accessLevel": "REQUEST"
+    },
+    {
+      "jobRoleCode": "SDR",
+      "capabilityCode": "copy.draft",
+      "accessLevel": "EXECUTE"
     },
     {
       "jobRoleCode": "SDR",
@@ -417,6 +427,11 @@
       "jobRoleCode": "CHURN_RETENCAO",
       "capabilityCode": "billing.read",
       "accessLevel": "READ"
+    },
+    {
+      "jobRoleCode": "CHURN_RETENCAO",
+      "capabilityCode": "churn.analyze",
+      "accessLevel": "EXECUTE"
     },
     {
       "jobRoleCode": "CHURN_RETENCAO",
