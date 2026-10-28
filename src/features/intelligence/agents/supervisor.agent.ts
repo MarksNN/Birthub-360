@@ -22,14 +22,19 @@ import { CRMAgent } from './crm.agent.js';
 import { buildModelWithFallback } from './fallback.util.js';
 import { OpsAgent } from './ops.agent.js';
 import { SDRQualificationAgent } from './sdrQualification.agent.js';
-import { detectSubSwarm, SUB_SWARMS, type SubSwarmDomain } from './subSwarms.config.js';
+import {
+  detectSubSwarm,
+  SUB_SWARMS,
+  type SubSwarmDomain,
+  type SwarmAgentKey,
+} from './subSwarms.config.js';
 import {
   SWARM_IDENTITY,
   SWARM_OUTPUT_CONTRACT,
   SWARM_UNTRUSTED_CONTENT_GUARD,
 } from './swarm.constants.js';
 
-export { detectSubSwarm, SUB_SWARMS, type SubSwarmDomain };
+export { detectSubSwarm, SUB_SWARMS, type SubSwarmDomain, type SwarmAgentKey };
 
 let cachedSupervisorLlm: ReturnType<typeof buildModelWithFallback> | null = null;
 function getSupervisorLlm() {
@@ -39,7 +44,6 @@ function getSupervisorLlm() {
   return cachedSupervisorLlm;
 }
 
-export type SwarmAgentKey = 'sdr' | 'bdr' | 'closer' | 'crm' | 'ops';
 export type SwarmRoute = SwarmAgentKey | 'finish';
 export type SwarmEventType = 'routing' | 'agent_result' | 'agent_error' | 'final';
 

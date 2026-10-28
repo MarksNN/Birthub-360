@@ -1,4 +1,4 @@
-import type { SwarmAgentKey } from './supervisor.agent.js';
+export type SwarmAgentKey = 'sdr' | 'bdr' | 'closer' | 'crm' | 'ops';
 
 export type SubSwarmDomain = 'commercial' | 'marketing' | 'customer_success' | 'operations';
 
