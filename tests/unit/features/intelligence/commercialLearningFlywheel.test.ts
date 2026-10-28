@@ -233,4 +233,87 @@ describe('CommercialLearningFlywheelService com persistência durável (RLS)', (
     ).rejects.toThrow('db down');
     expect(svc.localSubjectRefs('org-1')).toEqual([]);
   });
+
+  it('executa expurgo físico durável LGPD eliminando registros de abordagem e few-shot com tenant_id', async () => {
+    const approaches: FlywheelApproachRow[] = [];
+    const fewShots: FlywheelFewShotRow[] = [];
+    let tenantSet = '';
+
+    const persistence: FlywheelPersistencePurger = {
+      async $transaction<T>(fn: (tx: FlywheelPurgeTx) => Promise<T>): Promise<T> {
+        const tx: FlywheelPurgeTx = {
+          async $executeRaw(_q, ...values) {
+            tenantSet = values[0] as string;
+            return 0;
+          },
+          flywheelApproachRecord: {
+            async deleteMany({ where }) {
+              const initialCount = approaches.length;
+              const remaining = approaches.filter(
+                (a) => !(a.organizationId === where.organizationId && a.leadId === where.leadId),
+              );
+              approaches.length = 0;
+              approaches.push(...remaining);
+              return { count: initialCount - remaining.length };
+            },
+            async create({ data }) {
+              approaches.push(data);
+              return data;
+            },
+            async findMany({ where }) {
+              return approaches.filter(
+                (a) => a.organizationId === where.organizationId && a.leadId === where.leadId,
+              );
+            },
+          },
+          flywheelFewShotExample: {
+            async deleteMany({ where }) {
+              const initialCount = fewShots.length;
+              const remaining = fewShots.filter(
+                (f) => !(f.organizationId === where.organizationId && f.leadId === where.leadId),
+              );
+              fewShots.length = 0;
+              fewShots.push(...remaining);
+              return { count: initialCount - remaining.length };
+            },
+            async create({ data }) {
+              fewShots.push(data);
+              return data;
+            },
+            async findMany({ where }) {
+              return fewShots.filter(
+                (f) => f.organizationId === where.organizationId && f.channel === where.channel,
+              );
+            },
+          },
+        };
+        return fn(tx);
+      },
+    };
+
+    const svc = new CommercialLearningFlywheelService(persistence);
+    await svc.recordApproachSent({
+      organizationId: 'org-lgpd',
+      leadId: 'titular-123',
+      channel: 'WHATSAPP',
+      segment: 'Saúde',
+      approachText: 'Texto com dados do titular',
+    });
+    await svc.evaluateCommercialOutcome({
+      organizationId: 'org-lgpd',
+      leadId: 'titular-123',
+      outcomeType: 'DEAL_WON',
+    });
+
+    expect(approaches).toHaveLength(1);
+    expect(fewShots).toHaveLength(1);
+
+    const purgeResult = await svc.purgeSubject('org-lgpd', 'titular-123');
+
+    expect(purgeResult.persistedApproachesPurged).toBe(1);
+    expect(purgeResult.persistedFewShotPurged).toBe(1);
+    expect(approaches).toHaveLength(0);
+    expect(fewShots).toHaveLength(0);
+    expect(tenantSet).toBe('org-lgpd');
+  });
 });
