@@ -5696,17 +5696,24 @@ model ConsentPurgeTask {
 }
 
 model FlywheelApproachRecord {
-  id             String       @id
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  leadId         String
-  lead           Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  channel        String
-  segment        String
-  approachText   String       @db.Text
-  sentAt         DateTime     @db.Timestamptz(3)
+  id                  String                      @id
+  organizationId      String
+  organization        Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  leadId              String
+  lead                Lead                        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  agentSlug           String?
+  channel             String
+  segment             String
+  approachText        String                      @db.Text
+  sentAt              DateTime                    @db.Timestamptz(3)
+  humanFeedbackStatus String?
+  humanFeedbackNotes  String?                     @db.Text
+  embedding           Unsupported("vector(768)")?
+  createdAt           DateTime                    @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime                    @updatedAt @db.Timestamptz(3)
 
   @@index([organizationId, leadId])
+  @@index([organizationId, agentSlug, createdAt])
 }
 
 /// REMED-04 (handoff 04→01, onda-forense-20261020): decisão de rebalanceamento de carteira com
@@ -5744,23 +5751,30 @@ model RebalanceApproval {
 }
 
 model FlywheelFewShotExample {
-  id                  String       @id
+  id                  String                      @id
   organizationId      String
-  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization        Organization                @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   leadId              String
-  lead                Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  lead                Lead                        @relation(fields: [leadId], references: [id], onDelete: Cascade)
   dealId              String?
+  agentSlug           String?
   channel             String
   segment             String
-  approachText        String       @db.Text
+  approachText        String                      @db.Text
   outcomeStatus       String
   attributionEvidence Json
   confidence          Float
-  isActive            Boolean      @default(true)
-  promotedAt          DateTime     @db.Timestamptz(3)
+  isActive            Boolean                     @default(true)
+  humanFeedbackStatus String?
+  humanFeedbackNotes  String?                     @db.Text
+  embedding           Unsupported("vector(768)")?
+  promotedAt          DateTime                    @db.Timestamptz(3)
+  createdAt           DateTime                    @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime                    @updatedAt @db.Timestamptz(3)
 
   @@index([organizationId, leadId])
   @@index([organizationId, channel, isActive])
+  @@index([organizationId, agentSlug, createdAt])
 }
 
 /// REMED-06 (Agente 21, #33): DEK por tenant cifrada por KMS (envelope). Tombstone = destroyedAt com
