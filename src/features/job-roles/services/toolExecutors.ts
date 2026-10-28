@@ -299,7 +299,27 @@ interface GoogleCalendarContract {
     organizationId: string,
     input: { title: string; startTime: string; endTime: string; attendeeEmails?: string[] },
   ): Promise<{ id: string; meetLink?: string | null }>;
+  getUpcomingCalendarEvents?(
+    organizationId: string,
+    maxResults?: number,
+  ): Promise<Array<{ id: string; summary: string; start?: string; end?: string; meetLink?: string | null }>>;
 }
+
+const meetingRead: ToolExecutor = async (ctx) => {
+  const service = container.resolve<GoogleCalendarContract>('GoogleCalendarService');
+  const maxResults = num(ctx.resource.maxResults) ?? 5;
+  const events = service.getUpcomingCalendarEvents
+    ? await service.getUpcomingCalendarEvents(ctx.organizationId, maxResults)
+    : [];
+  return {
+    summary: `${events.length} reuniões futuras encontradas.`,
+    facts: events.map((e) => ({ label: 'reuniao', value: e.summary, source: 'getUpcomingCalendarEvents' })),
+    metrics: { total: events.length },
+    evidence: events.map((e) => `CalendarEvent.id=${e.id}`),
+    missingData: [],
+    raw: events,
+  };
+};
 
 const meetingSchedule: ToolExecutor = async (ctx) => {
   const title = requireStr(ctx.resource, 'title');
@@ -803,6 +823,7 @@ export const TOOL_EXECUTORS: Record<string, ToolExecutor> = {
   'lead.update': leadUpdate,
   'company.read': companyRead,
   'company.search': companySearch,
+  'meeting.read': meetingRead,
   'meeting.analyze': meetingAnalyze,
   'meeting.schedule': meetingSchedule,
   'deal.read': leadRead,

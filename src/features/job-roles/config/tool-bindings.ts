@@ -125,14 +125,14 @@ export const TOOL_BINDINGS: ToolBinding[] = [
   },
   {
     capabilityCode: 'meeting.read',
-    toolCode: 'meeting.read.unverified',
+    toolCode: 'integrations.google.get-upcoming-calendar-events',
     binding:
-      'Nenhum símbolo único e específico de "ler reunião" foi encontrado nesta auditoria (dado de reunião hoje é espalhado entre Activity/CalendarEvent/copiloto). Não é fonte ausente nem onda futura conhecida — gap registrado, não fabricado.',
-    available: false,
-    reason: 'TOOL_UNAVAILABLE',
-    verification: 'UNVERIFIED',
-    evidencePath: null,
-    exportName: null,
+      'getUpcomingCalendarEvents — leitura de reuniões reais do Google Calendar por tenant (Google Workspace).',
+    available: true,
+    reason: 'AVAILABLE',
+    verification: 'VERIFIED',
+    evidencePath: 'src/features/integrations/google/google.service.ts',
+    exportName: 'getUpcomingCalendarEvents',
     methodName: null,
   },
   {

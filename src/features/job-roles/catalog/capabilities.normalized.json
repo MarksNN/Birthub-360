@@ -116,11 +116,11 @@
       "actionType": "READ",
       "riskLevel": "LOW",
       "binding": {
-        "toolCode": "meeting.read.unverified",
-        "available": false,
-        "reason": "TOOL_UNAVAILABLE",
-        "verification": "UNVERIFIED",
-        "evidencePath": null
+        "toolCode": "integrations.google.get-upcoming-calendar-events",
+        "available": true,
+        "reason": "AVAILABLE",
+        "verification": "VERIFIED",
+        "evidencePath": "src/features/integrations/google/google.service.ts"
       }
     },
     {
