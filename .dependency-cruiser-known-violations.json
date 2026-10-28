@@ -756,14 +756,5 @@
         ]
       }
     ]
-  },
-  {
-    "type": "dependency",
-    "from": "src/features/automations/cadenceIntegration.service.ts",
-    "to": "src/features/cadence/services/adaptiveMultichannelCadence.service.ts",
-    "rule": {
-      "name": "no-cross-feature-imports",
-      "severity": "error"
-    }
   }
 ]
