@@ -1,10 +1,6 @@
 import { runWithContext } from '../../../lib/context.js';
 import { logger } from '../../../lib/logger.js';
-import {
-  churnAnalysisTool,
-  crossSellTool,
-  proposalTool,
-} from '../tools/advancedCommercialTools.js';
+import { churnAnalysisTool, proposalTool } from '../tools/advancedCommercialTools.js';
 import { forecastTool, pipelineManagementTool } from '../tools/commercialTools.js';
 import { companyDiscoveryTool } from '../tools/companyDiscoveryTool.js';
 import { multiCrmSyncTool } from '../tools/integrationTools.js';
@@ -12,7 +8,6 @@ import { promoteAndEnrichTool } from '../tools/promoteAndEnrichTool.js';
 import { scriptAndPromptTool } from '../tools/scriptAndPromptTool.js';
 import { universalEmailTool } from '../tools/universalEmailTool.js';
 import { universalMeetingsTool } from '../tools/universalMeetingsTool.js';
-import { universalMessagingTool } from '../tools/universalMessagingTool.js';
 import { universalNotificationsTool } from '../tools/universalNotificationsTool.js';
 import { universalOfficeDocsTool } from '../tools/universalOfficeDocsTool.js';
 import { universalTasksAndNotesTool } from '../tools/universalTasksAndNotesTool.js';
@@ -629,6 +624,157 @@ export async function runEcosystemPlaybook(
       executedAt: new Date().toISOString(),
       durationMs: Date.now() - startTime,
       steps,
+    };
+  });
+}
+
+export interface InboundEcosystemEventInput {
+  sourcePlatform:
+    | 'outlook_m365'
+    | 'gmail'
+    | 'imap_email'
+    | 'whatsapp'
+    | 'telegram'
+    | 'teams'
+    | 'slack'
+    | 'trello'
+    | 'monday'
+    | 'notion'
+    | 'bitrix24'
+    | 'hubspot'
+    | 'pipedrive'
+    | 'rdstation'
+    | 'calendly'
+    | 'zoom';
+  eventType:
+    | 'inbound_message'
+    | 'task_or_card_update'
+    | 'meeting_completed'
+    | 'crm_deal_stage_change';
+  sender?: string;
+  subjectOrTitle: string;
+  content: string;
+  leadId?: string;
+}
+
+export interface InboundEcosystemEventReport {
+  sourcePlatform: string;
+  eventType: string;
+  processedAt: string;
+  durationMs: number;
+  actionsTriggered: PlaybookStepResult[];
+}
+
+/**
+ * Motor Reativo de Eventos Inbound Multi-Plataforma.
+ * Recebe webhooks ou eventos simulados/reais de Outlook, Gmail, WhatsApp, Telegram, Teams, Slack,
+ * Trello, Monday, Notion, Bitrix24, HubSpot, Pipedrive, Calendly ou Zoom e dispara automaticamente
+ * a cadeia de inteligência + tarefas + notificação no Celular/Relógio/Pop-up.
+ */
+export async function ingestEcosystemEvent(
+  organizationId: string,
+  userId: string,
+  event: InboundEcosystemEventInput,
+): Promise<InboundEcosystemEventReport> {
+  const start = Date.now();
+  return runWithContext({ organizationId, userId }, async () => {
+    const actionsTriggered: PlaybookStepResult[] = [];
+
+    if (event.eventType === 'inbound_message') {
+      actionsTriggered.push(
+        await safeInvokeTool(
+          1,
+          `Registro de Nota & Tarefa a partir de ${event.sourcePlatform.toUpperCase()}`,
+          universalTasksAndNotesTool,
+          {
+            action: 'create_task',
+            platform: 'all',
+            title: `[${event.sourcePlatform.toUpperCase()}] Responder: ${event.subjectOrTitle}`,
+            description: `Remetente: ${event.sender || 'Contato Externo'}\nMensagem: ${event.content}`,
+            priority: 'high',
+            leadId: event.leadId,
+          },
+        ),
+      );
+
+      actionsTriggered.push(
+        await safeInvokeTool(
+          2,
+          'Geração Automática de Resposta & Script Comercial',
+          scriptAndPromptTool,
+          {
+            artifactType:
+              event.sourcePlatform === 'whatsapp' || event.sourcePlatform === 'telegram'
+                ? 'whatsapp_script'
+                : 'email_sequence',
+            targetAudienceOrPersona: event.sender || 'Decisor B2B',
+            objective: `Responder à mensagem "${event.subjectOrTitle}": ${event.content.slice(0, 300)}`,
+            leadId: event.leadId,
+            saveToPromptLibrary: true,
+          },
+        ),
+      );
+    } else if (event.eventType === 'meeting_completed') {
+      actionsTriggered.push(
+        await safeInvokeTool(
+          1,
+          `Síntese de Reunião (${event.sourcePlatform.toUpperCase()}) & Próximos Passos`,
+          universalMeetingsTool,
+          {
+            action: 'synthesize_transcript',
+            provider:
+              event.sourcePlatform === 'zoom'
+                ? 'zoom'
+                : event.sourcePlatform === 'teams'
+                  ? 'microsoft_teams'
+                  : 'google_meet',
+            transcript: event.content,
+            leadId: event.leadId,
+          },
+        ),
+      );
+    } else {
+      actionsTriggered.push(
+        await safeInvokeTool(
+          1,
+          `Espelhamento de Evento (${event.sourcePlatform.toUpperCase()}) no CRM & Quadros`,
+          universalTasksAndNotesTool,
+          {
+            action: 'create_note',
+            platform: 'all',
+            title: `[Evento ${event.sourcePlatform.toUpperCase()}] ${event.subjectOrTitle}`,
+            description: event.content,
+            leadId: event.leadId,
+          },
+        ),
+      );
+    }
+
+    actionsTriggered.push(
+      await safeInvokeTool(
+        actionsTriggered.length + 1,
+        'Disparo de Alerta Instantâneo (Pop-up + Celular + Smartwatch/Relógio)',
+        universalNotificationsTool,
+        {
+          channels: ['in_app_popup', 'mobile_push', 'smartwatch_wrist'],
+          title: `⚡ ${event.sourcePlatform.toUpperCase()}: ${event.subjectOrTitle.slice(0, 50)}`,
+          message: event.content.slice(0, 280),
+          wristSummary: `⚡ ${event.sourcePlatform.toUpperCase()}: ${event.subjectOrTitle}`.slice(
+            0,
+            65,
+          ),
+          kind: 'Alert',
+          leadId: event.leadId,
+        },
+      ),
+    );
+
+    return {
+      sourcePlatform: event.sourcePlatform,
+      eventType: event.eventType,
+      processedAt: new Date().toISOString(),
+      durationMs: Date.now() - start,
+      actionsTriggered,
     };
   });
 }
