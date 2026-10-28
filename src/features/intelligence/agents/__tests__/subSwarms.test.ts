@@ -23,27 +23,27 @@ describe('Sub-Swarms Hierárquicos — Configuração e Classificação Semânti
     expect(
       detectSubSwarm('Redigir mensagem personalizada de WhatsApp para campanha de prospecção fria'),
     ).toBe('marketing');
-    expect(
-      detectSubSwarm('Criar copy de abordagem consultiva para o segmento de Logística'),
-    ).toBe('marketing');
+    expect(detectSubSwarm('Criar copy de abordagem consultiva para o segmento de Logística')).toBe(
+      'marketing',
+    );
   });
 
   it('classifica corretamente missões de Operações Multi-Plataforma', () => {
-    expect(
-      detectSubSwarm('Criar tarefa no CRM e sincronizar Trello com o resumo da call'),
-    ).toBe('operations');
+    expect(detectSubSwarm('Criar tarefa no CRM e sincronizar Trello com o resumo da call')).toBe(
+      'operations',
+    );
     expect(
       detectSubSwarm('Disparar notificação via push no celular do executivo sobre o fechamento'),
     ).toBe('operations');
   });
 
   it('classifica missões gerais como Comercial por padrão', () => {
-    expect(
-      detectSubSwarm('Qualificar o lead e agendar reunião comercial de demonstração'),
-    ).toBe('commercial');
-    expect(
-      detectSubSwarm('Analisar o forecast e conduzir a negociação da proposta anual'),
-    ).toBe('commercial');
+    expect(detectSubSwarm('Qualificar o lead e agendar reunião comercial de demonstração')).toBe(
+      'commercial',
+    );
+    expect(detectSubSwarm('Analisar o forecast e conduzir a negociação da proposta anual')).toBe(
+      'commercial',
+    );
     expect(detectSubSwarm('')).toBe('commercial');
   });
 
