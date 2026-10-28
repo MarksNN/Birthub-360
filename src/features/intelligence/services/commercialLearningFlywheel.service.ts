@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import type { FewShotCopyItem } from '../../../shared/contracts/dataFlywheel.contract.js';
 import { logger } from '../../../lib/logger.js';
+import type { FewShotCopyItem } from '../../../shared/contracts/dataFlywheel.contract.js';
 
 /**
  * REMED-06 / Ajuste 1 — expurgo durável do Flywheel ao revogar consentimento.
@@ -18,12 +18,51 @@ export interface FlywheelPurgeTx {
     deleteMany(args: {
       where: { organizationId: string; leadId: string };
     }): Promise<{ count: number }>;
+    create(args: { data: FlywheelFewShotRow }): Promise<unknown>;
+    findMany(args: {
+      where: { organizationId: string; channel: string; isActive: boolean };
+    }): Promise<FlywheelFewShotRow[]>;
   };
   flywheelApproachRecord: {
     deleteMany(args: {
       where: { organizationId: string; leadId: string };
     }): Promise<{ count: number }>;
+    create(args: { data: FlywheelApproachRow }): Promise<unknown>;
+    findMany(args: {
+      where: { organizationId: string; leadId: string };
+      orderBy: { sentAt: 'desc' };
+      take: number;
+    }): Promise<FlywheelApproachRow[]>;
   };
+}
+
+/** Linha de FlywheelApproachRecord usada pelo serviço (colunas de gestão ficam com defaults). */
+export interface FlywheelApproachRow {
+  id: string;
+  organizationId: string;
+  leadId: string;
+  agentSlug: string | null;
+  channel: string;
+  segment: string;
+  approachText: string;
+  sentAt: Date;
+}
+
+/** Linha de FlywheelFewShotExample usada pelo serviço. */
+export interface FlywheelFewShotRow {
+  id: string;
+  organizationId: string;
+  leadId: string;
+  dealId: string | null;
+  agentSlug: string | null;
+  channel: string;
+  segment: string;
+  approachText: string;
+  outcomeStatus: string;
+  attributionEvidence: unknown;
+  confidence: number;
+  isActive: boolean;
+  promotedAt: Date;
 }
 
 export interface FlywheelPurgeResult {
@@ -37,6 +76,7 @@ export interface ApproachRecord {
   id: string;
   organizationId: string;
   leadId: string;
+  agentSlug?: string;
   channel: 'LINKEDIN' | 'WHATSAPP' | 'EMAIL';
   segment: string;
   approachText: string;
@@ -62,6 +102,26 @@ export class CommercialLearningFlywheelService {
   ): void {
     this.persistence = persistence;
     this.runTx = runTx;
+  }
+
+  /**
+   * Executa `body` numa transação com o tenant da sessão setado (RLS tenant_isolation), na
+   * mesma conexão do set_config (#40). Falhas propagam: persistência não falha em silêncio.
+   */
+  private async withTenantTx<T>(
+    organizationId: string,
+    body: (tx: FlywheelPurgeTx) => Promise<T>,
+  ): Promise<T> {
+    const run = async (tx: FlywheelPurgeTx) => {
+      if (tx.$executeRaw) {
+        await tx.$executeRaw`SELECT set_config('app.current_tenant_id', ${organizationId}, TRUE)`;
+      }
+      return body(tx);
+    };
+    if (this.runTx) {
+      return this.runTx(run as (tx: never) => Promise<T>, { organizationId });
+    }
+    return (this.persistence as FlywheelPersistencePurger).$transaction(run);
   }
 
   /**
@@ -137,10 +197,13 @@ export class CommercialLearningFlywheelService {
 
   /**
    * Registra uma abordagem comercial gerada e enviada para um lead com autorização.
+   * Com persistência configurada grava no PostgreSQL (sobrevive a restart/multi-instância);
+   * sem ela, mantém o estado em memória.
    */
   async recordApproachSent(approach: {
     organizationId: string;
     leadId: string;
+    agentSlug?: string;
     channel: 'LINKEDIN' | 'WHATSAPP' | 'EMAIL';
     segment: string;
     approachText: string;
@@ -156,7 +219,24 @@ export class CommercialLearningFlywheelService {
       sentAt: new Date().toISOString(),
     };
 
-    this.approaches.set(id, record);
+    if (this.persistence) {
+      await this.withTenantTx(record.organizationId, (tx) =>
+        tx.flywheelApproachRecord.create({
+          data: {
+            id,
+            organizationId: record.organizationId,
+            leadId: record.leadId,
+            agentSlug: record.agentSlug ?? null,
+            channel: record.channel,
+            segment: record.segment,
+            approachText: record.approachText,
+            sentAt: new Date(record.sentAt),
+          },
+        }),
+      );
+    } else {
+      this.approaches.set(id, record);
+    }
 
     logger.info(
       { id, organizationId: record.organizationId, leadId: record.leadId, channel: record.channel },
@@ -179,22 +259,47 @@ export class CommercialLearningFlywheelService {
   }): Promise<FewShotCopyItem | null> {
     const outcomeDate = outcome.occurredAt ? new Date(outcome.occurredAt) : new Date();
 
-    // Localiza abordagens prévias para este lead no mesmo tenant
-    const candidateApproaches = Array.from(this.approaches.values()).filter(
-      (a) => a.organizationId === outcome.organizationId && a.leadId === outcome.leadId,
-    );
+    // Localiza a abordagem mais recente para este lead no mesmo tenant
+    let matched: ApproachRecord | undefined;
+    if (this.persistence) {
+      const rows = await this.withTenantTx(outcome.organizationId, (tx) =>
+        tx.flywheelApproachRecord.findMany({
+          where: { organizationId: outcome.organizationId, leadId: outcome.leadId },
+          orderBy: { sentAt: 'desc' },
+          take: 1,
+        }),
+      );
+      const row = rows[0];
+      if (row) {
+        matched = {
+          id: row.id,
+          organizationId: row.organizationId,
+          leadId: row.leadId,
+          agentSlug: row.agentSlug ?? undefined,
+          channel: row.channel as ApproachRecord['channel'],
+          segment: row.segment,
+          approachText: row.approachText,
+          sentAt: row.sentAt.toISOString(),
+        };
+      }
+    } else {
+      const candidateApproaches = Array.from(this.approaches.values()).filter(
+        (a) => a.organizationId === outcome.organizationId && a.leadId === outcome.leadId,
+      );
+      // Ordena da mais recente para a mais antiga
+      candidateApproaches.sort(
+        (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
+      );
+      matched = candidateApproaches[0];
+    }
 
-    if (candidateApproaches.length === 0) {
+    if (!matched) {
       logger.info(
         { leadId: outcome.leadId, organizationId: outcome.organizationId },
         'CommercialLearningFlywheel: Nenhuma abordagem prévia rastreada para atribuição',
       );
       return null;
     }
-
-    // Ordena da mais recente para a mais antiga
-    candidateApproaches.sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
-    const matched = candidateApproaches[0];
 
     const diffDays =
       (outcomeDate.getTime() - new Date(matched.sentAt).getTime()) / (1000 * 60 * 60 * 24);
@@ -234,7 +339,29 @@ export class CommercialLearningFlywheelService {
       isActive: true,
     };
 
-    this.curatedFewShotLibrary.set(fewShotId, fewShotItem);
+    if (this.persistence) {
+      await this.withTenantTx(outcome.organizationId, (tx) =>
+        tx.flywheelFewShotExample.create({
+          data: {
+            id: fewShotId,
+            organizationId: fewShotItem.organizationId,
+            leadId: outcome.leadId,
+            dealId: outcome.dealId ?? null,
+            agentSlug: matched.agentSlug ?? null,
+            channel: fewShotItem.channel,
+            segment: fewShotItem.segment,
+            approachText: fewShotItem.approachText,
+            outcomeStatus: fewShotItem.outcomeStatus,
+            attributionEvidence: fewShotItem.attributionEvidence,
+            confidence: fewShotItem.confidence,
+            isActive: true,
+            promotedAt: new Date(fewShotItem.promotedAt),
+          },
+        }),
+      );
+    } else {
+      this.curatedFewShotLibrary.set(fewShotId, fewShotItem);
+    }
 
     logger.info(
       {
@@ -260,7 +387,30 @@ export class CommercialLearningFlywheelService {
     segment?: string,
     limit: number = 3,
   ): Promise<FewShotCopyItem[]> {
-    const list = Array.from(this.curatedFewShotLibrary.values()).filter(
+    let source: FewShotCopyItem[];
+    if (this.persistence) {
+      const rows = await this.withTenantTx(organizationId, (tx) =>
+        tx.flywheelFewShotExample.findMany({
+          where: { organizationId, channel, isActive: true },
+        }),
+      );
+      source = rows.map((r) => ({
+        id: r.id,
+        organizationId: r.organizationId,
+        channel: r.channel as FewShotCopyItem['channel'],
+        segment: r.segment,
+        approachText: r.approachText,
+        outcomeStatus: r.outcomeStatus as FewShotCopyItem['outcomeStatus'],
+        attributionEvidence: r.attributionEvidence as FewShotCopyItem['attributionEvidence'],
+        confidence: r.confidence,
+        promotedAt: r.promotedAt.toISOString(),
+        isActive: r.isActive,
+      }));
+    } else {
+      source = Array.from(this.curatedFewShotLibrary.values());
+    }
+
+    const list = source.filter(
       (item) =>
         item.organizationId === organizationId &&
         item.channel === channel &&
