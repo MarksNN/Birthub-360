@@ -4,7 +4,7 @@
   Birth Hub 360 - backup verificavel e reconstrucao controlada dos bancos locais.
 .DESCRIPTION
   Executa backup de prospectordb e prospectordb_test FORA do repositorio,
-  testa a instalacao de migrations em banco descartavel e, SOMENTE com
+  testa a instalacao de migrations/roles em banco descartavel e, SOMENTE com
   -ExecuteCutover, recria os dois bancos originais.
   Nao altera a main, workflows, volumes Docker nem arquivos .env.
   Nomes dos bancos/roles antigos permanecem por compatibilidade ate a migracao
@@ -66,6 +66,14 @@ function Apply-Migrations([string]$database, [string]$encodedPassword) {
     & $prisma migrate status
     Assert-Code ("prisma migrate status em " + $database)
     Validate-Schema $database
+}
+
+function Validate-BootstrapDryRun([string]$database) {
+    # Executa o bootstrap inteiro em transacao e faz ROLLBACK:
+    # prova que o SQL funciona sem alterar roles globais durante a validacao.
+    $cmd = 'test -f /docker-entrypoint-initdb.d/create-app-role.sql.tpl && psql -X -1 -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$1" -v app_password="$APP_DB_PASSWORD" -v migrator_password="$MIGRATOR_DB_PASSWORD" -f /docker-entrypoint-initdb.d/create-app-role.sql.tpl -c ROLLBACK'
+    & docker exec $container sh -c $cmd sh $database | Out-Null
+    Assert-Code ("bootstrap dry-run de " + $database)
 }
 
 function Bootstrap-RestrictedRoles([string]$database) {
@@ -150,8 +158,8 @@ try {
     Assert-Code 'preflight de credencial da role migradora'
     if (($migratorLogin | Select-Object -First 1).Trim() -ne '1') { throw 'Credencial da role migradora nao validada.' }
 
-    # Provar que o SQL oficial de bootstrap/restricao tambem funciona num banco limpo.
-    Bootstrap-RestrictedRoles $validation
+    # Provar o SQL de roles/RLS no banco limpo sem alterar os papeis globais.
+    Validate-BootstrapDryRun $validation
     Validate-Schema $validation
 
     Write-Host 'Validando TypeScript e testes unitarios antes de qualquer exclusao...' -ForegroundColor Cyan
