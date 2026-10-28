@@ -103,6 +103,8 @@ try {
         Assert-Code ('pg_dump de ' + $database)
         & docker exec $container pg_restore -l $temp | Out-Null
         Assert-Code ('validacao estrutural do dump de ' + $database)
+        & docker exec $container pg_restore -f /dev/null $temp | Out-Null
+        Assert-Code ('leitura integral do dump de ' + $database)
         & docker cp ($container + ':' + $temp) $destination
         Assert-Code ('copia do backup de ' + $database)
         & docker exec $container rm -f $temp | Out-Null
@@ -137,6 +139,21 @@ try {
     Assert-Code 'createdb de validacao'
     Apply-Migrations $validation $encodedPassword
 
+    # Testar a role de aplicacao antes de qualquer bootstrap (alterar senhas globais
+    # poderia interromper a aplicacao antiga se as credenciais estivessem divergentes).
+    $testRoleCmd = 'PGPASSWORD="$APP_DB_PASSWORD" psql -X -h 127.0.0.1 -U prospector_app -d prospectordb -A -t -q -c "SELECT 1"'
+    $login = & docker exec $container sh -c $testRoleCmd
+    Assert-Code 'preflight de credencial da role de runtime'
+    if (($login | Select-Object -First 1).Trim() -ne '1') { throw 'Credencial da role de runtime nao validada.' }
+    $testMigratorCmd = 'test -n "$MIGRATOR_DB_PASSWORD" && PGPASSWORD="$MIGRATOR_DB_PASSWORD" psql -X -h 127.0.0.1 -U prospector_migrator -d prospectordb -A -t -q -c "SELECT 1"'
+    $migratorLogin = & docker exec $container sh -c $testMigratorCmd
+    Assert-Code 'preflight de credencial da role migradora'
+    if (($migratorLogin | Select-Object -First 1).Trim() -ne '1') { throw 'Credencial da role migradora nao validada.' }
+
+    # Provar que o SQL oficial de bootstrap/restricao tambem funciona num banco limpo.
+    Bootstrap-RestrictedRoles $validation
+    Validate-Schema $validation
+
     Write-Host 'Validando TypeScript e testes unitarios antes de qualquer exclusao...' -ForegroundColor Cyan
     & npm.cmd run typecheck
     Assert-Code 'typecheck'
@@ -144,6 +161,8 @@ try {
     Assert-Code 'testes unitarios'
 
     if (-not $ExecuteCutover) {
+        & docker exec $container dropdb -U $bootstrapUser --if-exists --force $validation
+        Assert-Code 'limpeza do banco descartavel de validacao'
         Write-Host ('VALIDACAO CONCLUIDA. Bancos originais preservados. Backup: ' + $backupDirectory) -ForegroundColor Green
         Write-Host 'Para recriar os bancos, execute novamente com -ExecuteCutover (gera novo backup).' -ForegroundColor Yellow
         return
@@ -154,12 +173,6 @@ try {
     if ([int]$sessions -gt 0) {
         throw ("Existem " + $sessions + " conexoes usando os bancos. Pare servidor/workers e rode novamente.")
     }
-
-    # Teste previo de credencial da role restrita, evitando rotacao surpresa no bootstrap.
-    $testRoleCmd = 'PGPASSWORD="$APP_DB_PASSWORD" psql -X -h 127.0.0.1 -U prospector_app -d prospectordb -A -t -q -c "SELECT 1"'
-    $login = & docker exec $container sh -c $testRoleCmd
-    Assert-Code 'preflight de credencial da role de runtime'
-    if (($login | Select-Object -First 1).Trim() -ne '1') { throw 'Credencial da role de runtime nao validada.' }
 
     Write-Host 'Iniciando cutover: os dois bancos serao recriados a partir de migrations.' -ForegroundColor Yellow
     $cutoverStarted = $true
@@ -173,11 +186,13 @@ try {
         Validate-Schema $database
     }
 
+    & docker exec $container dropdb -U $bootstrapUser --if-exists --force $validation
+    Assert-Code 'limpeza do banco descartavel de validacao'
     Write-Host ('RECONSTRUCAO DE SCHEMA CONCLUIDA. Backup preservado em: ' + $backupDirectory) -ForegroundColor Green
     Write-Host 'ATENCAO: nao foi feito merge, deploy ou mudanca em .env. Validar smoke e integracao antes de uso.' -ForegroundColor Yellow
 }
 catch {
-    Write-Error ('PROCESSO INTERROMPIDO: ' + $_.Exception.Message)
+    Write-Host ('PROCESSO INTERROMPIDO: ' + $_.Exception.Message) -ForegroundColor Red
     if ($cutoverStarted) {
         Write-Host ('Um banco pode ter sido recriado parcialmente. Nao inicie a aplicacao. Backups: ' + $backupDirectory) -ForegroundColor Red
         Write-Host 'Restauracao deve usar os arquivos .dump guardados fora do repositorio; nenhum dump sera apagado.' -ForegroundColor Red
