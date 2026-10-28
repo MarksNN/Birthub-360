@@ -302,7 +302,9 @@ interface GoogleCalendarContract {
   getUpcomingCalendarEvents?(
     organizationId: string,
     maxResults?: number,
-  ): Promise<Array<{ id: string; summary: string; start?: string; end?: string; meetLink?: string | null }>>;
+  ): Promise<
+    Array<{ id: string; summary: string; start?: string; end?: string; meetLink?: string | null }>
+  >;
 }
 
 const meetingRead: ToolExecutor = async (ctx) => {
@@ -313,7 +315,11 @@ const meetingRead: ToolExecutor = async (ctx) => {
     : [];
   return {
     summary: `${events.length} reuniões futuras encontradas.`,
-    facts: events.map((e) => ({ label: 'reuniao', value: e.summary, source: 'getUpcomingCalendarEvents' })),
+    facts: events.map((e) => ({
+      label: 'reuniao',
+      value: e.summary,
+      source: 'getUpcomingCalendarEvents',
+    })),
     metrics: { total: events.length },
     evidence: events.map((e) => `CalendarEvent.id=${e.id}`),
     missingData: [],

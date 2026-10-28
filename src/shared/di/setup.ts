@@ -78,7 +78,10 @@ import { bitrixEventMeshBridge } from '../../features/integrations/bitrix/servic
 // `integrations/google/google.service.ts` diretamente (no-cross-feature-imports). Registrado aqui
 // e resolvido via `container.resolve<GoogleCalendarServiceContract>('GoogleCalendarService')` com
 // o tipo estrutural local já usado por `agent.routes.ts`.
-import { createCalendarEvent, getUpcomingCalendarEvents } from '../../features/integrations/google/google.service.js';
+import {
+  createCalendarEvent,
+  getUpcomingCalendarEvents,
+} from '../../features/integrations/google/google.service.js';
 import { StripeChargeAdapter } from '../../features/integrations/stripe/infra/StripeChargeAdapter.js';
 import { sendWhatsAppMessage } from '../../features/integrations/whatsapp/whatsapp.service.js';
 import { CloserAgent } from '../../features/intelligence/agents/closer.agent.js';
