@@ -1,6 +1,5 @@
 import type React from 'react';
 import { BirthubLogo } from './BirthubLogo.js';
-import { Birthub360Logo } from './Birthub360Logo.js';
 import type { ThemeMode, User } from '../types.js';
 import {
   Sparkles,
@@ -81,11 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Menu className="w-5 h-5" />
             </button>
-            {user.company === 'totaltrac' ? (
-              <Birthub360Logo variant="with-subtitle" size="sm" theme={theme} />
-            ) : (
-              <BirthubLogo variant="with-subtitle" size="sm" theme={theme} />
-            )}
+            <BirthubLogo variant="with-subtitle" size="sm" theme={theme} />
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
