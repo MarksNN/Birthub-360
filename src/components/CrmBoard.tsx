@@ -80,6 +80,24 @@ const DEAL_COLUMNS: LeadStatus[] = [
   'Negócios Ganhos',
 ];
 
+/**
+ * Rótulos canônicos de exibição para desacoplar chaves históricas de banco (`LeadStatus`)
+ * de nomes legados de pilotos de clientes na camada visual multi-tenant (Horizonte 2).
+ */
+export const STAGE_DISPLAY_LABELS: Partial<Record<LeadStatus, string>> = {
+  'Piloto VTECH': 'Piloto Técnico (PoC)',
+  'Piloto Birthub 360 Profile': 'Piloto Hub 360° — Em Curso',
+  'Piloto Birthub 360 Profile - Concluído': 'Piloto Hub 360° — Concluído',
+  'Piloto Birthub 360 Profile - Cancelado': 'Piloto Hub 360° — Cancelado',
+  'Piloto Logística': 'Piloto Operacional — Em Curso',
+  'Piloto Logístico - Concluído': 'Piloto Operacional — Concluído',
+  'Piloto Logístico - Cancelado': 'Piloto Operacional — Cancelado',
+};
+
+export function formatStageLabel(stage: LeadStatus): string {
+  return STAGE_DISPLAY_LABELS[stage] ?? stage;
+}
+
 interface CrmBoardProps {
   funnel?: 'Lead' | 'Negocio';
   embedded?: boolean;
@@ -1046,7 +1064,7 @@ export function CrmBoard({ funnel: funnelProp, embedded = false }: CrmBoardProps
                 </option>
                 {columns.map((col) => (
                   <option key={col} value={col}>
-                    {col}
+                    {formatStageLabel(col)}
                   </option>
                 ))}
               </select>
