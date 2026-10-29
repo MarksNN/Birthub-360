@@ -69,6 +69,7 @@ useDefault = true
 description = "Fixtures sintéticas de teste e falsos-positivos confirmados (não são segredos reais)"
 paths = [
   '''public/tools/treinamento-birthhub360/.*/__next\._tree\.txt$''',
+  '''public/tools/treinamento-atlasgr/.*/__next\._tree\.txt$''',
   '''(^|/)phase-12-manifest\.json$''',
   '''tests/unit/features/integrations/stripe/.*\.test\.ts$''',
   '''tests/unit/features/integrations/omie/.*\.test\.ts$''',
