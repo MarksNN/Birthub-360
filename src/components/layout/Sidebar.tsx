@@ -37,8 +37,8 @@ function getGroupAccent(groupId: string, sectionTitle: string): AccentColor {
     return 'cyan';
 
   if (sectionTitle === 'RECEITA' || sectionTitle === 'PERFORMANCE') return 'gold';
-  if (sectionTitle === 'INTELLIGENCE') return 'iris';
-  if (sectionTitle === 'RELATIONSHIPS') return 'pink';
+  if (sectionTitle === 'INTELLIGENCE' || sectionTitle === 'INTELIGÊNCIA') return 'iris';
+  if (sectionTitle === 'RELATIONSHIPS' || sectionTitle === 'RELACIONAMENTO') return 'pink';
   return 'cyan';
 }
 
@@ -50,11 +50,13 @@ function getSectionBadgeStyle(title: string): {
 } {
   switch (title) {
     case 'COMMAND CENTER':
+    case 'CENTRAL DE COMANDO':
     case 'EXECUTION':
+    case 'EXECUÇÃO':
       return {
         border: 'border-[#00D4FF]/35',
         bg: 'bg-[#00D4FF]/10',
-        text: 'text-[#0369a1] dark:text-[#00D4FF]',
+        text: 'text-[#0284c7] dark:text-[#00D4FF]',
         dot: 'bg-[#00D4FF]',
       };
     case 'RECEITA':
@@ -66,6 +68,7 @@ function getSectionBadgeStyle(title: string): {
         dot: 'bg-[#F59E0B]',
       };
     case 'INTELLIGENCE':
+    case 'INTELIGÊNCIA':
       return {
         border: 'border-[#8B7DFF]/35',
         bg: 'bg-[#8B7DFF]/10',
@@ -73,6 +76,7 @@ function getSectionBadgeStyle(title: string): {
         dot: 'bg-[#8B7DFF]',
       };
     case 'RELATIONSHIPS':
+    case 'RELACIONAMENTO':
       return {
         border: 'border-[#FF2D9B]/35',
         bg: 'bg-[#FF2D9B]/10',
@@ -92,13 +96,13 @@ function getSectionBadgeStyle(title: string): {
 function getActiveIconWellStyle(accent: AccentColor): string {
   switch (accent) {
     case 'cyan':
-      return 'bg-gradient-to-br from-sky-500/20 to-sky-600/10 text-[#0369a1] dark:text-[#38bdf8] border border-sky-400/40 shadow-[0_2px_8px_rgba(14,165,233,0.2)]';
+      return 'bg-[#00D4FF]/20 text-[#0284c7] dark:text-[#00D4FF] border border-[#00D4FF]/60 shadow-[0_0_10px_rgba(0,212,255,0.3)]';
     case 'pink':
-      return 'bg-gradient-to-br from-rose-500/20 to-rose-600/10 text-[#be185d] dark:text-[#fb7185] border border-rose-400/40 shadow-[0_2px_8px_rgba(244,63,94,0.2)]';
+      return 'bg-[#FF2D9B]/20 text-[#be185d] dark:text-[#FF2D9B] border border-[#FF2D9B]/60 shadow-[0_0_10px_rgba(255,45,155,0.3)]';
     case 'gold':
-      return 'bg-gradient-to-br from-amber-500/20 to-amber-600/10 text-[#b45309] dark:text-[#fbbf24] border border-amber-400/40 shadow-[0_2px_8px_rgba(245,158,11,0.2)]';
+      return 'bg-[#F59E0B]/20 text-[#b45309] dark:text-[#F59E0B] border border-[#F59E0B]/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
     case 'iris':
-      return 'bg-gradient-to-br from-violet-500/20 to-purple-600/10 text-[#6d28d9] dark:text-[#a78bfa] border border-violet-400/40 shadow-[0_2px_8px_rgba(139,125,255,0.2)]';
+      return 'bg-[#8B7DFF]/20 text-[#6d28d9] dark:text-[#8B7DFF] border border-[#8B7DFF]/60 shadow-[0_0_10px_rgba(139,125,255,0.3)]';
   }
 }
 
@@ -113,7 +117,7 @@ const ICON_WELL =
   'grid h-8 w-8 shrink-0 place-items-center rounded-xl motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out';
 
 const ICON_WELL_QUIET =
-  'bg-slate-100/80 dark:bg-white/[0.04] text-sky-700 dark:text-[#70D6FF] border border-slate-200/60 dark:border-white/[0.06] group-hover:bg-slate-200/70 dark:group-hover:bg-white/[0.08] group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:border-slate-300/80 dark:group-hover:border-white/[0.12]';
+  'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/60 group-hover:bg-slate-200/90 dark:group-hover:bg-slate-700/90 group-hover:text-slate-900 dark:group-hover:text-slate-100 group-hover:scale-105';
 
 const GHOST_CONTROL = `h-8 w-8 shrink-0 place-items-center rounded-xl border border-line text-ink-2 hover:bg-[color:color-mix(in_srgb,var(--ink)_5%,transparent)] hover:text-ink ${EASE} ${FOCUS_RING}`;
 
@@ -213,7 +217,7 @@ export function Sidebar({
             title="Birth Hub 360° — Ir para Visão Geral"
             aria-label="Birth Hub 360° — Ir para Visão Geral"
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-sm motion-safe:transition-all motion-safe:duration-200 hover:scale-105 hover:border-[#00D4FF]/50 hover:shadow-[0_0_14px_rgba(0,212,255,0.25)]">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-sm transition-transform duration-200 hover:scale-105">
               <BirthHubLogo
                 variant="mark"
                 animated={false}
@@ -224,11 +228,11 @@ export function Sidebar({
               <div className="min-w-0">
                 <div className="truncate font-display text-[15px] font-extrabold leading-none tracking-[-0.02em] text-slate-900 dark:text-white">
                   Birth Hub{' '}
-                  <span className="text-[#0369a1] dark:text-[#00D4FF] drop-shadow-[0_0_8px_rgba(0,212,255,0.4)]">
+                  <span className="text-[#00D4FF] drop-shadow-[0_0_8px_rgba(0,212,255,0.4)]">
                     360°
                   </span>
                 </div>
-                <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-[9.5px] font-bold uppercase tracking-wider text-[#0369a1] dark:text-[#00D4FF]">
+                <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-[9.5px] font-bold uppercase tracking-wider text-[#0284c7] dark:text-[#00D4FF]">
                   <span
                     className="h-1.5 w-1.5 rounded-full bg-[#00D4FF] animate-pulse"
                     aria-hidden="true"
@@ -339,10 +343,7 @@ export function Sidebar({
                         if (isCollapsed) {
                           setHoveredGroupId(group.id);
                           const rect = e.currentTarget.getBoundingClientRect();
-                          const viewportHeight =
-                            typeof window !== 'undefined' ? window.innerHeight : 800;
-                          const top = Math.min(rect.top, viewportHeight - 180);
-                          setPopoverTop(Math.max(16, top));
+                          setPopoverTop(rect.top);
                         }
                       }}
                       onMouseLeave={() => {
@@ -376,14 +377,14 @@ export function Sidebar({
                         {isActive && (
                           <span
                             aria-hidden="true"
-                            className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${
+                            className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full ${
                               accent === 'cyan'
-                                ? 'bg-gradient-to-b from-sky-400 to-sky-600 shadow-[0_0_8px_rgba(14,165,233,0.5)]'
+                                ? 'bg-[#00D4FF] shadow-[0_0_8px_#00D4FF]'
                                 : accent === 'gold'
-                                  ? 'bg-gradient-to-b from-amber-400 to-amber-600 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                                  ? 'bg-[#F59E0B] shadow-[0_0_8px_#F59E0B]'
                                   : accent === 'pink'
-                                    ? 'bg-gradient-to-b from-rose-400 to-rose-600 shadow-[0_0_8px_rgba(244,63,94,0.5)]'
-                                    : 'bg-gradient-to-b from-violet-400 to-purple-600 shadow-[0_0_8px_rgba(139,125,255,0.5)]'
+                                    ? 'bg-[#FF2D9B] shadow-[0_0_8px_#FF2D9B]'
+                                    : 'bg-[#8B7DFF] shadow-[0_0_8px_#8B7DFF]'
                             }`}
                           />
                         )}
@@ -401,7 +402,7 @@ export function Sidebar({
                             <span
                               className={`truncate font-sans text-[13px] tracking-[-0.012em] ${
                                 isActive
-                                  ? 'font-bold text-brand-ink dark:text-[#00D4FF]'
+                                  ? 'font-bold text-slate-950 dark:text-white'
                                   : 'font-medium text-slate-700 dark:text-slate-300'
                               }`}
                             >
@@ -436,10 +437,10 @@ export function Sidebar({
                                 key={(subItem.path ?? subItem.tab) + subItem.label}
                                 type="button"
                                 onClick={(e) => selectTab(subItem.tab, e, subItem.path)}
-                                className={`group/sub flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] motion-safe:transition-all motion-safe:duration-150 hover:translate-x-1 ${FOCUS_RING} ${
+                                className={`group/sub flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
                                   isSubActive
                                     ? accent === 'cyan'
-                                      ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0369a1] dark:text-[#00D4FF] font-semibold shadow-sm'
+                                      ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] font-semibold shadow-sm'
                                       : accent === 'gold'
                                         ? 'bg-[#F59E0B]/15 border border-[#F59E0B]/40 text-[#b45309] dark:text-[#F59E0B] font-semibold shadow-sm'
                                         : accent === 'pink'
@@ -498,7 +499,7 @@ export function Sidebar({
                                     }}
                                     className={`flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] tracking-[-0.011em] transition-all ${FOCUS_RING} ${
                                       isSubActive
-                                        ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0369a1] dark:text-[#00D4FF] font-semibold'
+                                        ? 'bg-[#00D4FF]/15 border border-[#00D4FF]/40 text-[#0284c7] dark:text-[#00D4FF] font-semibold'
                                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
                                     }`}
                                   >
@@ -545,7 +546,7 @@ export function Sidebar({
                 data-testid="sidebar-intelligence-cta"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#8B7DFF]/20 text-[#6d28d9] dark:text-[#8B7DFF] border border-[#8B7DFF]/40 shadow-[0_0_10px_rgba(139,125,255,0.3)] transition-transform duration-200 group-hover:scale-105">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#8B7DFF]/20 text-[#8B7DFF] border border-[#8B7DFF]/40 shadow-[0_0_10px_rgba(139,125,255,0.3)] transition-transform duration-200 group-hover:scale-105">
                     <ArrowRight
                       size={14}
                       strokeWidth={1.75}
@@ -554,15 +555,15 @@ export function Sidebar({
                     />
                   </span>
                   <div className="min-w-0">
-                    <div className="truncate font-display text-[13px] font-bold text-brand-ink dark:text-[#00D4FF] group-hover:text-[#6d28d9] dark:group-hover:text-[#8B7DFF] transition-colors">
+                    <div className="truncate font-display text-[13px] font-bold text-slate-900 dark:text-white group-hover:text-[#6d28d9] dark:group-hover:text-[#8B7DFF] transition-colors">
                       Ver Hub de IA
                     </div>
-                    <div className="truncate font-mono text-[9.5px] text-sky-700 dark:text-[#70D6FF]">
+                    <div className="truncate font-mono text-[9.5px] text-slate-500 dark:text-slate-400">
                       Copiloto &amp; Modelos ✦
                     </div>
                   </div>
                 </div>
-                <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#8B7DFF]/15 text-[#6d28d9] dark:text-[#8B7DFF] border border-[#8B7DFF]/30 shrink-0">
+                <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#8B7DFF]/15 text-[#8B7DFF] border border-[#8B7DFF]/30 shrink-0">
                   IA
                 </span>
               </button>
@@ -571,7 +572,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={() => openTab('intelligence')}
-              className={`sidebar-footer-card mx-auto grid h-10 w-10 place-items-center rounded-xl text-[#6d28d9] dark:text-[#8B7DFF] hover:scale-105 transition-all ${FOCUS_RING}`}
+              className={`sidebar-footer-card mx-auto grid h-10 w-10 place-items-center rounded-xl text-[#8B7DFF] hover:scale-105 transition-all ${FOCUS_RING}`}
               title="Ver Hub de IA"
               aria-label="Ver Hub de IA"
               data-testid="sidebar-intelligence-icon"

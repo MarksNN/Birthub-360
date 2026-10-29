@@ -46,7 +46,7 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
 
   return [
     {
-      title: 'COMMAND CENTER',
+      title: 'CENTRAL DE COMANDO',
       groups: [
         {
           id: 'dashboard',
@@ -60,6 +60,11 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           label: TAB_META.workspace.label,
           icon: TAB_META.workspace.icon,
           primaryTab: 'workspace',
+          subItems: [
+            { tab: 'workspace', label: 'Meu Espaço' },
+            { tab: 'daily-plan', label: 'Plano Diário' },
+            { tab: 'notifications', label: 'Notificações' },
+          ],
         },
       ],
     },
@@ -77,12 +82,14 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
             { tab: 'crm360', label: 'Negócios' },
             { tab: 'propostas', label: 'Propostas' },
             { tab: 'forecast', label: 'Forecast' },
+            { tab: 'pipeline_ponderado', label: 'Pipeline Ponderado' },
+            { tab: 'mesa-tratamento', label: 'Mesa de Tratamento' },
           ],
         },
       ],
     },
     {
-      title: 'INTELLIGENCE',
+      title: 'INTELIGÊNCIA',
       groups: [
         {
           // Handoff 05: LDR (`/app/market-intelligence`) + Hub de MI (`/app/market-intelligence/hub`)
@@ -126,6 +133,11 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           label: 'Hub de IA',
           icon: TAB_META.intelligence.icon,
           primaryTab: 'intelligence',
+          subItems: [
+            { tab: 'intelligence', label: 'Hub de IA' },
+            { tab: 'knowledge', label: 'Base de Conhecimento' },
+            { tab: 'sdr-diagnostic', label: 'Diagnóstico SDR' },
+          ],
         },
         ...(canAccessCopilotoIa
           ? [
@@ -140,7 +152,7 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
       ],
     },
     {
-      title: 'EXECUTION',
+      title: 'EXECUÇÃO',
       groups: [
         {
           // Handoff 05: Prospecção Inteligente (`/app/prospect/inteligente`) era rota órfã.
@@ -158,18 +170,34 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           label: 'Cadências',
           icon: TAB_META.cadence.icon,
           primaryTab: 'cadence',
+          subItems: [
+            { tab: 'cadence', label: 'Cadências' },
+            { tab: 'roteiros', label: 'Roteiros de Abordagem' },
+            { tab: 'chatbook', label: 'Chatbook' },
+          ],
         },
         {
           id: 'activities',
           label: 'Agenda',
           icon: TAB_META.activities.icon,
           primaryTab: 'activities',
+          subItems: [
+            { tab: 'activities', label: 'Tarefas & Atividades' },
+            { tab: 'calendar', label: 'Calendário' },
+          ],
         },
         {
           id: 'workflows',
-          label: 'Workflows',
+          label: 'Orquestração & Playbooks',
+          ariaLabel: 'Workflows',
           icon: TAB_META.jornadas.icon,
           primaryTab: 'jornadas',
+          subItems: [
+            { tab: 'jornadas', label: 'Jornadas Comerciais' },
+            { tab: 'playbooks', label: 'Playbooks Comerciais' },
+            { tab: 'processos', label: 'Processos de Vendas' },
+            { tab: 'editor', label: 'Editor de Documentos' },
+          ],
         },
         ...(canManageOperations
           ? [
@@ -184,7 +212,7 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
       ],
     },
     {
-      title: 'RELATIONSHIPS',
+      title: 'RELACIONAMENTO',
       groups: [
         {
           id: 'companies',
@@ -194,15 +222,14 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
         },
         {
           id: 'contacts',
-          label: 'Contatos',
+          label: 'Contatos & Decisores',
+          ariaLabel: 'Contatos',
           icon: TAB_META.contacts.icon,
           primaryTab: 'contacts',
-        },
-        {
-          id: 'decisores',
-          label: 'Decisores',
-          icon: Shield,
-          primaryTab: 'contacts',
+          subItems: [
+            { tab: 'contacts', label: 'Base de Contatos' },
+            { tab: 'contacts', path: 'contacts?view=decisores', label: 'Mapeamento de Decisores' },
+          ],
         },
       ],
     },
@@ -215,6 +242,11 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           ariaLabel: TAB_META.analytics.label,
           icon: TAB_META.analytics.icon,
           primaryTab: 'analytics',
+          subItems: [
+            { tab: 'analytics', label: 'Analytics' },
+            { tab: 'winloss', label: 'Win/Loss' },
+            { tab: 'reports', label: 'Relatórios Avançados' },
+          ],
         },
         {
           id: 'metas',
@@ -227,6 +259,13 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
           label: TAB_META.gamification.label,
           icon: TAB_META.gamification.icon,
           primaryTab: 'gamification',
+          subItems: [
+            { tab: 'gamification', label: 'Gamificação & Ranking' },
+            { tab: 'roleplay', label: 'Roleplay IA' },
+            { tab: 'qualification_matrix', label: 'Matriz de Qualificação' },
+            { tab: 'objections_matrix', label: 'Matriz de Objeções' },
+            { tab: 'topic_training', label: 'Academy' },
+          ],
         },
       ],
     },
@@ -242,6 +281,10 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
                       label: 'Integrações',
                       icon: TAB_META.integrations.icon,
                       primaryTab: 'integrations' as TabType,
+                      subItems: [
+                        { tab: 'integrations', label: 'Hub de Integrações' },
+                        { tab: 'bitrix', label: 'Guia Prático Bitrix24' },
+                      ],
                     },
                   ]
                 : []),
@@ -252,6 +295,11 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
                       label: 'Gestão de Time',
                       icon: TAB_META.team.icon,
                       primaryTab: 'team' as TabType,
+                      subItems: [
+                        { tab: 'team', label: 'Equipe' },
+                        { tab: 'module-access', label: 'Acesso a Módulos' },
+                        { tab: 'usage', label: 'Consumo de IA' },
+                      ],
                     },
                   ]
                 : []),
