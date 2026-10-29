@@ -1,11 +1,13 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma } from './src/lib/prisma.js';
 
 async function createAdminUser() {
+  const initialPassword = process.env.ADMIN_INITIAL_PASSWORD;
+  if (!initialPassword) {
+    throw new Error('Defina ADMIN_INITIAL_PASSWORD no ambiente antes de executar este script.');
+  }
+
   try {
-    // Criar organização
     const org = await prisma.organization.upsert({
       where: { id: 'org_admin' },
       update: {},
@@ -18,11 +20,8 @@ async function createAdminUser() {
     });
     console.log('Organização criada:', org.id);
 
-    // Hash da senha
-    const passwordHash = await bcrypt.hash('Admin@123456', 10);
-    console.log('Senha hash gerada');
+    const passwordHash = await bcrypt.hash(initialPassword, 10);
 
-    // Criar usuário admin
     const user = await prisma.user.upsert({
       where: { email: 'marcelinmark@gmail.com' },
       update: {},
@@ -34,13 +33,12 @@ async function createAdminUser() {
         organizationId: 'org_admin',
         emailVerified: true,
         role: 'ADMIN',
-        mustChangePassword: false,
+        mustChangePassword: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
     console.log('Usuário criado:', user.email);
-    console.log('Senha: Admin@123456');
   } catch (error) {
     console.error('Erro:', error);
   } finally {
@@ -48,4 +46,4 @@ async function createAdminUser() {
   }
 }
 
-createAdminUser();
+void createAdminUser();
