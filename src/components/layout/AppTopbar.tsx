@@ -139,6 +139,7 @@ export function AppTopbar({ activeTab, onOpenMobileNav }: AppTopbarProps) {
         }}
         className="group ml-5 hidden max-w-md flex-1 items-center gap-3 rounded-full border border-[color:var(--color-border-strong)] bg-[color:var(--surface)]/70 px-4 py-2.5 text-[color:var(--color-text-secondary)] transition-all duration-500 hover:border-[color:var(--color-brand-accent)] hover:bg-[color:var(--surface)] hover:text-[color:var(--color-text-primary)] hover:shadow-[var(--shadow-card)] lg:flex"
         data-testid="topbar-command-palette"
+        aria-label="Abrir command palette (Buscar empresa, decisor ou comando)"
       >
         <Search
           className="h-3.5 w-3.5 shrink-0 transition-all duration-500 group-hover:text-[color:var(--color-brand-accent)] group-hover:rotate-12"
