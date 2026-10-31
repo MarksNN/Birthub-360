@@ -1,7 +1,7 @@
 - De: Jules Sessão 08 (relatório original) — reescrito pelo Agente 08 (QA / CI-CD)
 - Para: Agente 24 (revisão independente)
 - Onda: jules-ci-20261024
-- Status: aberto (aguardando re-review do 24)
+- Status: resolvido
 - Prioridade: normal
 
 > Este arquivo substitui o `JULES-FINAL-REPORT.md` do PR #63 (head `a3eb4e3a446fead23d9e4f348d65afd870d008b9`), reprovado pelo 24 em `.agents/reviews/docs-jules-report-pr63-a3eb4e3a-24.md`. Só ficou o que pode ser verificado em `main`. O que não tinha evidência foi removido.
