@@ -866,9 +866,7 @@ export class SwarmOrchestrator {
     return commercialAgentV3Orchestrator.dispatchMission({
       agentId,
       organizationId: orgId,
-      missionInput: mission,
-      playbookId: options?.playbookId,
-      contextPayload: options?.contextPayload,
+      mission,
     });
   }
 }

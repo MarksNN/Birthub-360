@@ -60,7 +60,8 @@ router.get(
     const { agentId } = req.params as z.infer<typeof agentIdParamSchema>;
     const agent = commercialAgentV3Registry.getAgent(agentId);
     if (!agent) {
-      res.status(404).json({ success: false, error: 'Agente não encontrado' });
+      res.status(404);
+      res.json({ success: false, error: 'Agente não encontrado' });
       return;
     }
 
@@ -93,7 +94,8 @@ router.get(
     const { agentId, playbookId } = req.params as z.infer<typeof playbookParamSchema>;
     const playbookData = commercialAgentV3Registry.getPlaybookContent(agentId, playbookId);
     if (!playbookData) {
-      res.status(404).json({ success: false, error: 'Playbook não encontrado' });
+      res.status(404);
+      res.json({ success: false, error: 'Playbook não encontrado' });
       return;
     }
 

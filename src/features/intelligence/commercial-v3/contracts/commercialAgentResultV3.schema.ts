@@ -31,7 +31,7 @@ export const commercialV3ArtifactSchema = z.object({
     'OTHER_DOCUMENT',
   ]),
   name: z.string(),
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
   state: z.enum([
     'DRAFT_NOT_SENT',
     'PREPARED_NOT_EXECUTED',
@@ -196,6 +196,6 @@ export const commercialAgentResultV3Schema = z.object({
   approvalPending: commercialV3ApprovalPendingSchema,
   handoffs: z.array(commercialV3HandoffSchema),
   execution: commercialV3ExecutionSchema,
-  metrics: z.record(z.union([z.number(), z.string(), z.null()])),
+  metrics: z.record(z.string(), z.union([z.number(), z.string(), z.null()])),
   nextStep: z.string(),
 });
