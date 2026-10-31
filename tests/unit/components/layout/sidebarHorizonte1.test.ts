@@ -6,8 +6,8 @@ describe('getSidebarNavSections (Horizonte 1 — Unificação PT-BR e Eliminaç�
     const sections = getSidebarNavSections({
       canAccessCopilotoIa: true,
       canManageOperations: true,
-      canManageSystem: true,
-      canManageTeam: true,
+      isAdmin: true,
+      
     });
 
     const titles = sections.map((s) => s.title);
@@ -29,7 +29,7 @@ describe('getSidebarNavSections (Horizonte 1 — Unificação PT-BR e Eliminaç�
       'notifications',
     ]);
 
-    const crmGroup = allGroups.find((g) => g.id === 'crm');
+    const crmGroup = allGroups.find((g) => g.id === 'revenue_tree');
     expect(crmGroup?.subItems?.map((i) => i.tab)).toContain('pipeline_ponderado');
     expect(crmGroup?.subItems?.map((i) => i.tab)).toContain('mesa-tratamento');
 
@@ -40,7 +40,7 @@ describe('getSidebarNavSections (Horizonte 1 — Unificação PT-BR e Eliminaç�
       'sdr-diagnostic',
     ]);
 
-    const cadenceGroup = allGroups.find((g) => g.id === 'cadence');
+    const cadenceGroup = allGroups.find((g) => g.id === 'cadences');
     expect(cadenceGroup?.subItems?.map((i) => i.tab)).toEqual(['cadence', 'roteiros', 'chatbook']);
 
     const activitiesGroup = allGroups.find((g) => g.id === 'activities');
@@ -63,7 +63,7 @@ describe('getSidebarNavSections (Horizonte 1 — Unificação PT-BR e Eliminaç�
       { tab: 'contacts', path: 'contacts?view=decisores', label: 'Mapeamento de Decisores' },
     ]);
 
-    const analyticsGroup = allGroups.find((g) => g.id === 'analytics');
+    const analyticsGroup = allGroups.find((g) => g.id === 'performance');
     expect(analyticsGroup?.subItems?.map((i) => i.tab)).toEqual(['analytics', 'winloss', 'reports']);
 
     const gamificationGroup = allGroups.find((g) => g.id === 'gamification');
