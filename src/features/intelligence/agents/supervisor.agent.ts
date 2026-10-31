@@ -842,4 +842,33 @@ export class SwarmOrchestrator {
       throw error;
     }
   }
+
+  /**
+   * Executa uma missão especializada usando a Suíte Comercial V3.1 (19 especialistas, 463 habilidades).
+   * Integração de envelope seguro V3.1 e garantia de isolamento multi-tenant fail-closed.
+   */
+  async executeCommercialV3Specialist(
+    agentId: import('../commercial-v3/contracts/commercialAgentV3.types.js').CommercialV3AgentId,
+    mission: string,
+    options?: {
+      organizationId?: string;
+      playbookId?: string;
+      contextPayload?: Record<string, unknown>;
+      sessionId?: string;
+    },
+  ) {
+    const { commercialAgentV3Orchestrator } = await import(
+      '../commercial-v3/services/commercialAgentV3Orchestrator.service.js'
+    );
+    const orgId = options?.organizationId || getTenantId() || 'org_default';
+    assertPiiExternalConsent(orgId);
+
+    return commercialAgentV3Orchestrator.dispatchMission({
+      agentId,
+      organizationId: orgId,
+      missionInput: mission,
+      playbookId: options?.playbookId,
+      contextPayload: options?.contextPayload,
+    });
+  }
 }
