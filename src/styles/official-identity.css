@@ -150,6 +150,12 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     var(--shadow-elevated);
 }
+/* Domain accent is supplied by the application shell; body text stays neutral. */
+[data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ink);
+  text-shadow: none;
+}
+
 .bh-platform-card:not(.bh-landing-card) :is(h1, h2, h3, h4, h5, h6) {
   color: var(--ink);
   text-shadow: none;
@@ -165,11 +171,6 @@ body {
     var(--shadow-elevated);
 }
 
-/* Domain accent is supplied by the application shell; body text stays neutral. */
-[data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--ink);
-  text-shadow: none;
-}
 .bh-platform-card[data-accent="gold"] {
   --card-accent: var(--color-heading-gold);
 }
@@ -230,11 +231,6 @@ html.dark,
   --danger-active: var(--color-heading-danger);
 }
 
-/* Domain accent is supplied by the application shell; body text stays neutral. */
-[data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--ink);
-  text-shadow: none;
-}
 .bh-platform-card .bh-label {
   color: var(--card-accent);
 }
