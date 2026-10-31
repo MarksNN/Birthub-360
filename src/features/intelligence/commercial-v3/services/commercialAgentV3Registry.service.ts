@@ -89,6 +89,21 @@ export class CommercialAgentV3RegistryService {
     return this.agentIndices.get(agentId)?.playbooks ?? [];
   }
 
+  public getPlaybookContent(agentId: CommercialV3AgentId, playbookId: string): { playbook: CommercialPlaybookMetadata; content: string } | null {
+    const playbooks = this.getPlaybooks(agentId);
+    const pb = playbooks.find((p) => p.id === playbookId);
+    if (!pb) return null;
+
+    const fullPath = path.join(ASSETS_ROOT, pb.path);
+    if (!fs.existsSync(fullPath)) return null;
+
+    const content = fs.readFileSync(fullPath, 'utf-8');
+    return {
+      playbook: pb,
+      content,
+    };
+  }
+
   public getHandoffCandidates(agentId: CommercialV3AgentId): Array<[string, string, string]> {
     return this.handoffs[agentId] ?? [];
   }

@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  ArrowLeft,
   ArrowRight,
   BookOpen,
   CheckCircle2,
@@ -19,6 +20,7 @@ import { Button } from '../../../components/ui/Button.js';
 import type {
   CommercialAgentCatalogEntry,
   CommercialAgentResultV3,
+  CommercialPlaybookMetadata,
   CommercialSkillDefinition,
   CommercialV3AgentId,
 } from '../../intelligence/commercial-v3/contracts/commercialAgentV3.types.js';
@@ -65,6 +67,10 @@ export function CommercialAgentCellPanel() {
   const [agentDetails, setAgentDetails] = useState<CommercialV3AgentDetailResponse | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
+  // Leitor de Playbook Modal
+  const [viewingPlaybook, setViewingPlaybook] = useState<{ playbook: CommercialPlaybookMetadata; content: string } | null>(null);
+  const [loadingPlaybook, setLoadingPlaybook] = useState(false);
+
   // Playground Consultivo
   const [missionInput, setMissionInput] = useState('');
   const [dispatching, setDispatching] = useState(false);
@@ -109,6 +115,7 @@ export function CommercialAgentCellPanel() {
   useEffect(() => {
     if (!selectedAgentId) {
       setAgentDetails(null);
+      setViewingPlaybook(null);
       setMissionResult(null);
       setDispatchError(null);
       return;
@@ -116,6 +123,7 @@ export function CommercialAgentCellPanel() {
 
     let cancelled = false;
     setLoadingDetails(true);
+    setViewingPlaybook(null);
     setMissionResult(null);
     setDispatchError(null);
 
@@ -139,6 +147,21 @@ export function CommercialAgentCellPanel() {
       cancelled = true;
     };
   }, [selectedAgentId]);
+
+  const handleOpenPlaybook = async (playbookId: string) => {
+    if (!selectedAgentId) return;
+    setLoadingPlaybook(true);
+    try {
+      const res = await commercialV3Api.getPlaybook(selectedAgentId, playbookId);
+      if (res.success) {
+        setViewingPlaybook(res.data);
+      }
+    } catch (err: unknown) {
+      console.error('Erro ao abrir playbook:', err);
+    } finally {
+      setLoadingPlaybook(false);
+    }
+  };
 
   const handleDispatchMission = async () => {
     if (!selectedAgentId || !missionInput.trim()) return;
@@ -333,12 +356,28 @@ export function CommercialAgentCellPanel() {
           <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-2xl border border-line bg-surface shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between border-b border-line px-6 py-4 bg-surface-subtle">
               <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-ok-solid" />
+                {viewingPlaybook ? (
+                  <button
+                    type="button"
+                    onClick={() => setViewingPlaybook(null)}
+                    className="mr-1 rounded p-1 text-ink-2 hover:bg-surface hover:text-ink transition-colors flex items-center gap-1 text-xs"
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Voltar
+                  </button>
+                ) : (
+                  <span className="h-2.5 w-2.5 rounded-full bg-ok-solid" />
+                )}
                 <div>
                   <h3 className="font-display text-sm font-bold text-ink">
-                    {agentDetails?.agent.name || selectedAgentId}
+                    {viewingPlaybook
+                      ? `Playbook ${viewingPlaybook.playbook.id}: ${viewingPlaybook.playbook.name || 'SOP Operacional'}`
+                      : agentDetails?.agent.name || selectedAgentId}
                   </h3>
-                  <p className="text-xs text-ink-2 font-mono">Agente ID: {selectedAgentId} · Suíte Comercial V3.1</p>
+                  <p className="text-xs text-ink-2 font-mono">
+                    {viewingPlaybook
+                      ? `${selectedAgentId} · ${viewingPlaybook.playbook.path}`
+                      : `Agente ID: ${selectedAgentId} · Suíte Comercial V3.1`}
+                  </p>
                 </div>
               </div>
               <button
@@ -357,7 +396,22 @@ export function CommercialAgentCellPanel() {
                 </div>
               )}
 
-              {!loadingDetails && agentDetails && (
+              {/* MODO LEITURA DE PLAYBOOK */}
+              {viewingPlaybook && (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-line bg-surface-subtle/50 p-4 font-mono text-xs leading-relaxed text-ink whitespace-pre-wrap max-h-[60vh] overflow-y-auto">
+                    {viewingPlaybook.content}
+                  </div>
+                  <div className="flex justify-end">
+                    <Button size="sm" variant="outline" onClick={() => setViewingPlaybook(null)}>
+                      Voltar para Visão do Especialista
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* MODO DETALHES DO AGENTE */}
+              {!loadingDetails && !viewingPlaybook && agentDetails && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="rounded-xl border border-line p-4 bg-surface">
@@ -382,11 +436,17 @@ export function CommercialAgentCellPanel() {
                     <div className="rounded-xl border border-line p-4 bg-surface">
                       <p className="text-xs font-bold text-ink flex items-center gap-1.5 mb-2">
                         <BookOpen className="h-3.5 w-3.5 text-ink-2" /> Playbooks ({agentDetails.playbooksCount})
+                        <span className="text-[10px] text-primary font-normal ml-auto">(clique para ler)</span>
                       </p>
                       <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 text-xs">
                         {agentDetails.playbooks.map((p) => (
-                          <div key={p.id} className="p-1.5 rounded bg-surface-subtle text-[11px] font-mono text-ink-2 truncate">
-                            {p.id}: {p.path}
+                          <div
+                            key={p.id}
+                            onClick={() => handleOpenPlaybook(p.id)}
+                            className="group/pb flex items-center justify-between p-1.5 rounded bg-surface-subtle text-[11px] font-mono text-ink-2 hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
+                          >
+                            <span className="truncate font-semibold">{p.id}: {p.name || p.path}</span>
+                            <ChevronRight className="h-3 w-3 shrink-0 group-hover/pb:translate-x-0.5 transition-transform" />
                           </div>
                         ))}
                       </div>

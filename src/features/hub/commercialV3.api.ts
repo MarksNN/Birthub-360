@@ -2,6 +2,7 @@ import { api } from '../../lib/api.js';
 import type {
   CommercialAgentCatalogEntry,
   CommercialAgentResultV3,
+  CommercialPlaybookMetadata,
   CommercialSkillDefinition,
   CommercialV3AgentId,
 } from '../intelligence/commercial-v3/contracts/commercialAgentV3.types.js';
@@ -11,7 +12,7 @@ export interface CommercialV3AgentDetailResponse {
   skillsCount: number;
   skills: CommercialSkillDefinition[];
   playbooksCount: number;
-  playbooks: Array<{ id: string; path: string }>;
+  playbooks: CommercialPlaybookMetadata[];
   handoffs: Array<[string, string, string]>;
 }
 
@@ -33,6 +34,11 @@ export const commercialV3Api = {
 
   getAgent: (agentId: CommercialV3AgentId) =>
     api.get<{ success: boolean; data: CommercialV3AgentDetailResponse }>(`/api/agent/commercial-v3/agents/${agentId}`),
+
+  getPlaybook: (agentId: CommercialV3AgentId, playbookId: string) =>
+    api.get<{ success: boolean; data: { playbook: CommercialPlaybookMetadata; content: string } }>(
+      `/api/agent/commercial-v3/playbooks/${agentId}/${playbookId}`,
+    ),
 
   listSkills: (agentId?: CommercialV3AgentId) => {
     const query = agentId ? `?agentId=${agentId}` : '';

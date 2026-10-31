@@ -70,6 +70,21 @@ describe('Célula Comercial V3.1 — Context Builder (Montagem Contextual e Boot
   });
 });
 
+describe('Célula Comercial V3.1 — Leitura de Playbooks (Living Playbooks)', () => {
+  it('deve retornar o conteúdo Markdown e metadados de um Playbook operacional', () => {
+    const playbookData = commercialAgentV3Registry.getPlaybookContent('icp', 'P1');
+    expect(playbookData).not.toBeNull();
+    expect(playbookData?.playbook.id).toBe('P1');
+    expect(playbookData?.content).toContain('# P1 —');
+    expect(playbookData?.content).toContain('Procedimento operacional');
+  });
+
+  it('deve retornar null para playbook inexistente', () => {
+    const playbookData = commercialAgentV3Registry.getPlaybookContent('icp', 'P99_INEXISTENTE');
+    expect(playbookData).toBeNull();
+  });
+});
+
 describe('Célula Comercial V3.1 — Orquestrador e Validação de Contrato V3.1', () => {
   it('deve despachar missão em modo consultivo e gerar envelope validado pelo schema Zod', async () => {
     const response = await commercialAgentV3Orchestrator.dispatchMission({
@@ -111,7 +126,7 @@ describe('Célula Comercial V3.1 — Orquestrador e Validação de Contrato V3.1
       missingData: [],
       compliance: {
         channel: 'WHATSAPP',
-        sendEligible: true, // INVÁLIDO com signals UNKNOWN
+        sendEligible: true,
         reason: 'Tentativa não autorizada',
         checks: [],
         signals: {

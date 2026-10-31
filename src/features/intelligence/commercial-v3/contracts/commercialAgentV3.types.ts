@@ -237,7 +237,10 @@ export interface CommercialSkillDefinition {
 
 export interface CommercialPlaybookMetadata {
   id: string;
+  name?: string;
   path: string;
+  skillIds?: string[];
+  content?: string;
 }
 
 export interface CommercialAgentCatalogEntry {

@@ -17,6 +17,11 @@ const agentIdParamSchema = z.object({
   agentId: z.enum(COMMERCIAL_V3_AGENT_IDS),
 });
 
+const playbookParamSchema = z.object({
+  agentId: z.enum(COMMERCIAL_V3_AGENT_IDS),
+  playbookId: z.string().min(1),
+});
+
 const buildContextSchema = z.object({
   agentId: z.enum(COMMERCIAL_V3_AGENT_IDS),
   skillIds: z.array(z.string()).optional(),
@@ -74,6 +79,25 @@ router.get(
         handoffs,
       },
     });
+  },
+);
+
+/**
+ * GET /api/agent/commercial-v3/playbooks/:agentId/:playbookId
+ * Retorna o conteúdo Markdown e metadados de um Playbook operacional específico.
+ */
+router.get(
+  '/playbooks/:agentId/:playbookId',
+  validateRequest(playbookParamSchema, 'params'),
+  (req: Request, res: Response) => {
+    const { agentId, playbookId } = req.params as z.infer<typeof playbookParamSchema>;
+    const playbookData = commercialAgentV3Registry.getPlaybookContent(agentId, playbookId);
+    if (!playbookData) {
+      res.status(404).json({ success: false, error: 'Playbook não encontrado' });
+      return;
+    }
+
+    res.json({ success: true, data: playbookData });
   },
 );
 
