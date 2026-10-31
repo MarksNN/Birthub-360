@@ -55,7 +55,7 @@ router.get('/agents', (_req: Request, res: Response) => {
  */
 router.get(
   '/agents/:agentId',
-  validateRequest(agentIdParamSchema, 'params'),
+  validateRequest({ params: agentIdParamSchema }),
   (req: Request, res: Response) => {
     const { agentId } = req.params as z.infer<typeof agentIdParamSchema>;
     const agent = commercialAgentV3Registry.getAgent(agentId);
@@ -89,7 +89,7 @@ router.get(
  */
 router.get(
   '/playbooks/:agentId/:playbookId',
-  validateRequest(playbookParamSchema, 'params'),
+  validateRequest({ params: playbookParamSchema }),
   (req: Request, res: Response) => {
     const { agentId, playbookId } = req.params as z.infer<typeof playbookParamSchema>;
     const playbookData = commercialAgentV3Registry.getPlaybookContent(agentId, playbookId);
