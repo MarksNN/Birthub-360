@@ -12,6 +12,7 @@ request:
     connectionId: string
   body:
     type: urlencoded
+    content: []
 response:
   statusCode: 200
   statusText: OK

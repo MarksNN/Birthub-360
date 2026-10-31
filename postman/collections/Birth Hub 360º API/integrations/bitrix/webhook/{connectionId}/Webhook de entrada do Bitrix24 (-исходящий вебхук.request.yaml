@@ -24,6 +24,7 @@ pathVariables:
       }
 body:
   type: urlencoded
+  content: []
 settings: {}
 examples: ./.resources/Webhook de entrada do Bitrix24 (-исходящий вебхук.resources/examples
 order: 1000

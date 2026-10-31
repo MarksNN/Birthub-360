@@ -1,13 +1,13 @@
 $kind: http-request
 name: Lista atividades — modo "agenda" (range de datas) ou lista paginada
 description: ""
-url: "{{baseUrl}}/activities?from=2008-11-17&to=2008-11-17&date=2008-11-17&page=2598&limit=2598&leadId=string&status=Concluída&type=WhatsApp"
+url: "{{baseUrl}}/activities?from=2008-11-17&to=2008-11-17&date=2008-11-17&page=2598&limit=2598&leadId=string&status=Conclu%C3%ADda&type=WhatsApp"
 method: GET
 headers:
   Accept: application/json
 queryParams:
   - key: from
-    value: 2008-11-17
+    value: "2008-11-17"
     disabled: false
     description: Junto com `to`, retorna todas as atividades no intervalo (grade do Calendário, sem paginação)
     $type: |-
@@ -21,7 +21,7 @@ queryParams:
         }
       }
   - key: to
-    value: 2008-11-17
+    value: "2008-11-17"
     disabled: false
     description: ""
     $type: |-
@@ -35,7 +35,7 @@ queryParams:
         }
       }
   - key: date
-    value: 2008-11-17
+    value: "2008-11-17"
     disabled: false
     description: ""
     $type: |-
@@ -64,7 +64,7 @@ queryParams:
     description: ""
     $type: string
   - key: status
-    value: Concluída
+    value: "Conclu%C3%ADda"
     disabled: false
     description: ""
     $type: |-

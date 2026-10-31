@@ -38,5 +38,5 @@ body:
       ]
     }
 settings: {}
-examples: ./.resources/Ingesta um documento a partir de um arquivo (base64) — .txt, .resources/examples
+examples: ./.resources/Ingesta um documento a partir de um arquivo base64.resources/examples
 order: 1000
