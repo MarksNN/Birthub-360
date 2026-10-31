@@ -551,7 +551,9 @@ export class TokenQuotaService {
       // Projeção de encerramento do mês em UTC estrito (alinhado ao agregador FinOps)
       const now = new Date();
       const currentDay = Math.max(1, now.getUTCDate());
-      const daysInMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)).getUTCDate();
+      const daysInMonth = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0),
+      ).getUTCDate();
       const dailyRunRate = consumedTokens / currentDay;
       const projectedMonthEndTokens = Math.round(dailyRunRate * daysInMonth);
 

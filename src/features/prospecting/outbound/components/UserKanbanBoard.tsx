@@ -179,8 +179,8 @@ export function UserKanbanBoard({ user, isDark }: UserKanbanBoardProps) {
               Template: Cold Call
             </h4>
             <p className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} mb-2`}>
-              "Atue como SDR da Birth Hub 360. Gere um script de 30 segundos focando em redução de risco e
-              segurança logística para o decisor X."
+              "Atue como SDR da Birth Hub 360. Gere um script de 30 segundos focando em redução de
+              risco e segurança logística para o decisor X."
             </p>
             <button
               type="button"

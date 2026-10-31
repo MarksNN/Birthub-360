@@ -1,4 +1,6 @@
+# Scripts shell devem usar LF
 *.sh text eol=lf
+
 # CRLF nesses arquivos (checkout Windows com core.autocrlf=true, sem regra própria antes desta
 # linha) quebra `import`/`import()` de dentro do Vitest — SyntaxError "Invalid or unexpected
 # token" ao importar scripts/ci/check-bundle-budget.mjs a partir de

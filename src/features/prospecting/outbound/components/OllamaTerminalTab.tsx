@@ -274,8 +274,8 @@ export const OllamaTerminalTab: React.FC<OllamaTerminalTabProps> = ({
 
           <div className="p-3.5 rounded-xl bg-[var(--brand-primary)]/10 border border-[var(--brand-primary)]/30 text-[var(--brand-primary)] text-[11px] leading-relaxed">
             💡 <strong>Dica de Integração:</strong> Quando o Ollama estiver rodando, a interface da
-            A Birth Hub 360 detectará automaticamente o endpoint na porta padrão <code>11434</code> e
-            utilizará o <code>llama3</code> com resposta imediata e privacidade total.
+            A Birth Hub 360 detectará automaticamente o endpoint na porta padrão <code>11434</code>{' '}
+            e utilizará o <code>llama3</code> com resposta imediata e privacidade total.
           </div>
         </div>
       </div>

@@ -155,7 +155,9 @@ export const Header: React.FC<HeaderProps> = ({
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-amber-300 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200 shadow-sm'
             }`}
-            title={isDark ? 'Ativar Modo Claro (Birth Hub 360)' : 'Ativar Modo Escuro (Birth Hub 360)'}
+            title={
+              isDark ? 'Ativar Modo Claro (Birth Hub 360)' : 'Ativar Modo Escuro (Birth Hub 360)'
+            }
           >
             {isDark ? (
               <>
