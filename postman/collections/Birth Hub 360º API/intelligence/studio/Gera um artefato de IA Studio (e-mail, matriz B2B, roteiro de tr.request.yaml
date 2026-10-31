@@ -1,0 +1,40 @@
+$kind: http-request
+name: Gera um artefato de IA Studio (e-mail, matriz B2B, roteiro de treinamento etc. — union discriminada por `kind`)
+description: ""
+url: "{{baseUrl}}/intelligence/studio"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "kind": "string",
+      "brand": {},
+      "inputs": {}
+    }
+  $type: |-
+    {
+      "description": "Discriminated union por `kind` (email, b2b_matrix, training_script, ...) — ver studio.service.ts",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "object"
+        },
+        "inputs": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind",
+        "brand",
+        "inputs"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera um artefato de IA Studio (e-mail, matriz B2B, roteiro de tr.resources/examples
+order: 2000

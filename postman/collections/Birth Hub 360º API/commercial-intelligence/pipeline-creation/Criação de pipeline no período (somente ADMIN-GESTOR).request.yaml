@@ -1,0 +1,13 @@
+$kind: http-request
+name: Criação de pipeline no período (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/pipeline-creation"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Criação de pipeline no período (somente ADMIN-GESTOR).resources/examples
+order: 1000

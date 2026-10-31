@@ -1,0 +1,33 @@
+$kind: http-request
+name: KPIs, evolução diária e distribuição de desfechos da Mesa de Tratamento. ADMIN/GESTOR veem o time todo; CLOSER/SDR só o próprio histórico.
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/dashboard?period=30d"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: period
+    value: 30d
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "today",
+              "7d",
+              "30d",
+              "all"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/KPIs, evolução diária e distribuição de desfechos da Mesa d.resources/examples
+order: 1000

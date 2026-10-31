@@ -1,0 +1,17 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/intelligence/suite/roleplay/turn"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/#9 Simula a resposta do cliente num turno de roleplay de vendas.resources/examples
+order: 1000

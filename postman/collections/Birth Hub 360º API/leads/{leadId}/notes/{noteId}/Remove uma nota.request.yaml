@@ -1,0 +1,43 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/leads/:leadId/notes/:noteId"
+method: DELETE
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: noteId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Remove uma nota.resources/examples
+order: 1000

@@ -1,0 +1,18 @@
+$kind: http-request
+name: "#8 Gera o próximo passo de uma cadência multicanal (cadência dinâmica)"
+description: ""
+url: "{{baseUrl}}/intelligence/suite/cadence-step"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/#8 Gera o próximo passo de uma cadência multicanal (cadência.resources/examples
+order: 1000

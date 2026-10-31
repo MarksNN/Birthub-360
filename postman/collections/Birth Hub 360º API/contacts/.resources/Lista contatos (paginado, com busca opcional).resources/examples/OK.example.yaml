@@ -1,0 +1,160 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/contacts?q=string&page=1&limit=50"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    - key: q
+      value: string
+      disabled: false
+      description: Busca textual (nome/e-mail/telefone)
+    - key: page
+      value: "1"
+      disabled: false
+      description: ""
+    - key: limit
+      value: "50"
+      disabled: false
+      description: ""
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "name": "string",
+            "companyId": "string",
+            "id": "string",
+            "organizationId": "string",
+            "createdAt": "2008-06-08T09:04:00.413Z",
+            "updatedAt": "2015-09-04T13:14:59.266Z",
+            "role": "string",
+            "department": "string",
+            "phone": "string",
+            "whatsapp": "string",
+            "email": "HhB-wFTQ@BSFmtOUhI.tb",
+            "linkedin": "string",
+            "birthDate": "string",
+            "observations": "string",
+            "status": "Inativo"
+          },
+          {
+            "name": "string",
+            "companyId": "string",
+            "id": "string",
+            "organizationId": "string",
+            "createdAt": "1955-03-13T16:41:41.859Z",
+            "updatedAt": "2017-02-22T12:04:21.894Z",
+            "role": "string",
+            "department": "string",
+            "phone": "string",
+            "whatsapp": "string",
+            "email": "em3J1M4IQ98YOjj@iGrjAJcVuuZVXElacoCcBpSy.rglm",
+            "linkedin": "string",
+            "birthDate": "string",
+            "observations": "string",
+            "status": "Ativo"
+          }
+        ],
+        "meta": {}
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "department": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    },
+                    "whatsapp": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "linkedin": {
+                      "type": "string"
+                    },
+                    "birthDate": {
+                      "type": "string"
+                    },
+                    "observations": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "allOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "companyId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "companyId"
+                  ]
+                }
+              ]
+            }
+          },
+          "meta": {
+            "type": "object"
+          }
+        }
+      }
+order: 1000

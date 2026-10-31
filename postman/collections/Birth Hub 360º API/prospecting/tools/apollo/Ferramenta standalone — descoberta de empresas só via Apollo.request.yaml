@@ -1,0 +1,19 @@
+$kind: http-request
+name: Ferramenta standalone — descoberta de empresas só via Apollo Organization Search, sem Google Places/OpenStreetMap
+description: ""
+url: "{{baseUrl}}/prospecting/tools/apollo"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Mesmo formato de /prospecting/discover (ProspectCriteria)",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — descoberta de empresas só via Apollo.resources/examples
+order: 1000

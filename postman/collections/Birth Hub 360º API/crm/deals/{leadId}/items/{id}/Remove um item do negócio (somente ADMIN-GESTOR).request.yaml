@@ -1,0 +1,46 @@
+$kind: http-request
+name: Remove um item do negócio (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/crm/deals/:leadId/items/:id"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Remove um item do negócio (somente ADMIN-GESTOR).resources/examples
+order: 1000

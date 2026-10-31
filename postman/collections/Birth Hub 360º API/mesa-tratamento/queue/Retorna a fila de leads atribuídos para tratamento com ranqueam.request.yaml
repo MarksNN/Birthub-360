@@ -1,0 +1,13 @@
+$kind: http-request
+name: Retorna a fila de leads atribuídos para tratamento com ranqueamento por prioridade
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/queue"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna a fila de leads atribuídos para tratamento com ranqueam.resources/examples
+order: 1000

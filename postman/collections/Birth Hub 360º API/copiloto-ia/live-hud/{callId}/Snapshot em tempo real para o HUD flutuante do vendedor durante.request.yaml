@@ -1,0 +1,30 @@
+$kind: http-request
+name: Snapshot em tempo real para o HUD flutuante do vendedor durante a chamada (Onda 15)
+description: Fornece o estado atualizado para o componente LiveCopilotHUD (sentimento predominante, objeção ativa, sugestão de contorno recomendada e alerta de risco).
+url: "{{baseUrl}}/copiloto-ia/live-hud/:callId"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: callId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Snapshot em tempo real para o HUD flutuante do vendedor durante.resources/examples
+order: 1000

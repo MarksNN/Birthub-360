@@ -1,0 +1,31 @@
+$kind: http-request
+name: Lista o catálogo de capabilities (resource.action) — leitura livre, qualquer usuário autenticado
+description: ""
+url: "{{baseUrl}}/capabilities?activeOnly=false"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: activeOnly
+    value: "false"
+    disabled: false
+    description: 'Quando "false", inclui também capabilities desativadas. Default: true.'
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista o catálogo de capabilities (resource.action) — leitura.resources/examples
+order: 1000

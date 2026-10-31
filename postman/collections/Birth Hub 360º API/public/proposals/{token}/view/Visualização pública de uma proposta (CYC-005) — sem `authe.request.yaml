@@ -1,0 +1,30 @@
+$kind: http-request
+name: Visualização pública de uma proposta (CYC-005) — sem `authenticateToken`/`requireTenant`, montada fora do bloco autenticado (mesmo lugar dos webhooks de integração). Registra a visualização real (`viewCount`/`firstViewedAt`/`lastViewedAt`) e avança o stat
+description: ""
+url: "{{baseUrl}}/public/proposals/:token/view"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: token
+    value: string
+    disabled: false
+    description: publicToken opaco do documento comercial — é a credencial, não há autenticação de sessão nesta rota
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Visualização pública de uma proposta (CYC-005) — sem `authe.resources/examples
+order: 1000

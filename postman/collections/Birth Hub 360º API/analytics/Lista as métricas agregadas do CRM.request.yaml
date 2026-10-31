@@ -1,0 +1,12 @@
+$kind: http-request
+description: "Mantém o formato legado da resposta: `metrics` e `total` no nível superior e novamente dentro de `data`. Retorna HTTP 200 com listas e total vazios quando a consulta falha ou não há métricas."
+url: "{{baseUrl}}/analytics"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as métricas agregadas do CRM.resources/examples
+order: 1000

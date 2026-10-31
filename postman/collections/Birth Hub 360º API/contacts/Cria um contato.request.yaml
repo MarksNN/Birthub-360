@@ -1,0 +1,74 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/contacts"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "companyId": "string",
+      "role": "string",
+      "department": "string",
+      "phone": "string",
+      "whatsapp": "string",
+      "email": "fcbP9PQ4@IuXYSLWDLVqwngFpRkoAqxvmkt.wcru",
+      "linkedin": "string",
+      "birthDate": "string",
+      "observations": "string",
+      "status": "Inativo"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "whatsapp": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "string"
+        },
+        "status": {
+          "allOf": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "companyId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "companyId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria um contato.resources/examples
+order: 2000

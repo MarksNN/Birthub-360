@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Cria uma sequência de cadência a partir de um modelo de jornada pré-definido (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Restrito a ADMIN/GESTOR/CLOSER/SDR."
+description: ""
+url: "{{baseUrl}}/cadence/sequences/from-template/:templateId"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: templateId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Cria uma sequência de cadência a partir de um modelo de jornad.resources/examples
+order: 1000

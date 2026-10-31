@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Opções válidas para os filtros da tela (vendedores/produtos/origens/ICPs conhecidos) (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Somente ADMIN/GESTOR."
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/filter-options"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Opções válidas para os filtros da tela (vendedores-produtos-o.resources/examples
+order: 1000

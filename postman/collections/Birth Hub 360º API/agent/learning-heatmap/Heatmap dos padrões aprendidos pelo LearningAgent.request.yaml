@@ -1,0 +1,12 @@
+$kind: http-request
+description: "Heatmap dos padrões aprendidos pelo LearningAgent, escopado por (organização, usuário autenticado): o handler passa `organizationId` e o `id` do usuário autenticado."
+url: "{{baseUrl}}/agent/learning-heatmap"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Heatmap dos padrões aprendidos pelo LearningAgent.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Revalida a conexão técnica com a Apollo (API key), sem consumir créditos
+description: ""
+url: "{{baseUrl}}/prospecting/apollo/reconnect"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Revalida a conexão técnica com a Apollo (API key), sem consumi.resources/examples
+order: 1000

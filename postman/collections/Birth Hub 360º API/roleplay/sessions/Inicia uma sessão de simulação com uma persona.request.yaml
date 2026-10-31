@@ -1,0 +1,28 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/roleplay/sessions"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "personaId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "personaId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "personaId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Inicia uma sessão de simulação com uma persona.resources/examples
+order: 1000

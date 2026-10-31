@@ -1,0 +1,30 @@
+$kind: http-request
+name: Desabilita um módulo de produto específico para a organização (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/organization-modules/:moduleKey"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: moduleKey
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Desabilita um módulo de produto específico para a organizaçã.resources/examples
+order: 2000

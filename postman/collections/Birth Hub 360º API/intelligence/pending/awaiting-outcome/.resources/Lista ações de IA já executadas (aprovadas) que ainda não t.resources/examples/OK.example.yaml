@@ -1,0 +1,211 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/intelligence/pending/awaiting-outcome"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "actions": [
+            {
+              "id": "string",
+              "entity": "Lead",
+              "action": "create_follow_up",
+              "payload": {
+                "key_0": "string",
+                "key_1": 3219.2769448285476,
+                "key_2": true,
+                "key_3": true,
+                "key_4": 1825
+              },
+              "riskLevel": "high",
+              "approved": true,
+              "executed": true,
+              "attempts": 8267,
+              "createdAt": "2002-06-13T19:40:55.110Z",
+              "updatedAt": "1981-10-19T12:35:00.642Z",
+              "agentRole": "CLOSER",
+              "confidence": 0.4134774237636589,
+              "idempotencyKey": "string",
+              "approvedAt": "2007-12-28T04:17:55.030Z",
+              "approvedBy": "string",
+              "discardedAt": "2017-07-20T11:06:14.375Z",
+              "discardedBy": "string",
+              "executedAt": "1948-08-08T18:19:14.916Z",
+              "executionError": "string",
+              "lastAttemptAt": "2000-07-09T02:13:33.873Z",
+              "organizationId": "string"
+            },
+            {
+              "id": "string",
+              "entity": "Lead",
+              "action": "send_email",
+              "payload": {
+                "key_0": "string",
+                "key_1": 4978
+              },
+              "riskLevel": "high",
+              "approved": true,
+              "executed": true,
+              "attempts": 8603,
+              "createdAt": "1947-02-09T05:01:31.728Z",
+              "updatedAt": "1951-06-06T05:40:32.262Z",
+              "agentRole": "SUPERVISOR",
+              "confidence": 0.2076333764209063,
+              "idempotencyKey": "string",
+              "approvedAt": "2012-07-01T12:22:24.832Z",
+              "approvedBy": "string",
+              "discardedAt": "1956-02-25T00:22:36.183Z",
+              "discardedBy": "string",
+              "executedAt": "1971-07-23T12:55:15.252Z",
+              "executionError": "string",
+              "lastAttemptAt": "1979-04-11T15:06:45.993Z",
+              "organizationId": "string"
+            }
+          ]
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "entity": {
+                      "type": "string",
+                      "example": "Lead"
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "send_email",
+                        "swarm_recommendation",
+                        "create_follow_up"
+                      ]
+                    },
+                    "payload": {
+                      "type": "object"
+                    },
+                    "agentRole": {
+                      "type": "string",
+                      "enum": [
+                        "SDR",
+                        "BDR",
+                        "CLOSER",
+                        "CRM",
+                        "OPS",
+                        "SUPERVISOR"
+                      ]
+                    },
+                    "riskLevel": {
+                      "type": "string",
+                      "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                      ]
+                    },
+                    "confidence": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "idempotencyKey": {
+                      "type": "string"
+                    },
+                    "approved": {
+                      "type": "boolean"
+                    },
+                    "approvedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "approvedBy": {
+                      "type": "string",
+                      "description": "Id do usuário (User.id) que aprovou — onda 39, trilha de aprovação."
+                    },
+                    "discardedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "discardedBy": {
+                      "type": "string",
+                      "description": "Id do usuário (User.id) que descartou — onda 39, trilha de aprovação."
+                    },
+                    "executed": {
+                      "type": "boolean"
+                    },
+                    "executedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "executionError": {
+                      "type": "string"
+                    },
+                    "attempts": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "lastAttemptAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "organizationId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "entity",
+                    "action",
+                    "payload",
+                    "riskLevel",
+                    "approved",
+                    "executed",
+                    "attempts",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+order: 1000

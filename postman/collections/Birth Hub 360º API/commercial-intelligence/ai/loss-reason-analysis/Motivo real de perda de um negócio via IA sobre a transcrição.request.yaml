@@ -1,0 +1,29 @@
+$kind: http-request
+name: Motivo real de perda de um negócio via IA sobre a transcrição real (item 21). Só roda com clique explícito por negócio; mesmo limitador de IA dedicado dos demais endpoints `ai/*` deste módulo (somente ADMIN/GESTOR).
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/ai/loss-reason-analysis"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "leadId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Motivo real de perda de um negócio via IA sobre a transcrição.resources/examples
+order: 1000

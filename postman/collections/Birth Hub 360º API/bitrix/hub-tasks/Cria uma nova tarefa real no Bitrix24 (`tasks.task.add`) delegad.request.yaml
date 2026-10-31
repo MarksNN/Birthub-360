@@ -1,0 +1,34 @@
+$kind: http-request
+name: Cria uma nova tarefa real no Bitrix24 (`tasks.task.add`) delegada a um colega.
+description: ""
+url: "{{baseUrl}}/bitrix/hub-tasks"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "text": "string",
+      "assigneeId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "assigneeId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "assigneeId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma nova tarefa real no Bitrix24 (`tasks.task.add`) delegad.resources/examples
+order: 2000

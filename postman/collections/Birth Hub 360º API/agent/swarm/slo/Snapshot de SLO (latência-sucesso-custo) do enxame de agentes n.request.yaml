@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Snapshot de SLO (latência/sucesso/custo) do enxame de agentes nos últimos N dias (Agente 18, achado de auditoria: endpoint real, sem entrada aqui — a rota nunca tinha sido registrada, ver `.agents/handoffs/onda-7/13-para-07-rota-slo-swarm.md`). Não usa o "
+description: ""
+url: "{{baseUrl}}/agent/swarm/slo?days=30"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: days
+    value: "30"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1,
+            "maximum": 90
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Snapshot de SLO (latência-sucesso-custo) do enxame de agentes n.resources/examples
+order: 1000

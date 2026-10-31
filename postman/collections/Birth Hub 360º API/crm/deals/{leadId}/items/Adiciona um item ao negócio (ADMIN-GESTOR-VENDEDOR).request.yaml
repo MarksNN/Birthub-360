@@ -1,0 +1,36 @@
+$kind: http-request
+name: Adiciona um item ao negócio (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/crm/deals/:leadId/items"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Formato de `crmDealItemSchema` (crm360.schema.ts)",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Adiciona um item ao negócio (ADMIN-GESTOR-VENDEDOR).resources/examples
+order: 2000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista as conexões com o Birth Voices Hub configuradas para o tenant
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/connections"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as conexões com o Birth Voices Hub configuradas para o te.resources/examples
+order: 1000

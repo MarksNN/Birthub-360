@@ -1,0 +1,25 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/integrations/birth-voice/suppressions"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "phone": "string",
+        "reason": "string",
+        "leadId": "string"
+      }
+response:
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
+  body:
+    type: text
+    content: ""
+order: 2000

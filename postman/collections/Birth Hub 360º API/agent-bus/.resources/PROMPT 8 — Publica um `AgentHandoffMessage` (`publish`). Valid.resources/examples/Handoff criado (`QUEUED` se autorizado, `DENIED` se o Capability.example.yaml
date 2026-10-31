@@ -1,0 +1,75 @@
+$kind: http-example
+name: Handoff criado (`QUEUED` se autorizado, `DENIED` se o Capability Engine negou) — ver `data.handoff`
+request:
+  url: "{{baseUrl}}/agent-bus"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "missionId": "string",
+        "conversationId": "string",
+        "fromAgent": "string",
+        "fromRole": "string",
+        "toAgent": "string",
+        "toRole": "string",
+        "requestType": "string",
+        "requestedCapability": "string",
+        "resourceScope": {},
+        "evidence": [
+          {
+            "sourceAgent": "string",
+            "summary": "string",
+            "recordedAt": "string",
+            "sourceExecutionId": "string",
+            "capabilityCode": "string"
+          },
+          {
+            "sourceAgent": "string",
+            "summary": "string",
+            "recordedAt": "string",
+            "sourceExecutionId": "string",
+            "capabilityCode": "string"
+          }
+        ],
+        "priority": "LOW",
+        "idempotencyKey": "string",
+        "parentHandoffId": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": "",
+        "meta": {}
+      }
+    $type: |-
+      {
+        "description": "Envelope de resposta genérico usado pela maioria dos endpoints",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "meta": {
+            "type": "object",
+            "description": "Presente em listagens paginadas (page, limit, total, etc.)"
+          }
+        }
+      }
+order: 1000

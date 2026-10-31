@@ -1,0 +1,30 @@
+$kind: http-request
+name: SLA/tempo de resposta no WhatsApp do lead (Onda 7) — primeira resposta, média e mediana por rajada de mensagens inbound consecutivas (ver computeWhatsAppResponseTimeStats)
+description: ""
+url: "{{baseUrl}}/copiloto-ia/leads/:leadId/whatsapp-response-time"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/SLA-tempo de resposta no WhatsApp do lead (Onda 7) — primeira.resources/examples
+order: 1000

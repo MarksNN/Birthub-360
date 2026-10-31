@@ -1,0 +1,38 @@
+$kind: http-request
+name: PROMPT 10 — Detecta uma lacuna real e propõe um agente/capability novo, nunca publica sozinho. ANTES de gerar qualquer spec, busca de verdade em `CapabilityDefinition`, `AgentDefinition` (+ catálogo-fonte completo de ~380 agentes, incluindo aliases) e `TO
+description: ""
+url: "{{baseUrl}}/agent-builder/proposals"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "need": "string",
+      "targetJobRoleCode": "string",
+      "domain": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "need": {
+          "type": "string",
+          "description": "Necessidade em texto livre — nunca reformulada antes de buscar."
+        },
+        "targetJobRoleCode": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "need"
+      ]
+    }
+settings: {}
+examples: ./.resources/PROMPT 10 — Detecta uma lacuna real e propõe um agente-capabi.resources/examples
+order: 1000

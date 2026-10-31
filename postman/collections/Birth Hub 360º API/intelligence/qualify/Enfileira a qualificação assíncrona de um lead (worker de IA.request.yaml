@@ -1,0 +1,34 @@
+$kind: http-request
+name: Enfileira a qualificação assíncrona de um lead (worker de IA via BullMQ)
+description: ""
+url: "{{baseUrl}}/intelligence/qualify"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadId": "string",
+      "companyInfo": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string"
+        },
+        "companyInfo": {
+          "type": "string",
+          "description": "Opcional — quando ausente, o worker busca os dados reais da empresa no CRM."
+        }
+      },
+      "required": [
+        "leadId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Enfileira a qualificação assíncrona de um lead (worker de IA.resources/examples
+order: 1000

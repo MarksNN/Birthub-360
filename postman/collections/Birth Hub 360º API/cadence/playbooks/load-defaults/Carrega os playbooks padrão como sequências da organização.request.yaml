@@ -1,0 +1,12 @@
+$kind: http-request
+description: Restrito a ADMIN/GESTOR/CLOSER/SDR. Usa o mesmo handler idempotente de `/cadence/templates/seed-defaults` e não recebe corpo.
+url: "{{baseUrl}}/cadence/playbooks/load-defaults"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Carrega os playbooks padrão como sequências da organização.resources/examples
+order: 1000

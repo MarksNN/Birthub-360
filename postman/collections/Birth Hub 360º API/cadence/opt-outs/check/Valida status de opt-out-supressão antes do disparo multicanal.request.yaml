@@ -1,0 +1,51 @@
+$kind: http-request
+name: Valida status de opt-out/supressão antes do disparo multicanal (Onda 15 / B-13)
+description: Interceptor pré-envio `checkOptOutStatus`. Garante que nenhum toque multicanal (WhatsApp, e-mail, voz) é disparado para titular em lista de supressão, revogação de consentimento ou exclusão LGPD Art. 18. Bloqueador B-13 e Regra Global §27.
+url: "{{baseUrl}}/cadence/opt-outs/check?contactId=string&channel=whatsapp"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: contactId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: channel
+    value: whatsapp
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp",
+              "voice"
+            ]
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Valida status de opt-out-supressão antes do disparo multicanal.resources/examples
+order: 1000

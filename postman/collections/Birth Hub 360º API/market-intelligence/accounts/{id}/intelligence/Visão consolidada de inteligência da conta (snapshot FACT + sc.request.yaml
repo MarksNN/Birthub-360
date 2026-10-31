@@ -1,0 +1,38 @@
+$kind: http-request
+name: Visão consolidada de inteligência da conta (snapshot FACT + score INFERENCE + contagens)
+description: "Lê a conta (`Company` com `organizationId` da sessão e `deletedAt: null`), o `AccountIntelligenceSnapshot` mais recente (maior `version`), o `AccountScore` mais recente e as contagens de sinais, decisores, relações (como origem ou destino), recomendações e evidências — tudo filtrado por `organizationId`. Sem snapshot, `state` = `not_refreshed` e `facts` = null; nada é fabricado."
+url: "{{baseUrl}}/market-intelligence/accounts/:id/intelligence"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: Id da Company do CRM do tenant (1–128 chars)
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+auth:
+  type: apikey
+  credentials:
+    key: better-auth.session_token
+    value: "{{apiKey}}"
+    in: header
+settings: {}
+examples: ./.resources/Visão consolidada de inteligência da conta (snapshot FACT + sc.resources/examples
+order: 1000

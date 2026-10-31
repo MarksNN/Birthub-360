@@ -1,0 +1,74 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/playbook/qualification-matrix"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "brand": "Birth Hub 360",
+      "segment": "string",
+      "persona": "string",
+      "framework": "MEDDPICC",
+      "questionCategory": "Situação",
+      "questionText": "string",
+      "idealAnswer": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "enum": [
+            "Birth Hub 360"
+          ]
+        },
+        "segment": {
+          "type": "string"
+        },
+        "persona": {
+          "type": "string"
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "SPIN",
+            "BANT",
+            "MEDDPICC",
+            "SNAP",
+            "CHALLENGER"
+          ]
+        },
+        "questionCategory": {
+          "type": "string",
+          "enum": [
+            "Situação",
+            "Problema",
+            "Implicação/Custo",
+            "Necessidade/ROI"
+          ]
+        },
+        "questionText": {
+          "type": "string"
+        },
+        "idealAnswer": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "brand",
+        "segment",
+        "persona",
+        "framework",
+        "questionCategory",
+        "questionText",
+        "idealAnswer"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma pergunta de qualificação.resources/examples
+order: 2000

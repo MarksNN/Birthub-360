@@ -1,0 +1,48 @@
+$kind: http-example
+name: Ainda não há registro para esta sessão (pendente ou nunca iniciada).
+request:
+  url: "{{baseUrl}}/intelligence/agents/sdr/status/:sessionId"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    sessionId: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 202
+  statusText: Accepted
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "status": "pending",
+        "sessionId": "string"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending"
+            ]
+          },
+          "sessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "sessionId"
+        ]
+      }
+order: 2000

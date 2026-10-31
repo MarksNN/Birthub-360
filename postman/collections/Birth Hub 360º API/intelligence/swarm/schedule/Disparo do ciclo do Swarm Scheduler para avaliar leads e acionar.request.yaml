@@ -1,0 +1,13 @@
+$kind: http-request
+name: Disparo do ciclo do Swarm Scheduler para avaliar leads e acionar cadências (Onda 15)
+description: Executa o ciclo de agendamento do Enxame Comercial Autônomo, avaliando oportunidades estagnadas e enfileirando ações multicanal via CadenceExecutionPort com rate-limiting e respeito às janelas comerciais (handoff 13-para-17).
+url: "{{baseUrl}}/intelligence/swarm/schedule"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Disparo do ciclo do Swarm Scheduler para avaliar leads e acionar.resources/examples
+order: 1000

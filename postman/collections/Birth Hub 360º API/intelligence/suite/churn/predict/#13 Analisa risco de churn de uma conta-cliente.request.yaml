@@ -1,0 +1,18 @@
+$kind: http-request
+name: "#13 Analisa risco de churn de uma conta/cliente"
+description: ""
+url: "{{baseUrl}}/intelligence/suite/churn/predict"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/#13 Analisa risco de churn de uma conta-cliente.resources/examples
+order: 1000

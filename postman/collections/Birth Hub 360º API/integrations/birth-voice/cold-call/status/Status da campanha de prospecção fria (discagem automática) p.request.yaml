@@ -1,0 +1,13 @@
+$kind: http-request
+name: Status da campanha de prospecção fria (discagem automática) para o tenant
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/cold-call/status"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Status da campanha de prospecção fria (discagem automática) p.resources/examples
+order: 1000

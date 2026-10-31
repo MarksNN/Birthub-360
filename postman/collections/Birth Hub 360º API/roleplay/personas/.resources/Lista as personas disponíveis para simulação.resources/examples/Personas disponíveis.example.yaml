@@ -1,0 +1,126 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/roleplay/personas"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "id": "string",
+            "name": "string",
+            "title": "string",
+            "companyType": "string",
+            "difficulty": "INICIANTE",
+            "scenario": "string",
+            "coreObjections": [
+              "string",
+              "string"
+            ],
+            "personalityTraits": [
+              "string",
+              "string"
+            ]
+          },
+          {
+            "id": "string",
+            "name": "string",
+            "title": "string",
+            "companyType": "string",
+            "difficulty": "INTERMEDIARIO",
+            "scenario": "string",
+            "coreObjections": [
+              "string",
+              "string"
+            ],
+            "personalityTraits": [
+              "string",
+              "string"
+            ]
+          }
+        ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "companyType": {
+                  "type": "string"
+                },
+                "difficulty": {
+                  "type": "string",
+                  "enum": [
+                    "INICIANTE",
+                    "INTERMEDIARIO",
+                    "AVANCADO"
+                  ]
+                },
+                "scenario": {
+                  "type": "string"
+                },
+                "coreObjections": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "personalityTraits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "title",
+                "companyType",
+                "difficulty",
+                "scenario",
+                "coreObjections",
+                "personalityTraits"
+              ]
+            }
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 1000

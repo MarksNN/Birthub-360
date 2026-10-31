@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista ações de IA pendentes de aprovação humana (AIPendingAction)
+description: ""
+url: "{{baseUrl}}/intelligence/pending"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista ações de IA pendentes de aprovação humana (AIPendingAc.resources/examples
+order: 1000

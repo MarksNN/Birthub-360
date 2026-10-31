@@ -1,0 +1,46 @@
+$kind: http-request
+name: Liga/desliga o flag para a própria organização do ADMIN autenticado
+description: Restrito a ADMIN. Nunca altera o default global do catálogo, só o override do tenant.
+url: "{{baseUrl}}/feature-flags/:key"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: key
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "enabled": false
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    }
+settings: {}
+examples: ./.resources/Liga-desliga o flag para a própria organização do ADMIN auten.resources/examples
+order: 1000

@@ -1,0 +1,45 @@
+$kind: http-request
+name: Consulta status de opt-out por contato e canal (Onda 15 / B-13)
+description: Verifica se um titular possui registro de descadastramento/opt-out ativo para um canal específico (email, whatsapp, voz) ou globalmente na organização autenticada.
+url: "{{baseUrl}}/lgpd/opt-out/:contactId?channel=global"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: channel
+    value: global
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "default": "global"
+          }
+        }
+      }
+pathVariables:
+  - key: contactId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consulta status de opt-out por contato e canal (Onda 15 - B-13).resources/examples
+order: 1000

@@ -1,0 +1,51 @@
+$kind: http-request
+name: "BILLING-003: único caminho que marca uma Fatura como Pago — confirma AO VIVO contra a API da Stripe (PaymentIntent existe, está `succeeded` e bate em valor/moeda com este documento) antes de gravar, nunca a partir de um valor só informado pelo chamador. M"
+description: ""
+url: "{{baseUrl}}/crm/documents/:id/reconcile-stripe-payment"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "connectionId": "string",
+      "paymentIntentId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "connectionId": {
+          "type": "string"
+        },
+        "paymentIntentId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "connectionId",
+        "paymentIntentId"
+      ]
+    }
+settings: {}
+examples: ./.resources/BILLING-003- único caminho que marca uma Fatura como Pago — c.resources/examples
+order: 1000

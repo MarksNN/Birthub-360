@@ -1,0 +1,166 @@
+$kind: http-request
+name: Lista empresas do catálogo global de CNPJ (LDR) — usado para achar matriz/filiais
+description: "`cnpj` aceita o CNPJ completo (14 posições) para busca exata, ou a raiz de 8 dígitos (matriz + filiais) para busca por `startsWith` — usado por CompanyBranchesView.tsx."
+url: "{{baseUrl}}/companies/market-intelligence?page=1&pageSize=25&q=string&cnpj=string&uf=MI&municipio=string&municipioIbge=6714481&cnae=string&situacao=string&porte=string&icpTier=FORA_DO_ICP&matrizFilial=MATRIZ&sort=name"
+method: GET
+queryParams:
+  - key: page
+    value: "1"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          }
+        }
+      }
+  - key: pageSize
+    value: "25"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 25,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      }
+  - key: q
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: cnpj
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: uf
+    value: MI
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          }
+        }
+      }
+  - key: municipio
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: municipioIbge
+    value: "6714481"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^\\d{7}$"
+          }
+        }
+      }
+  - key: cnae
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: situacao
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "description": "'TODAS' remove o filtro padrão (ATIVA)",
+            "type": "string"
+          }
+        }
+      }
+  - key: porte
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: icpTier
+    value: FORA_DO_ICP
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "MUITO_ALTO",
+              "ALTO",
+              "MEDIO",
+              "BAIXO",
+              "FORA_DO_ICP"
+            ]
+          }
+        }
+      }
+  - key: matrizFilial
+    value: MATRIZ
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "MATRIZ",
+              "FILIAL"
+            ]
+          }
+        }
+      }
+  - key: sort
+    value: name
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "default": "name",
+            "enum": [
+              "name",
+              "capital",
+              "icp"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista empresas do catálogo global de CNPJ (LDR) — usado para.resources/examples
+order: 1000

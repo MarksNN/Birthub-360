@@ -1,0 +1,40 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/market-intelligence/companies?page=1&pageSize=50&cnpj=string&razaoSocial=string&nomeFantasia=string&cnae=string&cnaeScope=all&municipio=string&municipioIbge=6714481&uf=MI&situacaoCadastral=SUSPENSA&icpMinimo=FORA_DO_ICP&matrizFilial=MATRIZ&rntrc=true&porte=string&simples=NAO_INFORMADO&mei=NAO_INFORMADO&capitalSocialMin=6009.965665738893&capitalSocialMax=6009.965665738893&sort=capitalSocial&order=asc"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    page: "1"
+    pageSize: "50"
+    cnpj: string
+    razaoSocial: string
+    nomeFantasia: string
+    cnae: string
+    cnaeScope: all
+    municipio: string
+    municipioIbge: "6714481"
+    uf: MI
+    situacaoCadastral: SUSPENSA
+    icpMinimo: FORA_DO_ICP
+    matrizFilial: MATRIZ
+    rntrc: "true"
+    porte: string
+    simples: NAO_INFORMADO
+    mei: NAO_INFORMADO
+    capitalSocialMin: "6009.965665738893"
+    capitalSocialMax: "6009.965665738893"
+    sort: capitalSocial
+    order: asc
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 503
+  statusText: Service Unavailable
+  body:
+    type: text
+    content: ""
+order: 3000

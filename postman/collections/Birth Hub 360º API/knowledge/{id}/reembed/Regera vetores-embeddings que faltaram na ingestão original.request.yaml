@@ -1,0 +1,30 @@
+$kind: http-request
+name: Regera vetores/embeddings que faltaram na ingestão original
+description: ""
+url: "{{baseUrl}}/knowledge/:id/reembed"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Regera vetores-embeddings que faltaram na ingestão original.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Health Score composto (6 pilares explicáveis; Confiabilidade de Forecast lê snapshots reais) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/health-score"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Health Score composto (6 pilares explicáveis; Confiabilidade de.resources/examples
+order: 1000

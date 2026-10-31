@@ -1,0 +1,83 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/mobile/field-meetings/sync"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "title": "string",
+        "leadId": "string",
+        "audioData": "string",
+        "audioMimeType": "string",
+        "audioSizeBytes": 9670,
+        "durationMs": 5687,
+        "recordedAt": "2021-04-30T03:00:11.169Z",
+        "meetingNotes": "string",
+        "consentMethod": "string",
+        "textVersion": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "id": "string",
+          "title": "string",
+          "status": "string",
+          "consentGranted": false,
+          "leadId": "string",
+          "audioObjectKey": "string",
+          "hasNotes": true
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "consentGranted": {
+                "type": "boolean"
+              },
+              "leadId": {
+                "type": "string"
+              },
+              "audioObjectKey": {
+                "type": "string"
+              },
+              "hasNotes": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+order: 1000

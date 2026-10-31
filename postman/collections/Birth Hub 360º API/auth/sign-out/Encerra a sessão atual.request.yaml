@@ -1,0 +1,10 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/auth/sign-out"
+method: POST
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Encerra a sessão atual.resources/examples
+order: 1000

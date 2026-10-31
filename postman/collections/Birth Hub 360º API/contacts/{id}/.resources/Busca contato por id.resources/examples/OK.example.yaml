@@ -1,0 +1,123 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/contacts/:id"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "name": "string",
+          "companyId": "string",
+          "id": "string",
+          "organizationId": "string",
+          "createdAt": "1998-12-17T00:46:52.870Z",
+          "updatedAt": "1948-11-09T00:05:29.152Z",
+          "role": "string",
+          "department": "string",
+          "phone": "string",
+          "whatsapp": "string",
+          "email": "MBDdi@jdFU.sbch",
+          "linkedin": "string",
+          "birthDate": "string",
+          "observations": "string",
+          "status": "Inativo"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "department": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "whatsapp": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "linkedin": {
+                    "type": "string"
+                  },
+                  "birthDate": {
+                    "type": "string"
+                  },
+                  "observations": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "allOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "companyId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "companyId"
+                ]
+              }
+            ]
+          }
+        }
+      }
+order: 1000

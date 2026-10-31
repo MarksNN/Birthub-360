@@ -1,0 +1,29 @@
+$kind: http-request
+name: Análise de custos por agente nos últimos N dias (indisponível)
+description: "Análise de custos por agente da organização do usuário autenticado nos últimos N dias. Status: falha sempre com 500 (PrismaClientValidationError); correção pendente do Agente 07."
+url: "{{baseUrl}}/agent/cost-analysis?days=30"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: days
+    value: "30"
+    disabled: false
+    description: "Janela em dias (default 30). O handler faz `parseInt` sem validação: o código não impõe limite superior (o único teto implícito é o intervalo válido de `Date`, ~1e8 dias), por isso nenhum `maximum` é documentado; `minimum: 1` reflete o uso coerente (0, negativo ou não numérico geram janela inválida/NaN)."
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Análise de custos por agente nos últimos N dias (indisponível.resources/examples
+order: 1000

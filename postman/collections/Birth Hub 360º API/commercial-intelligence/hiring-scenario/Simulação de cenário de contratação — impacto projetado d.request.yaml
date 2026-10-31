@@ -1,0 +1,31 @@
+$kind: http-request
+name: Simulação de cenário de contratação — impacto projetado de vendedores adicionais (somente ADMIN/GESTOR).
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/hiring-scenario?additionalReps=6611"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: additionalReps
+    value: "6611"
+    disabled: false
+    description: Quantidade de vendedores adicionais a simular
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Simulação de cenário de contratação — impacto projetado d.resources/examples
+order: 1000

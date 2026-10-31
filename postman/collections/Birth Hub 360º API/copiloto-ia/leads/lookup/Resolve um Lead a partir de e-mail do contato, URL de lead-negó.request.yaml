@@ -1,0 +1,30 @@
+$kind: http-request
+name: Resolve um Lead a partir de e-mail do contato, URL de lead/negócio do Bitrix24, ou id — usado pela extensão para vincular uma captura sem exigir o id colado à mão
+description: ""
+url: "{{baseUrl}}/copiloto-ia/leads/lookup?q=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: q
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Resolve um Lead a partir de e-mail do contato, URL de lead-negó.resources/examples
+order: 1000

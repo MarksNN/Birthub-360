@@ -1,0 +1,36 @@
+$kind: http-request
+name: Gera uma leitura executiva em Markdown a partir de métricas já calculadas (ex. `/api/analytics/overview`)
+description: ""
+url: "{{baseUrl}}/intelligence/report"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "metrics": {},
+      "brandId": "birthhub360"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "object"
+        },
+        "brandId": {
+          "type": "string",
+          "enum": [
+            "Birth Hub 360"
+          ]
+        }
+      },
+      "required": [
+        "metrics"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera uma leitura executiva em Markdown a partir de métricas já.resources/examples
+order: 1000

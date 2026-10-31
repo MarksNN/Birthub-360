@@ -1,0 +1,40 @@
+$kind: http-request
+name: "PROMPT 7 — Abre um AccessRequest: capability temporária e escopada fora do que o JobRole do ator já concede, nunca uma troca de cargo. Exige `agent.request_cross_role` concedido ao cargo do ator (Capability Engine normal), `resource` escopado não-vazio e "
+description: ""
+url: "{{baseUrl}}/access-requests"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "capabilityCode": "string",
+      "resource": {},
+      "reason": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "capabilityCode": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "object",
+          "description": "Escopo do pedido, ex.: { \"type\": \"LEAD\", \"id\": \"...\" } — nunca vazio."
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "capabilityCode",
+        "resource",
+        "reason"
+      ]
+    }
+settings: {}
+examples: ./.resources/PROMPT 7 — Abre um AccessRequest- capability temporária e esc.resources/examples
+order: 1000

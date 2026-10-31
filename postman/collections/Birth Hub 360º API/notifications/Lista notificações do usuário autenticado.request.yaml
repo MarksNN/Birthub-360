@@ -1,0 +1,30 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/notifications?unread=true"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: unread
+    value: "true"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "1",
+              "true"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista notificações do usuário autenticado.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Histórico (até 14) do resumo executivo diário gerado automaticamente pelo job agendado (dailyExecutiveSummary.worker.ts, ReportSource=DAILY_AUTO) — somente leitura, exibido no ReportsHub separado do relatório sob demanda.
+description: ""
+url: "{{baseUrl}}/intelligence/report/daily-summaries"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico (até 14) do resumo executivo diário gerado automati.resources/examples
+order: 1000

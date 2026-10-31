@@ -1,0 +1,61 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/playbook/objection-matrix"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "brand": "Birth Hub 360",
+      "segment": "string",
+      "persona": "string",
+      "objectionTitle": "string",
+      "objectionText": "string",
+      "responseScript": "string",
+      "keyDifferentiator": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "enum": [
+            "Birth Hub 360"
+          ]
+        },
+        "segment": {
+          "type": "string"
+        },
+        "persona": {
+          "type": "string"
+        },
+        "objectionTitle": {
+          "type": "string"
+        },
+        "objectionText": {
+          "type": "string"
+        },
+        "responseScript": {
+          "type": "string"
+        },
+        "keyDifferentiator": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "brand",
+        "segment",
+        "persona",
+        "objectionTitle",
+        "objectionText",
+        "responseScript",
+        "keyDifferentiator"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma objeção.resources/examples
+order: 2000

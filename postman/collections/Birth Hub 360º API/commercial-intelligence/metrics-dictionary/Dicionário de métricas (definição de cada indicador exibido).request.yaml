@@ -1,0 +1,13 @@
+$kind: http-request
+name: Dicionário de métricas (definição de cada indicador exibido) — para que dashboard, relatório exportado e API não divirjam silenciosamente. Somente ADMIN/GESTOR.
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/metrics-dictionary"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Dicionário de métricas (definição de cada indicador exibido).resources/examples
+order: 1000

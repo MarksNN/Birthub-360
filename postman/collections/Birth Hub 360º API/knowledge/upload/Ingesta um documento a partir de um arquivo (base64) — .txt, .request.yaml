@@ -1,0 +1,42 @@
+$kind: http-request
+name: Ingesta um documento a partir de um arquivo (base64) — .txt, .md, .csv, .json ou .docx
+description: ""
+url: "{{baseUrl}}/knowledge/upload"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "fileName": "string",
+      "data": "string",
+      "title": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "data": {
+          "type": "string",
+          "description": "Conteúdo do arquivo em base64"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "fileName",
+        "data"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ingesta um documento a partir de um arquivo (base64) — .txt, .resources/examples
+order: 1000

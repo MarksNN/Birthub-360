@@ -1,0 +1,13 @@
+$kind: http-request
+name: Consulta o estado dos módulos de produto habilitados e onboarding da organização
+description: ""
+url: "{{baseUrl}}/organization-modules"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consulta o estado dos módulos de produto habilitados e onboardi.resources/examples
+order: 1000

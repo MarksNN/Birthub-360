@@ -1,0 +1,29 @@
+$kind: http-request
+name: Ferramenta standalone — menções recentes de imprensa sobre uma empresa via GDELT, gratuito e sem chave
+description: ""
+url: "{{baseUrl}}/prospecting/tools/news"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "companyName": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "companyName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "companyName"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — menções recentes de imprensa sobre u.resources/examples
+order: 1000

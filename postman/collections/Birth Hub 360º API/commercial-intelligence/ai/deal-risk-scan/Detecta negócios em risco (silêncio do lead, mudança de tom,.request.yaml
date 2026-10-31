@@ -1,0 +1,13 @@
+$kind: http-request
+name: Detecta negócios em risco (silêncio do lead, mudança de tom, concorrente mencionado) e alerta os gestores reais da organização — item 5 de "IA Agêntica de Vendas". Disparo manual nesta versão; cooldown de 48h por (lead, motivo) evita alerta duplicado. Mes
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/ai/deal-risk-scan"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Detecta negócios em risco (silêncio do lead, mudança de tom,.resources/examples
+order: 1000

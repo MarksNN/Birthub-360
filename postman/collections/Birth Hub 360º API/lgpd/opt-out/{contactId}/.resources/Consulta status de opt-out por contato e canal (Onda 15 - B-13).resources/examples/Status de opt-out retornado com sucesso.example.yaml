@@ -1,0 +1,75 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/lgpd/opt-out/:contactId?channel=global"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    channel: global
+  pathVariables:
+    contactId: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "contactId": "string",
+          "channel": "whatsapp",
+          "optedOut": true,
+          "suppressed": true,
+          "reason": "string",
+          "optedOutAt": "2021-10-18T13:15:01.510Z"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "contactId": {
+                "type": "string"
+              },
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "email",
+                  "whatsapp",
+                  "voice"
+                ]
+              },
+              "optedOut": {
+                "type": "boolean"
+              },
+              "suppressed": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "optedOutAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+order: 1000

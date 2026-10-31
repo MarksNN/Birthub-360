@@ -1,0 +1,44 @@
+$kind: http-request
+name: "Painel de gestão (ADMIN/GESTOR): marca um lead como revisado/decidido pela gestão — registra histórico local (`MesaTratamentoTreatment`, outcome `decidido_pela_gestao`) e, quando o lead já está vinculado ao Bitrix24, também comenta na timeline lá."
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/lead/:id/decide"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "note": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "string",
+          "description": "Nota opcional sobre a decisão"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Painel de gestão (ADMIN-GESTOR)- marca um lead como revisado-de.resources/examples
+order: 1000

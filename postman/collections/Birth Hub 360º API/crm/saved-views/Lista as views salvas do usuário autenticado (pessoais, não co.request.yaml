@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista as views salvas do usuário autenticado (pessoais, não compartilhadas)
+description: ""
+url: "{{baseUrl}}/crm/saved-views"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as views salvas do usuário autenticado (pessoais, não co.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Retorna os logs recentes de execução e inferência do enxame de agentes
+description: ""
+url: "{{baseUrl}}/intelligence/observability/logs"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna os logs recentes de execução e inferência do enxame d.resources/examples
+order: 1000

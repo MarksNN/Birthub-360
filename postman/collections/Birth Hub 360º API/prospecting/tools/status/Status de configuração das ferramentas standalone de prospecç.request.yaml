@@ -1,0 +1,13 @@
+$kind: http-request
+name: Status de configuração das ferramentas standalone de prospecção (Google Places, Apollo, Hunter, GitHub, Notícias, YouTube) — só booleano, nunca a chave
+description: ""
+url: "{{baseUrl}}/prospecting/tools/status"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Status de configuração das ferramentas standalone de prospecç.resources/examples
+order: 1000

@@ -1,0 +1,40 @@
+$kind: http-request
+name: Lista recente de chamadas de voz IA (VoiceCallLog) — projeção estruturada do resultado gravado pelos webhooks de callback, paginada por cursor.
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/calls?limit=25&cursor=string&leadId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: limit
+    value: "25"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 25,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      }
+  - key: cursor
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista recente de chamadas de voz IA (VoiceCallLog) — projeçã.resources/examples
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Lista insights e objeções capturados em tempo real durante a chamada (Onda 15)
+description: Retorna a linha do tempo cronológica de insights em tempo real de uma conversa/ligação ativa ou encerrada.
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/live-insights"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista insights e objeções capturados em tempo real durante a c.resources/examples
+order: 2000

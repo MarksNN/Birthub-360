@@ -1,0 +1,44 @@
+$kind: http-request
+name: 'Streaming (SSE) do Chatbook — mesma entrada de `/intelligence/studio`, mas só o `kind` "assistant" (texto livre), transmitido em chunks (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Grava o turno de usuário+assistente no histórico ao '
+description: ""
+url: "{{baseUrl}}/intelligence/studio/stream"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: text/event-stream
+body:
+  type: json
+  content: |-
+    {
+      "brandKey": "Birth Hub 360",
+      "inputs": {
+        "question": "string"
+      }
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "brandKey": {
+          "type": "string",
+          "enum": [
+            "Birth Hub 360"
+          ]
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "brandKey",
+        "inputs"
+      ]
+    }
+settings: {}
+examples: ./.resources/Streaming (SSE) do Chatbook — mesma entrada de `-intelligence-.resources/examples
+order: 1000

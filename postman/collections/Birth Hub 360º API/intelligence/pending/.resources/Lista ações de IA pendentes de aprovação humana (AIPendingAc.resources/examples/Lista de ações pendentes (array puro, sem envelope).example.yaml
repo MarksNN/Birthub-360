@@ -1,0 +1,191 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/intelligence/pending"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": "string",
+          "entity": "Lead",
+          "action": "create_follow_up",
+          "payload": {
+            "key_0": 6054,
+            "key_1": 4963.63418668854
+          },
+          "riskLevel": "medium",
+          "approved": false,
+          "executed": true,
+          "attempts": 5880,
+          "createdAt": "2009-07-16T20:14:23.826Z",
+          "updatedAt": "1979-09-19T15:11:36.337Z",
+          "agentRole": "OPS",
+          "confidence": 0.8929864811069645,
+          "idempotencyKey": "string",
+          "approvedAt": "2008-08-07T18:21:47.849Z",
+          "approvedBy": "string",
+          "discardedAt": "1985-09-07T02:14:53.034Z",
+          "discardedBy": "string",
+          "executedAt": "1965-06-09T23:35:47.516Z",
+          "executionError": "string",
+          "lastAttemptAt": "1997-10-29T05:47:43.922Z",
+          "organizationId": "string"
+        },
+        {
+          "id": "string",
+          "entity": "Lead",
+          "action": "send_email",
+          "payload": {
+            "key_0": 4975,
+            "key_1": 9854.276795534717,
+            "key_2": 764
+          },
+          "riskLevel": "high",
+          "approved": false,
+          "executed": false,
+          "attempts": 4289,
+          "createdAt": "1952-04-05T13:07:17.978Z",
+          "updatedAt": "1983-03-22T17:38:10.367Z",
+          "agentRole": "SUPERVISOR",
+          "confidence": 0.5481488683297224,
+          "idempotencyKey": "string",
+          "approvedAt": "1946-11-17T15:12:06.484Z",
+          "approvedBy": "string",
+          "discardedAt": "2021-08-14T14:02:10.508Z",
+          "discardedBy": "string",
+          "executedAt": "2026-01-18T13:19:56.660Z",
+          "executionError": "string",
+          "lastAttemptAt": "1991-04-02T23:59:45.756Z",
+          "organizationId": "string"
+        }
+      ]
+    $type: |-
+      {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "entity": {
+              "type": "string",
+              "example": "Lead"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "send_email",
+                "swarm_recommendation",
+                "create_follow_up"
+              ]
+            },
+            "payload": {
+              "type": "object"
+            },
+            "agentRole": {
+              "type": "string",
+              "enum": [
+                "SDR",
+                "BDR",
+                "CLOSER",
+                "CRM",
+                "OPS",
+                "SUPERVISOR"
+              ]
+            },
+            "riskLevel": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "idempotencyKey": {
+              "type": "string"
+            },
+            "approved": {
+              "type": "boolean"
+            },
+            "approvedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "approvedBy": {
+              "type": "string",
+              "description": "Id do usuário (User.id) que aprovou — onda 39, trilha de aprovação."
+            },
+            "discardedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "discardedBy": {
+              "type": "string",
+              "description": "Id do usuário (User.id) que descartou — onda 39, trilha de aprovação."
+            },
+            "executed": {
+              "type": "boolean"
+            },
+            "executedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "executionError": {
+              "type": "string"
+            },
+            "attempts": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "lastAttemptAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "organizationId": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "id",
+            "entity",
+            "action",
+            "payload",
+            "riskLevel",
+            "approved",
+            "executed",
+            "attempts",
+            "createdAt",
+            "updatedAt"
+          ]
+        }
+      }
+order: 1000

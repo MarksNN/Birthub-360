@@ -1,0 +1,13 @@
+$kind: http-request
+name: Gera uma nota via IA para publicar no Bitrix a partir de um negócio (somente ADMIN/GESTOR; mesmo limitador de IA dedicado do endpoint acima)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/ai/bitrix-note"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Gera uma nota via IA para publicar no Bitrix a partir de um neg.resources/examples
+order: 1000

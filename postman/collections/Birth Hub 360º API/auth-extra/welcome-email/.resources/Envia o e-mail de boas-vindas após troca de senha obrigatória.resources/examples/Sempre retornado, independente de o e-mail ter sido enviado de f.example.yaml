@@ -1,0 +1,35 @@
+$kind: http-example
+name: Sempre retornado, independente de o e-mail ter sido enviado de fato
+request:
+  url: "{{baseUrl}}/auth-extra/welcome-email"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        }
+      }
+order: 1000

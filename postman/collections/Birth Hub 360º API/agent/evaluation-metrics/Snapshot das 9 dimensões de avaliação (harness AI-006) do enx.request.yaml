@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Snapshot das 9 dimensões de avaliação (harness AI-006) do enxame de agentes nos últimos N dias (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Não usa o envelope `{success,data}` padrão — devolve o snapshot diretamente."
+description: ""
+url: "{{baseUrl}}/agent/evaluation-metrics?days=30"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: days
+    value: "30"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1,
+            "maximum": 90
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Snapshot das 9 dimensões de avaliação (harness AI-006) do enx.resources/examples
+order: 1000

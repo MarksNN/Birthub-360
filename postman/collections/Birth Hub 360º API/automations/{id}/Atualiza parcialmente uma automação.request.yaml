@@ -1,0 +1,59 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/automations/:id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "trigger": "string",
+      "action": "string",
+      "active": false,
+      "config": {}
+    }
+  $type: |-
+    {
+      "description": "Formato exato (campos de gatilho/ação) definido em automation.service.ts; consulte GET /api/automations/options para os valores válidos de trigger/action.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "trigger": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "config": {
+          "type": "object"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Atualiza parcialmente uma automação.resources/examples
+order: 1000

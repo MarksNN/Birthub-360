@@ -1,0 +1,13 @@
+$kind: http-request
+name: Reconcilia e marca como falhas as extrações travadas/órfãs (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/extractions/reconcile-stuck"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Reconcilia e marca como falhas as extrações travadas-órfãs (.resources/examples
+order: 1000

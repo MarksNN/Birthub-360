@@ -1,0 +1,13 @@
+$kind: http-request
+name: Visão executiva geral (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/overview"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Visão executiva geral (somente ADMIN-GESTOR).resources/examples
+order: 1000

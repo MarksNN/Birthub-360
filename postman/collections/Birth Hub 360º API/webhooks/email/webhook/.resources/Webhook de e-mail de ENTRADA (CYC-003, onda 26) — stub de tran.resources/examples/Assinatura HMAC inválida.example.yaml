@@ -1,0 +1,32 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/webhooks/email/webhook"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "organizationId": "string",
+        "providerMessageId": "string",
+        "fromEmail": "string",
+        "leadId": "string",
+        "inReplyTo": "string",
+        "toEmail": "string",
+        "subject": "string",
+        "body": "string",
+        "autoSubmittedHeader": "string",
+        "receivedAt": "1992-09-18T11:23:19.400Z"
+      }
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  body:
+    type: text
+    content: ""
+order: 3000

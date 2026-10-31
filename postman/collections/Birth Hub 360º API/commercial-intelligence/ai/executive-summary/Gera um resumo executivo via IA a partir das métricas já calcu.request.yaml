@@ -1,0 +1,13 @@
+$kind: http-request
+name: Gera um resumo executivo via IA a partir das métricas já calculadas (somente ADMIN/GESTOR; limitador de taxa dedicado por organização, mesmo desenho do `aiLimiter` de `server.ts`)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/ai/executive-summary"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Gera um resumo executivo via IA a partir das métricas já calcu.resources/examples
+order: 1000

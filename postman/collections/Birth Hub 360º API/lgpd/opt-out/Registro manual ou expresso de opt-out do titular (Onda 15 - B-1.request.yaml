@@ -1,0 +1,49 @@
+$kind: http-request
+name: Registro manual ou expresso de opt-out do titular (Onda 15 / B-13)
+description: Grava opt-out para um titular na organização com canal, escopo, canal de origem, motivo e evidência. Restrito a ADMIN, GESTOR, CLOSER e SDR.
+url: "{{baseUrl}}/lgpd/opt-out"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "contactId": "string",
+      "channel": "string",
+      "scope": "string",
+      "originChannel": "manual",
+      "reason": "string",
+      "evidence": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "contactId": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "originChannel": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contactId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registro manual ou expresso de opt-out do titular (Onda 15 - B-1.resources/examples
+order: 2000

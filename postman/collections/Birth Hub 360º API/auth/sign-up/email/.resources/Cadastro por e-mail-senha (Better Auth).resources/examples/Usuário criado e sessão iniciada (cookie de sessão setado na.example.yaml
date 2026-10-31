@@ -1,0 +1,84 @@
+$kind: http-example
+name: Usuário criado e sessão iniciada (cookie de sessão setado na resposta)
+request:
+  url: "{{baseUrl}}/auth/sign-up/email"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "name": "string",
+        "email": "ghTpJgfiNXLRnSf@YWZqXwDYougTcQSSFWhJptgw.fyr",
+        "password": "string",
+        "organizationId": "string"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "user": {
+          "id": "string",
+          "email": "string",
+          "name": "string",
+          "role": "string",
+          "organizationId": "string"
+        },
+        "session": {
+          "id": "string",
+          "expiresAt": "2021-07-09T13:31:45.853Z"
+        }
+      }
+    $type: |-
+      {
+        "description": "Formato do Better Auth — não segue o envelope `{success,data}` do resto da API.",
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "description": "ADMIN | GESTOR | VENDEDOR | VISUALIZADOR"
+              },
+              "organizationId": {
+                "type": "string"
+              }
+            }
+          },
+          "session": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+order: 1000

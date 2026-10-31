@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Promove uma empresa do catálogo público de Market Intelligence para o pipeline comercial do tenant (cria/vincula `Company` no CRM) — Agente 18, achado de auditoria: endpoint real, sem entrada aqui."
+description: ""
+url: "{{baseUrl}}/market-intelligence/companies/:cnpj/approve-to-pipeline"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: cnpj
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Promove uma empresa do catálogo público de Market Intelligence.resources/examples
+order: 1000

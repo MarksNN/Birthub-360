@@ -1,0 +1,27 @@
+$kind: http-example
+name: Arquivo CSV (`text/csv`) com o mesmo conteúdo de `/analytics/cohort`
+request:
+  url: "{{baseUrl}}/analytics/export/csv"
+  method: GET
+  headers:
+    - key: Accept
+      value: text/csv
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/csv
+  body:
+    type: text
+    content: string
+    $type: |-
+      {
+        "type": "string"
+      }
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Marca a conversa como pronta (transcrição/análise concluídas — PROCESSING → READY)
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/ready"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Marca a conversa como pronta (transcrição-análise concluídas.resources/examples
+order: 1000

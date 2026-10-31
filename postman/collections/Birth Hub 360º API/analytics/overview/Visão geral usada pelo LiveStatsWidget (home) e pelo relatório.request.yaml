@@ -1,0 +1,13 @@
+$kind: http-request
+name: Visão geral usada pelo LiveStatsWidget (home) e pelo relatório executivo por IA
+description: ""
+url: "{{baseUrl}}/analytics/overview"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Visão geral usada pelo LiveStatsWidget (home) e pelo relatório.resources/examples
+order: 1000

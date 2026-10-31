@@ -1,0 +1,18 @@
+$kind: http-request
+name: Dispara uma ligação via 3CX (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/integrations/3cx/call"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Dispara uma ligação via 3CX (ADMIN-GESTOR-VENDEDOR).resources/examples
+order: 1000

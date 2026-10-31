@@ -1,0 +1,12 @@
+$kind: http-request
+description: "Status em tempo real do enxame de agentes da organização do usuário autenticado. Status: falha sempre com 500 (PrismaClientValidationError); correção pendente do Agente 07."
+url: "{{baseUrl}}/agent/realtime-dashboard"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Status em tempo real do enxame de agentes (indisponível).resources/examples
+order: 1000

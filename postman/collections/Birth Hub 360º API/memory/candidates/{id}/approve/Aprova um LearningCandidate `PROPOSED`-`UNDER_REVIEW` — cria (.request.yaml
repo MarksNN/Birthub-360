@@ -1,0 +1,47 @@
+$kind: http-request
+name: Aprova um LearningCandidate `PROPOSED`/`UNDER_REVIEW` — cria (ou reaproveita, se reconfirmação idêntica) a linha real na tabela de memória do escopo certo. Quando já existe memória ATIVA com conteúdo DIFERENTE para o mesmo tópico, exige `supersedesMemoryI
+description: ""
+url: "{{baseUrl}}/memory/candidates/:id/approve"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "notes": "string",
+      "supersedesMemoryId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "supersedesMemoryId": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Aprova um LearningCandidate `PROPOSED`-`UNDER_REVIEW` — cria (.resources/examples
+order: 1000

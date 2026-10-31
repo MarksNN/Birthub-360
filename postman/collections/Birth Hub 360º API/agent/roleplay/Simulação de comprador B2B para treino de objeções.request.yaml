@@ -1,0 +1,66 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/agent/roleplay"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "message": "string",
+      "tool": "groq"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "tool": {
+          "type": "string",
+          "enum": [
+            "copilot",
+            "groq",
+            "roleplay",
+            "objections",
+            "qualification",
+            "playbook"
+          ]
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "assistant"
+                ]
+              },
+              "content": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              }
+            },
+            "required": [
+              "role",
+              "content"
+            ]
+          }
+        }
+      },
+      "required": [
+        "message"
+      ]
+    }
+settings: {}
+examples: ./.resources/Simulação de comprador B2B para treino de objeções.resources/examples
+order: 1000

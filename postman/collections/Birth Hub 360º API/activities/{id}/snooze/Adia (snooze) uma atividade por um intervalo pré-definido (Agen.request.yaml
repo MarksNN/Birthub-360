@@ -1,0 +1,48 @@
+$kind: http-request
+name: "Adia (snooze) uma atividade por um intervalo pré-definido (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/activities/:id/snooze"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "duration": "tomorrow"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "enum": [
+            "2h",
+            "tomorrow",
+            "next_week"
+          ]
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Adia (snooze) uma atividade por um intervalo pré-definido (Agen.resources/examples
+order: 1000

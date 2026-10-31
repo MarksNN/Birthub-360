@@ -1,0 +1,48 @@
+$kind: http-request
+name: Adiciona uma observação a um item do Plano Diário.
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan/note"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "itemType": "string",
+      "itemId": "string",
+      "note": "string",
+      "entityType": "string",
+      "entityId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "itemType": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "lead|deal|contact|company — ver DailyPlanItem.bitrixEntityType"
+        },
+        "entityId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "itemType",
+        "itemId",
+        "note"
+      ]
+    }
+settings: {}
+examples: ./.resources/Adiciona uma observação a um item do Plano Diário-.resources/examples
+order: 1000

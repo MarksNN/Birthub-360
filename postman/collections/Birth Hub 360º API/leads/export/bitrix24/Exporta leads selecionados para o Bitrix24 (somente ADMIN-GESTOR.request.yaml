@@ -1,0 +1,18 @@
+$kind: http-request
+name: Exporta leads selecionados para o Bitrix24 (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/leads/export/bitrix24"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Exporta leads selecionados para o Bitrix24 (somente ADMIN-GESTOR.resources/examples
+order: 1000

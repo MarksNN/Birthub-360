@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista o mapeamento semantic_field → campo Bitrix configurado para o tenant
+description: ""
+url: "{{baseUrl}}/copiloto-ia/bitrix-field-mappings"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista o mapeamento semantic_field → campo Bitrix configurado p.resources/examples
+order: 1000

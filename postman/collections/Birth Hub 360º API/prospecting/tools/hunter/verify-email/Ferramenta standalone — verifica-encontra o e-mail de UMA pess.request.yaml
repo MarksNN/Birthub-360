@@ -1,0 +1,34 @@
+$kind: http-request
+name: Ferramenta standalone — verifica/encontra o e-mail de UMA pessoa já identificada, via Hunter.io Email Finder
+description: ""
+url: "{{baseUrl}}/prospecting/tools/hunter/verify-email"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "domain": "string",
+      "fullName": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "domain",
+        "fullName"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — verifica-encontra o e-mail de UMA pess.resources/examples
+order: 1000

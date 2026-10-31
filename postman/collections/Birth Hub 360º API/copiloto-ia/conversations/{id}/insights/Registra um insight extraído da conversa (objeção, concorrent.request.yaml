@@ -1,0 +1,64 @@
+$kind: http-request
+name: Registra um insight extraído da conversa (objeção, concorrente citado, buying signal etc. — ver conversationIntelligence.service.ts)
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/insights"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "type": "string",
+      "valueJson": {},
+      "confidence": 7760.006088665538,
+      "evidenceSegmentIds": [
+        "string",
+        "string"
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "valueJson": {
+          "type": "object"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "evidenceSegmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "type"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra um insight extraído da conversa (objeção, concorrent.resources/examples
+order: 1000

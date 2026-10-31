@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Remove uma busca salva de prospecção da organização autenticada (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/prospecting/saved-searches/:id"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Remove uma busca salva de prospecção da organização autentic.resources/examples
+order: 1000

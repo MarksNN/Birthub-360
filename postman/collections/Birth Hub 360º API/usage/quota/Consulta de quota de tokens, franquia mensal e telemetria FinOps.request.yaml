@@ -1,0 +1,13 @@
+$kind: http-request
+name: Consulta de quota de tokens, franquia mensal e telemetria FinOps (Onda 15)
+description: Retorna o teto mensal de tokens por tier de organização, consumo acumulado no mês corrente, percentual utilizado, estado de alerta (Normal, Warning 80%, Crítico 100%) e indicador de ativação de fallback para modelos econômicos (handoff 10-para-23). Restrito a ADMIN e GESTOR.
+url: "{{baseUrl}}/usage/quota"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consulta de quota de tokens, franquia mensal e telemetria FinOps.resources/examples
+order: 1000

@@ -1,0 +1,34 @@
+$kind: http-example
+name: "Stream `text/event-stream` de eventos da missão, terminando em `event: end`"
+request:
+  url: "{{baseUrl}}/agent/swarm/stream"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: text/event-stream
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "mission": "string",
+        "sessionId": "string",
+        "leadId": "string"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/event-stream
+  body:
+    type: text
+    content: string
+    $type: |-
+      {
+        "type": "string"
+      }
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Reexecuta uma extração com falha ou interrompida (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/extractions/:id/retry"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Reexecuta uma extração com falha ou interrompida (somente ADMI.resources/examples
+order: 1000

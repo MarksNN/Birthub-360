@@ -1,0 +1,26 @@
+$kind: http-request
+name: "#20 Sanitiza um texto livre removendo/mascarando dados pessoais (LGPD)"
+description: ""
+url: "{{baseUrl}}/intelligence/suite/lgpd/sanitize"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "text": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/#20 Sanitiza um texto livre removendo-mascarando dados pessoais.resources/examples
+order: 1000

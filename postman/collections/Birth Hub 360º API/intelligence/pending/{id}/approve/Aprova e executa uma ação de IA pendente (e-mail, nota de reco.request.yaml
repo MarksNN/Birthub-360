@@ -1,0 +1,30 @@
+$kind: http-request
+name: Aprova e executa uma ação de IA pendente (e-mail, nota de recomendação ou follow-up)
+description: ""
+url: "{{baseUrl}}/intelligence/pending/:id/approve"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Aprova e executa uma ação de IA pendente (e-mail, nota de reco.resources/examples
+order: 1000

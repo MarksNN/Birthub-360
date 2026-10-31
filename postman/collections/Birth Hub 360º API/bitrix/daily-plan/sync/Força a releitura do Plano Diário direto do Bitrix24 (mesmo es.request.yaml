@@ -1,0 +1,26 @@
+$kind: http-request
+name: Força a releitura do Plano Diário direto do Bitrix24 (mesmo escopo de `/bitrix/daily-plan`).
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan/sync"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "assignedById": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "assignedById": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Força a releitura do Plano Diário direto do Bitrix24 (mesmo es.resources/examples
+order: 1000

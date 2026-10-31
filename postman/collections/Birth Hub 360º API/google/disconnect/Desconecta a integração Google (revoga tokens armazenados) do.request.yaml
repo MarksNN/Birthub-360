@@ -1,0 +1,13 @@
+$kind: http-request
+name: Desconecta a integração Google (revoga tokens armazenados) do tenant
+description: ""
+url: "{{baseUrl}}/google/disconnect"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Desconecta a integração Google (revoga tokens armazenados) do.resources/examples
+order: 1000

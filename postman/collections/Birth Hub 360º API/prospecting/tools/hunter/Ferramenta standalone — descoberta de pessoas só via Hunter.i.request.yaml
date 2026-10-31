@@ -1,0 +1,33 @@
+$kind: http-request
+name: Ferramenta standalone — descoberta de pessoas só via Hunter.io Domain Search, sem Apollo People Search
+description: ""
+url: "{{baseUrl}}/prospecting/tools/hunter"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "domain": "string",
+      "limit": 2862
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "domain"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — descoberta de pessoas só via Hunter.i.resources/examples
+order: 1000

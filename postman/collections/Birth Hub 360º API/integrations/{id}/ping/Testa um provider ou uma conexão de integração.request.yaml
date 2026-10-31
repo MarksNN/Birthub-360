@@ -1,0 +1,74 @@
+$kind: http-request
+description: Restrito a ADMIN/GESTOR.
+url: "{{baseUrl}}/integrations/:id/ping"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: Identificador do provider ou de uma conexão persistida
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "provider": "string",
+      "token": "string",
+      "apiKey": "string",
+      "accessToken": "string",
+      "domain": "string",
+      "boardId": "string",
+      "webhookUrl": "string",
+      "config": {
+        "key_0": 778,
+        "key_1": 1932
+      }
+    }
+  $type: |-
+    {
+      "description": "Campos opcionais aceitos pelo schema do endpoint de teste de integração",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "boardId": {
+          "type": "string"
+        },
+        "webhookUrl": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Testa um provider ou uma conexão de integração.resources/examples
+order: 1000

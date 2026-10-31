@@ -1,0 +1,54 @@
+$kind: http-request
+name: Cria uma nova atividade avulsa no Plano Diário (registrada localmente na Central).
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan/activity"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "string",
+      "channel": "string",
+      "contactName": "string",
+      "phone": "string",
+      "dueTime": "string",
+      "observations": "string",
+      "leadId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "contactName": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "dueTime": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "string"
+        },
+        "leadId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "channel"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma nova atividade avulsa no Plano Diário (registrada loca.resources/examples
+order: 1000

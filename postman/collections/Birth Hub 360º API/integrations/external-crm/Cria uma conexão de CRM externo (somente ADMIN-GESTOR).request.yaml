@@ -1,0 +1,44 @@
+$kind: http-request
+name: Cria uma conexão de CRM externo (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/integrations/external-crm"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "provider": "string",
+      "label": "string",
+      "config": {},
+      "inboundEventsEnabled": true
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object",
+          "description": "Credenciais/configuração do provider (cifradas em repouso)"
+        },
+        "inboundEventsEnabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "provider",
+        "label",
+        "config"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma conexão de CRM externo (somente ADMIN-GESTOR).resources/examples
+order: 2000

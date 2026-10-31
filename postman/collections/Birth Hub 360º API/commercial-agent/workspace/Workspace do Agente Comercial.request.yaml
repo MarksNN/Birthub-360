@@ -1,0 +1,10 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/commercial-agent/workspace"
+method: GET
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Workspace do Agente Comercial.resources/examples
+order: 1000

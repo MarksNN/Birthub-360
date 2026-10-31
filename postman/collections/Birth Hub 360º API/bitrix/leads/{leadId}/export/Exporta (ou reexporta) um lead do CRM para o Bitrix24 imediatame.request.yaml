@@ -1,0 +1,51 @@
+$kind: http-request
+name: "Exporta (ou reexporta) um lead do CRM para o Bitrix24 imediatamente (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/bitrix/leads/:leadId/export"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "connectionId": "string",
+      "statusId": "string",
+      "assignedById": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "connectionId": {
+          "type": "string"
+        },
+        "statusId": {
+          "type": "string"
+        },
+        "assignedById": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Exporta (ou reexporta) um lead do CRM para o Bitrix24 imediatame.resources/examples
+order: 1000

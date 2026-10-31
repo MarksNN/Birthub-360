@@ -1,0 +1,13 @@
+$kind: http-request
+name: Forecast auto-calibrado pelo erro histórico real dos snapshots mensais (somente ADMIN/GESTOR).
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/forecast-calibration"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Forecast auto-calibrado pelo erro histórico real dos snapshots.resources/examples
+order: 1000

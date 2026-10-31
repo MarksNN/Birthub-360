@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista as extrações históricas do Bitrix24 (somente ADMIN/GESTOR — uma extração pode trazer todo o dado histórico da conta)
+description: ""
+url: "{{baseUrl}}/bitrix/extractions"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as extrações históricas do Bitrix24 (somente ADMIN-GEST.resources/examples
+order: 1000

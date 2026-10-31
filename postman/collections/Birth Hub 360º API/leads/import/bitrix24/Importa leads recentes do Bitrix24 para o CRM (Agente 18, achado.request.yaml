@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Importa leads recentes do Bitrix24 para o CRM (Agente 18, achado de auditoria de contrato: método documentado estava errado — `GET`, o real é `POST`; o código (`LeadController.importFromBitrix24` → `leadUseCases.importRecentBitrixLeads`) não aceita query "
+description: ""
+url: "{{baseUrl}}/leads/import/bitrix24"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Importa leads recentes do Bitrix24 para o CRM (Agente 18, achado.resources/examples
+order: 1000

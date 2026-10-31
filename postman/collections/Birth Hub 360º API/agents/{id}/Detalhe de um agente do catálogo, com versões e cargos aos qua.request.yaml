@@ -1,0 +1,30 @@
+$kind: http-request
+name: Detalhe de um agente do catálogo, com versões e cargos aos quais está concedido
+description: ""
+url: "{{baseUrl}}/agents/:id"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Detalhe de um agente do catálogo, com versões e cargos aos qua.resources/examples
+order: 1000

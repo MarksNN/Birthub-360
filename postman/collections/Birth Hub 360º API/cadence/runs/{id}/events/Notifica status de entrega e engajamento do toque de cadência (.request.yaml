@@ -1,0 +1,78 @@
+$kind: http-request
+name: Notifica status de entrega e engajamento do toque de cadência (Onda 15 / CadenceExecutionPort)
+description: Recebe atualizações de status de entrega (`delivered`, `bounced`, `replied`, `failed`) emitidas pelos despachantes multicanal (WhatsApp, e-mail, SDR Voice) para alimentar o Swarm e a máquina de estados do run (handoff 13-para-17).
+url: "{{baseUrl}}/cadence/runs/:id/events"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "stepOrder": 1000,
+      "channel": "email",
+      "status": "failed",
+      "details": "string",
+      "timestamp": "1999-12-12T05:59:43.467Z"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "stepOrder": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "whatsapp",
+            "voice"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "delivered",
+            "bounced",
+            "replied",
+            "failed"
+          ]
+        },
+        "details": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "stepOrder",
+        "channel",
+        "status"
+      ]
+    }
+settings: {}
+examples: ./.resources/Notifica status de entrega e engajamento do toque de cadência (.resources/examples
+order: 1000

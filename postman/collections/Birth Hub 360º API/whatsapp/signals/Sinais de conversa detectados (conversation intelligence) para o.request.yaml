@@ -1,0 +1,13 @@
+$kind: http-request
+name: Sinais de conversa detectados (conversation intelligence) para o tenant
+description: ""
+url: "{{baseUrl}}/whatsapp/signals"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Sinais de conversa detectados (conversation intelligence) para o.resources/examples
+order: 1000

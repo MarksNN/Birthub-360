@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Aprova uma versão pendente do perfil de estilo aprendido pelo LearningAgent do (tenant, usuário) autenticado — gate de aprovação humana (item 103 da constituição de produto). Self-service: identidade sempre de `req.user`, nunca de body/querystring."
+description: ""
+url: "{{baseUrl}}/agent/swarm/learn/approve"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "targetVersion": 6573
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "targetVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "targetVersion"
+      ]
+    }
+settings: {}
+examples: ./.resources/Aprova uma versão pendente do perfil de estilo aprendido pelo L.resources/examples
+order: 1000

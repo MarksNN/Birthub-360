@@ -1,0 +1,30 @@
+$kind: http-request
+name: Remove um lead (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/leads/:id"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Remove um lead (somente ADMIN-GESTOR).resources/examples
+order: 3000

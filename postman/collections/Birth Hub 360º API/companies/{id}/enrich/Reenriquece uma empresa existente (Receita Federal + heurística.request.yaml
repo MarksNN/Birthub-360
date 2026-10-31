@@ -1,0 +1,30 @@
+$kind: http-request
+name: Reenriquece uma empresa existente (Receita Federal + heurísticas de domínio/e-mail)
+description: ""
+url: "{{baseUrl}}/companies/:id/enrich"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Reenriquece uma empresa existente (Receita Federal + heurística.resources/examples
+order: 1000

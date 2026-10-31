@@ -1,0 +1,26 @@
+$kind: http-example
+name: Papel insuficiente (só ADMIN/GESTOR)
+request:
+  url: "{{baseUrl}}/mesa-tratamento/lead/:id/reassign"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "bitrixUserId": "string"
+      }
+response:
+  statusCode: 403
+  statusText: Forbidden
+  body:
+    type: text
+    content: ""
+order: 3000

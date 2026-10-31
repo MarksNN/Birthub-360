@@ -1,0 +1,30 @@
+$kind: http-request
+name: Desconecta a conexão Omie (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/integrations/omie/disconnect/:connectionId"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: connectionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Desconecta a conexão Omie (somente ADMIN-GESTOR).resources/examples
+order: 1000

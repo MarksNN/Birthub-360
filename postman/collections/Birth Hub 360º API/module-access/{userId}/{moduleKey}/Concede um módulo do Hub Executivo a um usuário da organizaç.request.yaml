@@ -1,0 +1,46 @@
+$kind: http-request
+name: Concede um módulo do Hub Executivo a um usuário da organização (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/module-access/:userId/:moduleKey"
+method: PUT
+headers:
+  Accept: application/json
+pathVariables:
+  - key: userId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: moduleKey
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Concede um módulo do Hub Executivo a um usuário da organizaç.resources/examples
+order: 1000

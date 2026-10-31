@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/market-intelligence/accounts/:id/evidence?page=1&limit=20&evidenceType=INFERENCE&subjectType=string"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    page: "1"
+    limit: "20"
+    evidenceType: INFERENCE
+    subjectType: string
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Id da Company do CRM do tenant (1–128 chars)
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 403
+  statusText: Forbidden
+  body:
+    type: text
+    content: ""
+order: 4000

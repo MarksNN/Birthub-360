@@ -1,0 +1,30 @@
+$kind: http-request
+name: Remove um documento (somente ADMIN/GESTOR — mais restrito que os demais endpoints deste router, que aceitam também VENDEDOR)
+description: ""
+url: "{{baseUrl}}/knowledge/:id"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Remove um documento (somente ADMIN-GESTOR — mais restrito que.resources/examples
+order: 3000

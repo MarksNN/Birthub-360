@@ -1,0 +1,19 @@
+$kind: http-request
+name: Descoberta de candidatos via IA a partir de um ICP (Perfil de Cliente Ideal)
+description: ""
+url: "{{baseUrl}}/prospecting/discover"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Critérios de busca (ProspectCriteria) — formato livre, definido em prospecting.service.ts",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Descoberta de candidatos via IA a partir de um ICP (Perfil de Cl.resources/examples
+order: 1000

@@ -1,0 +1,35 @@
+$kind: http-request
+name: Registra um bloco de foco Pomodoro concluído (alimenta o dashboard SDR). O timer em si roda no cliente (localStorage) — só blocos de foco CONCLUÍDOS chegam aqui.
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/pomodoro/session"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "durationMinutes": 9692.637492182515,
+      "cycleNumber": 6371.957934300701
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "durationMinutes": {
+          "type": "number",
+          "description": "Duração do bloco em minutos"
+        },
+        "cycleNumber": {
+          "type": "number",
+          "description": "Número do ciclo dentro da sequência Pomodoro"
+        }
+      },
+      "required": [
+        "durationMinutes"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra um bloco de foco Pomodoro concluído (alimenta o dashbo.resources/examples
+order: 1000

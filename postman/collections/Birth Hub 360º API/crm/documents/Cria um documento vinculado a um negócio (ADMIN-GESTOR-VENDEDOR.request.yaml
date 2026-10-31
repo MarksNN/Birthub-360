@@ -1,0 +1,19 @@
+$kind: http-request
+name: Cria um documento vinculado a um negócio (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/crm/documents"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Formato de `crmDocumentSchema` (crm360.schema.ts)",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Cria um documento vinculado a um negócio (ADMIN-GESTOR-VENDEDOR.resources/examples
+order: 2000

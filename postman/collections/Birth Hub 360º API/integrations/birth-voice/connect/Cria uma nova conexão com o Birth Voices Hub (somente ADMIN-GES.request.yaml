@@ -1,0 +1,18 @@
+$kind: http-request
+name: Cria uma nova conexão com o Birth Voices Hub (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/connect"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Cria uma nova conexão com o Birth Voices Hub (somente ADMIN-GES.resources/examples
+order: 1000

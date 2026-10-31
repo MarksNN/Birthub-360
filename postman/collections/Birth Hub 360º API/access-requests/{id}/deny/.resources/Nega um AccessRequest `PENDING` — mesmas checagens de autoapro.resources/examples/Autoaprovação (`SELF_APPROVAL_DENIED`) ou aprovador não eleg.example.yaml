@@ -1,0 +1,26 @@
+$kind: http-example
+name: Autoaprovação (`SELF_APPROVAL_DENIED`) ou aprovador não elegível para a categoria (`APPROVER_NOT_ELIGIBLE`)
+request:
+  url: "{{baseUrl}}/access-requests/:id/deny"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "notes": "string"
+      }
+response:
+  statusCode: 403
+  statusText: Forbidden
+  body:
+    type: text
+    content: ""
+order: 2000

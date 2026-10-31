@@ -1,0 +1,13 @@
+$kind: http-request
+name: Playbook Vivo (somente ADMIN/GESTOR) — detecta abordagens que converteram melhor a partir de outcomes POSITIVOS reais e confirmados, agrupados por vendedor+segmento (nunca persiste sozinho)
+description: Agrupa AIPendingAction executadas com outcomeStatus POSITIVO por (Lead.owner, segmento); descarta grupos com menos de 2 casos reais e leads sem owner definido (nunca fabrica autoria). Cada sugestão retornada precisa de POST /playbook/living-playbook/broadcast (ou adição manual à Matriz de Objeções) para virar comunicado real ao time.
+url: "{{baseUrl}}/playbook/living-playbook/generate-suggestions"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Playbook Vivo (somente ADMIN-GESTOR) — detecta abordagens que.resources/examples
+order: 1000

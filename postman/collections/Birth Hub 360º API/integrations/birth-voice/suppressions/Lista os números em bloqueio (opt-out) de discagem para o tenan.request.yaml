@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os números em bloqueio (opt-out) de discagem para o tenant
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/suppressions"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os números em bloqueio (opt-out) de discagem para o tenan.resources/examples
+order: 1000

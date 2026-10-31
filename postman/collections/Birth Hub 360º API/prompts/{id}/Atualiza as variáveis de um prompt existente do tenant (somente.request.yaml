@@ -1,0 +1,46 @@
+$kind: http-request
+name: Atualiza as variáveis de um prompt existente do tenant (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/prompts/:id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "variables": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "variables"
+      ]
+    }
+settings: {}
+examples: ./.resources/Atualiza as variáveis de um prompt existente do tenant (somente.resources/examples
+order: 1000

@@ -1,0 +1,42 @@
+$kind: http-example
+name: leadIds ou updates ausente/inválido
+request:
+  url: "{{baseUrl}}/leads/batch-update"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "leadIds": [
+          "string"
+        ],
+        "updates": {
+          "status": "string",
+          "owner": "string",
+          "tags": [
+            "string",
+            "string"
+          ],
+          "addTags": [
+            "string",
+            "string"
+          ],
+          "removeTags": [
+            "string",
+            "string"
+          ]
+        }
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: text
+    content: ""
+order: 2000

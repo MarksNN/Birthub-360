@@ -1,0 +1,55 @@
+$kind: http-request
+name: Registra um relato de problema (botão flutuante "Reportar problema")
+description: |
+  Qualquer papel autenticado pode reportar. Limitado por organização
+  (`BUG_REPORT_RATE_LIMIT_MAX`, default 10/15min). O campo `context` é
+  sanitizado no backend (redação de token/segredo, truncamento) antes de
+  persistir — ver `src/features/bug-reports/domain/bugReport.sanitize.ts`.
+url: "{{baseUrl}}/bug-reports"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "string",
+      "description": "string",
+      "severity": "MEDIUM",
+      "context": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 5000
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
+        },
+        "context": {
+          "type": "object",
+          "description": "Capturado automaticamente pelo frontend (URL, user agent, viewport, últimos logs)"
+        }
+      },
+      "required": [
+        "title",
+        "description"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra um relato de problema (botão flutuante -Reportar probl.resources/examples
+order: 1000

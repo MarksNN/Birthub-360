@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Lista as buscas salvas de prospecção da organização autenticada (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/prospecting/saved-searches"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as buscas salvas de prospecção da organização autentic.resources/examples
+order: 1000

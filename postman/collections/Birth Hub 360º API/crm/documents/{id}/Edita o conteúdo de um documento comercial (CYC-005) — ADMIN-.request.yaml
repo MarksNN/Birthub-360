@@ -1,0 +1,36 @@
+$kind: http-request
+name: Edita o conteúdo de um documento comercial (CYC-005) — ADMIN/GESTOR/VENDEDOR. Cada chamada cria uma nova `CrmCommercialDocumentVersion` (histórico imutável, nunca sobrescrito).
+description: ""
+url: "{{baseUrl}}/crm/documents/:id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Formato de `crmDocumentUpdateSchema` (crm360.schema.ts)",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Edita o conteúdo de um documento comercial (CYC-005) — ADMIN-.resources/examples
+order: 3000

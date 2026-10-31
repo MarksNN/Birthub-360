@@ -1,0 +1,46 @@
+$kind: http-request
+name: Revoga um `TemporaryCapabilityGrant` ativo antes de expirar — permitido a ADMIN ou a qualquer usuário que atenda a política de aprovação da categoria do pedido original. `capabilityAuthorization.service.ts` para de considerar o grant na próxima chamada.
+description: ""
+url: "{{baseUrl}}/access-requests/grants/:grantId/revoke"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: grantId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "reason": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ]
+    }
+settings: {}
+examples: ./.resources/Revoga um `TemporaryCapabilityGrant` ativo antes de expirar —.resources/examples
+order: 1000

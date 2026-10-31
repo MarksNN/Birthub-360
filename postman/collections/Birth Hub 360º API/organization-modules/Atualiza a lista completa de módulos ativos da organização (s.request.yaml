@@ -1,0 +1,32 @@
+$kind: http-request
+name: Atualiza a lista completa de módulos ativos da organização (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/organization-modules"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "modules": [
+        "string",
+        "string"
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Atualiza a lista completa de módulos ativos da organização (s.resources/examples
+order: 2000

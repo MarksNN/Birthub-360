@@ -1,0 +1,43 @@
+$kind: http-request
+name: "Enriquecimento em cascata de uma empresa (Apollo → Hunter → Google Places), Agente 18, achado de auditoria: endpoint real, sem entrada aqui. Com `async: true` no corpo e fila disponível, enfileira o job em vez de rodar de forma síncrona."
+description: ""
+url: "{{baseUrl}}/prospecting/companies/:id/enrich-cascade"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "async": false
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "async": {
+          "type": "boolean"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Enriquecimento em cascata de uma empresa (Apollo → Hunter →.resources/examples
+order: 1000

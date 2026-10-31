@@ -1,0 +1,13 @@
+$kind: http-request
+name: Consulta status de execução e métricas do Swarm Scheduler (Onda 15)
+description: Retorna o estado operacional do agendador autônomo, última execução, organizações ativas e volume de recomendações geradas.
+url: "{{baseUrl}}/intelligence/swarm/status"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consulta status de execução e métricas do Swarm Scheduler (On.resources/examples
+order: 1000

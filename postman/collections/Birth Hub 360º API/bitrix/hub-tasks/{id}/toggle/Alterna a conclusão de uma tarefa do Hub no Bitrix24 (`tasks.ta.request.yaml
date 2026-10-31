@@ -1,0 +1,46 @@
+$kind: http-request
+name: Alterna a conclusão de uma tarefa do Hub no Bitrix24 (`tasks.task.complete`/`tasks.task.renew` conforme `done`).
+description: ""
+url: "{{baseUrl}}/bitrix/hub-tasks/:id/toggle"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "done": true
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "done": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "done"
+      ]
+    }
+settings: {}
+examples: ./.resources/Alterna a conclusão de uma tarefa do Hub no Bitrix24 (`tasks.ta.resources/examples
+order: 1000

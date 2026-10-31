@@ -1,0 +1,51 @@
+$kind: http-example
+name: corpo da requisição inválido (transcript vazio, enum fora do domínio, etc.)
+request:
+  url: "{{baseUrl}}/intelligence/roleplay/finish"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "brand": "Birth Hub 360",
+        "brandName": "string",
+        "brandDescription": "string",
+        "personaId": "string",
+        "personaLabel": "string",
+        "personaKey": "tech_director",
+        "difficulty": "medio",
+        "durationSeconds": 7718,
+        "transcript": [
+          {
+            "sender": "bot",
+            "text": "string"
+          }
+        ],
+        "turnEvaluations": [
+          {
+            "clarity": 38,
+            "objectionHandling": 73,
+            "total": 26,
+            "feedback": "string"
+          },
+          {
+            "clarity": 20,
+            "objectionHandling": 31,
+            "total": 59,
+            "feedback": "string"
+          }
+        ]
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: text
+    content: ""
+order: 2000

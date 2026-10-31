@@ -1,0 +1,89 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/leads/:leadId/notes"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    leadId: string
+  body:
+    type: json
+    content: |-
+      {
+        "content": "string",
+        "author": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "content": "string",
+          "author": "string",
+          "id": "string",
+          "leadId": "string",
+          "organizationId": "string",
+          "createdAt": "2004-09-26T23:50:45.652Z"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "leadId": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "author": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "content",
+                  "author"
+                ]
+              }
+            ]
+          }
+        }
+      }
+order: 1000

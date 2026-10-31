@@ -1,0 +1,11 @@
+name: Birthub 360 — Local
+values:
+  - key: baseUrl
+    value: http://localhost:3000
+    enabled: true
+  - key: accessToken
+    value: ""
+    enabled: true
+  - key: organizationId
+    value: ""
+    enabled: true

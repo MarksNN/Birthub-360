@@ -1,0 +1,30 @@
+$kind: http-request
+name: Desativa uma sequência de cadência da organização autenticada. Restrito a ADMIN/GESTOR/CLOSER/SDR.
+description: ""
+url: "{{baseUrl}}/cadence/sequences/:id/deactivate"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Desativa uma sequência de cadência da organização autenticad.resources/examples
+order: 1000

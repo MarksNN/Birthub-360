@@ -1,0 +1,32 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/mobile/field-meetings/sync"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "title": "string",
+        "leadId": "string",
+        "audioData": "string",
+        "audioMimeType": "string",
+        "audioSizeBytes": 9670,
+        "durationMs": 5687,
+        "recordedAt": "2021-04-30T03:00:11.169Z",
+        "meetingNotes": "string",
+        "consentMethod": "string",
+        "textVersion": "string"
+      }
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  body:
+    type: text
+    content: ""
+order: 3000

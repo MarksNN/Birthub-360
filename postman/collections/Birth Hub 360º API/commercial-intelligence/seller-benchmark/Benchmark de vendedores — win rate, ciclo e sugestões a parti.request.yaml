@@ -1,0 +1,13 @@
+$kind: http-request
+name: Benchmark de vendedores — win rate, ciclo e sugestões a partir do top performer, respeitando o mínimo de negócios para ranking (somente ADMIN/GESTOR).
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/seller-benchmark"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Benchmark de vendedores — win rate, ciclo e sugestões a parti.resources/examples
+order: 1000

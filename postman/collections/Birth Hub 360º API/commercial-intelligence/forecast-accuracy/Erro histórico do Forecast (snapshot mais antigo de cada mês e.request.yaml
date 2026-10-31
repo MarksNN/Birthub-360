@@ -1,0 +1,13 @@
+$kind: http-request
+name: Erro histórico do Forecast (snapshot mais antigo de cada mês encerrado vs. realizado) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/forecast-accuracy"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Erro histórico do Forecast (snapshot mais antigo de cada mês e.resources/examples
+order: 1000

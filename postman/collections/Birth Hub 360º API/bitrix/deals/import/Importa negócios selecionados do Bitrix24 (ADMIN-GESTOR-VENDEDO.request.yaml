@@ -1,0 +1,18 @@
+$kind: http-request
+name: Importa negócios selecionados do Bitrix24 (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/bitrix/deals/import"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Importa negócios selecionados do Bitrix24 (ADMIN-GESTOR-VENDEDO.resources/examples
+order: 1000

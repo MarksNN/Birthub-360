@@ -1,0 +1,30 @@
+$kind: http-request
+name: Busca por nome do Lead/Contato/Company (título, nome do contato, razão social ou nome fantasia), retornando até 10 candidatos — ao contrário de /leads/lookup (e-mail/URL do Bitrix24/id), que resolve para no máximo um resultado exato. Usada pela extensão C
+description: ""
+url: "{{baseUrl}}/copiloto-ia/leads/search?q=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: q
+    value: string
+    disabled: false
+    description: Mínimo de 2 caracteres.
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Busca por nome do Lead-Contato-Company (título, nome do contato.resources/examples
+order: 1000

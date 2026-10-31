@@ -1,0 +1,12 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/intelligence/suite/inventory"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Inventário das 20 capacidades de IA do AI Suite.resources/examples
+order: 1000

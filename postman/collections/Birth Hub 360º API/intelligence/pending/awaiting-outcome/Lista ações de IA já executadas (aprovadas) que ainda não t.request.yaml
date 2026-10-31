@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista ações de IA já executadas (aprovadas) que ainda não têm resultado de negócio registrado — fila do Closed-Loop Intelligence (item 103 da constituição de produto).
+description: ""
+url: "{{baseUrl}}/intelligence/pending/awaiting-outcome"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista ações de IA já executadas (aprovadas) que ainda não t.resources/examples
+order: 1000

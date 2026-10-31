@@ -1,0 +1,36 @@
+$kind: http-request
+name: Lista o catálogo de agentes (leitura livre, qualquer usuário autenticado)
+description: ""
+url: "{{baseUrl}}/agents?activeOnly=false&jobRoleId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: activeOnly
+    value: "false"
+    disabled: false
+    description: 'Quando "false", inclui também agentes desativados. Default: true.'
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      }
+  - key: jobRoleId
+    value: string
+    disabled: false
+    description: Filtra pelo cargo principal do agente
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista o catálogo de agentes (leitura livre, qualquer usuário a.resources/examples
+order: 1000

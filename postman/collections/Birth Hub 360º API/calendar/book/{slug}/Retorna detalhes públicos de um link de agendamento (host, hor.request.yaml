@@ -1,0 +1,28 @@
+$kind: http-request
+name: Retorna detalhes públicos de um link de agendamento (host, horários disponíveis)
+description: ""
+url: "{{baseUrl}}/calendar/book/:slug"
+method: GET
+pathVariables:
+  - key: slug
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna detalhes públicos de um link de agendamento (host, hor.resources/examples
+order: 1000

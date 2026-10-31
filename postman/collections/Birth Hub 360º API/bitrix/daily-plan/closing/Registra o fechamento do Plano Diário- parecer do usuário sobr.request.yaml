@@ -1,0 +1,45 @@
+$kind: http-request
+name: "Registra o fechamento do Plano Diário: parecer do usuário sobre o dia anterior e metas para o novo dia."
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan/closing"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "referenceDate": "string",
+      "userComment": "string",
+      "nextDayGoals": [
+        "string",
+        "string"
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "referenceDate": {
+          "type": "string",
+          "description": "YYYY-MM-DD, fuso do time comercial"
+        },
+        "userComment": {
+          "type": "string"
+        },
+        "nextDayGoals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "referenceDate",
+        "userComment"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra o fechamento do Plano Diário- parecer do usuário sobr.resources/examples
+order: 2000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Gera um FAQ via IA a partir de um documento já ingerido na base de conhecimento (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/knowledge/generate-faq"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "documentId": "d7e62b72-7d73-7a4b-9640-1c36cbb00971"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "documentId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera um FAQ via IA a partir de um documento já ingerido na base.resources/examples
+order: 1000

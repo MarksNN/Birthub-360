@@ -1,0 +1,34 @@
+$kind: http-request
+name: "Inicia uma execução de cadência para um lead a partir de uma sequência (Agente 18, achado de auditoria: endpoint real, sem entrada aqui — pré-requisito para o runtime de `cadenceRun.worker.ts` ter efeito prático). Restrito a ADMIN/GESTOR/CLOSER/SDR."
+description: ""
+url: "{{baseUrl}}/cadence/runs"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadId": "string",
+      "sequenceId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string"
+        },
+        "sequenceId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "leadId",
+        "sequenceId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Inicia uma execução de cadência para um lead a partir de uma.resources/examples
+order: 2000

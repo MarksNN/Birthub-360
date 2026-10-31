@@ -1,0 +1,30 @@
+$kind: http-request
+name: Rejeita uma versão pendente do perfil de estilo aprendido pelo LearningAgent do (tenant, usuário) autenticado — nunca vira `activeVersion`, mas permanece no histórico (append-only).
+description: ""
+url: "{{baseUrl}}/agent/swarm/learn/reject"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "targetVersion": 6573
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "targetVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "targetVersion"
+      ]
+    }
+settings: {}
+examples: ./.resources/Rejeita uma versão pendente do perfil de estilo aprendido pelo.resources/examples
+order: 1000

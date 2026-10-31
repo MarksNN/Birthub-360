@@ -1,0 +1,63 @@
+$kind: http-request
+name: Executa um agente sobre uma capability — passa sempre pelo Capability & Permission Engine (PROMPT 3) antes de qualquer execução real. Identidade/tenant sempre da sessão autenticada, nunca do corpo da requisição. `status=SUCCEEDED` só quando o binding é VE
+description: ""
+url: "{{baseUrl}}/agents/:agentCode/run"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: agentCode
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "requestedCapability": "string",
+      "mission": "string",
+      "resource": {},
+      "context": {},
+      "correlationId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "requestedCapability": {
+          "type": "string"
+        },
+        "mission": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "object"
+        },
+        "context": {
+          "type": "object"
+        },
+        "correlationId": {
+          "type": "string",
+          "description": "Chave de idempotência — reexecutar com o mesmo valor devolve o mesmo resultado já persistido."
+        }
+      },
+      "required": [
+        "requestedCapability"
+      ]
+    }
+settings: {}
+examples: ./.resources/Executa um agente sobre uma capability — passa sempre pelo Cap.resources/examples
+order: 1000

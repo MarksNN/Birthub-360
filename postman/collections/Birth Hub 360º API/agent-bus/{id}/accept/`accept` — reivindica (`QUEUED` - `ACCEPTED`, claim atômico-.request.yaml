@@ -1,0 +1,30 @@
+$kind: http-request
+name: "`accept` — reivindica (`QUEUED` -> `ACCEPTED`, claim atômico: nunca duas execuções reais para o mesmo handoff mesmo sob corrida) e entrega imediatamente ao AgentRuntime (`RUNNING` -> `COMPLETED`/`FAILED`/`DENIED`), reusando a idempotência de `correlationI"
+description: ""
+url: "{{baseUrl}}/agent-bus/:id/accept"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/`accept` — reivindica (`QUEUED` - `ACCEPTED`, claim atômico-.resources/examples
+order: 1000

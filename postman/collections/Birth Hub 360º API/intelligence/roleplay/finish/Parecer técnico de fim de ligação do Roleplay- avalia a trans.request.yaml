@@ -1,0 +1,160 @@
+$kind: http-request
+name: "Parecer técnico de fim de ligação do Roleplay: avalia a transcrição completa da chamada simulada (rapport, investigação de dores, tratamento de objeções, fechamento) via IA e persiste a sessão (RoleplaySession) escopada por usuário/marca."
+description: ""
+url: "{{baseUrl}}/intelligence/roleplay/finish"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "brand": "Birth Hub 360",
+      "brandName": "string",
+      "brandDescription": "string",
+      "personaId": "string",
+      "personaLabel": "string",
+      "personaKey": "tech_director",
+      "difficulty": "medio",
+      "durationSeconds": 7718,
+      "transcript": [
+        {
+          "sender": "bot",
+          "text": "string"
+        }
+      ],
+      "turnEvaluations": [
+        {
+          "clarity": 38,
+          "objectionHandling": 73,
+          "total": 26,
+          "feedback": "string"
+        },
+        {
+          "clarity": 20,
+          "objectionHandling": 31,
+          "total": 59,
+          "feedback": "string"
+        }
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "enum": [
+            "Birth Hub 360"
+          ]
+        },
+        "brandName": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "brandDescription": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "personaId": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "personaLabel": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "personaKey": {
+          "type": "string",
+          "enum": [
+            "skeptical_cfo",
+            "strict_buyer",
+            "tech_director"
+          ]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "facil",
+            "medio",
+            "dificil"
+          ]
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "transcript": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sender": {
+                "type": "string",
+                "enum": [
+                  "bot",
+                  "user"
+                ]
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "sender",
+              "text"
+            ]
+          }
+        },
+        "turnEvaluations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "clarity": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "objectionHandling": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "feedback": {
+                "type": "string",
+                "maxLength": 800
+              }
+            },
+            "required": [
+              "clarity",
+              "objectionHandling",
+              "total",
+              "feedback"
+            ]
+          }
+        }
+      },
+      "required": [
+        "brand",
+        "brandName",
+        "brandDescription",
+        "personaId",
+        "personaLabel",
+        "personaKey",
+        "difficulty",
+        "durationSeconds",
+        "transcript",
+        "turnEvaluations"
+      ]
+    }
+settings: {}
+examples: ./.resources/Parecer técnico de fim de ligação do Roleplay- avalia a trans.resources/examples
+order: 1000

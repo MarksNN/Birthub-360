@@ -1,0 +1,38 @@
+$kind: http-request
+name: Cria um novo prompt override (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/prompts"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "category": "string",
+      "variables": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "category"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria um novo prompt override (somente ADMIN-GESTOR).resources/examples
+order: 2000

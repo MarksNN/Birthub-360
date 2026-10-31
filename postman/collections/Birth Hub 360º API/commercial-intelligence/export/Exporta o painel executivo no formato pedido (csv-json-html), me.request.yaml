@@ -1,0 +1,43 @@
+$kind: http-request
+name: "Exporta o painel executivo no formato pedido (csv/json/html), mesmo filtro das demais telas do módulo (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Devolve o conteúdo bruto do arquivo (`Content-Disposition: attachment`), não o envelop"
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/export?format=json&month=string&owner=string"
+method: GET
+headers:
+  Accept: text/csv
+queryParams:
+  - key: format
+    value: json
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "default": "json",
+            "enum": [
+              "csv",
+              "json",
+              "html"
+            ]
+          }
+        }
+      }
+  - key: month
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: owner
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Exporta o painel executivo no formato pedido (csv-json-html), me.resources/examples
+order: 1000

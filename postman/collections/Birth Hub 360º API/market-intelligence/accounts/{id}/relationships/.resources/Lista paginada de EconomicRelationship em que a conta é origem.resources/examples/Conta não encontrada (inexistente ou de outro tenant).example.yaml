@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/market-intelligence/accounts/:id/relationships?page=1&limit=20&status=Rejected&relationType=string"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    page: "1"
+    limit: "20"
+    status: Rejected
+    relationType: string
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Id da Company do CRM do tenant (1–128 chars)
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: text
+    content: ""
+order: 5000

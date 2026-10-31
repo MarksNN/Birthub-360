@@ -1,0 +1,38 @@
+$kind: http-request
+name: Gera nova versão do snapshot de inteligência a partir de dados reais da conta
+description: "Papéis: ADMIN, GESTOR, CLOSER ou SDR (VISUALIZADOR → 403). Sem corpo. Exige identidade rastreável (CNPJ, site, enriquecimento com fonte+data ou evidência FACT existente); caso contrário 422. Monta fatos a partir dos campos do CRM/enriquecimento, calcula `inputHash` e, em transação Serializable, reaproveita o snapshot se o hash não mudou (200, `created: false`) ou cria nova versão + `IntelligenceEvidence` por campo (201, `created: true`). Escritas carimbadas com o `organizationId` da sessão. Conflito de concorrência persistente → 409."
+url: "{{baseUrl}}/market-intelligence/accounts/:id/refresh"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: Id da Company do CRM do tenant (1–128 chars)
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+auth:
+  type: apikey
+  credentials:
+    key: better-auth.session_token
+    value: "{{apiKey}}"
+    in: header
+settings: {}
+examples: ./.resources/Gera nova versão do snapshot de inteligência a partir de dados.resources/examples
+order: 1000

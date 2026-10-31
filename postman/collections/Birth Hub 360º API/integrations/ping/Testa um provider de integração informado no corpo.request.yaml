@@ -1,0 +1,57 @@
+$kind: http-request
+description: Restrito a ADMIN/GESTOR; usa o mesmo handler de `/integrations/{id}/ping`.
+url: "{{baseUrl}}/integrations/ping"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "provider": "string",
+      "token": "string",
+      "apiKey": "string",
+      "accessToken": "string",
+      "domain": "string",
+      "boardId": "string",
+      "webhookUrl": "string",
+      "config": {
+        "key_0": 778,
+        "key_1": 1932
+      }
+    }
+  $type: |-
+    {
+      "description": "Campos opcionais aceitos pelo schema do endpoint de teste de integração",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "boardId": {
+          "type": "string"
+        },
+        "webhookUrl": {
+          "type": "string"
+        },
+        "config": {
+          "type": "object"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Testa um provider de integração informado no corpo.resources/examples
+order: 1000

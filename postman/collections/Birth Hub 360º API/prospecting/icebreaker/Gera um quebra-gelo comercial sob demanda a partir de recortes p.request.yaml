@@ -1,0 +1,29 @@
+$kind: http-request
+name: Gera um quebra-gelo comercial sob demanda a partir de recortes públicos reais da empresa
+description: ""
+url: "{{baseUrl}}/prospecting/icebreaker"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "companyName": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "companyName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "companyName"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera um quebra-gelo comercial sob demanda a partir de recortes p.resources/examples
+order: 1000

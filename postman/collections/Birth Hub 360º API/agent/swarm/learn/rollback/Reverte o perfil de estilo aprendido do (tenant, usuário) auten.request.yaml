@@ -1,0 +1,30 @@
+$kind: http-request
+name: Reverte o perfil de estilo aprendido do (tenant, usuário) autenticado para uma versão anterior já existente no histórico — nunca apaga nem sobrescreve versões, só move o ponteiro ativo. GOV-13, onda 39.
+description: ""
+url: "{{baseUrl}}/agent/swarm/learn/rollback"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "targetVersion": 6573
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "targetVersion": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "targetVersion"
+      ]
+    }
+settings: {}
+examples: ./.resources/Reverte o perfil de estilo aprendido do (tenant, usuário) auten.resources/examples
+order: 1000

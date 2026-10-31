@@ -1,0 +1,41 @@
+$kind: http-example
+name: 'Relatório em Markdown (`{ "result": "..." }`, sem envelope padrão)'
+request:
+  url: "{{baseUrl}}/intelligence/report"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "metrics": {},
+        "brandId": "birthhub360"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "result": "string"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+order: 1000

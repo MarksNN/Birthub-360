@@ -1,0 +1,18 @@
+$kind: http-request
+name: Dispara a análise de ganho/perda via IA sob demanda
+description: ""
+url: "{{baseUrl}}/intelligence/win-loss-analysis"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Dispara a análise de ganho-perda via IA sob demanda.resources/examples
+order: 1000

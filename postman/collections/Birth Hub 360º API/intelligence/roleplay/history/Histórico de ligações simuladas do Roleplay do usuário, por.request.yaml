@@ -1,0 +1,33 @@
+$kind: http-request
+name: Histórico de ligações simuladas do Roleplay do usuário, por marca — últimas 20 sessões (transcrição completa e avaliações não incluídas, só o parecer técnico resumido).
+description: ""
+url: "{{baseUrl}}/intelligence/roleplay/history?brand=Birth Hub 360"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: brand
+    value: Birth Hub 360
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "Birth Hub 360"
+            ]
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico de ligações simuladas do Roleplay do usuário, por.resources/examples
+order: 1000

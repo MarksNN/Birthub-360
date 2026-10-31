@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Exporta o mesmo relatório de cohort (`/analytics/cohort`) em CSV real. Renomeado de `/analytics/export/pdf` na Onda 2/Roadmap v2 (Agente 04) — a rota antiga devolvia um `Buffer` fixo (`PDF_FAKE_CONTENT_FOR_NOW`) sob `Content-Type: application/pdf`, nunca "
+description: ""
+url: "{{baseUrl}}/analytics/export/csv"
+method: GET
+headers:
+  Accept: text/csv
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Exporta o mesmo relatório de cohort (`-analytics-cohort`) em CS.resources/examples
+order: 1000

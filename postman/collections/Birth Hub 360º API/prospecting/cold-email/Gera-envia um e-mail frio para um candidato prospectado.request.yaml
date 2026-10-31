@@ -1,0 +1,18 @@
+$kind: http-request
+name: Gera/envia um e-mail frio para um candidato prospectado
+description: ""
+url: "{{baseUrl}}/prospecting/cold-email"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Gera-envia um e-mail frio para um candidato prospectado.resources/examples
+order: 1000

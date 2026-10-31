@@ -1,0 +1,106 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/leads/:leadId/attachments"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    leadId: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "id": "string",
+            "leadId": "string",
+            "companyId": "string",
+            "contactId": "string",
+            "fileName": "string",
+            "mimeType": "string",
+            "sizeBytes": 3671,
+            "objectKey": "string",
+            "uploadedBy": "string",
+            "organizationId": "string",
+            "createdAt": "1957-12-12T00:46:11.941Z"
+          },
+          {
+            "id": "string",
+            "leadId": "string",
+            "companyId": "string",
+            "contactId": "string",
+            "fileName": "string",
+            "mimeType": "string",
+            "sizeBytes": 9177,
+            "objectKey": "string",
+            "uploadedBy": "string",
+            "organizationId": "string",
+            "createdAt": "1974-01-24T20:28:39.210Z"
+          }
+        ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "leadId": {
+                  "type": "string"
+                },
+                "companyId": {
+                  "type": "string"
+                },
+                "contactId": {
+                  "type": "string"
+                },
+                "fileName": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "sizeBytes": {
+                  "type": "integer"
+                },
+                "objectKey": {
+                  "type": "string"
+                },
+                "uploadedBy": {
+                  "type": "string"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+order: 1000

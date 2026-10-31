@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista as conversas de WhatsApp do tenant com sinais de intenção detectados
+description: ""
+url: "{{baseUrl}}/whatsapp/conversations"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as conversas de WhatsApp do tenant com sinais de intençã.resources/examples
+order: 1000

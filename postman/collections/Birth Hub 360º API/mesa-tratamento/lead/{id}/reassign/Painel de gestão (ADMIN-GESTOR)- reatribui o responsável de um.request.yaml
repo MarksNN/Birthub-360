@@ -1,0 +1,47 @@
+$kind: http-request
+name: "Painel de gestão (ADMIN/GESTOR): reatribui o responsável de um lead no Bitrix24 (`ASSIGNED_BY_ID`) e resolve `Lead.owner` local para o `User.id` correspondente, quando existir vínculo entre o usuário Bitrix e um usuário Atlas."
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/lead/:id/reassign"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "bitrixUserId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "bitrixUserId": {
+          "type": "string",
+          "description": "Id do usuário no Bitrix24"
+        }
+      },
+      "required": [
+        "bitrixUserId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Painel de gestão (ADMIN-GESTOR)- reatribui o responsável de um.resources/examples
+order: 1000

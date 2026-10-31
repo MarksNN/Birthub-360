@@ -1,0 +1,19 @@
+$kind: http-request
+name: "Feed iCalendar (`.ics`) da agenda de atividades do usuário/organização, para assinatura em app de calendário externo (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/activities/feed.ics?owner=string"
+method: GET
+headers:
+  Accept: text/calendar
+queryParams:
+  - key: owner
+    value: string
+    disabled: false
+    description: "Nome do responsável a filtrar (padrão: usuário autenticado)"
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Feed iCalendar (`.ics`) da agenda de atividades do usuário-orga.resources/examples
+order: 1000

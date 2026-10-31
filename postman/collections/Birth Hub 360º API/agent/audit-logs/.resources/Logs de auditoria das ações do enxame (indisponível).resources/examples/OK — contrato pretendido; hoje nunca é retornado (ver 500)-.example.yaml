@@ -1,0 +1,56 @@
+$kind: http-example
+name: OK — contrato pretendido; hoje nunca é retornado (ver 500).
+request:
+  url: "{{baseUrl}}/agent/audit-logs?agentType=string&action=string&result=error"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    agentType: string
+    action: string
+    result: error
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "total": 6999
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+order: 1000

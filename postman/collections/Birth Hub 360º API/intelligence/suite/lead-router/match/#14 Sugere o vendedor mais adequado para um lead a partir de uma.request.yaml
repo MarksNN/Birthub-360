@@ -1,0 +1,32 @@
+$kind: http-request
+name: "#14 Sugere o vendedor mais adequado para um lead a partir de uma lista de candidatos enviada pelo chamador (roteamento inteligente de leads)"
+description: ""
+url: "{{baseUrl}}/intelligence/suite/lead-router/match"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "lead": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "lead": {
+          "type": "object"
+        },
+        "reps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/#14 Sugere o vendedor mais adequado para um lead a partir de uma.resources/examples
+order: 1000

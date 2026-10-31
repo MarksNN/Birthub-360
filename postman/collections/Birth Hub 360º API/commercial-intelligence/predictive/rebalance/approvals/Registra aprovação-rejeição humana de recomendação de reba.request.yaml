@@ -1,0 +1,72 @@
+$kind: http-request
+name: Registra aprovação/rejeição humana de recomendação de rebalanceamento (não altera o CRM) — somente ADMIN/GESTOR
+description: |
+  Idempotente por (tenant, recommendationId): mesma decisão/payload → 200 com
+  `alreadyRecorded: true` sem nova escrita; decisão/payload divergente → 409 com
+  `data.existing`. A decisão é gravada no AuditLog; `appliedToCrm` é sempre false.
+  Schema Zod: `rebalanceApprovalRequestSchema` (strict; `toOwner` ≠ `fromOwner`).
+  Evite dados pessoais em `note` (texto livre, persistido no AuditLog).
+url: "{{baseUrl}}/commercial-intelligence/predictive/rebalance/approvals"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "recommendationId": "string",
+      "leadId": "string",
+      "fromOwner": "string",
+      "toOwner": "string",
+      "decision": "REJECTED",
+      "note": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "recommendationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "leadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "fromOwner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "toOwner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Deve ser diferente de fromOwner"
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "APPROVED",
+            "REJECTED"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "recommendationId",
+        "leadId",
+        "fromOwner",
+        "toOwner",
+        "decision"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra aprovação-rejeição humana de recomendação de reba.resources/examples
+order: 1000

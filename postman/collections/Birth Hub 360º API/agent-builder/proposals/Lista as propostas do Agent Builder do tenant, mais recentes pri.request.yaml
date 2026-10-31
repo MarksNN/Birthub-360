@@ -1,0 +1,34 @@
+$kind: http-request
+name: Lista as propostas do Agent Builder do tenant, mais recentes primeiro (filtro opcional por `status` na query)
+description: ""
+url: "{{baseUrl}}/agent-builder/proposals?status=UNDER_REVIEW"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: status
+    value: UNDER_REVIEW
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "GAP_NOT_CONFIRMED",
+              "UNDER_REVIEW",
+              "APPROVED_FOR_DEVELOPMENT",
+              "REJECTED"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as propostas do Agent Builder do tenant, mais recentes pri.resources/examples
+order: 2000

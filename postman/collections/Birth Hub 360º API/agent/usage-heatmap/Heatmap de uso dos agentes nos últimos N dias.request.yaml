@@ -1,0 +1,28 @@
+$kind: http-request
+description: Heatmap de uso dos agentes da organização do usuário autenticado nos últimos N dias.
+url: "{{baseUrl}}/agent/usage-heatmap?days=30"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: days
+    value: "30"
+    disabled: false
+    description: "Janela em dias (default 30). O handler faz `parseInt` sem validação: o código não impõe limite superior (o único teto implícito é o intervalo válido de `Date`, ~1e8 dias), por isso nenhum `maximum` é documentado; `minimum: 1` reflete o uso coerente (0, negativo ou não numérico geram janela inválida/NaN)."
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Heatmap de uso dos agentes nos últimos N dias.resources/examples
+order: 1000

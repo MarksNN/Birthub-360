@@ -1,0 +1,53 @@
+$kind: http-request
+name: Interpreta busca em linguagem natural e extrai critérios de prospecção estruturados
+description: ""
+url: "{{baseUrl}}/prospecting/interpret"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "query": "string",
+      "consent": true,
+      "model": "string",
+      "mode": "groq",
+      "allowPaidProviders": true
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 2000
+        },
+        "model": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "automatic",
+            "groq",
+            "local"
+          ]
+        },
+        "consent": {
+          "type": "boolean"
+        },
+        "allowPaidProviders": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "query",
+        "consent"
+      ]
+    }
+settings: {}
+examples: ./.resources/Interpreta busca em linguagem natural e extrai critérios de pro.resources/examples
+order: 1000

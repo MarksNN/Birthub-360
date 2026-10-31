@@ -1,0 +1,42 @@
+$kind: http-example
+name: Lista de negócios; vazia quando não há dados ou a consulta falha
+request:
+  url: "{{baseUrl}}/crm/deals"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "key_0": false,
+          "key_1": "string",
+          "key_2": "string",
+          "key_3": true,
+          "key_4": 9734
+        },
+        {
+          "key_0": false
+        }
+      ]
+    $type: |-
+      {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+order: 1000

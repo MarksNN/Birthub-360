@@ -1,0 +1,30 @@
+$kind: http-request
+name: Habilita um módulo de produto específico para a organização (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/organization-modules/:moduleKey"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: moduleKey
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Habilita um módulo de produto específico para a organização.resources/examples
+order: 1000

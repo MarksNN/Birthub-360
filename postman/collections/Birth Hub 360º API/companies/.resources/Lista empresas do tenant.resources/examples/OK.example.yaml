@@ -1,0 +1,204 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/companies"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "legalName": "string",
+            "tradeName": "string",
+            "id": "string",
+            "organizationId": "string",
+            "createdAt": "2022-08-15T09:23:35.477Z",
+            "updatedAt": "2017-11-15T03:01:56.649Z",
+            "cnpj": "string",
+            "stateRegistration": "string",
+            "segment": "string",
+            "cnae": "string",
+            "size": "string",
+            "employeeCount": 5607,
+            "estimatedRevenue": 3739.637750042868,
+            "website": "string",
+            "linkedin": "string",
+            "instagram": "string",
+            "address": "string",
+            "city": "string",
+            "state": "string",
+            "zipCode": "string",
+            "owner": "string",
+            "status": "Inativo",
+            "observations": "string"
+          },
+          {
+            "legalName": "string",
+            "tradeName": "string",
+            "id": "string",
+            "organizationId": "string",
+            "createdAt": "1963-12-19T04:28:46.411Z",
+            "updatedAt": "1980-11-09T04:43:59.228Z",
+            "cnpj": "string",
+            "stateRegistration": "string",
+            "segment": "string",
+            "cnae": "string",
+            "size": "string",
+            "employeeCount": 3704,
+            "estimatedRevenue": 51.215174779242204,
+            "website": "string",
+            "linkedin": "string",
+            "instagram": "string",
+            "address": "string",
+            "city": "string",
+            "state": "string",
+            "zipCode": "string",
+            "owner": "string",
+            "status": "Inativo",
+            "observations": "string"
+          }
+        ],
+        "meta": {}
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "legalName": {
+                      "type": "string"
+                    },
+                    "tradeName": {
+                      "type": "string"
+                    },
+                    "cnpj": {
+                      "type": "string"
+                    },
+                    "stateRegistration": {
+                      "type": "string"
+                    },
+                    "segment": {
+                      "type": "string"
+                    },
+                    "cnae": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "string"
+                    },
+                    "employeeCount": {
+                      "type": "integer"
+                    },
+                    "estimatedRevenue": {
+                      "type": "number"
+                    },
+                    "website": {
+                      "type": "string"
+                    },
+                    "linkedin": {
+                      "type": "string"
+                    },
+                    "instagram": {
+                      "type": "string"
+                    },
+                    "phones": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "emails": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "address": {
+                      "type": "string"
+                    },
+                    "city": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "zipCode": {
+                      "type": "string"
+                    },
+                    "owner": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "allOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "observations": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "legalName",
+                    "tradeName"
+                  ]
+                }
+              ]
+            }
+          },
+          "meta": {
+            "type": "object"
+          }
+        }
+      }
+order: 1000

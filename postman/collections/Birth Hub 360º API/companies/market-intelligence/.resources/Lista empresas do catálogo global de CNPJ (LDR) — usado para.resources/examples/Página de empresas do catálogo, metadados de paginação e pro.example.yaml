@@ -1,0 +1,33 @@
+$kind: http-example
+name: Página de empresas do catálogo, metadados de paginação e proveniência do snapshot
+request:
+  url: "{{baseUrl}}/companies/market-intelligence?page=1&pageSize=25&q=string&cnpj=string&uf=MI&municipio=string&municipioIbge=6714481&cnae=string&situacao=string&porte=string&icpTier=FORA_DO_ICP&matrizFilial=MATRIZ&sort=name"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    page: "1"
+    pageSize: "25"
+    q: string
+    cnpj: string
+    uf: MI
+    municipio: string
+    municipioIbge: "6714481"
+    cnae: string
+    situacao: string
+    porte: string
+    icpTier: FORA_DO_ICP
+    matrizFilial: MATRIZ
+    sort: name
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: ""
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Gera um playbook de mentoria via IA a partir das métricas do filtro atual (Agente 18, achado de auditoria: endpoint real, sem entrada aqui; somente ADMIN/GESTOR, mesmo limitador de IA dedicado dos demais endpoints `ai/*` deste módulo)."
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/ai/mentor-playbook"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Gera um playbook de mentoria via IA a partir das métricas do fi.resources/examples
+order: 1000

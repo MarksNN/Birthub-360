@@ -1,0 +1,26 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/memory/:scope/:id/rollback"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    scope: organization
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "reason": "string"
+      }
+response:
+  statusCode: 409
+  statusText: Conflict
+  body:
+    type: text
+    content: ""
+order: 4000

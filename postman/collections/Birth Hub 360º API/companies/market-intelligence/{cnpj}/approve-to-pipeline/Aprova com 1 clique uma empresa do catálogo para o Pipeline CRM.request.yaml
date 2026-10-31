@@ -1,0 +1,30 @@
+$kind: http-request
+name: Aprova com 1 clique uma empresa do catálogo para o Pipeline CRM do tenant (cria Company + Lead)
+description: ""
+url: "{{baseUrl}}/companies/market-intelligence/:cnpj/approve-to-pipeline"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: cnpj
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Aprova com 1 clique uma empresa do catálogo para o Pipeline CRM.resources/examples
+order: 1000

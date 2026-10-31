@@ -1,0 +1,26 @@
+$kind: http-example
+name: Cargo do ator não pode solicitar acesso cruzado (`agent.request_cross_role` não concedido/negado)
+request:
+  url: "{{baseUrl}}/access-requests"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "capabilityCode": "string",
+        "resource": {},
+        "reason": "string"
+      }
+response:
+  statusCode: 403
+  statusText: Forbidden
+  body:
+    type: text
+    content: ""
+order: 3000

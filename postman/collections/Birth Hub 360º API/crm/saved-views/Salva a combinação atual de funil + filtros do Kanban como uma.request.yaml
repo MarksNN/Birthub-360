@@ -1,0 +1,55 @@
+$kind: http-request
+name: Salva a combinação atual de funil + filtros do Kanban como uma view nomeada
+description: ""
+url: "{{baseUrl}}/crm/saved-views"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "funnel": "Lead",
+      "filters": {
+        "owner": "string",
+        "q": "string"
+      }
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "funnel": {
+          "type": "string",
+          "enum": [
+            "Lead",
+            "Negocio"
+          ]
+        },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "owner": {
+              "type": "string",
+              "description": "User.id do dono filtrado"
+            },
+            "q": {
+              "type": "string",
+              "description": "Texto de busca livre"
+            }
+          }
+        }
+      },
+      "required": [
+        "name",
+        "funnel"
+      ]
+    }
+settings: {}
+examples: ./.resources/Salva a combinação atual de funil + filtros do Kanban como uma.resources/examples
+order: 2000

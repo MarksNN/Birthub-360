@@ -1,0 +1,64 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/copiloto-ia/conversations/:id/transcript-segments"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "segments": [
+          {
+            "startMs": 4245.232160690037,
+            "endMs": 2279.3233199118536,
+            "text": "string",
+            "speakerLabel": "string",
+            "confidence": 7017.420860576408
+          },
+          {
+            "startMs": 4250.825530973017,
+            "endMs": 5792.054723468645,
+            "text": "string",
+            "speakerLabel": "string",
+            "confidence": 7585.643275795262
+          }
+        ]
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": "",
+        "meta": {}
+      }
+    $type: |-
+      {
+        "description": "Envelope de resposta genérico usado pela maioria dos endpoints",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "meta": {
+            "type": "object",
+            "description": "Presente em listagens paginadas (page, limit, total, etc.)"
+          }
+        }
+      }
+order: 1000

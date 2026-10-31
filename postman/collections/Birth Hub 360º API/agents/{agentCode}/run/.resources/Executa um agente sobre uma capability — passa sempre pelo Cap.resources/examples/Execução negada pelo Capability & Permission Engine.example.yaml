@@ -1,0 +1,29 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/agents/:agentCode/run"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    agentCode: string
+  body:
+    type: json
+    content: |-
+      {
+        "requestedCapability": "string",
+        "mission": "string",
+        "resource": {},
+        "context": {},
+        "correlationId": "string"
+      }
+response:
+  statusCode: 403
+  statusText: Forbidden
+  body:
+    type: text
+    content: ""
+order: 3000

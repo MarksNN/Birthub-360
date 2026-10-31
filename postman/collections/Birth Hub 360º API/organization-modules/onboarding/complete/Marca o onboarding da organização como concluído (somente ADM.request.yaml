@@ -1,0 +1,13 @@
+$kind: http-request
+name: Marca o onboarding da organização como concluído (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/organization-modules/onboarding/complete"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Marca o onboarding da organização como concluído (somente ADM.resources/examples
+order: 1000

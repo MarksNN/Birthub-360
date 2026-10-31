@@ -1,0 +1,19 @@
+$kind: http-request
+name: Histórico de mensagens persistidas (de um lead, ou as mais recentes do tenant)
+description: ""
+url: "{{baseUrl}}/whatsapp/messages?leadId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico de mensagens persistidas (de um lead, ou as mais rece.resources/examples
+order: 1000

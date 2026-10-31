@@ -1,0 +1,23 @@
+$kind: http-example
+name: Processado, ou aceito e ignorado (evento fora do vocabulário tratado, ou reentrega duplicada)
+request:
+  url: "{{baseUrl}}/integrations/stripe/webhook/:connectionId"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    connectionId: string
+  body:
+    type: json
+    content: "{}"
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: ""
+order: 1000

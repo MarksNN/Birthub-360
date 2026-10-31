@@ -1,0 +1,17 @@
+$kind: http-request
+name: Webhook de resultado de ligação de voz (Bland AI). JSON parseado com parser próprio (não depende do `express.json()` global, montado antes dele), segredo comparado em tempo constante no header `x-birthhub360-webhook-secret` vs `BIRTHHUB360_WEBHOOK_SECRET`
+description: ""
+url: "{{baseUrl}}/webhooks/voice-result"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Webhook de resultado de ligação de voz (Bland AI). JSON parsea.resources/examples
+order: 1000

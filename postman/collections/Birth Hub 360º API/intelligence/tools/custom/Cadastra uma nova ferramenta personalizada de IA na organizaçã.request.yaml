@@ -1,0 +1,39 @@
+$kind: http-request
+name: Cadastra uma nova ferramenta personalizada de IA na organização
+description: ""
+url: "{{baseUrl}}/intelligence/tools/custom"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "category": "string",
+      "prompt": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "category",
+        "prompt"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cadastra uma nova ferramenta personalizada de IA na organizaçã.resources/examples
+order: 2000

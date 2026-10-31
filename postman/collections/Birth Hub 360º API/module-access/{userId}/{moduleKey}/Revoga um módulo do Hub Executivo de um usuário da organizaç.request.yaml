@@ -1,0 +1,46 @@
+$kind: http-request
+name: Revoga um módulo do Hub Executivo de um usuário da organização (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/module-access/:userId/:moduleKey"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: userId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: moduleKey
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Revoga um módulo do Hub Executivo de um usuário da organizaç.resources/examples
+order: 2000

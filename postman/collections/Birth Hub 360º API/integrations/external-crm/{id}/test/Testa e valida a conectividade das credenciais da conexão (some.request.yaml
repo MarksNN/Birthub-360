@@ -1,0 +1,30 @@
+$kind: http-request
+name: Testa e valida a conectividade das credenciais da conexão (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/integrations/external-crm/:id/test"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Testa e valida a conectividade das credenciais da conexão (some.resources/examples
+order: 1000

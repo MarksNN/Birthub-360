@@ -1,0 +1,56 @@
+$kind: http-request
+name: Executa uma recomendação da conta (task Bitrix, cadência SDR ou marcação simples)
+description: "Papéis: ADMIN, GESTOR, CLOSER ou SDR. Sem corpo. Isolamento de tenant via RLS (`withRlsContext`), não por filtro explícito de `organizationId` no service; a recomendação também precisa pertencer à conta `{id}` (senão 404). Já `Executed` → 400. Por `actionType`: `CREATE_BITRIX_TASK` cria `tasks.task.add` no Bitrix do tenant (sem conexão → 400) e grava `externalRef`; `START_SDR_CADENCE` inicia cadência no lead mais recente da conta com a sequência ativa mais recente da organização (sem lead ou sequência → 400; cadência já ativa → 409); outros tipos só marcam `Executed`. Qualquer erro durante a execução marca a recomendação como `Failed` antes de propagar."
+url: "{{baseUrl}}/market-intelligence/accounts/:id/recommendations/:recommendationId/execute"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: Id da Company do CRM do tenant (1–128 chars)
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: recommendationId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+auth:
+  type: apikey
+  credentials:
+    key: better-auth.session_token
+    value: "{{apiKey}}"
+    in: header
+settings: {}
+examples: ./.resources/Executa uma recomendação da conta (task Bitrix, cadência SDR.resources/examples
+order: 1000

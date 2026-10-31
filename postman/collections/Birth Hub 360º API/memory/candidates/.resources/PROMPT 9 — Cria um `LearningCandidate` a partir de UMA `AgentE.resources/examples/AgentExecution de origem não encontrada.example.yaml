@@ -1,0 +1,48 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/memory/candidates"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "sourceExecutionId": "string",
+        "targetScope": "ORGANIZATION",
+        "topic": "string",
+        "category": "FORECAST_RULE",
+        "proposedContent": {
+          "summary": "string"
+        },
+        "reflection": {
+          "rationale": "string"
+        },
+        "evidence": [
+          {
+            "sourceAgent": "string",
+            "summary": "string",
+            "recordedAt": "string",
+            "sourceExecutionId": "string",
+            "capabilityCode": "string"
+          },
+          {
+            "sourceAgent": "string",
+            "summary": "string",
+            "recordedAt": "string",
+            "sourceExecutionId": "string",
+            "capabilityCode": "string"
+          }
+        ]
+      }
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: text
+    content: ""
+order: 3000

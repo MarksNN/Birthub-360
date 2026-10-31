@@ -1,0 +1,71 @@
+$kind: http-request
+name: Executa o agente de Contract Signature sobre o status real de assinatura (verificado via SignatureRequestRepositoryPort, nunca presumido) do documento informado.
+description: ""
+url: "{{baseUrl}}/agent/commercial-cell/contract-signature/run"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "documentId": "string",
+      "contractTitle": "string",
+      "requiredSignatories": [
+        {
+          "email": "fRVUh600m@vfBcrhLbuVITMbJYMXrFEFnGwgBj.gwap",
+          "name": "string"
+        },
+        {
+          "email": "AOw6@euMsRgyOABhPSVeJiXCvYzPzWHlXcHnF.xjxh",
+          "name": "string"
+        }
+      ],
+      "missingData": [
+        "string",
+        "string"
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "documentId": {
+          "type": "string"
+        },
+        "contractTitle": {
+          "type": "string"
+        },
+        "requiredSignatories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
+            },
+            "required": [
+              "email"
+            ]
+          }
+        },
+        "missingData": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "documentId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Executa o agente de Contract Signature sobre o status real de as.resources/examples
+order: 1000

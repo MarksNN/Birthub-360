@@ -1,0 +1,36 @@
+$kind: http-request
+name: "Mesma leitura executiva de `/intelligence/report`, em streaming (SSE) em vez de resposta única (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/intelligence/report/stream"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: text/event-stream
+body:
+  type: json
+  content: |-
+    {
+      "metrics": {},
+      "brandId": "birthhub360"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "object"
+        },
+        "brandId": {
+          "type": "string",
+          "enum": [
+            "Birth Hub 360"
+          ]
+        }
+      },
+      "required": [
+        "metrics"
+      ]
+    }
+settings: {}
+examples: ./.resources/Mesma leitura executiva de `-intelligence-report`, em streaming.resources/examples
+order: 1000

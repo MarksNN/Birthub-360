@@ -1,0 +1,117 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/roleplay/sessions/:id/evaluate"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "overallScore": 7039.339986790608,
+          "spinSellingScores": {
+            "situation": 1123.3280656794254,
+            "problem": 3045.4086615121055,
+            "implication": 8787.210240117256,
+            "needPayoff": 4646.775177125713
+          },
+          "objectionHandlingScore": 8246.420527391849,
+          "strengths": [
+            "string",
+            "string"
+          ],
+          "improvementAreas": [
+            "string",
+            "string"
+          ],
+          "summary": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "overallScore": {
+                "type": "number"
+              },
+              "spinSellingScores": {
+                "type": "object",
+                "properties": {
+                  "situation": {
+                    "type": "number"
+                  },
+                  "problem": {
+                    "type": "number"
+                  },
+                  "implication": {
+                    "type": "number"
+                  },
+                  "needPayoff": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "situation",
+                  "problem",
+                  "implication",
+                  "needPayoff"
+                ]
+              },
+              "objectionHandlingScore": {
+                "type": "number"
+              },
+              "strengths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "improvementAreas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "summary": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "overallScore",
+              "spinSellingScores",
+              "objectionHandlingScore",
+              "strengths",
+              "improvementAreas",
+              "summary"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 1000

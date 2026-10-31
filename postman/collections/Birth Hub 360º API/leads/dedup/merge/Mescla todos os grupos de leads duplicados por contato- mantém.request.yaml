@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Mescla todos os grupos de leads duplicados por contato: mantém o lead de maior valor comercial, reatribui notas/atividades/anexos/histórico dos demais e os remove (soft-delete)"
+description: ""
+url: "{{baseUrl}}/leads/dedup/merge"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Mescla todos os grupos de leads duplicados por contato- mantém.resources/examples
+order: 1000

@@ -1,0 +1,86 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/integrations/:id/ping"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Identificador do provider ou de uma conexão persistida
+  body:
+    type: json
+    content: |-
+      {
+        "provider": "string",
+        "token": "string",
+        "apiKey": "string",
+        "accessToken": "string",
+        "domain": "string",
+        "boardId": "string",
+        "webhookUrl": "string",
+        "config": {
+          "key_0": 778,
+          "key_1": 1932
+        }
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "valid": true,
+        "provider": "string",
+        "message": "string",
+        "id": "string",
+        "portalDomain": "string"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "valid": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "portalDomain": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "valid",
+          "provider",
+          "message"
+        ]
+      }
+order: 1000

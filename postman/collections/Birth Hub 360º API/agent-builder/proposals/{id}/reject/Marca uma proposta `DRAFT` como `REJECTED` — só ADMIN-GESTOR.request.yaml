@@ -1,0 +1,43 @@
+$kind: http-request
+name: Marca uma proposta `DRAFT` como `REJECTED` — só ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/agent-builder/proposals/:id/reject"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "notes": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Marca uma proposta `DRAFT` como `REJECTED` — só ADMIN-GESTOR.resources/examples
+order: 1000

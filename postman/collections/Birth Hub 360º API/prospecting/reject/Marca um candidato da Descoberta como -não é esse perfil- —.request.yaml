@@ -1,0 +1,18 @@
+$kind: http-request
+name: 'Marca um candidato da Descoberta como "não é esse perfil" — passa a ser excluído de buscas futuras deste tenant (Agente 18, achado de auditoria: endpoint real, sem entrada aqui).'
+description: ""
+url: "{{baseUrl}}/prospecting/reject"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Marca um candidato da Descoberta como -não é esse perfil- —.resources/examples
+order: 1000

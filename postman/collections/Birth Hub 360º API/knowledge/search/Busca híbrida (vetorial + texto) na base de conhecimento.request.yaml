@@ -1,0 +1,36 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/knowledge/search"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "query": "string",
+      "limit": 3
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 500
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 25
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+settings: {}
+examples: ./.resources/Busca híbrida (vetorial + texto) na base de conhecimento.resources/examples
+order: 1000

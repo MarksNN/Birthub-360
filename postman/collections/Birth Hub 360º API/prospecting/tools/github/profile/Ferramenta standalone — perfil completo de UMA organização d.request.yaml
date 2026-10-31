@@ -1,0 +1,29 @@
+$kind: http-request
+name: Ferramenta standalone — perfil completo de UMA organização do GitHub já identificada, para salvar no CRM
+description: ""
+url: "{{baseUrl}}/prospecting/tools/github/profile"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "login": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "login"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — perfil completo de UMA organização d.resources/examples
+order: 1000

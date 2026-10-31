@@ -1,0 +1,30 @@
+$kind: http-request
+name: Dashboard completo da tela de Analytics, numa única requisição
+description: ""
+url: "{{baseUrl}}/analytics/dashboard?months=6"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: months
+    value: "6"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 6,
+            "minimum": 3,
+            "maximum": 24
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Dashboard completo da tela de Analytics, numa única requisiçã.resources/examples
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Portabilidade de dados do titular (LGPD Art. 18 V) — exporta todos os dados pessoais vinculados ao contato. Base legal: exercício de direito do titular."
+description: ""
+url: "{{baseUrl}}/lgpd/titular/:contactId/export"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: contactId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Portabilidade de dados do titular (LGPD Art. 18 V) — exporta t.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Histórico versionado do perfil de estilo aprendido pelo LearningAgent (todas as versões + qual está ativa) do (tenant, usuário) autenticado — GOV-13, onda 39. Ver `.agents/handoffs/onda-39/13-para-07-rota-rollback-learning-profile.md`.
+description: ""
+url: "{{baseUrl}}/agent/swarm/learn/history"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico versionado do perfil de estilo aprendido pelo Learnin.resources/examples
+order: 1000

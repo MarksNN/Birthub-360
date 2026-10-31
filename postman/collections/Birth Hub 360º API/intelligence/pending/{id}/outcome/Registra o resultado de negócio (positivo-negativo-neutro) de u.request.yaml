@@ -1,0 +1,56 @@
+$kind: http-request
+name: Registra o resultado de negócio (positivo/negativo/neutro) de uma ação de IA já executada, fechando o ciclo do Closed-Loop Intelligence.
+description: ""
+url: "{{baseUrl}}/intelligence/pending/:id/outcome"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "status": "POSITIVE",
+      "notes": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "POSITIVE",
+            "NEGATIVE",
+            "NEUTRAL"
+          ]
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "status"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra o resultado de negócio (positivo-negativo-neutro) de u.resources/examples
+order: 1000

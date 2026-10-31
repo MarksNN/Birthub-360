@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista leads do tenant (paginado/filtrável — filtros aplicados no controller)
+description: ""
+url: "{{baseUrl}}/leads"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista leads do tenant (paginado-filtrável — filtros aplicados.resources/examples
+order: 1000

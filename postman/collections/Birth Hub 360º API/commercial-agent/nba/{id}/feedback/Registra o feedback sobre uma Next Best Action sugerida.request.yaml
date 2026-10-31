@@ -1,0 +1,46 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/commercial-agent/nba/:id/feedback"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "feedbackType": "string",
+      "reason": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "feedbackType": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Registra o feedback sobre uma Next Best Action sugerida.resources/examples
+order: 1000

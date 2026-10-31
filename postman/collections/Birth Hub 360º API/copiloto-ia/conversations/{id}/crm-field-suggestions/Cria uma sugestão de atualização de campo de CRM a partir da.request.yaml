@@ -1,0 +1,74 @@
+$kind: http-request
+name: Cria uma sugestão de atualização de campo de CRM a partir da conversa (fica PENDING)
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/crm-field-suggestions"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "entityType": "CONTACT",
+      "entityId": "string",
+      "fieldCode": "string",
+      "suggestedValue": "string",
+      "previousValue": "string",
+      "confidence": 6678.009132585194
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "LEAD",
+            "COMPANY",
+            "CONTACT"
+          ]
+        },
+        "entityId": {
+          "type": "string"
+        },
+        "fieldCode": {
+          "type": "string"
+        },
+        "previousValue": {
+          "type": "string"
+        },
+        "suggestedValue": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "entityType",
+        "entityId",
+        "fieldCode",
+        "suggestedValue"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma sugestão de atualização de campo de CRM a partir da.resources/examples
+order: 1000

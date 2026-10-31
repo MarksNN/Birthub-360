@@ -1,0 +1,57 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/market-intelligence/accounts/:id/refresh"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Id da Company do CRM do tenant (1–128 chars)
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "created": false,
+          "snapshot": {}
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "created": {
+                "type": "boolean",
+                "description": "true quando uma nova versão foi criada"
+              },
+              "snapshot": {
+                "type": "object",
+                "description": "AccountIntelligenceSnapshot (version, summary, structuredFacts com inputHash, sourceStatus, status Partial|Complete) com knowledgeType FACT"
+              }
+            }
+          }
+        }
+      }
+order: 1000

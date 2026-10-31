@@ -1,0 +1,100 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/usage/quota"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "tier": "STARTER",
+          "monthlyTokenAllowance": 843,
+          "tokensConsumedThisMonth": 3660,
+          "percentUsed": 6361.912816677747,
+          "periodStart": "1956-12-26T18:06:44.521Z",
+          "periodEnd": "1974-05-18T20:09:25.944Z",
+          "alertStatus": "CRITICAL_100",
+          "fallbackModeActive": false,
+          "costUsdEstimate": 6216.1399483022005
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "type": "string",
+                "enum": [
+                  "STARTER",
+                  "PROFESSIONAL",
+                  "ENTERPRISE",
+                  "CUSTOM"
+                ]
+              },
+              "monthlyTokenAllowance": {
+                "type": "integer"
+              },
+              "tokensConsumedThisMonth": {
+                "type": "integer"
+              },
+              "percentUsed": {
+                "type": "number"
+              },
+              "alertStatus": {
+                "type": "string",
+                "enum": [
+                  "NORMAL",
+                  "WARNING_80",
+                  "CRITICAL_100",
+                  "EXCEEDED"
+                ]
+              },
+              "fallbackModeActive": {
+                "type": "boolean",
+                "description": "True quando o consumo atinge 100% e o gateway faz fallback para modelos econômicos"
+              },
+              "periodStart": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "periodEnd": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "costUsdEstimate": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "tier",
+              "monthlyTokenAllowance",
+              "tokensConsumedThisMonth",
+              "percentUsed",
+              "periodStart",
+              "periodEnd"
+            ]
+          }
+        }
+      }
+order: 1000

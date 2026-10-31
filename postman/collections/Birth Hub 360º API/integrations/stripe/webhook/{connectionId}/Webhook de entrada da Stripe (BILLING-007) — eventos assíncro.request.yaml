@@ -1,0 +1,34 @@
+$kind: http-request
+name: Webhook de entrada da Stripe (BILLING-007) — eventos assíncronos de pagamento (confirmação, estorno, falha) que `createStripeCharge`/`getStripeCharge` (caminho síncrono) não cobrem. Autenticidade por segredo de assinatura por conexão (`StripeConnection.we
+description: ""
+url: "{{baseUrl}}/integrations/stripe/webhook/:connectionId"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: connectionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Webhook de entrada da Stripe (BILLING-007) — eventos assíncro.resources/examples
+order: 1000

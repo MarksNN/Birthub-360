@@ -1,0 +1,299 @@
+$kind: http-request
+description: Filtros, ordenação e paginação são executados no PostgreSQL. pageSize máximo 200.
+url: "{{baseUrl}}/market-intelligence/companies?page=1&pageSize=50&cnpj=string&razaoSocial=string&nomeFantasia=string&cnae=string&cnaeScope=all&municipio=string&municipioIbge=6714481&uf=MI&situacaoCadastral=SUSPENSA&icpMinimo=FORA_DO_ICP&matrizFilial=MATRIZ&rntrc=true&porte=string&simples=NAO_INFORMADO&mei=NAO_INFORMADO&capitalSocialMin=6009.965665738893&capitalSocialMax=6009.965665738893&sort=capitalSocial&order=asc"
+method: GET
+queryParams:
+  - key: page
+    value: "1"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          }
+        }
+      }
+  - key: pageSize
+    value: "50"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          }
+        }
+      }
+  - key: cnpj
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: razaoSocial
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 2
+          }
+        }
+      }
+  - key: nomeFantasia
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "minLength": 2
+          }
+        }
+      }
+  - key: cnae
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: cnaeScope
+    value: all
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "default": "all",
+            "enum": [
+              "principal",
+              "all"
+            ]
+          }
+        }
+      }
+  - key: municipio
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: municipioIbge
+    value: "6714481"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^\\d{7}$"
+          }
+        }
+      }
+  - key: uf
+    value: MI
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          }
+        }
+      }
+  - key: situacaoCadastral
+    value: SUSPENSA
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "ATIVA",
+              "SUSPENSA",
+              "INAPTA",
+              "BAIXADA",
+              "NULA"
+            ]
+          }
+        }
+      }
+  - key: icpMinimo
+    value: FORA_DO_ICP
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "MUITO_ALTO",
+              "ALTO",
+              "MEDIO",
+              "BAIXO",
+              "FORA_DO_ICP"
+            ]
+          }
+        }
+      }
+  - key: matrizFilial
+    value: MATRIZ
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "MATRIZ",
+              "FILIAL"
+            ]
+          }
+        }
+      }
+  - key: rntrc
+    value: "true"
+    disabled: false
+    description: ""
+    $type: boolean
+  - key: porte
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: simples
+    value: NAO_INFORMADO
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "SIM",
+              "NAO",
+              "NAO_INFORMADO"
+            ]
+          }
+        }
+      }
+  - key: mei
+    value: NAO_INFORMADO
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "SIM",
+              "NAO",
+              "NAO_INFORMADO"
+            ]
+          }
+        }
+      }
+  - key: capitalSocialMin
+    value: "6009.965665738893"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+  - key: capitalSocialMax
+    value: "6009.965665738893"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+  - key: sort
+    value: capitalSocial
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "razaoSocial",
+              "nomeFantasia",
+              "capitalSocial",
+              "icpScore",
+              "dataInicioAtividade"
+            ]
+          }
+        }
+      }
+  - key: order
+    value: asc
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Pesquisa empresas do snapshot CNPJ publicado.resources/examples
+order: 1000

@@ -1,0 +1,39 @@
+$kind: http-request
+name: "Série histórica dos indicadores, para o mesmo filtro de mês/vendedor/produto/origem/ICP das demais telas do módulo (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Somente ADMIN/GESTOR."
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/trends?month=string&owner=string&product=string&source=string&icp=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: month
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: owner
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: product
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: source
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: icp
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Série histórica dos indicadores, para o mesmo filtro de mês-v.resources/examples
+order: 1000

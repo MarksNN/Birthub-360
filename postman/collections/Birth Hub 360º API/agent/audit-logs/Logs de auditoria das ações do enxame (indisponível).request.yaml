@@ -1,0 +1,40 @@
+$kind: http-request
+description: "Endpoint indisponível: falha sempre com 500 (TypeError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07. Nota: a reativação exigirá requireRole(ADMIN, GESTOR), validação zod na query e os campos definidos pelo Agente 21."
+url: "{{baseUrl}}/agent/audit-logs?agentType=string&action=string&result=error"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: agentType
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: action
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: result
+    value: error
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "success",
+              "error"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Logs de auditoria das ações do enxame (indisponível).resources/examples
+order: 1000

@@ -1,0 +1,67 @@
+$kind: http-request
+name: Gera de 4 a 6 perguntas de qualificação (SPIN/BANT) para o vendedor
+description: ""
+url: "{{baseUrl}}/agent/qualification"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "message": "string",
+      "tool": "groq"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "tool": {
+          "type": "string",
+          "enum": [
+            "copilot",
+            "groq",
+            "roleplay",
+            "objections",
+            "qualification",
+            "playbook"
+          ]
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "assistant"
+                ]
+              },
+              "content": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              }
+            },
+            "required": [
+              "role",
+              "content"
+            ]
+          }
+        }
+      },
+      "required": [
+        "message"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera de 4 a 6 perguntas de qualificação (SPIN-BANT) para o ven.resources/examples
+order: 1000

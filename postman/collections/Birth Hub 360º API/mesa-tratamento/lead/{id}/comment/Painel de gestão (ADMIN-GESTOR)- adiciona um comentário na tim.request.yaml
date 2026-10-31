@@ -1,0 +1,46 @@
+$kind: http-request
+name: "Painel de gestão (ADMIN/GESTOR): adiciona um comentário na timeline do Bitrix24 sem registrar um resultado completo de atendimento."
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/lead/:id/comment"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "comment": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "comment"
+      ]
+    }
+settings: {}
+examples: ./.resources/Painel de gestão (ADMIN-GESTOR)- adiciona um comentário na tim.resources/examples
+order: 1000

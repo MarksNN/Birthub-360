@@ -1,0 +1,90 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/analytics"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "metrics": [
+          {
+            "key_0": 5053.980171094436,
+            "key_1": 6944
+          },
+          {
+            "key_0": 7033.22770445074
+          }
+        ],
+        "total": 7568,
+        "data": {
+          "metrics": [
+            {
+              "key_0": false,
+              "key_1": 7725,
+              "key_2": true
+            },
+            {
+              "key_0": "string"
+            }
+          ],
+          "total": 2391
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "metrics": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "metrics",
+              "total"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "metrics",
+          "total",
+          "data"
+        ]
+      }
+order: 1000

@@ -1,0 +1,49 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/copiloto-ia/leads/:leadId/deal-health"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "score": 5431.192908430128,
+      "factorsJson": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "number"
+        },
+        "factorsJson": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "score"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra um novo snapshot de Deal Health Score do lead.resources/examples
+order: 2000

@@ -1,0 +1,46 @@
+$kind: http-request
+name: Simula a regra contra uma amostra dos dados reais e atuais da organização, sem executar nenhuma ação de verdade (Onda 42, dossiê CPI DEC-14 opção A) — nenhum e-mail, atividade ou ligação é disparado. Restrito a ADMIN/GESTOR — lê uma amostra de leads/ativi
+description: ""
+url: "{{baseUrl}}/automations/:id/dry-run"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "limit": 9
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Tamanho da amostra de registros candidatos. Padrão 25, teto 100."
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Simula a regra contra uma amostra dos dados reais e atuais da or.resources/examples
+order: 1000

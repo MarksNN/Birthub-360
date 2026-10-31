@@ -1,0 +1,47 @@
+$kind: http-request
+name: Cadastro por e-mail/senha (Better Auth)
+description: ""
+url: "{{baseUrl}}/auth/sign-up/email"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "email": "ghTpJgfiNXLRnSf@YWZqXwDYougTcQSSFWhJptgw.fyr",
+      "password": "string",
+      "organizationId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6
+        },
+        "organizationId": {
+          "type": "string",
+          "description": "Reflete o registerSchema do projeto (src/lib/zod.ts); a lib Better Auth também aceita campos adicionais próprios."
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "password"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cadastro por e-mail-senha (Better Auth).resources/examples
+order: 1000

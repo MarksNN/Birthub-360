@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Executa manualmente (fora do agendamento) uma busca salva de prospecção (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/prospecting/saved-searches/:id/run"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Executa manualmente (fora do agendamento) uma busca salva de pro.resources/examples
+order: 1000

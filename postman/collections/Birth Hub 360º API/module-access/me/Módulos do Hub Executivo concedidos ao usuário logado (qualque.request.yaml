@@ -1,0 +1,13 @@
+$kind: http-request
+name: Módulos do Hub Executivo concedidos ao usuário logado (qualquer usuário autenticado, não exige ADMIN)
+description: ""
+url: "{{baseUrl}}/module-access/me"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Módulos do Hub Executivo concedidos ao usuário logado (qualque.resources/examples
+order: 1000

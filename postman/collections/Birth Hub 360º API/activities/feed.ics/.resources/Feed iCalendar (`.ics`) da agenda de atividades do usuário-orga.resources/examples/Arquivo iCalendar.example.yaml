@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/activities/feed.ics?owner=string"
+  method: GET
+  headers:
+    - key: Accept
+      value: text/calendar
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    - key: owner
+      value: string
+      disabled: false
+      description: "Nome do responsável a filtrar (padrão: usuário autenticado)"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/calendar
+  body:
+    type: text
+    content: string
+    $type: |-
+      {
+        "type": "string"
+      }
+order: 1000

@@ -1,0 +1,21 @@
+$kind: http-example
+name: Empresa e Lead aprovados/reaproveitados (idempotente por CNPJ+organização)
+request:
+  url: "{{baseUrl}}/companies/market-intelligence/:cnpj/approve-to-pipeline"
+  method: POST
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    cnpj: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: ""
+order: 1000

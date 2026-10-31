@@ -1,0 +1,56 @@
+$kind: http-request
+name: Cria uma nova conversa (reunião/ligação) para captura e análise
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "source": "WHATSAPP",
+      "title": "string",
+      "externalMeetingId": "string",
+      "leadId": "string",
+      "companyId": "string",
+      "contactId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "MEET",
+            "CALL",
+            "WHATSAPP",
+            "MANUAL",
+            "OTHER"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "externalMeetingId": {
+          "type": "string"
+        },
+        "leadId": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "contactId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma nova conversa (reunião-ligação) para captura e anál.resources/examples
+order: 1000

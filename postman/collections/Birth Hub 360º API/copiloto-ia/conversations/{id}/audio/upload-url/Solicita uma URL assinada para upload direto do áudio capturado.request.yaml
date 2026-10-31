@@ -1,0 +1,43 @@
+$kind: http-request
+name: Solicita uma URL assinada para upload direto do áudio capturado ao storage de objetos
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/audio/upload-url"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "mimeType": "audio/webm"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "mimeType": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Solicita uma URL assinada para upload direto do áudio capturado.resources/examples
+order: 1000

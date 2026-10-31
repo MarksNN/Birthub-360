@@ -1,0 +1,12 @@
+$kind: http-request
+description: Estado do circuit breaker de autonomia do enxame para a organização do usuário autenticado (observabilidade). `data` é `null` quando não há estado registrado.
+url: "{{baseUrl}}/agent/circuit-breaker/state"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Estado atual do circuit breaker de autonomia do enxame.resources/examples
+order: 1000

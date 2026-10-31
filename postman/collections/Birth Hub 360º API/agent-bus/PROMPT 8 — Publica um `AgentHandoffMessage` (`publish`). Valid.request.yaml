@@ -1,0 +1,147 @@
+$kind: http-request
+name: "PROMPT 8 — Publica um `AgentHandoffMessage` (`publish`). Valida estrutura (agente/cargo de origem e destino existentes e ativos, capability existente e ativa), aplica loop guard (nunca um ciclo entre agentes já presentes na cadeia de `parentHandoffId`) e "
+description: ""
+url: "{{baseUrl}}/agent-bus"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "missionId": "string",
+      "conversationId": "string",
+      "fromAgent": "string",
+      "fromRole": "string",
+      "toAgent": "string",
+      "toRole": "string",
+      "requestType": "string",
+      "requestedCapability": "string",
+      "resourceScope": {},
+      "evidence": [
+        {
+          "sourceAgent": "string",
+          "summary": "string",
+          "recordedAt": "string",
+          "sourceExecutionId": "string",
+          "capabilityCode": "string"
+        },
+        {
+          "sourceAgent": "string",
+          "summary": "string",
+          "recordedAt": "string",
+          "sourceExecutionId": "string",
+          "capabilityCode": "string"
+        }
+      ],
+      "priority": "LOW",
+      "idempotencyKey": "string",
+      "parentHandoffId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "missionId": {
+          "type": "string"
+        },
+        "conversationId": {
+          "type": "string"
+        },
+        "fromAgent": {
+          "type": "string",
+          "description": "Código de AgentDefinition de origem."
+        },
+        "fromRole": {
+          "type": "string",
+          "description": "Código de JobRole de origem."
+        },
+        "toAgent": {
+          "type": "string",
+          "description": "Código de AgentDefinition de destino."
+        },
+        "toRole": {
+          "type": "string",
+          "description": "Código de JobRole de destino."
+        },
+        "requestType": {
+          "type": "string"
+        },
+        "requestedCapability": {
+          "type": "string"
+        },
+        "resourceScope": {
+          "type": "object"
+        },
+        "knownFacts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Cada item exige provenance — sourceAgent/summary/recordedAt nunca um texto solto.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceAgent": {
+                "type": "string"
+              },
+              "sourceExecutionId": {
+                "type": "string"
+              },
+              "capabilityCode": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "recordedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sourceAgent",
+              "summary",
+              "recordedAt"
+            ]
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "LOW",
+            "NORMAL",
+            "HIGH",
+            "URGENT"
+          ]
+        },
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "parentHandoffId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "missionId",
+        "conversationId",
+        "fromAgent",
+        "fromRole",
+        "toAgent",
+        "toRole",
+        "requestType",
+        "requestedCapability"
+      ]
+    }
+settings: {}
+examples: ./.resources/PROMPT 8 — Publica um `AgentHandoffMessage` (`publish`). Valid.resources/examples
+order: 1000

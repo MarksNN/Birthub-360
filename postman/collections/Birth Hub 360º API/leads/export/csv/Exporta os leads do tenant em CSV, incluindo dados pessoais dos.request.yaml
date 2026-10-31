@@ -1,0 +1,13 @@
+$kind: http-request
+name: Exporta os leads do tenant em CSV, incluindo dados pessoais dos contatos vinculados (somente ADMIN/GESTOR — exportação bulk de dado pessoal, minimização de acesso por LGPD)
+description: ""
+url: "{{baseUrl}}/leads/export/csv"
+method: GET
+headers:
+  Accept: text/csv
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Exporta os leads do tenant em CSV, incluindo dados pessoais dos.resources/examples
+order: 1000

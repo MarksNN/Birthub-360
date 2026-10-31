@@ -1,0 +1,13 @@
+$kind: http-request
+name: Jornada — handoffs, reentradas (recuperados/reativados), clientes sem interação e mapa de transições — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/journey"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Jornada — handoffs, reentradas (recuperados-reativados), clien.resources/examples
+order: 1000

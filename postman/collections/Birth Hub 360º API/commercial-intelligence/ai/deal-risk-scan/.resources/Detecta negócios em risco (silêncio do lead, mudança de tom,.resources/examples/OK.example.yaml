@@ -1,0 +1,57 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/commercial-intelligence/ai/deal-risk-scan"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "scanned": 4454,
+          "alertsCreated": 2211,
+          "skippedCooldown": 6906,
+          "errors": 4224
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "scanned": {
+                "type": "integer"
+              },
+              "alertsCreated": {
+                "type": "integer"
+              },
+              "skippedCooldown": {
+                "type": "integer"
+              },
+              "errors": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+order: 1000

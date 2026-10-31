@@ -1,0 +1,52 @@
+$kind: http-example
+name: Nova senha temporária (mesma regra de não persistência/reexibição do POST /team acima)
+request:
+  url: "{{baseUrl}}/team/:id/reset-password"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "member": {},
+          "tempPassword": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "member": {
+                "type": "object"
+              },
+              "tempPassword": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+order: 1000

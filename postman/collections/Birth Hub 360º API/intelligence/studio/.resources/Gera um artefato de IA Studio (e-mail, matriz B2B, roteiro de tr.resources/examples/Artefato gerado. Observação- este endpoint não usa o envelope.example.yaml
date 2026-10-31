@@ -1,0 +1,42 @@
+$kind: http-example
+name: 'Artefato gerado. Observação: este endpoint não usa o envelope `{success,data}` padrão, e sim `{ "result": ... }`.'
+request:
+  url: "{{baseUrl}}/intelligence/studio"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "kind": "string",
+        "brand": {},
+        "inputs": {}
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "result": {}
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object"
+          }
+        }
+      }
+order: 1000

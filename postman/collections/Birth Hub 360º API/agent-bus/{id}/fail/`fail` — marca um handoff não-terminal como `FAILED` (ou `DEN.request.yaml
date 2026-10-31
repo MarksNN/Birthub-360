@@ -1,0 +1,54 @@
+$kind: http-request
+name: "`fail` — marca um handoff não-terminal como `FAILED` (ou `DENIED`, via `outcome`). Repetir sobre um handoff já no mesmo outcome é seguro (retry seguro); tentar sobre um handoff já terminal com outro outcome é rejeitado (`INVALID_STATE`)."
+description: ""
+url: "{{baseUrl}}/agent-bus/:id/fail"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "errorMessage": "string",
+      "outcome": "DENIED"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "errorMessage": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "FAILED",
+            "DENIED"
+          ]
+        }
+      },
+      "required": [
+        "errorMessage"
+      ]
+    }
+settings: {}
+examples: ./.resources/`fail` — marca um handoff não-terminal como `FAILED` (ou `DEN.resources/examples
+order: 1000

@@ -1,0 +1,55 @@
+$kind: http-example
+name: Execução concluída (com sucesso ou com falha) — ver `status` no corpo.
+request:
+  url: "{{baseUrl}}/intelligence/agents/sdr/status/:sessionId"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    sessionId: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "status": "failed",
+        "sessionId": "string",
+        "messages": "",
+        "error": "string"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "failed"
+            ]
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string",
+            "description": "Presente quando status=failed."
+          }
+        },
+        "required": [
+          "status",
+          "sessionId"
+        ]
+      }
+order: 1000

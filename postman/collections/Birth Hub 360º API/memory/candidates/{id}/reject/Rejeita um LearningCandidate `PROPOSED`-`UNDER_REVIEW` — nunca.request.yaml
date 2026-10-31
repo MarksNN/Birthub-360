@@ -1,0 +1,43 @@
+$kind: http-request
+name: Rejeita um LearningCandidate `PROPOSED`/`UNDER_REVIEW` — nunca cria memória nenhuma
+description: ""
+url: "{{baseUrl}}/memory/candidates/:id/reject"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "notes": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Rejeita um LearningCandidate `PROPOSED`-`UNDER_REVIEW` — nunca.resources/examples
+order: 1000

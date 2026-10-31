@@ -1,0 +1,21 @@
+$kind: http-example
+name: Redireciona para `/app?google=connected` (sucesso) ou `/app?google=error&message=...` (falha) — nunca um corpo JSON, mesmo em erro.
+request:
+  url: "{{baseUrl}}/google/callback?code=string"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    code: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 302
+  statusText: Found
+  body:
+    type: text
+    content: ""
+order: 1000

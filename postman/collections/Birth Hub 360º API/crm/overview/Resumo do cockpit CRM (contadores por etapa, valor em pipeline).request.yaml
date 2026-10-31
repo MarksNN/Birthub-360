@@ -1,0 +1,12 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/crm/overview"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Resumo do cockpit CRM (contadores por etapa, valor em pipeline).resources/examples
+order: 1000

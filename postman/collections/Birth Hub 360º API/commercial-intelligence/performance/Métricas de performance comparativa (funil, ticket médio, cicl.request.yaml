@@ -1,0 +1,13 @@
+$kind: http-request
+name: Métricas de performance comparativa (funil, ticket médio, ciclo de venda) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/performance"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Métricas de performance comparativa (funil, ticket médio, cicl.resources/examples
+order: 1000

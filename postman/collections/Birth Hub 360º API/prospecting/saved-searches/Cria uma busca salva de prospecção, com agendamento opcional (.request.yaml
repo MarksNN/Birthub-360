@@ -1,0 +1,41 @@
+$kind: http-request
+name: "Cria uma busca salva de prospecção, com agendamento opcional (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/prospecting/saved-searches"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "criteria": {},
+      "schedule": "daily"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "criteria": {
+          "type": "object"
+        },
+        "schedule": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly"
+          ]
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma busca salva de prospecção, com agendamento opcional (.resources/examples
+order: 2000

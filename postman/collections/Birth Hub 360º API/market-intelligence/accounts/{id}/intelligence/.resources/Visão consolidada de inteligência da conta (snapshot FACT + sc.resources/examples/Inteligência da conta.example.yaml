@@ -1,0 +1,97 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/market-intelligence/accounts/:id/intelligence"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Id da Company do CRM do tenant (1–128 chars)
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "account": {},
+          "state": "not_refreshed",
+          "facts": {},
+          "latestInference": {},
+          "collections": {
+            "signals": 6189,
+            "decisionMakers": 8054,
+            "relationships": 3909,
+            "recommendations": 6138,
+            "evidence": 808
+          }
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "object",
+                "description": "Campos selecionados da Company do CRM"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "not_refreshed"
+                ]
+              },
+              "facts": {
+                "type": "object",
+                "description": "Snapshot mais recente com `knowledgeType` = FACT"
+              },
+              "latestInference": {
+                "type": "object",
+                "description": "AccountScore mais recente com `knowledgeType` = INFERENCE"
+              },
+              "collections": {
+                "type": "object",
+                "properties": {
+                  "signals": {
+                    "type": "integer"
+                  },
+                  "decisionMakers": {
+                    "type": "integer"
+                  },
+                  "relationships": {
+                    "type": "integer"
+                  },
+                  "recommendations": {
+                    "type": "integer"
+                  },
+                  "evidence": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+order: 1000

@@ -1,0 +1,34 @@
+$kind: http-request
+name: Roda o agente de aprendizado contínuo, refletindo sobre ações recentes do usuário
+description: ""
+url: "{{baseUrl}}/agent/swarm/learn"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": "string",
+      "organizationId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "organizationId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Roda o agente de aprendizado contínuo, refletindo sobre ações.resources/examples
+order: 1000

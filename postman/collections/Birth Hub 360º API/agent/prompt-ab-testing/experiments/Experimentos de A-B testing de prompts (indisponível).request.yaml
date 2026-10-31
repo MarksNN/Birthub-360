@@ -1,0 +1,13 @@
+$kind: http-request
+name: Experimentos de A/B testing de prompts (indisponível)
+description: "Endpoint indisponível: falha sempre com 500 (TypeError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07."
+url: "{{baseUrl}}/agent/prompt-ab-testing/experiments"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Experimentos de A-B testing de prompts (indisponível).resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Verifica se o usuário autenticado tem um fechamento de Plano Diário pendente (dia civil anterior com atividades locais e sem `DailyPlanClosing` registrado) — usado pelo DailyClosingGate para decidir se bloqueia o app.
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan/closing/pending"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Verifica se o usuário autenticado tem um fechamento de Plano Di.resources/examples
+order: 1000

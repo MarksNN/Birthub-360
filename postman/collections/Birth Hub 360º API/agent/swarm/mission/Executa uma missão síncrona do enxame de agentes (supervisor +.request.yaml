@@ -1,0 +1,42 @@
+$kind: http-request
+name: Executa uma missão síncrona do enxame de agentes (supervisor + sub-agentes)
+description: ""
+url: "{{baseUrl}}/agent/swarm/mission"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mission": "string",
+      "sessionId": "string",
+      "leadId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "mission": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "sessionId": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "leadId": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Quando presente, permite ao agente SDR do enxame buscar o contexto real do lead no CRM."
+        }
+      },
+      "required": [
+        "mission"
+      ]
+    }
+settings: {}
+examples: ./.resources/Executa uma missão síncrona do enxame de agentes (supervisor +.resources/examples
+order: 1000

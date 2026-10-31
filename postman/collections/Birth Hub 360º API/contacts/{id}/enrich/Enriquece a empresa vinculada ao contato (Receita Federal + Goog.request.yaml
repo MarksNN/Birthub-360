@@ -1,0 +1,30 @@
+$kind: http-request
+name: Enriquece a empresa vinculada ao contato (Receita Federal + Google Negócios + Apollo)
+description: ""
+url: "{{baseUrl}}/contacts/:id/enrich"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Enriquece a empresa vinculada ao contato (Receita Federal + Goog.resources/examples
+order: 1000

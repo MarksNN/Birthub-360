@@ -1,0 +1,13 @@
+$kind: http-request
+name: Testa conectividade e disponibilidade dos provedores de prospecção
+description: ""
+url: "{{baseUrl}}/prospecting/providers/test"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Testa conectividade e disponibilidade dos provedores de prospec.resources/examples
+order: 1000

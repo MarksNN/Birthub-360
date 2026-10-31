@@ -1,0 +1,30 @@
+$kind: http-request
+name: Baixa o arquivo de uma extração concluída (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/extractions/:id/download"
+method: GET
+headers:
+  Accept: application/octet-stream
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Baixa o arquivo de uma extração concluída (somente ADMIN-GEST.resources/examples
+order: 1000

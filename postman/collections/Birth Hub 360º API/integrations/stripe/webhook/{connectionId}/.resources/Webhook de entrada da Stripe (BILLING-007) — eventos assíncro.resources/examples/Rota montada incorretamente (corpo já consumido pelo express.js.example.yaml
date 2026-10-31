@@ -1,0 +1,23 @@
+$kind: http-example
+name: Rota montada incorretamente (corpo já consumido pelo express.json() global)
+request:
+  url: "{{baseUrl}}/integrations/stripe/webhook/:connectionId"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    connectionId: string
+  body:
+    type: json
+    content: "{}"
+response:
+  statusCode: 500
+  statusText: Internal Server Error
+  body:
+    type: text
+    content: ""
+order: 5000

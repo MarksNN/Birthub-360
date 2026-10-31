@@ -1,0 +1,29 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/bitrix/extractions/:id/download"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/octet-stream
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/octet-stream
+  body:
+    type: text
+    content: string
+    $type: |-
+      {
+        "type": "string",
+        "format": "binary"
+      }
+order: 1000

@@ -1,0 +1,79 @@
+$kind: http-example
+name: Página de resultados do tenant (lista vazia quando não há dados reais)
+request:
+  url: "{{baseUrl}}/market-intelligence/accounts/:id/relationships?page=1&limit=20&status=Rejected&relationType=string"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    page: "1"
+    limit: "20"
+    status: Rejected
+    relationType: string
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Id da Company do CRM do tenant (1–128 chars)
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "page": 1199,
+          "limit": 2536,
+          "total": 2171,
+          "totalPages": 1504,
+          "hasNextPage": true
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "page": {
+                "type": "integer"
+              },
+              "limit": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              },
+              "totalPages": {
+                "type": "integer"
+              },
+              "hasNextPage": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+order: 1000

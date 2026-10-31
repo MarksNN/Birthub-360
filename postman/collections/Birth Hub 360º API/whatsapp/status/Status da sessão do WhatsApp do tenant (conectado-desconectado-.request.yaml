@@ -1,0 +1,13 @@
+$kind: http-request
+name: Status da sessão do WhatsApp do tenant (conectado/desconectado/QR Code)
+description: ""
+url: "{{baseUrl}}/whatsapp/status"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Status da sessão do WhatsApp do tenant (conectado-desconectado-.resources/examples
+order: 1000

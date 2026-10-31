@@ -1,0 +1,53 @@
+$kind: http-request
+name: "Confirma manualmente um horário de reunião com o lead (CYC-004) — só aceita confirmação verificável (`evidenceType: manual-verified`, nunca inferência de IA sobre o texto de uma mensagem). Cria uma Note de evidência real e um `CadenceCalendarEvent`. A cri"
+description: ""
+url: "{{baseUrl}}/cadence/leads/:leadId/schedule-meeting"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "proposedStart": "2012-06-30T00:00:34.116Z",
+      "proposedEnd": "1981-03-22T00:24:15.324Z"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "proposedStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "proposedEnd": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "proposedStart",
+        "proposedEnd"
+      ]
+    }
+settings: {}
+examples: ./.resources/Confirma manualmente um horário de reunião com o lead (CYC-004.resources/examples
+order: 1000

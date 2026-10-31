@@ -1,0 +1,44 @@
+$kind: http-request
+name: Anuncia um padrão vencedor do Playbook Vivo pro time inteiro, via notificação in-app (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/playbook/living-playbook/broadcast"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sellerName": "string",
+      "segment": "string",
+      "patternTitle": "string",
+      "suggestedScript": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "sellerName": {
+          "type": "string"
+        },
+        "segment": {
+          "type": "string"
+        },
+        "patternTitle": {
+          "type": "string"
+        },
+        "suggestedScript": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sellerName",
+        "segment",
+        "patternTitle",
+        "suggestedScript"
+      ]
+    }
+settings: {}
+examples: ./.resources/Anuncia um padrão vencedor do Playbook Vivo pro time inteiro, v.resources/examples
+order: 1000

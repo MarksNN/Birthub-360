@@ -1,0 +1,40 @@
+$kind: http-request
+name: Cria um novo usuário na organização com senha temporária (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/team"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "email": "pGKL@qkjevpCOJldQyIAyhrVnmyjNM.gt",
+      "role": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "role": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "role"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria um novo usuário na organização com senha temporária (so.resources/examples
+order: 3000

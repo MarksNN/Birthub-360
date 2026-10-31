@@ -1,0 +1,30 @@
+$kind: http-request
+name: Histórico de e-mails persistidos (EmailMessage, reply tracking do Agente 17) de um lead — base para a central unificada de conversas do card do lead.
+description: ""
+url: "{{baseUrl}}/integrations/email/messages?leadId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico de e-mails persistidos (EmailMessage, reply tracking.resources/examples
+order: 1000

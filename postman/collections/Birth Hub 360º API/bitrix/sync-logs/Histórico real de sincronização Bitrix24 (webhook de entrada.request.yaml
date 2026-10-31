@@ -1,0 +1,30 @@
+$kind: http-request
+name: Histórico real de sincronização Bitrix24 (webhook de entrada + push/pull automático ou manual), tenant-scoped. Backing real do Monitor de Webhooks — corrigido na Onda 1/Roadmap v2 (Agente 06); antes o painel chamava um endpoint inexistente e caía para eve
+description: ""
+url: "{{baseUrl}}/bitrix/sync-logs?take=50"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: take
+    value: "50"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico real de sincronização Bitrix24 (webhook de entrada.resources/examples
+order: 1000

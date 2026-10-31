@@ -1,0 +1,45 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/leads/:leadId/attachments/:attachmentId/download-url"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: attachmentId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Gera uma URL assinada para download do arquivo.resources/examples
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Pausa manualmente uma execução de cadência ativa (CYC-009). Idempotente: pausar um run que não está `active` devolve o run inalterado, nunca lança erro."
+description: ""
+url: "{{baseUrl}}/cadence/runs/:id/pause"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Pausa manualmente uma execução de cadência ativa (CYC-009). I.resources/examples
+order: 1000

@@ -1,0 +1,36 @@
+$kind: http-request
+name: Login por e-mail/senha (Better Auth)
+description: ""
+url: "{{baseUrl}}/auth/sign-in/email"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "h29@HxRNczwwiRCEbVBaqjGN.uxu",
+      "password": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    }
+settings: {}
+examples: ./.resources/Login por e-mail-senha (Better Auth).resources/examples
+order: 1000

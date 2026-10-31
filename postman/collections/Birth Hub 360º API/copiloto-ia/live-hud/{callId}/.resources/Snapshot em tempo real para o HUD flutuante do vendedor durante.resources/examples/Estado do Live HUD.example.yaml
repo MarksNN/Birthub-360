@@ -1,0 +1,96 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/copiloto-ia/live-hud/:callId"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    callId: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "callId": "string",
+          "dealId": "string",
+          "currentSentiment": "POSITIVO",
+          "sentimentScore": 3645.6083336901033,
+          "activeObjection": {
+            "category": "string",
+            "detectedText": "string",
+            "suggestedRebuttal": "string",
+            "confidence": 6046.251741547264
+          },
+          "riskAlert": "string",
+          "latencyMs": 7986
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "callId": {
+                "type": "string"
+              },
+              "dealId": {
+                "type": "string"
+              },
+              "currentSentiment": {
+                "type": "string",
+                "enum": [
+                  "MUITO_POSITIVO",
+                  "POSITIVO",
+                  "NEUTRO",
+                  "NEGATIVO"
+                ]
+              },
+              "sentimentScore": {
+                "type": "number"
+              },
+              "activeObjection": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string"
+                  },
+                  "detectedText": {
+                    "type": "string"
+                  },
+                  "suggestedRebuttal": {
+                    "type": "string"
+                  },
+                  "confidence": {
+                    "type": "number"
+                  }
+                }
+              },
+              "riskAlert": {
+                "type": "string"
+              },
+              "latencyMs": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+order: 1000

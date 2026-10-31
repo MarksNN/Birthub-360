@@ -1,0 +1,26 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/agent-bus/:id/fail"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "errorMessage": "string",
+        "outcome": "DENIED"
+      }
+response:
+  statusCode: 409
+  statusText: Conflict
+  body:
+    type: text
+    content: ""
+order: 4000

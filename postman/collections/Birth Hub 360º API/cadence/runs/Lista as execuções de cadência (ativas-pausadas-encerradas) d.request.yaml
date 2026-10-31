@@ -1,0 +1,19 @@
+$kind: http-request
+name: Lista as execuções de cadência (ativas/pausadas/encerradas) da organização autenticada
+description: ""
+url: "{{baseUrl}}/cadence/runs?status=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: status
+    value: string
+    disabled: false
+    description: "Filtro opcional por status, separado por vírgula (ex.: Active,Paused)"
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as execuções de cadência (ativas-pausadas-encerradas) d.resources/examples
+order: 1000

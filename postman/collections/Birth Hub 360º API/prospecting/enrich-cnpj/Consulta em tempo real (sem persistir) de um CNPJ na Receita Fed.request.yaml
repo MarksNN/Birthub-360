@@ -1,0 +1,29 @@
+$kind: http-request
+name: Consulta em tempo real (sem persistir) de um CNPJ na Receita Federal via BrasilAPI
+description: ""
+url: "{{baseUrl}}/prospecting/enrich-cnpj"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "cnpj": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "cnpj": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cnpj"
+      ]
+    }
+settings: {}
+examples: ./.resources/Consulta em tempo real (sem persistir) de um CNPJ na Receita Fed.resources/examples
+order: 1000

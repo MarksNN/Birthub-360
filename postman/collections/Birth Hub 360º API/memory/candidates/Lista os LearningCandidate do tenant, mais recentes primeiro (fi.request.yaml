@@ -1,0 +1,35 @@
+$kind: http-request
+name: Lista os LearningCandidate do tenant, mais recentes primeiro (filtro opcional por `status` na query)
+description: ""
+url: "{{baseUrl}}/memory/candidates?status=APPROVED"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: status
+    value: APPROVED
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "PROPOSED",
+              "UNDER_REVIEW",
+              "APPROVED",
+              "REJECTED",
+              "SUPERSEDED",
+              "ROLLED_BACK"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os LearningCandidate do tenant, mais recentes primeiro (fi.resources/examples
+order: 2000

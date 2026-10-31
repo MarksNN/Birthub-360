@@ -1,0 +1,61 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/leads/:leadId/attachments/upload-url"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "fileName": "string",
+      "mimeType": "string",
+      "sizeBytes": 2144
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "mimeType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Limite de 25MB por anexo"
+        }
+      },
+      "required": [
+        "fileName",
+        "mimeType",
+        "sizeBytes"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera uma URL assinada para upload direto do arquivo ao storage.resources/examples
+order: 1000

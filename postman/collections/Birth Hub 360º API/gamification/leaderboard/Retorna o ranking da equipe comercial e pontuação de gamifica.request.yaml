@@ -1,0 +1,13 @@
+$kind: http-request
+name: Retorna o ranking da equipe comercial e pontuação de gamificação
+description: ""
+url: "{{baseUrl}}/gamification/leaderboard"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna o ranking da equipe comercial e pontuação de gamifica.resources/examples
+order: 1000

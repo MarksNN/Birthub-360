@@ -1,0 +1,67 @@
+$kind: http-request
+name: Registra o anexo após o upload direto ao storage ter sido concluído
+description: ""
+url: "{{baseUrl}}/leads/:leadId/attachments"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "objectKey": "string",
+      "fileName": "string",
+      "mimeType": "string",
+      "sizeBytes": 9611
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "objectKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fileName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "mimeType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "objectKey",
+        "fileName",
+        "mimeType",
+        "sizeBytes"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra o anexo após o upload direto ao storage ter sido concl.resources/examples
+order: 2000

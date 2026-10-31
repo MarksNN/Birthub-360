@@ -1,0 +1,35 @@
+$kind: http-request
+name: Habilita/desabilita quais eventos de entrada esta conexão aceita (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/connections/:connectionId/inbound-events"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: connectionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Habilita-desabilita quais eventos de entrada esta conexão aceit.resources/examples
+order: 1000

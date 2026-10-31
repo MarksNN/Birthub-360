@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os registros de opt-out (por canal ou global) da organização autenticada
+description: ""
+url: "{{baseUrl}}/cadence/opt-outs"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os registros de opt-out (por canal ou global) da organiza.resources/examples
+order: 1000

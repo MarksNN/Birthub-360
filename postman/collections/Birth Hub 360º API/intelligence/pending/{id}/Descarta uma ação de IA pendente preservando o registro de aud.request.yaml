@@ -1,0 +1,30 @@
+$kind: http-request
+name: Descarta uma ação de IA pendente preservando o registro de auditoria
+description: ""
+url: "{{baseUrl}}/intelligence/pending/:id"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Descarta uma ação de IA pendente preservando o registro de aud.resources/examples
+order: 2000

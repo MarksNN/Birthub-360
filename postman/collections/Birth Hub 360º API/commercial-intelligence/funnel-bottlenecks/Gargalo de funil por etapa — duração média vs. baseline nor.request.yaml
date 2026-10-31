@@ -1,0 +1,13 @@
+$kind: http-request
+name: Gargalo de funil por etapa — duração média vs. baseline normal e negócios parados agora (somente ADMIN/GESTOR).
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/funnel-bottlenecks"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Gargalo de funil por etapa — duração média vs. baseline nor.resources/examples
+order: 1000

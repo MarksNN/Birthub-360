@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Lista os logs de auditoria de segurança/LGPD da organização autenticada (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Somente ADMIN/GESTOR."
+description: ""
+url: "{{baseUrl}}/lgpd/audit-logs?limit=50"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: limit
+    value: "50"
+    disabled: false
+    description: Máximo de registros (padrão 50, teto 100)
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os logs de auditoria de segurança-LGPD da organização a.resources/examples
+order: 1000

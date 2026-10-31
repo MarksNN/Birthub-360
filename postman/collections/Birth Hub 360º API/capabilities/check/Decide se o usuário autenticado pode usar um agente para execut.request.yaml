@@ -1,0 +1,38 @@
+$kind: http-request
+name: Decide se o usuário autenticado pode usar um agente para executar uma capability — nunca executa nada, só responde a decisão estruturada (allowed/reason/riskLevel/requiresApproval/ toolAvailable/bindingVerification). Identidade e tenant vêm sempre da sess
+description: ""
+url: "{{baseUrl}}/capabilities/check"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "agentCode": "string",
+      "capabilityCode": "string",
+      "resource": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "agentCode": {
+          "type": "string"
+        },
+        "capabilityCode": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "agentCode",
+        "capabilityCode"
+      ]
+    }
+settings: {}
+examples: ./.resources/Decide se o usuário autenticado pode usar um agente para execut.resources/examples
+order: 1000

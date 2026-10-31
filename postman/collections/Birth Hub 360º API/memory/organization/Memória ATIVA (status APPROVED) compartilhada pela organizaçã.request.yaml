@@ -1,0 +1,13 @@
+$kind: http-request
+name: Memória ATIVA (status APPROVED) compartilhada pela organização inteira
+description: ""
+url: "{{baseUrl}}/memory/organization"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Memória ATIVA (status APPROVED) compartilhada pela organizaçã.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Matriz usuário × módulo da organização (usuários reais + catálogo de módulos), para o painel de administração — somente ADMIN
+description: ""
+url: "{{baseUrl}}/module-access"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Matriz usuário × módulo da organização (usuários reais + c.resources/examples
+order: 2000

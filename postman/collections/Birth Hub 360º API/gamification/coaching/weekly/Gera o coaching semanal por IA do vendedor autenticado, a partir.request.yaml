@@ -1,0 +1,32 @@
+$kind: http-request
+name: Gera o coaching semanal por IA do vendedor autenticado, a partir de dados reais de atividades e negócios (Piloto 007, .claude/PILOTS.md) — nunca de outro vendedor, o nome usado vem sempre da sessão autenticada.
+description: ""
+url: "{{baseUrl}}/gamification/coaching/weekly"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "role": "SDR / Hunter"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "SDR / Hunter",
+            "Closer / Executivo de Contas",
+            "Account Manager / Farmer"
+          ],
+          "description": "Função de vendas informada manualmente pelo próprio usuário (opcional, não persistida) — não existe campo de função de vendas no cadastro do usuário."
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Gera o coaching semanal por IA do vendedor autenticado, a partir.resources/examples
+order: 1000

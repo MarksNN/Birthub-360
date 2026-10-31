@@ -1,0 +1,30 @@
+$kind: http-request
+name: Lista o histórico de versões de um documento comercial (CYC-005), mais recente primeiro
+description: ""
+url: "{{baseUrl}}/crm/documents/:id/versions"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista o histórico de versões de um documento comercial (CYC-00.resources/examples
+order: 1000

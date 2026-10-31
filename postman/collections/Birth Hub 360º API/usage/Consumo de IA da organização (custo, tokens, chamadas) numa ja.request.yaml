@@ -1,0 +1,30 @@
+$kind: http-request
+name: Consumo de IA da organização (custo, tokens, chamadas) numa janela de dias
+description: ""
+url: "{{baseUrl}}/usage?days=30"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: days
+    value: "30"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 7,
+            "maximum": 90
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consumo de IA da organização (custo, tokens, chamadas) numa ja.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Metas comerciais do período (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/goals"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Metas comerciais do período (somente ADMIN-GESTOR).resources/examples
+order: 1000

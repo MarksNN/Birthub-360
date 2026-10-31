@@ -1,0 +1,32 @@
+$kind: http-request
+name: Dispara o agente SDR de qualificação para um lead (execução assíncrona em background)
+description: ""
+url: "{{baseUrl}}/intelligence/agents/sdr/qualify"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadId": "string",
+      "sessionId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "leadId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Dispara o agente SDR de qualificação para um lead (execução.resources/examples
+order: 1000

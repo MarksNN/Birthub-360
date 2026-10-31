@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os grupos de leads duplicados (mesmo contato) do tenant, somente leitura
+description: ""
+url: "{{baseUrl}}/leads/dedup/preview"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os grupos de leads duplicados (mesmo contato) do tenant, s.resources/examples
+order: 1000

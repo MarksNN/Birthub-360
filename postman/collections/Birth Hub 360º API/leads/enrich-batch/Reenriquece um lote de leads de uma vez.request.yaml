@@ -1,0 +1,34 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/leads/enrich-batch"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadIds": [
+        "string",
+        "string"
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "leadIds"
+      ]
+    }
+settings: {}
+examples: ./.resources/Reenriquece um lote de leads de uma vez.resources/examples
+order: 1000

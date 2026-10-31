@@ -1,0 +1,68 @@
+$kind: http-request
+name: "Webhook de e-mail de ENTRADA (CYC-003, onda 26) — stub de transporte: aceita diretamente o payload que um provedor real de inbound-parse (SendGrid/Postmark/Mailgun) entregaria depois de resolver `organizationId`, já que este projeto não tem hoje uma caixa"
+description: ""
+url: "{{baseUrl}}/webhooks/email/webhook"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "organizationId": "string",
+      "providerMessageId": "string",
+      "fromEmail": "string",
+      "leadId": "string",
+      "inReplyTo": "string",
+      "toEmail": "string",
+      "subject": "string",
+      "body": "string",
+      "autoSubmittedHeader": "string",
+      "receivedAt": "1992-09-18T11:23:19.400Z"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "organizationId": {
+          "type": "string"
+        },
+        "leadId": {
+          "type": "string",
+          "description": "Dica direta de lead — resolvido por e-mail do contato quando ausente."
+        },
+        "providerMessageId": {
+          "type": "string"
+        },
+        "inReplyTo": {
+          "type": "string"
+        },
+        "fromEmail": {
+          "type": "string"
+        },
+        "toEmail": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "autoSubmittedHeader": {
+          "type": "string"
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "organizationId",
+        "providerMessageId",
+        "fromEmail"
+      ]
+    }
+settings: {}
+examples: ./.resources/Webhook de e-mail de ENTRADA (CYC-003, onda 26) — stub de tran.resources/examples
+order: 1000

@@ -1,0 +1,83 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/social-selling/approach/generate"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "targetCompany": "string",
+        "targetRole": "string",
+        "segment": "string",
+        "triggerEvent": "string",
+        "channel": "whatsapp",
+        "tone": "provocative"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "headline": "string",
+          "hook": "string",
+          "body": "string",
+          "callToAction": "string",
+          "fullMessage": "string",
+          "channel": "string",
+          "tone": "string",
+          "estimatedTokens": 7693
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "headline": {
+                "type": "string"
+              },
+              "hook": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              },
+              "callToAction": {
+                "type": "string"
+              },
+              "fullMessage": {
+                "type": "string"
+              },
+              "channel": {
+                "type": "string"
+              },
+              "tone": {
+                "type": "string"
+              },
+              "estimatedTokens": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+order: 1000

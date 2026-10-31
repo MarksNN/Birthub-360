@@ -1,0 +1,45 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/intelligence/search?q=string&limit=5"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: q
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: limit
+    value: "5"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 5,
+            "minimum": 1,
+            "maximum": 20
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Busca vetorial (RAG) sobre a base de conhecimento do tenant.resources/examples
+order: 1000

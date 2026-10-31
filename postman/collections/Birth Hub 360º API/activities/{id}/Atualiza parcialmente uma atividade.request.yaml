@@ -1,0 +1,91 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/activities/:id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "type": "Ligação",
+      "owner": "string",
+      "date": "1970-01-07",
+      "leadId": "string",
+      "time": "string",
+      "status": "Concluída",
+      "observations": "string"
+    }
+  $type: |-
+    {
+      "description": "Todos os campos são opcionais em PUT (`.partial()`)",
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "Ligação",
+                "WhatsApp",
+                "E-mail",
+                "Reunião",
+                "Follow-up",
+                "Visita",
+                "Tarefa"
+              ]
+            },
+            "owner": {
+              "type": "string"
+            },
+            "date": {
+              "type": "string",
+              "format": "date"
+            },
+            "time": {
+              "type": "string"
+            },
+            "status": {
+              "allOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "observations": {
+              "type": "string"
+            },
+            "leadId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "owner",
+            "date",
+            "leadId"
+          ]
+        }
+      ]
+    }
+settings: {}
+examples: ./.resources/Atualiza parcialmente uma atividade.resources/examples
+order: 1000

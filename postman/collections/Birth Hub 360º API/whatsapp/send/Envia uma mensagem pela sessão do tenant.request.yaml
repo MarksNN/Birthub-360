@@ -1,0 +1,33 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/whatsapp/send"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "number": "string",
+      "text": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "number",
+        "text"
+      ]
+    }
+settings: {}
+examples: ./.resources/Envia uma mensagem pela sessão do tenant.resources/examples
+order: 1000

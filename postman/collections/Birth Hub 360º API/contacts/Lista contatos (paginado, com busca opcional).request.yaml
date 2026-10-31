@@ -1,0 +1,46 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/contacts?q=string&page=1&limit=50"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: q
+    value: string
+    disabled: false
+    description: Busca textual (nome/e-mail/telefone)
+    $type: string
+  - key: page
+    value: "1"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 1
+          }
+        }
+      }
+  - key: limit
+    value: "50"
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "default": 50
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista contatos (paginado, com busca opcional).resources/examples
+order: 1000

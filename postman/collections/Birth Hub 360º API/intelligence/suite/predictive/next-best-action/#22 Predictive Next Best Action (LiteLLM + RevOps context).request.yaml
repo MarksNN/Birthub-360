@@ -1,0 +1,50 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/intelligence/suite/predictive/next-best-action"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadId": "string",
+      "leadName": "string",
+      "stage": "string",
+      "companyName": "string",
+      "recentNotes": "string",
+      "lastInteractionDaysAgo": 6375
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string"
+        },
+        "leadName": {
+          "type": "string"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "recentNotes": {
+          "type": "string"
+        },
+        "lastInteractionDaysAgo": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "leadId",
+        "leadName",
+        "stage"
+      ]
+    }
+settings: {}
+examples: ./.resources/#22 Predictive Next Best Action (LiteLLM + RevOps context).resources/examples
+order: 1000

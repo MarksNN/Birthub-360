@@ -1,0 +1,18 @@
+$kind: http-request
+name: Cria uma nova conexão com o PABX 3CX (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/integrations/3cx/connect"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Cria uma nova conexão com o PABX 3CX (somente ADMIN-GESTOR).resources/examples
+order: 1000

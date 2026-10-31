@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Eliminação/anonimização do titular (LGPD Art. 18 VI) — irreversível. Somente ADMIN/GESTOR. Base legal: exercício de direito do titular. `organizationId` vem exclusivamente da sessão autenticada, nunca de header do cliente (mitiga anonimização cross-tenant"
+description: ""
+url: "{{baseUrl}}/lgpd/titular/:contactId"
+method: DELETE
+headers:
+  Accept: application/json
+pathVariables:
+  - key: contactId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Eliminação-anonimização do titular (LGPD Art. 18 VI) — irr.resources/examples
+order: 2000

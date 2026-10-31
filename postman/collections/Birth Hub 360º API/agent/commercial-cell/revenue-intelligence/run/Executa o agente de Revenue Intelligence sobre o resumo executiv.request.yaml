@@ -1,0 +1,51 @@
+$kind: http-request
+name: Executa o agente de Revenue Intelligence sobre o resumo executivo e o playbook de mentoria já calculados pelo CommercialIntelligenceAiService para o período informado.
+description: ""
+url: "{{baseUrl}}/agent/commercial-cell/revenue-intelligence/run"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "month": "7409-25",
+      "owner": "string",
+      "product": "string",
+      "source": "string",
+      "icp": "string",
+      "company": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "month": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "description": "Formato YYYY-MM"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "icp": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "month"
+      ]
+    }
+settings: {}
+examples: ./.resources/Executa o agente de Revenue Intelligence sobre o resumo executiv.resources/examples
+order: 1000

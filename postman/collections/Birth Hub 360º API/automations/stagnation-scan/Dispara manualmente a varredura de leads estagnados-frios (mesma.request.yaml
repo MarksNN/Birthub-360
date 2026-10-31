@@ -1,0 +1,13 @@
+$kind: http-request
+name: Dispara manualmente a varredura de leads estagnados/frios (mesma lógica do cron diário) — somente ADMIN, varredura cross-tenant administrativa
+description: ""
+url: "{{baseUrl}}/automations/stagnation-scan"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Dispara manualmente a varredura de leads estagnados-frios (mesma.resources/examples
+order: 1000

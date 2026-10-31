@@ -1,0 +1,13 @@
+$kind: http-request
+name: Webhook de evento de chamada do PABX 3CX (Call Flow). Corpo cru (`express.raw`), assinatura HMAC no header `x-3cx-signature`, segredo `THREECX_WEBHOOK_SECRET`.
+description: ""
+url: "{{baseUrl}}/integrations/3cx/webhook"
+method: POST
+headers:
+  Content-Type: application/octet-stream
+body:
+  type: file
+  content: {}
+settings: {}
+examples: ./.resources/Webhook de evento de chamada do PABX 3CX (Call Flow). Corpo cru.resources/examples
+order: 1000

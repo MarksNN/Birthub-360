@@ -1,0 +1,19 @@
+$kind: http-request
+name: Lista as conexões de CRM externo do tenant (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/integrations/external-crm?provider=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: provider
+    value: string
+    disabled: false
+    description: "Filtra por provider (ex.: hubspot, rdstation, monday)"
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as conexões de CRM externo do tenant (somente ADMIN-GESTO.resources/examples
+order: 1000

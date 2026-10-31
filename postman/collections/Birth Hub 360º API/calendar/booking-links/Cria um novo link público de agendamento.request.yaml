@@ -1,0 +1,40 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/calendar/booking-links"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "slug": "string",
+      "title": "string",
+      "description": "string",
+      "durationMin": 356
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "durationMin": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "slug",
+        "title"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria um novo link público de agendamento.resources/examples
+order: 2000

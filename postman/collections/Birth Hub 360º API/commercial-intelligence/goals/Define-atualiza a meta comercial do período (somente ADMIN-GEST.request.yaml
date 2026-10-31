@@ -1,0 +1,18 @@
+$kind: http-request
+name: Define/atualiza a meta comercial do período (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/goals"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Define-atualiza a meta comercial do período (somente ADMIN-GEST.resources/examples
+order: 2000

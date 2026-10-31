@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Mescla todos os grupos de empresas duplicadas por CNPJ/nome fantasia: mantém a empresa sobrevivente (priorizando enriquecida e mais antiga), reatribui Contact/Lead/Note/ Attachment/EnrichmentLog/CrmCommercialDocument/CopilotoConversation e remove as demai"
+description: ""
+url: "{{baseUrl}}/companies/dedup/merge"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Mescla todos os grupos de empresas duplicadas por CNPJ-nome fant.resources/examples
+order: 1000

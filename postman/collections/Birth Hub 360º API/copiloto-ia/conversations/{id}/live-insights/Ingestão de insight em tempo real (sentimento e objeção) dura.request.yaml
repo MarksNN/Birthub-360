@@ -1,0 +1,111 @@
+$kind: http-request
+name: Ingestão de insight em tempo real (sentimento e objeção) durante chamada ativa (Onda 15)
+description: Emite eventos de detecção de sentimento, objeções comerciais e intenções de compra durante chamadas LiveKit/WebRTC ativas. Alimenta o Live HUD do closer (<800ms) e o cálculo de risco de fechamento do deal (handoffs 07-para-04 e 07-para-02).
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/live-insights"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "callId": "string",
+      "dealId": "string",
+      "timestamp": "2024-02-23T12:54:21.445Z",
+      "sentimentScore": 0.8583695784570766,
+      "objectionCategory": "preco_ou_orcamento",
+      "suggestedRebuttal": "string",
+      "organizationId": "string",
+      "confidence": 0.8898238801350777,
+      "competitorMentioned": "string",
+      "keyPhrases": [
+        "string",
+        "string"
+      ],
+      "transcriptSnippet": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "callId": {
+          "type": "string"
+        },
+        "dealId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "objectionCategory": {
+          "type": "string",
+          "enum": [
+            "preco_ou_orcamento",
+            "concorrente",
+            "timing_ou_prioridade",
+            "autoridade_decisor",
+            "produto_fit",
+            "indecisao",
+            "contrato_ou_juridico",
+            "outros"
+          ]
+        },
+        "suggestedRebuttal": {
+          "type": "string"
+        },
+        "sentimentScore": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Score de sentimento (-1 muito negativo a +1 muito positivo)"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "competitorMentioned": {
+          "type": "string"
+        },
+        "keyPhrases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transcriptSnippet": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "callId",
+        "dealId",
+        "timestamp",
+        "sentimentScore"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ingestão de insight em tempo real (sentimento e objeção) dura.resources/examples
+order: 1000

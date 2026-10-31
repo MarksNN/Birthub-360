@@ -1,0 +1,30 @@
+$kind: http-request
+name: Marca a conversa como falha (ex. erro de transcrição — qualquer estado → FAILED)
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/fail"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Marca a conversa como falha (ex. erro de transcrição — qualq.resources/examples
+order: 1000

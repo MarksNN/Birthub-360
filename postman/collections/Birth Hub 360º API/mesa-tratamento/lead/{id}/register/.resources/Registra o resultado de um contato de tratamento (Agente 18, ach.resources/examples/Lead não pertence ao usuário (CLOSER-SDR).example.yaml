@@ -1,0 +1,31 @@
+$kind: http-example
+name: Lead não pertence ao usuário (CLOSER/SDR)
+request:
+  url: "{{baseUrl}}/mesa-tratamento/lead/:id/register"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "outcome": "reuniao_agendada",
+        "note": "string",
+        "bitrixStatusId": "string",
+        "lossReasonId": "string",
+        "nextActionTitle": "string",
+        "nextActionWhen": "2008-10-28T00:27:43.191Z"
+      }
+response:
+  statusCode: 403
+  statusText: Forbidden
+  body:
+    type: text
+    content: ""
+order: 3000

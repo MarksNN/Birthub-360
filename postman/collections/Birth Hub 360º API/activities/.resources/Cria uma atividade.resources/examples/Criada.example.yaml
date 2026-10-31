@@ -1,0 +1,122 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/activities"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "type": "WhatsApp",
+        "owner": "string",
+        "date": "1989-02-12",
+        "leadId": "string",
+        "time": "string",
+        "status": "Cancelada",
+        "observations": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "type": "Tarefa",
+          "owner": "string",
+          "date": "2012-03-21",
+          "leadId": "string",
+          "id": "string",
+          "organizationId": "string",
+          "createdAt": "1955-05-29T04:52:40.388Z",
+          "time": "string",
+          "status": "Cancelada",
+          "observations": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "Ligação",
+                      "WhatsApp",
+                      "E-mail",
+                      "Reunião",
+                      "Follow-up",
+                      "Visita",
+                      "Tarefa"
+                    ]
+                  },
+                  "owner": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "time": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "allOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "observations": {
+                    "type": "string"
+                  },
+                  "leadId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "owner",
+                  "date",
+                  "leadId"
+                ]
+              }
+            ]
+          }
+        }
+      }
+order: 1000

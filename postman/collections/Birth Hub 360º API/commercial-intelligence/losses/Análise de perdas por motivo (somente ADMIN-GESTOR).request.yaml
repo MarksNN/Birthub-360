@@ -1,0 +1,13 @@
+$kind: http-request
+name: Análise de perdas por motivo (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/losses"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Análise de perdas por motivo (somente ADMIN-GESTOR).resources/examples
+order: 1000

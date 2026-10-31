@@ -1,0 +1,38 @@
+$kind: http-request
+name: Bloqueia manualmente um número (opt-out registrado por outro canal)
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/suppressions"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "phone": "string",
+      "reason": "string",
+      "leadId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "leadId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "phone"
+      ]
+    }
+settings: {}
+examples: ./.resources/Bloqueia manualmente um número (opt-out registrado por outro ca.resources/examples
+order: 2000

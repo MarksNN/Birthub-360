@@ -1,0 +1,73 @@
+$kind: http-request
+name: Salva a configuração de provider/modelo/temperatura por ferramenta de IA (config global, sem organizationId — exige ADMIN de tenant E o token de operador de plataforma via requirePlatformOperator, mesma trava dupla de /admin/queues; TENANT-002)
+description: ""
+url: "{{baseUrl}}/intelligence/ai-settings"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "settings": [
+        {
+          "toolKey": "string",
+          "provider": "string",
+          "model": "local-llama3-fast",
+          "temperature": 1.79711014018758
+        },
+        {
+          "toolKey": "string",
+          "provider": "string",
+          "model": "local-llama3-fast",
+          "temperature": 1.6377920184012738
+        }
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "toolKey": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string",
+                "enum": [
+                  "local-llama3",
+                  "local-llama3-fast",
+                  "qwen-coder",
+                  "deepseek-coder"
+                ]
+              },
+              "temperature": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 2
+              }
+            },
+            "required": [
+              "toolKey",
+              "provider",
+              "model",
+              "temperature"
+            ]
+          }
+        }
+      },
+      "required": [
+        "settings"
+      ]
+    }
+settings: {}
+examples: ./.resources/Salva a configuração de provider-modelo-temperatura por ferram.resources/examples
+order: 2000

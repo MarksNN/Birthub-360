@@ -1,0 +1,259 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/roleplay/history"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "id": "string",
+            "organizationId": "string",
+            "userId": "string",
+            "personaId": "string",
+            "status": "ACTIVE",
+            "messages": [
+              {
+                "id": "string",
+                "role": "assistant",
+                "content": "string",
+                "timestamp": "1980-01-01T11:46:06.580Z"
+              },
+              {
+                "id": "string",
+                "role": "assistant",
+                "content": "string",
+                "timestamp": "2022-06-18T16:39:54.631Z"
+              }
+            ],
+            "createdAt": "1950-01-30T14:02:12.182Z",
+            "updatedAt": "2013-05-20T15:38:30.267Z",
+            "feedback": {
+              "overallScore": 905.4015156185912,
+              "spinSellingScores": {
+                "situation": 3104.950555664561,
+                "problem": 6064.06008585659,
+                "implication": 7746.508311968187,
+                "needPayoff": 8.604881941968179
+              },
+              "objectionHandlingScore": 877.7216972516344,
+              "strengths": [
+                "string",
+                "string"
+              ],
+              "improvementAreas": [
+                "string",
+                "string"
+              ],
+              "summary": "string"
+            }
+          },
+          {
+            "id": "string",
+            "organizationId": "string",
+            "userId": "string",
+            "personaId": "string",
+            "status": "COMPLETED",
+            "messages": [
+              {
+                "id": "string",
+                "role": "system",
+                "content": "string",
+                "timestamp": "1980-04-13T22:30:53.031Z"
+              },
+              {
+                "id": "string",
+                "role": "user",
+                "content": "string",
+                "timestamp": "1991-01-22T15:24:09.380Z"
+              }
+            ],
+            "createdAt": "1956-04-21T01:08:27.417Z",
+            "updatedAt": "2013-09-08T20:04:50.045Z",
+            "feedback": {
+              "overallScore": 9458.48971402012,
+              "spinSellingScores": {
+                "situation": 560.0994409887361,
+                "problem": 9885.696025728828,
+                "implication": 7528.908590831123,
+                "needPayoff": 727.004669304917
+              },
+              "objectionHandlingScore": 1499.0715467095172,
+              "strengths": [
+                "string",
+                "string"
+              ],
+              "improvementAreas": [
+                "string",
+                "string"
+              ],
+              "summary": "string"
+            }
+          }
+        ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "personaId": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "ACTIVE",
+                    "COMPLETED"
+                  ]
+                },
+                "messages": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "user",
+                          "assistant",
+                          "system"
+                        ]
+                      },
+                      "content": {
+                        "type": "string"
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "role",
+                      "content",
+                      "timestamp"
+                    ]
+                  }
+                },
+                "feedback": {
+                  "type": "object",
+                  "properties": {
+                    "overallScore": {
+                      "type": "number"
+                    },
+                    "spinSellingScores": {
+                      "type": "object",
+                      "properties": {
+                        "situation": {
+                          "type": "number"
+                        },
+                        "problem": {
+                          "type": "number"
+                        },
+                        "implication": {
+                          "type": "number"
+                        },
+                        "needPayoff": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "situation",
+                        "problem",
+                        "implication",
+                        "needPayoff"
+                      ]
+                    },
+                    "objectionHandlingScore": {
+                      "type": "number"
+                    },
+                    "strengths": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "improvementAreas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "summary": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "overallScore",
+                    "spinSellingScores",
+                    "objectionHandlingScore",
+                    "strengths",
+                    "improvementAreas",
+                    "summary"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "organizationId",
+                "userId",
+                "personaId",
+                "status",
+                "messages",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 1000

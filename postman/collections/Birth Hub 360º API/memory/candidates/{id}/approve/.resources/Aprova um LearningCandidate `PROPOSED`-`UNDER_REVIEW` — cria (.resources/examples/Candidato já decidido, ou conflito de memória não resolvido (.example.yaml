@@ -1,0 +1,27 @@
+$kind: http-example
+name: Candidato já decidido, ou conflito de memória não resolvido (MEMORY_CONFLICT)
+request:
+  url: "{{baseUrl}}/memory/candidates/:id/approve"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "notes": "string",
+        "supersedesMemoryId": "string"
+      }
+response:
+  statusCode: 409
+  statusText: Conflict
+  body:
+    type: text
+    content: ""
+order: 4000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Marca o início da captura de áudio da conversa (SCHEDULED → CAPTURING)
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/start"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Marca o início da captura de áudio da conversa (SCHEDULED →.resources/examples
+order: 1000

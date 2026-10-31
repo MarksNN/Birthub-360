@@ -1,0 +1,30 @@
+$kind: http-request
+name: Lista os itens (produtos/serviços) compostos num negócio
+description: ""
+url: "{{baseUrl}}/crm/deals/:leadId/items"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os itens (produtos-serviços) compostos num negócio.resources/examples
+order: 1000

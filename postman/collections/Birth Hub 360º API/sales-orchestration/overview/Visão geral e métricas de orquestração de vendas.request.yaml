@@ -1,0 +1,10 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/sales-orchestration/overview"
+method: GET
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Visão geral e métricas de orquestração de vendas.resources/examples
+order: 1000

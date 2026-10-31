@@ -1,0 +1,51 @@
+$kind: http-request
+name: Atualiza o status de triagem de um relato (OPEN → TRIAGED → RESOLVED)
+description: Restrito a ADMIN/GESTOR.
+url: "{{baseUrl}}/bug-reports/:id/status"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "status": "OPEN"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "TRIAGED",
+            "RESOLVED"
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ]
+    }
+settings: {}
+examples: ./.resources/Atualiza o status de triagem de um relato (OPEN → TRIAGED →.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Matriz usuário × cargo da organização, para o painel de administração — somente ADMIN
+description: ""
+url: "{{baseUrl}}/job-roles/assignments/matrix"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Matriz usuário × cargo da organização, para o painel de admi.resources/examples
+order: 1000

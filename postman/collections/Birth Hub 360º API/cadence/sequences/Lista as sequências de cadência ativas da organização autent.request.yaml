@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Lista as sequências de cadência ativas da organização autenticada (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/cadence/sequences"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as sequências de cadência ativas da organização autent.resources/examples
+order: 1000

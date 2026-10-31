@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os documentos (propostas, contratos) vinculados a negócios
+description: ""
+url: "{{baseUrl}}/crm/documents"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os documentos (propostas, contratos) vinculados a negócio.resources/examples
+order: 1000

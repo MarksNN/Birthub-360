@@ -1,0 +1,13 @@
+$kind: http-request
+name: PROMPT 6 — Workspace do cargo do usuário autenticado. Resolve o JobRole primário ativo do ator e monta a home do workspace (KPIs, agent groups, módulos/quick actions, navegação) a partir do que já é público/concedido (`RoleSupervisorProfile.preferredCapab
+description: ""
+url: "{{baseUrl}}/workspace/me"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/PROMPT 6 — Workspace do cargo do usuário autenticado. Resolve.resources/examples
+order: 1000

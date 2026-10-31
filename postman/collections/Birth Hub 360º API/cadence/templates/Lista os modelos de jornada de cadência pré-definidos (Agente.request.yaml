@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Lista os modelos de jornada de cadência pré-definidos (Agente 18, achado de auditoria: endpoint real, sem entrada aqui — `CADENCE_JOURNEY_TEMPLATES`, catálogo estático no código, não por tenant)."
+description: ""
+url: "{{baseUrl}}/cadence/templates"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os modelos de jornada de cadência pré-definidos (Agente.resources/examples
+order: 1000

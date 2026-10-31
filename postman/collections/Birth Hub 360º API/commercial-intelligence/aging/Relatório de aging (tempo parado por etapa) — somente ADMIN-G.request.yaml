@@ -1,0 +1,13 @@
+$kind: http-request
+name: Relatório de aging (tempo parado por etapa) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/aging"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Relatório de aging (tempo parado por etapa) — somente ADMIN-G.resources/examples
+order: 1000

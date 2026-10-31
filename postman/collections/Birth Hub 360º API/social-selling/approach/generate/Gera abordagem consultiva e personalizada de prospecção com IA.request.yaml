@@ -1,0 +1,60 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/social-selling/approach/generate"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "targetCompany": "string",
+      "targetRole": "string",
+      "segment": "string",
+      "triggerEvent": "string",
+      "channel": "whatsapp",
+      "tone": "provocative"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "targetCompany": {
+          "type": "string"
+        },
+        "targetRole": {
+          "type": "string"
+        },
+        "segment": {
+          "type": "string"
+        },
+        "triggerEvent": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "linkedin",
+            "whatsapp",
+            "email"
+          ]
+        },
+        "tone": {
+          "type": "string",
+          "enum": [
+            "consultative",
+            "direct",
+            "provocative",
+            "friendly"
+          ]
+        }
+      },
+      "required": [
+        "targetCompany",
+        "targetRole"
+      ]
+    }
+settings: {}
+examples: ./.resources/Gera abordagem consultiva e personalizada de prospecção com IA.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Cockpit do Revenue Oracle (forecast a partir dos deals ganhos do tenant) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/predictive/cockpit"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Cockpit do Revenue Oracle (forecast a partir dos deals ganhos do.resources/examples
+order: 1000

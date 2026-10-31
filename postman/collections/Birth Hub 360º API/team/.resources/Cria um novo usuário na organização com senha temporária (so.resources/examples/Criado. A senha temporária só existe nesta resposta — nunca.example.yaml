@@ -1,0 +1,57 @@
+$kind: http-example
+name: Criado. A senha temporária só existe nesta resposta — nunca é persistida em texto puro nem devolvida de novo depois.
+request:
+  url: "{{baseUrl}}/team"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "name": "string",
+        "email": "pGKL@qkjevpCOJldQyIAyhrVnmyjNM.gt",
+        "role": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "member": {},
+          "tempPassword": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "member": {
+                "type": "object"
+              },
+              "tempPassword": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+order: 1000

@@ -1,0 +1,27 @@
+$kind: http-example
+name: Documento sem e-mail de assinante (nem contato vinculado, nem signerEmail no body)
+request:
+  url: "{{baseUrl}}/crm/documents/:id/request-signature"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "signerEmail": "emSTQFGglpDSj@xEWNIMobDBYvZnDZydpPcQORaXYBDL.emq",
+        "signerName": "string"
+      }
+response:
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
+  body:
+    type: text
+    content: ""
+order: 3000

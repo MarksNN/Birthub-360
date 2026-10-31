@@ -1,0 +1,13 @@
+$kind: http-request
+name: Último relatório executivo gerado sob demanda (ReportsHub) para o tenant — nunca inclui o resumo automático diário (ver ReportSource)
+description: ""
+url: "{{baseUrl}}/intelligence/report/latest"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Último relatório executivo gerado sob demanda (ReportsHub) par.resources/examples
+order: 1000

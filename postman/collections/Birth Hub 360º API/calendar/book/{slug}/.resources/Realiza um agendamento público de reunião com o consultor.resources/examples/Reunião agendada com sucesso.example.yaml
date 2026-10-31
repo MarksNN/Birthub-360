@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/calendar/book/:slug"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    slug: string
+  body:
+    type: json
+    content: |-
+      {
+        "name": "string",
+        "email": "string",
+        "phone": "string",
+        "date": "string",
+        "time": "string",
+        "company": "string",
+        "notes": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  body:
+    type: text
+    content: ""
+order: 1000

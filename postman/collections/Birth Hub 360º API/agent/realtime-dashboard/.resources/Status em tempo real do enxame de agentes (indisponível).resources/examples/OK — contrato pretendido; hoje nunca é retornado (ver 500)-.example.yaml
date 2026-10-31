@@ -1,0 +1,43 @@
+$kind: http-example
+name: OK — contrato pretendido; hoje nunca é retornado (ver 500).
+request:
+  url: "{{baseUrl}}/agent/realtime-dashboard"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": "",
+        "meta": {}
+      }
+    $type: |-
+      {
+        "description": "Envelope de resposta genérico usado pela maioria dos endpoints",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "meta": {
+            "type": "object",
+            "description": "Presente em listagens paginadas (page, limit, total, etc.)"
+          }
+        }
+      }
+order: 1000

@@ -1,0 +1,211 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/leads"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": [
+          {
+            "id": "string",
+            "organizationId": "string",
+            "createdAt": "1994-04-03T16:14:21.402Z",
+            "updatedAt": "1951-12-14T17:16:02.574Z",
+            "status": "Cadência Iniciada",
+            "source": "string",
+            "channel": "string",
+            "temperature": "Frio",
+            "score": 16,
+            "owner": "string",
+            "companyId": "string",
+            "contactId": "string",
+            "funnel": "Negocio",
+            "title": "string",
+            "amount": 3467.935396595354,
+            "currency": "str",
+            "probability": 51,
+            "expectedCloseAt": "string",
+            "pipelineId": "string",
+            "pipelineStageId": "string",
+            "customFields": {
+              "key_0": true,
+              "key_1": 419,
+              "key_2": 7989.0789248921255,
+              "key_3": 3558.1018244550887,
+              "key_4": "string"
+            },
+            "pic": "PIC1_Expansao",
+            "qualification": {}
+          },
+          {
+            "id": "string",
+            "organizationId": "string",
+            "createdAt": "1956-09-24T10:45:41.434Z",
+            "updatedAt": "2017-05-02T00:49:02.832Z",
+            "status": "Piloto Birthub 360 Profile - Concluído",
+            "source": "string",
+            "channel": "string",
+            "temperature": "Frio",
+            "score": 1518,
+            "owner": "string",
+            "companyId": "string",
+            "contactId": "string",
+            "funnel": "Negocio",
+            "title": "string",
+            "amount": 1230.8338511960071,
+            "currency": "str",
+            "probability": 66,
+            "expectedCloseAt": "string",
+            "pipelineId": "string",
+            "pipelineStageId": "string",
+            "customFields": {
+              "key_0": "string"
+            },
+            "pic": "PIC3_Transicao",
+            "qualification": {}
+          }
+        ],
+        "meta": {}
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "allOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "channel": {
+                      "type": "string"
+                    },
+                    "temperature": {
+                      "allOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "score": {
+                      "type": "integer"
+                    },
+                    "owner": {
+                      "type": "string"
+                    },
+                    "companyId": {
+                      "type": "string"
+                    },
+                    "contactId": {
+                      "type": "string"
+                    },
+                    "funnel": {
+                      "type": "string",
+                      "enum": [
+                        "Lead",
+                        "Negocio"
+                      ]
+                    },
+                    "title": {
+                      "type": "string",
+                      "maxLength": 180
+                    },
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "currency": {
+                      "type": "string",
+                      "minLength": 3,
+                      "maxLength": 3
+                    },
+                    "probability": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "expectedCloseAt": {
+                      "type": "string"
+                    },
+                    "pipelineId": {
+                      "type": "string"
+                    },
+                    "pipelineStageId": {
+                      "type": "string"
+                    },
+                    "customFields": {
+                      "type": "object"
+                    },
+                    "pic": {
+                      "type": "string",
+                      "enum": [
+                        "PIC1_Expansao",
+                        "PIC2_Risco",
+                        "PIC3_Transicao"
+                      ],
+                      "description": "Perfil de Cliente Ideal do Playbook de Pré-Vendas Atlas"
+                    },
+                    "qualification": {
+                      "type": "object",
+                      "description": "Checklist de qualificação do SDR (Playbook Comercial Birth Hub 360, seção 4.2) — objeto livre"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "meta": {
+            "type": "object"
+          }
+        }
+      }
+order: 1000

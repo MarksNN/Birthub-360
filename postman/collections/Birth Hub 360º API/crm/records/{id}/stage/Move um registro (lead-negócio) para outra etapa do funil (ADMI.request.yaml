@@ -1,0 +1,36 @@
+$kind: http-request
+name: Move um registro (lead/negócio) para outra etapa do funil (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/crm/records/:id/stage"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Formato de `moveCrmRecordSchema` (crm360.schema.ts)",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Move um registro (lead-negócio) para outra etapa do funil (ADMI.resources/examples
+order: 1000

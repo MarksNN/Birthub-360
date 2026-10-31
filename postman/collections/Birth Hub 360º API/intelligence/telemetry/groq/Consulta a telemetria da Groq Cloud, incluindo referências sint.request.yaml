@@ -1,0 +1,13 @@
+$kind: http-request
+name: Consulta a telemetria da Groq Cloud, incluindo referências sintéticas em memória
+description: Os agregados persistidos são filtrados pela organização autenticada. O serviço também mantém chamadas de referência sintéticas em memória sem organizationId; enquanto presentes, elas podem aparecer nos contadores e em recentCalls para diferentes organizações e não representam uso real do tenant.
+url: "{{baseUrl}}/intelligence/telemetry/groq"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consulta a telemetria da Groq Cloud, incluindo referências sint.resources/examples
+order: 1000

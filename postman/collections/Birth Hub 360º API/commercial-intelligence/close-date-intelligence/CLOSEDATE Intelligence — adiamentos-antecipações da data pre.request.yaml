@@ -1,0 +1,13 @@
+$kind: http-request
+name: CLOSEDATE Intelligence — adiamentos/antecipações da data prevista por negócio, vendedor, produto e etapa — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/close-date-intelligence"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/CLOSEDATE Intelligence — adiamentos-antecipações da data pre.resources/examples
+order: 1000

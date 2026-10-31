@@ -1,0 +1,13 @@
+$kind: http-request
+name: Consulta a saúde e disponibilidade dos provedores de prospecção turbo
+description: ""
+url: "{{baseUrl}}/prospecting/providers"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Consulta a saúde e disponibilidade dos provedores de prospecç.resources/examples
+order: 1000

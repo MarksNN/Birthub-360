@@ -1,0 +1,72 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/integrations/:id/ping"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    - key: id
+      value: string
+      disabled: false
+      description: Identificador do provider ou de uma conexão persistida
+  body:
+    type: json
+    content: |-
+      {
+        "provider": "string",
+        "token": "string",
+        "apiKey": "string",
+        "accessToken": "string",
+        "domain": "string",
+        "boardId": "string",
+        "webhookUrl": "string",
+        "config": {
+          "key_0": 778,
+          "key_1": 1932
+        }
+      }
+response:
+  statusCode: 403
+  statusText: Forbidden
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "error": "string",
+        "valid": false
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "valid": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "error"
+        ]
+      }
+order: 4000

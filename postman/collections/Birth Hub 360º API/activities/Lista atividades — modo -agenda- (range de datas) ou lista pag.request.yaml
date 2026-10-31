@@ -1,0 +1,112 @@
+$kind: http-request
+name: Lista atividades — modo "agenda" (range de datas) ou lista paginada
+description: ""
+url: "{{baseUrl}}/activities?from=2008-11-17&to=2008-11-17&date=2008-11-17&page=2598&limit=2598&leadId=string&status=Concluída&type=WhatsApp"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: from
+    value: 2008-11-17
+    disabled: false
+    description: Junto com `to`, retorna todas as atividades no intervalo (grade do Calendário, sem paginação)
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+  - key: to
+    value: 2008-11-17
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+  - key: date
+    value: 2008-11-17
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+  - key: page
+    value: "2598"
+    disabled: false
+    description: ""
+    $type: integer
+  - key: limit
+    value: "2598"
+    disabled: false
+    description: ""
+    $type: integer
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: status
+    value: Concluída
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "Pendente",
+              "Em andamento",
+              "Concluída",
+              "Cancelada"
+            ]
+          }
+        }
+      }
+  - key: type
+    value: WhatsApp
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "Ligação",
+              "WhatsApp",
+              "E-mail",
+              "Reunião",
+              "Follow-up",
+              "Visita",
+              "Tarefa"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista atividades — modo -agenda- (range de datas) ou lista pag.resources/examples
+order: 1000

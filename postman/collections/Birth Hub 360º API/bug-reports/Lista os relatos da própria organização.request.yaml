@@ -1,0 +1,31 @@
+$kind: http-request
+description: Restrito a ADMIN/GESTOR.
+url: "{{baseUrl}}/bug-reports?status=TRIAGED"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: status
+    value: TRIAGED
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "TRIAGED",
+              "RESOLVED"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os relatos da própria organização.resources/examples
+order: 2000

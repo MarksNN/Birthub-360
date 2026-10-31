@@ -1,0 +1,12 @@
+$kind: http-request
+description: A resposta é um array JSON cru, sem envelope `success`/`data`. O handler retorna `[]` com HTTP 200 se a consulta falhar.
+url: "{{baseUrl}}/crm/deals"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os negócios do CRM.resources/examples
+order: 1000

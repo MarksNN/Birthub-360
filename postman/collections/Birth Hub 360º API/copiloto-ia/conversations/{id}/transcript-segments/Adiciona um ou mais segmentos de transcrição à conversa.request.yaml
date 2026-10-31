@@ -1,0 +1,83 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/transcript-segments"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "segments": [
+        {
+          "startMs": 4245.232160690037,
+          "endMs": 2279.3233199118536,
+          "text": "string",
+          "speakerLabel": "string",
+          "confidence": 7017.420860576408
+        },
+        {
+          "startMs": 4250.825530973017,
+          "endMs": 5792.054723468645,
+          "text": "string",
+          "speakerLabel": "string",
+          "confidence": 7585.643275795262
+        }
+      ]
+    }
+  $type: |-
+    {
+      "description": "Aceita um segmento único (campos no corpo) ou {segments: [...]}",
+      "type": "object",
+      "properties": {
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "speakerLabel": {
+                "type": "string"
+              },
+              "startMs": {
+                "type": "number"
+              },
+              "endMs": {
+                "type": "number"
+              },
+              "text": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "startMs",
+              "endMs",
+              "text"
+            ]
+          }
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Adiciona um ou mais segmentos de transcrição à conversa.resources/examples
+order: 1000

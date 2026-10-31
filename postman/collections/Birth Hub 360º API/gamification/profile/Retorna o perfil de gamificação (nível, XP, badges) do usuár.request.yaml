@@ -1,0 +1,13 @@
+$kind: http-request
+name: Retorna o perfil de gamificação (nível, XP, badges) do usuário autenticado
+description: ""
+url: "{{baseUrl}}/gamification/profile"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna o perfil de gamificação (nível, XP, badges) do usuár.resources/examples
+order: 1000

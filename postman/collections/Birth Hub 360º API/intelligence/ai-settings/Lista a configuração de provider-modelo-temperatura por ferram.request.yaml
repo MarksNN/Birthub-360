@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista a configuração de provider/modelo/temperatura por ferramenta de IA
+description: ""
+url: "{{baseUrl}}/intelligence/ai-settings"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista a configuração de provider-modelo-temperatura por ferram.resources/examples
+order: 1000

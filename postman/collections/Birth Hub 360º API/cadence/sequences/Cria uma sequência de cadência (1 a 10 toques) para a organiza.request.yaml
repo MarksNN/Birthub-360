@@ -1,0 +1,79 @@
+$kind: http-request
+name: "Cria uma sequência de cadência (1 a 10 toques) para a organização autenticada (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Restrito a ADMIN/GESTOR/CLOSER/SDR."
+description: ""
+url: "{{baseUrl}}/cadence/sequences"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "touches": [
+        {
+          "order": 1910,
+          "channel": "whatsapp",
+          "delayHoursFromPrevious": 80,
+          "maxAttempts": 2,
+          "templateRef": "string"
+        }
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "touches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "order": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "email",
+                  "whatsapp",
+                  "voice"
+                ]
+              },
+              "delayHoursFromPrevious": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 720
+              },
+              "maxAttempts": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "templateRef": {
+                "type": "string",
+                "maxLength": 4000
+              }
+            },
+            "required": [
+              "order",
+              "channel",
+              "delayHoursFromPrevious"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "touches"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria uma sequência de cadência (1 a 10 toques) para a organiza.resources/examples
+order: 2000

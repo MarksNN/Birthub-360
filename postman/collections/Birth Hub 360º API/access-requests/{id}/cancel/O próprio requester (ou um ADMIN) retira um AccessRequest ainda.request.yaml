@@ -1,0 +1,30 @@
+$kind: http-request
+name: O próprio requester (ou um ADMIN) retira um AccessRequest ainda `PENDING` — nunca decide o pedido, só o encerra como `CANCELLED`
+description: ""
+url: "{{baseUrl}}/access-requests/:id/cancel"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/O próprio requester (ou um ADMIN) retira um AccessRequest ainda.resources/examples
+order: 1000

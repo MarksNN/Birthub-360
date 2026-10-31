@@ -1,0 +1,31 @@
+$kind: http-request
+name: Lista o catálogo de cargos profissionais (leitura livre, qualquer usuário autenticado)
+description: ""
+url: "{{baseUrl}}/job-roles?activeOnly=false"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: activeOnly
+    value: "false"
+    disabled: false
+    description: 'Quando "false", inclui também cargos desativados. Default: true.'
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista o catálogo de cargos profissionais (leitura livre, qualqu.resources/examples
+order: 1000

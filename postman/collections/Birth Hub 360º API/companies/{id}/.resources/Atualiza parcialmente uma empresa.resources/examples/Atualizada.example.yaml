@@ -1,0 +1,195 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/companies/:id"
+  method: PUT
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: json
+    content: |-
+      {
+        "legalName": "string",
+        "tradeName": "string",
+        "cnpj": "string",
+        "stateRegistration": "string",
+        "segment": "string",
+        "cnae": "string",
+        "size": "string",
+        "employeeCount": 3481,
+        "estimatedRevenue": 6857.532062340272,
+        "website": "string",
+        "linkedin": "string",
+        "instagram": "string",
+        "address": "string",
+        "city": "string",
+        "state": "string",
+        "zipCode": "string",
+        "owner": "string",
+        "status": "Em análise",
+        "observations": "string"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "legalName": "string",
+          "tradeName": "string",
+          "id": "string",
+          "organizationId": "string",
+          "createdAt": "1973-11-20T14:13:16.067Z",
+          "updatedAt": "1998-05-29T20:49:08.743Z",
+          "cnpj": "string",
+          "stateRegistration": "string",
+          "segment": "string",
+          "cnae": "string",
+          "size": "string",
+          "employeeCount": 2550,
+          "estimatedRevenue": 1027.7337353517823,
+          "website": "string",
+          "linkedin": "string",
+          "instagram": "string",
+          "address": "string",
+          "city": "string",
+          "state": "string",
+          "zipCode": "string",
+          "owner": "string",
+          "status": "Inativo",
+          "observations": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "legalName": {
+                    "type": "string"
+                  },
+                  "tradeName": {
+                    "type": "string"
+                  },
+                  "cnpj": {
+                    "type": "string"
+                  },
+                  "stateRegistration": {
+                    "type": "string"
+                  },
+                  "segment": {
+                    "type": "string"
+                  },
+                  "cnae": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "string"
+                  },
+                  "employeeCount": {
+                    "type": "integer"
+                  },
+                  "estimatedRevenue": {
+                    "type": "number"
+                  },
+                  "website": {
+                    "type": "string"
+                  },
+                  "linkedin": {
+                    "type": "string"
+                  },
+                  "instagram": {
+                    "type": "string"
+                  },
+                  "phones": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "emails": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "zipCode": {
+                    "type": "string"
+                  },
+                  "owner": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "allOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "observations": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "legalName",
+                  "tradeName"
+                ]
+              }
+            ]
+          }
+        }
+      }
+order: 1000

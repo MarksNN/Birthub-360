@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os pipelines/etapas configurados do funil de negócio
+description: ""
+url: "{{baseUrl}}/crm/pipelines"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os pipelines-etapas configurados do funil de negócio.resources/examples
+order: 1000

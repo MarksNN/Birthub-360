@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista negócios/deals do Bitrix24 disponíveis para importação
+description: ""
+url: "{{baseUrl}}/bitrix/deals"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista negócios-deals do Bitrix24 disponíveis para importação.resources/examples
+order: 1000

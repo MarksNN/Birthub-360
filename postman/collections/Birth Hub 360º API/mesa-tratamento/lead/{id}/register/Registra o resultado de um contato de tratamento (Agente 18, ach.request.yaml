@@ -1,0 +1,79 @@
+$kind: http-request
+name: "Registra o resultado de um contato de tratamento (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). CLOSER/SDR só registra em leads que são seus. Exige Bitrix24 conectado e o lead já vinculado ao Bitrix (`bitrixLeadId`)."
+description: ""
+url: "{{baseUrl}}/mesa-tratamento/lead/:id/register"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "outcome": "reuniao_agendada",
+      "note": "string",
+      "bitrixStatusId": "string",
+      "lossReasonId": "string",
+      "nextActionTitle": "string",
+      "nextActionWhen": "2008-10-28T00:27:43.191Z"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "contato",
+            "reuniao_agendada",
+            "reuniao_realizada",
+            "retorno",
+            "convertido",
+            "sem_fit",
+            "dados_invalidos",
+            "revisao"
+          ]
+        },
+        "note": {
+          "type": "string"
+        },
+        "bitrixStatusId": {
+          "type": "string"
+        },
+        "lossReasonId": {
+          "type": "string",
+          "description": "Obrigatório quando `outcome` é `sem_fit` ou `dados_invalidos`"
+        },
+        "nextActionTitle": {
+          "type": "string"
+        },
+        "nextActionWhen": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "outcome",
+        "note"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra o resultado de um contato de tratamento (Agente 18, ach.resources/examples
+order: 1000

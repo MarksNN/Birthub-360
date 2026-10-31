@@ -1,0 +1,28 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/intelligence/suite/predictive/lead-score"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "leadId"
+      ]
+    }
+settings: {}
+examples: ./.resources/#21 Predictive Lead Scoring (Qdrant + pgvector).resources/examples
+order: 1000

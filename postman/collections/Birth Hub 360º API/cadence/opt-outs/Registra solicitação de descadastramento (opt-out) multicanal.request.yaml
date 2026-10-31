@@ -1,0 +1,50 @@
+$kind: http-request
+name: Registra solicitação de descadastramento (opt-out) multicanal ou global (Onda 15 / B-13)
+description: Adiciona contato à lista de supressão de cadência por canal ou global (palavras-chave STOP, SAIR, CANCELAR ou link de unsubscribe). Atualiza consentimento no banco de dados instantaneamente.
+url: "{{baseUrl}}/cadence/opt-outs"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "contactId": "string",
+      "channel": "all",
+      "reason": "string",
+      "evidence": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "contactId": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "whatsapp",
+            "voice",
+            "all"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "evidence": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "contactId",
+        "channel"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra solicitação de descadastramento (opt-out) multicanal.resources/examples
+order: 2000

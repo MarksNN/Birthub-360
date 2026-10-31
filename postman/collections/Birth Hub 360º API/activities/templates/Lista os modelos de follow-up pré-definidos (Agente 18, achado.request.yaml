@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Lista os modelos de follow-up pré-definidos (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/activities/templates"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os modelos de follow-up pré-definidos (Agente 18, achado.resources/examples
+order: 1000

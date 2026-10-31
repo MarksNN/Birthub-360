@@ -1,0 +1,257 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/intelligence/telemetry/groq"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "provider": "Groq Cloud",
+          "status": "configured",
+          "avgTtftMs": 9473.635837003674,
+          "minTtftMs": 4076.9687246026288,
+          "maxTtftMs": 7168.05705509188,
+          "p95TtftMs": 6766.187278549479,
+          "totalTokens": 2633,
+          "promptTokens": 3569,
+          "completionTokens": 3984,
+          "totalCostUsd": 1273.4419876184688,
+          "totalRequests": 2220,
+          "models": [
+            {
+              "model": "string",
+              "displayName": "string",
+              "requests": 2298,
+              "totalTokens": 4544,
+              "promptTokens": 799,
+              "completionTokens": 2730,
+              "avgTtftMs": 8883.279393682182,
+              "totalCostUsd": 2388.9477258929137
+            },
+            {
+              "model": "string",
+              "displayName": "string",
+              "requests": 2902,
+              "totalTokens": 1968,
+              "promptTokens": 2771,
+              "completionTokens": 2239,
+              "avgTtftMs": 8700.87455978549,
+              "totalCostUsd": 9922.569763621756
+            }
+          ],
+          "recentCalls": [
+            {
+              "id": "string",
+              "model": "string",
+              "ttftMs": 5876.112098789831,
+              "latencyMs": 8538.63644675121,
+              "promptTokens": 2751,
+              "completionTokens": 160,
+              "totalTokens": 5928,
+              "costUsd": 1700.7883974546555,
+              "timestamp": "1992-01-26T02:04:28.797Z",
+              "organizationId": "string"
+            },
+            {
+              "id": "string",
+              "model": "string",
+              "ttftMs": 5054.240008093706,
+              "latencyMs": 5238.558469012369,
+              "promptTokens": 5139,
+              "completionTokens": 4306,
+              "totalTokens": 9815,
+              "costUsd": 6593.058438669549,
+              "timestamp": "2026-05-26T17:07:08.931Z",
+              "organizationId": "string"
+            }
+          ],
+          "generatedAt": "1967-10-27T13:21:02.886Z"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "Groq Cloud"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "online",
+                  "configured"
+                ]
+              },
+              "avgTtftMs": {
+                "type": "number"
+              },
+              "minTtftMs": {
+                "type": "number"
+              },
+              "maxTtftMs": {
+                "type": "number"
+              },
+              "p95TtftMs": {
+                "type": "number"
+              },
+              "totalTokens": {
+                "type": "integer"
+              },
+              "promptTokens": {
+                "type": "integer"
+              },
+              "completionTokens": {
+                "type": "integer"
+              },
+              "totalCostUsd": {
+                "type": "number"
+              },
+              "totalRequests": {
+                "type": "integer"
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "model": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "requests": {
+                      "type": "integer"
+                    },
+                    "totalTokens": {
+                      "type": "integer"
+                    },
+                    "promptTokens": {
+                      "type": "integer"
+                    },
+                    "completionTokens": {
+                      "type": "integer"
+                    },
+                    "avgTtftMs": {
+                      "type": "number"
+                    },
+                    "totalCostUsd": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "model",
+                    "displayName",
+                    "requests",
+                    "totalTokens",
+                    "promptTokens",
+                    "completionTokens",
+                    "avgTtftMs",
+                    "totalCostUsd"
+                  ]
+                }
+              },
+              "recentCalls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "model": {
+                      "type": "string"
+                    },
+                    "ttftMs": {
+                      "type": "number"
+                    },
+                    "latencyMs": {
+                      "type": "number"
+                    },
+                    "promptTokens": {
+                      "type": "integer"
+                    },
+                    "completionTokens": {
+                      "type": "integer"
+                    },
+                    "totalTokens": {
+                      "type": "integer"
+                    },
+                    "costUsd": {
+                      "type": "number"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "organizationId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "model",
+                    "ttftMs",
+                    "latencyMs",
+                    "promptTokens",
+                    "completionTokens",
+                    "totalTokens",
+                    "costUsd",
+                    "timestamp"
+                  ]
+                }
+              },
+              "generatedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "provider",
+              "status",
+              "avgTtftMs",
+              "minTtftMs",
+              "maxTtftMs",
+              "p95TtftMs",
+              "totalTokens",
+              "promptTokens",
+              "completionTokens",
+              "totalCostUsd",
+              "totalRequests",
+              "models",
+              "recentCalls",
+              "generatedAt"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 1000

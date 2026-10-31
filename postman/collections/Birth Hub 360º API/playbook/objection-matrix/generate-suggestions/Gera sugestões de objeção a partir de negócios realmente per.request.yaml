@@ -1,0 +1,13 @@
+$kind: http-request
+name: Gera sugestões de objeção a partir de negócios realmente perdidos (nunca persiste sozinho)
+description: Agrupa negócios com status Negócios_Perdidos e motivo de perda preenchido por (segmento, persona); descarta grupos com menos de 2 casos reais. Cada sugestão retornada precisa de um POST /playbook/objection-matrix separado, com aprovação humana explícita, para virar um item real da matriz.
+url: "{{baseUrl}}/playbook/objection-matrix/generate-suggestions"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Gera sugestões de objeção a partir de negócios realmente per.resources/examples
+order: 1000

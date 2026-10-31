@@ -1,0 +1,29 @@
+$kind: http-request
+name: 'Webhook de entrada do Bitrix24 ("исходящий вебхук") — leads/eventos criados no Bitrix chegam aqui (Agente 18, achado de auditoria de contrato: path documentado estava errado — `/integrations/bitrix`, sem o segmento `/webhook` que o próprio router declara '
+description: ""
+url: "{{baseUrl}}/integrations/bitrix/webhook/:connectionId"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+pathVariables:
+  - key: connectionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: urlencoded
+settings: {}
+examples: ./.resources/Webhook de entrada do Bitrix24 (-исходящий вебхук.resources/examples
+order: 1000

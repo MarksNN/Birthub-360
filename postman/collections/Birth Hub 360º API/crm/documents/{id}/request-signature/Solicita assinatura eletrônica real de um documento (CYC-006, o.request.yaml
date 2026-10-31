@@ -1,0 +1,48 @@
+$kind: http-request
+name: "Solicita assinatura eletrônica real de um documento (CYC-006, onda 28) — provedor `'govbr'`, stub de transporte (ver `GovBrSignatureProviderPort.ts`). `signerEmail`/ `signerName` são opcionais: caem no e-mail/nome do Contact vinculado ao documento quando "
+description: ""
+url: "{{baseUrl}}/crm/documents/:id/request-signature"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "signerEmail": "emSTQFGglpDSj@xEWNIMobDBYvZnDZydpPcQORaXYBDL.emq",
+      "signerName": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "signerEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "signerName": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Solicita assinatura eletrônica real de um documento (CYC-006, o.resources/examples
+order: 1000

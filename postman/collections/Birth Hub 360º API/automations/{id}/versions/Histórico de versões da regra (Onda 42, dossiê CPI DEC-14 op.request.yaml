@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Histórico de versões da regra (Onda 42, dossiê CPI DEC-14 opção A): estado atual mais uma linha de tempo de edições anteriores (quem/quando trocou, e o diff textual campo a campo até o estado seguinte), mais recente primeiro. Restrito a ADMIN/GESTOR — rev"
+description: ""
+url: "{{baseUrl}}/automations/:id/versions"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico de versões da regra (Onda 42, dossiê CPI DEC-14 op.resources/examples
+order: 1000

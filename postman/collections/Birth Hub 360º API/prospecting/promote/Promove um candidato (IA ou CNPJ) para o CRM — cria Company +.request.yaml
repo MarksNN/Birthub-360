@@ -1,0 +1,39 @@
+$kind: http-request
+name: Promove um candidato (IA ou CNPJ) para o CRM — cria Company + Contact + Lead e enriquece automaticamente
+description: ""
+url: "{{baseUrl}}/prospecting/promote"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "tradeName": "string",
+      "source": "string",
+      "savedSearchId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "tradeName": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "savedSearchId": {
+          "type": "string",
+          "description": "Id da SavedSearch cujo candidato está sendo promovido, quando aplicável (onda 40 — rastreabilidade busca→lead)."
+        }
+      },
+      "required": [
+        "tradeName",
+        "source"
+      ]
+    }
+settings: {}
+examples: ./.resources/Promove um candidato (IA ou CNPJ) para o CRM — cria Company +.resources/examples
+order: 1000

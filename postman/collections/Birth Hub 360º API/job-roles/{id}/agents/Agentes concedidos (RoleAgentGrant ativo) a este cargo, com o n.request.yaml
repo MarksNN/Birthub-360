@@ -1,0 +1,30 @@
+$kind: http-request
+name: Agentes concedidos (RoleAgentGrant ativo) a este cargo, com o nível de acesso de cada um
+description: ""
+url: "{{baseUrl}}/job-roles/:id/agents"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Agentes concedidos (RoleAgentGrant ativo) a este cargo, com o n.resources/examples
+order: 1000

@@ -1,0 +1,33 @@
+$kind: http-request
+name: Ferramenta standalone — busca organizações no GitHub (Search API pública, gratuita, sem chave)
+description: ""
+url: "{{baseUrl}}/prospecting/tools/github"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "query": "string",
+      "limit": 6242
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — busca organizações no GitHub (Search.resources/examples
+order: 1000

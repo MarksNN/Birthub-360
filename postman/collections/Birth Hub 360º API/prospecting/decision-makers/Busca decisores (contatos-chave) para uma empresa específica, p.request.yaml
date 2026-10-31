@@ -1,0 +1,33 @@
+$kind: http-request
+name: Busca decisores (contatos-chave) para uma empresa específica, por domínio
+description: ""
+url: "{{baseUrl}}/prospecting/decision-makers"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "domain": "string",
+      "criteria": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "criteria": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "domain"
+      ]
+    }
+settings: {}
+examples: ./.resources/Busca decisores (contatos-chave) para uma empresa específica, p.resources/examples
+order: 1000

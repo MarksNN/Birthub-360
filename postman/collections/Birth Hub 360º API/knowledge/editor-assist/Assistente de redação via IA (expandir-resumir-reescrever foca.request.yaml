@@ -1,0 +1,40 @@
+$kind: http-request
+name: 'Assistente de redação via IA (expandir/resumir/reescrever focando em dores) para o editor de documentos da base de conhecimento (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Não usa o envelope `{success,data}` padrão, e sim `{ "succes'
+description: ""
+url: "{{baseUrl}}/knowledge/editor-assist"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "action": "pain",
+      "text": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "expand",
+            "concise",
+            "pain"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "action",
+        "text"
+      ]
+    }
+settings: {}
+examples: ./.resources/Assistente de redação via IA (expandir-resumir-reescrever foca.resources/examples
+order: 1000

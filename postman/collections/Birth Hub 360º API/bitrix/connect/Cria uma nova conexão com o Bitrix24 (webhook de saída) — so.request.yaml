@@ -1,0 +1,18 @@
+$kind: http-request
+name: Cria uma nova conexão com o Bitrix24 (webhook de saída) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/bitrix/connect"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Cria uma nova conexão com o Bitrix24 (webhook de saída) — so.resources/examples
+order: 1000

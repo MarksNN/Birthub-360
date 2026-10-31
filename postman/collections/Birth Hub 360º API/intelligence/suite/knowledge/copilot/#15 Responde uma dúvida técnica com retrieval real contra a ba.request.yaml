@@ -1,0 +1,36 @@
+$kind: http-request
+name: "#15 Responde uma dúvida técnica com retrieval real contra a base de conhecimento do tenant autenticado (o cliente envia só a pergunta, não os trechos)"
+description: ""
+url: "{{baseUrl}}/intelligence/suite/knowledge/copilot"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "question": "string",
+      "userRole": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 2000
+        },
+        "userRole": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "question"
+      ]
+    }
+settings: {}
+examples: ./.resources/#15 Responde uma dúvida técnica com retrieval real contra a ba.resources/examples
+order: 1000

@@ -1,0 +1,151 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/companies/dedup/preview"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "groups": [
+            {
+              "key": "string",
+              "matchedBy": "tradeName",
+              "survivorId": "string",
+              "duplicateIds": [
+                "string",
+                "string"
+              ],
+              "companies": [
+                {
+                  "id": "string",
+                  "legalName": "string",
+                  "tradeName": "string",
+                  "cnpj": "string",
+                  "enrichmentStatus": "string",
+                  "createdAt": "2008-05-30T01:22:19.150Z"
+                },
+                {
+                  "id": "string",
+                  "legalName": "string",
+                  "tradeName": "string",
+                  "cnpj": "string",
+                  "enrichmentStatus": "string",
+                  "createdAt": "2012-09-16T10:02:50.709Z"
+                }
+              ]
+            },
+            {
+              "key": "string",
+              "matchedBy": "tradeName",
+              "survivorId": "string",
+              "duplicateIds": [
+                "string",
+                "string"
+              ],
+              "companies": [
+                {
+                  "id": "string",
+                  "legalName": "string",
+                  "tradeName": "string",
+                  "cnpj": "string",
+                  "enrichmentStatus": "string",
+                  "createdAt": "1980-02-22T17:33:24.938Z"
+                },
+                {
+                  "id": "string",
+                  "legalName": "string",
+                  "tradeName": "string",
+                  "cnpj": "string",
+                  "enrichmentStatus": "string",
+                  "createdAt": "1969-08-30T03:39:58.351Z"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "matchedBy": {
+                      "type": "string",
+                      "enum": [
+                        "cnpj",
+                        "tradeName"
+                      ]
+                    },
+                    "survivorId": {
+                      "type": "string"
+                    },
+                    "duplicateIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "companies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "legalName": {
+                            "type": "string"
+                          },
+                          "tradeName": {
+                            "type": "string"
+                          },
+                          "cnpj": {
+                            "type": "string"
+                          },
+                          "enrichmentStatus": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+order: 1000

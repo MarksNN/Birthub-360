@@ -1,0 +1,137 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/commercial-intelligence/predictive/rebalance/approvals"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "recommendationId": "string",
+        "leadId": "string",
+        "fromOwner": "string",
+        "toOwner": "string",
+        "decision": "REJECTED",
+        "note": "string"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "approval": {
+            "approvalId": "string",
+            "organizationId": "string",
+            "decidedBy": "string",
+            "decidedAt": "1952-01-26T03:10:21.531Z",
+            "appliedToCrm": false,
+            "recommendationId": "string",
+            "leadId": "string",
+            "fromOwner": "string",
+            "toOwner": "string",
+            "decision": "APPROVED",
+            "note": "string"
+          },
+          "alreadyRecorded": true
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "alreadyRecorded": {
+                "type": "boolean"
+              },
+              "approval": {
+                "type": "object",
+                "properties": {
+                  "approvalId": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "decidedBy": {
+                    "type": "string"
+                  },
+                  "decidedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "appliedToCrm": {
+                    "type": "boolean",
+                    "enum": [
+                      false
+                    ]
+                  },
+                  "recommendationId": {
+                    "type": "string"
+                  },
+                  "leadId": {
+                    "type": "string"
+                  },
+                  "fromOwner": {
+                    "type": "string"
+                  },
+                  "toOwner": {
+                    "type": "string"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "APPROVED",
+                      "REJECTED"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "approvalId",
+                  "organizationId",
+                  "decidedBy",
+                  "decidedAt",
+                  "appliedToCrm",
+                  "recommendationId",
+                  "leadId",
+                  "fromOwner",
+                  "toOwner",
+                  "decision"
+                ]
+              }
+            },
+            "required": [
+              "approval",
+              "alreadyRecorded"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 2000

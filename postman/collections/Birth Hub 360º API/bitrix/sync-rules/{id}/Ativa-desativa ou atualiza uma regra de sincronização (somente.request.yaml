@@ -1,0 +1,35 @@
+$kind: http-request
+name: Ativa/desativa ou atualiza uma regra de sincronização (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/sync-rules/:id"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Ativa-desativa ou atualiza uma regra de sincronização (somente.resources/examples
+order: 1000

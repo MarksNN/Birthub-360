@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os AccessRequest abertos pelo próprio ator autenticado (qualquer status), mais recentes primeiro
+description: ""
+url: "{{baseUrl}}/access-requests"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os AccessRequest abertos pelo próprio ator autenticado (q.resources/examples
+order: 2000

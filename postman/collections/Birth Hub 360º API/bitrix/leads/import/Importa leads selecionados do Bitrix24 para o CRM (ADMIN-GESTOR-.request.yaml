@@ -1,0 +1,18 @@
+$kind: http-request
+name: Importa leads selecionados do Bitrix24 para o CRM (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/bitrix/leads/import"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Importa leads selecionados do Bitrix24 para o CRM (ADMIN-GESTOR-.resources/examples
+order: 1000

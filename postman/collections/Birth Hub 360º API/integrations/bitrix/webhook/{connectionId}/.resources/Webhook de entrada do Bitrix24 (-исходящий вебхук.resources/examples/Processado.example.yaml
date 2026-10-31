@@ -1,0 +1,21 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/integrations/bitrix/webhook/:connectionId"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/x-www-form-urlencoded
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    connectionId: string
+  body:
+    type: urlencoded
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: ""
+order: 1000

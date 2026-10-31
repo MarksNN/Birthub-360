@@ -1,0 +1,12 @@
+$kind: http-request
+description: "Endpoint indisponível: falha sempre com 500 (PrismaClientValidationError). A resposta 501 é o comportamento planejado (padrão de voice-hub/routes/ai.routes.ts:21-31) até a reimplementação pelo Agente 07."
+url: "{{baseUrl}}/agent/model-benchmark"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Benchmark de modelos do enxame (indisponível).resources/examples
+order: 1000

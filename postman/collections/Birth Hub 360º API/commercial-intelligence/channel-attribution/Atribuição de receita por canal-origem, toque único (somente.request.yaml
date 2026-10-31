@@ -1,0 +1,13 @@
+$kind: http-request
+name: Atribuição de receita por canal/origem, toque único (somente ADMIN/GESTOR).
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/channel-attribution"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Atribuição de receita por canal-origem, toque único (somente.resources/examples
+order: 1000

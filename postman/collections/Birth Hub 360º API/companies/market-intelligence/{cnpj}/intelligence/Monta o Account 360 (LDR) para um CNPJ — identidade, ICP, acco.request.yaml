@@ -1,0 +1,28 @@
+$kind: http-request
+name: Monta o Account 360 (LDR) para um CNPJ — identidade, ICP, account score e next best action
+description: '"Ausência de dado" é sempre reportada como NOT_AVAILABLE, nunca fabricada — sinais, decisores e grupo econômico dependem de evidência persistida no contexto do tenant.'
+url: "{{baseUrl}}/companies/market-intelligence/:cnpj/intelligence"
+method: GET
+pathVariables:
+  - key: cnpj
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Monta o Account 360 (LDR) para um CNPJ — identidade, ICP, acco.resources/examples
+order: 1000

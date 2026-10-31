@@ -1,0 +1,21 @@
+$kind: http-example
+name: Identificação, CNAE, endereço, contato público, ICP, RNTRC e proveniência
+request:
+  url: "{{baseUrl}}/market-intelligence/companies/:cnpj"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    cnpj: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: ""
+order: 1000

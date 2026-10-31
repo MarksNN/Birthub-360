@@ -1,0 +1,30 @@
+$kind: http-request
+name: Testa a conectividade com o Hub (somente `/health`, sem autenticação — nunca confirma API key/agentId cadastrados). Somente ADMIN/GESTOR.
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/connections/:connectionId/test"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: connectionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Testa a conectividade com o Hub (somente `-health`, sem autentic.resources/examples
+order: 1000

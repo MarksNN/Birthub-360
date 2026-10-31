@@ -1,0 +1,37 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/intelligence/toolkit/execute"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "functionName": "string",
+        "args": [
+          "string",
+          "string"
+        ],
+        "piiValues": [
+          {
+            "token": "string",
+            "value": "string"
+          },
+          {
+            "token": "string",
+            "value": "string"
+          }
+        ]
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: text
+    content: ""
+order: 2000

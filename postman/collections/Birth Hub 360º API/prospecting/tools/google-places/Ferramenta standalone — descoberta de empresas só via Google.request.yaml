@@ -1,0 +1,19 @@
+$kind: http-request
+name: Ferramenta standalone — descoberta de empresas só via Google Places (New) Text Search, sem Apollo/OpenStreetMap
+description: ""
+url: "{{baseUrl}}/prospecting/tools/google-places"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "description": "Mesmo formato de /prospecting/discover (ProspectCriteria)",
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — descoberta de empresas só via Google.resources/examples
+order: 1000

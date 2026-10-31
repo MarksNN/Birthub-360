@@ -1,0 +1,49 @@
+$kind: http-request
+name: "`complete` — marca `RUNNING`/`ACCEPTED` -> `COMPLETED`. Normalmente chamado internamente por `accept` após o AgentRuntime terminar com sucesso; exposto também para conclusão manual (ex.: destino humano fora do AgentRuntime automático). Repetir sobre um ha"
+description: ""
+url: "{{baseUrl}}/agent-bus/:id/complete"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "response": {},
+      "confidence": 0.39354668200258347
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "response": {
+          "type": "object"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/`complete` — marca `RUNNING`-`ACCEPTED` - `COMPLETED`. Normalm.resources/examples
+order: 1000

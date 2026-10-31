@@ -1,0 +1,38 @@
+$kind: http-request
+name: Atribui um cargo a um usuário da organização (somente ADMIN). Quando `isPrimary` (default true), rebaixa qualquer outro cargo principal ativo do mesmo usuário.
+description: ""
+url: "{{baseUrl}}/job-roles/assignments"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": "string",
+      "jobRoleId": "string",
+      "isPrimary": true
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "jobRoleId": {
+          "type": "string"
+        },
+        "isPrimary": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "userId",
+        "jobRoleId"
+      ]
+    }
+settings: {}
+examples: ./.resources/Atribui um cargo a um usuário da organização (somente ADMIN).resources/examples
+order: 2000

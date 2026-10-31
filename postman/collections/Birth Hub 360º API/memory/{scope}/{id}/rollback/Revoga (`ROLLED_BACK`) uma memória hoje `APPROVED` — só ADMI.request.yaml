@@ -1,0 +1,67 @@
+$kind: http-request
+name: Revoga (`ROLLED_BACK`) uma memória hoje `APPROVED` — só ADMIN/GESTOR. Não cria uma nova versão (reverter desliga a atual, não é uma nova opinião); a memória revogada some imediatamente das consultas de "uso futuro" (`/memory/agent`, `/memory/role`, `/memo
+description: ""
+url: "{{baseUrl}}/memory/:scope/:id/rollback"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: scope
+    value: organization
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "role",
+              "organization"
+            ]
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "reason": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ]
+    }
+settings: {}
+examples: ./.resources/Revoga (`ROLLED_BACK`) uma memória hoje `APPROVED` — só ADMI.resources/examples
+order: 1000

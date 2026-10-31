@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os flags resolvidos (default global + override da própria organização já aplicado)
+description: Qualquer papel autenticado pode ler.
+url: "{{baseUrl}}/feature-flags"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os flags resolvidos (default global + override da própria.resources/examples
+order: 1000

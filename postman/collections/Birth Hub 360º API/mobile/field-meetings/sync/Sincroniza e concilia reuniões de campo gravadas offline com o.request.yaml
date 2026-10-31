@@ -1,0 +1,66 @@
+$kind: http-request
+name: Sincroniza e concilia reuniões de campo gravadas offline com o Copiloto IA
+description: ""
+url: "{{baseUrl}}/mobile/field-meetings/sync"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "string",
+      "leadId": "string",
+      "audioData": "string",
+      "audioMimeType": "string",
+      "audioSizeBytes": 9670,
+      "durationMs": 5687,
+      "recordedAt": "2021-04-30T03:00:11.169Z",
+      "meetingNotes": "string",
+      "consentMethod": "string",
+      "textVersion": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "leadId": {
+          "type": "string"
+        },
+        "audioData": {
+          "type": "string"
+        },
+        "audioMimeType": {
+          "type": "string"
+        },
+        "audioSizeBytes": {
+          "type": "integer"
+        },
+        "durationMs": {
+          "type": "integer"
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "meetingNotes": {
+          "type": "string"
+        },
+        "consentMethod": {
+          "type": "string"
+        },
+        "textVersion": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    }
+settings: {}
+examples: ./.resources/Sincroniza e concilia reuniões de campo gravadas offline com o.resources/examples
+order: 1000

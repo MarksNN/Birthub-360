@@ -1,0 +1,30 @@
+$kind: http-request
+name: Avaliação de coaching da conversa (rubrica + score geral), quando já calculada — `data` vem `null` se ainda não houver avaliação registrada
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/coaching"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Avaliação de coaching da conversa (rubrica + score geral), qua.resources/examples
+order: 1000

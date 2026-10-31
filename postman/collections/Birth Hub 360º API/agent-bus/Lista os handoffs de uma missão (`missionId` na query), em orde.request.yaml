@@ -1,0 +1,30 @@
+$kind: http-request
+name: Lista os handoffs de uma missão (`missionId` na query), em ordem de criação
+description: ""
+url: "{{baseUrl}}/agent-bus?missionId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: missionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os handoffs de uma missão (`missionId` na query), em orde.resources/examples
+order: 2000

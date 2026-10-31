@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os gatilhos e ações disponíveis, para montar os selects da tela
+description: ""
+url: "{{baseUrl}}/automations/options"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os gatilhos e ações disponíveis, para montar os selects.resources/examples
+order: 1000

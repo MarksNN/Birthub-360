@@ -1,0 +1,21 @@
+$kind: http-example
+name: "Account Intelligence completo: identity, qualification, accountScore, signals, decisionMakers, economicGroup, crm, nextBestAction, provenance"
+request:
+  url: "{{baseUrl}}/companies/market-intelligence/:cnpj/intelligence"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    cnpj: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: ""
+order: 1000

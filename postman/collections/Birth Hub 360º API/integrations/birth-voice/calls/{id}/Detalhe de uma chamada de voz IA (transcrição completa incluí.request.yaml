@@ -1,0 +1,30 @@
+$kind: http-request
+name: Detalhe de uma chamada de voz IA (transcrição completa incluída)
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/calls/:id"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Detalhe de uma chamada de voz IA (transcrição completa incluí.resources/examples
+order: 1000

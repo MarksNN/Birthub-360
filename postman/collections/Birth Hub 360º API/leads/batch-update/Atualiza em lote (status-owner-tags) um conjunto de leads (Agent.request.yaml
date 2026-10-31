@@ -1,0 +1,80 @@
+$kind: http-request
+name: "Atualiza em lote (status/owner/tags) um conjunto de leads (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/leads/batch-update"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadIds": [
+        "string"
+      ],
+      "updates": {
+        "status": "string",
+        "owner": "string",
+        "tags": [
+          "string",
+          "string"
+        ],
+        "addTags": [
+          "string",
+          "string"
+        ],
+        "removeTags": [
+          "string",
+          "string"
+        ]
+      }
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updates": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "addTags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "removeTags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "leadIds",
+        "updates"
+      ]
+    }
+settings: {}
+examples: ./.resources/Atualiza em lote (status-owner-tags) um conjunto de leads (Agent.resources/examples
+order: 1000

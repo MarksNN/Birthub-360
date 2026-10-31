@@ -1,0 +1,26 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/cadence/leads/:leadId/schedule-meeting"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    leadId: string
+  body:
+    type: json
+    content: |-
+      {
+        "proposedStart": "2012-06-30T00:00:34.116Z",
+        "proposedEnd": "1981-03-22T00:24:15.324Z"
+      }
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: text
+    content: ""
+order: 2000

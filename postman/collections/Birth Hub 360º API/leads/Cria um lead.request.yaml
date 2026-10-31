@@ -1,0 +1,127 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/leads"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": "Convertido em Oportunidade",
+      "source": "string",
+      "channel": "string",
+      "temperature": "Quente",
+      "score": 8159,
+      "owner": "string",
+      "companyId": "string",
+      "contactId": "string",
+      "funnel": "Negocio",
+      "title": "string",
+      "amount": 3462.393055068221,
+      "currency": "str",
+      "probability": 91,
+      "expectedCloseAt": "string",
+      "pipelineId": "string",
+      "pipelineStageId": "string",
+      "customFields": {
+        "key_0": false,
+        "key_1": 2579,
+        "key_2": 6470.95574023928,
+        "key_3": 8533
+      },
+      "pic": "PIC2_Risco",
+      "qualification": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "status": {
+          "allOf": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "source": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "temperature": {
+          "allOf": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "score": {
+          "type": "integer"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "companyId": {
+          "type": "string"
+        },
+        "contactId": {
+          "type": "string"
+        },
+        "funnel": {
+          "type": "string",
+          "enum": [
+            "Lead",
+            "Negocio"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 180
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "expectedCloseAt": {
+          "type": "string"
+        },
+        "pipelineId": {
+          "type": "string"
+        },
+        "pipelineStageId": {
+          "type": "string"
+        },
+        "customFields": {
+          "type": "object"
+        },
+        "pic": {
+          "type": "string",
+          "enum": [
+            "PIC1_Expansao",
+            "PIC2_Risco",
+            "PIC3_Transicao"
+          ],
+          "description": "Perfil de Cliente Ideal do Playbook de Pré-Vendas Atlas"
+        },
+        "qualification": {
+          "type": "object",
+          "description": "Checklist de qualificação do SDR (Playbook Comercial Birth Hub 360, seção 4.2) — objeto livre"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Cria um lead.resources/examples
+order: 2000

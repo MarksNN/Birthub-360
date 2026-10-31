@@ -1,0 +1,46 @@
+$kind: http-example
+name: 'Conteúdo gerado. Observação: devolve `{ "result": ... }`, não o envelope padrão.'
+request:
+  url: "{{baseUrl}}/intelligence"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "tool": "string",
+        "leadId": "string",
+        "competitor": "string",
+        "tone": "string",
+        "objective": "string",
+        "personaFallback": "string",
+        "brandId": "birthhub360"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "result": "string"
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          }
+        }
+      }
+order: 1000

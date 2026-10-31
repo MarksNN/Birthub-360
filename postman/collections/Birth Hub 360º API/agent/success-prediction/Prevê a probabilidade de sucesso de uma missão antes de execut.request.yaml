@@ -1,0 +1,66 @@
+$kind: http-request
+name: Prevê a probabilidade de sucesso de uma missão antes de executá-la (indisponível)
+description: "Predição escopada pela organização do usuário autenticado. Status: falha sempre com 500 (PrismaClientValidationError) depois da validação do corpo; correção pendente do Agente 07."
+url: "{{baseUrl}}/agent/success-prediction"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "agentRole": "SDR",
+      "missionType": "string",
+      "leadId": "string",
+      "leadScore": 48.88726423400822,
+      "leadStage": "string",
+      "timeSinceLastContact": 6339.766924830435,
+      "previousAttempts": 1835
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "agentRole": {
+          "type": "string",
+          "enum": [
+            "SDR",
+            "BDR",
+            "CLOSER",
+            "CRM",
+            "OPS",
+            "SUPERVISOR"
+          ]
+        },
+        "missionType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "leadId": {
+          "type": "string"
+        },
+        "leadScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "leadStage": {
+          "type": "string"
+        },
+        "timeSinceLastContact": {
+          "type": "number"
+        },
+        "previousAttempts": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "agentRole",
+        "missionType"
+      ]
+    }
+settings: {}
+examples: ./.resources/Prevê a probabilidade de sucesso de uma missão antes de execut.resources/examples
+order: 1000

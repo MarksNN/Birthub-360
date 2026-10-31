@@ -1,0 +1,44 @@
+$kind: http-request
+name: Cria/atualiza um mapeamento de campo (upsert) — auditado explicitamente
+description: ""
+url: "{{baseUrl}}/copiloto-ia/bitrix-field-mappings"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "entityType": "LEAD",
+      "semanticField": "string",
+      "bitrixFieldCode": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "LEAD",
+            "COMPANY",
+            "CONTACT"
+          ]
+        },
+        "semanticField": {
+          "type": "string"
+        },
+        "bitrixFieldCode": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "entityType",
+        "semanticField",
+        "bitrixFieldCode"
+      ]
+    }
+settings: {}
+examples: ./.resources/Cria-atualiza um mapeamento de campo (upsert) — auditado expli.resources/examples
+order: 2000

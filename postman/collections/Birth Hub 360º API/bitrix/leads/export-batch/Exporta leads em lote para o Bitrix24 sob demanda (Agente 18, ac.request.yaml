@@ -1,0 +1,36 @@
+$kind: http-request
+name: "Exporta leads em lote para o Bitrix24 sob demanda (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Sem `leadIds` no corpo, exporta todos os leads elegíveis da organização."
+description: ""
+url: "{{baseUrl}}/bitrix/leads/export-batch"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "leadIds": [
+        "string",
+        "string"
+      ],
+      "connectionId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "leadIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "connectionId": {
+          "type": "string"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Exporta leads em lote para o Bitrix24 sob demanda (Agente 18, ac.resources/examples
+order: 1000

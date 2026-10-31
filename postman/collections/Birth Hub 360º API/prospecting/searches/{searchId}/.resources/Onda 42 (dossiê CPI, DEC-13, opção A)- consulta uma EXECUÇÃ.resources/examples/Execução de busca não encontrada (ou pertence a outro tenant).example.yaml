@@ -1,0 +1,23 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/prospecting/searches/:searchId"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    - key: searchId
+      value: string
+      disabled: false
+      description: Search-ID (cuid) de uma execução real de busca de prospecção, devolvido em `data.searchId` pelas respostas de /prospecting/discover e /prospecting/saved-searches/{id}/run.
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: text
+    content: ""
+order: 2000

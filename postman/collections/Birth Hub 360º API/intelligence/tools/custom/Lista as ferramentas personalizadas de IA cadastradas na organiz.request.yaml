@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista as ferramentas personalizadas de IA cadastradas na organização
+description: ""
+url: "{{baseUrl}}/intelligence/tools/custom"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista as ferramentas personalizadas de IA cadastradas na organiz.resources/examples
+order: 1000

@@ -1,0 +1,29 @@
+$kind: http-example
+name: Nome ou funil ausente/inválido
+request:
+  url: "{{baseUrl}}/crm/saved-views"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "name": "string",
+        "funnel": "Lead",
+        "filters": {
+          "owner": "string",
+          "q": "string"
+        }
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: text
+    content: ""
+order: 2000

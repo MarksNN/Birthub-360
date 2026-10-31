@@ -1,0 +1,18 @@
+$kind: http-request
+name: Cria uma regra de sincronização (ADMIN/GESTOR/VENDEDOR pode criar a PRÓPRIA regra — o responsável é travado no próprio usuário para não-gestores)
+description: ""
+url: "{{baseUrl}}/bitrix/sync-rules"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Cria uma regra de sincronização (ADMIN-GESTOR-VENDEDOR pode cr.resources/examples
+order: 2000

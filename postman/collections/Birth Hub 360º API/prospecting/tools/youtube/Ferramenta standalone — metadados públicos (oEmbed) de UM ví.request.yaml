@@ -1,0 +1,29 @@
+$kind: http-request
+name: Ferramenta standalone — metadados públicos (oEmbed) de UM vídeo do YouTube já conhecido, gratuito e sem chave
+description: ""
+url: "{{baseUrl}}/prospecting/tools/youtube"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "url": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ferramenta standalone — metadados públicos (oEmbed) de UM ví.resources/examples
+order: 1000

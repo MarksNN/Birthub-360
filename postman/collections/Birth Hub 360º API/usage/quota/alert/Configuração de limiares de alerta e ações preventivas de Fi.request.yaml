@@ -1,0 +1,58 @@
+$kind: http-request
+name: Configuração de limiares de alerta e ações preventivas de FinOps (Onda 15)
+description: Configura limiares de aviso (80% e 100%) e ações automatizadas (notificação por email/webhook, ativação forçada de fallback para LLMs mais econômicos, ou throttling defensivo) para a franquia de IA da organização. Restrito a ADMIN.
+url: "{{baseUrl}}/usage/quota/alert"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "thresholdPercent": 100,
+      "notifyEmails": [
+        "IsH@mIgwN.fwb",
+        "ES6D@PfQv.dw"
+      ],
+      "webhookUrl": "https://HjE.awwqgMK6aAhEdaXUgtl-rXAt9JfCZCZQNpNZDjyyUlAa+fCy.-gHaPAHJtM1HLlX0QeB5",
+      "action": "enforce_fallback"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "thresholdPercent": {
+          "type": "integer",
+          "enum": [
+            80,
+            100
+          ]
+        },
+        "notifyEmails": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "webhookUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "notify_only",
+            "enforce_fallback",
+            "throttle"
+          ]
+        }
+      },
+      "required": [
+        "thresholdPercent"
+      ]
+    }
+settings: {}
+examples: ./.resources/Configuração de limiares de alerta e ações preventivas de Fi.resources/examples
+order: 1000

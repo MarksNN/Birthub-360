@@ -1,0 +1,13 @@
+$kind: http-request
+name: Nome/id dos membros da organização, para reatribuir lead/atividade — qualquer usuário autenticado (não exige ADMIN; sem e-mail nem papel no retorno, por design)
+description: ""
+url: "{{baseUrl}}/team/assignable"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Nome-id dos membros da organização, para reatribuir lead-ativi.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Indicadores antecedentes (leading indicators) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/leading-indicators"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Indicadores antecedentes (leading indicators) — somente ADMIN-.resources/examples
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Detalha um handoff pelo id (`data.handoff.effectiveStatus` computa `EXPIRED` na leitura quando aplicável)
+description: ""
+url: "{{baseUrl}}/agent-bus/:id"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Detalha um handoff pelo id (`data.handoff.effectiveStatus` compu.resources/examples
+order: 1000

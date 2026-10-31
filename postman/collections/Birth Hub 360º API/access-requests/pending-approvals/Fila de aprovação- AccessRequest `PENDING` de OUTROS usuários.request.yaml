@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Fila de aprovação: AccessRequest `PENDING` de OUTROS usuários cuja categoria o ator autenticado atende (piso de UserRole + JobRole elegível da política, ver `access-request-policy.ts`) — nunca inclui os próprios pedidos do ator."
+description: ""
+url: "{{baseUrl}}/access-requests/pending-approvals"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Fila de aprovação- AccessRequest `PENDING` de OUTROS usuários.resources/examples
+order: 1000

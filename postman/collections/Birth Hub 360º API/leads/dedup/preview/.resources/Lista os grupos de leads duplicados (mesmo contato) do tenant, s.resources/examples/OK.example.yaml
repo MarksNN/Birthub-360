@@ -1,0 +1,142 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/leads/dedup/preview"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "data": {
+          "groups": [
+            {
+              "contactId": "string",
+              "survivorId": "string",
+              "duplicateIds": [
+                "string",
+                "string"
+              ],
+              "leads": [
+                {
+                  "id": "string",
+                  "title": "string",
+                  "amount": 1324.202036035793,
+                  "currency": "string",
+                  "status": "string",
+                  "createdAt": "2018-09-27T15:01:36.108Z"
+                },
+                {
+                  "id": "string",
+                  "title": "string",
+                  "amount": 1019.3027589779946,
+                  "currency": "string",
+                  "status": "string",
+                  "createdAt": "2020-10-03T20:18:38.534Z"
+                }
+              ]
+            },
+            {
+              "contactId": "string",
+              "survivorId": "string",
+              "duplicateIds": [
+                "string",
+                "string"
+              ],
+              "leads": [
+                {
+                  "id": "string",
+                  "title": "string",
+                  "amount": 3188.4310147420856,
+                  "currency": "string",
+                  "status": "string",
+                  "createdAt": "1999-03-03T10:57:33.459Z"
+                },
+                {
+                  "id": "string",
+                  "title": "string",
+                  "amount": 4654.852014633481,
+                  "currency": "string",
+                  "status": "string",
+                  "createdAt": "2006-05-21T03:26:45.257Z"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "contactId": {
+                      "type": "string"
+                    },
+                    "survivorId": {
+                      "type": "string"
+                    },
+                    "duplicateIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "leads": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+order: 1000

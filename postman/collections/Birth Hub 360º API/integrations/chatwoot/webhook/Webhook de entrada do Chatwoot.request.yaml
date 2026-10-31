@@ -1,0 +1,10 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/integrations/chatwoot/webhook"
+method: POST
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Webhook de entrada do Chatwoot.resources/examples
+order: 1000

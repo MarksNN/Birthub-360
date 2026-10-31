@@ -1,0 +1,87 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/analytics/cohort"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "cohorts": [
+            {
+              "month": "2026-07",
+              "total": 200,
+              "month1": 90,
+              "month2": 80
+            },
+            {
+              "month": "2026-07",
+              "total": 200,
+              "month1": 90,
+              "month2": 80
+            }
+          ]
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "cohorts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "month": {
+                      "type": "string",
+                      "example": "2026-07"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "month1": {
+                      "type": "integer",
+                      "example": 90
+                    },
+                    "month2": {
+                      "type": "integer",
+                      "example": 80
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "cohorts"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 1000

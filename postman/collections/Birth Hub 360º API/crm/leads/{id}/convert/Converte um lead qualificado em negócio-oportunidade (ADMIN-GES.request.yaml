@@ -1,0 +1,30 @@
+$kind: http-request
+name: Converte um lead qualificado em negócio/oportunidade (ADMIN/GESTOR/VENDEDOR)
+description: ""
+url: "{{baseUrl}}/crm/leads/:id/convert"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Converte um lead qualificado em negócio-oportunidade (ADMIN-GES.resources/examples
+order: 1000

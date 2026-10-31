@@ -1,0 +1,27 @@
+$kind: http-example
+name: Corpo inválido, ou status ausente/fora do vocabulário aceito
+request:
+  url: "{{baseUrl}}/webhooks/signature/webhook"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "provider": "govbr",
+        "providerRequestId": "string",
+        "status": "sent",
+        "evidenceRef": "string"
+      }
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: text
+    content: ""
+order: 2000

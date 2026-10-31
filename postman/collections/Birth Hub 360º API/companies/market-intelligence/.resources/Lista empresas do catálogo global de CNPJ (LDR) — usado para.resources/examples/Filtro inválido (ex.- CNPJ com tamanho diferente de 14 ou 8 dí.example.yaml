@@ -1,0 +1,33 @@
+$kind: http-example
+name: "Filtro inválido (ex.: CNPJ com tamanho diferente de 14 ou 8 dígitos, UF inválida)"
+request:
+  url: "{{baseUrl}}/companies/market-intelligence?page=1&pageSize=25&q=string&cnpj=string&uf=MI&municipio=string&municipioIbge=6714481&cnae=string&situacao=string&porte=string&icpTier=FORA_DO_ICP&matrizFilial=MATRIZ&sort=name"
+  method: GET
+  headers:
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    page: "1"
+    pageSize: "25"
+    q: string
+    cnpj: string
+    uf: MI
+    municipio: string
+    municipioIbge: "6714481"
+    cnae: string
+    situacao: string
+    porte: string
+    icpTier: FORA_DO_ICP
+    matrizFilial: MATRIZ
+    sort: name
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 400
+  statusText: Bad Request
+  body:
+    type: text
+    content: ""
+order: 2000

@@ -1,0 +1,28 @@
+$kind: http-request
+name: "Processa o callback OAuth do Google. Observação de contrato (corrigida em 2026-08-15, Onda 8): este endpoint NUNCA devolve JSON — sempre um redirect 302 para o frontend (`/app?google=connected` em sucesso, `/app?google=error&message=...` em falha)."
+description: ""
+url: "{{baseUrl}}/google/callback?code=string"
+method: GET
+queryParams:
+  - key: code
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Processa o callback OAuth do Google. Observação de contrato (c.resources/examples
+order: 1000

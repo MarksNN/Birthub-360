@@ -1,0 +1,63 @@
+$kind: http-request
+name: Executa o agente de Churn Retention sobre a previsão de risco de churn (ChurnPredictionService) para a conta informada.
+description: ""
+url: "{{baseUrl}}/agent/commercial-cell/churn-retention/run"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "clientName": "string",
+      "contractAgeMonths": 9780.757375788402,
+      "monthlyRecurringRevenue": 5512.898369478955,
+      "openSupportTickets": 9532,
+      "unresolvedComplaints": 3462,
+      "paymentDelaysLast90Days": 222,
+      "platformUsageDropPercentage": 1868.8877776909885,
+      "recentSentimentNotes": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "clientName": {
+          "type": "string"
+        },
+        "contractAgeMonths": {
+          "type": "number"
+        },
+        "monthlyRecurringRevenue": {
+          "type": "number"
+        },
+        "openSupportTickets": {
+          "type": "integer"
+        },
+        "unresolvedComplaints": {
+          "type": "integer"
+        },
+        "paymentDelaysLast90Days": {
+          "type": "integer"
+        },
+        "platformUsageDropPercentage": {
+          "type": "number"
+        },
+        "recentSentimentNotes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "clientName",
+        "contractAgeMonths",
+        "monthlyRecurringRevenue",
+        "openSupportTickets",
+        "unresolvedComplaints",
+        "paymentDelaysLast90Days",
+        "platformUsageDropPercentage"
+      ]
+    }
+settings: {}
+examples: ./.resources/Executa o agente de Churn Retention sobre a previsão de risco d.resources/examples
+order: 1000

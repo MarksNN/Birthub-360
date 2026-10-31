@@ -1,0 +1,18 @@
+$kind: http-request
+name: Inicia uma nova extração histórica do Bitrix24 (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/extractions"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Inicia uma nova extração histórica do Bitrix24 (somente ADMIN.resources/examples
+order: 2000

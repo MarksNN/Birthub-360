@@ -1,0 +1,14 @@
+$kind: http-request
+name: Extrai texto/dados de um documento via OCR (Tesseract) para apoiar a descoberta de candidatos
+description: ""
+url: "{{baseUrl}}/prospecting/ocr"
+method: POST
+headers:
+  Content-Type: multipart/form-data
+  Accept: application/json
+body:
+  type: formdata
+  content: []
+settings: {}
+examples: ./.resources/Extrai texto-dados de um documento via OCR (Tesseract) para apoi.resources/examples
+order: 1000

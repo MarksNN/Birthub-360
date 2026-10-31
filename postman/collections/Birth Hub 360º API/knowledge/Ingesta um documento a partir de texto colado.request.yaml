@@ -1,0 +1,37 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/knowledge"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "string",
+      "content": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400000
+        }
+      },
+      "required": [
+        "title",
+        "content"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ingesta um documento a partir de texto colado.resources/examples
+order: 2000

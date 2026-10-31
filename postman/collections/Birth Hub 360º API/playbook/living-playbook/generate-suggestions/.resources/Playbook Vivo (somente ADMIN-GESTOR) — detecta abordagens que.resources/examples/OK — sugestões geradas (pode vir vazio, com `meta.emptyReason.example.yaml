@@ -1,0 +1,109 @@
+$kind: http-example
+name: OK — sugestões geradas (pode vir vazio, com `meta.emptyReason` explicando o motivo)
+request:
+  url: "{{baseUrl}}/playbook/living-playbook/generate-suggestions"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "sellerId": "string",
+            "sellerName": "string",
+            "segment": "string",
+            "evidenceCount": 7377,
+            "patternTitle": "string",
+            "patternDescription": "string",
+            "suggestedScript": "string",
+            "sourceExcerpts": [
+              "string",
+              "string"
+            ]
+          },
+          {
+            "sellerId": "string",
+            "sellerName": "string",
+            "segment": "string",
+            "evidenceCount": 5007,
+            "patternTitle": "string",
+            "patternDescription": "string",
+            "suggestedScript": "string",
+            "sourceExcerpts": [
+              "string",
+              "string"
+            ]
+          }
+        ],
+        "meta": {
+          "emptyReason": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sellerId": {
+                  "type": "string"
+                },
+                "sellerName": {
+                  "type": "string"
+                },
+                "segment": {
+                  "type": "string"
+                },
+                "evidenceCount": {
+                  "type": "integer"
+                },
+                "patternTitle": {
+                  "type": "string"
+                },
+                "patternDescription": {
+                  "type": "string"
+                },
+                "suggestedScript": {
+                  "type": "string"
+                },
+                "sourceExcerpts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "emptyReason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+order: 1000

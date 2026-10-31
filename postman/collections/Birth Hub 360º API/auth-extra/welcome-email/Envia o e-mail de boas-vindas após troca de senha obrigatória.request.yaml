@@ -1,0 +1,12 @@
+$kind: http-request
+description: "Disparado pelo próprio usuário logo após trocar com sucesso a senha temporária/padrão (não requer ADMIN). Best-effort de propósito: a troca de senha já aconteceu e o acesso já está liberado quando isto roda, então uma falha de envio (SMTP não configurado, provedor fora do ar) é só registrada em log — a resposta é sempre `200 { success: true }`, nunca bloqueia ou reverte o acesso do usuário."
+url: "{{baseUrl}}/auth-extra/welcome-email"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Envia o e-mail de boas-vindas após troca de senha obrigatória.resources/examples
+order: 1000

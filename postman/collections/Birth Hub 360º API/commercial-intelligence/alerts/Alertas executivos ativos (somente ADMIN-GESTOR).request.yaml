@@ -1,0 +1,13 @@
+$kind: http-request
+name: Alertas executivos ativos (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/alerts"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Alertas executivos ativos (somente ADMIN-GESTOR).resources/examples
+order: 1000

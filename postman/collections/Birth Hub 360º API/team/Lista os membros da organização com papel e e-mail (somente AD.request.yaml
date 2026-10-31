@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os membros da organização com papel e e-mail (somente ADMIN)
+description: ""
+url: "{{baseUrl}}/team"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os membros da organização com papel e e-mail (somente AD.resources/examples
+order: 2000

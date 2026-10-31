@@ -1,0 +1,65 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/leads/batch-update"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "leadIds": [
+          "string"
+        ],
+        "updates": {
+          "status": "string",
+          "owner": "string",
+          "tags": [
+            "string",
+            "string"
+          ],
+          "addTags": [
+            "string",
+            "string"
+          ],
+          "removeTags": [
+            "string",
+            "string"
+          ]
+        }
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": "",
+        "meta": {}
+      }
+    $type: |-
+      {
+        "description": "Envelope de resposta genérico usado pela maioria dos endpoints",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "meta": {
+            "type": "object",
+            "description": "Presente em listagens paginadas (page, limit, total, etc.)"
+          }
+        }
+      }
+order: 1000

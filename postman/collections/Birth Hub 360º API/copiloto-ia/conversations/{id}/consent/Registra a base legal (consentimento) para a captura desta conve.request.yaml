@@ -1,0 +1,63 @@
+$kind: http-request
+name: Registra a base legal (consentimento) para a captura desta conversa — auditado explicitamente (AuditService), mesmo padrão de src/features/lgpd/lgpd.routes.ts
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations/:id/consent"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "granted": true,
+      "method": "string",
+      "textVersion": "string",
+      "actorId": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "granted": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string",
+          "description": "Ex.: verbal, checkbox, e-mail"
+        },
+        "textVersion": {
+          "type": "string",
+          "description": "Versão do texto de consentimento apresentado"
+        },
+        "actorId": {
+          "type": "string",
+          "description": "Default: usuário autenticado"
+        }
+      },
+      "required": [
+        "granted",
+        "method",
+        "textVersion"
+      ]
+    }
+settings: {}
+examples: ./.resources/Registra a base legal (consentimento) para a captura desta conve.resources/examples
+order: 1000

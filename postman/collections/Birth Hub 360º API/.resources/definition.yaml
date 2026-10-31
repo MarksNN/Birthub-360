@@ -1,0 +1,50 @@
+$kind: collection
+description: |-
+  Documentação da API do Birth Hub 360º (CRM comercial + prospecção + IA).
+
+  **Autenticação**: a maioria das rotas exige uma sessão válida do Better Auth,
+  enviada via cookie de sessão (`better-auth.session_token`) definido por
+  `POST /api/auth/sign-in/email` ou pelo fluxo social (`/api/auth/sign-in/social`).
+  As rotas `/api/auth/*` são geridas pela biblioteca `better-auth` e não são
+  implementadas manualmente neste projeto — os schemas de request abaixo
+  (`SignUpEmailRequest`, `SignInEmailRequest`) refletem os campos aceitos pela
+  lib, mas o contrato completo (inclusive `/api/auth/sign-in/social`,
+  `/api/auth/sign-out`, `/api/auth/get-session`, etc.) é o padrão do Better Auth.
+
+  **Multi-tenant**: toda rota autenticada (exceto `/api/auth/*`) roda sob
+  `requireTenant`, que resolve o `organizationId` da sessão. Recursos operacionais
+  são filtrados pelo tenant. O catálogo público oficial de Market Intelligence é
+  global e somente leitura para tenants autenticados; ele nunca é misturado à
+  entidade `Company` do CRM.
+
+  **Envelope de resposta**: a maior parte dos endpoints devolve
+  `{ "success": true, "data": ... }` (e opcionalmente `meta` para paginação) em
+  caso de sucesso, ou `{ "success": false, "error": "..." }` em caso de falha.
+  Alguns endpoints legados de `/api/intelligence` fogem do padrão e devolvem
+  `{ "result": ... }` diretamente — isso está anotado endpoint a endpoint.
+
+  **Fora do escopo deste documento (não são recursos REST descritos como `paths` abaixo, mas
+  existem em produção — ver `server.ts`)**:
+  - `GET /metrics` — métricas Prometheus (`prom-client`), texto plano, sem autenticação própria.
+    Só existe quando `EXPOSE_METRICS=true`.
+  - `GET /api-docs` — esta própria documentação (Swagger UI), servida a partir deste arquivo.
+    Montada fora de produção por padrão, ou em qualquer ambiente com `EXPOSE_API_DOCS=true`.
+  - `/admin/queues` — painel Bull Board de monitoramento de filas (HTML, não JSON). Exige sessão
+    válida **e** papel `ADMIN` (`authenticateToken, requireTenant, requireRole(['ADMIN'])`).
+    Expõe jobs de todas as organizações (as filas são globais, não por tenant) — risco residual
+    documentado em `docs/security/SECURITY_GUIDE.md`.
+
+
+  Contact Support:
+   Name: Birth Hub 360
+   Email: comercial@birthhub360.com.br
+variables:
+  baseUrl: /api
+auth:
+  - id: 8ba65618-5846-4d0b-b21c-d7fb4e52896d
+    type: apikey
+    name: apikey auth
+    credentials:
+      key: better-auth.session_token
+      value: "{{apiKey}}"
+      in: header

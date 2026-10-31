@@ -1,0 +1,30 @@
+$kind: http-request
+name: "Para manualmente uma execução de cadência (CYC-009) — diferente de pausar, é definitivo (`stopReason: manual-stop`), nunca retomável."
+description: ""
+url: "{{baseUrl}}/cadence/runs/:id/stop"
+method: POST
+headers:
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Para manualmente uma execução de cadência (CYC-009) — difer.resources/examples
+order: 1000

@@ -1,0 +1,136 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/copiloto-ia/conversations/:id/live-insights"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "callId": "string",
+            "dealId": "string",
+            "timestamp": "2009-09-07T10:27:07.857Z",
+            "sentimentScore": 0.5786272316101428,
+            "objectionCategory": "timing_ou_prioridade",
+            "suggestedRebuttal": "string",
+            "organizationId": "string",
+            "confidence": 0.9742092272607532,
+            "competitorMentioned": "string",
+            "keyPhrases": [
+              "string",
+              "string"
+            ],
+            "transcriptSnippet": "string"
+          },
+          {
+            "callId": "string",
+            "dealId": "string",
+            "timestamp": "2006-10-01T01:11:52.208Z",
+            "sentimentScore": 0.37198513011389633,
+            "objectionCategory": "autoridade_decisor",
+            "suggestedRebuttal": "string",
+            "organizationId": "string",
+            "confidence": 0.17142021078223646,
+            "competitorMentioned": "string",
+            "keyPhrases": [
+              "string",
+              "string"
+            ],
+            "transcriptSnippet": "string"
+          }
+        ]
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "callId": {
+                  "type": "string"
+                },
+                "dealId": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "objectionCategory": {
+                  "type": "string",
+                  "enum": [
+                    "preco_ou_orcamento",
+                    "concorrente",
+                    "timing_ou_prioridade",
+                    "autoridade_decisor",
+                    "produto_fit",
+                    "indecisao",
+                    "contrato_ou_juridico",
+                    "outros"
+                  ]
+                },
+                "suggestedRebuttal": {
+                  "type": "string"
+                },
+                "sentimentScore": {
+                  "type": "number",
+                  "minimum": -1,
+                  "maximum": 1,
+                  "description": "Score de sentimento (-1 muito negativo a +1 muito positivo)"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "confidence": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "competitorMentioned": {
+                  "type": "string"
+                },
+                "keyPhrases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "transcriptSnippet": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "callId",
+                "dealId",
+                "timestamp",
+                "sentimentScore"
+              ]
+            }
+          }
+        }
+      }
+order: 1000

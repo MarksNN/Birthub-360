@@ -1,0 +1,38 @@
+$kind: http-example
+name: "Resultados da busca vetorial (`{ results: [...] }`, sem o envelope padrão)"
+request:
+  url: "{{baseUrl}}/intelligence/search?q=string&limit=5"
+  method: GET
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  queryParams:
+    q: string
+    limit: "5"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: "{}"
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+order: 1000

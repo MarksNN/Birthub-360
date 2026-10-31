@@ -1,0 +1,13 @@
+$kind: http-request
+name: Retorna as recomendações atuais de coaching do vendedor autenticado
+description: ""
+url: "{{baseUrl}}/gamification/coaching"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna as recomendações atuais de coaching do vendedor autent.resources/examples
+order: 1000

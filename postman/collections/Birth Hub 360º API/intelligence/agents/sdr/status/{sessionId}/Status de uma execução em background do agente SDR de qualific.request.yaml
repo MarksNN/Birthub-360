@@ -1,0 +1,30 @@
+$kind: http-request
+name: Status de uma execução em background do agente SDR de qualificação
+description: "Não segue o DataEnvelope genérico (formato próprio). AI-003 (onda 31): 3 estados possíveis — `pending` (nenhum registro ainda, execução em andamento ou não iniciada), `completed` (concluída com sucesso, `messages` presente) e `failed` (bloqueio de guardrail LGPD ou erro na execução do agente, `error` presente). Antes, `failed` não existia — qualquer falha anterior à persistência do resultado deixava a sessão presa em `pending` para sempre."
+url: "{{baseUrl}}/intelligence/agents/sdr/status/:sessionId"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: sessionId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Status de uma execução em background do agente SDR de qualific.resources/examples
+order: 1000

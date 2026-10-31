@@ -1,0 +1,46 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/roleplay/sessions/:id/messages"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "message": "string"
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "message"
+      ]
+    }
+settings: {}
+examples: ./.resources/Envia uma mensagem e recebe a resposta da persona.resources/examples
+order: 1000

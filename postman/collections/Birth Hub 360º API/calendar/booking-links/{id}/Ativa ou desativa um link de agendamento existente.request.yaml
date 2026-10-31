@@ -1,0 +1,45 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/calendar/booking-links/:id"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "active": true
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "active"
+      ]
+    }
+settings: {}
+examples: ./.resources/Ativa ou desativa um link de agendamento existente.resources/examples
+order: 1000

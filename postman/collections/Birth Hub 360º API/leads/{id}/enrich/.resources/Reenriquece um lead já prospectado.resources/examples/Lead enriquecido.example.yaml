@@ -1,0 +1,173 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/leads/:id/enrich"
+  method: POST
+  headers:
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  pathVariables:
+    id: string
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "id": "string",
+          "organizationId": "string",
+          "createdAt": "1964-07-05T16:47:49.255Z",
+          "updatedAt": "1984-11-23T04:26:06.485Z",
+          "status": "Piloto Logístico - Concluído",
+          "source": "string",
+          "channel": "string",
+          "temperature": "Morno",
+          "score": 548,
+          "owner": "string",
+          "companyId": "string",
+          "contactId": "string",
+          "funnel": "Negocio",
+          "title": "string",
+          "amount": 1087.4090810291082,
+          "currency": "str",
+          "probability": 66,
+          "expectedCloseAt": "string",
+          "pipelineId": "string",
+          "pipelineStageId": "string",
+          "customFields": {
+            "key_0": 7813
+          },
+          "pic": "PIC3_Transicao",
+          "qualification": {}
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "allOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "channel": {
+                    "type": "string"
+                  },
+                  "temperature": {
+                    "allOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "score": {
+                    "type": "integer"
+                  },
+                  "owner": {
+                    "type": "string"
+                  },
+                  "companyId": {
+                    "type": "string"
+                  },
+                  "contactId": {
+                    "type": "string"
+                  },
+                  "funnel": {
+                    "type": "string",
+                    "enum": [
+                      "Lead",
+                      "Negocio"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 180
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 3
+                  },
+                  "probability": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "expectedCloseAt": {
+                    "type": "string"
+                  },
+                  "pipelineId": {
+                    "type": "string"
+                  },
+                  "pipelineStageId": {
+                    "type": "string"
+                  },
+                  "customFields": {
+                    "type": "object"
+                  },
+                  "pic": {
+                    "type": "string",
+                    "enum": [
+                      "PIC1_Expansao",
+                      "PIC2_Risco",
+                      "PIC3_Transicao"
+                    ],
+                    "description": "Perfil de Cliente Ideal do Playbook de Pré-Vendas Atlas"
+                  },
+                  "qualification": {
+                    "type": "object",
+                    "description": "Checklist de qualificação do SDR (Playbook Comercial Birth Hub 360, seção 4.2) — objeto livre"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+order: 1000

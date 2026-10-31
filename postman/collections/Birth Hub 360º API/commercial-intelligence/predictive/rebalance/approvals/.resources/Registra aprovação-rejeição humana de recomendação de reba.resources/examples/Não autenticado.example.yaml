@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/commercial-intelligence/predictive/rebalance/approvals"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "recommendationId": "string",
+        "leadId": "string",
+        "fromOwner": "string",
+        "toOwner": "string",
+        "decision": "REJECTED",
+        "note": "string"
+      }
+response:
+  statusCode: 401
+  statusText: Unauthorized
+  body:
+    type: text
+    content: ""
+order: 3000

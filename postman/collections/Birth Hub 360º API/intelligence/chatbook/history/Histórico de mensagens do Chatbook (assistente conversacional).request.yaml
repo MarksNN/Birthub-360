@@ -1,0 +1,33 @@
+$kind: http-request
+name: "Histórico de mensagens do Chatbook (assistente conversacional) do usuário, por marca (Agente 18, achado de auditoria: endpoint real, sem entrada aqui)."
+description: ""
+url: "{{baseUrl}}/intelligence/chatbook/history?brand=Birth Hub 360"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: brand
+    value: Birth Hub 360
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "Birth Hub 360"
+            ]
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Histórico de mensagens do Chatbook (assistente conversacional).resources/examples
+order: 1000

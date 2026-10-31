@@ -1,0 +1,72 @@
+$kind: http-request
+name: Executa uma das 20 funções do AI Toolkit (summarizeLead, generateEmailDraft, scoreLeadQuality, etc.)
+description: ""
+url: "{{baseUrl}}/intelligence/toolkit/execute"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "functionName": "string",
+      "args": [
+        "string",
+        "string"
+      ],
+      "piiValues": [
+        {
+          "token": "string",
+          "value": "string"
+        },
+        {
+          "token": "string",
+          "value": "string"
+        }
+      ]
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "functionName": {
+          "type": "string",
+          "description": "Nome de uma função do toolkit (ver src/lib/ai/features.ts)"
+        },
+        "args": {
+          "type": "array",
+          "description": "Argumentos de texto — a aridade exata varia por função",
+          "items": {
+            "type": "string"
+          }
+        },
+        "piiValues": {
+          "type": "array",
+          "description": "Opcional. Valores de PII conhecidos pelo chamador (ex.: nome do contato de um lead) a minimizar no texto antes de ir ao provedor de IA externo e restaurar na resposta — mesmo padrão usado nos demais endpoints de IA. Sem isso, o texto em `args` vai integralmente ao provedor externo, já que estas funções recebem texto livre sem um campo estruturado de PII.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "description": "Placeholder que substitui o valor, ex.: \"[NOME_DO_CONTATO]\""
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "token",
+              "value"
+            ]
+          }
+        }
+      },
+      "required": [
+        "functionName",
+        "args"
+      ]
+    }
+settings: {}
+examples: ./.resources/Executa uma das 20 funções do AI Toolkit (summarizeLead, gener.resources/examples
+order: 1000

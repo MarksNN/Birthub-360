@@ -1,0 +1,13 @@
+$kind: http-request
+name: Análise de retenção por cohort mensal, tenant-scoped (`AnalyticsUseCases.cohortAnalysis`). Corrigido na Onda 2/Roadmap v2 (Agente 04) — antes devolvia uma lista fixa de exemplo ("Fake data just for the prototype"); ver `.agents/runs/roadmap-v2-onda-2.md`.
+description: ""
+url: "{{baseUrl}}/analytics/cohort"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Análise de retenção por cohort mensal, tenant-scoped (`Analyt.resources/examples
+order: 1000

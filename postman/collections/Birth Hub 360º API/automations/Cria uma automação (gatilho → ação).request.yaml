@@ -1,0 +1,42 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/automations"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "trigger": "string",
+      "action": "string",
+      "active": false,
+      "config": {}
+    }
+  $type: |-
+    {
+      "description": "Formato exato (campos de gatilho/ação) definido em automation.service.ts; consulte GET /api/automations/options para os valores válidos de trigger/action.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "trigger": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "config": {
+          "type": "object"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Cria uma automação (gatilho → ação).resources/examples
+order: 3000

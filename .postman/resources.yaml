@@ -1,0 +1,9 @@
+workspace:
+  id: 75de8b09-90b1-48c1-8fa5-c362d921f2a6
+localResources:
+  specs:
+    - ../docs/openapi.yaml
+    - ../postman/specs/Birth Hub 360º API/openapi.yaml
+resourceNameMappings:
+  specs:
+    - ../postman/specs/Birth Hub 360º API/openapi.yaml: Birth Hub 360º API

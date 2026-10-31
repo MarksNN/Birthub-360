@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista de negócios para drill-down executivo (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/deals"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista de negócios para drill-down executivo (somente ADMIN-GEST.resources/examples
+order: 1000

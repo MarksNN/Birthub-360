@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Resumo do Golden Dataset versionado (AI-005) e validação dos casos de uso de ferramentas (Agente 18, achado de auditoria: endpoint real, sem entrada aqui). Não usa o envelope `{success,data}` padrão."
+description: ""
+url: "{{baseUrl}}/agent/golden-dataset/summary"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Resumo do Golden Dataset versionado (AI-005) e validação dos c.resources/examples
+order: 1000

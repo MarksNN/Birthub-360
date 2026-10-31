@@ -1,0 +1,13 @@
+$kind: http-request
+name: Catálogo estático da Célula Comercial de Agentes de IA (onda 43) — metadado de produto (status, risco, capacidades, handoffs), não dado de tenant.
+description: ""
+url: "{{baseUrl}}/agent/commercial-cell"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Catálogo estático da Célula Comercial de Agentes de IA (onda.resources/examples
+order: 1000

@@ -1,0 +1,35 @@
+$kind: http-request
+name: Publica um comentário no lead correspondente no Bitrix24 (somente ADMIN/GESTOR)
+description: ""
+url: "{{baseUrl}}/bitrix/leads/:leadId/comment"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: "{}"
+  $type: |-
+    {
+      "type": "object"
+    }
+settings: {}
+examples: ./.resources/Publica um comentário no lead correspondente no Bitrix24 (somen.resources/examples
+order: 1000

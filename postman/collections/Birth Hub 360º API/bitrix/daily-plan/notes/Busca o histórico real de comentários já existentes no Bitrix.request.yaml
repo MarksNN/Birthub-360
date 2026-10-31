@@ -1,0 +1,56 @@
+$kind: http-request
+name: Busca o histórico real de comentários já existentes no Bitrix24 para um item do Plano Diário (task.commentitem.getlist / crm.timeline.comment.list) — chamado sob demanda ao abrir a gaveta de observação de um item, não em lote.
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan/notes?itemType=string&itemId=string&entityType=string&entityId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: itemType
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: itemId
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+  - key: entityType
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: entityId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Busca o histórico real de comentários já existentes no Bitrix.resources/examples
+order: 1000

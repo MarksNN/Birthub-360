@@ -1,0 +1,19 @@
+$kind: http-request
+name: Plano Diário pessoal do usuário autenticado (tarefas/atividades/leads do Bitrix24 + Central, consolidados). ADMIN/GESTOR podem consultar o plano de outro membro via `assignedById`.
+description: ""
+url: "{{baseUrl}}/bitrix/daily-plan?assignedById=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: assignedById
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Plano Diário pessoal do usuário autenticado (tarefas-atividade.resources/examples
+order: 1000

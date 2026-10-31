@@ -1,0 +1,299 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/roleplay/sessions"
+  method: POST
+  headers:
+    - key: Content-Type
+      value: application/json
+    - key: Accept
+      value: application/json
+    - key: better-auth.session_token
+      value: <API Key>
+      description: "Added as a part of security scheme: apikey"
+  body:
+    type: json
+    content: |-
+      {
+        "personaId": "string"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "session": {
+            "id": "string",
+            "organizationId": "string",
+            "userId": "string",
+            "personaId": "string",
+            "status": "ACTIVE",
+            "messages": [
+              {
+                "id": "string",
+                "role": "assistant",
+                "content": "string",
+                "timestamp": "1953-04-06T22:26:25.138Z"
+              },
+              {
+                "id": "string",
+                "role": "system",
+                "content": "string",
+                "timestamp": "1971-06-21T05:29:02.470Z"
+              }
+            ],
+            "createdAt": "1998-06-02T17:43:50.481Z",
+            "updatedAt": "1973-08-27T17:34:49.246Z",
+            "feedback": {
+              "overallScore": 7207.1289704587,
+              "spinSellingScores": {
+                "situation": 3905.6193112286287,
+                "problem": 4538.443847094246,
+                "implication": 3061.7552560167915,
+                "needPayoff": 1455.994076329793
+              },
+              "objectionHandlingScore": 1928.218906187632,
+              "strengths": [
+                "string",
+                "string"
+              ],
+              "improvementAreas": [
+                "string",
+                "string"
+              ],
+              "summary": "string"
+            }
+          },
+          "persona": {
+            "id": "string",
+            "name": "string",
+            "title": "string",
+            "companyType": "string",
+            "difficulty": "INTERMEDIARIO",
+            "scenario": "string",
+            "coreObjections": [
+              "string",
+              "string"
+            ],
+            "personalityTraits": [
+              "string",
+              "string"
+            ]
+          },
+          "initialGreeting": "string"
+        }
+      }
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "session": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "organizationId": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  },
+                  "personaId": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ACTIVE",
+                      "COMPLETED"
+                    ]
+                  },
+                  "messages": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "assistant",
+                            "system"
+                          ]
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "content",
+                        "timestamp"
+                      ]
+                    }
+                  },
+                  "feedback": {
+                    "type": "object",
+                    "properties": {
+                      "overallScore": {
+                        "type": "number"
+                      },
+                      "spinSellingScores": {
+                        "type": "object",
+                        "properties": {
+                          "situation": {
+                            "type": "number"
+                          },
+                          "problem": {
+                            "type": "number"
+                          },
+                          "implication": {
+                            "type": "number"
+                          },
+                          "needPayoff": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "situation",
+                          "problem",
+                          "implication",
+                          "needPayoff"
+                        ]
+                      },
+                      "objectionHandlingScore": {
+                        "type": "number"
+                      },
+                      "strengths": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "improvementAreas": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "summary": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "overallScore",
+                      "spinSellingScores",
+                      "objectionHandlingScore",
+                      "strengths",
+                      "improvementAreas",
+                      "summary"
+                    ]
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "id",
+                  "organizationId",
+                  "userId",
+                  "personaId",
+                  "status",
+                  "messages",
+                  "createdAt",
+                  "updatedAt"
+                ]
+              },
+              "persona": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "companyType": {
+                    "type": "string"
+                  },
+                  "difficulty": {
+                    "type": "string",
+                    "enum": [
+                      "INICIANTE",
+                      "INTERMEDIARIO",
+                      "AVANCADO"
+                    ]
+                  },
+                  "scenario": {
+                    "type": "string"
+                  },
+                  "coreObjections": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "personalityTraits": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "title",
+                  "companyType",
+                  "difficulty",
+                  "scenario",
+                  "coreObjections",
+                  "personalityTraits"
+                ]
+              },
+              "initialGreeting": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "session",
+              "persona",
+              "initialGreeting"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      }
+order: 1000

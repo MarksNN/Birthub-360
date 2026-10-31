@@ -1,0 +1,13 @@
+$kind: http-request
+name: Tarefas delegadas pelo usuário autenticado no widget "Tarefas pendentes" do Hub Executivo — tarefas reais do Bitrix24 (`tasks.task.list`), não estado local. Devolve também a lista de colegas ativos do Bitrix24 para o seletor "Designar para".
+description: ""
+url: "{{baseUrl}}/bitrix/hub-tasks"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Tarefas delegadas pelo usuário autenticado no widget -Tarefas p.resources/examples
+order: 1000

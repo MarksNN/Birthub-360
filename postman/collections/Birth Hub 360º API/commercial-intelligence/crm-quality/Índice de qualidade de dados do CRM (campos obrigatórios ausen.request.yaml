@@ -1,0 +1,13 @@
+$kind: http-request
+name: Índice de qualidade de dados do CRM (campos obrigatórios ausentes, falhas de sync) — somente ADMIN/GESTOR
+description: ""
+url: "{{baseUrl}}/commercial-intelligence/crm-quality"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Índice de qualidade de dados do CRM (campos obrigatórios ausen.resources/examples
+order: 1000

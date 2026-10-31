@@ -1,0 +1,49 @@
+$kind: http-request
+name: Aprova um AccessRequest `PENDING` e cria o `TemporaryCapabilityGrant` (padrão 24h, configurável até 7 dias via `expiresInHours`). Nunca permite autoaprovação (aprovador == requester) nem aprovador fora da política da categoria — ambos rejeitam a tentativa
+description: ""
+url: "{{baseUrl}}/access-requests/:id/approve"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: id
+    value: string
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      }
+body:
+  type: json
+  content: |-
+    {
+      "notes": "string",
+      "expiresInHours": 146
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "expiresInHours": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 168
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/Aprova um AccessRequest `PENDING` e cria o `TemporaryCapabilityG.resources/examples
+order: 1000

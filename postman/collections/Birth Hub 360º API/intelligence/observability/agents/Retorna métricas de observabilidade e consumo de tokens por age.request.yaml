@@ -1,0 +1,13 @@
+$kind: http-request
+name: Retorna métricas de observabilidade e consumo de tokens por agente/célula
+description: ""
+url: "{{baseUrl}}/intelligence/observability/agents"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Retorna métricas de observabilidade e consumo de tokens por age.resources/examples
+order: 1000

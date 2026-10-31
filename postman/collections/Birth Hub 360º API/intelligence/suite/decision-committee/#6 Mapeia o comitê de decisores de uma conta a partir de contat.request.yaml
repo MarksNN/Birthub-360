@@ -1,0 +1,32 @@
+$kind: http-request
+name: "#6 Mapeia o comitê de decisores de uma conta a partir de contatos e contexto da empresa"
+description: ""
+url: "{{baseUrl}}/intelligence/suite/decision-committee"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "companyContext": {}
+    }
+  $type: |-
+    {
+      "type": "object",
+      "properties": {
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "companyContext": {
+          "type": "object"
+        }
+      }
+    }
+settings: {}
+examples: ./.resources/#6 Mapeia o comitê de decisores de uma conta a partir de contat.resources/examples
+order: 1000

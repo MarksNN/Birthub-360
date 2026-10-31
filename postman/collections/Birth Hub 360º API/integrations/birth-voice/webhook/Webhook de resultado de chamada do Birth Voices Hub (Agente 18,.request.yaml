@@ -1,0 +1,13 @@
+$kind: http-request
+name: "Webhook de resultado de chamada do Birth Voices Hub (Agente 18, achado de auditoria de contrato: path documentado estava incompleto — faltava o segmento `/webhook`; o mount é em `/api/integrations/birth-voice`, mas o router do webhook só reage ao sub-path"
+description: ""
+url: "{{baseUrl}}/integrations/birth-voice/webhook"
+method: POST
+headers:
+  Content-Type: application/octet-stream
+body:
+  type: file
+  content: {}
+settings: {}
+examples: ./.resources/Webhook de resultado de chamada do Birth Voices Hub (Agente 18,.resources/examples
+order: 1000

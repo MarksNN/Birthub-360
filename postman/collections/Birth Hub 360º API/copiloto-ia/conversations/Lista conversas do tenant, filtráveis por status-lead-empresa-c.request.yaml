@@ -1,0 +1,50 @@
+$kind: http-request
+name: Lista conversas do tenant, filtráveis por status/lead/empresa/contato
+description: ""
+url: "{{baseUrl}}/copiloto-ia/conversations?status=SCHEDULED&leadId=string&companyId=string&contactId=string"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: status
+    value: SCHEDULED
+    disabled: false
+    description: ""
+    $type: |-
+      {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": [
+              "SCHEDULED",
+              "CAPTURING",
+              "PROCESSING",
+              "READY",
+              "FAILED",
+              "CANCELLED"
+            ]
+          }
+        }
+      }
+  - key: leadId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: companyId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+  - key: contactId
+    value: string
+    disabled: false
+    description: ""
+    $type: string
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista conversas do tenant, filtráveis por status-lead-empresa-c.resources/examples
+order: 2000

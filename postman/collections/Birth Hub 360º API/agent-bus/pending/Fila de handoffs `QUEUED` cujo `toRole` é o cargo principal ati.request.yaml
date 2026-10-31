@@ -1,0 +1,13 @@
+$kind: http-request
+name: Fila de handoffs `QUEUED` cujo `toRole` é o cargo principal ativo do ator autenticado (ou todos, para ADMIN) — ordenada por prioridade e, dentro da mesma prioridade, FIFO.
+description: ""
+url: "{{baseUrl}}/agent-bus/pending"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Fila de handoffs `QUEUED` cujo `toRole` é o cargo principal ati.resources/examples
+order: 1000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: Lista os produtos/serviços cadastrados para composição de negócio
+description: ""
+url: "{{baseUrl}}/crm/products"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/Lista os produtos-serviços cadastrados para composição de neg.resources/examples
+order: 1000

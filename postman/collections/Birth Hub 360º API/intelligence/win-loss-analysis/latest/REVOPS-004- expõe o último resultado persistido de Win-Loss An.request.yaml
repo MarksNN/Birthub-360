@@ -1,0 +1,13 @@
+$kind: http-request
+name: "REVOPS-004: expõe o último resultado persistido de Win/Loss Analysis (automático de sexta OU manual via POST acima, o que for mais recente) — antes desta correção a varredura automática nunca aparecia em lugar nenhum da UI. Mesmo padrão de /intelligence/r"
+description: ""
+url: "{{baseUrl}}/intelligence/win-loss-analysis/latest"
+method: GET
+headers:
+  Accept: application/json
+body:
+  type: text
+  content: ""
+settings: {}
+examples: ./.resources/REVOPS-004- expõe o último resultado persistido de Win-Loss An.resources/examples
+order: 1000
