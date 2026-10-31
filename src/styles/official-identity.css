@@ -164,6 +164,12 @@ body {
     inset 0 1px 0 var(--card-accent),
     var(--shadow-elevated);
 }
+
+/* Domain accent is supplied by the application shell; body text stays neutral. */
+[data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ink);
+  text-shadow: none;
+}
 .bh-platform-card[data-accent="gold"] {
   --card-accent: var(--color-heading-gold);
 }
