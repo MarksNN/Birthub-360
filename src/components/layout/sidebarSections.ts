@@ -282,8 +282,8 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
                       icon: TAB_META.integrations.icon,
                       primaryTab: 'integrations' as TabType,
                       subItems: [
-                        { tab: 'integrations', label: 'Hub de Integrações' },
-                        { tab: 'bitrix', label: 'Guia Prático Bitrix24' },
+                        { tab: 'integrations' as TabType, label: 'Hub de Integrações' },
+                        { tab: 'bitrix' as TabType, label: 'Guia Prático Bitrix24' },
                       ],
                     },
                   ]
@@ -296,9 +296,9 @@ export function getSidebarNavSections(permissions: SidebarNavPermissions): NavSe
                       icon: TAB_META.team.icon,
                       primaryTab: 'team' as TabType,
                       subItems: [
-                        { tab: 'team', label: 'Equipe' },
-                        { tab: 'module-access', label: 'Acesso a Módulos' },
-                        { tab: 'usage', label: 'Consumo de IA' },
+                        { tab: 'team' as TabType, label: 'Equipe' },
+                        { tab: 'module-access' as TabType, label: 'Acesso a Módulos' },
+                        { tab: 'usage' as TabType, label: 'Consumo de IA' },
                       ],
                     },
                   ]
