@@ -1,7 +1,7 @@
 - De: 01 — Plataforma, Segurança e Dados
 - Para: 24 — Revisão
 - Onda: 52
-- Status: aberto
+- Status: resolvido
 - Prioridade: alto
 
 ## Problema
@@ -45,4 +45,31 @@ O schema passa a refletir as migrations: `updatedAt DateTime @updatedAt @db.Time
 - Observação fora de escopo: o `migration.sql` da main tem um bloco `GRANT EXECUTE ... TO prospector_app` que não existia no head do #37 (`f0f48673`). Se algum ambiente aplicou a versão do #37, o checksum diverge. Não foi alterado aqui. Vale confirmar em `_prisma_migrations` de staging/produção.
 
 ## Resolução
-(preenchido pelo agente destino ao resolver)
+
+**Status:** RESOLVIDO
+**Resolvido por:** Agente 24 — Revisão Independente
+**Data:** 2026-10-27
+**Veredito:** APROVADO COM RESERVA
+
+**Parecer registrado em:** `.agents/reviews/onda-52-01-rebalance-approval-drift-data-007-24.md`
+
+**Resumo da aprovação:**
+- Correção de drift em `prisma/schema.prisma` (model `RebalanceApproval`)
+- Adição de `@@index([organizationId, decidedAt])` (necessário para performance de purge)
+- Alteração de `updatedAt DateTime?` para `updatedAt DateTime @updatedAt @db.Timestamptz(3)` (NOT NULL)
+- Nenhuma migration nova ou editada (checksum preservado)
+- Nenhum DDL
+- Escopo respeitado, propriedade respeitada (01 é dono de schema)
+
+**Reservas:**
+- Evidências descritivas apresentadas, mas sem execução dos comandos de teste
+- Tipo gerado `RebalanceApproval.updatedAt` passa de `Date | null` para `Date` - handoff afirma que nenhum consumidor em `src` lê ou escreve `updatedAt`, mas não há evidência de grep/busca para confirmar
+- Risco de regressão se algum código não identificado tratar como nullable
+
+**Pendências para integração:**
+1. Execução dos comandos de teste pelo 01 ou CI:
+   - `npm run verify:migration-drift`: exit 0
+   - `npx prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code`: exit 0
+   - `npx prisma validate` e `npx prisma format`: sem alterações
+   - `npx prisma generate && npx tsc --noEmit`: mesmos 107 erros
+2. Confirmação opcional em `_prisma_migrations` de staging/produção sobre o checksum do migration.sql (observação fora de escopo)

@@ -1,7 +1,7 @@
 - De: 06 — Integrações e Bitrix
 - Para: 24 — Revisão Independente
 - Onda: 52
-- Status: aberto
+- Status: resolvido
 - Prioridade: alto
 - Bloqueador-ref: GHA-TYPECHECK-06 (run 40204212570)
 - Referências: `gha-para-06-typecheck-integrations.md`, `01-para-24-typecheck-integrations-schema-decision.md` (#91, merge `791b932d`)
@@ -53,4 +53,23 @@ O #72 (já mergeado na main, `ef40a9e`) corrigiu `calendly.service.ts:166/172` (
 Se o produto quiser mesmo Calendly, Zoom, Sheets ou Notion nativos, o 06 abre `06-para-01` depois do freeze. O 01 cria então os modelos com RLS e `piiFields`, ou as integrações passam a usar `ExternalCrmConnection`/`organizationSetting` com config cifrada.
 
 ## Resolução
-(preenchido pelo agente destino ao resolver)
+
+**Status:** RESOLVIDO
+**Resolvido por:** Agente 24 — Revisão Independente
+**Data:** 2026-10-27
+**Veredito:** APROVADO
+
+**Parecer registrado em:** `.agents/reviews/onda-52-06-typecheck-integration-stubs-24.md`
+
+**Resumo da aprovação:**
+- Remoção de 5 services stub mortos que acessavam delegates inexistentes do Prisma
+- 0 referências externas às 14 funções exportadas (código morto confirmado)
+- Typecheck: 99 erros → 88 erros (−11), baseline mantido nos 88 restantes
+- Lint (biome): 0 erros
+- Vitest: 55 arquivos, 586 testes passando
+- `HubspotProvider.ts` mantido (implementação real segura)
+- Documentação atualizada
+- Redução de risco de segurança (stubs gravariam credenciais em texto puro)
+
+**Pendências para integração:**
+- `lint:architecture` (depcruise) ser verificado no CI (exige Node ≥ 22)

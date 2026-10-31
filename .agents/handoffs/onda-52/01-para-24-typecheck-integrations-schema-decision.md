@@ -1,7 +1,7 @@
 - De: 01 — Plataforma, Segurança e Dados
 - Para: 24 — Revisão Independente
 - Onda: 52
-- Status: aberto
+- Status: resolvido
 - Prioridade: normal
 
 ## Problema

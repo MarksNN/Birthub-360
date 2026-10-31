@@ -1,7 +1,7 @@
 - De: 15 — Segurança Aplicada
 - Para: 24 — Revisão Independente (revisor técnico: 06 — Integrações e Bitrix)
 - Onda: 52
-- Status: aberto. PR #102 (branch `agente/15-integration-secrets-at-rest`), **24 BLOCKED em `aa4e0c22`** → rodada de correção empurrada por cima (fast-forward, sem force). O novo head é o commit que contém esta versão do handoff (`fix(security): 15 — correções do parecer 24/06 …`). Aguarda nova revisão do 24. `750452f5` (`fix(security): 15 — gitleaks FP #6 …`) só adiciona ao allowlist do `.gitleaks.toml` o regex ancorado `^sms-plain-key-0001$` (fixture de `integrationSettingsBackfill.test.ts:94`, falso-positivo `generic-api-key`); gitleaks 8.24.3 local em `--no-merges --first-parent acd6c614..HEAD`: no leaks found. **Head atual:** commit seguinte a `750452f5` (`docs(security): 15 — runbook RB-SEC-010 …`), **somente `.md`, sem código** (a diag `f0f85829` do 24 continua válida): reescreve `docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` para o contrato atual do `reencrypt-credentials.ts` (achado P2 do 24: o passo "Live" antigo rodava dry-run silencioso e o passo 4 trocava a chave sem re-cifrar). Agora: snapshot com id → dry-run com contagem esperada → `--apply --snapshot-confirmed=<id>` (inclui `--model=Setting` e o backfill antes da rotação) → **verificação obrigatória** com a `NEW_KEY` (6a `Erros: 0`, 6b `Re-criptografadas: 0`) → só então troca da chave e deploy; rollback; aviso de dry-run por padrão; ADR-010; OK do Marcelo. Alinhados: ADR-010 (passo 7 do runbook), `SECRET_ROTATION_POLICY.md`, `SECURITY_GUIDE.md`, `INCIDENT_RESPONSE.md`.
+- Status: resolvido. PR #102 (branch `agente/15-integration-secrets-at-rest`), **24 APROVADO em 2026-10-27** após rodada de correção empurrada por cima (fast-forward, sem force). Parecer registrado em `.agents/reviews/onda-52-15-integration-secrets-at-rest-24.md`. `750452f5` (`fix(security): 15 — gitleaks FP #6 …`) só adiciona ao allowlist do `.gitleaks.toml` o regex ancorado `^sms-plain-key-0001$` (fixture de `integrationSettingsBackfill.test.ts:94`, falso-positivo `generic-api-key`); gitleaks 8.24.3 local em `--no-merges --first-parent acd6c614..HEAD`: no leaks found. **Head atual:** commit seguinte a `750452f5` (`docs(security): 15 — runbook RB-SEC-010 …`), **somente `.md`, sem código** (a diag `f0f85829` do 24 continua válida): reescreve `docs/security/runbooks/ROTATE_CREDENTIALS_ENCRYPTION_KEY.md` para o contrato atual do `reencrypt-credentials.ts` (achado P2 do 24: o passo "Live" antigo rodava dry-run silencioso e o passo 4 trocava a chave sem re-cifrar). Agora: snapshot com id → dry-run com contagem esperada → `--apply --snapshot-confirmed=<id>` (inclui `--model=Setting` e o backfill antes da rotação) → **verificação obrigatória** com a `NEW_KEY` (6a `Erros: 0`, 6b `Re-criptografadas: 0`) → só então troca da chave e deploy; rollback; aviso de dry-run por padrão; ADR-010; OK do Marcelo. Alinhados: ADR-010 (passo 7 do runbook), `SECRET_ROTATION_POLICY.md`, `SECURITY_GUIDE.md`, `INCIDENT_RESPONSE.md`.
 - Prioridade: alto (achado ALTA)
 - Referências: diagnóstico do 15 "integration secrets at rest" (veredito ALTA), contrato 06↔15 (steering 1 e 2), `docs/ADR/ADR-010-integration-settings-at-rest.md`, #33 (KMS, Agente 21)
 
@@ -155,3 +155,45 @@ Não houve mudança de schema Prisma nem migration, e não foi usado `@ts-ignore
 4. Revisão do 06: semântica de `connected`, `accountSid` do SMS, bitrix pelo Hub e follow-up do `mailboxEmail`.
 5. CodeQL no PR: #105, #106 e #107 fecham na próxima análise (corrigidos no código, sem dismiss).
 6. Fail-closed: com credencial ilegível, nenhuma tool usa env da plataforma (testes `falha fechada: …`).
+
+## Resolução
+
+**Status:** RESOLVIDO
+**Resolvido por:** Agente 24 — Revisão Independente
+**Data:** 2026-10-27
+**Veredito:** APROVADO
+
+**Parecer registrado em:** `.agents/reviews/onda-52-15-integration-secrets-at-rest-24.md`
+
+**Resumo da aprovação:**
+- Todas as correções do parecer anterior (BLOCKED em `aa4e0c22`) foram implementadas
+- Logger redaction expandido conforme solicitado
+- Script guards implementados e testados (15 testes passando)
+- CodeQL alertas #105, #106, #107 corrigidos no código (sem dismiss via API)
+- ADR-010 v2 atualizado com runbook de rotação correto
+- Steering do 06 implementado (erros com status correto, estado por campo, fail-closed)
+- 85/85 testes unitários passando
+- Typecheck: 88 erros (baseline mantido, 0 erros novos)
+- Biome: 0 erros
+- gitleaks: no leaks found
+- Tenancy respeitado com fail-closed
+- LGPD: credenciais cifradas em repouso, redact no logger
+- Segurança: guards robustos, snapshot obrigatório, dry-run por padrão
+
+**Pendências para integração:**
+1. Análise CodeQL no PR #102 confirmar fechamento dos alertas #105, #106, #107
+2. OK do Marcelo para execução do backfill em staging/produção
+3. Coordenação com 06 para follow-ups documentados (UI Bitrix, DELETE/clear, mailboxEmail, etc.)
+4. Coordenação com 02 para decisão sobre fallback de plataforma (MÉDIA)
+
+**Follow-ups não bloqueadores (documentados no handoff):**
+- `save`/`clear` sem transação (risco de concorrência)
+- Cobertura de testes para Teams, Monday, Notion, ClickUp e Asana
+- UI do Bitrix
+- Erros de `validateWebhookUrl` (500 → 400)
+- Rota DELETE/clear
+- `mailboxEmail` vs `email` no M365
+- v2/KMS (#33)
+- Execução do backfill
+- Rotação dos tokens expostos
+- Fallback de plataforma para tenant sem config (MÉDIA, decisão de produto)
