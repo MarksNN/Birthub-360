@@ -62,6 +62,10 @@ export {
   UNTRUSTED_CONTENT_GUARD_INSTRUCTION,
   wrapUntrustedContent,
 } from './gateway/prompt-safety.js';
+export {
+  UntrustedContentGuard,
+  createUntrustedContentGuard,
+} from './gateway/untrustedContentGuard.js';
 export { litellmProvider } from './gateway/providers/litellm.provider.js';
 export { withRetry } from './gateway/retry.js';
 export { streamChatCompletion } from './gateway/streaming.js';

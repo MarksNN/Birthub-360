@@ -756,5 +756,32 @@
         ]
       }
     ]
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/hub/components/CommercialAgentCellPanel.tsx",
+    "rule": {
+      "name": "no-cross-feature-imports",
+      "severity": "error"
+    },
+    "to": "src/features/intelligence/commercial-v3/evaluation/commercialRedteamEvaluator.service.ts"
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/hub/components/CommercialAgentCellPanel.tsx",
+    "rule": {
+      "name": "no-cross-feature-imports",
+      "severity": "error"
+    },
+    "to": "src/features/intelligence/commercial-v3/contracts/commercialAgentV3.types.ts"
+  },
+  {
+    "type": "dependency",
+    "from": "src/features/hub/commercialV3.api.ts",
+    "rule": {
+      "name": "no-cross-feature-imports",
+      "severity": "error"
+    },
+    "to": "src/features/intelligence/commercial-v3/contracts/commercialAgentV3.types.ts"
   }
 ]

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { generateStructuredOutput } from '../../../../lib/ai/gateway.js';
-import { createUntrustedContentGuard } from '../../../../lib/ai/gateway/untrustedContentGuard.js';
+import { createUntrustedContentGuard } from '../../../../lib/ai/gateway.js';
 import { logger } from '../../../../lib/logger.js';
 import type {
   CommercialAgentResultV3,
