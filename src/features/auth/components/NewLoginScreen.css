@@ -362,16 +362,13 @@
 }
 .vancouver-gradient-text,
 .gradient-text {
-  background: none;
-  -webkit-text-fill-color: currentColor;
-  color: var(--color-heading-gold, #b45309);
-}
-.birthhub-auth .vancouver-gradient-text,
-.birthhub-auth .gradient-text {
-  color: #b45309;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--color-heading-gold);
 }
 .birthhub-auth .text-brand {
-  color: #0369a1;
+  color: var(--color-brand-primary);
 }
 .vancouver-navbar {
   background: var(--color-background);
@@ -415,11 +412,11 @@
 }
 .vancouver-btn-outline {
   background: var(--color-surface);
-  color: #0369a1;
+  color: var(--color-brand-primary);
   border-color: var(--color-border-strong);
 }
 .birthhub-auth .vancouver-btn-outline {
-  color: #0369a1;
+  color: var(--color-brand-primary);
 }
 .birthhub-auth [role="dialog"] > .vancouver-card {
   border-radius: var(--radius-modal);

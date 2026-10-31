@@ -101,21 +101,21 @@ const OFFICIAL_PILLARS = [
   },
   {
     id: '07',
-    slug: 'GOV',
-    name: 'GOVERNANÇA COMERCIAL',
-    desc: 'Mesa de tratamento de duplicidades, rastreabilidade de dados, controle de acessos (RBAC) e conformidade LGPD.',
-    color: 'var(--color-heading-danger)',
-    tag: 'Segurança & RLS',
-    icon: ShieldCheck,
+    slug: 'AUTO',
+    name: 'AUTOMAÇÃO & CONECTIVIDADE',
+    desc: 'Sincronização bidirecional idempotente com Bitrix24, webhooks auditáveis, regras operacionais e integrações.',
+    color: 'var(--color-heading-gold)',
+    tag: 'Sincronização Bitrix',
+    icon: Database,
   },
   {
     id: '08',
-    slug: 'ENRICH',
-    name: 'ENRIQUECIMENTO DE DADOS',
-    desc: 'Sincronização bidirecional idempotente com Bitrix24, validação cadastral e extração automatizada de contatos.',
-    color: 'var(--color-heading-cyan)',
-    tag: 'Sincronização Bitrix',
-    icon: Database,
+    slug: 'ENGAGE',
+    name: 'ENGAJAMENTO COMERCIAL',
+    desc: 'Mesa de tratamento comercial, governança de interações multicanal, rastreabilidade (RBAC) e conformidade LGPD.',
+    color: 'var(--color-heading-pink)',
+    tag: 'Mesa & Interações',
+    icon: ShieldCheck,
   },
 ];
 
@@ -541,13 +541,13 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                         Qualificação (42)
                       </div>
                       <div className="p-2 rounded-lg bg-sky-50 border border-sky-100 text-xs font-bold text-sky-900">
-                        Vibra Energia S/A
+                        Conta Enterprise Energia S/A
                         <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 350.000 · Decisor Validado
                         </span>
                       </div>
                       <div className="p-2 rounded-lg bg-surface border border-line text-xs font-bold text-ink">
-                        Ambev Logística
+                        Operação Logística B2B
                         <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 180.000 · Em contato
                         </span>
@@ -558,7 +558,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                         Proposta (18)
                       </div>
                       <div className="p-2 rounded-lg bg-purple-50 border border-purple-100 text-xs font-bold text-purple-900">
-                        Suzano Papel & Celulose
+                        Indústria Celulose S/A
                         <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 820.000 · Apresentada
                         </span>
@@ -569,7 +569,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                         Fechamento (12)
                       </div>
                       <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-100 text-xs font-bold text-emerald-900">
-                        Gerdau Aços
+                        Siderúrgica Nacional B2B
                         <span className="block text-[10px] text-ink-2 font-normal">
                           R$ 1.200.000 · Minuta Pronta
                         </span>
@@ -976,7 +976,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                   </span>
                   <div className="p-3 bg-sky-50 rounded-xl border border-sky-100 text-xs">
                     <span className="font-bold text-sky-900 block">
-                      Sinal de Expansão · Petrobras Logística
+                      Sinal de Expansão · Holding Logística Enterprise
                     </span>
                     <span className="text-ink-2 block">
                       Novas vagas abertas para compras corporativas detectadas.
@@ -984,7 +984,7 @@ export function NewLoginScreen({ initialScreen }: { initialScreen?: string } = {
                   </div>
                   <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 text-xs">
                     <span className="font-bold text-purple-900 block">
-                      Sinal Tecnológico · Vale S.A.
+                      Sinal Tecnológico · Mineradora Global S/A
                     </span>
                     <span className="text-ink-2 block">
                       Migração de infraestrutura para nuvem concluída.
