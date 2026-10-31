@@ -87,7 +87,7 @@ module.exports = {
       },
       to: {
         path: '^src/features/([^/]+)/',
-        pathNot: ['^src/features/$1/', '^src/features/notifications/'],
+        pathNot: ['^src/features/$1/', '^src/features/notifications/', '^src/features/intelligence/'],
       },
     },
     {
