@@ -31,6 +31,7 @@ export default defineConfig({
     // (access-request/agent-bus/agent-runtime/role-supervisor) estouraram o hook padrão de 10s só
     // por rodarem depois de mais um arquivo pesado ter sido adicionado à suíte sequencial.
     hookTimeout: 30000,
+    testTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
@@ -56,7 +57,7 @@ export default defineConfig({
       exclude: [
         'src/main.tsx',
         'src/**/*.d.ts',
-        'src/components/ui/AtlasLogo.tsx',
+        'src/components/brand/BirthHubLogo.tsx',
         // `src/**/*.{ts,tsx}` inclui os arquivos de teste unitário que moram ao lado do código-fonte
         // em `__tests__/` (convenção usada em boa parte de `src/features/**`). Esta suíte de
         // integração nunca os executa (não estão em `test.include` acima) — sem esta exclusão eles

@@ -34,7 +34,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
     'Como quebrar a objeção: "Já temos empresa de gerenciamento de risco"?',
     'Crie 3 opções de assunto de Cold Email de alto impacto para diretores de frota.',
     'Gere um script de WhatsApp de 3 linhas com pergunta aberta sobre sinistros.',
-    'Explique como a tecnologia de predição da Atlas reduz custos com seguro de carga.',
+    'Explique como a tecnologia de predição da Birth Hub 360 reduz custos com seguro de carga.',
   ];
 
   const loadMessages = async (sessionId: string) => {
@@ -65,8 +65,8 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
         session_id: newId,
         role: 'assistant',
         content:
-          'Olá! Sou o Assistente de Inteligência Comercial e Estratégia da **Atlas (Segurança e Inteligência Logística)**. Posso redigir scripts personalizados, contornar objeções de clientes ou afinar sua abordagem de prospecção. Como posso ajudar hoje?',
-        model: 'Atlas LLaMA3',
+          'Olá! Sou o Assistente de Inteligência Comercial e Estratégia da **Birth Hub 360 (Inteligência Comercial e RevOps)**. Posso redigir scripts personalizados, contornar objeções de clientes ou afinar sua abordagem de prospecção. Como posso ajudar hoje?',
+        model: 'Birth Hub 360 LLaMA3',
         created_at: new Date().toISOString(),
       },
     ]);
@@ -249,7 +249,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
               <h3
                 className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-[#F8F9FF]' : 'text-slate-800'}`}
               >
-                <span>Assistente Atlas LLaMA3</span>
+                <span>Assistente Birth Hub 360 LLaMA3</span>
                 <span className="text-[10px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 px-1.5 py-0.2 rounded font-mono font-semibold">
                   ONLINE
                 </span>
@@ -303,7 +303,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
                   }`}
                 >
                   <div className="flex items-center justify-between text-[10px] opacity-70 pb-1 border-b border-white/10">
-                    <span>{isUser ? 'Você' : 'Atlas LLaMA3 Specialist'}</span>
+                    <span>{isUser ? 'Você' : 'Assistente Birth Hub 360'}</span>
                     <span>
                       {new Date(msg.created_at).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -414,7 +414,7 @@ export const ChatTab: React.FC<ChatTabProps> = ({ aiConfig, theme = 'dark' }) =>
               type="text"
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
-              placeholder="Digite sua dúvida ou peça um roteiro específico para a Atlas..."
+              placeholder="Digite sua dúvida ou peça um roteiro específico para o Birth Hub 360..."
               className={`flex-1 border rounded-xl px-4 py-2.5 text-xs outline-none ${
                 isDark
                   ? 'bg-slate-900 border-slate-700 text-slate-100 placeholder-slate-500 focus:border-[var(--brand-primary)]'

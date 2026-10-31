@@ -39,7 +39,7 @@ async function capture() {
   });
 
   await unauthContext.addInitScript(() => {
-    localStorage.setItem('atlas_theme', 'dark');
+    localStorage.setItem('birthhub360_theme', 'dark');
     localStorage.setItem('theme', 'dark');
     document.documentElement.classList.add('dark');
     document.documentElement.classList.remove('light');
@@ -91,7 +91,7 @@ async function capture() {
   });
 
   await authContext.addInitScript(() => {
-    localStorage.setItem('atlas_theme', 'dark');
+    localStorage.setItem('birthhub360_theme', 'dark');
     localStorage.setItem('theme', 'dark');
     localStorage.setItem('@prospector:has_seen_tour', 'true');
     localStorage.setItem('hasSeenTour', 'true');

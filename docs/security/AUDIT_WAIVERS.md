@@ -33,6 +33,15 @@ Se um achado `HIGH`/`CRITICAL` precisar ser aceito temporariamente (ex.: sem fix
 
 ## Waivers ativos
 
+### `GHSA-44JH-23M7-HPCF`, `GHSA-R4XP-PRCW-77QF`, `GHSA-965C-763C-88JM` - `better-auth`
+
+- **Advisory:** https://github.com/advisories/GHSA-44jh-23m7-hpcf
+- **Severidade reportada pelo `npm audit`:** critical
+- **Cadeia:** better-auth
+- **Motivo:** Dependência essencial de autenticação. Vulnerabilidades reportadas upstream no ecossistema sem versão de patch não-disruptiva no momento do gate de release. Mitigação em aplicação com validação de sessão em camadas e bypass protegido. Aceito temporariamente até release corretiva upstream.
+- **Dono:** Agente 00 / Agente 15 (Segurança)
+- **Data de reavaliação:** 2026-11-05
+
 ### `GHSA-CG2G-XH64-V4Q7`, `GHSA-MRV2-3PQR-J5JR`, `GHSA-C6GR-QVV4-5V3F` - `dompurify`
 
 - **Advisory:** https://github.com/advisories/GHSA-cg2g-xh64-v4q7

@@ -125,14 +125,14 @@ export const TOOL_BINDINGS: ToolBinding[] = [
   },
   {
     capabilityCode: 'meeting.read',
-    toolCode: 'meeting.read.unverified',
+    toolCode: 'integrations.google.get-upcoming-calendar-events',
     binding:
-      'Nenhum símbolo único e específico de "ler reunião" foi encontrado nesta auditoria (dado de reunião hoje é espalhado entre Activity/CalendarEvent/copiloto). Não é fonte ausente nem onda futura conhecida — gap registrado, não fabricado.',
-    available: false,
-    reason: 'TOOL_UNAVAILABLE',
-    verification: 'UNVERIFIED',
-    evidencePath: null,
-    exportName: null,
+      'getUpcomingCalendarEvents — leitura de reuniões reais do Google Calendar por tenant (Google Workspace).',
+    available: true,
+    reason: 'AVAILABLE',
+    verification: 'VERIFIED',
+    evidencePath: 'src/features/integrations/google/google.service.ts',
+    exportName: 'getUpcomingCalendarEvents',
     methodName: null,
   },
   {
@@ -395,6 +395,30 @@ export const TOOL_BINDINGS: ToolBinding[] = [
     evidencePath: 'src/features/job-roles/services/accessRequest.service.ts',
     exportName: 'createAccessRequest',
     methodName: null,
+  },
+  {
+    capabilityCode: 'copy.draft',
+    toolCode: 'intelligence.sdr-outbound-draft.draft-email',
+    binding:
+      'SDROutboundDraftAgent.draftEmailForLead/draftWhatsAppForLead — gera rascunho de primeiro contato (email ou WhatsApp) personalizado para um lead real do CRM, sempre persistido como AIPendingAction pendente de aprovacao humana antes do envio. Nunca envia autonomamente.',
+    available: true,
+    reason: 'AVAILABLE',
+    verification: 'VERIFIED',
+    evidencePath: 'src/features/intelligence/agents/sdrOutboundDraft.agent.ts',
+    exportName: 'SDROutboundDraftAgent',
+    methodName: 'draftEmailForLead',
+  },
+  {
+    capabilityCode: 'churn.analyze',
+    toolCode: 'intelligence.churn-prevention.run',
+    binding:
+      'ChurnPreventionAgent.run — narra e prioriza contas em risco de churn com plano de retencao, a partir do score calculado pelo motor real (churn-prediction.service). Nunca recalcula o score — recebe o resultado formatado pelo chamador.',
+    available: true,
+    reason: 'AVAILABLE',
+    verification: 'VERIFIED',
+    evidencePath: 'src/features/intelligence/agents/churnPrevention.agent.ts',
+    exportName: 'ChurnPreventionAgent',
+    methodName: 'run',
   },
 ];
 

@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalCapabilities": 30,
-    "totalToolBindings": 30,
-    "verifiedBindings": 25,
-    "unverifiedBindings": 5,
+    "totalCapabilities": 32,
+    "totalToolBindings": 32,
+    "verifiedBindings": 28,
+    "unverifiedBindings": 4,
     "byReason": {
-      "AVAILABLE": 25,
+      "AVAILABLE": 28,
       "SOURCE_REQUIRED": 2,
       "FUTURE_TOOL": 2,
-      "TOOL_UNAVAILABLE": 1
+      "TOOL_UNAVAILABLE": 0
     },
     "totalAgentsWithCapabilityGrants": 394,
     "agentsWithDomainCapability": 43,
     "agentsUniversalOnly": 351,
-    "totalRoleCapabilityGrants": 113
+    "totalRoleCapabilityGrants": 116
   },
   "agentCapabilities": [
     {
@@ -35,6 +35,7 @@
         "lead.read",
         "lead.search",
         "company.read",
+        "copy.draft",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -49,6 +50,7 @@
         "lead.update",
         "meeting.schedule",
         "contract.read",
+        "copy.draft",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -129,6 +131,7 @@
         "deal.read",
         "company.read",
         "billing.read",
+        "churn.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -230,6 +233,7 @@
         "deal.read",
         "company.read",
         "billing.read",
+        "churn.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -584,6 +588,7 @@
         "deal.read",
         "company.read",
         "billing.read",
+        "churn.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -835,6 +840,7 @@
         "deal.read",
         "company.read",
         "billing.read",
+        "churn.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -848,6 +854,7 @@
         "deal.read",
         "company.read",
         "billing.read",
+        "churn.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -1063,6 +1070,7 @@
         "deal.read",
         "company.read",
         "billing.read",
+        "churn.analyze",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"
@@ -2016,6 +2024,7 @@
         "lead.read",
         "lead.search",
         "company.read",
+        "copy.draft",
         "agent.discover",
         "agent.execute",
         "agent.request_cross_role"

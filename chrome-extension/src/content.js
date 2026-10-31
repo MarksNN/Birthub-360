@@ -33,7 +33,7 @@ function publishContext() {
   if (contextInvalidated) return;
   try {
     chrome.runtime
-      .sendMessage({ type: 'ATLAS_MEET_CONTEXT', payload: getMeetContext() })
+      .sendMessage({ type: 'BIRTHHUB360_MEET_CONTEXT', payload: getMeetContext() })
       .catch(() => {});
   } catch {
     contextInvalidated = true;
@@ -78,7 +78,7 @@ function ensureBadge() {
 }
 
 chrome.runtime.onMessage.addListener((message) => {
-  if (message?.type !== 'ATLAS_CAPTURE_STATE') return;
+  if (message?.type !== 'BIRTHHUB360_CAPTURE_STATE') return;
   if (message.capturing) {
     ensureBadge().style.display = 'block';
   } else if (badgeEl) {
@@ -86,4 +86,4 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
-console.log('[Atlas Copiloto] Google Meet detectado');
+console.log('[Birth Hub 360 Copiloto] Google Meet detectado');

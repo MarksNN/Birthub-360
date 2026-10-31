@@ -1,14 +1,10 @@
-/* Paleta real da Birth Hub 360 (identidade-visual/birthhub360/tokens/birthhub360.css) — laranja de marca no
-   lugar do azul genérico usado antes aqui. A cor de AÇÃO (laranja) é fixa nos dois temas; o que
-   muda entre claro/escuro é só a superfície (fundo/texto/borda), via tokens abaixo — mesmo
-   princípio de "tema e marca são eixos independentes" da Constituição de Design da Central
-   (CLAUDE.md §7). Tema escuro continua o padrão (era o único antes); claro é opt-in via o botão
-   no header, persistido em chrome.storage.sync. */
+/* Tokens oficiais Birth Hub 360: Azul Neon, Rosa Neon e Dourado Neon.
+   O modo claro/escuro altera superfícies, não a identidade da marca. */
 :root {
   font-family: Inter, system-ui, sans-serif;
-  --atlas-laranja: #ff5618;
-  --atlas-laranja-medio: #ff8008;
-  --atlas-laranja-apoio: #ff6b10;
+  --bh-azul-neon: #00d4ff;
+  --bh-rosa-neon: #ff2d9b;
+  --bh-dourado-neon: #ffc107;
 
   color-scheme: dark;
   --bg: #0a0f1a;
@@ -140,9 +136,9 @@ input:not([type]) {
 }
 input[type='text']:focus,
 input:not([type]):focus {
-  outline: 2px solid var(--atlas-laranja);
+  outline: 2px solid var(--bh-azul-neon);
   outline-offset: 1px;
-  border-color: var(--atlas-laranja);
+  border-color: var(--bh-azul-neon);
 }
 button {
   width: 100%;
@@ -150,15 +146,15 @@ button {
   border: 0;
   border-radius: 12px;
   font-weight: 700;
-  background: var(--atlas-laranja);
+  background: var(--bh-azul-neon);
   color: #fff;
   cursor: pointer;
 }
 button:hover:not(:disabled) {
-  background: var(--atlas-laranja-medio);
+  background: var(--bh-rosa-neon);
 }
 button:focus-visible {
-  outline: 2px solid var(--atlas-laranja-apoio);
+  outline: 2px solid var(--bh-dourado-neon);
   outline-offset: 2px;
 }
 button:disabled {
@@ -187,7 +183,7 @@ button.secondary:hover:not(:disabled) {
 .consent input {
   width: auto;
   margin: 2px 0 0;
-  accent-color: var(--atlas-laranja);
+  accent-color: var(--bh-azul-neon);
 }
 .hint {
   font-size: 12px;

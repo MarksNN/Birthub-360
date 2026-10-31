@@ -1,5 +1,5 @@
 // Opções de ICP (Perfil de Cliente Ideal) para os dropdowns do Prospector.
-// Extraídas do "Playbook de Pré-Vendas Atlas" e do "Playbook Comercial - Birth Hub 360"
+// Extraídas do "Playbook Comercial Birth Hub 360" e do "Playbook Comercial - Birth Hub 360"
 // fornecidos pelo time comercial.
 
 export const SEGMENTO_OPTIONS = [
@@ -85,12 +85,12 @@ export const PORTE_OPTIONS = [
   { label: '1001+ funcionários', value: '1001,1000000' },
 ];
 
-// Personas-alvo da Atlas — extraídas da tabela "Contatos ideais" do Playbook de Pré-Vendas Atlas,
+// Personas-alvo da Birth Hub 360 — extraídas da tabela "Contatos ideais" do Playbook Comercial Birth Hub 360,
 // ordenadas por nível de decisão real observado em campo (Dono/CEO decide sozinho; TI/Compras são
 // gatekeepers que raramente decidem, mas travam o processo). Usado como atalho na busca de
 // decisores em vez de digitar cargo "no chute" — cada opção já vem com as variações de título em
 // português mais comuns para esse papel e a senioridade Apollo correspondente.
-export const ATLAS_PERSONA_OPTIONS = [
+export const COMMERCIAL_PERSONA_OPTIONS = [
   {
     label: 'Dono / CEO',
     nivel: 'Decisor final',
@@ -200,7 +200,7 @@ export const BIRTHHUB360_PERSONA_OPTIONS = [
   },
 ] as const;
 
-// Os 3 PICs (Perfil de Cliente Ideal) do Playbook de Pré-Vendas Atlas — cada um com gatilho,
+// Os 3 PICs (Perfil de Cliente Ideal) do Playbook Comercial Birth Hub 360 — cada um com gatilho,
 // decisor e discurso diferentes. Setado manualmente pelo SDR/AM após identificar o gatilho real
 // numa conversa (nunca inferido automaticamente — não há sinal confiável disponível hoje para
 // "processo judicial recente" ou "troca de liderança" sem uma fonte de dados dedicada).

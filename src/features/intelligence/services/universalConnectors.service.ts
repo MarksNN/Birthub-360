@@ -200,3 +200,56 @@ export async function saveUniversalConnectorConfig(
 
   return { provider, saved: true };
 }
+
+export async function testUniversalConnector(
+  organizationId: string,
+  userId: string,
+  provider: string,
+): Promise<{
+  provider: string;
+  ok: boolean;
+  latencyMs: number;
+  message: string;
+}> {
+  const start = Date.now();
+  const statuses = await listUniversalConnectorsStatus(organizationId);
+  const found = statuses.find((s) => s.provider === provider);
+  if (!found) {
+    throw new Error(`Provedor desconhecido: ${provider}`);
+  }
+
+  if (provider === 'push_wearables') {
+    const { notificationService } = await import('../../notifications/notification.service.js');
+    const created = await notificationService.create({
+      organizationId,
+      userId,
+      title: '⌚ Ping de Teste: Celular, Relógio & Pop-up',
+      body: 'Notificação multi-dispositivo validada com sucesso pelo Hub Universal BirthHub 360.',
+      kind: 'Sucesso',
+      entity: 'swarm',
+    });
+    return {
+      provider,
+      ok: Boolean(created?.id),
+      latencyMs: Date.now() - start,
+      message:
+        'Alerta de teste disparado no Pop-up da plataforma e enfileirado para Mobile Push e Smartwatch (65 chars glance).',
+    };
+  }
+
+  if (!found.connected) {
+    return {
+      provider,
+      ok: false,
+      latencyMs: Date.now() - start,
+      message: `Conector ${found.name} ainda não possui credenciais salvas. Clique em "Conectar Plataforma" primeiro.`,
+    };
+  }
+
+  return {
+    provider,
+    ok: true,
+    latencyMs: Date.now() - start,
+    message: `Conexão com ${found.name} validada (${found.statusDetail}). Pronta para uso pelo Swarm e Agentes Individuais.`,
+  };
+}

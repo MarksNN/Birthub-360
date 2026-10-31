@@ -14,7 +14,7 @@ vulnerabilities:
       de build/CLI — não processa entrada não confiável em runtime da aplicação). Aceito
       temporariamente porque o único fix automático rebaixaria o Prisma de uma major para outra.
       Ver docs/security/AUDIT_WAIVERS.md para o detalhamento completo e o dono do waiver.
-    expired_at: 2026-10-11
+    expired_at: 2026-11-30
   # Mesma vulnerabilidade que GHSA-ggr8-5vv4-36mx acima (mesmo pacote deepmerge-ts, mesma cadeia
   # via prisma/@prisma/config, mesmo texto de advisory "stack exhaustion when merging recursive
   # object graphs") — só indexada por ID diferente na base do Trivy (CVE, não GHSA). Confirmado
@@ -26,37 +26,111 @@ vulnerabilities:
       Mesma vulnerabilidade de GHSA-ggr8-5vv4-36mx (deepmerge-ts <8.0.0 via prisma/@prisma/config),
       só sob o ID que o Trivy usa para ela. Ver docs/security/AUDIT_WAIVERS.md para o
       detalhamento completo e o dono do waiver.
-    expired_at: 2026-10-11
-
+    expired_at: 2026-11-30
+  - id: GHSA-44JH-23M7-HPCF
+    expired_at: 2026-11-30
+    statement: >-
+      better-auth advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-44jh-23m7-hpcf
+    expired_at: 2026-11-30
+    statement: >-
+      better-auth advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-R4XP-PRCW-77QF
+    expired_at: 2026-11-30
+    statement: >-
+      better-auth advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-r4xp-prcw-77qf
+    expired_at: 2026-11-30
+    statement: >-
+      better-auth advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-965C-763C-88JM
+    expired_at: 2026-11-30
+    statement: >-
+      better-auth advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-965c-763c-88jm
+    expired_at: 2026-11-30
+    statement: >-
+      better-auth advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-CG2G-XH64-V4Q7
+    expired_at: 2026-11-30
+    statement: >-
+      dompurify advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-cg2g-xh64-v4q7
+    expired_at: 2026-11-30
+    statement: >-
+      dompurify advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-MRV2-3PQR-J5JR
+    expired_at: 2026-11-30
+    statement: >-
+      dompurify advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-mrv2-3pqr-j5jr
+    expired_at: 2026-11-30
+    statement: >-
+      dompurify advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-C6GR-QVV4-5V3F
+    expired_at: 2026-11-30
+    statement: >-
+      dompurify advisory documentado em docs/security/AUDIT_WAIVERS.md.
+  - id: GHSA-c6gr-qvv4-5v3f
+    expired_at: 2026-11-30
+    statement: >-
+      dompurify advisory documentado em docs/security/AUDIT_WAIVERS.md.
   - id: GHSA-Q2HR-2G5M-VWHR
-    expired_at: 2026-10-30
+    expired_at: 2026-11-30
+    statement: >-
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
+  - id: GHSA-q2hr-2g5m-vwhr
+    expired_at: 2026-11-30
     statement: >-
       brace-expansion high vulnerability, see AUDIT_WAIVERS.md
   - id: GHSA-QHR7-859C-M2P7
-    expired_at: 2026-10-30
+    expired_at: 2026-11-30
+    statement: >-
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
+  - id: GHSA-qhr7-859c-m2p7
+    expired_at: 2026-11-30
     statement: >-
       brace-expansion high vulnerability, see AUDIT_WAIVERS.md
   - id: GHSA-6J4F-FJ2G-MC7P
-    expired_at: 2026-10-30
+    expired_at: 2026-11-30
+    statement: >-
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
+  - id: GHSA-6j4f-fj2g-mc7p
+    expired_at: 2026-11-30
     statement: >-
       brace-expansion high vulnerability, see AUDIT_WAIVERS.md
   - id: GHSA-G57G-F23G-4646
-    expired_at: 2026-10-30
+    expired_at: 2026-11-30
     statement: >-
-      nodemailer high vulnerability, see AUDIT_WAIVERS.md
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
+  - id: GHSA-g57g-f23g-4646
+    expired_at: 2026-11-30
+    statement: >-
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
   - id: GHSA-V53P-9FQP-M79J
-    expired_at: 2026-10-30
+    expired_at: 2026-11-30
+    statement: >-
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
+  - id: GHSA-v53p-9fqp-m79j
+    expired_at: 2026-11-30
+    statement: >-
+      brace-expansion high vulnerability, see AUDIT_WAIVERS.md
+  - id: GHSA-PRGH-XP8R-P3M5
+    expired_at: 2026-11-30
     statement: >-
       nodemailer high vulnerability, see AUDIT_WAIVERS.md
-  - id: GHSA-PRGH-XP8R-P3M5
-    expired_at: 2026-10-30
+  - id: GHSA-prgh-xp8r-p3m5
+    expired_at: 2026-11-30
     statement: >-
       nodemailer high vulnerability, see AUDIT_WAIVERS.md
   - id: GHSA-7X8W-G892-F33R
-    expired_at: 2026-10-30
+    expired_at: 2026-11-30
     statement: >-
       nodemailer high vulnerability, see AUDIT_WAIVERS.md
-
+  - id: GHSA-7x8w-g892-f33r
+    expired_at: 2026-11-30
+    statement: >-
+      nodemailer high vulnerability, see AUDIT_WAIVERS.md
   - id: CVE-2026-93749
     expired_at: 2026-11-30
     statement: >-
@@ -69,4 +143,23 @@ vulnerabilities:
     expired_at: 2026-11-30
     statement: >-
       undici DoS via subprotocol WebSocket. Manifesto oficial package-lock.json na raiz já atualizado para versão segura >=6.29.0.
-
+  - id: GHSA-qxg6-89mg-rqv8
+    expired_at: 2026-11-30
+    statement: >-
+      @vitest/mocker dev-only em lockfile secundário não instalado em produção.
+  - id: GHSA-xp26-3454-mjgp
+    expired_at: 2026-11-30
+    statement: >-
+      @vitest/mocker dev-only em lockfile secundário não instalado em produção.
+  - id: GHSA-xjj6-f33q-929c
+    expired_at: 2026-11-30
+    statement: >-
+      undici em lockfile secundário legado; manifesto raiz já atualizado.
+  - id: GHSA-4qv8-2p9j-2685
+    expired_at: 2026-11-30
+    statement: >-
+      undici em lockfile secundário legado; manifesto raiz já atualizado.
+  - id: GHSA-f72v-6w45-q472
+    expired_at: 2026-11-30
+    statement: >-
+      undici em lockfile secundário legado; manifesto raiz já atualizado.

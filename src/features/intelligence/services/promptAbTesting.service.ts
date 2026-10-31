@@ -121,7 +121,9 @@ export async function createPromptExperiment(params: {
   // Por simplicidade, vamos usar um campo JSON no experimento
   await promptExperimentDelegate.update({
     where: { id: experimentId },
-    data: {},
+    data: {
+      variants,
+    },
   });
 
   logger.info(
@@ -207,6 +209,7 @@ export async function completePromptExperiment(
       status: 'COMPLETED',
       endedAt: new Date(),
       winningVariantId: winner.variantId,
+      metrics,
     },
   });
 

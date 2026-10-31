@@ -99,7 +99,7 @@ export const bullmqQueueRetryCount = new client.Counter({
 });
 
 export const workerProcessUp = new client.Gauge({
-  name: 'atlas_worker_up',
+  name: 'birthhub360_worker_up',
   help: '1 quando o processo dedicado de workers terminou o bootstrap e está ativo.',
 });
 
@@ -122,7 +122,7 @@ const registeredRedisConnections: RegisteredRedisConnection[] = [];
 // CPI (auditoria — "Alerta real de Redis health" nunca tinha métrica real). ioredis já mantém
 // `.status` internamente ('ready' quando a conexão está utilizável) — só faltava expor isso como
 // Gauge Prometheus por papel de conexão. Consumida pelo grupo
-// `prospector-atlas.database.ativos-hoje` em alert.rules.yml.
+// `birthhub360.database.ativos-hoje` em alert.rules.yml.
 export function registerRedisConnectionForMetrics(
   role: string,
   redis: Redis,

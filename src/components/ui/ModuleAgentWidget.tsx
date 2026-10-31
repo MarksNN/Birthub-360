@@ -19,10 +19,10 @@ interface AgentCharacter {
 
 const AGENTS_BY_PILLAR: Record<string, AgentCharacter> = {
   'PILAR 01 — HUB COMERCIAL': {
-    name: 'Atlas',
+    name: 'Orbit',
     role: 'Guardião do CRM',
-    seed: 'Atlas',
-    command: 'Ei Atlas',
+    seed: 'Orbit',
+    command: 'Ei Orbit',
     color: 'from-amber-400 to-amber-600',
     contextMsg: 'Monitorando pipeline e negócios ativos',
   },

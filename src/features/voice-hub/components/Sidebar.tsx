@@ -27,7 +27,7 @@ import {
 import { auth } from '../../../lib/auth.js';
 import { useSessionStore } from '../store/useSessionStore.js';
 import { useTheme } from './design-system/ThemeContext.js';
-import { useToast, AtlasLogo } from './design-system/index.js';
+import { useToast, BirthubLogo } from './design-system/index.js';
 import { getAccessibleTextOnBrand } from './design-system/tokens.js';
 import { NotificationCenter } from './NotificationCenter/index.js';
 
@@ -246,7 +246,7 @@ export function Sidebar() {
       <div className="mb-4 flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
           <div className="p-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm transition-transform duration-200 hover:scale-105">
-            <AtlasLogo className="h-6 w-6" />
+            <BirthubLogo className="h-6 w-6" />
           </div>
           <div className="text-left">
             <h1 className="text-base font-extrabold leading-none tracking-tight text-slate-900 dark:text-white">

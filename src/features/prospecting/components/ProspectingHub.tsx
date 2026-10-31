@@ -7,7 +7,7 @@ import { BRAND } from '../../../config/brand.js';
 import { api } from '../../../lib/api.js';
 import { SoundFX } from '../../../lib/soundEffects.js';
 import {
-  ATLAS_PERSONA_OPTIONS,
+  COMMERCIAL_PERSONA_OPTIONS,
   BIRTHHUB360_PERSONA_OPTIONS,
   BIRTHHUB360_SEGMENTO_OPTIONS,
   SEGMENTO_OPTIONS,
@@ -32,7 +32,7 @@ export { DecisionMakerSearch } from './prospecting-hub/DecisionMakerSearch.js';
 // para fora do componente para não recriar a referência do array a cada render (useEffect abaixo
 // depende dela).
 const ACTIVE_SEGMENTS = [...SEGMENTO_OPTIONS, ...BIRTHHUB360_SEGMENTO_OPTIONS];
-const ACTIVE_PERSONA_OPTIONS = [...ATLAS_PERSONA_OPTIONS, ...BIRTHHUB360_PERSONA_OPTIONS];
+const ACTIVE_PERSONA_OPTIONS = [...COMMERCIAL_PERSONA_OPTIONS, ...BIRTHHUB360_PERSONA_OPTIONS];
 
 type HubTab = 'cnpj' | 'discovery' | 'ocr' | 'tools';
 

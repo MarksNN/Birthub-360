@@ -52,7 +52,9 @@ export async function signUp(
   if (signupData.token === null) {
     // Sem bypass de teste, confirma posse do e-mail no banco como o helper anterior;
     // não cria usuário/sessão por seed nem altera a política de autenticação do produto.
-    await expect(page.getByText('Conta criada com sucesso! Verifique seu e-mail.', { exact: true }))
+    await expect(
+      page.getByText(/Conta criada com sucesso|Solicitação de provisionamento enviada com sucesso/),
+    )
       .toBeVisible();
     requestContext.enterWith({ bypassRls: true });
     await prisma.user.update({ where: { email }, data: { emailVerified: true } });

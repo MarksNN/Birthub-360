@@ -222,7 +222,7 @@ propósito por estar fora de "## Exceções ativas"):
 
 ### `src/features/intelligence/components/IntelligenceHub.tsx`
 
-- **Limite excepcional:** 1400 linhas (teto = tamanho atual; o arquivo não pode crescer)
+- **Limite excepcional:** 1334 linhas (teto = tamanho atual; o arquivo não pode crescer)
 - **Dono:** Agente 07 — IA e Automações (redução; Agente 03 na parte de UI)
 - **Motivo:** exceção TEMPORÁRIA. O redesign do hub de IA em pilares operacionais (commits a96bb68d e 0774cd67, 2026-10-24) levou o arquivo a 1334 linhas sem exceção registrada, e o gate `check:hotspots` herdado da main passou a bloquear a validação dos PRs #67, #71 e #72. A exceção destrava o gate com teto no tamanho atual enquanto o Agente 07 (com o Agente 03 na UI) extrai os pilares/painéis para componentes próprios.
 - **Registrado em:** 2026-10-25

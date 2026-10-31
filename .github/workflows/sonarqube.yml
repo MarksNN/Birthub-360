@@ -1,33 +1,25 @@
 name: SonarQube Analysis
 
-# Redundância conhecida (auditoria de CI, onda 3): este job roda `test:unit --coverage` de novo,
-# mesmo ci.yml já gerando e publicando esse mesmo relatório como artifact `coverage-reports` (ver
-# ci.yml, step "Upload coverage reports", `if: always()`). Reaproveitar aquele artifact aqui
-# exigiria trocar o gatilho deste workflow para `workflow_run` (esperar ci.yml terminar, baixar o
-# artifact via `actions/download-artifact` com `run-id: ${{ github.event.workflow_run.id }}`) e
-# resolver o contexto de PR a partir de `github.event.workflow_run.pull_requests` em vez de
-# `pull_request` nativo — uma mudança de comportamento maior (Sonar passaria a rodar só depois do
-# ci.yml concluir, e a decoração de PR dependeria desse mapeamento) que não foi feita nesta rodada
-# por não ser possível validar contra o GitHub Actions real nesta sessão.
-#
-# O gap de coverage documentado aqui anteriormente (`sonar.javascript.lcov.reportPaths` não batia
-# com o `reportsDirectory`/`reporter` de `vitest.unit.config.ts`) foi corrigido nesta onda:
-# `vitest.unit.config.ts` agora inclui `lcov` em `coverage.reporter`, e
-# `sonar-project.properties` aponta para `coverage/unit/lcov.info` (o `reportsDirectory` real
-# deste config, não o `./coverage` do `vitest.config.ts` da raiz usado só pelo Storybook).
-# Validado localmente rodando um subconjunto de testes com `--coverage` e confirmando o arquivo.
-# O que É feito nesta rodada: este job já roda só a fatia mínima que o Sonar precisa (unit +
-# coverage), não a suíte completa de ci.yml (sem integration/e2e/build) — não há aqui outra
-# duplicação óbvia a remover sem a mudança de trigger acima.
+# Pipeline oficial de análise de qualidade estática e cobertura do Birthub 360 no SonarQube Cloud.
+# Organização: Marks (vars.SONAR_ORGANIZATION = marcelinmark26359876123123)
+# Projeto: Birthub 360 (vars.SONAR_PROJECT_KEY = MarksNN_Birthub-360)
+# Autenticação: secrets.SONAR_TOKEN
+# Validação obrigatória pré-scan: scripts/ci/validate-sonarqube-config.mjs
+
 on:
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('sonarqube-pr-{0}', github.event.pull_request.number) || format('sonarqube-{0}-{1}', github.event_name, github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   sonarcloud:
@@ -72,6 +64,15 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
+
+      - name: Validate SonarQube Configuration
+        run: node scripts/ci/validate-sonarqube-config.mjs
+        env:
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          IS_FORK_PR: ${{ github.event.pull_request.head.repo.fork == true && 'true' || 'false' }}
 
       - name: Install dependencies
         run: npm ci

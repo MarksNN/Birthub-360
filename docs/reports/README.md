@@ -38,7 +38,7 @@ autenticação (JWT/refresh token) que não é mais real desde a migração para
 
 ## CRM e migração SDR/BDR
 
-- [`RELATORIO_FINAL.md`](RELATORIO_FINAL.md) — Relatório final da integração do módulo SDR/BDR ao PROSPECTOR-ATLAS (estatísticas de arquivos reutilizados/descartados).
+- [`RELATORIO_FINAL.md`](RELATORIO_FINAL.md) — Relatório final da integração do módulo SDR/BDR ao Birth Hub 360 (estatísticas de arquivos reutilizados/descartados).
 - [`RELATORIO_FINAL_FASE2.md`](RELATORIO_FINAL_FASE2.md) — Fase 2: implementação do CRM Core (Empresas, Contatos, Leads, Pipeline, Atividades, Dashboard).
 - [`RELATORIO_CRM_CONSOLIDADO.md`](RELATORIO_CRM_CONSOLIDADO.md) — Consolidação da segunda fase de migração do CRM (dashboard, timeline, pipeline drag-and-drop, validação Zod).
 - [`RELATORIO_CRM_QA.md`](RELATORIO_CRM_QA.md) — Matriz de testes e validação (cobertura por módulo) do CRM.

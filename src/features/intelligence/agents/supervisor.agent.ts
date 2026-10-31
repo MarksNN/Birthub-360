@@ -23,10 +23,18 @@ import { buildModelWithFallback } from './fallback.util.js';
 import { OpsAgent } from './ops.agent.js';
 import { SDRQualificationAgent } from './sdrQualification.agent.js';
 import {
+  detectSubSwarm,
+  SUB_SWARMS,
+  type SubSwarmDomain,
+  type SwarmAgentKey,
+} from './subSwarms.config.js';
+import {
   SWARM_IDENTITY,
   SWARM_OUTPUT_CONTRACT,
   SWARM_UNTRUSTED_CONTENT_GUARD,
 } from './swarm.constants.js';
+
+export { detectSubSwarm, SUB_SWARMS, type SubSwarmDomain, type SwarmAgentKey };
 
 let cachedSupervisorLlm: ReturnType<typeof buildModelWithFallback> | null = null;
 function getSupervisorLlm() {
@@ -36,7 +44,6 @@ function getSupervisorLlm() {
   return cachedSupervisorLlm;
 }
 
-export type SwarmAgentKey = 'sdr' | 'bdr' | 'closer' | 'crm' | 'ops';
 export type SwarmRoute = SwarmAgentKey | 'finish';
 export type SwarmEventType = 'routing' | 'agent_result' | 'agent_error' | 'final';
 
@@ -123,6 +130,10 @@ const SwarmState = Annotation.Root({
   leadId: Annotation<string>({
     reducer: (left, right) => right ?? left,
     default: () => '',
+  }),
+  subSwarm: Annotation<SubSwarmDomain>({
+    reducer: (left, right) => right ?? left,
+    default: () => 'commercial',
   }),
   next: Annotation<SwarmRoute>({
     reducer: (left, right) => right ?? left,
@@ -299,11 +310,22 @@ async function supervisorNode(state: SwarmStateType, config?: RunnableConfig) {
   // automaticamente.
   const agentKeys = Object.keys(AGENT_INFO) as SwarmAgentKey[];
 
+  const activeSubSwarm =
+    state.subSwarm && state.subSwarm !== 'commercial'
+      ? state.subSwarm
+      : detectSubSwarm(state.mission);
+  const subSwarmConfig = SUB_SWARMS[activeSubSwarm];
+  const subSwarmContextLine = `Sub-Swarm detectado para esta missão: ${subSwarmConfig.label} — Especialistas prioritários: ${subSwarmConfig.primaryAgents.join(', ')}.`;
+
   const leadContextLine = state.leadId
     ? `Lead ID disponível para esta missão: ${state.leadId} (o especialista 'sdr' pode usá-lo).`
     : `Nenhum Lead ID foi informado para esta missão — NÃO escolha 'sdr' enquanto isso não mudar, pois ele depende de um lead real do CRM e sempre falharia sem um ID.`;
 
   const systemPrompt = `${SWARM_IDENTITY} Você é o Supervisor: coordena ${agentKeys.length} especialistas e decide, a cada rodada, qual deve atuar a seguir (ou se a missão está concluída).
+
+<sub_swarm_ativo>
+${subSwarmContextLine}
+</sub_swarm_ativo>
 
 <especialistas_disponiveis>
 ${(
@@ -401,6 +423,7 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
 
   return {
     step,
+    subSwarm: activeSubSwarm,
     next: decision.action,
     instruction: decision.instruction,
     messages: [

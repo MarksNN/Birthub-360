@@ -538,7 +538,7 @@ describe('Capability & Permission Engine (PROMPT 3 + hardening PROMPT 3B)', () =
       expect(decision.reason).toBe('FUTURE_TOOL');
     });
 
-    it('meeting.read é TOOL_UNAVAILABLE (não é SOURCE_REQUIRED nem FUTURE_TOOL — gap honesto)', async () => {
+    it('meeting.read é PERMITTED (VERIFIED/AVAILABLE via getUpcomingCalendarEvents)', async () => {
       const { user } = await makeUserWithJobRole('SDR', 'SDR');
       // "sdr-qualification" nesta onda não recebe meeting.read por padrão (fora do escopo real
       // mapeado) — concede ad-hoc tanto ao agente quanto ao cargo para isolar o teste
@@ -586,8 +586,10 @@ describe('Capability & Permission Engine (PROMPT 3 + hardening PROMPT 3B)', () =
           agentCode: 'sdr-qualification',
           capabilityCode: 'meeting.read',
         });
-        expect(decision.allowed).toBe(false);
-        expect(decision.reason).toBe('TOOL_UNAVAILABLE');
+        expect(decision.allowed).toBe(true);
+        expect(decision.reason).toBe('PERMITTED');
+        expect(decision.bindingVerification).toBe('VERIFIED');
+        expect(decision.toolAvailable).toBe(true);
       } finally {
         await prisma.agentCapabilityGrant.delete({ where: { id: agentGrant.id } });
         await prisma.roleCapabilityGrant.delete({ where: { id: roleGrant.id } });
