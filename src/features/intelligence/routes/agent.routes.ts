@@ -375,9 +375,11 @@ router.get('/swarm/learn/history', async (req: Request, res: Response, next: Nex
 // motivo (gate de hotspot) e a garantia de que nenhuma URL pública mudou. Montado aqui como
 // sub-router, então os caminhos continuam `/api/agent/commercial-cell/...`.
 import { commercialCellRoutes } from './commercialCell.routes.js';
+import { commercialV3Routes } from '../commercial-v3/routes/commercialV3.routes.js';
 import { universalEcosystemRoutes } from './universalEcosystem.routes.js';
 
 router.use(commercialCellRoutes);
+router.use('/commercial-v3', commercialV3Routes);
 router.use(universalEcosystemRoutes);
 
 const learningRollbackSchema = z.object({
