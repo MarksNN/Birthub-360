@@ -15,7 +15,7 @@ import type { Request, Response, NextFunction } from 'express';
 // de um JWT (mas sem alg confusion, sem lib nova, sem tabela de sessão no
 // Postgres) e é trivial de testar como função pura (ver tests/auth.test.ts).
 
-export const SESSION_COOKIE_NAME = 'atlas_session';
+export const SESSION_COOKIE_NAME = 'birthhub360_session';
 
 // 12h: turno de trabalho típico de um vendedor/gestor logado no CRM. Curto o
 // bastante para limitar o estrago de um cookie vazado, longo o bastante para

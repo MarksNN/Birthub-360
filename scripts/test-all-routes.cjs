@@ -30,7 +30,7 @@ const routesToTest = [
   await context.addInitScript(() => {
     localStorage.setItem('token', 'fake-jwt-token-for-visual-audit');
     localStorage.setItem('theme', 'dark');
-    localStorage.setItem('atlas_theme', 'dark');
+    localStorage.setItem('birthhub360_theme', 'dark');
     localStorage.setItem('@prospector:has_seen_tour', 'true');
     localStorage.setItem('hasSeenTour', 'true');
     localStorage.setItem('onboarding_completed', 'true');

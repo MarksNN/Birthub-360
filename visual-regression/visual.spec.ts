@@ -5,7 +5,7 @@ import { signUp, uniqueTestEmail, waitForAppReady } from '../tests/e2e/helpers';
 async function setupDeterministicState(page: import('@playwright/test').Page, theme: 'light' | 'dark') {
   // Set theme
   await page.addInitScript((t) => {
-    window.localStorage.setItem('atlas_theme', t);
+    window.localStorage.setItem('birthhub360_theme', t);
   }, theme);
 
   // Wait for critical fonts

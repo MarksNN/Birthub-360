@@ -4,7 +4,7 @@ import { LinkedinIcon as Linkedin } from '../../../../components/ui/icons/Linked
 import { useActivePlaybook } from '../../../../hooks/useActivePlaybook.js';
 import { api } from '../../../../lib/api.js';
 import {
-  ATLAS_PERSONA_OPTIONS,
+  COMMERCIAL_PERSONA_OPTIONS,
   BIRTHHUB360_PERSONA_OPTIONS,
 } from '../../../../shared/constants/icp-options.js';
 import {
@@ -47,7 +47,7 @@ export function DecisionMakerSearch({
   const light = appearance === 'light';
   // Antes dividido entre dois playbooks nomeados por empresa (Birth Hub 360) — unificado
   // num único playbook geral (pedido explícito do usuário), sem descartar nenhuma opção.
-  const personaOptions = [...ATLAS_PERSONA_OPTIONS, ...BIRTHHUB360_PERSONA_OPTIONS];
+  const personaOptions = [...COMMERCIAL_PERSONA_OPTIONS, ...BIRTHHUB360_PERSONA_OPTIONS];
   const [open, setOpen] = useState(false);
   const [criteria, setCriteria] = useState<DecisionMakerCriteria>({
     apenasEmailVerificado: true,

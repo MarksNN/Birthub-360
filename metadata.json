@@ -1,6 +1,6 @@
 {
-  "name": "Atlas Smart CRM",
-  "description": "Smart CRM and Prospecting Tool for Atlas",
+  "name": "Birth Hub 360 — Revenue Intelligence",
+  "description": "Plataforma de inteligência comercial, RevOps e automações Birth Hub 360",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

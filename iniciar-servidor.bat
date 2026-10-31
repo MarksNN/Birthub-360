@@ -4,7 +4,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================
-echo   Birth Hub 360 - Prospector
+echo   Birth Hub 360 - Central de Inteligência Comercial
 echo   Iniciando servidor local na rede
 echo ============================================
 echo.
@@ -26,7 +26,7 @@ if errorlevel 1 goto wait_docker
 echo Docker pronto.
 echo.
 
-docker ps --filter "name=atlas_postgres" --filter "status=running" --format "{{.Names}}" | findstr /I "atlas_postgres" >nul
+docker ps --filter "name=birthhub_postgres" --filter "status=running" --format "{{.Names}}" | findstr /I "birthhub_postgres" >nul
 if not errorlevel 1 (
     echo Containers ja estao rodando, pulando docker compose up.
     goto containers_ready
