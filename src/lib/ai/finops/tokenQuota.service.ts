@@ -142,15 +142,11 @@ export function __resetTokenQuotaCacheForTests(): void {
 }
 
 function currentMonthStart(now: Date = new Date()): Date {
-  const d = new Date(now);
-  d.setDate(1);
-  d.setHours(0, 0, 0, 0);
-  d.setMilliseconds(0);
-  return d;
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
 }
 
 function currentMonthKey(now: Date = new Date()): string {
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
 export function normalizeTier(rawTier?: string | null): OrganizationTier {
@@ -299,7 +295,12 @@ export class TokenQuotaService {
       setTokenQuotaLimitGauge(organizationId, tier, quotaTokens);
 
       const consumedTokens = await this.getMonthlyTokenUsage(organizationId);
-      const usageRatio = quotaTokens > 0 ? consumedTokens / quotaTokens : 0;
+      const estimatedAddition =
+        typeof params.estimatedTokens === 'number' && Number.isFinite(params.estimatedTokens)
+          ? Math.max(0, Math.round(params.estimatedTokens))
+          : 0;
+      const effectiveConsumedTokens = consumedTokens + estimatedAddition;
+      const usageRatio = quotaTokens > 0 ? effectiveConsumedTokens / quotaTokens : 0;
       const percentageUsed = usageRatio * 100;
 
       let status: 'ok' | 'warning' | 'exceeded' = 'ok';
@@ -478,6 +479,30 @@ export class TokenQuotaService {
   }): Promise<void> {
     const { organizationId, model, tokens, tier = 'starter' } = params;
     recordTokenUsage(organizationId, tier, model, tokens);
+
+    if (!organizationId || !Number.isFinite(tokens) || tokens <= 0) {
+      return;
+    }
+
+    const delta = Math.round(tokens);
+    const cacheKey = `${CACHE_KEY_PREFIX}${organizationId}:${currentMonthKey()}`;
+    const now = Date.now();
+    const local = localTokenUsageCache.get(cacheKey);
+    if (local && local.expiresAt > now) {
+      local.value += delta;
+    }
+
+    try {
+      const exists = await cacheConnection.exists(cacheKey);
+      if (exists) {
+        await cacheConnection.incrby(cacheKey, delta);
+      }
+    } catch (err: unknown) {
+      logger.warn(
+        { err, organizationId },
+        '[TokenQuota] Redis indisponível ao incrementar cache de tokens em tempo real',
+      );
+    }
   }
 
   /**
@@ -523,10 +548,10 @@ export class TokenQuotaService {
       if (usageRatio >= 1.0) status = 'exceeded';
       else if (usageRatio >= 0.8) status = 'warning';
 
-      // Projeção de encerramento do mês
+      // Projeção de encerramento do mês em UTC estrito (alinhado ao agregador FinOps)
       const now = new Date();
-      const currentDay = Math.max(1, now.getDate());
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const currentDay = Math.max(1, now.getUTCDate());
+      const daysInMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)).getUTCDate();
       const dailyRunRate = consumedTokens / currentDay;
       const projectedMonthEndTokens = Math.round(dailyRunRate * daysInMonth);
 

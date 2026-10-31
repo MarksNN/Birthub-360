@@ -1,4 +1,4 @@
-title = "gitleaks config — Prospector Birth Hub 360"
+title = "gitleaks config — Birth Hub 360"
 
 # Mantém todas as regras padrão do gitleaks (mesmo comportamento de detecção que o repositório já
 # tinha antes deste arquivo existir, ver .github/workflows/ci.yml, job "secret-scan") e só

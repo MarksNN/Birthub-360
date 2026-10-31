@@ -60,7 +60,7 @@ afterEach(() => cleanup());
 
 describe('Settings — tema', () => {
   it('clicar em "Modo Escuro" enquanto já está escuro NÃO troca para claro (achado real do Piloto 025)', async () => {
-    localStorage.setItem('atlas_theme', 'dark');
+    localStorage.setItem('birthhub360_theme', 'dark');
     const user = userEvent.setup();
     render(<Settings />);
 
@@ -75,7 +75,7 @@ describe('Settings — tema', () => {
   });
 
   it('clicar em "Modo Claro" enquanto está escuro troca para claro', async () => {
-    localStorage.setItem('atlas_theme', 'dark');
+    localStorage.setItem('birthhub360_theme', 'dark');
     const user = userEvent.setup();
     render(<Settings />);
 

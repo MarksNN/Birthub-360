@@ -3,7 +3,7 @@ echo ==========================================================
 echo  Central Birth Hub 360 -- Bootstrap do Ollama no Windows
 echo ==========================================================
 
-set OLLAMA_CONTAINER=atlas_ollama
+set OLLAMA_CONTAINER=birthhub_ollama
 
 echo Aguardando container %OLLAMA_CONTAINER%...
 docker exec %OLLAMA_CONTAINER% ollama list >nul 2>&1

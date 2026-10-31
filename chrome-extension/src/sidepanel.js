@@ -225,7 +225,7 @@ async function saveConversationForTab() {
 function notifyCaptureState(capturing) {
   if (activeTabId == null) return;
   chrome.runtime
-    .sendMessage({ type: 'ATLAS_SET_CAPTURE_STATE', tabId: activeTabId, capturing })
+    .sendMessage({ type: 'BIRTHHUB360_SET_CAPTURE_STATE', tabId: activeTabId, capturing })
     .catch(() => {});
 }
 
@@ -427,7 +427,7 @@ toggleCaptureEl.addEventListener('click', () =>
       // Para a gravação local e sobe o áudio ANTES de fechar a sessão no backend — se o upload
       // falhar, o usuário vê o erro com a conversa ainda em CAPTURING, em vez de já ter avançado
       // pra PROCESSING sem áudio nenhum associado.
-      const stopResult = await chrome.runtime.sendMessage({ type: 'ATLAS_STOP_RECORDING' });
+      const stopResult = await chrome.runtime.sendMessage({ type: 'BIRTHHUB360_STOP_RECORDING' });
       if (!stopResult?.ok) {
         throw new Error(stopResult?.error || 'Falha ao enviar a gravação para o backend.');
       }
@@ -438,7 +438,7 @@ toggleCaptureEl.addEventListener('click', () =>
       const updated = await copilotoApi.startCapture(conversation.id);
       conversation.status = updated.status;
       const startResult = await chrome.runtime.sendMessage({
-        type: 'ATLAS_START_RECORDING',
+        type: 'BIRTHHUB360_START_RECORDING',
         tabId: activeTabId,
         conversationId: conversation.id,
       });

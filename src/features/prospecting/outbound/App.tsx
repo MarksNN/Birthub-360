@@ -76,12 +76,12 @@ export default function App() {
 
   // Theme state with local persistence
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('atlas_theme');
+    const saved = localStorage.getItem('birthhub360_theme');
     return saved === 'light' || saved === 'dark' ? saved : 'light';
   });
 
   useEffect(() => {
-    localStorage.setItem('atlas_theme', theme);
+    localStorage.setItem('birthhub360_theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
@@ -127,7 +127,7 @@ export default function App() {
   });
 
   const [pitch, setPitch] = useState<string>(
-    'A Atlas conecta pessoas e tecnologia gerando valores com segurança e inteligência logística. Apoiamos frotas e transportadoras rodoviárias de carga a gerenciar riscos, prever desvios operacionais e reduzir custos de sinistro em até 85%.',
+    'A Birth Hub 360 conecta inteligência comercial, dados e automações para apoiar prospecção, relacionamento com clientes e decisões de receita com segurança e governança.',
   );
 
   const [googleApiKey, setGoogleApiKey] = useState<string>('');
@@ -155,7 +155,7 @@ export default function App() {
   // Recent Searches State
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() => {
     try {
-      const saved = localStorage.getItem('atlas_recent_searches');
+      const saved = localStorage.getItem('birthhub360_recent_searches');
       return saved
         ? JSON.parse(saved)
         : [
@@ -180,7 +180,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem('atlas_recent_searches', JSON.stringify(recentSearches));
+    localStorage.setItem('birthhub360_recent_searches', JSON.stringify(recentSearches));
   }, [recentSearches]);
 
   // Relational Database Stats
@@ -448,7 +448,7 @@ export default function App() {
     dlAnchor.setAttribute('href', dataStr);
     dlAnchor.setAttribute(
       'download',
-      `atlas_outbound_leads_${new Date().toISOString().slice(0, 10)}.json`,
+      `birthhub360_outbound_leads_${new Date().toISOString().slice(0, 10)}.json`,
     );
     document.body.appendChild(dlAnchor);
     dlAnchor.click();
@@ -479,7 +479,7 @@ export default function App() {
     dlAnchor.setAttribute('href', url);
     dlAnchor.setAttribute(
       'download',
-      `atlas_outbound_leads_${new Date().toISOString().slice(0, 10)}.csv`,
+      `birthhub360_outbound_leads_${new Date().toISOString().slice(0, 10)}.csv`,
     );
     document.body.appendChild(dlAnchor);
     dlAnchor.click();

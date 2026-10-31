@@ -15,7 +15,7 @@ function getInitialTheme(): ThemeMode {
   if (typeof window === 'undefined') return 'light';
 
   try {
-    const savedTheme = window.localStorage.getItem('atlas_theme');
+    const savedTheme = window.localStorage.getItem('birthhub360_theme');
     return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light';
   } catch (error) {
     console.error('Não foi possível carregar a preferência de tema salva.', error);
@@ -28,7 +28,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('atlas_theme', theme);
+      window.localStorage.setItem('birthhub360_theme', theme);
     } catch (error) {
       console.error('Não foi possível salvar a preferência de tema.', error);
     }

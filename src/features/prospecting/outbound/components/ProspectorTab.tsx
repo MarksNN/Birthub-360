@@ -274,7 +274,7 @@ export const ProspectorTab: React.FC<ProspectorTabProps> = ({
           body: JSON.stringify({
             lead,
             webhookUrl,
-            title: `[Atlas Outbound] ${lead.name} (${lead.decision_maker_name || 'Decisor'})`,
+            title: `[Birth Hub 360 Outbound] ${lead.name} (${lead.decision_maker_name || 'Decisor'})`,
           }),
         });
       }

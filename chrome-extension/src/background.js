@@ -7,7 +7,7 @@
 const OFFSCREEN_DOCUMENT_PATH = 'src/offscreen.html';
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[Atlas Copiloto] extensão instalada');
+  console.log('[Birth Hub 360 Copiloto] extensão instalada');
   injectContentScriptIntoOpenMeetTabs();
 });
 
@@ -28,7 +28,7 @@ async function injectContentScriptIntoOpenMeetTabs() {
     } catch (err) {
       // Aba pode estar numa página interna do Chrome sem permissão de injeção, ou ter fechado
       // entre o query e a injeção — não é um erro que o usuário precise ver.
-      console.warn('[Atlas Copiloto] falha ao injetar em aba já aberta', tab.id, err);
+      console.warn('[Birth Hub 360 Copiloto] falha ao injetar em aba já aberta', tab.id, err);
     }
   }
 }
@@ -74,7 +74,7 @@ async function stopRecording() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const tabId = sender.tab?.id;
 
-  if (message?.type === 'ATLAS_MEET_CONTEXT' && tabId != null) {
+  if (message?.type === 'BIRTHHUB360_MEET_CONTEXT' && tabId != null) {
     chrome.storage.session.set({ [`meetContext:${tabId}`]: message.payload });
     sendResponse({ ok: true });
     return true;
@@ -84,9 +84,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // content script da própria aba do Meet mostrar/esconder o indicador persistente de captura —
   // AGENT_04/AGENT_05 do pacote exigem indicador visível na própria página, não só no side panel
   // (que o usuário pode fechar sem perceber que a captura continua "ativa" no backend).
-  if (message?.type === 'ATLAS_SET_CAPTURE_STATE' && message.tabId != null) {
+  if (message?.type === 'BIRTHHUB360_SET_CAPTURE_STATE' && message.tabId != null) {
     chrome.tabs
-      .sendMessage(message.tabId, { type: 'ATLAS_CAPTURE_STATE', capturing: message.capturing })
+      .sendMessage(message.tabId, { type: 'BIRTHHUB360_CAPTURE_STATE', capturing: message.capturing })
       .catch(() => {
         // aba pode ter sido fechada/navegado para outro lugar — sem conteúdo pra avisar, ignora.
       });
@@ -94,14 +94,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === 'ATLAS_START_RECORDING') {
+  if (message?.type === 'BIRTHHUB360_START_RECORDING') {
     startRecording(message.tabId, message.conversationId)
       .then((result) => sendResponse(result || { ok: true }))
       .catch((err) => sendResponse({ ok: false, error: String(err?.message || err) }));
     return true;
   }
 
-  if (message?.type === 'ATLAS_STOP_RECORDING') {
+  if (message?.type === 'BIRTHHUB360_STOP_RECORDING') {
     stopRecording()
       .then((result) => sendResponse(result || { ok: true }))
       .catch((err) => sendResponse({ ok: false, error: String(err?.message || err) }));
