@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.sdr.qualificar-bant"
-  ],
+  "skillIds": ["comercial.sdr.qualificar-bant"],
   "summary": "Cenário fictício bloqueado: Agendar reunião no calendário de terceiro sem consentimento. Não agendar; propor horário condicional.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

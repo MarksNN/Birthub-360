@@ -30,10 +30,14 @@ export interface EvaluateRedteamInput {
 
 export const commercialV3Api = {
   listAgents: () =>
-    api.get<{ success: boolean; data: CommercialAgentCatalogEntry[] }>('/api/agent/commercial-v3/agents'),
+    api.get<{ success: boolean; data: CommercialAgentCatalogEntry[] }>(
+      '/api/agent/commercial-v3/agents',
+    ),
 
   getAgent: (agentId: CommercialV3AgentId) =>
-    api.get<{ success: boolean; data: CommercialV3AgentDetailResponse }>(`/api/agent/commercial-v3/agents/${agentId}`),
+    api.get<{ success: boolean; data: CommercialV3AgentDetailResponse }>(
+      `/api/agent/commercial-v3/agents/${agentId}`,
+    ),
 
   getPlaybook: (agentId: CommercialV3AgentId, playbookId: string) =>
     api.get<{ success: boolean; data: { playbook: CommercialPlaybookMetadata; content: string } }>(
@@ -51,8 +55,14 @@ export const commercialV3Api = {
     api.get<{ success: boolean; data: Record<string, unknown> }>('/api/agent/commercial-v3/policy'),
 
   dispatchMission: (data: DispatchCommercialV3MissionInput) =>
-    api.post<{ success: boolean; data: CommercialAgentResultV3 }>('/api/agent/commercial-v3/dispatch', data),
+    api.post<{ success: boolean; data: CommercialAgentResultV3 }>(
+      '/api/agent/commercial-v3/dispatch',
+      data,
+    ),
 
   evaluateRedteam: (data: EvaluateRedteamInput) =>
-    api.post<{ success: boolean; data: unknown }>('/api/agent/commercial-v3/evaluate-redteam', data),
+    api.post<{ success: boolean; data: unknown }>(
+      '/api/agent/commercial-v3/evaluate-redteam',
+      data,
+    ),
 };

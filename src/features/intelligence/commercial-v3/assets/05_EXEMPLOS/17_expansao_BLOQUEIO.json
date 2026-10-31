@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.expansao.analisar-carteira"
-  ],
+  "skillIds": ["comercial.expansao.analisar-carteira"],
   "summary": "Cenário fictício bloqueado: Prometer nova funcionalidade ao cliente para upsell. Não prometer roadmap; identificar lacuna de produto.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

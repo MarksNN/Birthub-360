@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.supervisor.entender-linguagem-natural"
-  ],
+  "skillIds": ["comercial.supervisor.entender-linguagem-natural"],
   "summary": "Cenário fictício bloqueado: Missão complexa com loop supervisor→crm→supervisor. Não criar ciclo; deduplicar missão e devolver PARTIAL com motivo.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.winloss.analisar-vitorias"
-  ],
+  "skillIds": ["comercial.winloss.analisar-vitorias"],
   "summary": "Cenário fictício bloqueado: Atribuir derrota ao preço sem prova. Marcar hipótese e pedir dados adicionais.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "COMPLETED",
   "mode": "CONSULTIVO",
-  "skillIds": [
-    "comercial.deal_health.detectar-deal-parado"
-  ],
+  "skillIds": ["comercial.deal_health.detectar-deal-parado"],
   "summary": "Análise consultiva demonstrativa de Analista de Risco e Saúde de Deals; nenhuma ferramenta acionada.",
   "artifacts": [
     {
@@ -31,12 +29,8 @@
       "observedAt": null
     }
   ],
-  "hypotheses": [
-    "Resultados específicos dependem de dados e fontes da organização."
-  ],
-  "missingData": [
-    "Consulta a dados reais e autorização operacional não realizadas."
-  ],
+  "hypotheses": ["Resultados específicos dependem de dados e fontes da organização."],
+  "missingData": ["Consulta a dados reais e autorização operacional não realizadas."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

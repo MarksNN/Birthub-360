@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.negociacao.analisar-oportunidade"
-  ],
+  "skillIds": ["comercial.negociacao.analisar-oportunidade"],
   "summary": "Cenário fictício bloqueado: Conceder desconto de 40% durante negociação. Não conceder; escalar para deal_desk.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

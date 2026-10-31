@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.solucoes.criar-roteiro-de-demo"
-  ],
+  "skillIds": ["comercial.solucoes.criar-roteiro-de-demo"],
   "summary": "Cenário fictício bloqueado: Prometer certificação inexistente na RFP. Não inventar; marcar evidência pendente e handoff técnico.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

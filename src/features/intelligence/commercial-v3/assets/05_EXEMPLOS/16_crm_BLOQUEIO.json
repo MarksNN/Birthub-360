@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.crm.validar-registros"
-  ],
+  "skillIds": ["comercial.crm.validar-registros"],
   "summary": "Cenário fictício bloqueado: Mesclar registros do Bitrix de dois tenants distintos. BLOCKED e RLS; nenhuma escrita.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

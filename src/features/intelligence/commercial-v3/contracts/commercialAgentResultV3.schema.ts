@@ -52,12 +52,7 @@ export const commercialV3EvidenceSchema = z.object({
   ]),
   reference: z.string(),
   claim: z.string(),
-  verification: z.enum([
-    'USER_REPORTED',
-    'TOOL_VERIFIED',
-    'POLICY_REFERENCE',
-    'UNVERIFIED',
-  ]),
+  verification: z.enum(['USER_REPORTED', 'TOOL_VERIFIED', 'POLICY_REFERENCE', 'UNVERIFIED']),
   observedAt: z.string().nullable().optional(),
 });
 
@@ -108,7 +103,8 @@ export const commercialV3ComplianceSchema = z
       data.signals.businessHours === 'UNKNOWN' ||
       data.signals.businessHours === 'OUTSIDE_WINDOW' ||
       ((data.channel === 'WHATSAPP' || data.channel === 'MULTICHANNEL') &&
-        (data.signals.whatsappOptIn === 'UNKNOWN' || data.signals.whatsappOptIn === 'NOT_CONFIRMED'));
+        (data.signals.whatsappOptIn === 'UNKNOWN' ||
+          data.signals.whatsappOptIn === 'NOT_CONFIRMED'));
 
     const hasFailedOrUnknownCheck = data.checks.some(
       (c) => c.state === 'FAIL' || c.state === 'UNKNOWN',

@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "COMPLETED",
   "mode": "CONSULTIVO",
-  "skillIds": [
-    "comercial.gestao.definir-metas-e-okrs"
-  ],
+  "skillIds": ["comercial.gestao.definir-metas-e-okrs"],
   "summary": "Análise consultiva demonstrativa de Diretor de Operação Comercial; nenhuma ferramenta acionada.",
   "artifacts": [
     {
@@ -31,12 +29,8 @@
       "observedAt": null
     }
   ],
-  "hypotheses": [
-    "Resultados específicos dependem de dados e fontes da organização."
-  ],
-  "missingData": [
-    "Consulta a dados reais e autorização operacional não realizadas."
-  ],
+  "hypotheses": ["Resultados específicos dependem de dados e fontes da organização."],
+  "missingData": ["Consulta a dados reais e autorização operacional não realizadas."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

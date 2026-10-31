@@ -29,10 +29,7 @@ import {
   type CommercialAgentStatus,
   commercialAgentCellApi,
 } from '../commercialAgentCell.api.js';
-import {
-  type CommercialV3AgentDetailResponse,
-  commercialV3Api,
-} from '../commercialV3.api.js';
+import { type CommercialV3AgentDetailResponse, commercialV3Api } from '../commercialV3.api.js';
 
 const STATUS_CONFIG: Record<
   CommercialAgentStatus,
@@ -68,7 +65,10 @@ export function CommercialAgentCellPanel() {
   const [loadingDetails, setLoadingDetails] = useState(false);
 
   // Leitor de Playbook Modal
-  const [viewingPlaybook, setViewingPlaybook] = useState<{ playbook: CommercialPlaybookMetadata; content: string } | null>(null);
+  const [viewingPlaybook, setViewingPlaybook] = useState<{
+    playbook: CommercialPlaybookMetadata;
+    content: string;
+  } | null>(null);
   const [loadingPlaybook, setLoadingPlaybook] = useState(false);
 
   // Playground Consultivo
@@ -100,7 +100,9 @@ export function CommercialAgentCellPanel() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setV3Error(err instanceof Error ? err.message : 'Falha ao carregar a Suíte Comercial V3.1.');
+          setV3Error(
+            err instanceof Error ? err.message : 'Falha ao carregar a Suíte Comercial V3.1.',
+          );
         }
       })
       .finally(() => {
@@ -136,7 +138,9 @@ export function CommercialAgentCellPanel() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setDispatchError(err instanceof Error ? err.message : 'Falha ao buscar detalhes do agente.');
+          setDispatchError(
+            err instanceof Error ? err.message : 'Falha ao buscar detalhes do agente.',
+          );
         }
       })
       .finally(() => {
@@ -181,7 +185,9 @@ export function CommercialAgentCellPanel() {
         setDispatchError('Não foi possível concluir a missão.');
       }
     } catch (err: unknown) {
-      setDispatchError(err instanceof Error ? err.message : 'Erro ao processar a missão comercial.');
+      setDispatchError(
+        err instanceof Error ? err.message : 'Erro ao processar a missão comercial.',
+      );
     } finally {
       setDispatching(false);
     }
@@ -214,9 +220,7 @@ export function CommercialAgentCellPanel() {
             type="button"
             onClick={() => setActiveTab('v3')}
             className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
-              activeTab === 'v3'
-                ? 'bg-primary text-white shadow-xs'
-                : 'text-ink-2 hover:text-ink'
+              activeTab === 'v3' ? 'bg-primary text-white shadow-xs' : 'text-ink-2 hover:text-ink'
             }`}
           >
             <Sparkles className="h-3.5 w-3.5" />
@@ -241,11 +245,10 @@ export function CommercialAgentCellPanel() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-card border border-primary/20 bg-primary/5 p-4">
             <div>
-              <p className="text-xs font-bold text-ink">
-                Arquitetura Comercial V3.1 Reconstruída
-              </p>
+              <p className="text-xs font-bold text-ink">Arquitetura Comercial V3.1 Reconstruída</p>
               <p className="text-[11px] text-ink-2">
-                19 Especialistas integrados, 463 habilidades canônicas, 99 playbooks operacionais sob demanda e envelope de governança LGPD/B2B.
+                19 Especialistas integrados, 463 habilidades canônicas, 99 playbooks operacionais
+                sob demanda e envelope de governança LGPD/B2B.
               </p>
             </div>
             <div className="relative w-full sm:w-64">
@@ -325,7 +328,8 @@ export function CommercialAgentCellPanel() {
 
           {!legacyAgents && !legacyError && (
             <div className="flex items-center gap-2 text-sm text-ink-2">
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Carregando agentes legados…
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Carregando agentes
+              legados…
             </div>
           )}
 
@@ -392,7 +396,8 @@ export function CommercialAgentCellPanel() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {loadingDetails && (
                 <div className="flex items-center justify-center py-12 text-sm text-ink-2">
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" /> Carregando habilidades e playbooks...
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" /> Carregando habilidades e
+                  playbooks...
                 </div>
               )}
 
@@ -416,11 +421,15 @@ export function CommercialAgentCellPanel() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="rounded-xl border border-line p-4 bg-surface">
                       <p className="text-xs font-bold text-ink flex items-center gap-1.5 mb-2">
-                        <Sparkles className="h-3.5 w-3.5 text-primary" /> Habilidades ({agentDetails.skillsCount})
+                        <Sparkles className="h-3.5 w-3.5 text-primary" /> Habilidades (
+                        {agentDetails.skillsCount})
                       </p>
                       <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 text-xs">
                         {agentDetails.skills.slice(0, 10).map((s) => (
-                          <div key={s.id} className="flex items-center justify-between gap-2 p-1.5 rounded bg-surface-subtle text-[11px]">
+                          <div
+                            key={s.id}
+                            className="flex items-center justify-between gap-2 p-1.5 rounded bg-surface-subtle text-[11px]"
+                          >
                             <span className="truncate text-ink font-medium">{s.name}</span>
                             <Badge variant="outline">{s.playbookId}</Badge>
                           </div>
@@ -435,8 +444,11 @@ export function CommercialAgentCellPanel() {
 
                     <div className="rounded-xl border border-line p-4 bg-surface">
                       <p className="text-xs font-bold text-ink flex items-center gap-1.5 mb-2">
-                        <BookOpen className="h-3.5 w-3.5 text-ink-2" /> Playbooks ({agentDetails.playbooksCount})
-                        <span className="text-[10px] text-primary font-normal ml-auto">(clique para ler)</span>
+                        <BookOpen className="h-3.5 w-3.5 text-ink-2" /> Playbooks (
+                        {agentDetails.playbooksCount})
+                        <span className="text-[10px] text-primary font-normal ml-auto">
+                          (clique para ler)
+                        </span>
                       </p>
                       <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 text-xs">
                         {agentDetails.playbooks.map((p) => (
@@ -445,7 +457,9 @@ export function CommercialAgentCellPanel() {
                             onClick={() => handleOpenPlaybook(p.id)}
                             className="group/pb flex items-center justify-between p-1.5 rounded bg-surface-subtle text-[11px] font-mono text-ink-2 hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
                           >
-                            <span className="truncate font-semibold">{p.id}: {p.name || p.path}</span>
+                            <span className="truncate font-semibold">
+                              {p.id}: {p.name || p.path}
+                            </span>
                             <ChevronRight className="h-3 w-3 shrink-0 group-hover/pb:translate-x-0.5 transition-transform" />
                           </div>
                         ))}
@@ -455,10 +469,15 @@ export function CommercialAgentCellPanel() {
 
                   {agentDetails.handoffs.length > 0 && (
                     <div className="rounded-xl border border-line/60 bg-surface-subtle/40 p-4">
-                      <p className="text-xs font-bold text-ink mb-2">Handoffs Sugeridos (Via Supervisor)</p>
+                      <p className="text-xs font-bold text-ink mb-2">
+                        Handoffs Sugeridos (Via Supervisor)
+                      </p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {agentDetails.handoffs.map(([to, reason]) => (
-                          <div key={to} className="p-2 rounded-lg border border-line bg-surface text-[11px]">
+                          <div
+                            key={to}
+                            className="p-2 rounded-lg border border-line bg-surface text-[11px]"
+                          >
                             <span className="font-bold text-primary">→ {to}</span>
                             <p className="text-ink-2 mt-0.5 line-clamp-2">{reason}</p>
                           </div>
@@ -512,7 +531,8 @@ export function CommercialAgentCellPanel() {
                       <div className="mt-3 rounded-lg border border-ok-solid/30 bg-ok-solid/5 p-3 space-y-2 text-xs">
                         <div className="flex items-center justify-between font-bold text-ok-solid">
                           <span className="flex items-center gap-1">
-                            <CheckCircle2 className="h-3.5 w-3.5" /> Envelope V3.1 Validado ({missionResult.status})
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Envelope V3.1 Validado (
+                            {missionResult.status})
                           </span>
                           <span className="font-mono text-[10px] text-ink-2">
                             ID: {missionResult.missionId}
@@ -520,16 +540,20 @@ export function CommercialAgentCellPanel() {
                         </div>
 
                         <div className="rounded bg-surface p-2.5 border border-line text-[11px] text-ink leading-relaxed">
-                          <p className="font-semibold text-ink-2 mb-1">Resumo Humano (Supervisor):</p>
+                          <p className="font-semibold text-ink-2 mb-1">
+                            Resumo Humano (Supervisor):
+                          </p>
                           {missionResult.resumo_humano}
                         </div>
 
                         <div className="grid grid-cols-2 gap-2 text-[10px] text-ink-2">
                           <div>
-                            <strong>Conformidade Canal:</strong> {missionResult.compliance.channel} (Elegível: {String(missionResult.compliance.sendEligible)})
+                            <strong>Conformidade Canal:</strong> {missionResult.compliance.channel}{' '}
+                            (Elegível: {String(missionResult.compliance.sendEligible)})
                           </div>
                           <div>
-                            <strong>Execução Real:</strong> {missionResult.execution.performed ? 'SIM' : 'NÃO (Rascunho Seguro)'}
+                            <strong>Execução Real:</strong>{' '}
+                            {missionResult.execution.performed ? 'SIM' : 'NÃO (Rascunho Seguro)'}
                           </div>
                         </div>
                       </div>

@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.forecast.ler-pipeline"
-  ],
+  "skillIds": ["comercial.forecast.ler-pipeline"],
   "summary": "Cenário fictício bloqueado: Inventar probabilidade de fechamento sem modelo real. Rotular cenário qualitativo; não produzir forecast homologado.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

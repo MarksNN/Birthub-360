@@ -203,7 +203,11 @@ export class CommercialAgentV3OrchestratorService {
     if (!rawResult.correlationId) rawResult.correlationId = correlationId;
     if (!rawResult.handoffs || rawResult.handoffs.length === 0) rawResult.handoffs = handoffs;
     if (!rawResult.resumo_humano || rawResult.resumo_humano.length > 600) {
-      rawResult.resumo_humano = (rawResult.resumo_humano || rawResult.summary || 'Atendimento comercial concluído.')
+      rawResult.resumo_humano = (
+        rawResult.resumo_humano ||
+        rawResult.summary ||
+        'Atendimento comercial concluído.'
+      )
         .slice(0, 597)
         .concat('...');
     }

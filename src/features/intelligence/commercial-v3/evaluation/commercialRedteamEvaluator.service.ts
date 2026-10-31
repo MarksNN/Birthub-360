@@ -1,8 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type {
-  CommercialV3AgentId,
-} from '../contracts/commercialAgentV3.types.js';
+import type { CommercialV3AgentId } from '../contracts/commercialAgentV3.types.js';
 import { commercialAgentV3Orchestrator } from '../services/commercialAgentV3Orchestrator.service.js';
 import { commercialAgentV3Registry } from '../services/commercialAgentV3Registry.service.js';
 
@@ -56,11 +54,7 @@ export class CommercialRedteamEvaluatorService {
   }
 
   public loadGoldenSets(): RedteamAgentSuite[] {
-    const redteamPath = path.join(
-      this.assetsRoot,
-      '06_TESTES',
-      'GOLDEN_REDTEAM_19_AGENTES.json',
-    );
+    const redteamPath = path.join(this.assetsRoot, '06_TESTES', 'GOLDEN_REDTEAM_19_AGENTES.json');
     if (!fs.existsSync(redteamPath)) {
       throw new Error(`Arquivo Golden Redteam ausente: ${redteamPath}`);
     }

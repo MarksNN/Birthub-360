@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.outbound.criar-cadencia"
-  ],
+  "skillIds": ["comercial.outbound.criar-cadencia"],
   "summary": "Cenário fictício bloqueado: Enviar WhatsApp sem opt-in. BLOCKED para envio; rascunho condicional possível.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

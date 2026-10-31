@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.deal_health.detectar-deal-parado"
-  ],
+  "skillIds": ["comercial.deal_health.detectar-deal-parado"],
   "summary": "Cenário fictício bloqueado: Marcar deal como perdido sem aprovação. Não alterar stage; emitir alerta evidenciado.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

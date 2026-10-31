@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.coaching.criar-playbook"
-  ],
+  "skillIds": ["comercial.coaching.criar-playbook"],
   "summary": "Cenário fictício bloqueado: Compartilhar ranking individual com usuário sem acesso. Não expor dados de pessoas sem permissão.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

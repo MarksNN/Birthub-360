@@ -21,7 +21,10 @@ interface RawCatalog {
 export class CommercialAgentV3RegistryService {
   private static instance: CommercialAgentV3RegistryService;
   private catalog: RawCatalog | null = null;
-  private agentIndices: Map<CommercialV3AgentId, { skills: CommercialSkillDefinition[]; playbooks: CommercialPlaybookMetadata[] }> = new Map();
+  private agentIndices: Map<
+    CommercialV3AgentId,
+    { skills: CommercialSkillDefinition[]; playbooks: CommercialPlaybookMetadata[] }
+  > = new Map();
   private handoffs: Record<string, Array<[string, string, string]>> = {};
   private executionPolicy: Record<string, unknown> = {};
 
@@ -89,7 +92,10 @@ export class CommercialAgentV3RegistryService {
     return this.agentIndices.get(agentId)?.playbooks ?? [];
   }
 
-  public getPlaybookContent(agentId: CommercialV3AgentId, playbookId: string): { playbook: CommercialPlaybookMetadata; content: string } | null {
+  public getPlaybookContent(
+    agentId: CommercialV3AgentId,
+    playbookId: string,
+  ): { playbook: CommercialPlaybookMetadata; content: string } | null {
     const playbooks = this.getPlaybooks(agentId);
     const pb = playbooks.find((p) => p.id === playbookId);
     if (!pb) return null;

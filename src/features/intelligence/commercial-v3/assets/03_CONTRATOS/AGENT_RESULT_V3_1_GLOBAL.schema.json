@@ -53,32 +53,16 @@
       ]
     },
     "missionId": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "correlationId": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "status": {
-      "enum": [
-        "COMPLETED",
-        "PARTIAL",
-        "BLOCKED",
-        "APPROVAL_REQUIRED",
-        "NEEDS_INFO"
-      ]
+      "enum": ["COMPLETED", "PARTIAL", "BLOCKED", "APPROVAL_REQUIRED", "NEEDS_INFO"]
     },
     "mode": {
-      "enum": [
-        "CONSULTIVO",
-        "OPERACIONAL",
-        "BLOQUEADO"
-      ]
+      "enum": ["CONSULTIVO", "OPERACIONAL", "BLOQUEADO"]
     },
     "skillIds": {
       "type": "array",
@@ -96,12 +80,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "artifactType",
-          "name",
-          "payload",
-          "state"
-        ],
+        "required": ["artifactType", "name", "payload", "state"],
         "properties": {
           "artifactType": {
             "enum": [
@@ -153,12 +132,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "sourceType",
-          "reference",
-          "claim",
-          "verification"
-        ],
+        "required": ["sourceType", "reference", "claim", "verification"],
         "properties": {
           "sourceType": {
             "enum": [
@@ -178,18 +152,10 @@
             "type": "string"
           },
           "verification": {
-            "enum": [
-              "USER_REPORTED",
-              "TOOL_VERIFIED",
-              "POLICY_REFERENCE",
-              "UNVERIFIED"
-            ]
+            "enum": ["USER_REPORTED", "TOOL_VERIFIED", "POLICY_REFERENCE", "UNVERIFIED"]
           },
           "observedAt": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         }
       }
@@ -209,23 +175,10 @@
     "compliance": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "checks",
-        "channel",
-        "sendEligible",
-        "reason",
-        "signals"
-      ],
+      "required": ["checks", "channel", "sendEligible", "reason", "signals"],
       "properties": {
         "channel": {
-          "enum": [
-            "EMAIL",
-            "WHATSAPP",
-            "PHONE",
-            "LINKEDIN",
-            "MULTICHANNEL",
-            "NONE"
-          ]
+          "enum": ["EMAIL", "WHATSAPP", "PHONE", "LINKEDIN", "MULTICHANNEL", "NONE"]
         },
         "sendEligible": {
           "type": "boolean",
@@ -239,11 +192,7 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-              "check",
-              "state",
-              "reason"
-            ],
+            "required": ["check", "state", "reason"],
             "properties": {
               "check": {
                 "enum": [
@@ -264,22 +213,14 @@
                 ]
               },
               "state": {
-                "enum": [
-                  "PASS",
-                  "FAIL",
-                  "UNKNOWN",
-                  "NOT_APPLICABLE"
-                ],
+                "enum": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"],
                 "description": "UNKNOWN = não foi verificado; FAIL = verificado e reprovado; não tratar UNKNOWN como PASS."
               },
               "reason": {
                 "type": "string"
               },
               "evidenceRef": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "type": ["string", "null"]
               }
             }
           }
@@ -296,44 +237,23 @@
           ],
           "properties": {
             "whatsappOptIn": {
-              "enum": [
-                "CONFIRMED",
-                "NOT_CONFIRMED",
-                "UNKNOWN",
-                "NOT_APPLICABLE"
-              ],
+              "enum": ["CONFIRMED", "NOT_CONFIRMED", "UNKNOWN", "NOT_APPLICABLE"],
               "description": "Consentimento/elegibilidade de contato WhatsApp; UNKNOWN significa ausência de verificação, não autorização."
             },
             "optOutSuppression": {
-              "enum": [
-                "CLEAR",
-                "SUPPRESSED",
-                "UNKNOWN"
-              ],
+              "enum": ["CLEAR", "SUPPRESSED", "UNKNOWN"],
               "description": "CLEAR somente com verificação real de inexistência de supressão; UNKNOWN bloqueia envio."
             },
             "touchHistory": {
-              "enum": [
-                "NO_CONFLICT",
-                "CONFLICT",
-                "UNKNOWN"
-              ],
+              "enum": ["NO_CONFLICT", "CONFLICT", "UNKNOWN"],
               "description": "Histórico verificado sem conflito, duplicidade confirmada ou não verificado."
             },
             "businessHours": {
-              "enum": [
-                "WITHIN_WINDOW",
-                "OUTSIDE_WINDOW",
-                "UNKNOWN",
-                "NOT_APPLICABLE"
-              ],
+              "enum": ["WITHIN_WINDOW", "OUTSIDE_WINDOW", "UNKNOWN", "NOT_APPLICABLE"],
               "description": "Janela avaliada no fuso do destinatário e organização; UNKNOWN não confirma horário permitido."
             },
             "timezone": {
-              "type": [
-                "string",
-                "null"
-              ],
+              "type": ["string", "null"],
               "description": "Fuso de contato conhecido (IANA) ou null quando desconhecido; null não valida janela de envio."
             }
           },
@@ -347,20 +267,13 @@
               "signals": {
                 "properties": {
                   "optOutSuppression": {
-                    "enum": [
-                      "UNKNOWN",
-                      "SUPPRESSED"
-                    ]
+                    "enum": ["UNKNOWN", "SUPPRESSED"]
                   }
                 },
-                "required": [
-                  "optOutSuppression"
-                ]
+                "required": ["optOutSuppression"]
               }
             },
-            "required": [
-              "signals"
-            ]
+            "required": ["signals"]
           },
           "then": {
             "properties": {
@@ -376,20 +289,13 @@
               "signals": {
                 "properties": {
                   "touchHistory": {
-                    "enum": [
-                      "UNKNOWN",
-                      "CONFLICT"
-                    ]
+                    "enum": ["UNKNOWN", "CONFLICT"]
                   }
                 },
-                "required": [
-                  "touchHistory"
-                ]
+                "required": ["touchHistory"]
               }
             },
-            "required": [
-              "signals"
-            ]
+            "required": ["signals"]
           },
           "then": {
             "properties": {
@@ -405,20 +311,13 @@
               "signals": {
                 "properties": {
                   "businessHours": {
-                    "enum": [
-                      "UNKNOWN",
-                      "OUTSIDE_WINDOW"
-                    ]
+                    "enum": ["UNKNOWN", "OUTSIDE_WINDOW"]
                   }
                 },
-                "required": [
-                  "businessHours"
-                ]
+                "required": ["businessHours"]
               }
             },
-            "required": [
-              "signals"
-            ]
+            "required": ["signals"]
           },
           "then": {
             "properties": {
@@ -432,29 +331,18 @@
           "if": {
             "properties": {
               "channel": {
-                "enum": [
-                  "WHATSAPP",
-                  "MULTICHANNEL"
-                ]
+                "enum": ["WHATSAPP", "MULTICHANNEL"]
               },
               "signals": {
                 "properties": {
                   "whatsappOptIn": {
-                    "enum": [
-                      "UNKNOWN",
-                      "NOT_CONFIRMED"
-                    ]
+                    "enum": ["UNKNOWN", "NOT_CONFIRMED"]
                   }
                 },
-                "required": [
-                  "whatsappOptIn"
-                ]
+                "required": ["whatsappOptIn"]
               }
             },
-            "required": [
-              "channel",
-              "signals"
-            ]
+            "required": ["channel", "signals"]
           },
           "then": {
             "properties": {
@@ -472,21 +360,14 @@
                   "type": "object",
                   "properties": {
                     "state": {
-                      "enum": [
-                        "FAIL",
-                        "UNKNOWN"
-                      ]
+                      "enum": ["FAIL", "UNKNOWN"]
                     }
                   },
-                  "required": [
-                    "state"
-                  ]
+                  "required": ["state"]
                 }
               }
             },
-            "required": [
-              "checks"
-            ]
+            "required": ["checks"]
           },
           "then": {
             "properties": {
@@ -501,44 +382,22 @@
     "approvalPending": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "required",
-        "status",
-        "action",
-        "approverRole",
-        "requestId",
-        "reason"
-      ],
+      "required": ["required", "status", "action", "approverRole", "requestId", "reason"],
       "properties": {
         "required": {
           "type": "boolean"
         },
         "status": {
-          "enum": [
-            "NOT_REQUIRED",
-            "PENDING",
-            "APPROVED",
-            "REJECTED",
-            "EXPIRED"
-          ]
+          "enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED", "EXPIRED"]
         },
         "action": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "approverRole": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "requestId": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "reason": {
           "type": "string"
@@ -550,12 +409,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "to",
-          "reason",
-          "payloadRef",
-          "viaSupervisor"
-        ],
+        "required": ["to", "reason", "payloadRef", "viaSupervisor"],
         "properties": {
           "to": {
             "enum": [
@@ -584,10 +438,7 @@
             "type": "string"
           },
           "payloadRef": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "viaSupervisor": {
             "const": true
@@ -641,36 +492,23 @@
           ]
         },
         "executionId": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "idempotencyKey": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "toolCalls": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-              "toolCode",
-              "status",
-              "reference"
-            ],
+            "required": ["toolCode", "status", "reference"],
             "properties": {
               "toolCode": {
                 "type": "string"
               },
               "status": {
-                "enum": [
-                  "SUCCESS",
-                  "FAILURE"
-                ]
+                "enum": ["SUCCESS", "FAILURE"]
               },
               "reference": {
                 "type": "string"

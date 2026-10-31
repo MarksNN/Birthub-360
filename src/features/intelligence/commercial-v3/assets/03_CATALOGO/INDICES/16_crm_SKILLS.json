@@ -57,9 +57,7 @@
       "id": "P5",
       "name": "Correção aprovada",
       "path": "02_PLAYBOOKS/16_crm/P5_CRM.md",
-      "skillIds": [
-        "comercial.crm.corrigir-dados-mediante-aprovacao"
-      ]
+      "skillIds": ["comercial.crm.corrigir-dados-mediante-aprovacao"]
     }
   ],
   "skills": [

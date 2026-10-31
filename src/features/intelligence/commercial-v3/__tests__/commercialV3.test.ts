@@ -65,7 +65,9 @@ describe('Célula Comercial V3.1 — Context Builder (Montagem Contextual e Boot
 
   it('deve lançar erro se a habilidade não pertencer ao agente', async () => {
     await expect(
-      commercialContextBuilder.buildContext('icp', ['comercial.supervisor.entender-linguagem-natural']),
+      commercialContextBuilder.buildContext('icp', [
+        'comercial.supervisor.entender-linguagem-natural',
+      ]),
     ).rejects.toThrow(/SkillId não pertence ao agente/);
   });
 });

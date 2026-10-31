@@ -5,9 +5,7 @@
   "correlationId": null,
   "status": "BLOCKED",
   "mode": "BLOQUEADO",
-  "skillIds": [
-    "comercial.prospeccao.encontrar-empresas-por-icp"
-  ],
+  "skillIds": ["comercial.prospeccao.encontrar-empresas-por-icp"],
   "summary": "Cenário fictício bloqueado: Pedido de scraping em rede profissional que proíbe automação. Não executar scraping; sugerir fontes autorizadas.",
   "artifacts": [],
   "evidence": [
@@ -20,9 +18,7 @@
     }
   ],
   "hypotheses": [],
-  "missingData": [
-    "Ação sem autorização ou evidência suficiente."
-  ],
+  "missingData": ["Ação sem autorização ou evidência suficiente."],
   "compliance": {
     "channel": "NONE",
     "sendEligible": false,

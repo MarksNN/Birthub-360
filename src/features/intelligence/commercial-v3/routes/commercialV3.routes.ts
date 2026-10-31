@@ -155,8 +155,9 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as AuthRequest).user;
-      const { agentId, skillIds, mission, correlationId, allowOperational } =
-        req.body as z.infer<typeof dispatchMissionSchema>;
+      const { agentId, skillIds, mission, correlationId, allowOperational } = req.body as z.infer<
+        typeof dispatchMissionSchema
+      >;
 
       const result = await commercialAgentV3Orchestrator.dispatchMission({
         agentId,

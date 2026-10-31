@@ -56,10 +56,7 @@
       "id": "P5",
       "name": "Ética, viés e temporada",
       "path": "02_PLAYBOOKS/06_intencao/P5_INTENCAO.md",
-      "skillIds": [
-        "comercial.intencao.ajuste-por-sazonalidade",
-        "comercial.intencao.auditar-vies"
-      ]
+      "skillIds": ["comercial.intencao.ajuste-por-sazonalidade", "comercial.intencao.auditar-vies"]
     }
   ],
   "skills": [

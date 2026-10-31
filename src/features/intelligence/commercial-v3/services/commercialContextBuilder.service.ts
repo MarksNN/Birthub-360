@@ -50,8 +50,7 @@ export class CommercialContextBuilderService {
 
     // 3. Injetar Índice Obrigatório de Habilidades
     const indexChunk =
-      'ÍNDICE OBRIGATÓRIO DE SKILLS (não é grant):\n' +
-      JSON.stringify(agentSkills, null, 2);
+      'ÍNDICE OBRIGATÓRIO DE SKILLS (não é grant):\n' + JSON.stringify(agentSkills, null, 2);
 
     // 4. Injetar Contrato Obrigatório
     const contractNoticeChunk =
