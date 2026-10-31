@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { generateStructuredOutput } from '../../../../lib/ai/gateway.js';
-import { untrustedContentGuard } from '../../../../lib/ai/gateway/untrustedContentGuard.js';
+import { createUntrustedContentGuard } from '../../../../lib/ai/gateway/untrustedContentGuard.js';
 import { logger } from '../../../../lib/logger.js';
 import type {
   CommercialAgentResultV3,
@@ -36,7 +36,9 @@ export class CommercialAgentV3OrchestratorService {
     }
 
     // 1. Guard contra prompt injection em inputs não confiáveis
-    const safeMission = untrustedContentGuard.sanitizeInput(input.mission);
+    const guard = createUntrustedContentGuard();
+    const injectionCheck = guard.detectInjection(input.mission);
+    const safeMission = injectionCheck.sanitizedContent;
 
     // 2. Determinar skillIds (se vazio, seleciona a primeira skill essencial do agente)
     const agentSkills = commercialAgentV3Registry.listSkills(input.agentId);
