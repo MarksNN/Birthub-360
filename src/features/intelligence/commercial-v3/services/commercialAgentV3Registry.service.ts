@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type {
   CommercialAgentCatalogEntry,
   CommercialPlaybookMetadata,
@@ -8,9 +7,25 @@ import type {
   CommercialV3AgentId,
 } from '../contracts/commercialAgentV3.types.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ASSETS_ROOT = path.resolve(__dirname, '../assets');
+const resolveAssetsRoot = (): string => {
+  const candidates = [
+    path.resolve(process.cwd(), 'src/features/intelligence/commercial-v3/assets'),
+    typeof __dirname !== 'undefined'
+      ? path.resolve(__dirname, '../src/features/intelligence/commercial-v3/assets')
+      : '',
+    typeof __dirname !== 'undefined' ? path.resolve(__dirname, '../assets') : '',
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(path.join(candidate, '03_CATALOGO', 'INDICE_GERAL_463.json'))) {
+      return candidate;
+    }
+  }
+
+  return path.resolve(process.cwd(), 'src/features/intelligence/commercial-v3/assets');
+};
+
+const ASSETS_ROOT = resolveAssetsRoot();
 
 interface RawCatalog {
   schemaVersion: string;
