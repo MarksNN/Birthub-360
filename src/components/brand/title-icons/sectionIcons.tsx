@@ -1,4 +1,3 @@
-import type React from 'react';
 import type { TitleIconProps } from './types.js';
 
 // 1. Hero Title: Quantum Hex-Orb Nexus
