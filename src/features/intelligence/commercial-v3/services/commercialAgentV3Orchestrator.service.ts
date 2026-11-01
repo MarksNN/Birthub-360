@@ -35,7 +35,7 @@ export class CommercialAgentV3OrchestratorService {
     }
 
     // 1. Guard contra prompt injection em inputs não confiáveis
-    const guard = createUntrustedContentGuard();
+    const guard = new UntrustedContentGuard();
     const injectionCheck = guard.detectInjection(input.mission);
     const safeMission = injectionCheck.sanitizedContent;
 
