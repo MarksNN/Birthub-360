@@ -229,11 +229,6 @@ html.dark,
   --danger-active: var(--color-heading-danger);
 }
 
-/* Domain accent is supplied by the application shell; body text stays neutral. */
-[data-page-accent] :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--ink);
-  text-shadow: none;
-}
 .bh-platform-card .bh-label {
   color: var(--card-accent);
 }
@@ -277,7 +272,7 @@ html:not(.dark) .text-\[\#00D4FF\],
 html:not(.dark) .text-\[\#00d4ff\],
 html:not(.dark) .text-\[\#0284c7\],
 html:not(.dark) .text-\[\#0284C7\] {
-  color: #0369a1 !important;
+  color: #0369a1;
 }
 [data-theme="light"] .text-\[\#FF2D9B\],
 [data-theme="light"] .text-\[\#ff2d9b\],
@@ -285,7 +280,7 @@ html.light .text-\[\#FF2D9B\],
 html.light .text-\[\#ff2d9b\],
 html:not(.dark) .text-\[\#FF2D9B\],
 html:not(.dark) .text-\[\#ff2d9b\] {
-  color: #be185d !important;
+  color: #be185d;
 }
 [data-theme="light"] .text-\[\#F59E0B\],
 [data-theme="light"] .text-\[\#f59e0b\],
@@ -296,7 +291,7 @@ html.light .text-\[\#b45309\],
 html:not(.dark) .text-\[\#F59E0B\],
 html:not(.dark) .text-\[\#f59e0b\],
 html:not(.dark) .text-\[\#b45309\] {
-  color: #92400e !important;
+  color: #92400e;
 }
 [data-theme="light"] .text-\[\#8B7DFF\],
 [data-theme="light"] .text-\[\#8b7dff\],
@@ -304,7 +299,7 @@ html.light .text-\[\#8B7DFF\],
 html.light .text-\[\#8b7dff\],
 html:not(.dark) .text-\[\#8B7DFF\],
 html:not(.dark) .text-\[\#8b7dff\] {
-  color: #6d28d9 !important;
+  color: #6d28d9;
 }
 [data-theme="light"] .text-\[\#EF4444\],
 [data-theme="light"] .text-\[\#ef4444\],
@@ -312,7 +307,7 @@ html.light .text-\[\#EF4444\],
 html.light .text-\[\#ef4444\],
 html:not(.dark) .text-\[\#EF4444\],
 html:not(.dark) .text-\[\#ef4444\] {
-  color: #b91c1c !important;
+  color: #b91c1c;
 }
 /* Existing neutral utility surfaces follow theme inside the product shell. */
 [data-page-accent] .bg-white {
@@ -480,14 +475,14 @@ html:not(.dark) [class*="0284c7"] {
 
 /* Override títulos e subtítulos dentro de cards para nunca usar branco ou preto */
 .bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) {
-  color: var(--title-color-default, var(--color-heading-cyan)) !important;
-  font-family: var(--font-brand-display) !important;
+  color: var(--title-color-default, var(--color-heading-cyan));
+  font-family: var(--font-brand-display);
 }
 .bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) + p,
 .bh-platform-card [class*="subtitle" i] {
-  color: var(--subtitle-color-default, #70d6ff) !important;
+  color: var(--subtitle-color-default, #70d6ff);
 }
 html.light .bh-platform-card [class*="subtitle" i],
 html.light .bh-platform-card :is(h1, h2, h3, h4, h5, h6, [class*="title" i]) + p {
-  color: var(--subtitle-color-default) !important;
+  color: var(--subtitle-color-default);
 }
