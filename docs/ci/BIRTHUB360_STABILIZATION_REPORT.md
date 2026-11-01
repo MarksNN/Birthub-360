@@ -57,3 +57,18 @@ Operação de estabilização iniciada para corrigir falhas no Central Birth Hub
 ## Recomendação de Merge
 
 **Não recomendado ainda.** Aguardando confirmação remota de todos os checks obrigatórios e homologação funcional. Sem merge sem autorização explícita.
+
+## Atualização 2026-11-01 (continuação)
+
+- Application Gate avançou: Lint, Prettier, Type Check e Architecture tests **passaram** no CI remoto.
+- Falha restante no gate: deriva de OpenAPI (endpoints commercial-v3).
+- Main avançou (PRs de formatação e mock). Branch atualizada via merge de origin/main.
+- OpenAPI: paths commercial-v3 já existiam em main; removida duplicata introduzida localmente + corrigida indentação. `verify:openapi-drift` passa.
+- SHA atual: `b297d91fe` (inclui merge + limpeza OpenAPI).
+
+### Bloqueadores remanescentes
+- Visual Regression (falha consistente; logs truncados — possível flakiness de snapshot ou diferença de ambiente).
+- SonarQube Quality Gate (falhou no SHA anterior; reexecução em andamento).
+- Homologação funcional integrada ainda não executada.
+
+**Recomendação:** aguardar resultado do Application Gate no SHA atual. Não fazer merge ainda.
