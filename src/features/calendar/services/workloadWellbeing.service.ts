@@ -10,7 +10,7 @@
  * - Multi-tenant estrito por organizationId.
  */
 
-import {
+import type {
   CollectiveAggregatedWorkload,
   MicroTrainingSession,
   WorkloadObjectiveMetrics,

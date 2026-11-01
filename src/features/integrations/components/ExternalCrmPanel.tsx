@@ -28,7 +28,8 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CompanyBrandIcon } from '../../../components/brand/CompanyBrandIcon.js';
 import { Card } from '../../../components/ui/Card.js';
 import { BRAND } from '../../../config/brand.js';

@@ -107,7 +107,7 @@ export class ValueRealizationService implements IValueRealizationPort {
     }
 
     let newStatus: ValueRealizationStatus = 'MEASURED_ON_TRACK';
-    let divergenceNotes: string | undefined = undefined;
+    let divergenceNotes: string | undefined;
 
     if (isTargetMet) {
       newStatus = 'ACHIEVED';

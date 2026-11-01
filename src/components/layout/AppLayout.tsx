@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { MainLayout } from './MainLayout.js';
 
 export const AppLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {

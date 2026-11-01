@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { KanbanCard } from './KanbanCard.js';
 import { KanbanColumn } from './KanbanColumn.js';
 
