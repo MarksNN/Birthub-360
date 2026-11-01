@@ -202,7 +202,7 @@ export class BehavioralEngineService implements IBehavioralEnginePort {
     let targetCount = 3;
     let minScore: number | undefined = 85;
     let xp = 150;
-    let badgeId: string | undefined ;
+    let badgeId: string | undefined;
     let skillName = 'Contorno de Objeções';
 
     if (b.metric === 'price_objection_handling') {
