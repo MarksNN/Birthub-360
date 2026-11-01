@@ -65,6 +65,18 @@ useDefault = true
 # escaneado; o regex não cobre nenhum outro valor. Allowlist (e não `// gitleaks:allow` nem
 # .gitleaksignore) porque o literal já está no diff de db02bd60 e precisa ficar suprimido para
 # qualquer range que inclua esse commit, sem reescrever histórico.
+#
+# Falso-positivo conhecido #7: snapshots visuais gerados em
+# design-system-guide/BIRTH-HUB-360-DESIGN-SYSTEM-GUIDE-assets/data/*.json contêm mensagens de
+# console do Vite/Playwright com URLs `ws://localhost:24678/?token=...` usadas por um ambiente de
+# desenvolvimento local. Não são segredos do app nem de produção; são artefatos de documentação
+# e baseline visual. O allowlist por caminho evita que o gate de secret-scan derrube o CI em cada
+# snapshot novo.
+#
+# Falso-positivo conhecido #8: `agente-codigo-local/firebase-applet-config.json` contém um valor de
+# placeholder (`apiKey: "AIza_PLACEHOLDER"`) usado somente como configuração local do Firebase e não
+# como credencial real. Esse arquivo é um artefato de desenvolvimento e deve continuar ignorado pelo
+# scan de segredos do CI.
 [allowlist]
 description = "Fixtures sintéticas de teste e falsos-positivos confirmados (não são segredos reais)"
 paths = [
@@ -74,6 +86,8 @@ paths = [
   '''tests/unit/features/integrations/stripe/.*\.test\.ts$''',
   '''tests/unit/features/integrations/omie/.*\.test\.ts$''',
   '''\.agents/runs/.*\.md$''',
+  '''(^|/)agente-codigo-local/firebase-applet-config\.json$''',
+  '''(^|/)design-system-guide/BIRTH-HUB-360-DESIGN-SYSTEM-GUIDE-assets/data/.*\.json$''',
 ]
 regexes = [
   '''eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiIxMjM0NTY3ODkwIn0\.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U''',
