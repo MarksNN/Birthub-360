@@ -61,7 +61,10 @@ export class CommercialAgentV3RegistryService {
         if (fs.existsSync(indexPath)) {
           const rawIndex = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
           this.agentIndices.set(agent.id, {
-            skills: rawIndex.skills,
+            skills: (rawIndex.skills || []).map((s: CommercialSkillDefinition) => ({
+              ...s,
+              agentId: agent.id,
+            })),
             playbooks: rawIndex.playbooks,
           });
         }
