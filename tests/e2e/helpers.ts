@@ -140,7 +140,8 @@ export async function signUp(
         if (
           !(err instanceof Error) ||
           (!err.message.includes('interrupted by another navigation') &&
-            !err.message.includes('Not attached to an active page'))
+            !err.message.includes('Not attached to an active page') &&
+            !err.message.includes('net::ERR_ABORTED'))
         ) {
           throw err;
         }
@@ -152,7 +153,8 @@ export async function signUp(
         if (
           !(err instanceof Error) ||
           (!err.message.includes('interrupted by another navigation') &&
-            !err.message.includes('Not attached to an active page'))
+            !err.message.includes('Not attached to an active page') &&
+            !err.message.includes('net::ERR_ABORTED'))
         ) {
           throw err;
         }
@@ -182,10 +184,7 @@ export async function signUp(
  * ADMIN — ver `src/features/team`). Mesmo padrão de bypass de RLS usado em
  * `tests/helpers/rbac-e2e-helpers.ts` para os testes de integração equivalentes.
  */
-export async function setUserRole(
-  email: string,
-  role: 'ADMIN' | 'GESTOR' | 'CLOSER' | 'SDR' | 'VISUALIZADOR',
-): Promise<void> {
+export async function setUserRole(email: string, role: 'ADMIN' | 'GESTOR' | 'CLOSER' | 'SDR' | 'VISUALIZADOR'): Promise<void> {
   // `enterWith` (não `.run()`) de propósito — mesmo racional de `tests/helpers/rbac-e2e-helpers.ts`:
   // `prisma.user.update(...)` devolve um `PrismaPromise` preguiçoso (só dispara a query real ao
   // ser `await`ado), e o hook `$allOperations` da extensão (src/lib/prisma.ts) que lê

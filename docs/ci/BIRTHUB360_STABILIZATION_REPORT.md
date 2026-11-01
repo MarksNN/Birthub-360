@@ -57,3 +57,12 @@ Operação de estabilização iniciada para corrigir falhas no Central Birth Hub
 ## Recomendação de Merge
 
 **Não recomendado ainda.** Aguardando confirmação remota de todos os checks obrigatórios e homologação funcional. Sem merge sem autorização explícita.
+
+
+## Atualização 2026-11-01 (branch de unit tests)
+
+- Branch `fix/stabilize-unit-tests-20261101` criada a partir da main (`a644e3dd6`).
+- Execução local com coverage: 5411 passed, 0 failed.
+- Main atual falha no Application Gate (unit tests com coverage) e SonarQube Quality Gate.
+- Esta branch será usada para validação remota.
+
