@@ -9,7 +9,7 @@
  * - Multi-tenant estrito por organizationId.
  */
 
-import {
+import type {
   ConversationalDynamicMetrics,
   ExplicitObjectionItem,
   MethodologyAdherence,

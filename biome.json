@@ -46,7 +46,8 @@
       "style": {
         "useConst": "error",
         "useTemplate": "warn",
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "warn",
+        "noDescendingSpecificity": "warn"
       },
       "performance": {
         "noDelete": "warn"
