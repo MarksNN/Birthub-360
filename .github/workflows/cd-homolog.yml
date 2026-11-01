@@ -42,7 +42,7 @@ jobs:
     outputs:
       sha: ${{ inputs.sha }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/require-ci-green
         with:
           sha: ${{ inputs.sha }}
@@ -58,7 +58,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository (SHA já validado pelo CI)
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.resolve-sha.outputs.sha }}
           fetch-depth: 0
@@ -66,7 +66,7 @@ jobs:
       # ITEM-11 (Onda 3 — SBOM e governança de dependências): todo release real produz um SBOM
       # CycloneDX correlacionável ao commit publicado. Ver docs/security/DEPENDENCY_POLICY.md.
       - name: Use Node.js 22 (para gerar o SBOM)
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
           cache: 'npm'
@@ -78,25 +78,25 @@ jobs:
         run: npm run security:sbom
 
       - name: Upload do SBOM como artefato do release
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sbom-${{ needs.resolve-sha.outputs.sha }}
           path: sbom.cdx.json
           retention-days: 90
 
       - name: Log in to the Container registry
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
 
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
           images: ghcr.io/${{ github.repository }}
 
@@ -104,7 +104,7 @@ jobs:
       # `publish` de production.yaml — build local (sem push), scan Trivy bloqueante, só então
       # push. Ver comentários equivalentes em production.yaml para o raciocínio completo.
       - name: Build Docker image (local, para scan antes do push)
-        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
           context: .
           push: false
@@ -128,14 +128,14 @@ jobs:
 
       - name: Upload SARIF do scan de imagem para a aba Security
         if: always()
-        uses: github/codeql-action/upload-sarif@42947a340483f03ba47bb1a039b2c519aab3df85 # v3.37.8
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           sarif_file: trivy-image-results.sarif
           category: trivy-image-homolog
 
       - name: Upload SARIF do scan de imagem como artefato (auditoria/retenção)
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: trivy-image-sarif-homolog
           path: trivy-image-results.sarif
