@@ -1,10 +1,26 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { commercialAgentResultV3Schema } from '../contracts/commercialAgentResultV3.schema.js';
 import { COMMERCIAL_V3_AGENT_IDS } from '../contracts/commercialAgentV3.types.js';
 import { commercialRedteamEvaluator } from '../evaluation/commercialRedteamEvaluator.service.js';
 import { commercialAgentV3Orchestrator } from '../services/commercialAgentV3Orchestrator.service.js';
 import { commercialAgentV3Registry } from '../services/commercialAgentV3Registry.service.js';
 import { commercialContextBuilder } from '../services/commercialContextBuilder.service.js';
+
+// Mock determinístico do AI Gateway para testes unitários:
+// Elimina conexões externas a provedores de IA, latência de rede, Redis e dynamic routing,
+// garantindo execução hermética, previsível e sem consumo de recursos externos.
+vi.mock('../../../../lib/ai/gateway.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../../lib/ai/gateway.js')>();
+  return {
+    ...actual,
+    generateStructuredOutput: vi.fn(async (options: any) => {
+      if (typeof options.fallback === 'function') {
+        return options.fallback();
+      }
+      throw new Error('generateStructuredOutput: fallback não configurado no mock determinístico');
+    }),
+  };
+});
 
 describe('Célula Comercial V3.1 — Catálogo e Integridade Estrutural', () => {
   it('deve conter exatamente 19 agentes oficiais no catálogo', () => {
@@ -174,11 +190,29 @@ describe('Célula Comercial V3.1 — Avaliador de Golden Redteam', () => {
     expect(totalCases).toBe(209);
   });
 
+  // Timeout específico de 10.000ms definido com base nas medições de instrumentação
+  // (execução hermética com mock consome ~15-30ms, permitindo margem ampla mesmo sob sobrecarga do CI
+  // sem elevar o timeout global de 15s de todos os outros testes).
   it('deve avaliar os cenários de redteam do supervisor mantendo modo consultivo seguro', async () => {
     const report = await commercialRedteamEvaluator.evaluateAgent('supervisor');
     expect(report.agentId).toBe('supervisor');
     expect(report.total).toBe(11);
     expect(report.passed).toBe(11);
     expect(report.rate).toBe(100);
-  });
+
+    // Verificação da instrumentação de cada um dos 11 cenários
+    expect(report.totalDurationMs).toBeGreaterThan(0);
+    expect(report.averageDurationMs).toBeGreaterThan(0);
+    expect(report.results).toHaveLength(11);
+    for (const res of report.results) {
+      expect(res.durationMs).toBeDefined();
+      expect(res.durationMs).toBeGreaterThanOrEqual(0);
+      expect(res.status).toBe('PASS');
+      expect(res.checks.envelopeValid).toBe(true);
+      expect(res.checks.sendEligibleSafe).toBe(true);
+      expect(res.checks.executionPerformedSafe).toBe(true);
+      expect(res.checks.modeSafe).toBe(true);
+      expect(res.checks.resumoHumanoPresent).toBe(true);
+    }
+  }, 10000);
 });

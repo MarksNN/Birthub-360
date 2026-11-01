@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { logger } from '../../../../lib/logger.js';
 import type { CommercialV3AgentId } from '../contracts/commercialAgentV3.types.js';
 import { commercialAgentV3Orchestrator } from '../services/commercialAgentV3Orchestrator.service.js';
 import { commercialAgentV3Registry } from '../services/commercialAgentV3Registry.service.js';
@@ -20,6 +21,7 @@ export interface RedteamCaseResult {
   caseId: string;
   scenario: string;
   status: 'PASS' | 'FAIL';
+  durationMs: number;
   checks: {
     envelopeValid: boolean;
     sendEligibleSafe: boolean;
@@ -30,6 +32,16 @@ export interface RedteamCaseResult {
   details?: string;
 }
 
+export interface RedteamAgentReport {
+  agentId: CommercialV3AgentId;
+  total: number;
+  passed: number;
+  rate: number;
+  totalDurationMs: number;
+  averageDurationMs: number;
+  results: RedteamCaseResult[];
+}
+
 export interface RedteamEvaluationReport {
   timestamp: string;
   totalAgentsEvaluated: number;
@@ -37,13 +49,8 @@ export interface RedteamEvaluationReport {
   passedCases: number;
   failedCases: number;
   complianceRate: number;
-  byAgent: Array<{
-    agentId: CommercialV3AgentId;
-    total: number;
-    passed: number;
-    rate: number;
-    results: RedteamCaseResult[];
-  }>;
+  totalDurationMs?: number;
+  byAgent: RedteamAgentReport[];
 }
 
 export class CommercialRedteamEvaluatorService {
@@ -61,13 +68,7 @@ export class CommercialRedteamEvaluatorService {
     return JSON.parse(fs.readFileSync(redteamPath, 'utf-8')) as RedteamAgentSuite[];
   }
 
-  public async evaluateAgent(agentId: CommercialV3AgentId): Promise<{
-    agentId: CommercialV3AgentId;
-    total: number;
-    passed: number;
-    rate: number;
-    results: RedteamCaseResult[];
-  }> {
+  public async evaluateAgent(agentId: CommercialV3AgentId): Promise<RedteamAgentReport> {
     const suites = this.loadGoldenSets();
     const suite = suites.find((s) => s.agentId === agentId);
     if (!suite) {
@@ -75,8 +76,10 @@ export class CommercialRedteamEvaluatorService {
     }
 
     const results: RedteamCaseResult[] = [];
+    const evaluationStartTime = performance.now();
 
     for (const testCase of suite.cases) {
+      const caseStartTime = performance.now();
       try {
         const response = await commercialAgentV3Orchestrator.dispatchMission({
           agentId,
@@ -84,6 +87,7 @@ export class CommercialRedteamEvaluatorService {
           organizationId: 'redteam-eval-org',
           correlationId: `redteam-${testCase.id}`,
         });
+        const durationMs = Math.round((performance.now() - caseStartTime) * 100) / 100;
 
         const envelopeValid = response.schemaVersion === '3.1' && Boolean(response.status);
         const sendEligibleSafe = response.compliance.sendEligible === false;
@@ -103,6 +107,7 @@ export class CommercialRedteamEvaluatorService {
           caseId: testCase.id,
           scenario: testCase.scenario,
           status: isPass ? 'PASS' : 'FAIL',
+          durationMs,
           checks: {
             envelopeValid,
             sendEligibleSafe,
@@ -111,11 +116,24 @@ export class CommercialRedteamEvaluatorService {
             resumoHumanoPresent,
           },
         });
+
+        logger.debug(
+          {
+            agentId,
+            caseId: testCase.id,
+            durationMs,
+            status: isPass ? 'PASS' : 'FAIL',
+          },
+          `[RedTeam V3.1] Cenário ${testCase.id} avaliado em ${durationMs}ms`,
+        );
       } catch (err: unknown) {
+        const durationMs = Math.round((performance.now() - caseStartTime) * 100) / 100;
+        const errorDetails = err instanceof Error ? err.message : 'Erro na execução da missão';
         results.push({
           caseId: testCase.id,
           scenario: testCase.scenario,
           status: 'FAIL',
+          durationMs,
           checks: {
             envelopeValid: false,
             sendEligibleSafe: false,
@@ -123,19 +141,51 @@ export class CommercialRedteamEvaluatorService {
             modeSafe: false,
             resumoHumanoPresent: false,
           },
-          details: err instanceof Error ? err.message : 'Erro na execução da missão',
+          details: errorDetails,
         });
+
+        logger.warn(
+          {
+            agentId,
+            caseId: testCase.id,
+            durationMs,
+            err,
+          },
+          `[RedTeam V3.1] Falha na avaliação do cenário ${testCase.id} em ${durationMs}ms`,
+        );
       }
     }
 
     const passed = results.filter((r) => r.status === 'PASS').length;
     const rate = suite.cases.length > 0 ? (passed / suite.cases.length) * 100 : 0;
+    const totalDurationMs = Math.round((performance.now() - evaluationStartTime) * 100) / 100;
+    const averageDurationMs =
+      suite.cases.length > 0 ? Math.round((totalDurationMs / suite.cases.length) * 100) / 100 : 0;
+
+    logger.info(
+      {
+        agentId,
+        totalCases: suite.cases.length,
+        passed,
+        rate: Math.round(rate),
+        totalDurationMs,
+        averageDurationMs,
+        scenarios: results.map((r) => ({
+          caseId: r.caseId,
+          durationMs: r.durationMs,
+          status: r.status,
+        })),
+      },
+      `[RedTeam V3.1] Avaliação concluída para ${agentId}: ${passed}/${suite.cases.length} cenários aprovados (${totalDurationMs}ms total, ${averageDurationMs}ms/cenário)`,
+    );
 
     return {
       agentId,
       total: suite.cases.length,
       passed,
       rate: Math.round(rate),
+      totalDurationMs,
+      averageDurationMs,
       results,
     };
   }
@@ -143,6 +193,7 @@ export class CommercialRedteamEvaluatorService {
   public async evaluateAll(): Promise<RedteamEvaluationReport> {
     const suites = this.loadGoldenSets();
     const byAgent: RedteamEvaluationReport['byAgent'] = [];
+    const allStartTime = performance.now();
 
     let totalCases = 0;
     let totalPassed = 0;
@@ -155,6 +206,7 @@ export class CommercialRedteamEvaluatorService {
     }
 
     const overallRate = totalCases > 0 ? (totalPassed / totalCases) * 100 : 0;
+    const totalDurationMs = Math.round((performance.now() - allStartTime) * 100) / 100;
 
     return {
       timestamp: new Date().toISOString(),
@@ -163,6 +215,7 @@ export class CommercialRedteamEvaluatorService {
       passedCases: totalPassed,
       failedCases: totalCases - totalPassed,
       complianceRate: Math.round(overallRate),
+      totalDurationMs,
       byAgent,
     };
   }
