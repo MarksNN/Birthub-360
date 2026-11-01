@@ -7,14 +7,20 @@ import { signUp, uniqueTestEmail, waitForAppReady } from './helpers';
 // (ver teste "recarrega .../app/crm..." abaixo). Antes dessa migração a navegação era só estado de
 // aba em memória e /app/crm sempre caía no Dashboard; esse teste existia justamente pra documentar
 // essa limitação, que não existe mais.
-const TAB_ROUTES: Record<string, string> = {
-  'Meu Espaço': 'workspace',
-  'Pipeline CRM': 'crm',
-  Empresas: 'companies',
-  Decisores: 'contacts',
-  Agenda: 'activities',
-  Analytics: 'analytics',
-};
+interface NavItemConfig {
+  label: string;
+  route: string;
+  testId: string;
+}
+
+const NAV_ITEMS: NavItemConfig[] = [
+  { label: 'Meu Espaço', route: 'workspace', testId: 'sidebar-nav-workspace' },
+  { label: 'Pipeline CRM', route: 'crm', testId: 'sidebar-nav-revenue_tree' },
+  { label: 'Empresas', route: 'companies', testId: 'sidebar-nav-companies' },
+  { label: 'Contatos & Decisores', route: 'contacts', testId: 'sidebar-nav-contacts' },
+  { label: 'Agenda', route: 'activities', testId: 'sidebar-nav-activities' },
+  { label: 'Analytics', route: 'analytics', testId: 'sidebar-nav-performance' },
+];
 
 test.describe('Navegação principal', () => {
   test.beforeEach(async ({ page }) => {
@@ -26,27 +32,26 @@ test.describe('Navegação principal', () => {
     await expect(page).toHaveTitle(/Birth Hub 360|Commercial Intelligence OS/);
   });
 
-  for (const [tab, route] of Object.entries(TAB_ROUTES)) {
-    test(`navega para "${tab}" pela barra lateral sem erros de console`, async ({ page }) => {
+  for (const { label, route, testId } of NAV_ITEMS) {
+    test(`navega para "${label}" pela barra lateral sem erros de console`, async ({ page }) => {
       const consoleErrors: string[] = [];
       page.on('console', (msg) => {
         if (msg.type() === 'error') consoleErrors.push(msg.text());
       });
       page.on('pageerror', (err) => consoleErrors.push(err.message));
 
-      // exact: true é necessário para "Agenda": sem isso, o seletor por substring também bate no
-      // botão "Ver agenda completa" do Dashboard (SinglePageDashboard.tsx) — que, por causa da
-      // transição de página (Framer Motion), pode continuar montado por um instante durante a
-      // navegação, causando strict mode violation intermitente.
-      await page.getByRole('button', { name: tab, exact: true }).click();
+      // Localizador escopado na barra lateral via data-testid estável evita ambiguidades
+      // entre o grupo principal e seus subitens no menu expandido (ex.: "Meu Espaço" e "Analytics")
+      const navButton = page.locator('aside').getByTestId(testId);
+      await navButton.click();
       await expect(page).toHaveURL(new RegExp(`/app/${route}$`));
       // Espera o skeleton de carregamento (lazy-loaded module) sumir antes de checar erros.
-      await expect(page.getByRole('button', { name: tab, exact: true })).toBeVisible();
+      await expect(navButton).toBeVisible();
       await waitForAppReady(page);
 
       expect(
         consoleErrors,
-        `erros de console ao abrir "${tab}": ${consoleErrors.join('; ')}`,
+        `erros de console ao abrir "${label}": ${consoleErrors.join('; ')}`,
       ).toEqual([]);
     });
   }

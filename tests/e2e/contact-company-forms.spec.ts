@@ -77,7 +77,8 @@ test.describe('Formulários de Empresas e Contatos (migrados pra ui/Dialog)', ()
     await page.getByRole('button', { name: 'Criar Empresa' }).click();
     await expect(page.getByText('Empresa criada.')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Decisores' }).click();
+    // Navega para Contatos & Decisores pela Sidebar
+    await page.locator('aside').getByTestId('sidebar-nav-contacts').click();
     await waitForAppReady(page);
     await page
       .getByRole('button', { name: /Novo Contato|Adicionar Primeiro Contato/ })

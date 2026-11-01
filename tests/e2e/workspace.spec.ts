@@ -55,7 +55,7 @@ test.describe('Meu Workspace (PROMPT 6)', () => {
     page,
   }) => {
     await signUp(page, { email: uniqueTestEmail('workspace-empty') });
-    await page.getByRole('button', { name: /Meu Espaço|Meu Workspace/ }).click();
+    await page.locator('aside').getByTestId('sidebar-nav-workspace').click();
     await expect(page).toHaveURL(/\/app\/workspace$/);
     await waitForAppReady(page);
 
@@ -78,9 +78,9 @@ test.describe('Meu Workspace (PROMPT 6)', () => {
     await expect(page.getByRole('heading', { name: 'Closer' })).toBeVisible();
     await expect(page.getByText('Indicadores Chave')).toBeVisible();
     await expect(page.getByText('Ações Rápidas')).toBeVisible();
-    // Módulo real da jornada do Closer (role-workspace-definitions.ts) — prova que a navegação
-    // veio do backend, não foi hardcoded na tela.
-    await expect(page.getByRole('button', { name: 'Pipeline', exact: true })).toBeVisible();
+    // Módulo real da jornada do Closer (role-workspace-definitions.ts) — escopado em main para
+    // diferenciar a ação rápida do Workspace do link homônimo presente na Sidebar (Pipeline CRM).
+    await expect(page.getByRole('main').getByRole('button', { name: 'Pipeline', exact: true })).toBeVisible();
   });
 
   test('responsivo: viewport mobile mantém o cabeçalho do cargo visível sem overflow horizontal', async ({

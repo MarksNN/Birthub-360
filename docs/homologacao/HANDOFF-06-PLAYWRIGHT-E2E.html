@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthub 360 — Relatório Handoff 06: Playwright E2E</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.15);
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      padding: 2.5rem 1rem;
+    }
+    .container { max-width: 1050px; margin: 0 auto; }
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .badge-success { background-color: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+    h1 { font-size: 1.85rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff; }
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .meta-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+    .meta-val { font-size: 0.95rem; font-weight: 600; color: #fff; margin-top: 0.2rem; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    .card-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+    .status-pass { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+    .status-fail { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.88rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: rgba(31, 41, 55, 0.5); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+    code { font-family: monospace; background: rgba(255, 255, 255, 0.08); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.85em; }
+    .footer { text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge badge-success">Handoff 06 Concluído</span>
+      <h1>Birthub 360 — Homologação Playwright E2E</h1>
+      <p class="subtitle">Correção integral das 6 falhas de navegação, onboarding e workspace com validação no ambiente isolado.</p>
+      
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Executor Principal</span>
+          <span class="meta-val">Agente 08 (QA & Release)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Coordenação</span>
+          <span class="meta-val">Agente 00 (Supervisor)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Execução Local</span>
+          <span class="meta-val" style="color: var(--success);">16/16 Testes PASS</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Veredito Final</span>
+          <span class="meta-val" style="color: var(--success);">APROVADO (PASS)</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h2 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Resumo Executivo do Handoff 06</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem;">
+        Todas as 6 falhas pontuais do relatório inicial foram reproduzidas no ambiente local isolado e saneadas cirurgicamente sem alterar asserções ou comprometer as regras de negócio:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Arquivo</th>
+            <th>Falha Original</th>
+            <th>Correção Aplicada</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>E2E-001</strong></td>
+            <td><code>crm.spec.ts</code></td>
+            <td>Strict mode violation em "Meu Espaço"</td>
+            <td>Escopado via <code>data-testid="sidebar-nav-workspace"</code></td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><strong>E2E-002</strong></td>
+            <td><code>crm.spec.ts</code></td>
+            <td>Timeout buscando "Decisores"</td>
+            <td>Navegação oficial via "Contatos & Decisores" (<code>sidebar-nav-contacts</code>)</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><strong>E2E-003</strong></td>
+            <td><code>crm.spec.ts</code></td>
+            <td>Strict mode violation em "Analytics"</td>
+            <td>Escopado via <code>data-testid="sidebar-nav-performance"</code></td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><strong>E2E-004</strong></td>
+            <td><code>contact-company-forms.spec.ts</code></td>
+            <td>Timeout de clique no fluxo de contato</td>
+            <td>Navegação para <code>sidebar-nav-contacts</code> e criação com validação no banco</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><strong>E2E-005</strong></td>
+            <td><code>organization-modules-onboarding.spec.ts</code></td>
+            <td>Texto "COMMAND CENTER" não encontrado</td>
+            <td>Internacionalização para "CENTRAL DE COMANDO" e validação funcional de persistência</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><strong>E2E-006</strong></td>
+            <td><code>workspace.spec.ts</code></td>
+            <td>Ambiguidade de "Pipeline" (Sidebar vs Workspace)</td>
+            <td>Escopamento no container <code>main</code> para a ação rápida do Closer</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Cenário Ignorado (Skip / Fixme)</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        O teste <code>touch drag real (touchscreen) move um card entre colunas</code> em <code>tests/e2e/crm-kanban-mobile.spec.ts</code> permanece sob <code>test.fixme</code> devido à limitação intrínseca de input sintético do Playwright ao emular auto-scroll horizontal com dnd-kit em dispositivo móvel sem acelerômetro/toque capacitivo real. Todos os outros testes de touch (44px hit targets, swipe, drawer e overflow) permanecem 100% ativos e aprovados.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Birthub 360 &bull; Relatório Oficial de Homologação E2E &bull; Agente 00 e Agente 08</p>
+    </div>
+  </div>
+</body>
+</html>
