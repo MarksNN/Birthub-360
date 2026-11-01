@@ -84,6 +84,7 @@ jobs:
         run: npm run test:unit -- --coverage
 
       - name: SonarQube Scan
+        id: sonar_scan
         uses: SonarSource/sonarqube-scan-action@ad8210318ac8bb816e41990d5af2b304f7a6c213 # master (snapshot fixado em SHA — política de branch protection exige commit SHA completo, não branch)
         with:
           args: >-
@@ -91,3 +92,13 @@ jobs:
             "-Dsonar.organization=${{ env.SONAR_ORGANIZATION }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+
+      - name: Report SonarQube Quality Gate Status
+        if: always() && steps.sonar_scan.outcome != 'skipped'
+        run: node scripts/ci/report-sonarqube-qualitygate.mjs
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'MarksNN_Birthub-360' }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_BRANCH: ${{ github.head_ref || github.ref_name }}
