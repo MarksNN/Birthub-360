@@ -64,7 +64,7 @@ jobs:
       BETTER_AUTH_URL: http://localhost:3000
       ALLOW_DEV_AUTH_BYPASS: true
       ALLOWED_ORIGINS: http://localhost:3000
-      AUTH_RATE_LIMIT_MAX: 500
+      AUTH_RATE_LIMIT_MAX: 5000
       PLATFORM_OPERATOR_TOKEN: ci-test-operator-token-not-for-production
 
     steps:

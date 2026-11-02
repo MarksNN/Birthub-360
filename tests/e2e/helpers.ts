@@ -64,9 +64,11 @@ export async function signUp(
     requestContext.enterWith({ bypassRls: true });
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { organizationId: true },
+      select: { organizationId: true, id: true },
     });
     if (user?.organizationId) {
+      // Injeta tenantId no context para que a policy RLS em "Setting" autorize a mutação
+      requestContext.enterWith({ tenantId: user.organizationId, bypassRls: true });
       await prisma.setting.updateMany({
         where: { organizationId: user.organizationId, key: 'organization.modules' },
         data: {
@@ -80,7 +82,7 @@ export async function signUp(
               'performance',
             ],
             onboardingCompletedAt: new Date().toISOString(),
-            updatedByUserId: null,
+            updatedByUserId: user.id,
           },
         },
       });
@@ -133,22 +135,9 @@ export async function signUp(
       complete.ok(),
       `conclusão de onboarding via API: HTTP ${complete.status()} (${safeError})`,
     ).toBe(true);
-    if (new URL(page.url()).pathname !== '/app') {
+    if (new URL(page.url()).pathname.startsWith('/setup')) {
       try {
         await page.goto('/app', { waitUntil: 'domcontentloaded' });
-      } catch (err: unknown) {
-        if (
-          !(err instanceof Error) ||
-          (!err.message.includes('interrupted by another navigation') &&
-            !err.message.includes('Not attached to an active page') &&
-            !err.message.includes('net::ERR_ABORTED'))
-        ) {
-          throw err;
-        }
-      }
-    } else {
-      try {
-        await page.reload({ waitUntil: 'domcontentloaded' });
       } catch (err: unknown) {
         if (
           !(err instanceof Error) ||

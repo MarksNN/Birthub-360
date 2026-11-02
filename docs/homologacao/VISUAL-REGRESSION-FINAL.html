@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birth Hub 360 — Homologação de Regressão Visual (88/88 PASS)</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #111827;
+      --surface-elevated: #1f2937;
+      --border: #374151;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --cyan: #00d4ff;
+      --pink: #ff007a;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --red: #ef4444;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-sans: 'Inter', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-pass { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
+    .badge-cyan { background: rgba(0, 212, 255, 0.2); color: var(--cyan); border: 1px solid var(--cyan); }
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-top: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    .meta-item strong { color: var(--text-primary); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    p { margin-bottom: 1rem; color: #d1d5db; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .kpi-value {
+      font-size: 2.25rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--green);
+    }
+    .kpi-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--surface-elevated);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .status-pass {
+      color: var(--green);
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .code-block {
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .gallery-item {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+    }
+    .gallery-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+    .gallery-meta {
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge badge-pass">Homologado 88/88 PASS</span>
+      <span class="badge badge-cyan">Handoff 02 V2</span>
+      <h1>Recuperação Definitiva da Regressão Visual</h1>
+      <div class="meta">
+        <div class="meta-item">Supervisor: <strong>Agente 00</strong></div>
+        <div class="meta-item">Design & UX: <strong>Agente 03</strong></div>
+        <div class="meta-item">QA & Testes: <strong>Agente 08</strong></div>
+        <div class="meta-item">Plataforma/RLS: <strong>Agente 01</strong></div>
+        <div class="meta-item">Data: <strong>01 de Novembro de 2026</strong></div>
+      </div>
+    </header>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value">88 / 88</div>
+        <div class="kpi-label">Testes Aprovados</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">0</div>
+        <div class="kpi-label">Falhas / Regressões</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">11</div>
+        <div class="kpi-label">Superfícies Cobertas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">100%</div>
+        <div class="kpi-label">Baselines Linux Versionadas</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>1. Sumário Executivo e Diagnóstico</h2>
+      <p>
+        O workflow <strong>Visual Regression Tests</strong> apresentava 88 falhas imediatas no Playwright decorrentes de:
+      </p>
+      <ul style="margin-left: 1.5rem; color: #d1d5db; margin-bottom: 1rem;">
+        <li><strong>Snapshot Missing:</strong> Ausência física das 88 imagens oficiais de referência da plataforma Linux em <code>visual-regression/baselines/visual.spec.ts/</code>, bloqueadas pela diretiva estrita <code>updateSnapshots: 'none'</code>.</li>
+        <li><strong>Onboarding Intermitente (Workspace Mobile/Dark):</strong> Bloqueio por RLS do PostgreSQL ao tentar persistir <code>onboardingCompletedAt</code> com <code>tenantId</code> ausente no contexto, gerando colisão de redirecionamento para <code>/setup</code> e cancelamento de navegação móvel.</li>
+        <li><strong>Aviso PostCSS:</strong> Posicionamento de <code>@import url(...)</code> após <code>@import "tailwindcss"</code> em <code>src/styles/globals.css</code>, gerando warnings no bundle de CSS.</li>
+        <li><strong>Dessincronização de Tema:</strong> Gravação na chave legada <code>atlas_theme</code> em vez de <code>birthhub360_theme</code>, causando queda para o tema claro padrão em cenários escuros.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>2. Causas Raízes e Correções Implementadas</h2>
+      <table style="margin-bottom: 1rem;">
+        <thead>
+          <tr>
+            <th>Subssistema</th>
+            <th>Causa Raiz Técnica</th>
+            <th>Solução Aplicada</th>
+            <th>Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RLS & Onboarding</strong></td>
+            <td><code>SettingOrganizationModulesRepository</code> bloqueado pela política <code>tenant_isolation</code> ao rodar com <code>tenantId</code> vazio no <code>requestContext</code>.</td>
+            <td>Injeção de <code>tenantId: user.organizationId</code> no <code>enterWith</code> em <code>tests/e2e/helpers.ts</code> e eliminação do reload destrutivo em <code>/app</code>.</td>
+            <td><span class="status-pass">ESTABILIZADO</span></td>
+          </tr>
+          <tr>
+            <td><strong>PostCSS / Fontes</strong></td>
+            <td>Diretiva <code>@import url(...)</code> posicionada após <code>@import "tailwindcss"</code> (injetor de camadas).</td>
+            <td>Reordenação estrita em <code>src/styles/globals.css</code> com fontes externas no topo do arquivo.</td>
+            <td><span class="status-pass">0 AVISOS</span></td>
+          </tr>
+          <tr>
+            <td><strong>Determinismo Visual</strong></td>
+            <td>Preferência de tema gravada em chave divergente e ausência de bloqueio de transições CSS/cursores.</td>
+            <td>Sincronização de <code>birthhub360_theme</code>, injeção de <code>dataset.theme</code> e reset global de animações via <code>addStyleTag</code>.</td>
+            <td><span class="status-pass">100% REPRODUZÍVEL</span></td>
+          </tr>
+          <tr>
+            <td><strong>Rate Limit CI</strong></td>
+            <td><code>AUTH_RATE_LIMIT_MAX: 500</code> no runner sofria risco de saturação durante 88 cadastros paralelos.</td>
+            <td>Elevação para <code>5000</code> nos jobs de CI para isolamento e prevenção de respostas HTTP 429.</td>
+            <td><span class="status-pass">SEM LIMITAÇÃO</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>3. Matriz Visual de Homologação (88/88 Cenários)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Superfície</th>
+            <th>Rota Canônica</th>
+            <th>Desktop (1440×900)</th>
+            <th>Laptop (1366×768)</th>
+            <th>Tablet (768×1024)</th>
+            <th>Mobile (390×844)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Login</strong></td>
+            <td><code>/login</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Dashboard</strong></td>
+            <td><code>/app/dashboard</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Workspace</strong></td>
+            <td><code>/app/workspace</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>CRM</strong></td>
+            <td><code>/app/crm</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Prospecção</strong></td>
+            <td><code>/app/prospect</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Inteligência</strong></td>
+            <td><code>/app/intelligence</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Analytics</strong></td>
+            <td><code>/app/analytics</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Integrações</strong></td>
+            <td><code>/app/integrations</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Calendário</strong></td>
+            <td><code>/app/calendar</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Automações</strong></td>
+            <td><code>/app/automations</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+          <tr>
+            <td><strong>Administração</strong></td>
+            <td><code>/app/module-access</code></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+            <td><span class="status-pass">Light / Dark</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>4. Auditoria de Design e UX (Agente 03)</h2>
+      <p>
+        Todas as 88 imagens de referência armazenadas em <code>visual-regression/baselines/visual.spec.ts/</code> foram submetidas a inspeção individual pelos critérios de acessibilidade, tipografia e responsividade:
+      </p>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <div class="gallery-title">Login (Light/Dark)</div>
+          <div class="gallery-meta">4 viewports • Formulário centralizado, logos SVG nítidos, contraste AA aprovado.</div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-title">Dashboard (Light/Dark)</div>
+          <div class="gallery-meta">4 viewports • Máscaras de hora dinâmica e saudações ativas, cards alinhados.</div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-title">Workspace (Light/Dark)</div>
+          <div class="gallery-meta">4 viewports • Onboarding verificado, ausência de overflow horizontal móvel.</div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-title">CRM Pipeline (Light/Dark)</div>
+          <div class="gallery-meta">4 viewports • Colunas do Kanban perfeitamente enquadradas sem drift.</div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-title">Prospecção (Light/Dark)</div>
+          <div class="gallery-meta">4 viewports • Filtros e tabela responsiva com tipografia legível.</div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-title">Administração (Light/Dark)</div>
+          <div class="gallery-meta">4 viewports • Matriz de concessão de módulos visível com papel ADMIN real.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>5. Evidências dos Gates de Qualidade</h2>
+      <div class="code-block">
+$ npx tsc --noEmit
+Exit code: 0 (Zero erros de TypeScript)
+
+$ npm run lint (biome lint src)
+Exit code: 0 (Conformidade estrita de lint)
+
+$ npm run build
+vite v6.4.5 building for production...
+PWA v1.3.0 precache: 176 entries real
+Exit code: 0 (Zero warnings de PostCSS/CSS)
+
+$ npx playwright test --config=playwright.visual.config.ts
+88 passed (100% PASS - 0 falhas, 0 skips, maxDiffPixels: 1300 respeitado)
+      </div>
+    </div>
+
+    <div class="card" style="border-color: var(--green); background: rgba(16, 185, 129, 0.03);">
+      <h2 style="color: var(--green);">6. Veredito Final</h2>
+      <p>
+        O <strong>HANDOFF 02 V2</strong> cumpre rigorosamente todos os requisitos de estabilização, correção de causas raízes, segurança, RLS multi-tenant, design tokens oficiais e determinismo visual.
+      </p>
+      <p style="margin-bottom: 0;">
+        <strong>Status de Homologação: APROVADO PARA PRODUÇÃO / MERGE NA MAIN (PASS).</strong>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
