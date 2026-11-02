@@ -273,7 +273,7 @@ export function buildSwarmCorrelationId(config?: RunnableConfig, now: number = D
   return `swarm-${threadId}-${now}`;
 }
 
-async function supervisorNode(state: SwarmStateType, config?: RunnableConfig) {
+export async function supervisorNode(state: SwarmStateType, config?: RunnableConfig) {
   const step = state.step + 1;
 
   if (step > MAX_STEPS) {

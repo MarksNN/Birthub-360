@@ -1,4 +1,7 @@
+import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import { describe, expect, it, vi } from 'vitest';
+import { generateStructuredOutput } from '../../../../lib/ai/gateway.js';
 import { commercialAgentResultV3Schema } from '../contracts/commercialAgentResultV3.schema.js';
 import { COMMERCIAL_V3_AGENT_IDS } from '../contracts/commercialAgentV3.types.js';
 import { commercialRedteamEvaluator } from '../evaluation/commercialRedteamEvaluator.service.js';
@@ -86,6 +89,41 @@ describe('Célula Comercial V3.1 — Context Builder (Montagem Contextual e Boot
       ]),
     ).rejects.toThrow(/SkillId não pertence ao agente/);
   });
+
+  it('ordena os playbooks com localeCompare e registra playbook ausente no disco', async () => {
+    const skills = commercialAgentV3Registry.listSkills('supervisor');
+    const ids = skills.slice(0, 4).map((skill) => skill.id);
+    const result = await commercialContextBuilder.buildContext('supervisor', ids);
+    const sorted = [...result.state.loadedPlaybooks].sort((left, right) =>
+      left.localeCompare(right),
+    );
+    expect(result.state.loadedPlaybooks).toEqual(sorted);
+
+    const playbook = commercialAgentV3Registry.getPlaybooks('icp')[0];
+    const original = fsp.readFile.bind(fsp);
+    const spy = vi.spyOn(fsp, 'readFile').mockImplementation(async (file, encoding) => {
+      const normalized = String(file).replaceAll('\\', '/');
+      if (normalized.endsWith(playbook.path.replaceAll('\\', '/'))) {
+        throw new Error('playbook ausente');
+      }
+      return original(file, encoding);
+    });
+    try {
+      const missing = await commercialContextBuilder.buildContext('icp', [
+        commercialAgentV3Registry.listSkills('icp')[0].id,
+      ]);
+      expect(missing.state.missingPlaybooks).toContain(playbook.id);
+      expect(missing.systemContext).toContain(`PLAYBOOK AUSENTE ${playbook.id}`);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('rejeita agente fora do catálogo', async () => {
+    await expect(commercialContextBuilder.buildContext('inexistente' as never, [])).rejects.toThrow(
+      /Agente desconhecido/,
+    );
+  });
 });
 
 describe('Célula Comercial V3.1 — Leitura de Playbooks (Living Playbooks)', () => {
@@ -125,6 +163,56 @@ describe('Célula Comercial V3.1 — Orquestrador e Validação de Contrato V3.1
 
     const parseResult = commercialAgentResultV3Schema.safeParse(response);
     expect(parseResult.success).toBe(true);
+  });
+
+  it('normaliza envelope parcial do gateway e cai no fallback quando o schema falha', async () => {
+    vi.mocked(generateStructuredOutput).mockResolvedValueOnce({
+      mode: 'OPERACIONAL',
+      execution: { performed: true, state: 'DONE' },
+      compliance: { sendEligible: true },
+      resumo_humano: 'y'.repeat(800),
+      handoffs: [],
+    } as never);
+
+    const response = await commercialAgentV3Orchestrator.dispatchMission({
+      agentId: 'supervisor',
+      mission: 'Revise a fila sem enviar mensagem.',
+      organizationId: 'org-norm',
+      allowOperational: false,
+      skillIds: commercialAgentV3Registry
+        .listSkills('supervisor')
+        .slice(0, 1)
+        .map((s) => s.id),
+    });
+
+    expect(response.mode).toBe('CONSULTIVO');
+    expect(response.execution.performed).toBe(false);
+    expect(response.compliance.sendEligible).toBe(false);
+    expect(response.resumo_humano.length).toBeLessThanOrEqual(600);
+  });
+
+  it('usa o envelope consultivo quando o gateway lança erro', async () => {
+    vi.mocked(generateStructuredOutput).mockRejectedValueOnce(new Error('gateway fora'));
+    const response = await commercialAgentV3Orchestrator.dispatchMission({
+      agentId: 'icp',
+      mission: 'Monte o ICP do segmento industrial.',
+      organizationId: 'org-catch',
+      correlationId: 'corr-fixo',
+    });
+    expect(response.status).toBe('COMPLETED');
+    expect(response.correlationId).toBe('corr-fixo');
+    expect(response.execution.performed).toBe(false);
+  });
+
+  it('mantém execução real desligada mesmo com allowOperational', async () => {
+    const response = await commercialAgentV3Orchestrator.dispatchMission({
+      agentId: 'sdr',
+      mission: 'Prepare a cadência, sem disparar.',
+      organizationId: 'org-op',
+      allowOperational: true,
+    });
+    expect(response.execution.performed).toBe(false);
+    expect(response.compliance.sendEligible).toBe(false);
   });
 
   it('deve rejeitar envelope com sendEligible=true se houver sinais UNKNOWN', () => {
@@ -215,4 +303,40 @@ describe('Célula Comercial V3.1 — Avaliador de Golden Redteam', () => {
       expect(res.checks.resumoHumanoPresent).toBe(true);
     }
   }, 10000);
+
+  it('marca FAIL quando o despacho do cenário lança erro', async () => {
+    const spy = vi
+      .spyOn(commercialAgentV3Orchestrator, 'dispatchMission')
+      .mockRejectedValueOnce(new Error('boom'));
+    try {
+      const report = await commercialRedteamEvaluator.evaluateAgent('supervisor');
+      expect(report.results[0]?.status).toBe('FAIL');
+      expect(report.results[0]?.details).toBe('boom');
+      expect(report.passed).toBe(report.total - 1);
+    } finally {
+      spy.mockRestore();
+    }
+  }, 10000);
+
+  it('recusa suite de agente ausente e arquivo golden ausente', async () => {
+    await expect(commercialRedteamEvaluator.evaluateAgent('fantasma' as never)).rejects.toThrow(
+      /Suite redteam não encontrada/,
+    );
+    const spy = vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+    try {
+      expect(() => commercialRedteamEvaluator.loadGoldenSets()).toThrow(/Golden Redteam ausente/);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('consolida os 19 agentes na avaliação completa', async () => {
+    const report = await commercialRedteamEvaluator.evaluateAll();
+    expect(report.totalAgentsEvaluated).toBe(19);
+    expect(report.totalCasesEvaluated).toBe(209);
+    expect(report.passedCases + report.failedCases).toBe(209);
+    expect(report.byAgent).toHaveLength(19);
+    expect(report.complianceRate).toBeGreaterThanOrEqual(0);
+    expect(report.complianceRate).toBeLessThanOrEqual(100);
+  }, 20000);
 });

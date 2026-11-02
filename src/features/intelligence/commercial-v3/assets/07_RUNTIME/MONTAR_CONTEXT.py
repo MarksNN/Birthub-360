@@ -1,9 +1,30 @@
 #!/usr/bin/env python3
 """Monta contexto de um especialista. Não realiza ações nem autorização.
-Ex.: python 07_RUNTIME/MONTAR_CONTEXT.py --agent crm --skill-id comercial.crm.inspecionar-fila-bitrix --output /tmp/crm-context.txt
+Ex.: python 07_RUNTIME/MONTAR_CONTEXT.py --agent crm --skill-id comercial.crm.inspecionar-fila-bitrix --output crm-context.txt
+
+--output aceita só um nome de arquivo. O arquivo sai em ./commercial-v3-out/,
+nunca num caminho absoluto ou com '..'.
 """
-import json, argparse
+import json, argparse, re
 from pathlib import Path
+
+SAFE_OUTPUT_NAME = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$')
+
+def confined_output(raw):
+    """Aceita somente um nome de arquivo e grava dentro de commercial-v3-out no cwd."""
+    if not isinstance(raw, str) or raw != raw.strip() or '\x00' in raw:
+        raise ValueError('Caminho de saída inválido')
+    # Path.name descarta diretório; se diferir do original, havia separador ou '..'.
+    if raw != Path(raw).name or raw in {'.', '..'}:
+        raise ValueError('A saída deve ser um nome de arquivo, sem diretório')
+    if not SAFE_OUTPUT_NAME.fullmatch(raw):
+        raise ValueError('Nome de arquivo de saída inválido')
+    base = (Path.cwd().resolve() / 'commercial-v3-out')
+    base.mkdir(parents=True, exist_ok=True)
+    target = (base / raw).resolve()
+    if target.parent != base:
+        raise ValueError('Saída fora do diretório permitido')
+    return target
 ROOT=Path(__file__).resolve().parents[1]
 
 def load(p):return (ROOT/p).read_text(encoding='utf-8')
@@ -32,6 +53,8 @@ def context(agent, skill_ids):
     return '\n\n---\n\n'.join(chunks),{'agentId':agent,'indexInjected':True,'schemaReady':True,'loadedPlaybooks':loaded,'missingPlaybooks':missing,'operationalAllowedByBootstrap':False}
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--agent',required=True);ap.add_argument('--skill-id',action='append',default=[]);ap.add_argument('--output',required=True);args=ap.parse_args()
-    out,state=context(args.agent,args.skill_id);p=Path(args.output);p.parent.mkdir(parents=True,exist_ok=True);p.write_text(out,encoding='utf-8')
+    out,state=context(args.agent,args.skill_id)
+    p=confined_output(args.output)
+    p.write_text(out,encoding='utf-8')
     p.with_suffix('.schema.json').write_text(load('03_CONTRATOS/AGENT_RESULT_V3_1_GLOBAL.schema.json'),encoding='utf-8')
     print(json.dumps(state,ensure_ascii=False))
