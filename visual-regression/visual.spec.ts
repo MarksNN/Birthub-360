@@ -115,11 +115,11 @@ test.describe('Visual Regression', () => {
 
       test('Administração - Module Access', async ({ page }) => {
         await setupDeterministicState(page, theme);
-        // Using admin setup requires deeper seeding, but normal user might get a 403 screen which is still worth checking visually
-        // For accurate admin tests, you'd seed the user role. But a 403 page is also a surface.
         await signUp(page, { email: uniqueTestEmail(`visual-admin-${theme}`) });
         await page.goto('/app/module-access');
         await waitForAppReady(page);
+        // Garante que o painel administrativo real carregou os dados (sem spinner residual)
+        await expect(page.locator('.animate-spin')).toHaveCount(0, { timeout: 15_000 });
         await waitForVisualFonts(page);
         await expect(page).toHaveScreenshot(`admin-module-access-${theme}.png`, SCREENSHOT_OPTIONS);
       });
