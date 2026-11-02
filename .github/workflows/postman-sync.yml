@@ -15,11 +15,11 @@ jobs:
     name: Postman sync
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Push workspace
-        uses: postmanlabs/postman-cli-action@v1
+        uses: postmanlabs/postman-cli-action@f4cd5fda93190809fff5a5ea6a9a5c5d3d8ef1e8 # v1.0.0
         with:
           api-key: ${{ secrets.POSTMAN_API_KEY }}
           command: postman workspace push --yes
