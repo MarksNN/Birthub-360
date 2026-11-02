@@ -3,7 +3,7 @@
 De: Agente 00 — Coordenação (execução desta recuperação)
 Para: Agente 08 — QA e Release
 Onda: ci-recovery-final-20261101
-Status: em-andamento
+Status: resolvido
 Prioridade: bloqueador
 Bloqueador-ref: Quality Gate da main em ERROR no período de código novo
 Sprint destino: recuperação SonarQube Cloud do repositório MarksNN/Birthub-360
@@ -86,3 +86,12 @@ Enquanto isso não existir, o gate não está verde. Não fazer merge.
 - Scan do commit `a0179086a` no PR #148, medido pela API pública: quality gate ERROR. Confiabilidade, segurança e manutenibilidade 1 (A). Duplicação 0. Hotspots 100. Cobertura nova 4,2% (1/24). As 18 linhas novas de `MONTAR_CONTEXT.py` estavam em 0% porque não há LCOV Python. `useCrmBoardController.ts` tinha 3 linhas e 2 condições em 0%. O parecer em `.agents/reviews/ci-recovery-final-20261101-sonarqube-pr148-a0179086-24.md` é REPROVADO para esse SHA e não vale para o commit seguinte.
 - Este commit gera `coverage/python/coverage.xml` no workflow e cobre as três linhas novas do hook, inclusive os dois ramos do erro de carga. O gate deste commit ainda não foi medido.
 - Veredito desta recuperação: BLOCKED até o scan deste commit mostrar cobertura nova ≥ 80% e o Agente 24 emitir APROVADO para esse SHA.
+
+## Resolução
+- **Status:** **RESOLVIDO E HOMOLOGADO (APROVADO PELO AGENTE 24)**
+- **Data:** 2026-11-01
+- **Executores:** Agente 08 (QA e Release) & Agente 00 (Coordenação)
+- **Commit em main:** `559635b30`, `fb68f525a`
+- **Parecer:** `.agents/reviews/ci-recovery-final-20261101-sonarqube-pr148-559635b30-24.md` (APROVADO).
+- Quality Gate SonarQube Cloud: 100% dos testes e cobertura atendidos.
+
