@@ -43,5 +43,5 @@ export async function waitForVisualFonts(page: Page) {
     await document.fonts.ready;
   });
   // Pequena pausa determinística para layout e font settling no Chromium
-  await page.waitForTimeout(150);
+  await page.waitForTimeout(300);
 }

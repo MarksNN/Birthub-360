@@ -10,6 +10,9 @@ const MASKS = {
     page.getByTestId('dashboard-analytics-chart'),
     page.getByTestId('revenue-signal-orb'),
   ],
+  admin: (page: import('@playwright/test').Page) => [
+    page.locator('table tbody tr th div.text-xs'),
+  ],
 };
 
 const SCREENSHOT_OPTIONS = {
@@ -115,13 +118,28 @@ test.describe('Visual Regression', () => {
 
       test('Administração - Module Access', async ({ page }) => {
         await setupDeterministicState(page, theme);
-        await signUp(page, { email: uniqueTestEmail(`visual-admin-${theme}`) });
+        await signUp(page, {
+          email: uniqueTestEmail(`visual-admin-${theme}`),
+          name: 'Administrador do Sistema',
+        });
         await page.goto('/app/module-access');
         await waitForAppReady(page);
         // Garante que o painel administrativo real carregou os dados (sem spinner residual)
         await expect(page.locator('.animate-spin')).toHaveCount(0, { timeout: 15_000 });
+        // Estabiliza o nome e o e-mail dinâmico no DOM para determinismo visual estrito
+        await page.evaluate(() => {
+          document.querySelectorAll('table tbody tr th span.font-bold').forEach((el) => {
+            el.textContent = 'Administrador do Sistema';
+          });
+          document.querySelectorAll('table tbody tr th div.text-xs').forEach((el) => {
+            el.textContent = 'admin@birthhub360.com.br';
+          });
+        });
         await waitForVisualFonts(page);
-        await expect(page).toHaveScreenshot(`admin-module-access-${theme}.png`, SCREENSHOT_OPTIONS);
+        await expect(page).toHaveScreenshot(`admin-module-access-${theme}.png`, {
+          ...SCREENSHOT_OPTIONS,
+          mask: MASKS.admin(page),
+        });
       });
     });
   }
