@@ -314,3 +314,51 @@ export async function executeAndRecord(action: ExecutableAction): Promise<Execut
 
   return result;
 }
+
+
+/**
+ * HITL — Acopla feedback da decisão humana (aprovação ou rejeição) ao LearningAgent e registra no AuditLog.
+ * Permite ao sistema fechar o closed-loop de inteligência com dados reais auditáveis da interação humana.
+ */
+export async function recordHumanDecisionFeedback(params: {
+  organizationId: string;
+  actorId: string;
+  actionId: string;
+  decision: 'APPROVE' | 'REJECT';
+  actionType?: string;
+  rationale?: string;
+  leadId?: string | null;
+}): Promise<void> {
+  const { organizationId, actorId, actionId, decision, actionType, rationale, leadId } = params;
+  try {
+    await prisma.auditLog.create({
+      data: {
+        tenantId: organizationId,
+        actorId,
+        action: decision === 'APPROVE' ? 'AI_PENDING_ACTION_APPROVED' : 'AI_PENDING_ACTION_REJECTED',
+        entity: 'AIPendingAction',
+        entityId: actionId,
+        details: JSON.stringify({
+          actionType,
+          leadId: leadId ?? null,
+          decision,
+          rationale: rationale ?? null,
+          timestamp: new Date().toISOString(),
+        }),
+      },
+    });
+
+    if (actorId && organizationId) {
+      import('../agents/learning.agent.js')
+        .then(({ LearningAgent }) => {
+          const agent = new LearningAgent();
+          return agent.reflectAndLearn(organizationId, actorId);
+        })
+        .catch((err) => {
+          logger.warn({ err, actorId, organizationId }, 'LearningAgent reflection background call error');
+        });
+    }
+  } catch (error) {
+    logger.error({ err: error, actionId, actorId }, 'Falha ao registrar feedback de decisão humana de IA');
+  }
+}

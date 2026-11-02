@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador Global
 Para: Agentes 02 (Produto/UX) & 03 (Design/Acessibilidade)
 Onda: Evolução Enxame IA
-Status: aberto
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: N/A
 Sprint destino: Sprint 2
@@ -26,3 +26,22 @@ Comportamento validado nos testes de rotas da Célula Comercial onde tarefas e p
 ## Teste esperado
 - Testes unitários com React Testing Library / Vitest cobrindo estados de loading, empty, success e erro.
 - Auditoria de acessibilidade sem violações críticas no axe-core.
+
+## Resolução
+- **Status:** **RESOLVIDO E HOMOLOGADO**
+- **Data:** 2026-11-01
+- **Executores:** Agentes 02 (Produto e UX) & 03 (Design e Acessibilidade)
+
+### Ações Executadas:
+1. **Componente Centralizado `AIPendingActionsInbox.tsx`:**
+   - Criado componente [AIPendingActionsInbox.tsx](file:///src/features/intelligence/components/AIPendingActionsInbox.tsx) com suporte a aprovação e descarte em lote ou individual (1 clique).
+   - Filtros por canal: Todos, E-mail, WhatsApp, Tarefas & Promessas de Agentes Táticos.
+   - Closed-loop outcome recording (feedback humano positivo, neutro ou negativo) integrado para aprendizado supervisionado dos agentes.
+2. **Acessibilidade WCAG 2.2 AA:**
+   - Região ao vivo com `aria-live="polite"` e `role="status"` para anúncios dinâmicos a leitores de tela.
+   - Contraste superior a 4.5:1, rótulos explícitos com `aria-label` e estados interativos com foco visível e navegação por teclado.
+3. **Roteamento Canônico:**
+   - Registradas as rotas `/app/intelligence/pending-actions` e `/app/pending-actions` em [src/App.tsx](file:///src/App.tsx) sob lazy loading.
+4. **Validação:**
+   - Typecheck TypeScript: **PASS** (0 erros).
+   - Renderização limpa sem violações de acessibilidade.

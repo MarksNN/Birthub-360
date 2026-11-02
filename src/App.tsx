@@ -77,6 +77,11 @@ const IntelligenceHub = lazy(() =>
 );
 // Rota isolada do Agente Comercial de Elite (NBA): removida por engano no commit 2ab1b535 (varredura
 // "commit remaining pending changes") e coberta por tests/e2e/elite-commercial-agent-nba.spec.ts.
+const AIPendingActionsInbox = lazy(() =>
+  import('./features/intelligence/components/AIPendingActionsInbox.js').then((m) => ({
+    default: m.AIPendingActionsInbox,
+  })),
+);
 const EliteCommercialAgentWorkspace = lazy(() =>
   import('./features/intelligence/components/EliteCommercialAgentWorkspace.js').then((m) => ({
     default: m.EliteCommercialAgentWorkspace,
@@ -420,6 +425,8 @@ function AppLayout() {
             />
             <Route path="intelligence" element={<IntelligenceHub />} />
             <Route path="intelligence/elite-agent" element={<EliteCommercialAgentWorkspace />} />
+            <Route path="intelligence/pending-actions" element={<AIPendingActionsInbox />} />
+            <Route path="pending-actions" element={<AIPendingActionsInbox />} />
             {/* P0 #693 / residual 07: mesma regra de canAccessCopilotoIa (SDR ou superior) na rota,
               não só no item de navegação — evita 403 cru ao digitar a URL. */}
             <Route
