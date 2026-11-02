@@ -37,6 +37,13 @@ vi.mock('../../../langfuse.js', () => ({
 }));
 
 import { requestContext } from '../../../async-context.js';
+import { cacheConnection } from '../../../queue/redis.js';
+import {
+  aiTokenQuotaAlertTotal,
+  aiTokenQuotaBlockedTotal,
+  aiTokenQuotaFallbackTotal,
+  aiTokenUsageTotal,
+} from '../../metrics.js';
 import {
   __resetTokenQuotaCacheForTests,
   AiTokenQuotaExceededError,
@@ -44,12 +51,6 @@ import {
   TIER_QUOTAS,
   tokenQuotaService,
 } from '../tokenQuota.service.js';
-import {
-  aiTokenQuotaAlertTotal,
-  aiTokenQuotaBlockedTotal,
-  aiTokenQuotaFallbackTotal,
-  aiTokenUsageTotal,
-} from '../../metrics.js';
 
 describe('TokenQuotaService — Governança e FinOps de Tokens de IA (Onda 15)', () => {
   beforeEach(() => {
@@ -346,6 +347,111 @@ describe('TokenQuotaService — Governança e FinOps de Tokens de IA (Onda 15)',
         },
         1500,
       );
+    });
+
+    it('soma a estimativa finita, ignora estimativa inválida e trata quota zero', async () => {
+      findUniqueMock.mockResolvedValue({
+        id: 'org-est',
+        wallet: { plan: { slug: 'starter' } },
+      });
+      aggregateMock.mockResolvedValue({ _sum: { tokens: 0 } });
+
+      const exceeded = await tokenQuotaService.checkTokenQuota({
+        organizationId: 'org-est',
+        requestedModel: 'groq/llama-3.3-70b-versatile',
+        estimatedTokens: 500_000,
+      });
+      expect(exceeded.status).toBe('exceeded');
+      expect(exceeded.percentageUsed).toBe(100);
+
+      __resetTokenQuotaCacheForTests();
+      const negative = await tokenQuotaService.checkTokenQuota({
+        organizationId: 'org-est',
+        requestedModel: 'groq/llama-3.3-70b-versatile',
+        estimatedTokens: -25,
+      });
+      expect(negative.percentageUsed).toBe(0);
+      expect(negative.status).toBe('ok');
+
+      __resetTokenQuotaCacheForTests();
+      const notFinite = await tokenQuotaService.checkTokenQuota({
+        organizationId: 'org-est',
+        requestedModel: 'groq/llama-3.3-70b-versatile',
+        estimatedTokens: Number.POSITIVE_INFINITY,
+      });
+      expect(notFinite.percentageUsed).toBe(0);
+
+      __resetTokenQuotaCacheForTests();
+      const notNumber = await tokenQuotaService.checkTokenQuota({
+        organizationId: 'org-est',
+        requestedModel: 'groq/llama-3.3-70b-versatile',
+        estimatedTokens: '100' as unknown as number,
+      });
+      expect(notNumber.percentageUsed).toBe(0);
+
+      __resetTokenQuotaCacheForTests();
+      const zeroQuota = await tokenQuotaService.checkTokenQuota({
+        organizationId: 'org-est',
+        requestedModel: 'groq/llama-3.3-70b-versatile',
+        customQuota: 0,
+        estimatedTokens: 10,
+      });
+      expect(zeroQuota.quotaTokens).toBe(0);
+      expect(zeroQuota.usageRatio).toBe(0);
+    });
+
+    it('atualiza o cache local do mês e o contador Redis quando a chave existe', async () => {
+      aggregateMock.mockResolvedValue({ _sum: { tokens: 40 } });
+      await tokenQuotaService.getMonthlyTokenUsage('org-local');
+      await tokenQuotaService.recordUsage({
+        organizationId: 'org-local',
+        model: 'm',
+        tokens: 15.6,
+        tier: 'starter',
+      });
+      await expect(tokenQuotaService.getMonthlyTokenUsage('org-local')).resolves.toBe(56);
+
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));
+      try {
+        __resetTokenQuotaCacheForTests();
+        aggregateMock.mockResolvedValue({ _sum: { tokens: 8 } });
+        await tokenQuotaService.getMonthlyTokenUsage('org-stale');
+        vi.setSystemTime(new Date('2026-11-01T12:02:00Z'));
+        await tokenQuotaService.recordUsage({
+          organizationId: 'org-stale',
+          model: 'm',
+          tokens: 3,
+          tier: 'starter',
+        });
+        aggregateMock.mockResolvedValue({ _sum: { tokens: 8 } });
+        await expect(tokenQuotaService.getMonthlyTokenUsage('org-stale')).resolves.toBe(8);
+      } finally {
+        vi.useRealTimers();
+      }
+
+      const exists = vi.fn().mockResolvedValueOnce(0).mockResolvedValueOnce(1);
+      const incrby = vi.fn().mockResolvedValue(16);
+      Object.assign(cacheConnection, { exists, incrby });
+      try {
+        await tokenQuotaService.recordUsage({
+          organizationId: 'org-redis',
+          model: 'm',
+          tokens: 16,
+          tier: 'pro',
+        });
+        await tokenQuotaService.recordUsage({
+          organizationId: 'org-redis',
+          model: 'm',
+          tokens: 16,
+          tier: 'pro',
+        });
+        expect(incrby).toHaveBeenCalledTimes(1);
+        expect(incrby).toHaveBeenCalledWith(expect.stringContaining('org-redis'), 16);
+      } finally {
+        (cacheConnection as { exists?: unknown }).exists = undefined;
+        (cacheConnection as { incrby?: unknown }).incrby = undefined;
+      }
     });
   });
 

@@ -57,7 +57,7 @@ export function parseReportTask(content) {
   return result;
 }
 
-function formatValue(metricKey, rawValue) {
+export function formatValue(metricKey, rawValue) {
   if (rawValue === undefined || rawValue === null || rawValue === '') {
     return 'N/A';
   }
@@ -78,6 +78,31 @@ function formatValue(metricKey, rawValue) {
 
 function formatComparator(comparator) {
   return COMPARATOR_SYMBOLS[comparator] ?? comparator ?? '';
+}
+
+/**
+ * Sonar envia o comparador da condição de FALHA (GT 1 reprova acima de 1).
+ * A exibição precisa mostrar o limite aceitável, não o operador de reprovação.
+ * GT 1 → aceitável ≤ 1; LT 80 → aceitável ≥ 80; GT 3 → aceitável ≤ 3.
+ */
+export function formatAcceptance(comparator, metricKey, rawThreshold) {
+  const threshold = formatValue(metricKey, rawThreshold);
+  switch (comparator) {
+    case 'GT':
+      return `≤ ${threshold}`;
+    case 'LT':
+      return `≥ ${threshold}`;
+    case 'EQ':
+      return `= ${threshold}`;
+    case 'NE':
+      return `≠ ${threshold}`;
+    default:
+      return `${formatComparator(comparator)} ${threshold}`.trim();
+  }
+}
+
+export function formatFailureRule(comparator, metricKey, rawThreshold) {
+  return `${formatComparator(comparator)} ${formatValue(metricKey, rawThreshold)}`.trim();
 }
 
 /**
@@ -211,8 +236,11 @@ export async function reportQualityGate(options = {}) {
     const isWarn = c.status === 'WARN';
     const label = METRIC_LABELS[c.metricKey] || c.metricKey;
     const actual = formatValue(c.metricKey, c.actualValue);
+    const rawThreshold = c.errorThreshold ?? c.warningThreshold;
     const comparator = formatComparator(c.comparator);
-    const threshold = formatValue(c.metricKey, c.errorThreshold ?? c.warningThreshold);
+    const threshold = formatValue(c.metricKey, rawThreshold);
+    const acceptance = formatAcceptance(c.comparator, c.metricKey, rawThreshold);
+    const failureRule = formatFailureRule(c.comparator, c.metricKey, rawThreshold);
 
     const conditionItem = {
       metricKey: c.metricKey,
@@ -221,6 +249,8 @@ export async function reportQualityGate(options = {}) {
       actual,
       comparator,
       threshold,
+      acceptance,
+      failureRule,
       isError,
       isWarn,
     };
@@ -238,11 +268,11 @@ export async function reportQualityGate(options = {}) {
       console.log(
         `  ✖ [${c.status}] ${c.label} (${c.metricKey})\n` +
           `      Atual:     ${c.actual}\n` +
-          `      Exigido:   ${c.comparator} ${c.threshold}`,
+          `      Aceitável: ${c.acceptance}\n` +
+          `      Falha quando: ${c.failureRule}`,
       );
-      // Emite anotação nativa de erro no GitHub Actions
       console.log(
-        `::error title=SonarQube Quality Gate [${c.metricKey}]::${c.label} está em ${c.actual}, mas o Quality Gate exige ${c.comparator} ${c.threshold}`,
+        `::error title=SonarQube Quality Gate [${c.metricKey}]::${c.label} está em ${c.actual}. Aceitável: ${c.acceptance}. Condição de falha do Sonar: ${c.failureRule}`,
       );
     }
   }
@@ -250,7 +280,7 @@ export async function reportQualityGate(options = {}) {
   if (passedConditions.length > 0) {
     console.log('\n✅ CONDIÇÕES APROVADAS:');
     for (const c of passedConditions) {
-      console.log(`  ✔ [OK] ${c.label}: ${c.actual} (limite ${c.comparator} ${c.threshold})`);
+      console.log(`  ✔ [OK] ${c.label}: ${c.actual} (aceitável ${c.acceptance})`);
     }
   }
 
@@ -263,12 +293,12 @@ export async function reportQualityGate(options = {}) {
       if (dashboardUrl) {
         md += `🔗 [Ver painel completo no SonarCloud](${dashboardUrl})\n\n`;
       }
-      md += `| Métrica | Status | Valor Atual | Limite do Quality Gate |\n`;
-      md += `| :--- | :---: | :---: | :---: |\n`;
+      md += `| Métrica | Status | Valor Atual | Aceitável | Falha quando |\n`;
+      md += `| :--- | :---: | :---: | :---: | :---: |\n`;
 
       for (const c of [...failedConditions, ...passedConditions]) {
         const icon = c.isError ? '❌ ERROR' : c.isWarn ? '⚠️ WARN' : '✅ OK';
-        md += `| **${c.label}**<br>(\`${c.metricKey}\`) | ${icon} | **${c.actual}** | ${c.comparator} ${c.threshold} |\n`;
+        md += `| **${c.label}**<br>(\`${c.metricKey}\`) | ${icon} | **${c.actual}** | ${c.acceptance} | ${c.failureRule} |\n`;
       }
       md += `\n`;
       fs.appendFileSync(stepSummaryPath, md, 'utf8');
