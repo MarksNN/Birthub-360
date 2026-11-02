@@ -5710,7 +5710,7 @@ model FlywheelApproachRecord {
   humanFeedbackNotes  String?                     @db.Text
   embedding           Unsupported("vector(768)")?
   createdAt           DateTime                    @default(now()) @db.Timestamptz(3)
-  updatedAt           DateTime                    @updatedAt @db.Timestamptz(3)
+  updatedAt           DateTime                    @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([organizationId, leadId])
   @@index([organizationId, agentSlug, createdAt])
@@ -5770,7 +5770,7 @@ model FlywheelFewShotExample {
   embedding           Unsupported("vector(768)")?
   promotedAt          DateTime                    @db.Timestamptz(3)
   createdAt           DateTime                    @default(now()) @db.Timestamptz(3)
-  updatedAt           DateTime                    @updatedAt @db.Timestamptz(3)
+  updatedAt           DateTime                    @default(now()) @updatedAt @db.Timestamptz(3)
 
   @@index([organizationId, leadId])
   @@index([organizationId, channel, isActive])
