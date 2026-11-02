@@ -5,7 +5,7 @@
 - **Para:** Agente 03 — Design, UX e Acessibilidade
 - **Apoio:** Agente 08 — QA e Test Harness
 - **Prioridade:** P1
-- **Status:** MAPEADO E ESTRUTURADO / AGUARDANDO DISPATCH LINUX
+- **Status:** RESOLVIDO — 88 BASELINES LINUX VERSIONADAS
 - **Arquivo de Teste:** `visual-regression/visual.spec.ts`
 - **Configuração:** `playwright.visual.config.ts`
 - **Workflows Envolvidos:** `.github/workflows/visual-regression.yml` e `.github/workflows/ci.yml` (job `visual-baselines`)
@@ -89,3 +89,13 @@ visual-baselines:
 - Proibido uso de `continue-on-error: true`.
 - Proibido afrouxar os thresholds de pixel diff (`maxDiffPixels: 1300` mantido).
 - Preservação estrita das 11 superfícies e dos 88 testes.
+
+---
+
+### 5. RESOLUÇÃO DA MISSÃO 7 (2026-11-01)
+
+- **Workflow Dispatch:** Executado job oficial `visual-baselines` em runner Linux (`ubuntu-latest`) no GitHub Actions (Run ID `41355086810`).
+- **Artefato Baixado e Validado:** `visual-snapshots-linux` contendo exatamente 88 imagens de referência `.png`.
+- **Versionamento:** Inclusão e versionamento dos 88 snapshots em `visual-regression/baselines/visual.spec.ts/`.
+- **Matriz Atendida:** 11 superfícies (`login`, `dashboard`, `workspace`, `crm`, `prospect`, `intelligence`, `analytics`, `integrations`, `calendar`, `automations`, `admin-module-access`) × 2 temas (`light`, `dark`) × 4 viewports (`desktop`, `laptop`, `tablet`, `mobile`).
+- **Branch:** `agente/08-03-visual-baselines-linux`.
