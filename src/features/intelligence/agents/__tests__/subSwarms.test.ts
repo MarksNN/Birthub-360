@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   detectSubSwarm,
+  getAllCatalogAgents,
   getSubSwarmCapabilities,
   getSubSwarmSpecialists,
+  mapDomainToSubSwarm,
+  matchCatalogAgents,
   SUB_SWARMS,
+  semanticRouteMission,
 } from '../subSwarms.config.js';
+import { SWARM_CATALOG_TOTAL_AGENTS } from '../swarm.constants.js';
 
 describe('Sub-Swarms Hierárquicos — Configuração e Classificação Semântica', () => {
   it('classifica corretamente missões de Customer Success / Churn', () => {
@@ -78,5 +83,58 @@ describe('Sub-Swarms Hierárquicos — Configuração e Classificação Semânti
       'customer_success',
       'operations',
     ]);
+  });
+});
+
+describe('Integração com o Catálogo Oficial de 379 Agentes', () => {
+  it('carrega exatamente os 379 agentes canônicos do catálogo', () => {
+    const agents = getAllCatalogAgents();
+    expect(agents.length).toBe(SWARM_CATALOG_TOTAL_AGENTS);
+    expect(agents.length).toBe(379);
+
+    // Verifica integridade dos campos obrigatórios
+    const sample = agents[0];
+    expect(sample).toHaveProperty('code');
+    expect(sample).toHaveProperty('name');
+    expect(sample).toHaveProperty('domain');
+    expect(sample).toHaveProperty('description');
+  });
+
+  it('mapeia domínios do catálogo para os Sub-Swarms correspondentes', () => {
+    expect(mapDomainToSubSwarm('Marketing')).toBe('marketing');
+    expect(mapDomainToSubSwarm('Customer Success')).toBe('customer_success');
+    expect(mapDomainToSubSwarm('Vendas')).toBe('commercial');
+    expect(mapDomainToSubSwarm('Executivo')).toBe('commercial');
+    expect(mapDomainToSubSwarm('Operações')).toBe('operations');
+    expect(mapDomainToSubSwarm('Financeiro')).toBe('operations');
+    expect(mapDomainToSubSwarm('Compliance/Jurídico')).toBe('operations');
+  });
+
+  it('executa roteamento semântico dinâmico selecionando especialistas adequados do catálogo', () => {
+    const mktMatches = matchCatalogAgents(
+      'Estruturar testes A/B de marketing para landing page e calcular taxa de conversão',
+      'marketing',
+      { topK: 3 },
+    );
+
+    expect(mktMatches.length).toBeGreaterThanOrEqual(1);
+    expect(mktMatches[0].subSwarm).toBe('marketing');
+    expect(mktMatches[0].similarityScore).toBeGreaterThan(0.2);
+    // Deve encontrar agente relacionado a teste A/B
+    const foundAbTest = mktMatches.some(
+      (m) => m.code.includes('ab-test') || m.name.includes('ABTest'),
+    );
+    expect(foundAbTest).toBe(true);
+  });
+
+  it('gera plano de roteamento semântico completo com recomendação e justificativa', () => {
+    const plan = semanticRouteMission(
+      'Analisar contas estagnadas com alto risco de churn e traçar estratégia de retenção',
+    );
+
+    expect(plan.subSwarm).toBe('customer_success');
+    expect(plan.primarySpecialists).toContain('crm');
+    expect(plan.catalogSpecialists.length).toBeGreaterThan(0);
+    expect(plan.reasoning).toContain('Sub-Swarm');
   });
 });

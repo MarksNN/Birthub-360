@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador Global
 Para: Agentes 13 (Governança Enxame) & 07 (IA e Automações)
 Onda: Evolução Enxame IA
-Status: aberto
+Status: resolvido
 Prioridade: normal
 Bloqueador-ref: N/A
 Sprint destino: Sprint 2
@@ -25,3 +25,25 @@ Definição de `SwarmAgentKey = 'sdr' | 'bdr' | 'closer' | 'crm' | 'ops'` em `su
 ## Teste esperado
 - Testes unitários de decisão estruturada do supervisor com novos sub-swarms.
 - Testes de concorrência e ausência de loops infinitos.
+
+## Resolução
+- **Status:** **RESOLVIDO E VALIDADO**
+- **Data:** 2026-11-01
+- **Executores:** Agente 13 (Governança Enxame) & Agente 07 (IA e Automações)
+- **Branch:** `agente/13-multi-swarm-hierarchy`
+
+### Ações Executadas:
+1. **Configuração de Sub-Swarms e Roteamento Semântico (`subSwarms.config.ts`):**
+   - Implementado roteador modular com 4 Sub-Swarms temáticos: Comercial (`commercial`), Marketing (`marketing`), Customer Success (`customer_success`) e Operações (`operations`).
+   - Algoritmo de roteamento semântico dinâmico (`semanticRouteMission` e `matchCatalogAgents`) que mapeia intenções da missão contra os 379 agentes canônicos do catálogo (`SWARM_CATALOG_TOTAL_AGENTS = 379`).
+2. **Hardening do Grafo e StateGraph (`supervisor.agent.ts` e `swarm.constants.ts`):**
+   - Teto rígido `SWARM_MAX_STEPS = 5` exportado como constante canônica de governança (Agente 13 / FinOps) e enforced em `supervisorNode` e `workflow`.
+   - Nó `semanticRouterNode` adicionado ao fluxo do LangGraph (`__start__ -> semanticRouter -> supervisor`), injetando `catalogMatches` e ativando o Sub-Swarm correto.
+   - Enriquecimento do `supervisorDecisionSchema` com suporte opcional a `subSwarm` e `catalogAgentCode`.
+   - `fallbackDecision` e `enforceLeadGuard` atualizados com direcionamento temático e prevenção de loops.
+3. **Evidências de Teste e Qualidade:**
+   - `src/features/intelligence/agents/__tests__/subSwarms.test.ts`: **11/11 testes PASS**.
+   - `src/features/intelligence/agents/__tests__/supervisor.decision.test.ts`: **25/25 testes PASS**.
+   - Suíte de Agentes de Inteligência (`src/features/intelligence/agents/__tests__/`): **15/15 arquivos, 102/102 testes PASS**.
+   - Typecheck TypeScript (`npx tsc --noEmit`): **0 erros (PASS)**.
+   - Biome check (`npx @biomejs/biome check`): **0 erros, 0 warnings (PASS)**.
