@@ -1,0 +1,540 @@
+{
+  "version": "2026-11-01.1",
+  "name": "golden-dataset-tactical",
+  "description": "Dataset canônico de avaliação factual para os Agentes Táticos do Swarm (Promise Guardian, Account Detective, Devil's Advocate)",
+  "generatedAt": "2026-11-01T00:00:00.000Z",
+  "promiseGuardianCases": [
+    {
+      "id": "pg-case-001",
+      "description": "Vendedor promete envio de proposta formal até prazo determinado",
+      "sourceType": "meeting",
+      "sellerName": "Carlos Eduardo",
+      "recipientName": "Dr. Marcos Silveira",
+      "transcript": "Perfeito, Dr. Marcos. Alinhamos todos os requisitos da telemetria e o senhor pode ficar tranquilo: eu vou te enviar a proposta comercial completa até sexta-feira às 17h com os valores diferenciados para os 45 caminhões.",
+      "expectedCommitments": [
+        {
+          "type": "send_proposal",
+          "descriptionSnippet": "proposta comercial",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-002",
+      "description": "Vendedor promete envio de case de sucesso e materiais de apoio",
+      "sourceType": "meeting",
+      "sellerName": "Juliana Prado",
+      "recipientName": "Renata Vasconcelos",
+      "transcript": "Com certeza, Renata. Eu compartilho o case de sucesso do setor de agronegócio para o senhor analisar como reduziram sinistros em 32% no primeiro trimestre.",
+      "expectedCommitments": [
+        {
+          "type": "share_case_study",
+          "descriptionSnippet": "case de sucesso",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-003",
+      "description": "Vendedor assume compromisso explícito de retorno telefônico de follow-up",
+      "sourceType": "voice_call",
+      "sellerName": "Lucas Martins",
+      "recipientName": "Gilberto Faria",
+      "transcript": "Entendido Seu Gilberto. Assim que eu receber o relatório da vistoria técnica amanhã cedo, eu te ligo para alinharmos os próximos passos.",
+      "expectedCommitments": [
+        {
+          "type": "return_call",
+          "descriptionSnippet": "Retorno de ligação",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-004",
+      "description": "Vendedor agenda demonstração da plataforma técnica",
+      "sourceType": "meeting",
+      "sellerName": "Amanda Reis",
+      "recipientName": "Engenheiro Marcelo",
+      "transcript": "Excelente colocação Marcelo. Para seu time ver a usabilidade do painel em tempo real, vamos agendar uma demonstração técnica com nossos engenheiros de pré-vendas na terça-feira.",
+      "expectedCommitments": [
+        {
+          "type": "schedule_demo",
+          "descriptionSnippet": "demonstração",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-005",
+      "description": "Vendedor compromete-se a checar condição de desconto especial com alçada",
+      "sourceType": "meeting",
+      "sellerName": "Carlos Eduardo",
+      "recipientName": "Diretor Financeiro Paulo",
+      "transcript": "Compreendo a restrição orçamentária para este trimestre. Eu vou checar com a diretoria comercial a possibilidade de um desconto especial na taxa de instalação dos rastreadores.",
+      "expectedCommitments": [
+        {
+          "type": "confirm_commercial_discount",
+          "descriptionSnippet": "desconto",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-006",
+      "description": "Vendedor assume compromisso de esclarecer dúvida técnica com a engenharia",
+      "sourceType": "voice_call",
+      "sellerName": "Lucas Martins",
+      "recipientName": "Roberto TI",
+      "transcript": "Sobre a compatibilidade do barramento CAN com o modelo Scania 2018, eu vou tirar essa dúvida técnica com a engenharia antes de emitirmos o contrato.",
+      "expectedCommitments": [
+        {
+          "type": "answer_technical_question",
+          "descriptionSnippet": "dúvida técnica com a engenharia",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-007",
+      "description": "Multi-compromisso: Vendedor promete envio de proposta e anexar case",
+      "sourceType": "meeting",
+      "sellerName": "Juliana Prado",
+      "recipientName": "Dr. Fernando Rocha",
+      "transcript": "Combinado então, Dr. Fernando. Eu vou te enviar a proposta consolidada até o fim do dia e também mando o case de sucesso do grupo Raízen em anexo.",
+      "expectedCommitments": [
+        {
+          "type": "send_proposal",
+          "descriptionSnippet": "proposta",
+          "requiresHumanApproval": true
+        },
+        {
+          "type": "share_case_study",
+          "descriptionSnippet": "case de sucesso",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-008",
+      "description": "Multi-compromisso: Agendamento de demo e verificação de dúvida com time de TI",
+      "sourceType": "meeting",
+      "sellerName": "Amanda Reis",
+      "recipientName": "Mariana Ramos",
+      "transcript": "Perfeito. Vamos agendar uma demo da ferramenta para quinta-feira e, antes disso, vou perguntar para o time de ti como funciona a exportação de dados via Webhook.",
+      "expectedCommitments": [
+        {
+          "type": "schedule_demo",
+          "descriptionSnippet": "demo",
+          "requiresHumanApproval": true
+        },
+        {
+          "type": "answer_technical_question",
+          "descriptionSnippet": "time de ti",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-009",
+      "description": "Controle Negativo: Diálogo exploratório sem nenhuma promessa assumida pelo vendedor",
+      "sourceType": "voice_call",
+      "sellerName": "Lucas Martins",
+      "recipientName": "Rogério Pires",
+      "transcript": "Boa tarde Rogério! Como estão as operações na frota de refrigerados? O mercado de distribuição tem enfrentado muitos atrasos devido ao tráfego na rodovia?",
+      "expectedCommitments": []
+    },
+    {
+      "id": "pg-case-010",
+      "description": "Controle Negativo: Cliente recusa proposta e vendedor agradece cordialmente",
+      "sourceType": "email",
+      "sellerName": "Carlos Eduardo",
+      "recipientName": "Patrícia Alves",
+      "transcript": "Prezada Patrícia, agradecemos muito a atenção e a resposta formal. Entendemos perfeitamente o momento de contingenciamento da empresa e mantemos as portas abertas para futuras parcerias.",
+      "expectedCommitments": []
+    },
+    {
+      "id": "pg-case-011",
+      "description": "Controle Negativo: Reunião de alinhamento com dúvidas do cliente sem promessa do vendedor",
+      "sourceType": "meeting",
+      "sellerName": "Juliana Prado",
+      "recipientName": "Cláudio Souza",
+      "transcript": "Cláudio, o funcionamento dos alertas de fadiga do motorista é 100% automático. As notificações chegam diretamente na central do cliente e no aplicativo do gestor.",
+      "expectedCommitments": []
+    },
+    {
+      "id": "pg-case-012",
+      "description": "Controle Negativo: Cliente solicita contato futuro mas vendedor apenas confirma recebimento",
+      "sourceType": "whatsapp",
+      "sellerName": "Amanda Reis",
+      "recipientName": "Helena Meirelles",
+      "transcript": "Mensagem recebida, Helena! Muito obrigado pelas informações sobre a quantidade de veículos na garagem. Um ótimo final de semana para vocês.",
+      "expectedCommitments": []
+    },
+    {
+      "id": "pg-case-013",
+      "description": "Vendedor promete envio de proposta revisada por email",
+      "sourceType": "email",
+      "sellerName": "Vinícius Sales",
+      "recipientName": "Bernardo Dias",
+      "transcript": "Bom dia Bernardo, reajustamos as faixas de volumetria acordadas ontem. Te envio a proposta comercial atualizada até as 12h.",
+      "expectedCommitments": [
+        {
+          "type": "send_proposal",
+          "descriptionSnippet": "proposta comercial",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-014",
+      "description": "Vendedor promete retorno telefônico após validação",
+      "sourceType": "voice_call",
+      "sellerName": "Lucas Martins",
+      "recipientName": "Sérgio Nogueira",
+      "transcript": "Perfeito Sérgio, assim que o jurídico validar o termo de confidencialidade, eu ligo para combinarmos a data de início da PoC.",
+      "expectedCommitments": [
+        {
+          "type": "return_call",
+          "descriptionSnippet": "Retorno de ligação",
+          "requiresHumanApproval": true
+        }
+      ]
+    },
+    {
+      "id": "pg-case-015",
+      "description": "Controle Negativo: Cliente reclama de atraso de entrega e vendedor orienta canal de suporte",
+      "sourceType": "whatsapp",
+      "sellerName": "Juliana Prado",
+      "recipientName": "Dra. Mônica",
+      "transcript": "Compreendo a urgência, Dra. Mônica. O canal prioritário para abertura de chamados técnicos de campo é o suporte 0800 indicado no manual do usuário.",
+      "expectedCommitments": []
+    }
+  ],
+  "accountDetectiveCases": [
+    {
+      "id": "ad-case-001",
+      "companyId": "comp-translog-101",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "companyName": "TransLog Brasil S/A",
+        "cnpj": "12.345.678/0001-90",
+        "cnae": "4930-2/02 - Transporte rodoviário de carga",
+        "segment": "Logística e Distribuição",
+        "employeeCount": 450,
+        "recentNewsTitles": [
+          "TransLog investe R$ 15 milhões em nova frota sustentável de cavalos mecânicos"
+        ],
+        "internalNotes": [
+          "Cliente mencionou que já cotou com o concorrente Sascar anteriormente"
+        ],
+        "knownContacts": [
+          { "name": "Dr. Roberto", "role": "Diretor de Operações", "influence": "Alta" },
+          { "name": "Vanessa TI", "role": "Gerente de Sistemas", "influence": "Média" }
+        ]
+      },
+      "expected": {
+        "requiredSectionsCount": 10,
+        "expectedVerifiedFactLabels": [
+          "Razão Social / Nome Operacional",
+          "Segmento de Atuação",
+          "CNPJ",
+          "Atividade Econômica Principal (CNAE)",
+          "Porte Estimado de Colaboradores"
+        ],
+        "expectedConfidence": "high",
+        "mustHaveCommercialRisk": true,
+        "mustIsolateHypotheses": true
+      }
+    },
+    {
+      "id": "ad-case-002",
+      "companyId": "comp-agrosul-202",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "companyName": "AgroSul Grãos & Sementes Ltda",
+        "cnpj": "98.765.432/0001-11",
+        "cnae": "0111-3/01 - Cultivo de arroz e grãos",
+        "segment": "Agronegócio",
+        "employeeCount": 180,
+        "recentNewsTitles": [],
+        "internalNotes": [
+          "Reunião inicial muito receptiva. Nenhuma menção a concorrentes diretos."
+        ],
+        "knownContacts": [
+          { "name": "Mauro Bozzetti", "role": "Gerente de Frota Agrícola", "influence": "Alta" }
+        ]
+      },
+      "expected": {
+        "requiredSectionsCount": 10,
+        "expectedVerifiedFactLabels": [
+          "Razão Social / Nome Operacional",
+          "Segmento de Atuação",
+          "CNPJ",
+          "Atividade Econômica Principal (CNAE)",
+          "Porte Estimado de Colaboradores"
+        ],
+        "expectedConfidence": "high",
+        "mustHaveCommercialRisk": true,
+        "mustIsolateHypotheses": true
+      }
+    },
+    {
+      "id": "ad-case-003",
+      "companyId": "comp-biohealth-303",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "companyName": "BioHealth Distribuição Hospitalar S/A",
+        "cnpj": "55.666.777/0001-88",
+        "segment": "Saúde e Medicamentos",
+        "employeeCount": 230,
+        "recentNewsTitles": [
+          "BioHealth obtém recertificação ANVISA para transporte de vacinas e termolábeis"
+        ],
+        "knownContacts": [
+          { "name": "Dra. Eliana Silva", "role": "Diretora de Compliance e Qualidade", "influence": "Decisor" }
+        ]
+      },
+      "expected": {
+        "requiredSectionsCount": 10,
+        "expectedVerifiedFactLabels": [
+          "Razão Social / Nome Operacional",
+          "Segmento de Atuação",
+          "CNPJ",
+          "Porte Estimado de Colaboradores"
+        ],
+        "expectedConfidence": "high",
+        "mustHaveCommercialRisk": true,
+        "mustIsolateHypotheses": true
+      }
+    },
+    {
+      "id": "ad-case-004",
+      "companyId": "comp-finpay-404",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "companyName": "FinPay Soluções de Pagamento e Crédito S/A",
+        "cnpj": "11.222.333/0001-44",
+        "cnae": "6613-4/00 - Administração de cartões de crédito",
+        "segment": "Fintech / Serviços Financeiros",
+        "employeeCount": 620,
+        "recentNewsTitles": [
+          "FinPay capta rodada Série B de R$ 50 milhões para expansão nacional"
+        ],
+        "internalNotes": [
+          "Conversa com VP Comercial identificou interesse em governança de contratos e inteligência de vendas"
+        ],
+        "knownContacts": [
+          { "name": "Rodrigo Valente", "role": "VP de Receita", "influence": "Econômico" }
+        ]
+      },
+      "expected": {
+        "requiredSectionsCount": 10,
+        "expectedVerifiedFactLabels": [
+          "Razão Social / Nome Operacional",
+          "Segmento de Atuação",
+          "CNPJ",
+          "Atividade Econômica Principal (CNAE)",
+          "Porte Estimado de Colaboradores"
+        ],
+        "expectedConfidence": "high",
+        "mustHaveCommercialRisk": true,
+        "mustIsolateHypotheses": true
+      }
+    },
+    {
+      "id": "ad-case-005",
+      "companyId": "comp-varejo-505",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "companyName": "Varejo Brasil Hipermercados Ltda",
+        "cnpj": "44.555.666/0001-77",
+        "segment": "Varejo Supermercadista",
+        "employeeCount": 1500,
+        "recentNewsTitles": [],
+        "internalNotes": [
+          "Usa atualmente fornecedor legado e concorrência ativa"
+        ],
+        "knownContacts": [
+          { "name": "Antônio Fagundes", "role": "Head de Suprimentos", "influence": "Alta" }
+        ]
+      },
+      "expected": {
+        "requiredSectionsCount": 10,
+        "expectedVerifiedFactLabels": [
+          "Razão Social / Nome Operacional",
+          "Segmento de Atuação",
+          "CNPJ",
+          "Porte Estimado de Colaboradores"
+        ],
+        "expectedConfidence": "high",
+        "mustHaveCommercialRisk": true,
+        "mustIsolateHypotheses": true
+      }
+    }
+  ],
+  "devilsAdvocateCases": [
+    {
+      "id": "da-case-001",
+      "dealId": "deal-opt-001",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Contrato Anual Telemetria Frota Pesada",
+        "currentStage": "Negociação Final",
+        "currentProbability": 85,
+        "daysInCurrentStage": 25,
+        "stageAverageDays": 7,
+        "daysSinceLastInteraction": 14,
+        "unresolvedObjections": ["Preço 20% acima do teto orçamentário"],
+        "competitorsMentioned": ["Sascar", "Omnilink"]
+      },
+      "expected": {
+        "optimismBiasDetected": true,
+        "recommendedAction": "downgrade_probability",
+        "maxRecommendedProbability": 40
+      }
+    },
+    {
+      "id": "da-case-002",
+      "dealId": "deal-healthy-002",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Expansão de 15 Rastreadores Filial Campinas",
+        "currentStage": "Proposta Apresentada",
+        "currentProbability": 60,
+        "daysInCurrentStage": 3,
+        "stageAverageDays": 8,
+        "daysSinceLastInteraction": 1,
+        "unresolvedObjections": [],
+        "competitorsMentioned": []
+      },
+      "expected": {
+        "optimismBiasDetected": false,
+        "recommendedAction": "maintain",
+        "recommendedProbability": 60
+      }
+    },
+    {
+      "id": "da-case-003",
+      "dealId": "deal-stagnant-003",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Piloto Módulo de Jornada de Motorista",
+        "currentStage": "Validação Técnica",
+        "currentProbability": 50,
+        "daysInCurrentStage": 18,
+        "stageAverageDays": 7,
+        "daysSinceLastInteraction": 3,
+        "unresolvedObjections": [],
+        "competitorsMentioned": []
+      },
+      "expected": {
+        "optimismBiasDetected": false,
+        "recommendedAction": "delay_close_date",
+        "recommendedProbability": 50
+      }
+    },
+    {
+      "id": "da-case-004",
+      "dealId": "deal-ghosting-004",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Renovação Anual Rastreadores Sudeste",
+        "currentStage": "Proposta Apresentada",
+        "currentProbability": 65,
+        "daysInCurrentStage": 6,
+        "stageAverageDays": 8,
+        "daysSinceLastInteraction": 10,
+        "unresolvedObjections": [],
+        "competitorsMentioned": []
+      },
+      "expected": {
+        "optimismBiasDetected": true,
+        "recommendedAction": "flag_as_at_risk",
+        "recommendedProbability": 30
+      }
+    },
+    {
+      "id": "da-case-005",
+      "dealId": "deal-critical-bias-005",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Implantação Completa ERP + Telemetria",
+        "currentStage": "Fechamento Iminente",
+        "currentProbability": 90,
+        "daysInCurrentStage": 30,
+        "stageAverageDays": 8,
+        "daysSinceLastInteraction": 16,
+        "unresolvedObjections": [
+          "Exigência de prazo de pagamento em 120 dias",
+          "Dúvida sobre suporte 24h em finais de semana"
+        ],
+        "competitorsMentioned": ["Autotrac"]
+      },
+      "expected": {
+        "optimismBiasDetected": true,
+        "recommendedAction": "downgrade_probability",
+        "maxRecommendedProbability": 40
+      }
+    },
+    {
+      "id": "da-case-006",
+      "dealId": "deal-early-clean-006",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Primeiro Contato e Apresentação",
+        "currentStage": "Descoberta",
+        "currentProbability": 20,
+        "daysInCurrentStage": 2,
+        "stageAverageDays": 5,
+        "daysSinceLastInteraction": 0,
+        "unresolvedObjections": [],
+        "competitorsMentioned": []
+      },
+      "expected": {
+        "optimismBiasDetected": false,
+        "recommendedAction": "maintain",
+        "recommendedProbability": 20
+      }
+    },
+    {
+      "id": "da-case-007",
+      "dealId": "deal-healthy-high-prob-007",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Aditivo Contratual Frota de Minas",
+        "currentStage": "Validação de Minuta",
+        "currentProbability": 80,
+        "daysInCurrentStage": 4,
+        "stageAverageDays": 10,
+        "daysSinceLastInteraction": 1,
+        "unresolvedObjections": [],
+        "competitorsMentioned": []
+      },
+      "expected": {
+        "optimismBiasDetected": false,
+        "recommendedAction": "maintain",
+        "recommendedProbability": 80
+      }
+    },
+    {
+      "id": "da-case-008",
+      "dealId": "deal-stagnant-discovery-008",
+      "organizationId": "org-eval-tactical",
+      "input": {
+        "dealTitle": "Diagnóstico Inicial de Operação",
+        "currentStage": "Diagnóstico",
+        "currentProbability": 40,
+        "daysInCurrentStage": 14,
+        "stageAverageDays": 6,
+        "daysSinceLastInteraction": 2,
+        "unresolvedObjections": [],
+        "competitorsMentioned": []
+      },
+      "expected": {
+        "optimismBiasDetected": false,
+        "recommendedAction": "delay_close_date",
+        "recommendedProbability": 40
+      }
+    }
+  ]
+}
