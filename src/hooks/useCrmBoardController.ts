@@ -27,7 +27,7 @@ export function useCrmBoardController(funnel: 'Lead' | 'Negocio') {
     } catch (err: any) {
       clientLogger.error({ err }, 'Error fetching leads');
       setError(
-        err instanceof Error ? err.message : 'N�o foi possivel carregar o pipeline comercial.',
+        err instanceof Error ? err.message : 'Não foi possível carregar o pipeline comercial.',
       );
     } finally {
       setLoading(false);
@@ -42,7 +42,7 @@ export function useCrmBoardController(funnel: 'Lead' | 'Negocio') {
     async (leadId: string) => {
       try {
         await api.post(`/api/crm/leads/${leadId}/convert`);
-        toast.success('Lead convertido em neg�cio e enviado ao pipeline comercial.');
+        toast.success('Lead convertido em negócio e enviado ao pipeline comercial.');
         await fetchLeads();
       } catch (error: any) {
         clientLogger.error({ err: error }, 'Error converting lead to deal');
@@ -63,7 +63,7 @@ export function useCrmBoardController(funnel: 'Lead' | 'Negocio') {
         toast.success(`${data.imported} novos leads importados do Bitrix24! `);
         await fetchLeads();
       } else if (data.skipped > 0) {
-        toast.info(`${data.skipped} leads recentes j� estavam no sistema.`);
+        toast.info(`${data.skipped} leads recentes já estavam no sistema.`);
       } else {
         toast.info('Nenhum lead novo encontrado no Bitrix24.');
       }

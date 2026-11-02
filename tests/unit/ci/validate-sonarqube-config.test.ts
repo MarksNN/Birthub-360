@@ -209,6 +209,7 @@ sonar.javascript.lcov.reportPaths=coverage/unit/lcov.info
     const parsed = parseProperties(content);
 
     expect(parsed['sonar.javascript.lcov.reportPaths']).toBe('coverage/unit/lcov.info');
+    expect(parsed['sonar.python.coverage.reportPaths']).toBe('coverage/python/coverage.xml');
     expect(parsed['sonar.sources']).toBe('src');
     expect(parsed['sonar.tests']).toBe('tests');
   });

@@ -68,7 +68,7 @@ export class CommercialContextBuilderService {
           .map((sid) => existingSkillsMap.get(sid)?.playbookId)
           .filter((pid): pid is string => Boolean(pid)),
       ),
-    ).sort();
+    ).sort((left, right) => left.localeCompare(right));
 
     const loadedPlaybooks: string[] = [];
     const missingPlaybooks: string[] = [];

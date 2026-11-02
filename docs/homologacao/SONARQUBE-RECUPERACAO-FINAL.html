@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birth Hub 360 — Recuperação SonarQube</title>
+  <style>
+    :root {
+      --bg: #061A3A;
+      --card: #0c274d;
+      --line: #1e3a5f;
+      --ink: #f4f7fb;
+      --muted: #b7c3d4;
+      --gold: #D4AF37;
+      --ok: #3dd68c;
+      --bad: #ff6b81;
+      --warn: #f5c16c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.55 Inter, "Segoe UI", sans-serif;
+    }
+    main { max-width: 980px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 { font-family: Sora, "Segoe UI", sans-serif; font-size: 1.8rem; line-height: 1.2; margin: 0 0 0.4rem; }
+    h2 { font-size: 1.15rem; margin: 2rem 0 0.6rem; color: var(--gold); }
+    p, li { color: var(--ink); }
+    .muted { color: var(--muted); }
+    .verdict {
+      display: inline-block;
+      margin-top: 0.8rem;
+      padding: 0.2rem 0.7rem;
+      border: 1px solid var(--bad);
+      color: var(--bad);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    section, table { background: var(--card); border: 1px solid var(--line); }
+    section { padding: 1rem 1.1rem; margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; }
+    th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--gold); font-weight: 650; }
+    code { font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; }
+    a { color: #8eb6ff; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="muted">Birth Hub 360 · MarksNN/Birthub-360 · SonarQube Cloud</p>
+      <h1>Recuperação do Quality Gate — código novo</h1>
+      <p class="muted">Branch de trabalho <code>agente/08-sonarqube-recovery</code>. Base de diagnóstico <code>519855cf5c679ed568d19a132f69c3dafdc35c61</code> (<code>main</code>). Período <code>previous_version</code> desde 2026-10-27T21:30:30Z. Projeto <code>MarksNN_Birthub-360</code>.</p>
+      <p class="verdict">VEREDITO: BLOCKED</p>
+      <p>O código desta branch trata as causas encontradas. O Quality Gate do commit candidato ainda não foi medido pelo Sonar. Sem essa medição, a recuperação não está homologada.</p>
+    </header>
+
+    <h2>Antes, na main</h2>
+    <table>
+      <thead>
+        <tr><th>Condição</th><th>Medido</th><th>Aceitável</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Confiabilidade nova</td><td>4 (D)</td><td>≤ 1 (A)</td><td>falha</td></tr>
+        <tr><td>Segurança nova</td><td>3 (C)</td><td>≤ 1 (A)</td><td>falha</td></tr>
+        <tr><td>Cobertura nova</td><td>39,6%</td><td>≥ 80%</td><td>falha</td></tr>
+        <tr><td>Duplicação nova</td><td>0,4%</td><td>≤ 3%</td><td>passa</td></tr>
+        <tr><td>Manutenibilidade nova</td><td>1 (A)</td><td>≤ 1 (A)</td><td>passa</td></tr>
+        <tr><td>Hotspots revisados</td><td>100%</td><td>100%</td><td>passa</td></tr>
+        <tr><td>SCA</td><td colspan="2"><code>redundant lockfiles</code>: <code>package-lock.json</code> e <code>pnpm-lock.yaml</code></td><td>erro</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">Unidades de cobertura nova: 444 cobertas de 1121 (686 linhas, 404 descobertas; 435 condições, 273 descobertas). Para 80% são necessárias 897. Faltam 453. Fonte: API pública do SonarCloud no commit de diagnóstico. Scan da main: GitHub Actions run 41355611590, job com exit 3 por <code>qualitygate.wait</code>.</p>
+
+    <h2>O PR #147 não é esta correção</h2>
+    <p>Security Dependency Review #350, Central Birth Hub 360 Release #562 e SonarQube Analysis #581 fecharam verdes no PR #147 (<code>agente/08-modernizacao-node24</code>, commit <code>34fbf760</code>). O gate daquele PR não trouxe cobertura nem duplicação, porque o diff é de workflow. A <code>main</code> em <code>519855cf</code> continua D / C / 39,6% com o erro de SCA.</p>
+
+    <h2>Achados D e C</h2>
+    <table>
+      <thead>
+        <tr><th>Regra</th><th>Severidade</th><th>Onde</th><th>Causa</th><th>Correção nesta branch</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>typescript:S2871</code><br>AaGVHHGqb13Y7R6S0biL</td>
+          <td>BUG CRITICAL</td>
+          <td><code>commercialContextBuilder.service.ts</code></td>
+          <td><code>.sort()</code> sem comparador</td>
+          <td><code>localeCompare</code>. Teste de ordenação dos playbooks.</td>
+        </tr>
+        <tr>
+          <td><code>pythonsecurity:S8707</code><br>AaGVHHEtb13Y7R6S0biJ<br>AaGVHHEtb13Y7R6S0biK</td>
+          <td>VULNERABILITY MAJOR ×2</td>
+          <td><code>MONTAR_CONTEXT.py</code></td>
+          <td><code>--output</code> ia para <code>Path</code> e escrita</td>
+          <td>Só nome de arquivo, gravado em <code>commercial-v3-out</code>. Travessia rejeitada no teste de CLI. O Sonar ainda não reanalisou. Se o taint em <code>base / raw</code> permanecer, o próximo passo é não construir <code>Path</code> a partir da string do usuário. Sem <code>NOSONAR</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>SCA</h2>
+    <p>O CI instala com <code>npm ci</code> a partir de <code>package-lock.json</code>. <code>pnpm-lock.yaml</code> é espelho de overrides para quem usa pnpm e para o Trivy. A propriedade adicionada é <code>sonar.sca.exclusions=pnpm-lock.yaml</code>. <code>sonar.sca.allowRedundantLockfiles</code> não foi usado. O lock do pnpm não foi removido. O sucesso do coletor só existe depois do próximo scan.</p>
+
+    <h2>Cobertura</h2>
+    <p>Os testes novos exercitam comportamento: painel da célula, rotas V3 com papéis, simulador inbound, playbooks e ingestão, cliente HTTP, CLI Python, ping de conector (serviço e rota, inclusive 401/403), ramos do schema que bloqueiam <code>sendEligible</code>, registry com e sem assets, quota com estimativa e cache, despacho V3 do supervisor com consentimento LGPD e escolha de sub-swarm. O scan do commit <code>a0179086a</code> no PR #148 mediu cobertura nova de 4,2%: 18 linhas de <code>MONTAR_CONTEXT.py</code> em 0% e 3 linhas mais 2 condições de <code>useCrmBoardController.ts</code> em 0%. O workflow agora gera Cobertura Python (<code>sonar.python.coverage.reportPaths=coverage/python/coverage.xml</code>) e o hook tem teste dos dois ramos de erro, da conversão e do import já existente. <code>VALIDAR_ESTRUTURA.py</code> continua fora desse relatório. O percentual novo ≥ 80% deste commit ainda depende do próximo scan.</p>
+
+    <h2>UTF-8 e relatório do gate</h2>
+    <p><code>useCrmBoardController.ts</code> voltou a ter as frases em português válidas nas linhas de erro e de toast. O reporter deixa de imprimir o operador de falha como critério: GT vira aceitável <code>≤</code>, LT vira <code>≥</code>. Há teste automatizado dos comparadores, ratings e da resposta da API. O script segue com exit 0; a autoridade do gate é o passo do scanner.</p>
+
+    <h2>O que foi executado aqui</h2>
+    <table>
+      <thead>
+        <tr><th>Comando</th><th>Resultado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>npm run typecheck</code></td><td>exit 0</td></tr>
+        <tr><td><code>npm run lint</code></td><td>exit 0. Biome reportou 639 warnings pré-existentes em <code>src</code>. Não houve error novo nestes arquivos.</td></tr>
+        <tr><td>Vitest dos 15 arquivos da recuperação</td><td>84 testes, exit 0</td></tr>
+        <tr><td><code>npm run test:unit</code> completo</td><td>NÃO EXECUTADO nesta sessão. O workflow do Sonar roda essa suíte com cobertura.</td></tr>
+        <tr><td><code>npm run test:integration</code></td><td>NÃO EXECUTADO. As rotas alteradas foram exercitadas com supertest nos testes unitários.</td></tr>
+        <tr><td><code>npm run build</code></td><td>exit 0. Vite, esbuild do servidor e <code>verify:pwa-precache</code> (176 entradas). Warnings pré-existentes de CSS <code>@import</code> e de chunk grande.</td></tr>
+        <tr><td>Scan Sonar de <code>a0179086a</code> (PR #148)</td><td>EXECUTADO no Actions, run 41367477339. Quality gate ERROR. Cobertura nova 4,2%. Confiabilidade e segurança A. SCA sem aborto de lockfile redundante.</td></tr>
+        <tr><td>Agente 24</td><td>REPROVADO para <code>a0179086a</code>. Não autoriza merge. O commit seguinte precisa de parecer novo.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Pendências</h2>
+    <ul>
+      <li>Ler o Quality Gate do commit que adiciona o Cobertura Python e o teste do hook.</li>
+      <li>Confirmar confiabilidade A, segurança A, cobertura nova ≥ 80%, duplicação, hotspots e SCA sem lockfile redundante nesse commit.</li>
+      <li>Se <code>S8707</code> sobreviver, apertar o confinamento do arquivo de saída.</li>
+      <li>Se a cobertura ficar abaixo de 80%, cobrir as unidades novas que o scan ainda marcar, sem exclusão e sem teste vazio.</li>
+      <li>Parecer APROVADO do Agente 24 sobre o diff final, antes de merge.</li>
+    </ul>
+
+    <h2>Links</h2>
+    <ul>
+      <li><a href="https://sonarcloud.io/dashboard?id=MarksNN_Birthub-360">Dashboard SonarCloud</a></li>
+      <li><a href="https://github.com/MarksNN/Birthub-360/actions/runs/41355611590">Scan da main que falhou o gate</a></li>
+      <li><a href="https://github.com/MarksNN/Birthub-360/pull/147">PR #147, que não corrige este período</a></li>
+    </ul>
+  </main>
+</body>
+</html>
