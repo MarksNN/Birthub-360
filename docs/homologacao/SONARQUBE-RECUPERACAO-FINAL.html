@@ -103,7 +103,7 @@
     <p>O CI instala com <code>npm ci</code> a partir de <code>package-lock.json</code>. <code>pnpm-lock.yaml</code> é espelho de overrides para quem usa pnpm e para o Trivy. A propriedade adicionada é <code>sonar.sca.exclusions=pnpm-lock.yaml</code>. <code>sonar.sca.allowRedundantLockfiles</code> não foi usado. O lock do pnpm não foi removido. O sucesso do coletor só existe depois do próximo scan.</p>
 
     <h2>Cobertura</h2>
-    <p>Os testes novos exercitam comportamento: painel da célula, rotas V3 com papéis, simulador inbound, playbooks e ingestão, cliente HTTP, CLI Python, ping de conector (serviço e rota, inclusive 401/403), ramos do schema que bloqueiam <code>sendEligible</code>, registry com e sem assets, quota com estimativa e cache, despacho V3 do supervisor com consentimento LGPD e escolha de sub-swarm. <code>VALIDAR_ESTRUTURA.py</code> e as linhas Python de <code>MONTAR_CONTEXT.py</code> continuam fora do LCOV de JavaScript. Não houve relatório Cobertura Python. O percentual novo ≥ 80% não foi confirmado pelo Sonar.</p>
+    <p>Os testes novos exercitam comportamento: painel da célula, rotas V3 com papéis, simulador inbound, playbooks e ingestão, cliente HTTP, CLI Python, ping de conector (serviço e rota, inclusive 401/403), ramos do schema que bloqueiam <code>sendEligible</code>, registry com e sem assets, quota com estimativa e cache, despacho V3 do supervisor com consentimento LGPD e escolha de sub-swarm. O scan do commit <code>a0179086a</code> no PR #148 mediu cobertura nova de 4,2%: 18 linhas de <code>MONTAR_CONTEXT.py</code> em 0% e 3 linhas mais 2 condições de <code>useCrmBoardController.ts</code> em 0%. O workflow agora gera Cobertura Python (<code>sonar.python.coverage.reportPaths=coverage/python/coverage.xml</code>) e o hook tem teste dos dois ramos de erro, da conversão e do import já existente. <code>VALIDAR_ESTRUTURA.py</code> continua fora desse relatório. O percentual novo ≥ 80% deste commit ainda depende do próximo scan.</p>
 
     <h2>UTF-8 e relatório do gate</h2>
     <p><code>useCrmBoardController.ts</code> voltou a ter as frases em português válidas nas linhas de erro e de toast. O reporter deixa de imprimir o operador de falha como critério: GT vira aceitável <code>≤</code>, LT vira <code>≥</code>. Há teste automatizado dos comparadores, ratings e da resposta da API. O script segue com exit 0; a autoridade do gate é o passo do scanner.</p>
@@ -120,15 +120,15 @@
         <tr><td><code>npm run test:unit</code> completo</td><td>NÃO EXECUTADO nesta sessão. O workflow do Sonar roda essa suíte com cobertura.</td></tr>
         <tr><td><code>npm run test:integration</code></td><td>NÃO EXECUTADO. As rotas alteradas foram exercitadas com supertest nos testes unitários.</td></tr>
         <tr><td><code>npm run build</code></td><td>exit 0. Vite, esbuild do servidor e <code>verify:pwa-precache</code> (176 entradas). Warnings pré-existentes de CSS <code>@import</code> e de chunk grande.</td></tr>
-        <tr><td>Scan Sonar do commit candidato</td><td>NÃO EXECUTADO. Não há token local e o token do Actions não é lido daqui.</td></tr>
-        <tr><td>Agente 24</td><td>Parecer ausente. Esta entrega não se aprova sozinha.</td></tr>
+        <tr><td>Scan Sonar de <code>a0179086a</code> (PR #148)</td><td>EXECUTADO no Actions, run 41367477339. Quality gate ERROR. Cobertura nova 4,2%. Confiabilidade e segurança A. SCA sem aborto de lockfile redundante.</td></tr>
+        <tr><td>Agente 24</td><td>REPROVADO para <code>a0179086a</code>. Não autoriza merge. O commit seguinte precisa de parecer novo.</td></tr>
       </tbody>
     </table>
 
     <h2>Pendências</h2>
     <ul>
-      <li>Abrir o PR desta branch e ler o Quality Gate do commit exato.</li>
-      <li>Confirmar confiabilidade A, segurança A, cobertura nova ≥ 80%, duplicação, hotspots e SCA sem lockfile redundante.</li>
+      <li>Ler o Quality Gate do commit que adiciona o Cobertura Python e o teste do hook.</li>
+      <li>Confirmar confiabilidade A, segurança A, cobertura nova ≥ 80%, duplicação, hotspots e SCA sem lockfile redundante nesse commit.</li>
       <li>Se <code>S8707</code> sobreviver, apertar o confinamento do arquivo de saída.</li>
       <li>Se a cobertura ficar abaixo de 80%, cobrir as unidades novas que o scan ainda marcar, sem exclusão e sem teste vazio.</li>
       <li>Parecer APROVADO do Agente 24 sobre o diff final, antes de merge.</li>

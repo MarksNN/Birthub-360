@@ -83,6 +83,17 @@ jobs:
       - name: Run Tests with Coverage
         run: npm run test:unit -- --coverage
 
+      - name: Python coverage for MONTAR_CONTEXT
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/sonar-py"
+          "$RUNNER_TEMP/sonar-py/bin/pip" install --disable-pip-version-check coverage
+          "$RUNNER_TEMP/sonar-py/bin/coverage" run --branch --source=src/features/intelligence/commercial-v3/assets/07_RUNTIME scripts/ci/cover-montar-context.py
+          mkdir -p coverage/python
+          "$RUNNER_TEMP/sonar-py/bin/coverage" xml -o coverage/python/coverage.xml
+          test -s coverage/python/coverage.xml
+
       - name: SonarQube Scan
         id: sonar_scan
         uses: SonarSource/sonarqube-scan-action@ad8210318ac8bb816e41990d5af2b304f7a6c213 # master (snapshot fixado em SHA — política de branch protection exige commit SHA completo, não branch)
