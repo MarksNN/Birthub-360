@@ -16,6 +16,11 @@ export interface CommercialV3AgentDetailResponse {
   handoffs: Array<[string, string, string]>;
 }
 
+export interface BuildCommercialV3ContextInput {
+  agentId: CommercialV3AgentId;
+  skillIds?: string[];
+}
+
 export interface DispatchCommercialV3MissionInput {
   agentId: CommercialV3AgentId;
   mission: string;
@@ -53,6 +58,22 @@ export const commercialV3Api = {
 
   getExecutionPolicy: () =>
     api.get<{ success: boolean; data: Record<string, unknown> }>('/api/agent/commercial-v3/policy'),
+
+  buildContext: (data: BuildCommercialV3ContextInput) =>
+    api.post<{
+      success: boolean;
+      data: {
+        systemContext: string;
+        state: {
+          agentId: CommercialV3AgentId;
+          indexInjected: boolean;
+          schemaReady: boolean;
+          loadedPlaybooks: string[];
+          missingPlaybooks: string[];
+          operationalAllowedByBootstrap: boolean;
+        };
+      };
+    }>('/api/agent/commercial-v3/context', data),
 
   dispatchMission: (data: DispatchCommercialV3MissionInput) =>
     api.post<{ success: boolean; data: CommercialAgentResultV3 }>(

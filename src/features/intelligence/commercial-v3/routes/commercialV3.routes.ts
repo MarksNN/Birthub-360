@@ -22,6 +22,10 @@ const playbookParamSchema = z.object({
   playbookId: z.string().min(1),
 });
 
+const listSkillsQuerySchema = z.object({
+  agentId: z.enum(COMMERCIAL_V3_AGENT_IDS).optional(),
+});
+
 const buildContextSchema = z.object({
   agentId: z.enum(COMMERCIAL_V3_AGENT_IDS),
   skillIds: z.array(z.string()).optional(),
@@ -107,16 +111,20 @@ router.get(
  * GET /api/agent/commercial-v3/skills
  * Retorna a lista das 463 habilidades do catálogo, opcionalmente filtrada por agentId.
  */
-router.get('/skills', (req: Request, res: Response) => {
-  const agentId = req.query.agentId as string | undefined;
-  if (agentId && (COMMERCIAL_V3_AGENT_IDS as readonly string[]).includes(agentId)) {
-    const skills = commercialAgentV3Registry.listSkills(agentId as any);
-    res.json({ success: true, data: skills });
-    return;
-  }
-  const skills = commercialAgentV3Registry.listSkills();
-  res.json({ success: true, total: skills.length, data: skills });
-});
+router.get(
+  '/skills',
+  validateRequest({ query: listSkillsQuerySchema }),
+  (req: Request, res: Response) => {
+    const { agentId } = req.query as z.infer<typeof listSkillsQuerySchema>;
+    if (agentId) {
+      const skills = commercialAgentV3Registry.listSkills(agentId);
+      res.json({ success: true, total: skills.length, data: skills });
+      return;
+    }
+    const skills = commercialAgentV3Registry.listSkills();
+    res.json({ success: true, total: skills.length, data: skills });
+  },
+);
 
 /**
  * GET /api/agent/commercial-v3/policy
@@ -141,6 +149,18 @@ router.post(
       const result = await commercialContextBuilder.buildContext(agentId, skillIds ?? []);
       res.json({ success: true, data: result });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        (error.message.includes('SkillId não pertence ao agente') ||
+          error.message.includes('Agente desconhecido no catálogo'))
+      ) {
+        res.status(400).json({
+          success: false,
+          error: error.message,
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
       next(error);
     }
   },
