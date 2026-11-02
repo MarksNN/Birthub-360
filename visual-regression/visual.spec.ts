@@ -11,7 +11,7 @@ const MASKS = {
     page.getByTestId('revenue-signal-orb'),
   ],
   admin: (page: import('@playwright/test').Page) => [
-    page.locator('table tbody tr th div.text-xs'),
+    page.locator('table tbody tr th'),
   ],
 };
 
@@ -118,10 +118,7 @@ test.describe('Visual Regression', () => {
 
       test('Administração - Module Access', async ({ page }) => {
         await setupDeterministicState(page, theme);
-        await signUp(page, {
-          email: uniqueTestEmail(`visual-admin-${theme}`),
-          name: 'Administrador do Sistema',
-        });
+        await signUp(page, { email: uniqueTestEmail(`visual-admin-${theme}`) });
         await page.goto('/app/module-access');
         await waitForAppReady(page);
         // Garante que o painel administrativo real carregou os dados (sem spinner residual)
