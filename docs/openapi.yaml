@@ -358,117 +358,196 @@ paths:
   /agent/commercial-v3/agents:
     get:
       tags: [Agent]
-      summary: Lista os agentes comerciais V3
+      summary: Lista os agentes comerciais V3.1
       security: [{ sessionCookie: [] }]
       responses:
         '200':
-          description: Lista de agentes
+          description: Lista dos 19 agentes comerciais da suíte V3.1
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data:
                     type: array
                     items:
                       type: object
                       additionalProperties: true
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/agents/{agentId}:
     get:
       tags: [Agent]
-      summary: Retorna detalhe do agente comercial V3
+      summary: Retorna detalhe do agente comercial V3.1
       security: [{ sessionCookie: [] }]
       parameters:
         - in: path
           name: agentId
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            enum:
+              - supervisor
+              - gestao
+              - icp
+              - account_intel
+              - prospeccao
+              - intencao
+              - outbound
+              - sdr
+              - solucoes
+              - negociacao
+              - deal_desk
+              - deal_health
+              - forecast
+              - growth_analytics
+              - coaching
+              - crm
+              - expansao
+              - parcerias
+              - winloss
       responses:
         '200':
-          description: Detalhe do agente
+          description: Detalhes do agente, habilidades associadas, playbooks e handoffs
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/playbooks/{agentId}/{playbookId}:
     get:
       tags: [Agent]
-      summary: Recupera um playbook do agente comercial V3
+      summary: Recupera um playbook operacional do agente comercial V3.1
       security: [{ sessionCookie: [] }]
       parameters:
         - in: path
           name: agentId
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            enum:
+              - supervisor
+              - gestao
+              - icp
+              - account_intel
+              - prospeccao
+              - intencao
+              - outbound
+              - sdr
+              - solucoes
+              - negociacao
+              - deal_desk
+              - deal_health
+              - forecast
+              - growth_analytics
+              - coaching
+              - crm
+              - expansao
+              - parcerias
+              - winloss
         - in: path
           name: playbookId
           required: true
-          schema: { type: string }
+          schema: { type: string, minLength: 1 }
       responses:
         '200':
-          description: Playbook do agente
+          description: Conteúdo Markdown e metadados do playbook
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data:
                     type: object
                     additionalProperties: true
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/skills:
     get:
       tags: [Agent]
-      summary: Lista skills do agente comercial V3
+      summary: Lista skills da suíte comercial V3.1
       security: [{ sessionCookie: [] }]
       parameters:
         - in: query
           name: agentId
           required: false
-          schema: { type: string }
+          schema:
+            type: string
+            enum:
+              - supervisor
+              - gestao
+              - icp
+              - account_intel
+              - prospeccao
+              - intencao
+              - outbound
+              - sdr
+              - solucoes
+              - negociacao
+              - deal_desk
+              - deal_health
+              - forecast
+              - growth_analytics
+              - coaching
+              - crm
+              - expansao
+              - parcerias
+              - winloss
       responses:
         '200':
-          description: Lista de skills
+          description: Lista de skills com contagem total
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
-                  total: { type: integer }
+                  success: { type: boolean, example: true }
+                  total: { type: integer, example: 463 }
                   data:
                     type: array
                     items:
                       type: object
                       additionalProperties: true
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/policy:
     get:
       tags: [Agent]
-      summary: Retorna a política de execução do agente comercial V3
+      summary: Retorna a política de execução operacional do agente comercial V3.1
       security: [{ sessionCookie: [] }]
       responses:
         '200':
-          description: Política de execução
+          description: Política de execução, limites e salvaguardas
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data: { type: object, additionalProperties: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/context:
     post:
       tags: [Agent]
-      summary: Monta o contexto do agente comercial V3
+      summary: Monta o contexto do agente comercial V3.1
+      description: Requer perfil ADMIN, GESTOR, CLOSER ou SDR.
       security: [{ sessionCookie: [] }]
       requestBody:
         required: true
@@ -476,27 +555,53 @@ paths:
           application/json:
             schema:
               type: object
+              required: [agentId]
               properties:
                 agentId:
                   type: string
+                  enum:
+                    - supervisor
+                    - gestao
+                    - icp
+                    - account_intel
+                    - prospeccao
+                    - intencao
+                    - outbound
+                    - sdr
+                    - solucoes
+                    - negociacao
+                    - deal_desk
+                    - deal_health
+                    - forecast
+                    - growth_analytics
+                    - coaching
+                    - crm
+                    - expansao
+                    - parcerias
+                    - winloss
                 skillIds:
                   type: array
                   items: { type: string }
       responses:
         '200':
-          description: Contexto montado
+          description: Contexto montado com sucesso
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/dispatch:
     post:
       tags: [Agent]
-      summary: Dispara uma missão comercial para um agente V3
+      summary: Dispara uma missão comercial para um agente V3.1
+      description: Requer perfil ADMIN, GESTOR, CLOSER ou SDR.
       security: [{ sessionCookie: [] }]
       requestBody:
         required: true
@@ -506,8 +611,33 @@ paths:
               type: object
               required: [agentId, mission]
               properties:
-                agentId: { type: string }
-                mission: { type: string }
+                agentId:
+                  type: string
+                  enum:
+                    - supervisor
+                    - gestao
+                    - icp
+                    - account_intel
+                    - prospeccao
+                    - intencao
+                    - outbound
+                    - sdr
+                    - solucoes
+                    - negociacao
+                    - deal_desk
+                    - deal_health
+                    - forecast
+                    - growth_analytics
+                    - coaching
+                    - crm
+                    - expansao
+                    - parcerias
+                    - winloss
+                mission:
+                  type: string
+                  minLength: 1
+                  maxLength: 4000
+                  description: Enunciado da missão comercial a ser executada
                 skillIds:
                   type: array
                   items: { type: string }
@@ -515,19 +645,24 @@ paths:
                 allowOperational: { type: boolean }
       responses:
         '200':
-          description: Missão despachada
+          description: Missão despachada e avaliada
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /agent/commercial-v3/evaluate-redteam:
     post:
       tags: [Agent]
-      summary: Executa a auditoria Redteam do agente comercial V3
+      summary: Executa a auditoria Redteam do agente comercial V3.1
+      description: Requer perfil ADMIN ou GESTOR.
       security: [{ sessionCookie: [] }]
       requestBody:
         required: false
@@ -536,18 +671,43 @@ paths:
             schema:
               type: object
               properties:
-                agentId: { type: string }
+                agentId:
+                  type: string
+                  enum:
+                    - supervisor
+                    - gestao
+                    - icp
+                    - account_intel
+                    - prospeccao
+                    - intencao
+                    - outbound
+                    - sdr
+                    - solucoes
+                    - negociacao
+                    - deal_desk
+                    - deal_health
+                    - forecast
+                    - growth_analytics
+                    - coaching
+                    - crm
+                    - expansao
+                    - parcerias
+                    - winloss
                 all: { type: boolean }
       responses:
         '200':
-          description: Relatório redteam
+          description: Relatório da avaliação Redteam
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /market-intelligence/companies:
     get:

@@ -29,7 +29,15 @@ export const validateRequest = (schemaOrConfig: ZodTypeAny | RequestValidationSc
           req.params = (await config.params.parseAsync(req.params)) as any;
         }
         if (config.query) {
-          req.query = (await config.query.parseAsync(req.query)) as any;
+          const parsedQuery = (await config.query.parseAsync(req.query)) as any;
+          try {
+            req.query = parsedQuery;
+          } catch {
+            for (const key of Object.keys(req.query)) {
+              delete (req.query as any)[key];
+            }
+            Object.assign(req.query, parsedQuery);
+          }
         }
         if (config.body) {
           req.body = await config.body.parseAsync(req.body);
