@@ -38,6 +38,8 @@ const OUTPUT_DIR = path.resolve(__dirname, '../../src/features/job-roles/catalog
 interface BirthHubNormalizedAgent {
   code: string;
   name: string;
+  domain?: string;
+  primaryJobRole?: string | null;
   binding: { type: string; existingCode?: string };
 }
 
@@ -120,10 +122,38 @@ const COMMERCIAL_CELL_DOMAIN_CAPABILITIES: Record<string, string[]> = {
   'devils-advocate': ['deal.read', 'deal.analyze', 'forecast.read', 'pipeline.analyze'],
 };
 
+/**
+ * Capabilities de domínio para grupos prioritários de agentes do catálogo Birth Hub (Marketing e CS).
+ * Handoff 00-para-07-18-tool-bindings-catalogo: atribui ferramentas de domínio executáveis/tipadas.
+ */
+const MARKETING_GROUP_CAPABILITIES = [
+  'copy.draft',
+  'lead.read',
+  'lead.search',
+  'company.read',
+  'company.search',
+  'knowledge.search',
+];
+
+const CS_GROUP_CAPABILITIES = [
+  'churn.analyze',
+  'company.read',
+  'company.search',
+  'deal.read',
+  'meeting.read',
+  'meeting.analyze',
+  'knowledge.search',
+];
+
 interface AgentCapabilityEntry {
   agentCode: string;
   capabilityCodes: string[];
-  source: 'COMMERCIAL_CELL' | 'EXISTING_SERVICE_INHERITED' | 'UNIVERSAL_ONLY';
+  source:
+    | 'COMMERCIAL_CELL'
+    | 'EXISTING_SERVICE_INHERITED'
+    | 'MARKETING_GROUP'
+    | 'CS_GROUP'
+    | 'UNIVERSAL_ONLY';
   inheritedFrom?: string;
 }
 
@@ -148,6 +178,38 @@ function buildAgentCapabilities(): AgentCapabilityEntry[] {
         capabilityCodes: [...new Set([...inherited, ...UNIVERSAL_AGENT_CAPABILITIES])],
         source: 'EXISTING_SERVICE_INHERITED',
         inheritedFrom: agent.binding.existingCode,
+      });
+    } else if (agent.domain === 'Marketing') {
+      const roleCaps =
+        agent.primaryJobRole && ROLE_DOMAIN_CAPABILITIES[agent.primaryJobRole as JobRoleCode]
+          ? ROLE_DOMAIN_CAPABILITIES[agent.primaryJobRole as JobRoleCode].map(([cap]) => cap)
+          : [];
+      entries.push({
+        agentCode: agent.code,
+        capabilityCodes: [
+          ...new Set([
+            ...MARKETING_GROUP_CAPABILITIES,
+            ...roleCaps,
+            ...UNIVERSAL_AGENT_CAPABILITIES,
+          ]),
+        ],
+        source: 'MARKETING_GROUP',
+      });
+    } else if (agent.domain === 'Customer Success') {
+      const roleCaps =
+        agent.primaryJobRole && ROLE_DOMAIN_CAPABILITIES[agent.primaryJobRole as JobRoleCode]
+          ? ROLE_DOMAIN_CAPABILITIES[agent.primaryJobRole as JobRoleCode].map(([cap]) => cap)
+          : [];
+      entries.push({
+        agentCode: agent.code,
+        capabilityCodes: [
+          ...new Set([
+            ...CS_GROUP_CAPABILITIES,
+            ...roleCaps,
+            ...UNIVERSAL_AGENT_CAPABILITIES,
+          ]),
+        ],
+        source: 'CS_GROUP',
       });
     } else {
       entries.push({
