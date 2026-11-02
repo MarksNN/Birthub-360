@@ -52,7 +52,7 @@ describe('visual regression deterministic state', () => {
     await waiting;
 
     expect(evaluate).toHaveBeenCalledOnce();
-    expect(waitForTimeout).toHaveBeenCalledWith(150);
+    expect(waitForTimeout).toHaveBeenCalledWith(300);
     expect(completed).toHaveBeenCalledOnce();
   });
 
