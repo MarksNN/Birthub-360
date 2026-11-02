@@ -28,7 +28,9 @@ describe('visual regression deterministic state', () => {
       vi.stubGlobal('window', { localStorage: { setItem } });
       const [initialize, selectedTheme] = addInitScript.mock.calls[0];
       initialize(selectedTheme);
-      expect(setItem).toHaveBeenCalledExactlyOnceWith('atlas_theme', theme);
+      expect(setItem).toHaveBeenCalledWith('birthhub360_theme', theme);
+      expect(setItem).toHaveBeenCalledWith('atlas_theme', theme);
+      expect(setItem).toHaveBeenCalledWith('@prospector:has_seen_tour', 'true');
     },
   );
 
