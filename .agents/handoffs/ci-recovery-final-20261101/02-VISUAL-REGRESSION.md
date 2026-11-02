@@ -98,3 +98,16 @@ Todas as 3 causas raízes foram investigadas e corrigidas cirurgicamente. As 88 
 3. `npm run build` -> **PASS** (zero warnings de PostCSS/CSS).
 4. `88 baselines versionadas` -> **PASS** em `visual-regression/baselines/visual.spec.ts/`.
 5. `maxDiffPixels: 1300` e `updateSnapshots: none` rigorosamente preservados em `playwright.visual.config.ts`.
+
+
+---
+
+### 6. EVIDÊNCIA DE EXECUÇÃO NO CI GITHUB ACTIONS
+
+- **Workflow:** `.github/workflows/visual-regression.yml` (Visual Regression Tests)
+- **Run ID:** `41375980211` (https://github.com/MarksNN/Birthub-360/actions/runs/41375980211)
+- **Job:** `Visual Regression` (ID `125056198212`)
+- **Duração:** 7m 44s
+- **Ambiente:** Ubuntu 24.04.5 LTS (Runner oficial GitHub Actions)
+- **Resultado:** **100% PASS** (88/88 cenários visuais aprovados contra as baselines Linux oficiais)
+- **Critério de Sucesso:** Atingido integralmente com tolerância estrita (`maxDiffPixels: 1300`).
