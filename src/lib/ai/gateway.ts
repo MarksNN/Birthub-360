@@ -78,11 +78,19 @@ export type {
   AiUsageLogInput,
   ChatCompletionMessage,
 } from './gateway/types.js';
+export {
+  CACHE_TTL,
+  SEMANTIC_CACHE_KEY_PREFIX,
+  SemanticCacheService,
+  semanticCache,
+} from './gateway/semanticCache.js';
+export type { SemanticCacheFinOpsMetrics } from './gateway/semanticCache.js';
 export { logAiUsage } from './usage-log.js';
 
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { getAiModel } from './gateway/chat-model.js';
 import { cleanAndParseJson } from './gateway/parsing.js';
+import { semanticCache } from './gateway/semanticCache.js';
 
 export async function generateTextOutput(options: {
   organizationId?: string;
@@ -90,7 +98,22 @@ export async function generateTextOutput(options: {
   systemInstruction?: string;
   prompt: string;
   fallback?: () => string;
+  useCache?: boolean;
+  ttlSeconds?: number;
 }): Promise<{ text: string }> {
+  if (options.useCache && options.organizationId) {
+    const cached = await semanticCache.get({
+      organizationId: options.organizationId,
+      model: 'general',
+      promptVersion: 'v1',
+      purpose: options.feature || 'general',
+      promptText: (options.systemInstruction || '') + '\n' + options.prompt,
+    });
+    if (cached) {
+      return { text: cached };
+    }
+  }
+
   try {
     const model = getAiModel(options.feature || 'general');
     const messages = [
@@ -100,6 +123,26 @@ export async function generateTextOutput(options: {
       new HumanMessage(options.prompt),
     ];
     const res = await model.invoke(messages);
+
+    if (options.useCache && options.organizationId && res.content) {
+      await semanticCache.set(
+        {
+          organizationId: options.organizationId,
+          model: 'general',
+          promptVersion: 'v1',
+          purpose: options.feature || 'general',
+          promptText: (options.systemInstruction || '') + '\n' + options.prompt,
+        },
+        res.content,
+        {
+          tokens: 150,
+          costUsd: 0.0001,
+          classification: 'INTERNAL',
+          ttlSeconds: options.ttlSeconds,
+        },
+      );
+    }
+
     return { text: res.content };
   } catch (err) {
     if (options.fallback) {
@@ -116,7 +159,22 @@ export async function generateStructuredOutput<T>(options: {
   prompt: string;
   schema?: unknown;
   fallback?: () => T;
+  useCache?: boolean;
+  ttlSeconds?: number;
 }): Promise<T> {
+  if (options.useCache && options.organizationId) {
+    const cached = await semanticCache.get({
+      organizationId: options.organizationId,
+      model: 'general',
+      promptVersion: 'v1',
+      purpose: options.feature || 'general-structured',
+      promptText: (options.systemInstruction || '') + '\n' + options.prompt,
+    });
+    if (cached) {
+      return cleanAndParseJson<T>(cached);
+    }
+  }
+
   const model = getAiModel(options.feature || 'general');
   const messages = [
     new SystemMessage(
@@ -126,5 +184,25 @@ export async function generateStructuredOutput<T>(options: {
     new HumanMessage(options.prompt),
   ];
   const res = await model.invoke(messages);
+
+  if (options.useCache && options.organizationId && res.content) {
+    await semanticCache.set(
+      {
+        organizationId: options.organizationId,
+        model: 'general',
+        promptVersion: 'v1',
+        purpose: options.feature || 'general-structured',
+        promptText: (options.systemInstruction || '') + '\n' + options.prompt,
+      },
+      res.content,
+      {
+        tokens: 200,
+        costUsd: 0.0002,
+        classification: 'INTERNAL',
+        ttlSeconds: options.ttlSeconds,
+      },
+    );
+  }
+
   return cleanAndParseJson<T>(res.content);
 }
