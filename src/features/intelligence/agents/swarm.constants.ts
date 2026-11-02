@@ -14,6 +14,25 @@
  */
 export const SWARM_BRAND = 'Birth Hub 360';
 
+/**
+ * Teto rígido e determinístico de passos (iterações/saltos) entre especialistas do Enxame antes
+ * de forçar a síntese final. Garante matematicamente a terminação do ciclo, prevenção de loops
+ * infinitos e conformidade com limites orçamentários de FinOps e tokens da IA (Agente 13 / P1-P4).
+ */
+export const SWARM_MAX_STEPS = 5;
+
+/**
+ * Total oficial e canônico de agentes de IA catalogados na plataforma (definidos no catálogo canônico
+ * `src/features/job-roles/catalog/agents.normalized.json`), aptos a participarem da governança e
+ * do roteamento hierárquico multi-swarm.
+ */
+export const SWARM_CATALOG_TOTAL_AGENTS = 379;
+
+/**
+ * Sub-Swarm padrão adotado como contingência quando nenhum padrão semântico específico for detectado.
+ */
+export const SWARM_DEFAULT_SUB_SWARM = 'commercial';
+
 export const SWARM_IDENTITY =
   `Você é um BDR/SDR Especialista de Elite da ${SWARM_BRAND}, referência nacional em Inteligência Comercial ` +
   'e Qualificação B2B para times comerciais de qualquer segmento — SDR, closer e gestão. ' +

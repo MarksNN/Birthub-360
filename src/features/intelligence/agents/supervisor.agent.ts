@@ -24,17 +24,38 @@ import { OpsAgent } from './ops.agent.js';
 import { SDRQualificationAgent } from './sdrQualification.agent.js';
 import {
   detectSubSwarm,
+  getAllCatalogAgents,
+  matchCatalogAgents,
+  type SemanticAgentMatch,
+  type SemanticRoutingPlan,
   SUB_SWARMS,
   type SubSwarmDomain,
   type SwarmAgentKey,
+  semanticRouteMission,
 } from './subSwarms.config.js';
 import {
+  SWARM_CATALOG_TOTAL_AGENTS,
+  SWARM_DEFAULT_SUB_SWARM,
   SWARM_IDENTITY,
+  SWARM_MAX_STEPS,
   SWARM_OUTPUT_CONTRACT,
   SWARM_UNTRUSTED_CONTENT_GUARD,
 } from './swarm.constants.js';
 
-export { detectSubSwarm, SUB_SWARMS, type SubSwarmDomain, type SwarmAgentKey };
+export {
+  detectSubSwarm,
+  getAllCatalogAgents,
+  matchCatalogAgents,
+  type SemanticAgentMatch,
+  type SemanticRoutingPlan,
+  SUB_SWARMS,
+  type SubSwarmDomain,
+  SWARM_CATALOG_TOTAL_AGENTS,
+  SWARM_DEFAULT_SUB_SWARM,
+  SWARM_MAX_STEPS,
+  type SwarmAgentKey,
+  semanticRouteMission,
+};
 
 let cachedSupervisorLlm: ReturnType<typeof buildModelWithFallback> | null = null;
 function getSupervisorLlm() {
@@ -68,7 +89,7 @@ export interface SwarmEvent {
 }
 
 // Limite de saltos entre especialistas antes de forçar a síntese final (evita loops infinitos).
-const MAX_STEPS = 5;
+const MAX_STEPS = SWARM_MAX_STEPS;
 
 const AGENT_INFO: Record<
   SwarmAgentKey,
@@ -135,6 +156,14 @@ const SwarmState = Annotation.Root({
     reducer: (left, right) => right ?? left,
     default: () => 'commercial',
   }),
+  catalogMatches: Annotation<SemanticAgentMatch[]>({
+    reducer: (left, right) => (right && right.length > 0 ? right : left),
+    default: () => [],
+  }),
+  selectedCatalogAgent: Annotation<string | null>({
+    reducer: (left, right) => right ?? left,
+    default: () => null,
+  }),
   next: Annotation<SwarmRoute>({
     reducer: (left, right) => right ?? left,
     default: () => 'sdr',
@@ -194,6 +223,16 @@ export const supervisorDecisionSchema = z.object({
     .describe(
       'Qual especialista deve atuar a seguir, ou "finish" se a missão já foi suficientemente atendida.',
     ),
+  subSwarm: z
+    .enum(['commercial', 'marketing', 'customer_success', 'operations'])
+    .optional()
+    .describe('Sub-Swarm temático direcionado para a etapa.'),
+  catalogAgentCode: z
+    .string()
+    .optional()
+    .describe(
+      'Código de um dos 379 agentes do catálogo selecionado pelo roteamento semântico, se aplicável.',
+    ),
   instruction: z
     .string()
     .default('')
@@ -219,13 +258,21 @@ export function fallbackDecision(
   completed: SwarmAgentKey[],
   hasLeadId: boolean,
   mission: string = '',
+  subSwarm?: SubSwarmDomain,
 ): SupervisorDecision {
-  // Sem leadId o especialista 'sdr' sempre falharia (depende de um lead real do CRM) — nem
-  // oferece ele como opção de contingência, senão o enxame queima uma rodada inteira só para
-  // descobrir isso (ver enforceLeadGuard, que cobre o mesmo caso quando é o LLM que erra).
-  const order: SwarmAgentKey[] = hasLeadId
-    ? ['sdr', 'bdr', 'closer', 'crm', 'ops']
-    : ['bdr', 'closer', 'crm', 'ops'];
+  const activeSubSwarm = subSwarm || (mission ? detectSubSwarm(mission) : 'commercial');
+  let order: SwarmAgentKey[];
+
+  if (activeSubSwarm === 'marketing') {
+    order = hasLeadId ? ['bdr', 'sdr', 'ops', 'crm'] : ['bdr', 'ops', 'crm'];
+  } else if (activeSubSwarm === 'customer_success') {
+    order = ['crm', 'ops', 'closer'];
+  } else if (activeSubSwarm === 'operations') {
+    order = ['ops', 'crm', 'bdr'];
+  } else {
+    order = hasLeadId ? ['sdr', 'bdr', 'closer', 'crm', 'ops'] : ['bdr', 'closer', 'crm', 'ops'];
+  }
+
   const pending = order.find((agent) => !completed.includes(agent));
   if (!pending) {
     return {
@@ -250,12 +297,19 @@ export function fallbackDecision(
 // enxame só para produzir o mesmo erro que dava pra prever aqui. Exportado para teste unitário.
 export function enforceLeadGuard(
   decision: SupervisorDecision,
-  context: Pick<SwarmStateType, 'leadId' | 'completed' | 'mission'>,
+  context: Pick<SwarmStateType, 'leadId' | 'completed' | 'mission'> & {
+    subSwarm?: SubSwarmDomain;
+  },
 ): SupervisorDecision {
   if (decision.action !== 'sdr' || context.leadId) {
     return decision;
   }
-  const rerouted = fallbackDecision(context.completed, false, context.mission);
+  const rerouted = fallbackDecision(
+    context.completed,
+    false,
+    context.mission,
+    context.subSwarm ?? decision.subSwarm,
+  );
   const note = 'SDR não pode ser acionado: nenhum leadId foi informado para esta missão.';
   return {
     ...rerouted,
@@ -273,11 +327,52 @@ export function buildSwarmCorrelationId(config?: RunnableConfig, now: number = D
   return `swarm-${threadId}-${now}`;
 }
 
+/**
+ * Nó de roteamento semântico dinâmico que conecta a missão aos Sub-Swarms temáticos
+ * e aos 379 especialistas do catálogo oficial da plataforma.
+ */
+async function semanticRouterNode(state: SwarmStateType, config?: RunnableConfig) {
+  const subSwarm =
+    state.subSwarm && state.subSwarm !== 'commercial'
+      ? state.subSwarm
+      : detectSubSwarm(state.mission);
+
+  const catalogMatches = matchCatalogAgents(state.mission, subSwarm, { topK: 3 });
+  const correlationId = buildSwarmCorrelationId(config);
+
+  const topMatch = catalogMatches[0];
+  const content = topMatch
+    ? `Roteamento semântico dinâmico: Sub-Swarm '${SUB_SWARMS[subSwarm].label}' ativado. Especialista sugerido do catálogo amplo (${SWARM_CATALOG_TOTAL_AGENTS} agentes): ${topMatch.name} (${topMatch.code}) [Aderência: ${Math.round(topMatch.similarityScore * 100)}%].`
+    : `Roteamento semântico dinâmico: Sub-Swarm '${SUB_SWARMS[subSwarm].label}' ativado com especialistas primários.`;
+
+  return {
+    subSwarm,
+    catalogMatches,
+    messages: [
+      toAiMessage(
+        buildEvent(
+          'routing',
+          'supervisor',
+          content,
+          0,
+          topMatch?.matchReason || `Sub-Swarm ${subSwarm}`,
+          undefined,
+          0.9,
+          undefined,
+          undefined,
+          false,
+          correlationId,
+        ),
+      ),
+    ],
+  };
+}
+
 export async function supervisorNode(state: SwarmStateType, config?: RunnableConfig) {
   const step = state.step + 1;
 
   if (step > MAX_STEPS) {
-    const reasoning = `Limite de ${MAX_STEPS} etapas do enxame atingido.`;
+    const reasoning = `Limite de ${MAX_STEPS} etapas do enxame atingido. Terminação determinística de ciclo garantida.`;
     return {
       step,
       next: 'finish' as const,
@@ -291,6 +386,11 @@ export async function supervisorNode(state: SwarmStateType, config?: RunnableCon
             step,
             reasoning,
             undefined,
+            1.0,
+            undefined,
+            undefined,
+            false,
+            buildSwarmCorrelationId(config),
           ),
         ),
       ],
@@ -321,6 +421,21 @@ export async function supervisorNode(state: SwarmStateType, config?: RunnableCon
     ? `Lead ID disponível para esta missão: ${state.leadId} (o especialista 'sdr' pode usá-lo).`
     : `Nenhum Lead ID foi informado para esta missão — NÃO escolha 'sdr' enquanto isso não mudar, pois ele depende de um lead real do CRM e sempre falharia sem um ID.`;
 
+  const catalogMatches =
+    state.catalogMatches && state.catalogMatches.length > 0
+      ? state.catalogMatches
+      : matchCatalogAgents(state.mission, activeSubSwarm, { topK: 3 });
+
+  const catalogSpecialistsBlock =
+    catalogMatches.length > 0
+      ? `\n<especialistas_catalogo_amplo_379>\nEspecialistas recomendados do catálogo de ${SWARM_CATALOG_TOTAL_AGENTS} agentes para esta missão:\n${catalogMatches
+          .map(
+            (m) =>
+              `- '${m.code}' (${m.name} - Domínio: ${m.domain}): ${m.description} [Score: ${m.similarityScore}]`,
+          )
+          .join('\n')}\n</especialistas_catalogo_amplo_379>`
+      : '';
+
   const systemPrompt = `${SWARM_IDENTITY} Você é o Supervisor: coordena ${agentKeys.length} especialistas e decide, a cada rodada, qual deve atuar a seguir (ou se a missão está concluída).
 
 <sub_swarm_ativo>
@@ -340,6 +455,7 @@ ${(
   )
   .join('\n')}
 </especialistas_disponiveis>
+${catalogSpecialistsBlock}
 
 <contexto_missao>
 Missão original do usuário:
@@ -407,11 +523,16 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
     decision = supervisorDecisionSchema.parse(result.parsed);
   } catch (error: any) {
     logger.error({ err: error }, 'Swarm supervisor routing failed, using fallback heuristic');
-    decision = fallbackDecision(state.completed, Boolean(state.leadId), state.mission);
+    decision = fallbackDecision(
+      state.completed,
+      Boolean(state.leadId),
+      state.mission,
+      activeSubSwarm,
+    );
     fallbackTriggered = true;
   }
 
-  decision = enforceLeadGuard(decision, state);
+  decision = enforceLeadGuard(decision, { ...state, subSwarm: activeSubSwarm });
 
   const content =
     decision.action === 'finish'
@@ -424,6 +545,7 @@ ${SWARM_UNTRUSTED_CONTENT_GUARD}`;
   return {
     step,
     subSwarm: activeSubSwarm,
+    selectedCatalogAgent: decision.catalogAgentCode || null,
     next: decision.action,
     instruction: decision.instruction,
     messages: [
@@ -737,6 +859,7 @@ function routerCondition(state: SwarmStateType): SwarmRoute {
 }
 
 const workflow = new StateGraph(SwarmState)
+  .addNode('semanticRouter', semanticRouterNode)
   .addNode('supervisor', supervisorNode)
   .addNode('sdr', sdrNode)
   .addNode('bdr', bdrNode)
@@ -744,7 +867,8 @@ const workflow = new StateGraph(SwarmState)
   .addNode('crm', crmNode)
   .addNode('ops', opsNode)
   .addNode('finish', finishNode)
-  .addEdge('__start__', 'supervisor')
+  .addEdge('__start__', 'semanticRouter')
+  .addEdge('semanticRouter', 'supervisor')
   .addConditionalEdges('supervisor', routerCondition, {
     sdr: 'sdr',
     bdr: 'bdr',
@@ -870,3 +994,6 @@ export class SwarmOrchestrator {
     });
   }
 }
+
+export const SupervisorAgent = SwarmOrchestrator;
+export type SupervisorAgent = SwarmOrchestrator;

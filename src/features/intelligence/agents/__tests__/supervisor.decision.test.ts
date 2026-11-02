@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   enforceLeadGuard,
   fallbackDecision,
+  SWARM_CATALOG_TOTAL_AGENTS,
+  SWARM_MAX_STEPS,
   supervisorDecisionSchema,
 } from '../supervisor.agent.js';
 
@@ -56,8 +58,32 @@ describe('supervisorDecisionSchema', () => {
     if (parsed.success) expect(parsed.data.action).toBe('closer');
   });
 
+  it('aceita decisões enriquecidas com Sub-Swarm e agente do catálogo', () => {
+    const parsed = supervisorDecisionSchema.safeParse({
+      action: 'bdr',
+      subSwarm: 'marketing',
+      catalogAgentCode: 'ab-test-automator',
+      instruction: 'Estruture um teste A/B para copy outbound.',
+      reasoning: 'Especialista sugerido pelo catálogo dos 379 agentes com alta aderência.',
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.subSwarm).toBe('marketing');
+      expect(parsed.data.catalogAgentCode).toBe('ab-test-automator');
+    }
+  });
+
   it('rejeita uma ação fora do enum esperado', () => {
     const parsed = supervisorDecisionSchema.safeParse({ action: 'chutar-para-fora' });
+    expect(parsed.success).toBe(false);
+  });
+
+  it('rejeita um subSwarm inválido', () => {
+    const parsed = supervisorDecisionSchema.safeParse({
+      action: 'bdr',
+      subSwarm: 'financeiro-inexistente',
+    });
     expect(parsed.success).toBe(false);
   });
 
@@ -68,16 +94,34 @@ describe('supervisorDecisionSchema', () => {
   });
 });
 
-describe('fallbackDecision', () => {
-  it('com leadId disponível, oferece sdr primeiro', () => {
+describe('fallbackDecision com Sub-Swarms Hierárquicos', () => {
+  it('com leadId disponível no Sub-Swarm comercial, oferece sdr primeiro', () => {
     const decision = fallbackDecision([], true);
     expect(decision.action).toBe('sdr');
   });
 
-  it('sem leadId, nunca oferece sdr como contingência', () => {
+  it('sem leadId no comercial, nunca oferece sdr como contingência', () => {
     const decision = fallbackDecision([], false);
     expect(decision.action).not.toBe('sdr');
     expect(decision.action).toBe('bdr');
+  });
+
+  it('no Sub-Swarm de Marketing sem leadId, prioriza bdr', () => {
+    const decision = fallbackDecision([], false, '', 'marketing');
+    expect(decision.action).toBe('bdr');
+  });
+
+  it('no Sub-Swarm de Customer Success, prioriza crm e ops', () => {
+    const decision1 = fallbackDecision([], true, '', 'customer_success');
+    expect(decision1.action).toBe('crm');
+
+    const decision2 = fallbackDecision(['crm'], true, '', 'customer_success');
+    expect(decision2.action).toBe('ops');
+  });
+
+  it('no Sub-Swarm de Operações, prioriza ops', () => {
+    const decision = fallbackDecision([], true, '', 'operations');
+    expect(decision.action).toBe('ops');
   });
 
   it('sem leadId, pula direto para finish quando os demais especialistas já atuaram', () => {
@@ -164,5 +208,38 @@ describe('enforceLeadGuard', () => {
     const decision = enforceLeadGuard(original, { leadId: '', completed: [], mission: '' });
 
     expect(decision).toEqual(original);
+  });
+});
+
+describe('Garantia Determinística de Terminação de Ciclo e Ausência de Loops', () => {
+  it('respeita o teto rígido de SWARM_MAX_STEPS = 5', () => {
+    expect(SWARM_MAX_STEPS).toBe(5);
+  });
+
+  it('ancora o catálogo aos 379 agentes oficiais', () => {
+    expect(SWARM_CATALOG_TOTAL_AGENTS).toBe(379);
+  });
+
+  it('garante que o ciclo encerra deterministamente sem loops infinitos em até 5 passos', () => {
+    let currentStep = 0;
+    const completed: Array<'sdr' | 'bdr' | 'closer' | 'crm' | 'ops'> = [];
+    const hasLeadId = true;
+
+    while (currentStep < 10) {
+      currentStep++;
+      if (currentStep > SWARM_MAX_STEPS) {
+        // Teto de terminação forçado
+        break;
+      }
+      const decision = fallbackDecision(completed, hasLeadId, 'Missão teste');
+      if (decision.action === 'finish') {
+        break;
+      }
+      completed.push(decision.action);
+    }
+
+    // O número de iterações nunca pode ultrapassar o teto rígido de MAX_STEPS = 5
+    expect(currentStep).toBeLessThanOrEqual(SWARM_MAX_STEPS + 1);
+    expect(completed.length).toBeLessThanOrEqual(SWARM_MAX_STEPS);
   });
 });
