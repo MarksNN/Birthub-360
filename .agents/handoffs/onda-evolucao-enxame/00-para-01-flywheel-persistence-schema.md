@@ -1,7 +1,7 @@
 De: Agente 00 — Coordenador Global
 Para: Agente 01 — Plataforma, Segurança e Dados
 Onda: Evolução Enxame IA
-Status: aberto
+Status: resolvido
 Prioridade: alto
 Bloqueador-ref: REMED-06
 Sprint destino: Sprint 1
@@ -31,3 +31,17 @@ Comentário explícito em `commercialLearningFlywheel.service.ts`:
 
 ## Contexto adicional
 Alinhado com a recomendação da LGPD (Agente 21) de exclusão física definitiva no exercício dos direitos do titular.
+
+## Resolução
+- **Status:** **RESOLVIDO E MERGEADO EM MAIN**
+- **Data:** 2026-11-01
+- **Executores:** Agente 01 (Plataforma, Segurança e Dados) & Agente 21 (LGPD)
+- **Commits em main:** `4b3718474`, `9c8aa2072`, `25118dca6`, `123017e64`, `f6be6a3ec`, `518772574`, `05963537d`, `60161d37f`.
+
+### Ações Executadas:
+1. Adicionados os modelos relacionais `FlywheelApproachRecord` e `FlywheelFewShotExample` em `prisma/schema.prisma` com `organizationId` obrigatório e política RLS de tenant isolation.
+2. Migrações seguras geradas e aplicadas (`20261026000001_flywheel_schema_rls_enrichment` e `20261025000001_flywheel_initial`).
+3. Suporte a cascade de expurgo físico LGPD vinculado a `Lead` e `Organization`.
+4. Atualizado `CommercialLearningFlywheelService` para persistência durável no PostgreSQL com fallback seguro.
+5. Migration drift resolvido com adição de `@default(now())` em `updatedAt`.
+
