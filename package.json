@@ -298,7 +298,7 @@
     "@vitest/browser-playwright": "4.1.12",
     "@vitest/coverage-v8": "^4.1.12",
     "autoprefixer": "^10.6.1",
-    "dependency-cruiser": "^18.5.0",
+    "dependency-cruiser": "^18.7.2",
     "dotenv-cli": "^11.0.0",
     "esbuild": "^0.25.0",
     "eslint": "^9.39.5",
